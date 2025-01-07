@@ -1,6 +1,6 @@
 ---
-id: "COD-001"
-category: "codebase"
+id: "APP-SRC-001"
+category: "application-security/source-code"
 revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "15m"
