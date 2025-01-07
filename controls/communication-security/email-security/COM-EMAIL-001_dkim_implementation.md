@@ -5,8 +5,8 @@ revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "30m"
 frameworks:
-  - name: "soc2"
-	sections: ["CC6.1", "CC6.8"]
+    - name: "soc2"
+      sections: ["CC6.1", "CC6.8"]
 ---
 
 ## Purpose
