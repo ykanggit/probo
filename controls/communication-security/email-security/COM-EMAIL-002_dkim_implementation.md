@@ -15,13 +15,6 @@ adding a digital signature to outgoing messages, allowing receiving
 mail systems to verify that emails genuinely came from your domain and
 weren't modified in transit.
 
-## Risk Assessment
-
-| Risk                            | Impact | Reason                                                               |
-|---------------------------------|--------|----------------------------------------------------------------------|
-| Phishing and Social Engineering | 8      | Reduces phishing by preventing email spoofing of company domains     |
-| Business Email Compromise (BEC) | 8      | Prevents attackers from impersonating trusted partners or executives |
-
 ## Implementation
 
 ### Google Workspace

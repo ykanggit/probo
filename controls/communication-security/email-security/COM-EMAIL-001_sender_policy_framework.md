@@ -16,13 +16,6 @@ domain. It helps receiving mail servers verify that incoming email
 from a domain comes from a host authorized by that domain's
 administrators.
 
-## Risk Assessment
-
-| Risk                            | Impact | Reason                                                               |
-|---------------------------------|--------|----------------------------------------------------------------------|
-| Phishing and Social Engineering | 8      | Reduces phishing by preventing email spoofing of company             |
-| Business Email Compromise (BEC) | 8      | Prevents attackers from impersonating trusted partners or executives |
-
 ## Implementation
 
 1. Identify all legitimate email sources:
