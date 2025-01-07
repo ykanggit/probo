@@ -1,6 +1,6 @@
 ---
 id: "APP-SRC-002"
-category: "codebase"
+category: "application-security/source-code"
 revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "15m"
