@@ -26,6 +26,7 @@ production and maintains adherence to coding standards.
 3. Enter the branch name (e.g. "main") in the branch name pattern
    field.
 4. Enable: "Require a pull request before merging"
+5. Click Create or Save to apply the rule
 
 ## Evidence
 
