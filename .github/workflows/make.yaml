@@ -1,0 +1,17 @@
+name: "make"
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  fmt-check:
+    name: "fmt-check"
+    runs-on: "ubuntu-22.04"
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: "actions/setup-node@v4"
+      - run: "make fmt-check"
