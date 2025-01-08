@@ -1,6 +1,6 @@
 ---
-id: "COM-EMAIL-002"
-category: "communication-security/email-security"
+id: "PLT-EMAIL-002"
+category: "platform/email-security"
 revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "30m"

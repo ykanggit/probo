@@ -1,6 +1,6 @@
 ---
-id: "APP-SRC-004"
-category: "application-security/source-code"
+id: "COD-004"
+category: "code"
 revision-version: 1
 revision-date: "2024-01-08"
 estimate-time: "1h"
