@@ -1,9 +1,7 @@
 NPX?=	npx
 PRETTIER?=	$(NPX) prettier
 
-
 CONTROL_SRC:=	$(shell find ./controls -type f -name "*.md")
-
 
 .PHONY: all
 all: fmt
