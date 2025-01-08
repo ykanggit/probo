@@ -5,16 +5,16 @@ revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "30m"
 frameworks:
-    - name: "soc2"
-      sections: ["CC6.1", "CC6.8"]
+  - name: "soc2"
+    sections: ["CC6.1", "CC6.8"]
 ---
 
 ## Purpose
-SPF (Sender Policy Framework) prevents email spoofing by defining
-which mail servers are authorized to send emails on behalf of your
-domain. It helps receiving mail servers verify that incoming email
-from a domain comes from a host authorized by that domain's
-administrators.
+
+SPF (Sender Policy Framework) prevents email spoofing by defining which mail
+servers are authorized to send emails on behalf of your domain. It helps
+receiving mail servers verify that incoming email from a domain comes from a
+host authorized by that domain's administrators.
 
 ## Implementation
 
@@ -35,10 +35,9 @@ administrators.
    - Create TXT record at domain root
    - Publish SPF record in DNS
    - Wait for DNS propagation
-   
+
 ## Evidence
 
 - Screenshot of published SPF DNS record
 - Email header samples showing SPF pass
 - Documentation of authorized senders
-

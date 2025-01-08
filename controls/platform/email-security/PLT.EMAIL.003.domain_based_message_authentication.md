@@ -15,16 +15,18 @@ frameworks:
 ---
 
 ## Purpose
-DMARC (Domain-based Message Authentication, Reporting, and
-Conformance) is a policy framework that builds upon SPF and DKIM. It
-tells receiving servers what to do when emails fail SPF or DKIM
-checks, and provides reporting on authentication results.
+
+DMARC (Domain-based Message Authentication, Reporting, and Conformance) is a
+policy framework that builds upon SPF and DKIM. It tells receiving servers what
+to do when emails fail SPF or DKIM checks, and provides reporting on
+authentication results.
 
 ## Implementation
 
 ### Google Workspace
 
-1. Create a Google Group named `dmarc-report@example.com` which is assecible from external users.
+1. Create a Google Group named `dmarc-report@example.com` which is assecible
+   from external users.
 2. Create DMARC record in monitoring mode:
    ```
    Record: _dmarc.example.com
@@ -38,5 +40,6 @@ checks, and provides reporting on authentication results.
    authentication of emails.
 
 ## Evidence
+
 - Screenshot of DMARC DNS record
 - Sample aggregate reports

@@ -5,14 +5,14 @@ revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "15m"
 frameworks:
-    - name: "soc2"
-      sections: ["CC4.1", "CC8.1"]
+  - name: "soc2"
+    sections: ["CC4.1", "CC8.1"]
 ---
 
 ## Purpose
-It ensures that potential security flaws are detected early. This
-proactive approach strengthens your security posture and helps
-maintain high code quality.
+
+It ensures that potential security flaws are detected early. This proactive
+approach strengthens your security posture and helps maintain high code quality.
 
 ## Implementation
 
@@ -23,8 +23,8 @@ maintain high code quality.
 3. Select "Set up this workflow" under "CodeQL Analysis".
 4. Review the YAML file and commit it to your repository.
 
-Code scanning will now run every time code is pushed to the
-repository, and results will appear in the Security tab.
+Code scanning will now run every time code is pushed to the repository, and
+results will appear in the Security tab.
 
 ## Evidence
 
