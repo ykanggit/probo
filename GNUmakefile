@@ -2,7 +2,7 @@ NPX?=	npx
 PRETTIER?=	$(NPX) prettier
 
 .PHONY: all
-all:
+all: fmt
 
 .PHONY: fmt
 fmt:
