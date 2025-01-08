@@ -22,21 +22,19 @@ access.
 1. Enable FileVault
    - System Settings → Privacy & Security
 
-
 ### Windows
 
 1. Enable BitLocker
    - Control Panel → System and Security
-   
-   
+
 ## Evidence
 
 **Option 1**: MDM Solution
+
 - Encryption status report
 - Device inventory status
 
 **Option 2**: Manual Documentation
+
 - Screenshots of encryption status
 - Device inventory with status
-
-

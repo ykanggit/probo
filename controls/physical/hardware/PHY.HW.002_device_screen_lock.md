@@ -23,7 +23,7 @@ company data and resources.
    - Maximum 5-minute timeout
    - Require password/biometrics to unlock
    - Disable bypass options
-   
+
 ### MacOS
 
 1. Apple menu → System Settings → Lock Screen
@@ -34,16 +34,14 @@ company data and resources.
 1. Settings → Personalization → Lock screen
 2. Enable "Require sign-in when PC wakes"
 
-
 ## Evidence
 
 **Option 1**: MDM Solution
+
 - Screen lock policy compliance report
 - Configuration status dashboard
 
 **Option 2**: Manual Documentation
+
 - Screenshots of screen lock settings
 - Device compliance checklist
-
-
-
