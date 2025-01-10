@@ -24,7 +24,7 @@ we work, and what we do.
 > You’re now ready to present yourself to the team!
 
 
--[ ] Share a few things about you in #all_people in Slack: who are
+- [ ] Share a few things about you in #all_people in Slack: who are
 you, where do you come from, what was your journey until now, whatever
 fun fact you’d like to share with us, … you can draw some inspiration
 by looking at the previous ones 🙂
