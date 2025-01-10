@@ -11,23 +11,22 @@ frameworks:
 
 ## Purpose
 
-Yes, people will leave your company (either by your decision or
-theirs). And you want to be prepare! If an early employee leaves and
-you forgot to change the ownership on his/her document, you might lose
-the documents.
+Yes, people will leave your company (either by your decision or theirs). And you
+want to be prepare! If an early employee leaves and you forgot to change the
+ownership on his/her document, you might lose the documents.
 
-Also, you want to be sure people can’t access the company data or
-systems once they left!
+Also, you want to be sure people can’t access the company data or systems once
+they left!
 
 ## Implementation
 
-
 1. Integrate the following elements in your offboarding checklist:
+
    - Return of company assets (laptop etc.)
    - Transfer ownership of documents
    - Revoke all access to systems
 
-	(if you don't have an offboarding checklist → [Offboarding admin checklist](data/offboarding-admin-checklist.md))
+   (if you don't have an offboarding checklist →
+   [Offboarding admin checklist](data/offboarding-admin-checklist.md))
 
-2. Upload a screenshot of your checklist that contains those bullet
-   points below
+2. Upload a screenshot of your checklist that contains those bullet points below
