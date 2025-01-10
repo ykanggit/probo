@@ -1,4 +1,4 @@
-# Probo Controls
+# Probo
 ## Community
 
 Collaborate on open-source security compliance tools with fellow experts.
