@@ -1,4 +1,9 @@
 # Probo Controls
+## Community
+
+Collaborate on open-source security compliance tools with fellow experts.
+
+[Join our Discord Community →](https://discord.gg/8qfdJYfvpY)
 
 ## Contributing
 
