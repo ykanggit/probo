@@ -24,7 +24,7 @@ right, it is only about documenting it.
 
 ⇒ Define the recruitment process you follow when bringing on a new member (if
 you don’t have one formalized, here is a structure:
-[Recruitment process](data/recruitment-process.md)).
+[Recruitment process](templates/recruitment-process.md)).
 
 ## Evidence
 

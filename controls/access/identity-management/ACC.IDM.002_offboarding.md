@@ -27,6 +27,6 @@ they left!
    - Revoke all access to systems
 
    (if you don't have an offboarding checklist →
-   [Offboarding admin checklist](data/offboarding-admin-checklist.md))
+   [Offboarding admin checklist](templates/offboarding-admin-checklist.md))
 
 2. Upload a screenshot of your checklist that contains those bullet points below
