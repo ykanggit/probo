@@ -11,8 +11,8 @@ frameworks:
 
 ## Purpose
 
-You know how critical a data center is. You don’t want unauthorized
-people to access it.
+You know how critical a data center is. You don’t want unauthorized people to
+access it.
 
 ## Implementation
 
@@ -21,7 +21,6 @@ people to access it.
 Nothing, it is already done
 
 > Evidence to provide: https://cloud.google.com/trust-center?hl=en
-
 
 ## Evidence
 
