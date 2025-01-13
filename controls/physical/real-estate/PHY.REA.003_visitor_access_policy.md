@@ -18,5 +18,10 @@ regarding visitors.
 
 ## Implementation
 
+Nothing, it is done! The element below will be added to your access
+policy.
+
+## Evidence
+
 Visitors must be accompanied by an employee at all times when they are
 on premises.
