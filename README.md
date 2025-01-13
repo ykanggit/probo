@@ -24,7 +24,7 @@ Soon, we will add:
 
 - Star the repo
 - [Join our Discord →](https://discord.gg/8qfdJYfvpY)
-- Contributions are most welcomed
+- [Contributions](CONTRIBUTING.md) are most welcomed
 - Submit a [feature request](https://github.com/getprobo/probo/issues/new) or [bug report](https://github.com/getprobo/probo/issues/new)
 
 ## License
