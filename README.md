@@ -1,14 +1,30 @@
-# Probo
-## Community
+# Probo, the Open-Source compliance platform
 
-Collaborate on open-source security compliance tools with fellow experts.
+## Why another compliance platform?
 
-[Join our Discord Community →](https://discord.gg/8qfdJYfvpY)
+We build Probo for three reasons:
 
-## Contributing
+**Existing solutions are behing a paywall and too expensive.** Compliance frameworks often push good practices, the security measures should be accessible to all.
 
-We love contributions; even the smallest ones are welcome:
-- Open a pull request
+**Reinvent the journey.** We want to start from scratch, exploiting past issues to craft a new experience.
+
+**We believe in Open-source and community.** It impacts almost all companies, the whole ecosystem should benefit from it. 
+
+## What can you do with Probo today?
+Not much yet. But it is only the beggining of the journey.
+So far, you have access to **all the security measures necessary to prepare a SOC 2 audit**. 
+
+Soon, we will add:
+- End-to-end platform
+- Personnalized policy generation (based on the security measure implemented)
+- Integration with Google Workplaces, Github, GCP & AWS
+- Support for ISO 27001 and GDPR
+
+## Join the community
+
+- Star the repo
+- [Join our Discord →](https://discord.gg/8qfdJYfvpY)
+- Contributions are most welcomed
 - Submit a [feature request](https://github.com/getprobo/probo/issues/new) or [bug report](https://github.com/getprobo/probo/issues/new)
 
 ## License
