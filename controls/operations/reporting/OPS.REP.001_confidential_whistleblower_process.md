@@ -1,6 +1,6 @@
 ---
 id: "OPS-REP-001"
-category: "access/identity-management"
+category: "operations/reporting"
 revision-version: 1
 revision-date: "2024-01-13"
 estimate-time: "15m"
@@ -11,20 +11,19 @@ frameworks:
 
 ## Purpose
 
-It encourages and enables employees to raise serious concerns
-(violations of your code of ethics or law or regulations) in order for
-them to be addressed and corrected while being protected from any
-retaliation.
+It encourages and enables employees to raise serious concerns (violations of
+your code of ethics or law or regulations) in order for them to be addressed and
+corrected while being protected from any retaliation.
 
 ## Implementation
 
 ### Google Workspace
 
-1. Set up an anonymous [Google
-   form](https://html.form.guide/google-forms/make-google-form-survey-anonymous/)
+1. Set up an anonymous
+   [Google form](https://html.form.guide/google-forms/make-google-form-survey-anonymous/)
 
-2. Communicate the link to your employees by explaining how and why
-   they should use it.
+2. Communicate the link to your employees by explaining how and why they should
+   use it.
 
 ## Evidence
 
