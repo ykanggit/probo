@@ -41,5 +41,5 @@ someone leaves the organization.
 
 ## Evidence
 
-- Screenshot of SSO activation for Google Workplace + your cloud
-  provider + code hosting tool
+- Screenshot of SSO activation for Google Workplace + your cloud provider + code
+  hosting tool
