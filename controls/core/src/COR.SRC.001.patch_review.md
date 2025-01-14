@@ -1,13 +1,16 @@
 ---
-id: "COD-001"
-category: "code"
+id: "COR.SRC.001"
+category: "core/src"
 revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "15m"
+necessity: "mandatory"
 frameworks:
   - name: "soc2"
     sections: ["CC1.4", "CC5.2", "CC8.1"]
 ---
+
+# Code Review
 
 ## Purpose
 

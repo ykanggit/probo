@@ -1,13 +1,16 @@
 ---
-id: "COD-002"
-category: "code"
+id: "COR.SRC.002"
+category: "core/src"
 revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "15m"
+necessity: "optional"
 frameworks:
   - name: "soc2"
     sections: ["CC4.1", "CC8.1"]
 ---
+
+# Configure Code Scanning
 
 ## Purpose
 
