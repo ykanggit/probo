@@ -1,19 +1,23 @@
 ---
-id: "PHY-REA-003"
-category: "physical/real-estate"
+id: "PHY.FAC.003"
+category: "physical/facilities"
 revision-version: 1
 revision-date: "2024-01-13"
 estimate-time: "15m"
+necessity: "mandatory"
 frameworks:
   - name: "soc2"
     sections: ["CC6.4"]
 ---
 
+# Implement Visitor Access Policies
+
 ## Purpose
 
-Even if you do most of your business online, you still have offices, computers
-or even printed document: you need to make sure those assets are physically
-secured (we will focus on the digital access later) regarding visitors.
+Even if you do most of your business online, you still have offices,
+computers or even printed document: you need to make sure those assets
+are physically secured (we will focus on the digital access later)
+regarding visitors.
 
 ## Implementation
 

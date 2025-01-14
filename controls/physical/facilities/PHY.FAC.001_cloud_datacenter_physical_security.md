@@ -1,13 +1,16 @@
 ---
-id: "PHY-REA-001"
-category: "physical/real-estate"
+id: "PHY.FAC.001"
+category: "physical/facilities"
 revision-version: 1
 revision-date: "2024-01-13"
 estimate-time: "15m"
+necessity: "optional"
 frameworks:
   - name: "soc2"
     sections: ["CC6.4"]
 ---
+
+# Cloud datacenter physical security
 
 ## Purpose
 
