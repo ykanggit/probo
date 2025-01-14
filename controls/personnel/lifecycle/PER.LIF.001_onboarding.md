@@ -23,8 +23,8 @@ It is the perfect timing to ensure that every employees has:
 ## Implementation
 
 In theory, you already have an onboarding plan for your new employees (if not,
-[Onboarding for new joiner](templates/onboarding-for-new-joiner.md)) and a to-do for
-your admin running the onboarding (if not,
+[Onboarding for new joiner](templates/onboarding-for-new-joiner.md)) and a to-do
+for your admin running the onboarding (if not,
 [Onboarding admin checklist](templates/onboarding-admin-checklist.md)).
 
 On your employee to-do, be sure to include:
