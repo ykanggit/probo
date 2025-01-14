@@ -1,18 +1,21 @@
 ---
-id: "PLT-EMAIL-003"
-category: "platform/email-security"
+id: "PER.COM.003"
+category: "personnel/comms"
 revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "30m"
+necessity: "mandatory"
 related:
-    - id: "COM-EMAIL-001"
+    - id: "PER.COM.001"
 	  required: true
-	- id: "COM-EMAIL-002"
+	- id: "PER.COM.002"
 	  required: true
 frameworks:
     - name: "soc2"
       sections: ["CC6.1", "CC6.8"]
 ---
+
+# Configure DMARC for Email Authentication
 
 ## Purpose
 

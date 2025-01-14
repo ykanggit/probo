@@ -1,13 +1,16 @@
 ---
-id: "ACC-IDM-003"
-category: "access/identity-management"
+id: "PER.LIF.003"
+category: "personnel/lifecycle"
 revision-version: 1
 revision-date: "2024-01-10"
 estimate-time: "30m"
+necessity: "mandatory"
 frameworks:
   - name: "soc2"
     sections: ["CC1.4", "CC5.3"]
 ---
+
+# Know your recruits
 
 ## Purpose
 

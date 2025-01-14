@@ -1,13 +1,16 @@
 ---
-id: "PLT-EMAIL-002"
-category: "platform/email-security"
+id: "PER.COM.002"
+category: "personnel/comms"
 revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "30m"
+necessity: "mandatory"
 frameworks:
   - name: "soc2"
     sections: ["CC6.1", "CC6.8"]
 ---
+
+# Configure DKIM for Email Authentication
 
 ## Purpose
 

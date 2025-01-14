@@ -1,13 +1,16 @@
 ---
-id: "OPS.TRN-001"
+id: "PER.LIF.007"
 category: "operations/training"
 revision-version: 1
 revision-date: "2024-01-13"
 estimate-time: "30m"
+necessity: "optional"
 frameworks:
   - name: "soc2"
     sections: ["CC1.4", "CC2.2"]
 ---
+
+# Train your employees on security
 
 ## Purpose
 

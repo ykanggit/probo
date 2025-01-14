@@ -1,13 +1,16 @@
 ---
-id: "PLT-EMAIL-001"
-category: "platform/email-security"
+id: "PER.COM.001"
+category: "personnel/comms"
 revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "30m"
+necessity: "mandatory"
 frameworks:
   - name: "soc2"
     sections: ["CC6.1", "CC6.8"]
 ---
+
+# Configure SPF for Email Authentication
 
 ## Purpose
 

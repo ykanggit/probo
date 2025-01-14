@@ -1,13 +1,16 @@
 ---
-id: "PLT-EMAIL-004"
-category: "platform/email-security"
+id: "PER.COM.004"
+category: "personnel/comms"
 revision-version: 1
 revision-date: "2024-01-07"
 estimate-time: "15m"
+necessity: "mandatory"
 frameworks:
   - name: "soc2"
     sections: ["CC6.8", "CC7.2"]
 ---
+
+# Configure Email Security Filters 
 
 ## Purpose
 

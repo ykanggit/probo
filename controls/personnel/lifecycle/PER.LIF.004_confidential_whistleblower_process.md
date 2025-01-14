@@ -1,13 +1,16 @@
 ---
-id: "OPS-REP-001"
-category: "operations/reporting"
+id: "PER.LIF.004"
+category: "personnel/lifecycle"
 revision-version: 1
 revision-date: "2024-01-13"
 estimate-time: "15m"
+necessity: "mandatory"
 frameworks:
   - name: "soc2"
     sections: ["CC2.2"]
 ---
+
+# Implement confidential whistleblower process
 
 ## Purpose
 

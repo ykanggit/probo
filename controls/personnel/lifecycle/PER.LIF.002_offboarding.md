@@ -1,13 +1,16 @@
 ---
-id: "ACC-IDM-002"
-category: "access/identity-management"
+id: "PER.LIF.002"
+category: "personnel/lifecycle"
 revision-version: 1
 revision-date: "2024-01-10"
 estimate-time: "30m"
+necessity: "mandatory"
 frameworks:
   - name: "soc2"
     sections: ["CC5.3", "CC6.2", "CC6.5"]
 ---
+
+# Properly off-board your employees
 
 ## Purpose
 
@@ -30,3 +33,7 @@ they left!
    [Offboarding admin checklist](templates/offboarding-admin-checklist.md))
 
 2. Upload a screenshot of your checklist that contains those bullet points below
+
+## Evidence
+
+- Screenshot of a completed admin checklist for offboarding

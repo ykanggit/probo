@@ -1,13 +1,16 @@
 ---
-id: "OPS-REP-003"
-category: "operations/reporting"
+id: "PER.LIF.006"
+category: "personnel/lifecycle"
 revision-version: 1
 revision-date: "2024-01-13"
 estimate-time: "15m"
+necessity: "mandatory"
 frameworks:
   - name: "soc2"
     sections: ["CC1.2", "CC1.3", "CC1.5", "CC2.2", "CC4.3"]
 ---
+
+# Specify security responsabilities
 
 ## Purpose
 

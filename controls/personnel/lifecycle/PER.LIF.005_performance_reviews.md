@@ -1,13 +1,16 @@
 ---
-id: "OPS-REP-002"
-category: "operations/reporting"
+id: "PER.LIF.005"
+category: "personnel/lifecycle"
 revision-version: 1
 revision-date: "2024-01-13"
 estimate-time: "30m"
+necessity: "optional"
 frameworks:
   - name: "soc2"
     sections: ["CC1.3", "CC1.4", "CC1.5", "CC4.2", "CC5.3"]
 ---
+
+# Run performance reviews
 
 ## Purpose
 

@@ -1,13 +1,16 @@
 ---
-id: "ACC-IDM-001"
-category: "access/identity-management"
+id: "PER.LIF.001"
+category: "personnel/lifecycle"
 revision-version: 1
 revision-date: "2024-01-10"
 estimate-time: "30m"
+necessity: "mandatory"
 frameworks:
   - name: "soc2"
     sections: ["CC1.4", "CC5.3"]
 ---
+
+# Integrate security checklist in your onboarding process
 
 ## Purpose
 
@@ -20,7 +23,7 @@ It is the perfect timing to ensure that every employees has:
 ## Implementation
 
 In theory, you already have an onboarding plan for your new employees (if not,
-Onboarding for new joiner](data/onboarding-for-new-joiner.md)) and a to-do for
+[Onboarding for new joiner](data/onboarding-for-new-joiner.md)) and a to-do for
 your admin running the onboarding (if not,
 [Onboarding admin checklist](templates/onboarding-admin-checklist.md)).
 
@@ -41,3 +44,4 @@ On your admin to-do, be sure to include:
 ## Evidence
 
 - Screenshots of a completed onboarding checklists.
+- Screenshots of a completed admin checklist for new joiner.
