@@ -15,24 +15,21 @@ frameworks:
 ## Purpose
 
 In short, implementing a VPN will encrypt your data and ensure a safe
-transmission between your employees devices and your internal network
-(even when using untrusted networks like a public wifi) ⇒ it offers a
-layer of security for your data.
+transmission between your employees devices and your internal network (even when
+using untrusted networks like a public wifi) ⇒ it offers a layer of security for
+your data.
 
 ## Implementation
 
-> If you have doubt whether you should do it or not, ping us on
-> Discord.
-<br/>
-> If everything is on Google Suite/Notion/Slack with MFA and you don’t
-> have your own network => no needed.
+> If you have doubt whether you should do it or not, ping us on Discord. <br/>
+> If everything is on Google Suite/Notion/Slack with MFA and you don’t have your
+> own network => no needed.
 
-If you think you need one, you should consider deploying one and make
-it mandatory when working remote => You can follow the [Wireguard
-installation guide there](https://www.wireguard.com/install/).
-
+If you think you need one, you should consider deploying one and make it
+mandatory when working remote => You can follow the
+[Wireguard installation guide there](https://www.wireguard.com/install/).
 
 ## Evidence
 
-- Screenshot of VPN settings page (to show active use) or log of VPN
-  connection from employees device.
+- Screenshot of VPN settings page (to show active use) or log of VPN connection
+  from employees device.

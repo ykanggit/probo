@@ -20,10 +20,9 @@ secured (we will focus on the digital access later).
 
 ## Implementation
 
-If you are working from a co-working space or subleasing offices, you
-don’t have much do to. Provide a link to their access policy and the
-dashboard they probably provide to manage the list of authorized
-personnel.
+If you are working from a co-working space or subleasing offices, you don’t have
+much do to. Provide a link to their access policy and the dashboard they
+probably provide to manage the list of authorized personnel.
 
 If you have your own office space, you need to provide:
 

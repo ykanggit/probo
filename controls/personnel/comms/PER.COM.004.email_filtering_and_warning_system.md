@@ -10,7 +10,7 @@ frameworks:
     sections: ["CC6.8", "CC7.2"]
 ---
 
-# Configure Email Security Filters 
+# Configure Email Security Filters
 
 ## Purpose
 

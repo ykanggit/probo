@@ -14,10 +14,9 @@ frameworks:
 
 ## Purpose
 
-Even if you do most of your business online, you still have offices,
-computers or even printed document: you need to make sure those assets
-are physically secured (we will focus on the digital access later)
-regarding visitors.
+Even if you do most of your business online, you still have offices, computers
+or even printed document: you need to make sure those assets are physically
+secured (we will focus on the digital access later) regarding visitors.
 
 ## Implementation
 

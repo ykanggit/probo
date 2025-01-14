@@ -14,9 +14,9 @@ frameworks:
 
 ## Purpose
 
-Ensure all employee devices have disk encryption and firewall
-protection enabled to secure data at rest and protect network
-communications from unauthorized access.
+Ensure all employee devices have disk encryption and firewall protection enabled
+to secure data at rest and protect network communications from unauthorized
+access.
 
 ## Implementation
 
