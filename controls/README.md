@@ -92,11 +92,11 @@ SOC 2 is about showing how you operate—document and share your processes.
 
 ### Review and keep things up to date
 
-## Why does it matter?
+#### Why does it matter?
 
 Your company changes over time, and so should your security posture.
 
-## How can I proceed?
+#### How can I proceed?
 
 Some things don’t need review (eg: MFA is enabled), but your infrastructure and
 your employee are changing.
