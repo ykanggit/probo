@@ -85,3 +85,7 @@ Keep your partnerships secure by managing third-party risks.
 ### Transparency
 
 SOC 2 is about showing how you operate—document and share your processes.
+
+- [Have a security page](TRA.001_have_a_security_page.md)
+- [Clearly explain your services](transparency/TRA.002_clearly_explain_your_services.md)
+- [External support available](TRA.003_external_support_available.md)
