@@ -89,3 +89,21 @@ SOC 2 is about showing how you operate—document and share your processes.
 - [Have a security page](TRA.001_have_a_security_page.md)
 - [Clearly explain your services](transparency/TRA.002_clearly_explain_your_services.md)
 - [External support available](TRA.003_external_support_available.md)
+
+### Review and keep things up to date
+
+## Why does it matter?
+
+Your company changes over time, and so should your security posture.
+
+## How can I proceed?
+
+Some things don’t need review (eg: MFA is enabled), but your infrastructure and
+your employee are changing.
+
+⇒ You need to make sure people and digital asset with access are the one working
+today in/with your company.
+
+- [Remove unauthorized assets](core/infra/COR.INF.007_asset_decommissioning.md)
+- [Conduct an access reviews](personnel/access/PER.ACC.006_periodic_access_review.md)
+- [Test your disaster recovery plan](operations/incidents/OPS.INC.003_drp_testing.md)
