@@ -19,3 +19,11 @@ The main idea is to follow those principles:
    passwords/access
 3. **Continuous update:** making sure the privileges are up to date and you use
    the latest best practices
+
+## Mitigations
+
+- [Enable MFA on critical services](PER.ACC.001_mfa_on_critical_services.md)
+- [Access Request Process](PER.ACC.002_access_request_process.md)
+- [Setup a password manager](PER.ACC.003_password_manager.md)
+- [Setup Role Based Access Control](PER.ACC.004_role_based_access_control.md)
+- [Enforce SSO when possible](PER.ACC.005_enforce_single_sign_on.md)

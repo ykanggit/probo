@@ -17,3 +17,10 @@ We break this into two main areas of focus:
    unauthorized entry.
 2. **Internet Security:** Ensure that members of your teams or contractors that
    work remotely have a secure access to internet.
+
+## Mitigations
+
+- [Cloud datacenter physical security](PHY.FAC.001_cloud_datacenter_physical_security.md)
+- [Implement Physical Access Control](PHY.FAC.002_physical_access_control.md)
+- [Implement Visitor Access Policies](PHY.FAC.003_visitor_access_policy.md)
+- [Use VPNs to Secure Access for Remote Devices](PHY.FAC.004_virtual_private_network.md)

@@ -12,3 +12,10 @@ client information.
 
 Implement measures to protect data from unauthorized access and set up processes
 to regularly secure and monitor its location.
+
+## Mitigations
+
+- [Automated backup](COR.DAT.001_automated_backup.md)
+- [Help the auditor with a data-flow diagram](COR.DAT.002_data_flow_diagram.md)
+- [Encrypt your data storage](COR.DAT.003_data_at_rest.md)
+- [Encrypt your data in transit](COR.DAT.004_tls.md)

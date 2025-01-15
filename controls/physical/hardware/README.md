@@ -17,3 +17,9 @@ machine, you need:
 - Firewall is active
 - Anti-malware detection is active
 - Data is encrypted
+
+## Mitigations
+
+- [Configure Anti-malware Protection on Employee Devices](PHY.HW.001_endpoint_antimalware.md)
+- [Configure Automatic Screen Lock on Employee Devices](PHY.HW.002_device_screen_lock.md)
+- [Configure Disk Encryption and Firewall on Employee Devices](PHY.HW.003_device_encryption.md)

@@ -16,3 +16,10 @@ helps you scale your engineering team.
 - **Implement structured processes:** Define a development lifecycle for
   software, adopt Infrastructure-as-Code (IaC), and deploy configuration
   management systems to maintain consistency and security.
+
+## Mitigations
+
+- [Code Review](COR.SRC.001.patch_review.md)
+- [Configure Code Scanning](COR.SRC.002.enable_code_scanning.md)
+- [Configure Dependancy Vulnerability Alerts](COR.SRC.003.dependancy_vulnerability_alerts.md)
+- [Document your Development Lifecycle](COR.SRC.004.systems_development_life_cycle.md)

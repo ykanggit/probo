@@ -9,3 +9,8 @@ impacts.
 ## How can I proceed?
 
 Create a procedure to restore services and test it
+
+## Mitigations
+
+- [Build an incident response process](OPS.INC.001_incident_response_process.md)
+- [Disaster Recovery Plan](OPS.INC.002_drp.md)
