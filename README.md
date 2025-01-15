@@ -1,4 +1,4 @@
-# Probo, the Open-Source compliance platform
+![probo banner](https://raw.githubusercontent.com/getprobo/.github/main/profile/banner.png)
 
 ## Why another compliance platform?
 
