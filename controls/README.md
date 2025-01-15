@@ -13,14 +13,15 @@ labelled with three levels:
   those, your auditor or customer will ask questions, you better justify it.
 - **Optional** – Your auditor or customer might ask questions if any of those
   elements are necessary to mitigate a risk you have.
-    <aside>
+
+    <details>
     🗣
     
     A good example is penetration testing.
     
     - Penetration tests are expensive, but they can be a good investment, especially if you are running into a prospect requiring it
     - However they probably wont make sense if you are at the MVP stage and you are gonna trash and rebuild your product in a few month
-    </aside>
+    </details>
 
 - **Advanced** – They show a great commitment toward security. Unless it is the
   only way to mitigate a risk very specific to your company, you won’t be asked
@@ -31,19 +32,19 @@ labelled with three levels:
 We have regrouped what you need to do by different thematic in order to setup
 the proper foundations for your company to get SOC-2:
 
-<aside>
+<details>
 
-- **Pro tip:** Setup screenshot to clipboard You will have to take quite a lot
-  of screenshot until we automate most of it. We recommend that you setup a
-  screenshot to clipboard so you can just take a screenshot and paste-it saving
-  you ton of time. On mac:
+**Pro tip:** Setup screenshot to clipboard You will have to take quite a lot of
+screenshot until we automate most of it. We recommend that you setup a
+screenshot to clipboard so you can just take a screenshot and paste-it saving
+you ton of time. On mac:
 
-      - Use **CMD + SHIFT + 5** to enter screenshot mode
-      - Click options, to change “save to” to “clipboard”
-      - Now you can use **CMD + SHIFT + 3** to take a screenshot to clipboard
-      - And paste it in the right place with **CMD + V**
+- Use **CMD + SHIFT + 5** to enter screenshot mode
+- Click options, to change “save to” to “clipboard”
+- Now you can use **CMD + SHIFT + 3** to take a screenshot to clipboard
+- And paste it in the right place with **CMD + V**
 
-</aside>
+</details>
 
 ### Physical assets
 
