@@ -4,7 +4,7 @@
 
 We build Probo for three reasons:
 
-**Existing solutions are behing a paywall and too expensive.** Compliance frameworks often push good practices, the security measures should be accessible to all.
+**Existing solutions are behind a paywall and too expensive.** Compliance frameworks often push good practices, the security measures should be accessible to all.
 
 **Reinvent the journey.** We want to start from scratch, exploiting past issues to craft a new experience.
 
