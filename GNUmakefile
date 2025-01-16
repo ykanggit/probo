@@ -1,6 +1,9 @@
 NPX?=	npx
 PRETTIER?=	$(NPX) prettier
 GO?=	go
+DOCKER?=	docker
+
+DOCKER_COMPOSE=	$(DOCKER) compose -f compose.yaml $(DOCKER_COMPOSE_FLAGS)
 
 VERSION=	unknown
 LDFLAGS=	-ldflags "-X 'main.version=$(VERSION)' -X 'main.env=prod'"
@@ -41,3 +44,15 @@ fmt-check:
 .PHONY: clean
 clean:
 	$(RM) -rf bin/*
+
+.PHONY: stack-up
+stack-up:
+	$(DOCKER_COMPOSE) up -d
+
+.PHONY: stack-down
+stack-down:
+	$(DOCKER_COMPOSE) down
+
+.PHONY: stack-ps
+stack-ps:
+	$(DOCKER_COMPOSE) ps
