@@ -2,9 +2,11 @@ package probod
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.gearno.de/kit/log"
+	"go.gearno.de/kit/pg"
 	"go.gearno.de/kit/unit"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -15,6 +17,7 @@ type (
 	}
 
 	config struct {
+		Pg pgConfig `json:"pg"`
 	}
 )
 
@@ -24,7 +27,17 @@ var (
 )
 
 func New() *Implm {
-	return &Implm{}
+	return &Implm{
+		cfg: config{
+			Pg: pgConfig{
+				Addr:     "localhost:5432",
+				Username: "probod",
+				Password: "probod",
+				Database: "probod",
+				PoolSize: 100,
+			},
+		},
+	}
 }
 
 func (impl *Implm) GetConfiguration() any {
@@ -37,6 +50,17 @@ func (impl *Implm) Run(
 	r prometheus.Registerer,
 	tp trace.TracerProvider,
 ) error {
+
+	_, err := pg.NewClient(
+		impl.cfg.Pg.Options(
+			pg.WithLogger(l),
+			pg.WithRegisterer(r),
+			pg.WithTracerProvider(tp),
+		)...,
+	)
+	if err != nil {
+		return fmt.Errorf("cannot create pg client: %w", err)
+	}
 
 	l.InfoCtx(parentCtx, "started")
 
