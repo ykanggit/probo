@@ -2,9 +2,15 @@ package probod
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net"
+	"net/http"
+	"sync"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"go.gearno.de/kit/httpserver"
 	"go.gearno.de/kit/log"
 	"go.gearno.de/kit/pg"
 	"go.gearno.de/kit/unit"
@@ -17,7 +23,8 @@ type (
 	}
 
 	config struct {
-		Pg pgConfig `json:"pg"`
+		Pg  pgConfig  `json:"pg"`
+		Api apiConfig `json:"api"`
 	}
 )
 
@@ -29,6 +36,9 @@ var (
 func New() *Implm {
 	return &Implm{
 		cfg: config{
+			Api: apiConfig{
+				Addr: "localhost:8080",
+			},
 			Pg: pgConfig{
 				Addr:     "localhost:5432",
 				Username: "probod",
@@ -50,6 +60,9 @@ func (impl *Implm) Run(
 	r prometheus.Registerer,
 	tp trace.TracerProvider,
 ) error {
+	wg := sync.WaitGroup{}
+	ctx, cancel := context.WithCancelCause(parentCtx)
+	defer cancel(context.Canceled)
 
 	_, err := pg.NewClient(
 		impl.cfg.Pg.Options(
@@ -62,11 +75,73 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot create pg client: %w", err)
 	}
 
-	l.InfoCtx(parentCtx, "started")
+	apiServerCtx, stopApiServer := context.WithCancel(context.Background())
+	defer stopApiServer()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := impl.runApiServer(apiServerCtx, l, r, tp, nil); err != nil {
+			cancel(fmt.Errorf("api server crashed: %w", err))
+		}
+	}()
 
-	<-parentCtx.Done()
+	<-ctx.Done()
 
-	l.InfoCtx(parentCtx, "stopped")
+	stopApiServer()
 
-	return nil
+	wg.Wait()
+
+	return context.Cause(ctx)
+}
+
+func (impl *Implm) runApiServer(
+	ctx context.Context,
+	l *log.Logger,
+	r prometheus.Registerer,
+	tp trace.TracerProvider,
+	handler http.Handler,
+) error {
+	apiServer := httpserver.NewServer(
+		impl.cfg.Api.Addr,
+		handler,
+		httpserver.WithLogger(l),
+		httpserver.WithRegisterer(r),
+		httpserver.WithTracerProvider(tp),
+	)
+
+	l.Info("starting api server", log.String("addr", apiServer.Addr))
+
+	listener, err := net.Listen("tcp", apiServer.Addr)
+	if err != nil {
+		return fmt.Errorf("cannot listen on %q: %w", apiServer.Addr, err)
+	}
+	defer listener.Close()
+
+	serverErrCh := make(chan error, 1)
+	go func() {
+		err := apiServer.Serve(listener)
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			serverErrCh <- fmt.Errorf("cannot server http request: %w", err)
+		}
+		close(serverErrCh)
+	}()
+
+	l.Info("api server started")
+
+	select {
+	case err := <-serverErrCh:
+		return err
+	case <-ctx.Done():
+	}
+
+	l.InfoCtx(ctx, "shutting down api server")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	if err := apiServer.Shutdown(shutdownCtx); err != nil {
+		return fmt.Errorf("cannot shutdown api server: %w", err)
+	}
+
+	return ctx.Err()
 }
