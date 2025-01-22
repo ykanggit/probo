@@ -27,7 +27,7 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 		return nil, fmt.Errorf("cannot list framework controls: %w", err)
 	}
 
-	return types.NewControlConnection(page, cursor), nil
+	return types.NewControlConnection(page), nil
 }
 
 // Frameworks is the resolver for the frameworks field.
