@@ -61,7 +61,6 @@ FROM
 WHERE
     organization_id = @organization_id
     AND %
-ORDER BY name ASC;
 `
 
 	q = fmt.Sprintf(q, cursor.SQLFragment())
