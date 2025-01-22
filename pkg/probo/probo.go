@@ -60,3 +60,24 @@ func (s *Service) ListOrganizationFrameworks(
 
 	return page.NewPage(frameworks, cursor), nil
 }
+
+func (s *Service) ListFrameworkControls(
+	ctx context.Context,
+	frameworkID string,
+	cursor *page.Cursor,
+) (*page.Page[*coredata.Control], error) {
+	var controls coredata.Controls
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return controls.LoadByFrameworkID(ctx, conn, frameworkID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(controls, cursor), nil
+}

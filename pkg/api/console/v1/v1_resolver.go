@@ -20,7 +20,14 @@ func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *
 
 // Controls is the resolver for the controls field.
 func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.ControlConnection, error) {
-	panic(fmt.Errorf("not implemented: Controls - controls"))
+	cursor := types.NewCursor(first, after, last, before)
+
+	page, err := r.svc.ListFrameworkControls(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list framework controls: %w", err)
+	}
+
+	return types.NewControlConnection(page, cursor), nil
 }
 
 // Frameworks is the resolver for the frameworks field.
