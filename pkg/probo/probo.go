@@ -81,3 +81,24 @@ func (s *Service) ListFrameworkControls(
 
 	return page.NewPage(controls, cursor), nil
 }
+
+func (s *Service) ListControlTasks(
+	ctx context.Context,
+	controlID string,
+	cursor *page.Cursor,
+) (*page.Page[*coredata.Task], error) {
+	var tasks coredata.Tasks
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return tasks.LoadByControlID(ctx, conn, controlID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(tasks, cursor), nil
+}

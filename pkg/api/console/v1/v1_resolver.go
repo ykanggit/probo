@@ -15,7 +15,14 @@ import (
 
 // Tasks is the resolver for the tasks field.
 func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskConnection, error) {
-	panic(fmt.Errorf("not implemented: Tasks - tasks"))
+	cursor := types.NewCursor(first, after, last, before)
+
+	page, err := r.svc.ListControlTasks(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list framework controls: %w", err)
+	}
+
+	return types.NewTaskConnection(page), nil
 }
 
 // Controls is the resolver for the controls field.
