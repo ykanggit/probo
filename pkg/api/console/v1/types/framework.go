@@ -5,7 +5,7 @@ import (
 	"github.com/getprobo/probo/pkg/probo/coredata/page"
 )
 
-func NewExecutionConnection(p *page.Page[*coredata.Framework]) *FrameworkConnection {
+func NewFrameworkConnection(p *page.Page[*coredata.Framework]) *FrameworkConnection {
 	var edges = make([]*FrameworkEdge, len(p.Data))
 
 	for i := range edges {
@@ -21,10 +21,10 @@ func NewExecutionConnection(p *page.Page[*coredata.Framework]) *FrameworkConnect
 func NewFrameworkEdge(f *coredata.Framework) *FrameworkEdge {
 	return &FrameworkEdge{
 		Cursor: f.CursorKey(),
-		Node:   NewExecution(f),
+		Node:   NewFramework(f),
 	}
 }
 
-func NewExecution(e *coredata.Framework) *Framework {
+func NewFramework(e *coredata.Framework) *Framework {
 	return &Framework{}
 }

@@ -32,7 +32,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
 	}
 
-	return types.NewExecutionConnection(page), nil
+	return types.NewFrameworkConnection(page), nil
 }
 
 // Node is the resolver for the node field.
