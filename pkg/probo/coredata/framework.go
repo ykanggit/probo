@@ -60,7 +60,7 @@ FROM
     frameworks
 WHERE
     organization_id = @organization_id
-    AND %
+    AND %s
 `
 
 	q = fmt.Sprintf(q, cursor.SQLFragment())

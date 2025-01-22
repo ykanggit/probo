@@ -61,7 +61,7 @@ FROM
     controls
 WHERE
     framework_id = @framework_id
-    AND %
+    AND %s
 `
 	q = fmt.Sprintf(q, cursor.SQLFragment())
 
