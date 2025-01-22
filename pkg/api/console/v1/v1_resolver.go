@@ -19,7 +19,7 @@ func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *
 
 	page, err := r.svc.ListControlTasks(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list framework controls: %w", err)
+		return nil, fmt.Errorf("cannot list control tasks: %w", err)
 	}
 
 	return types.NewTaskConnection(page), nil
