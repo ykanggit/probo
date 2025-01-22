@@ -2,6 +2,10 @@
 
 package console_v1
 
+import "github.com/getprobo/probo/pkg/probo"
+
 type (
-	Resolver struct{}
+	Resolver struct {
+		svc *probo.Service
+	}
 )

@@ -4,6 +4,8 @@ package types
 
 import (
 	"time"
+
+	"github.com/getprobo/probo/pkg/probo/coredata/page"
 )
 
 type Node interface {
@@ -29,8 +31,8 @@ type ControlConnection struct {
 }
 
 type ControlEdge struct {
-	Cursor string   `json:"cursor"`
-	Node   *Control `json:"node"`
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Control       `json:"node"`
 }
 
 type Framework struct {
@@ -51,8 +53,8 @@ type FrameworkConnection struct {
 }
 
 type FrameworkEdge struct {
-	Cursor string     `json:"cursor"`
-	Node   *Framework `json:"node"`
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Framework     `json:"node"`
 }
 
 type Organization struct {
@@ -67,10 +69,10 @@ func (Organization) IsNode()            {}
 func (this Organization) GetID() string { return this.ID }
 
 type PageInfo struct {
-	HasNextPage     bool    `json:"hasNextPage"`
-	HasPreviousPage bool    `json:"hasPreviousPage"`
-	StartCursor     *string `json:"startCursor,omitempty"`
-	EndCursor       *string `json:"endCursor,omitempty"`
+	HasNextPage     bool            `json:"hasNextPage"`
+	HasPreviousPage bool            `json:"hasPreviousPage"`
+	StartCursor     *page.CursorKey `json:"startCursor,omitempty"`
+	EndCursor       *page.CursorKey `json:"endCursor,omitempty"`
 }
 
 type Query struct {
@@ -92,6 +94,6 @@ type TaskConnection struct {
 }
 
 type TaskEdge struct {
-	Cursor string `json:"cursor"`
-	Node   *Task  `json:"node"`
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Task          `json:"node"`
 }

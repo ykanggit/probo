@@ -1,3 +1,5 @@
+gearno.de/ref v0.0.0-20221013162104-a522beda40f4 h1:tS3oPI89+Y33vZRR/DwbNTewefycz1UzEeDYgMKNdzY=
+gearno.de/ref v0.0.0-20221013162104-a522beda40f4/go.mod h1:yMxgb+Im8XTCLBBgpy8p5xE6/OaWkKyfypNd3HPQpLw=
 github.com/99designs/gqlgen v0.17.63 h1:HCdaYDPd9HqUXRchEvmE3EFzELRwLlaJ8DBuyC8Cqto=
 github.com/99designs/gqlgen v0.17.63/go.mod h1:sVCM2iwIZisJjTI/DEC3fpH+HFgxY1496ZJ+jbT9IjA=
 github.com/agnivade/levenshtein v1.2.0 h1:U9L4IOT0Y3i0TIlUIDJ7rVUziKi/zPbrJGaFrtYH3SY=

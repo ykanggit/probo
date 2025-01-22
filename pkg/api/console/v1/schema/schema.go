@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/getprobo/probo/pkg/api/console/v1/types"
+	"github.com/getprobo/probo/pkg/probo/coredata/page"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -54,7 +55,7 @@ type ComplexityRoot struct {
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
-		Tasks       func(childComplexity int, first *int, after *string, last *int, before *string) int
+		Tasks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 		UpdatedAt   func(childComplexity int) int
 	}
 
@@ -69,7 +70,7 @@ type ComplexityRoot struct {
 	}
 
 	Framework struct {
-		Controls    func(childComplexity int, first *int, after *string, last *int, before *string) int
+		Controls    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -89,7 +90,7 @@ type ComplexityRoot struct {
 
 	Organization struct {
 		CreatedAt  func(childComplexity int) int
-		Frameworks func(childComplexity int, first *int, after *string, last *int, before *string) int
+		Frameworks func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 		ID         func(childComplexity int) int
 		Name       func(childComplexity int) int
 		UpdatedAt  func(childComplexity int) int
@@ -125,13 +126,13 @@ type ComplexityRoot struct {
 }
 
 type ControlResolver interface {
-	Tasks(ctx context.Context, obj *types.Control, first *int, after *string, last *int, before *string) (*types.TaskConnection, error)
+	Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskConnection, error)
 }
 type FrameworkResolver interface {
-	Controls(ctx context.Context, obj *types.Framework, first *int, after *string, last *int, before *string) (*types.ControlConnection, error)
+	Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.ControlConnection, error)
 }
 type OrganizationResolver interface {
-	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *string, last *int, before *string) (*types.FrameworkConnection, error)
+	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
 }
 type QueryResolver interface {
 	Node(ctx context.Context, id string) (types.Node, error)
@@ -194,7 +195,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Control.Tasks(childComplexity, args["first"].(*int), args["after"].(*string), args["last"].(*int), args["before"].(*string)), true
+		return e.complexity.Control.Tasks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
 
 	case "Control.updatedAt":
 		if e.complexity.Control.UpdatedAt == nil {
@@ -241,7 +242,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Framework.Controls(childComplexity, args["first"].(*int), args["after"].(*string), args["last"].(*int), args["before"].(*string)), true
+		return e.complexity.Framework.Controls(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
 
 	case "Framework.createdAt":
 		if e.complexity.Framework.CreatedAt == nil {
@@ -323,7 +324,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Organization.Frameworks(childComplexity, args["first"].(*int), args["after"].(*string), args["last"].(*int), args["before"].(*string)), true
+		return e.complexity.Organization.Frameworks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
 
 	case "Organization.id":
 		if e.complexity.Organization.ID == nil {
@@ -688,13 +689,13 @@ func (ec *executionContext) field_Control_tasks_argsFirst(
 func (ec *executionContext) field_Control_tasks_argsAfter(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*string, error) {
+) (*page.CursorKey, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
 	if tmp, ok := rawArgs["after"]; ok {
-		return ec.unmarshalOCursorKey2ᚖstring(ctx, tmp)
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
 	}
 
-	var zeroVal *string
+	var zeroVal *page.CursorKey
 	return zeroVal, nil
 }
 
@@ -714,13 +715,13 @@ func (ec *executionContext) field_Control_tasks_argsLast(
 func (ec *executionContext) field_Control_tasks_argsBefore(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*string, error) {
+) (*page.CursorKey, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
 	if tmp, ok := rawArgs["before"]; ok {
-		return ec.unmarshalOCursorKey2ᚖstring(ctx, tmp)
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
 	}
 
-	var zeroVal *string
+	var zeroVal *page.CursorKey
 	return zeroVal, nil
 }
 
@@ -765,13 +766,13 @@ func (ec *executionContext) field_Framework_controls_argsFirst(
 func (ec *executionContext) field_Framework_controls_argsAfter(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*string, error) {
+) (*page.CursorKey, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
 	if tmp, ok := rawArgs["after"]; ok {
-		return ec.unmarshalOCursorKey2ᚖstring(ctx, tmp)
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
 	}
 
-	var zeroVal *string
+	var zeroVal *page.CursorKey
 	return zeroVal, nil
 }
 
@@ -791,13 +792,13 @@ func (ec *executionContext) field_Framework_controls_argsLast(
 func (ec *executionContext) field_Framework_controls_argsBefore(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*string, error) {
+) (*page.CursorKey, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
 	if tmp, ok := rawArgs["before"]; ok {
-		return ec.unmarshalOCursorKey2ᚖstring(ctx, tmp)
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
 	}
 
-	var zeroVal *string
+	var zeroVal *page.CursorKey
 	return zeroVal, nil
 }
 
@@ -842,13 +843,13 @@ func (ec *executionContext) field_Organization_frameworks_argsFirst(
 func (ec *executionContext) field_Organization_frameworks_argsAfter(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*string, error) {
+) (*page.CursorKey, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
 	if tmp, ok := rawArgs["after"]; ok {
-		return ec.unmarshalOCursorKey2ᚖstring(ctx, tmp)
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
 	}
 
-	var zeroVal *string
+	var zeroVal *page.CursorKey
 	return zeroVal, nil
 }
 
@@ -868,13 +869,13 @@ func (ec *executionContext) field_Organization_frameworks_argsLast(
 func (ec *executionContext) field_Organization_frameworks_argsBefore(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*string, error) {
+) (*page.CursorKey, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
 	if tmp, ok := rawArgs["before"]; ok {
-		return ec.unmarshalOCursorKey2ᚖstring(ctx, tmp)
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
 	}
 
-	var zeroVal *string
+	var zeroVal *page.CursorKey
 	return zeroVal, nil
 }
 
@@ -1100,7 +1101,7 @@ func (ec *executionContext) _Control_tasks(ctx context.Context, field graphql.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Control().Tasks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*string), fc.Args["last"].(*int), fc.Args["before"].(*string))
+		return ec.resolvers.Control().Tasks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1329,9 +1330,9 @@ func (ec *executionContext) _ControlEdge_cursor(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(page.CursorKey)
 	fc.Result = res
-	return ec.marshalNCursorKey2string(ctx, field.Selections, res)
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ControlEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1521,7 +1522,7 @@ func (ec *executionContext) _Framework_controls(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Framework().Controls(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*string), fc.Args["last"].(*int), fc.Args["before"].(*string))
+		return ec.resolvers.Framework().Controls(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1750,9 +1751,9 @@ func (ec *executionContext) _FrameworkEdge_cursor(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(page.CursorKey)
 	fc.Result = res
-	return ec.marshalNCursorKey2string(ctx, field.Selections, res)
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_FrameworkEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1904,7 +1905,7 @@ func (ec *executionContext) _Organization_frameworks(ctx context.Context, field 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Frameworks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*string), fc.Args["last"].(*int), fc.Args["before"].(*string))
+		return ec.resolvers.Organization().Frameworks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2114,9 +2115,9 @@ func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*page.CursorKey)
 	fc.Result = res
-	return ec.marshalOCursorKey2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PageInfo_startCursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2149,9 +2150,9 @@ func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*page.CursorKey)
 	fc.Result = res
-	return ec.marshalOCursorKey2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PageInfo_endCursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2585,9 +2586,9 @@ func (ec *executionContext) _TaskEdge_cursor(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(page.CursorKey)
 	fc.Result = res
-	return ec.marshalNCursorKey2string(ctx, field.Selections, res)
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_TaskEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5358,13 +5359,13 @@ func (ec *executionContext) marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋpro
 	return ec._ControlEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCursorKey2string(ctx context.Context, v any) (string, error) {
-	res, err := graphql.UnmarshalString(v)
+func (ec *executionContext) unmarshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx context.Context, v any) (page.CursorKey, error) {
+	res, err := types.UnmarshalCursorKeyScalar(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNCursorKey2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalString(v)
+func (ec *executionContext) marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx context.Context, sel ast.SelectionSet, v page.CursorKey) graphql.Marshaler {
+	res := types.MarshalCursorKeyScalar(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -5837,19 +5838,19 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOCursorKey2ᚖstring(ctx context.Context, v any) (*string, error) {
+func (ec *executionContext) unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx context.Context, v any) (*page.CursorKey, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := graphql.UnmarshalString(v)
+	res, err := types.UnmarshalCursorKeyScalar(v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOCursorKey2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+func (ec *executionContext) marshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx context.Context, sel ast.SelectionSet, v *page.CursorKey) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalString(*v)
+	res := types.MarshalCursorKeyScalar(*v)
 	return res
 }
 

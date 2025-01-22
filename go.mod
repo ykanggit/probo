@@ -3,10 +3,12 @@ module github.com/getprobo/probo
 go 1.23.4
 
 require (
+	gearno.de/ref v0.0.0-20221013162104-a522beda40f4
 	github.com/99designs/gqlgen v0.17.63
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/prometheus/client_golang v1.20.5
 	github.com/vektah/gqlparser/v2 v2.5.21
+	go.gearno.de/crypto/uuid v0.1.0
 	go.gearno.de/kit v0.0.0-20241119134016-ee4f36699e6b
 	go.opentelemetry.io/otel/trace v1.32.0
 )
@@ -34,7 +36,6 @@ require (
 	github.com/sosodev/duration v1.3.1 // indirect
 	github.com/urfave/cli/v2 v2.27.5 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
-	go.gearno.de/crypto/uuid v0.1.0 // indirect
 	go.gearno.de/x/panicf v0.1.1 // indirect
 	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.32.0 // indirect

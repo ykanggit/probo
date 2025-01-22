@@ -10,21 +10,29 @@ import (
 
 	"github.com/getprobo/probo/pkg/api/console/v1/schema"
 	"github.com/getprobo/probo/pkg/api/console/v1/types"
+	"github.com/getprobo/probo/pkg/probo/coredata/page"
 )
 
 // Tasks is the resolver for the tasks field.
-func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *int, after *string, last *int, before *string) (*types.TaskConnection, error) {
+func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskConnection, error) {
 	panic(fmt.Errorf("not implemented: Tasks - tasks"))
 }
 
 // Controls is the resolver for the controls field.
-func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *string, last *int, before *string) (*types.ControlConnection, error) {
+func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.ControlConnection, error) {
 	panic(fmt.Errorf("not implemented: Controls - controls"))
 }
 
 // Frameworks is the resolver for the frameworks field.
-func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *string, last *int, before *string) (*types.FrameworkConnection, error) {
-	panic(fmt.Errorf("not implemented: Frameworks - frameworks"))
+func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
+	cursor := types.NewCursor(first, after, last, before)
+
+	page, err := r.svc.ListOrganizationFramework(ctx, "", cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
+	}
+
+	return types.NewExecutionConnection(page), nil
 }
 
 // Node is the resolver for the node field.
