@@ -40,7 +40,7 @@ func (s *Service) GetOrganization(
 	return organization, nil
 }
 
-func (s *Service) ListOrganizationFramework(
+func (s *Service) ListOrganizationFrameworks(
 	ctx context.Context,
 	organizationID string,
 	cursor *page.Cursor,

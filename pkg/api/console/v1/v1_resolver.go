@@ -27,7 +27,7 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := r.svc.ListOrganizationFramework(ctx, "", cursor)
+	page, err := r.svc.ListOrganizationFrameworks(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
 	}
