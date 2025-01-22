@@ -72,6 +72,7 @@ WHERE
 	if err != nil {
 		return err
 	}
+	defer r.Close()
 
 	frameworks := Frameworks{}
 	for r.Next() {
@@ -82,7 +83,6 @@ WHERE
 
 		frameworks = append(frameworks, framework)
 	}
-	defer r.Close()
 
 	if err = r.Err(); err != nil {
 		return err
