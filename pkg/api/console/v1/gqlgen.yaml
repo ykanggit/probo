@@ -1,0 +1,24 @@
+schema: ["schema.graphql"]
+
+exec:
+  filename: "schema/schema.go"
+  package: "schema"
+
+model:
+  filename: "types/types.go"
+  package: "types"
+
+resolver:
+  layout: "follow-schema"
+  dir: "."
+  package: "console_v1"
+  filename_template: "v1_resolver.go"
+
+autobind: []
+omit_panic_handler: true
+call_argument_directives_with_null: true
+
+models:
+  Datetime:
+    model:
+      - "github.com/99designs/gqlgen/graphql.Time"

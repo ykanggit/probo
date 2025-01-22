@@ -10,6 +10,7 @@ LDFLAGS=	-ldflags "-X 'main.version=$(VERSION)' -X 'main.env=prod'"
 GCFLAGS=	-gcflags="-e"
 
 GO_BUILD=	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) $(GO) build $(LDFLAGS) $(GCFLAGS)
+GO_GENERATE=	$(GO) generate
 
 CONTROL_SRC:=	$(shell find ./controls -type f -name "*.md")
 
@@ -30,8 +31,13 @@ vet:
 build: bin/probod
 
 .PHONY: bin/probod
-bin/probod:
+bin/probod: pkg/api/console/v1/schema/schema.go pkg/api/console/v1/types/types.go pkg/api/console/v1/v1_resolver.go
 	$(GO_BUILD) -o $(PROBOD_BIN) $(PROBOD_SRC)
+
+pkg/api/console/v1/schema/schema.go \
+pkg/api/console/v1/types/types.go \
+pkg/api/console/v1/v1_resolver.go: pkg/api/console/v1/gqlgen.yaml pkg/api/console/v1/schema.graphql
+	$(GO_GENERATE) ./pkg/api/console/v1
 
 .PHONY: fmt
 fmt:

@@ -1,0 +1,108 @@
+directive @goField(
+  forceResolver: Boolean
+  name: String
+  omittable: Boolean
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+scalar CursorKey
+scalar Void
+scalar Datetime
+
+interface Node {
+  id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: CursorKey
+  endCursor: CursorKey
+}
+
+type Organization implements Node {
+  id: ID!
+  name: String!
+
+  frameworks(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): FrameworkConnection! @goField(forceResolver: true)
+
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type FrameworkConnection {
+  edges: [FrameworkEdge!]!
+  pageInfo: PageInfo!
+}
+
+type FrameworkEdge {
+  cursor: CursorKey!
+  node: Framework!
+}
+
+type Framework implements Node {
+  id: ID!
+  name: String!
+  description: String!
+
+  controls(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): ControlConnection! @goField(forceResolver: true)
+
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type ControlConnection {
+  edges: [ControlEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ControlEdge {
+  cursor: CursorKey!
+  node: Control!
+}
+
+type Control implements Node {
+  id: ID!
+  name: String!
+  description: String!
+
+  tasks(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): TaskConnection! @goField(forceResolver: true)
+
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type TaskConnection {
+  edges: [TaskEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TaskEdge {
+  cursor: CursorKey!
+  node: Task!
+}
+
+type Task implements Node {
+  id: ID!
+  name: String!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type Query {
+  node(id: ID!): Node!
+}
