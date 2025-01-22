@@ -28,7 +28,7 @@ vet:
 	$(GO) vet ./...
 
 .PHONY: build
-build: bin/probod
+build: vet bin/probod
 
 .PHONY: bin/probod
 bin/probod: pkg/api/console/v1/schema/schema.go pkg/api/console/v1/types/types.go pkg/api/console/v1/v1_resolver.go
