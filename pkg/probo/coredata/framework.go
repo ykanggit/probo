@@ -84,7 +84,7 @@ WHERE
 		frameworks = append(frameworks, framework)
 	}
 
-	if err = r.Err(); err != nil {
+	if err := r.Err(); err != nil {
 		return err
 	}
 
