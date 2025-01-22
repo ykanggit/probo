@@ -26,7 +26,7 @@ type (
 	Frameworks []*Framework
 )
 
-func (f *Framework) CursorKey() page.CursorKey {
+func (f Framework) CursorKey() page.CursorKey {
 	return page.NewCursorKey(f.ID, f.CreatedAt)
 }
 
