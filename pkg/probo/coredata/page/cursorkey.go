@@ -20,7 +20,7 @@ var (
 )
 
 const (
-	byteLength = 28
+	byteLength = 24
 )
 
 func ParseCursorKey(s string) (CursorKey, error) {
@@ -51,8 +51,8 @@ func CursorKeyFromBytes(b []byte) (CursorKey, error) {
 
 func NewCursorKey(id uuid.UUID, t time.Time) CursorKey {
 	var cursorKey CursorKey
-	copy(cursorKey[:20], id[:])
-	_ = binary.PutVarint(cursorKey[20:], t.UnixMicro())
+	copy(cursorKey[:16], id[:])
+	_ = binary.PutVarint(cursorKey[16:], t.UnixMicro())
 
 	return cursorKey
 }
@@ -66,7 +66,12 @@ func (ck CursorKey) String() string {
 }
 
 func (ck CursorKey) Timestamp() time.Time {
-	return ck.ID().Timestamp()
+	unixMicro, _ := binary.Varint(ck[16:])
+
+	seconds := unixMicro / 1e6
+	nanoseconds := (unixMicro % 1e6) * 1e3
+
+	return time.Unix(seconds, nanoseconds)
 }
 
 func (ck CursorKey) ID() uuid.UUID {
