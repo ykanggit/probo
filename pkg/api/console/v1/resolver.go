@@ -51,10 +51,7 @@ func graphql(probo *probo.Service) http.HandlerFunc {
 		},
 	)
 	srv := handler.New(es)
-	srv.AddTransport(transport.Options{})
-	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
-	srv.AddTransport(transport.MultipartForm{})
 	srv.Use(extension.Introspection{})
 
 	return func(w http.ResponseWriter, r *http.Request) {
