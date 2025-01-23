@@ -49,7 +49,7 @@ func (f *Frameworks) LoadByOrganizationID(
 ) error {
 	q := `
 SELECT
-    framework_id,
+    id,
     organization_id,
     name,
     description,
@@ -100,7 +100,7 @@ func (f *Framework) LoadByID(
 ) error {
 	q := `
 SELECT
-    framework_id,
+    id,
     organization_id,
     name,
     description,

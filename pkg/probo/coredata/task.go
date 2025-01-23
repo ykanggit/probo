@@ -46,7 +46,7 @@ func (t *Tasks) LoadByControlID(
 ) error {
 	q := `
 SELECT
-    task_id,
+    id,
     control_id,
     content_ref,
     created_at,

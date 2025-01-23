@@ -33,7 +33,7 @@ func (o *Organization) LoadByID(
 ) error {
 	q := `
 SELECT
-    organization_id,
+    id,
     name,
     created_at,
     updated_at

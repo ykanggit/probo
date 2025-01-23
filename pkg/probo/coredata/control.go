@@ -50,7 +50,7 @@ func (c *Controls) LoadByFrameworkID(
 ) error {
 	q := `
 SELECT
-    control_id,
+    id,
     framework_id,
     name,
     description,
