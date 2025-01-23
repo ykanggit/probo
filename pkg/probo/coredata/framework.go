@@ -23,8 +23,8 @@ import (
 	"github.com/getprobo/probo/pkg/probo/coredata/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata/page"
 	"github.com/jackc/pgx/v5"
-	"go.gearno.de/kit/pg"
 	"go.gearno.de/crypto/uuid"
+	"go.gearno.de/kit/pg"
 )
 
 type (
