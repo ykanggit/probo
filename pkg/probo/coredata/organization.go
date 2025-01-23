@@ -48,7 +48,7 @@ LIMIT 1;
 	r := conn.QueryRow(ctx, q, args)
 
 	o2 := Organization{}
-	if err := r.Scan(&o2); err != nil {
+	if err := o2.scan(r); err != nil {
 		return err
 	}
 
