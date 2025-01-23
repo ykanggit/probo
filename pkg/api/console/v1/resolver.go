@@ -34,18 +34,20 @@ type (
 	}
 )
 
-func NewMux() *chi.Mux {
+func NewMux(probo *probo.Service) *chi.Mux {
 	r := chi.NewMux()
 	r.Get("/", playground.Handler("GraphQL", "/console/v1/query"))
-	r.Post("/query", graphql())
+	r.Post("/query", graphql(probo))
 
 	return r
 }
 
-func graphql() http.HandlerFunc {
+func graphql(probo *probo.Service) http.HandlerFunc {
 	es := schema.NewExecutableSchema(
 		schema.Config{
-			Resolvers: &Resolver{},
+			Resolvers: &Resolver{
+				svc: probo,
+			},
 		},
 	)
 	srv := handler.New(es)

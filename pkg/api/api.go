@@ -92,7 +92,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	router.Use(cors.Handler(corsOpts))
 
-	router.Mount("/console/v1", console_v1.NewMux())
+	router.Mount("/console/v1", console_v1.NewMux(s.cfg.Probo))
 
 	router.ServeHTTP(w, r)
 }
