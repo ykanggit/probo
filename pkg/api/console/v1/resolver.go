@@ -16,10 +16,46 @@
 
 package console_v1
 
-import "github.com/getprobo/probo/pkg/probo"
+import (
+	"net/http"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/getprobo/probo/pkg/api/console/v1/schema"
+	"github.com/getprobo/probo/pkg/probo"
+	"github.com/go-chi/chi/v5"
+)
 
 type (
 	Resolver struct {
 		svc *probo.Service
 	}
 )
+
+func NewMux() *chi.Mux {
+	r := chi.NewMux()
+	r.Get("/", playground.Handler("GraphQL", "/console/v1/query"))
+	r.Post("/query", graphql())
+
+	return r
+}
+
+func graphql() http.HandlerFunc {
+	es := schema.NewExecutableSchema(
+		schema.Config{
+			Resolvers: &Resolver{},
+		},
+	)
+	srv := handler.New(es)
+	srv.AddTransport(transport.Options{})
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
+	srv.Use(extension.Introspection{})
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		srv.ServeHTTP(w, r)
+	}
+}

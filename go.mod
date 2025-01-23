@@ -5,6 +5,8 @@ go 1.23.4
 require (
 	gearno.de/ref v0.0.0-20221013162104-a522beda40f4
 	github.com/99designs/gqlgen v0.17.63
+	github.com/go-chi/chi/v5 v5.1.0
+	github.com/go-chi/cors v1.2.1
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/prometheus/client_golang v1.20.5
 	github.com/vektah/gqlparser/v2 v2.5.21
@@ -19,11 +21,13 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
-	github.com/go-chi/chi/v5 v5.1.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.23.0 // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect

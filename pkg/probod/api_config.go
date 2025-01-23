@@ -15,7 +15,12 @@
 package probod
 
 type (
+	corsConfig struct {
+		AllowedOrigins []string `json:"allowed-origins"`
+	}
+
 	apiConfig struct {
-		Addr string `json:"addr"`
+		Addr string     `json:"addr"`
+		Cors corsConfig `json:"cors"`
 	}
 )

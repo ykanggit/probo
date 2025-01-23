@@ -23,6 +23,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/getprobo/probo/pkg/api"
+	"github.com/getprobo/probo/pkg/probo"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.gearno.de/kit/httpserver"
 	"go.gearno.de/kit/log"
@@ -52,6 +54,9 @@ func New() *Implm {
 		cfg: config{
 			Api: apiConfig{
 				Addr: "localhost:8080",
+				Cors: corsConfig{
+					AllowedOrigins: []string{"http://localhost:3000"},
+				},
 			},
 			Pg: pgConfig{
 				Addr:     "localhost:5432",
@@ -78,7 +83,7 @@ func (impl *Implm) Run(
 	ctx, cancel := context.WithCancelCause(parentCtx)
 	defer cancel(context.Canceled)
 
-	_, err := pg.NewClient(
+	pgClient, err := pg.NewClient(
 		impl.cfg.Pg.Options(
 			pg.WithLogger(l),
 			pg.WithRegisterer(r),
@@ -89,12 +94,24 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot create pg client: %w", err)
 	}
 
+	probo := probo.NewService(ctx, pgClient)
+
+	apiServer, err := api.NewServer(
+		api.Config{
+			Probo:          probo,
+			AllowedOrigins: impl.cfg.Api.Cors.AllowedOrigins,
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("cannot create api server: %w", err)
+	}
+
 	apiServerCtx, stopApiServer := context.WithCancel(context.Background())
 	defer stopApiServer()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := impl.runApiServer(apiServerCtx, l, r, tp, nil); err != nil {
+		if err := impl.runApiServer(apiServerCtx, l, r, tp, apiServer); err != nil {
 			cancel(fmt.Errorf("api server crashed: %w", err))
 		}
 	}()
