@@ -15,66 +15,21 @@
 package coredata
 
 import (
-	"context"
-	"time"
-	"maps"
-	"fmt"
-
 	"github.com/jackc/pgx/v5"
-	"go.gearno.de/kit/pg"
 )
 
 type (
-	Organization struct {
-		ID        string
-		Name      string
-		CreatedAt time.Time
-		UpdatedAt time.Time
-	}
+	Scope struct {}
 )
 
-func (o *Organization) scan(r pgx.Row) error {
-	return r.Scan(
-		&o.ID,
-		&o.Name,
-		&o.CreatedAt,
-		&o.UpdatedAt,
-	)
+func NewScope() *Scope {
+	return &Scope{}
 }
 
-func (o *Organization) LoadByID(
-	ctx context.Context,
-	conn pg.Conn,
-	scope *Scope,
-	organizationID string,
-) error {
-	q := `
-SELECT
-    id,
-    name,
-    created_at,
-    updated_at
-FROM
-    organizations
-WHERE
-    %s
-    AND organization_id = @organization_id
-LIMIT 1;
-`
+func (*Scope) SQLArguments() pgx.NamedArgs {
+	return pgx.NamedArgs{}
+}
 
-	q = fmt.Sprintf(q, scope.SQLFragment())
-
-	args := pgx.NamedArgs{"organization_id": organizationID}
-	maps.Copy(args, scope.SQLArguments())
-
-	r := conn.QueryRow(ctx, q, args)
-
-	o2 := Organization{}
-	if err := o2.scan(r); err != nil {
-		return err
-	}
-
-	*o = o2
-
-	return nil
+func (*Scope) SQLFragment() string {
+	return "TRUE"
 }

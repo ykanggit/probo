@@ -59,6 +59,7 @@ func (c *Control) scan(r pgx.Row) error {
 func (c *Controls) LoadByFrameworkID(
 	ctx context.Context,
 	conn pg.Conn,
+	scope *Scope,
 	frameworkID string,
 	cursor *page.Cursor,
 ) error {
@@ -74,12 +75,14 @@ SELECT
 FROM
     controls
 WHERE
-    framework_id = @framework_id
+    %s
+    AND framework_id = @framework_id
     AND %s
 `
-	q = fmt.Sprintf(q, cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.NamedArgs{"framework_id": frameworkID}
+	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
 	r, err := conn.Query(ctx, q, args)

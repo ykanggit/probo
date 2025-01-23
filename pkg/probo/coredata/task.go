@@ -55,6 +55,7 @@ func (t *Task) scan(r pgx.Row) error {
 func (t *Tasks) LoadByControlID(
 	ctx context.Context,
 	conn pg.Conn,
+	scope *Scope,
 	controlID string,
 	cursor *page.Cursor,
 ) error {
@@ -68,13 +69,15 @@ SELECT
 FROM
     tasks
 WHERE
-    control_id = @control_id
+    %s
+    AND control_id = @control_id
     AND %s
 `
 
-	q = fmt.Sprintf(q, cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.NamedArgs{"control_id": controlID}
+	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
 	r, err := conn.Query(ctx, q, args)

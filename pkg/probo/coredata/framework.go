@@ -58,6 +58,7 @@ func (f *Framework) scan(r pgx.Row) error {
 func (f *Frameworks) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
+	scope *Scope,
 	organizationID string,
 	cursor *page.Cursor,
 ) error {
@@ -73,13 +74,15 @@ SELECT
 FROM
     frameworks
 WHERE
-    organization_id = @organization_id
+    %s
+    AND organization_id = @organization_id
     AND %s
 `
 
-	q = fmt.Sprintf(q, cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.NamedArgs{"organization_id": organizationID}
+	maps.Copy(args, cursor.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
 	r, err := conn.Query(ctx, q, args)
@@ -110,6 +113,7 @@ WHERE
 func (f *Framework) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
+	scope *Scope,
 	frameworkID string,
 ) error {
 	q := `
@@ -124,10 +128,15 @@ SELECT
 FROM
     frameworks
 WHERE
-    framework_id = @framework_id
+    %s
+    AND framework_id = @framework_id
 LIMIT 1;
 `
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+	
 	args := pgx.NamedArgs{"framework_id": frameworkID}
+	maps.Copy(args, scope.SQLArguments())
 	r := conn.QueryRow(ctx, q, args)
 
 	f2 := Framework{}

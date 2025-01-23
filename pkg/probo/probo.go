@@ -25,12 +25,14 @@ import (
 type (
 	Service struct {
 		pg *pg.Client
+		scope *coredata.Scope
 	}
 )
 
 func NewService(ctx context.Context, pgClient *pg.Client) *Service {
 	return &Service{
 		pg: pgClient,
+		scope: coredata.NewScope(), // must be created from auth
 	}
 }
 
@@ -43,7 +45,7 @@ func (s *Service) GetOrganization(
 	err := s.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return organization.LoadByID(ctx, conn, organizationID)
+			return organization.LoadByID(ctx, conn, s.scope, organizationID)
 		},
 	)
 
@@ -64,7 +66,7 @@ func (s *Service) ListOrganizationFrameworks(
 	err := s.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return frameworks.LoadByOrganizationID(ctx, conn, organizationID, cursor)
+			return frameworks.LoadByOrganizationID(ctx, conn, s.scope, organizationID, cursor)
 		},
 	)
 
@@ -85,7 +87,7 @@ func (s *Service) ListFrameworkControls(
 	err := s.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return controls.LoadByFrameworkID(ctx, conn, frameworkID, cursor)
+			return controls.LoadByFrameworkID(ctx, conn, s.scope, frameworkID, cursor)
 		},
 	)
 
@@ -106,7 +108,7 @@ func (s *Service) ListControlTasks(
 	err := s.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return tasks.LoadByControlID(ctx, conn, controlID, cursor)
+			return tasks.LoadByControlID(ctx, conn, s.scope, controlID, cursor)
 		},
 	)
 
