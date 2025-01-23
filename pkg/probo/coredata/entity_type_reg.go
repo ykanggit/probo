@@ -14,18 +14,10 @@
 
 package coredata
 
-import (
-	"time"
-
-	"github.com/getprobo/probo/pkg/probo/coredata/gid"
-)
-
-type (
-	Evidence struct {
-		ID        gid.GID
-		TaskID    string
-		ContentID string
-		CreatedAt time.Time
-		UpdatedAt time.Time
-	}
+const (
+	OrganizationEntityType uint32 = iota
+	FrameworkEntityType
+	ControlEntityType
+	TaskEntityType
+	EvidenceEntityType
 )

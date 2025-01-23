@@ -20,13 +20,14 @@ import (
 	"maps"
 	"time"
 
+	"github.com/getprobo/probo/pkg/probo/coredata/gid"
 	"github.com/jackc/pgx/v5"
 	"go.gearno.de/kit/pg"
 )
 
 type (
 	Organization struct {
-		ID        string
+		ID        gid.GID
 		Name      string
 		CreatedAt time.Time
 		UpdatedAt time.Time

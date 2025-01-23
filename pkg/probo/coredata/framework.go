@@ -20,15 +20,16 @@ import (
 	"maps"
 	"time"
 
+	"github.com/getprobo/probo/pkg/probo/coredata/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata/page"
 	"github.com/jackc/pgx/v5"
-	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
+	"go.gearno.de/crypto/uuid"
 )
 
 type (
 	Framework struct {
-		ID             uuid.UUID
+		ID             gid.GID
 		OrganizationID string
 		Name           string
 		Description    string
@@ -41,7 +42,7 @@ type (
 )
 
 func (f Framework) CursorKey() page.CursorKey {
-	return page.NewCursorKey(f.ID, f.CreatedAt)
+	return page.NewCursorKey(uuid.UUID(f.ID), f.CreatedAt)
 }
 
 func (f *Framework) scan(r pgx.Row) error {

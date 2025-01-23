@@ -20,15 +20,17 @@ import (
 	"maps"
 	"time"
 
+	"github.com/getprobo/probo/pkg/probo/coredata/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata/page"
 	"github.com/jackc/pgx/v5"
+
 	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
 
 type (
 	Task struct {
-		ID         uuid.UUID
+		ID         gid.GID
 		ControlID  string
 		ContentRef string
 		CreatedAt  time.Time
@@ -39,7 +41,7 @@ type (
 )
 
 func (t Task) CursorKey() page.CursorKey {
-	return page.NewCursorKey(t.ID, t.CreatedAt)
+	return page.NewCursorKey(uuid.UUID(t.ID), t.CreatedAt)
 }
 
 func (t *Task) scan(r pgx.Row) error {
