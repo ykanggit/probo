@@ -60,7 +60,7 @@ func (f *Frameworks) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope *Scope,
-	organizationID string,
+	organizationID gid.GID,
 	cursor *page.Cursor,
 ) error {
 	q := `
@@ -115,7 +115,7 @@ func (f *Framework) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope *Scope,
-	frameworkID string,
+	frameworkID gid.GID,
 ) error {
 	q := `
 SELECT

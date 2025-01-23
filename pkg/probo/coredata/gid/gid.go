@@ -27,15 +27,30 @@ type (
 	GID uuid.UUID
 )
 
+var (
+	Nil = GID(uuid.Nil)
+)
+
+func ParseGID(encoded string) (GID, error) {
+	gid := GID{}
+
+	err := gid.UnmarshalText([]byte(encoded))
+	if err != nil {
+		return Nil, err
+	}
+
+	return gid, nil
+}
+
 func NewGID(et uint32) (GID, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
-		return GID(uuid.Nil), err
+		return Nil, err
 	}
 
 	binary.BigEndian.PutUint32(id[10:14], et)
 
-	return GID(id), nil
+	return Nil, nil
 }
 
 func (gid GID) Value() (driver.Value, error) {

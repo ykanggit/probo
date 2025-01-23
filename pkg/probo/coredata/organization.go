@@ -47,7 +47,7 @@ func (o *Organization) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope *Scope,
-	organizationID string,
+	organizationID gid.GID,
 ) error {
 	q := `
 SELECT

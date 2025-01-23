@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"github.com/getprobo/probo/pkg/probo/coredata"
+	"github.com/getprobo/probo/pkg/probo/coredata/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata/page"
 	"go.gearno.de/kit/pg"
 )
@@ -38,7 +39,7 @@ func NewService(ctx context.Context, pgClient *pg.Client) *Service {
 
 func (s *Service) GetOrganization(
 	ctx context.Context,
-	organizationID string,
+	organizationID gid.GID,
 ) (*coredata.Organization, error) {
 	organization := &coredata.Organization{}
 
@@ -63,7 +64,7 @@ func (s *Service) GetOrganization(
 
 func (s *Service) ListOrganizationFrameworks(
 	ctx context.Context,
-	organizationID string,
+	organizationID gid.GID,
 	cursor *page.Cursor,
 ) (*page.Page[*coredata.Framework], error) {
 	var frameworks coredata.Frameworks
@@ -90,7 +91,7 @@ func (s *Service) ListOrganizationFrameworks(
 
 func (s *Service) ListFrameworkControls(
 	ctx context.Context,
-	frameworkID string,
+	frameworkID gid.GID,
 	cursor *page.Cursor,
 ) (*page.Page[*coredata.Control], error) {
 	var controls coredata.Controls
@@ -117,7 +118,7 @@ func (s *Service) ListFrameworkControls(
 
 func (s *Service) ListControlTasks(
 	ctx context.Context,
-	controlID string,
+	controlID gid.GID,
 	cursor *page.Cursor,
 ) (*page.Page[*coredata.Task], error) {
 	var tasks coredata.Tasks

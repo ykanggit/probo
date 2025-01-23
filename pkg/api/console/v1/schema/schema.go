@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/getprobo/probo/pkg/api/console/v1/types"
+	"github.com/getprobo/probo/pkg/probo/coredata/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata/page"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -104,7 +105,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Node func(childComplexity int, id string) int
+		Node func(childComplexity int, id gid.GID) int
 	}
 
 	Task struct {
@@ -135,7 +136,7 @@ type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
 }
 type QueryResolver interface {
-	Node(ctx context.Context, id string) (types.Node, error)
+	Node(ctx context.Context, id gid.GID) (types.Node, error)
 }
 
 type executableSchema struct {
@@ -385,7 +386,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Node(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.Node(childComplexity, args["id"].(gid.GID)), true
 
 	case "Task.createdAt":
 		if e.complexity.Task.CreatedAt == nil {
@@ -915,13 +916,13 @@ func (ec *executionContext) field_Query_node_args(ctx context.Context, rawArgs m
 func (ec *executionContext) field_Query_node_argsID(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (string, error) {
+) (gid.GID, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 	if tmp, ok := rawArgs["id"]; ok {
-		return ec.unmarshalNID2string(ctx, tmp)
+		return ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx, tmp)
 	}
 
-	var zeroVal string
+	var zeroVal gid.GID
 	return zeroVal, nil
 }
 
@@ -999,9 +1000,9 @@ func (ec *executionContext) _Control_id(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(gid.GID)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Control_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1420,9 +1421,9 @@ func (ec *executionContext) _Framework_id(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(gid.GID)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Framework_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1841,9 +1842,9 @@ func (ec *executionContext) _Organization_id(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(gid.GID)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Organization_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2176,7 +2177,7 @@ func (ec *executionContext) _Query_node(ctx context.Context, field graphql.Colle
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Node(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Query().Node(rctx, fc.Args["id"].(gid.GID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2342,9 +2343,9 @@ func (ec *executionContext) _Task_id(ctx context.Context, field graphql.Collecte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(gid.GID)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Task_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5461,13 +5462,13 @@ func (ec *executionContext) marshalNFrameworkEdge2ᚖgithubᚗcomᚋgetproboᚋp
 	return ec._FrameworkEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNID2string(ctx context.Context, v any) (string, error) {
-	res, err := graphql.UnmarshalID(v)
+func (ec *executionContext) unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx context.Context, v any) (gid.GID, error) {
+	res, err := types.UnmarshalGIDScalar(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalID(v)
+func (ec *executionContext) marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx context.Context, sel ast.SelectionSet, v gid.GID) graphql.Marshaler {
+	res := types.MarshalGIDScalar(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")

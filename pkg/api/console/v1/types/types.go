@@ -5,16 +5,17 @@ package types
 import (
 	"time"
 
+	"github.com/getprobo/probo/pkg/probo/coredata/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata/page"
 )
 
 type Node interface {
 	IsNode()
-	GetID() string
+	GetID() gid.GID
 }
 
 type Control struct {
-	ID          string          `json:"id"`
+	ID          gid.GID         `json:"id"`
 	Name        string          `json:"name"`
 	Description string          `json:"description"`
 	Tasks       *TaskConnection `json:"tasks"`
@@ -22,8 +23,8 @@ type Control struct {
 	UpdatedAt   time.Time       `json:"updatedAt"`
 }
 
-func (Control) IsNode()            {}
-func (this Control) GetID() string { return this.ID }
+func (Control) IsNode()             {}
+func (this Control) GetID() gid.GID { return this.ID }
 
 type ControlConnection struct {
 	Edges    []*ControlEdge `json:"edges"`
@@ -36,7 +37,7 @@ type ControlEdge struct {
 }
 
 type Framework struct {
-	ID          string             `json:"id"`
+	ID          gid.GID            `json:"id"`
 	Name        string             `json:"name"`
 	Description string             `json:"description"`
 	Controls    *ControlConnection `json:"controls"`
@@ -44,8 +45,8 @@ type Framework struct {
 	UpdatedAt   time.Time          `json:"updatedAt"`
 }
 
-func (Framework) IsNode()            {}
-func (this Framework) GetID() string { return this.ID }
+func (Framework) IsNode()             {}
+func (this Framework) GetID() gid.GID { return this.ID }
 
 type FrameworkConnection struct {
 	Edges    []*FrameworkEdge `json:"edges"`
@@ -58,15 +59,15 @@ type FrameworkEdge struct {
 }
 
 type Organization struct {
-	ID         string               `json:"id"`
+	ID         gid.GID              `json:"id"`
 	Name       string               `json:"name"`
 	Frameworks *FrameworkConnection `json:"frameworks"`
 	CreatedAt  time.Time            `json:"createdAt"`
 	UpdatedAt  time.Time            `json:"updatedAt"`
 }
 
-func (Organization) IsNode()            {}
-func (this Organization) GetID() string { return this.ID }
+func (Organization) IsNode()             {}
+func (this Organization) GetID() gid.GID { return this.ID }
 
 type PageInfo struct {
 	HasNextPage     bool            `json:"hasNextPage"`
@@ -79,14 +80,14 @@ type Query struct {
 }
 
 type Task struct {
-	ID        string    `json:"id"`
+	ID        gid.GID   `json:"id"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-func (Task) IsNode()            {}
-func (this Task) GetID() string { return this.ID }
+func (Task) IsNode()             {}
+func (this Task) GetID() gid.GID { return this.ID }
 
 type TaskConnection struct {
 	Edges    []*TaskEdge `json:"edges"`

@@ -10,6 +10,7 @@ import (
 
 	"github.com/getprobo/probo/pkg/api/console/v1/schema"
 	"github.com/getprobo/probo/pkg/api/console/v1/types"
+	"github.com/getprobo/probo/pkg/probo/coredata/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata/page"
 )
 
@@ -50,7 +51,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 }
 
 // Node is the resolver for the node field.
-func (r *queryResolver) Node(ctx context.Context, id string) (types.Node, error) {
+func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error) {
 	panic(fmt.Errorf("not implemented: Node - node"))
 }
 

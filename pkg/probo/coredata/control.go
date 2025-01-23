@@ -62,7 +62,7 @@ func (c *Controls) LoadByFrameworkID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope *Scope,
-	frameworkID string,
+	frameworkID gid.GID,
 	cursor *page.Cursor,
 ) error {
 	q := `

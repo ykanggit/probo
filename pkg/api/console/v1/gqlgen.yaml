@@ -19,6 +19,9 @@ omit_panic_handler: true
 call_argument_directives_with_null: true
 
 models:
+  ID:
+    model:
+      - "github.com/getprobo/probo/pkg/api/console/v1/types.GIDScalar"
   Datetime:
     model:
       - "github.com/99designs/gqlgen/graphql.Time"

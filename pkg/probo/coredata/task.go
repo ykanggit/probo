@@ -58,7 +58,7 @@ func (t *Tasks) LoadByControlID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope *Scope,
-	controlID string,
+	controlID gid.GID,
 	cursor *page.Cursor,
 ) error {
 	q := `
