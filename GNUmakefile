@@ -40,7 +40,14 @@ pkg/api/console/v1/v1_resolver.go: pkg/api/console/v1/gqlgen.yaml pkg/api/consol
 	$(GO_GENERATE) ./pkg/api/console/v1
 
 .PHONY: fmt
-fmt:
+fmt: fmt-markdown fmt-go
+
+.PHONY: fmt-go
+fmt-go:
+	go fmt ./...
+
+.PHONY: fmt-markdown
+fmt-markdown:
 	$(PRETTIER) --write --prose-wrap always $(CONTROL_SRC)
 
 .PHONY: fmt-check
