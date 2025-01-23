@@ -16,9 +16,9 @@ package coredata
 
 import (
 	"context"
-	"time"
-	"maps"
 	"fmt"
+	"maps"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"go.gearno.de/kit/pg"

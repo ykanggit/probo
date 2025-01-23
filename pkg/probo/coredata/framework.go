@@ -134,7 +134,7 @@ LIMIT 1;
 `
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
-	
+
 	args := pgx.NamedArgs{"framework_id": frameworkID}
 	maps.Copy(args, scope.SQLArguments())
 	r := conn.QueryRow(ctx, q, args)

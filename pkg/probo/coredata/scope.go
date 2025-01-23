@@ -19,7 +19,7 @@ import (
 )
 
 type (
-	Scope struct {}
+	Scope struct{}
 )
 
 func NewScope() *Scope {
