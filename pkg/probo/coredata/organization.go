@@ -59,7 +59,7 @@ FROM
     organizations
 WHERE
     %s
-    AND organization_id = @organization_id
+    AND id = @organization_id
 LIMIT 1;
 `
 
