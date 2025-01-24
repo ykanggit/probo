@@ -10,8 +10,10 @@ import (
 
 	"github.com/getprobo/probo/pkg/api/console/v1/schema"
 	"github.com/getprobo/probo/pkg/api/console/v1/types"
+	"github.com/getprobo/probo/pkg/probo/coredata"
 	"github.com/getprobo/probo/pkg/probo/coredata/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata/page"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // Tasks is the resolver for the tasks field.
@@ -52,7 +54,19 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error) {
-	panic(fmt.Errorf("not implemented: Node - node"))
+
+	switch id.EntityType() {
+	case coredata.OrganizationEntityType:
+		organization, err := r.svc.GetOrganization(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+
+		return types.NewOrganization(organization), nil
+	default:
+	}
+
+	return nil, gqlerror.Errorf("node %q not found", id)
 }
 
 // Control returns schema.ControlResolver implementation.
