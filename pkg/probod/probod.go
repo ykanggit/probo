@@ -94,7 +94,10 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot create pg client: %w", err)
 	}
 
-	probo := probo.NewService(ctx, pgClient)
+	probo, err := probo.NewService(ctx, pgClient)
+	if err != nil {
+		return fmt.Errorf("cannot create probo service: %w", err)
+	}
 
 	apiServer, err := api.NewServer(
 		api.Config{
