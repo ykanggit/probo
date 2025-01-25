@@ -18,6 +18,11 @@ import (
 	"github.com/getprobo/probo/pkg/probo/coredata"
 )
 
-func NewOrganization(e *coredata.Organization) *Organization {
-	return &Organization{}
+func NewOrganization(o *coredata.Organization) *Organization {
+	return &Organization{
+		ID:        o.ID,
+		Name:      o.Name,
+		CreatedAt: o.CreatedAt,
+		UpdatedAt: o.UpdatedAt,
+	}
 }
