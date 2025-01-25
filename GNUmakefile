@@ -69,3 +69,7 @@ stack-down:
 .PHONY: stack-ps
 stack-ps:
 	$(DOCKER_COMPOSE) ps
+
+.PHONY: psql
+psql:
+	$(DOCKER_COMPOSE) exec postgres psql -U probod -d probod
