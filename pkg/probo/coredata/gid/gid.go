@@ -50,11 +50,11 @@ func NewGID(et uint32) (GID, error) {
 
 	binary.BigEndian.PutUint32(id[10:14], et)
 
-	return Nil, nil
+	return GID(id), nil
 }
 
 func (gid GID) Value() (driver.Value, error) {
-	return gid[:], nil
+	return gid.String(), nil
 }
 
 func (gid GID) EntityType() uint32 {
@@ -64,19 +64,15 @@ func (gid GID) EntityType() uint32 {
 func (gid *GID) Scan(value interface{}) error {
 	switch v := value.(type) {
 	case string:
-		id, err := uuid.Parse(v)
+		enc := base64.RawURLEncoding
+		id, err := enc.DecodeString(v)
 		if err != nil {
 			return err
 		}
-		*gid = GID(id)
-	case []byte:
-		id, err := uuid.ParseBytes(v)
-		if err != nil {
-			return err
-		}
+
 		*gid = GID(id)
 	default:
-		return fmt.Errorf("invalid type for GID: expected string or []byte, got %T", value)
+		return fmt.Errorf("invalid type for GID: expected string, got %T", value)
 	}
 	return nil
 }
