@@ -32,13 +32,19 @@ func NewControlConnection(p *page.Page[*coredata.Control]) *ControlConnection {
 	}
 }
 
-func NewControlEdge(f *coredata.Control) *ControlEdge {
+func NewControlEdge(c *coredata.Control) *ControlEdge {
 	return &ControlEdge{
-		Cursor: f.CursorKey(),
-		Node:   NewControl(f),
+		Cursor: c.CursorKey(),
+		Node:   NewControl(c),
 	}
 }
 
-func NewControl(e *coredata.Control) *Control {
-	return &Control{}
+func NewControl(c *coredata.Control) *Control {
+	return &Control{
+		ID:          c.ID,
+		Name:        c.Name,
+		Description: c.Description,
+		CreatedAt:   c.CreatedAt,
+		UpdatedAt:   c.UpdatedAt,
+	}
 }
