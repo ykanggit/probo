@@ -3,6 +3,9 @@ PRETTIER?=	$(NPX) prettier
 GO?=	go
 DOCKER?=	docker
 
+DOCKER_BUILD_FLAGS?=
+DOCKER_BUILD=	DOCKER_BUILDKIT=1 $(DOCKER) build $(DOCKER_BUILD_FLAGS)
+
 DOCKER_COMPOSE=	$(DOCKER) compose -f compose.yaml $(DOCKER_COMPOSE_FLAGS)
 
 VERSION=	unknown
@@ -13,6 +16,9 @@ GO_BUILD=	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) $(GO) build $(LDFLAGS) $(GCFLA
 GO_GENERATE=	$(GO) generate
 
 CONTROL_SRC:=	$(shell find ./controls -type f -name "*.md")
+
+DOCKER_IMAGE_NAME=	ghcr.io/getprobo/probo
+DOCKER_TAG_NAME?=	latest
 
 PROBOD_BIN=	bin/probod
 PROBOD_SRC=	cmd/probod/main.go
@@ -28,10 +34,14 @@ vet:
 	$(GO) vet ./...
 
 .PHONY: build
-build: vet bin/probod
+build: bin/probod docker-build
+
+.PHONY: docker-build
+docker-build:
+	$(DOCKER_BUILD) --tag $(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME) --file Dockerfile .
 
 .PHONY: bin/probod
-bin/probod: pkg/api/console/v1/schema/schema.go pkg/api/console/v1/types/types.go pkg/api/console/v1/v1_resolver.go
+bin/probod: pkg/api/console/v1/schema/schema.go pkg/api/console/v1/types/types.go pkg/api/console/v1/v1_resolver.go vet
 	$(GO_BUILD) -o $(PROBOD_BIN) $(PROBOD_SRC)
 
 pkg/api/console/v1/schema/schema.go \

@@ -8,6 +8,9 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     make bin/probod
 
 FROM ubuntu:22.04
+LABEL org.opencontainers.image.source="https://github.com/getprobo/probo"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.vendor="Probo Inc"
 WORKDIR /app
 RUN useradd -m probo && \
     apt-get update && \
