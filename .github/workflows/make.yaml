@@ -11,6 +11,8 @@ jobs:
   docker-build:
     name: "docker-build"
     runs-on: "ubuntu-22.04"
+    permissions:
+      packages: "write"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "docker/setup-qemu-action@v2"
