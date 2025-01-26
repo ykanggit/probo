@@ -32,13 +32,17 @@ func NewTaskConnection(p *page.Page[*coredata.Task]) *TaskConnection {
 	}
 }
 
-func NewTaskEdge(f *coredata.Task) *TaskEdge {
+func NewTaskEdge(t *coredata.Task) *TaskEdge {
 	return &TaskEdge{
-		Cursor: f.CursorKey(),
-		Node:   NewTask(f),
+		Cursor: t.CursorKey(),
+		Node:   NewTask(t),
 	}
 }
 
-func NewTask(e *coredata.Task) *Task {
-	return &Task{}
+func NewTask(t *coredata.Task) *Task {
+	return &Task{
+		ID:        t.ID,
+		CreatedAt: t.CreatedAt,
+		UpdatedAt: t.UpdatedAt,
+	}
 }
