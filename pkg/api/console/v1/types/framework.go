@@ -39,6 +39,12 @@ func NewFrameworkEdge(f *coredata.Framework) *FrameworkEdge {
 	}
 }
 
-func NewFramework(e *coredata.Framework) *Framework {
-	return &Framework{}
+func NewFramework(f *coredata.Framework) *Framework {
+	return &Framework{
+		ID:          f.ID,
+		Name:        f.Name,
+		Description: f.Description,
+		CreatedAt:   f.CreatedAt,
+		UpdatedAt:   f.UpdatedAt,
+	}
 }
