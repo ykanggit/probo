@@ -7,6 +7,7 @@ directive @goField(
 scalar CursorKey
 scalar Void
 scalar Datetime
+scalar Upload
 
 interface Node {
   id: ID!
@@ -74,6 +75,7 @@ type Control implements Node {
   id: ID!
   name: String!
   description: String!
+  state: String!
 
   tasks(
     first: Int

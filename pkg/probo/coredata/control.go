@@ -34,6 +34,7 @@ type (
 		FrameworkID string
 		Name        string
 		Description string
+		State       ControlState
 		ContentRef  string
 		CreatedAt   time.Time
 		UpdatedAt   time.Time
@@ -52,6 +53,7 @@ func (c *Control) scan(r pgx.Row) error {
 		&c.FrameworkID,
 		&c.Name,
 		&c.Description,
+		&c.State,
 		&c.ContentRef,
 		&c.CreatedAt,
 		&c.UpdatedAt,
@@ -66,19 +68,34 @@ func (c *Controls) LoadByFrameworkID(
 	cursor *page.Cursor,
 ) error {
 	q := `
+WITH control_states AS (
+    SELECT
+        control_id,
+        to_state,
+        reason,
+        RANK() OVER w
+    FROM
+        control_state_transitions
+    WINDOW
+        w AS (PARTITION BY control_id ORDER BY created_at DESC)
+)
 SELECT
     id,
     framework_id,
     name,
     description,
+    cs.to_state AS state,
     content_ref,
     created_at,
     updated_at
 FROM
     controls
+INNER JOIN
+    control_states cs ON cs.control_id = controls.id
 WHERE
     %s
     AND framework_id = @framework_id
+    AND cs.rank = 1
     AND %s
 `
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())

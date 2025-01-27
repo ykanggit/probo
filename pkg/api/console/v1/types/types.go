@@ -18,6 +18,7 @@ type Control struct {
 	ID          gid.GID         `json:"id"`
 	Name        string          `json:"name"`
 	Description string          `json:"description"`
+	State       string          `json:"state"`
 	Tasks       *TaskConnection `json:"tasks"`
 	CreatedAt   time.Time       `json:"createdAt"`
 	UpdatedAt   time.Time       `json:"updatedAt"`

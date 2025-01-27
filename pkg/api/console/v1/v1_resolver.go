@@ -54,7 +54,6 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error) {
-
 	switch id.EntityType() {
 	case coredata.OrganizationEntityType:
 		organization, err := r.svc.GetOrganization(ctx, id)
