@@ -13,6 +13,14 @@ interface Node {
   id: ID!
 }
 
+enum ControlState {
+  NotStarted
+  InProgress
+  NotApplicable
+  Implemented
+}
+
+
 type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
@@ -75,7 +83,7 @@ type Control implements Node {
   id: ID!
   name: String!
   description: String!
-  state: String!
+  state: ControlState!
 
   tasks(
     first: Int

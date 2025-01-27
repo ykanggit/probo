@@ -556,6 +556,14 @@ interface Node {
   id: ID!
 }
 
+enum ControlState {
+  NotStarted
+  InProgress
+  NotApplicable
+  Implemented
+}
+
+
 type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
@@ -618,7 +626,7 @@ type Control implements Node {
   id: ID!
   name: String!
   description: String!
-  state: String!
+  state: ControlState!
 
   tasks(
     first: Int
@@ -1124,9 +1132,9 @@ func (ec *executionContext) _Control_state(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(types.ControlState)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Control_state(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1136,7 +1144,7 @@ func (ec *executionContext) fieldContext_Control_state(_ context.Context, field 
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type ControlState does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5413,6 +5421,16 @@ func (ec *executionContext) marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋpro
 		return graphql.Null
 	}
 	return ec._ControlEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx context.Context, v any) (types.ControlState, error) {
+	var res types.ControlState
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx context.Context, sel ast.SelectionSet, v types.ControlState) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx context.Context, v any) (page.CursorKey, error) {

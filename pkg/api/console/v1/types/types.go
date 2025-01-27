@@ -3,6 +3,9 @@
 package types
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 
 	"github.com/getprobo/probo/pkg/probo/coredata/gid"
@@ -18,7 +21,7 @@ type Control struct {
 	ID          gid.GID         `json:"id"`
 	Name        string          `json:"name"`
 	Description string          `json:"description"`
-	State       string          `json:"state"`
+	State       ControlState    `json:"state"`
 	Tasks       *TaskConnection `json:"tasks"`
 	CreatedAt   time.Time       `json:"createdAt"`
 	UpdatedAt   time.Time       `json:"updatedAt"`
@@ -98,4 +101,49 @@ type TaskConnection struct {
 type TaskEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Task          `json:"node"`
+}
+
+type ControlState string
+
+const (
+	ControlStateNotStarted    ControlState = "NotStarted"
+	ControlStateInProgress    ControlState = "InProgress"
+	ControlStateNotApplicable ControlState = "NotApplicable"
+	ControlStateImplemented   ControlState = "Implemented"
+)
+
+var AllControlState = []ControlState{
+	ControlStateNotStarted,
+	ControlStateInProgress,
+	ControlStateNotApplicable,
+	ControlStateImplemented,
+}
+
+func (e ControlState) IsValid() bool {
+	switch e {
+	case ControlStateNotStarted, ControlStateInProgress, ControlStateNotApplicable, ControlStateImplemented:
+		return true
+	}
+	return false
+}
+
+func (e ControlState) String() string {
+	return string(e)
+}
+
+func (e *ControlState) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ControlState(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ControlState", str)
+	}
+	return nil
+}
+
+func (e ControlState) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
