@@ -20,4 +20,5 @@ const (
 	ControlEntityType
 	TaskEntityType
 	EvidenceEntityType
+	ControlStateTransitionEntityType
 )

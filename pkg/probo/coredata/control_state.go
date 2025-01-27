@@ -17,8 +17,6 @@ package coredata
 import (
 	"database/sql/driver"
 	"fmt"
-
-	"go.gearno.de/x/panicf"
 )
 
 type (
@@ -67,14 +65,12 @@ func (cs ControlState) String() string {
 		val = "NOT_APPLICABLE"
 	case ControlStateImplemented:
 		val = "IMPLEMENTED"
-	default:
-		panicf.Panic("invalid control state value: %v", cs)
 	}
 
 	return val
 }
 
-func (cs ControlState) Scan(value any) error {
+func (cs *ControlState) Scan(value any) error {
 	val, ok := value.(string)
 	if !ok {
 		return fmt.Errorf("invalid scan source for ControlState, expected string got %T", value)

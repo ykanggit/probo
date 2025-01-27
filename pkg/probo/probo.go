@@ -149,3 +149,31 @@ func (s *Service) ListControlTasks(
 
 	return page.NewPage(tasks, cursor), nil
 }
+
+func (s *Service) ListControlStateTransitions(
+	ctx context.Context,
+	controlID gid.GID,
+	cursor *page.Cursor,
+) (*page.Page[*coredata.ControlStateTransition], error) {
+	var controlStateTransitions coredata.ControlStateTransitions
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return controlStateTransitions.LoadByControlID(
+				ctx,
+				conn,
+				s.scope,
+				controlID,
+				cursor,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(controlStateTransitions, cursor), nil
+}
+

@@ -16,6 +16,18 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
+// StateTransisions is the resolver for the stateTransisions field.
+func (r *controlResolver) StateTransisions(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.ControlStateTransitionConnection, error) {
+	cursor := types.NewCursor(first, after, last, before)
+
+	page, err := r.svc.ListControlStateTransitions(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list control tasks: %w", err)
+	}
+
+	return types.NewControlStateTransitionConnection(page), nil
+}
+
 // Tasks is the resolver for the tasks field.
 func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

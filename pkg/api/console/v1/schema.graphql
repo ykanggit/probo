@@ -14,10 +14,10 @@ interface Node {
 }
 
 enum ControlState {
-  NotStarted
-  InProgress
-  NotApplicable
-  Implemented
+  NOT_STARTED
+  IN_PROGRESS
+  NOT_APPLICABLE
+  IMPLEMENTED
 }
 
 
@@ -85,6 +85,13 @@ type Control implements Node {
   description: String!
   state: ControlState!
 
+  stateTransisions(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): ControlStateTransitionConnection! @goField(forceResolver: true)
+
   tasks(
     first: Int
     after: CursorKey
@@ -92,6 +99,25 @@ type Control implements Node {
     before: CursorKey
   ): TaskConnection! @goField(forceResolver: true)
 
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type ControlStateTransitionConnection {
+  edges: [ControlStateTransitionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ControlStateTransitionEdge {
+  cursor: CursorKey!
+  node: ControlStateTransition!
+}
+
+type ControlStateTransition {
+  id: ID!
+  fromState: ControlState
+  toState: ControlState!
+  reason: String
   createdAt: Datetime!
   updatedAt: Datetime!
 }

@@ -18,13 +18,14 @@ type Node interface {
 }
 
 type Control struct {
-	ID          gid.GID         `json:"id"`
-	Name        string          `json:"name"`
-	Description string          `json:"description"`
-	State       ControlState    `json:"state"`
-	Tasks       *TaskConnection `json:"tasks"`
-	CreatedAt   time.Time       `json:"createdAt"`
-	UpdatedAt   time.Time       `json:"updatedAt"`
+	ID               gid.GID                           `json:"id"`
+	Name             string                            `json:"name"`
+	Description      string                            `json:"description"`
+	State            ControlState                      `json:"state"`
+	StateTransisions *ControlStateTransitionConnection `json:"stateTransisions"`
+	Tasks            *TaskConnection                   `json:"tasks"`
+	CreatedAt        time.Time                         `json:"createdAt"`
+	UpdatedAt        time.Time                         `json:"updatedAt"`
 }
 
 func (Control) IsNode()             {}
@@ -38,6 +39,25 @@ type ControlConnection struct {
 type ControlEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Control       `json:"node"`
+}
+
+type ControlStateTransition struct {
+	ID        gid.GID       `json:"id"`
+	FromState *ControlState `json:"fromState,omitempty"`
+	ToState   ControlState  `json:"toState"`
+	Reason    *string       `json:"reason,omitempty"`
+	CreatedAt time.Time     `json:"createdAt"`
+	UpdatedAt time.Time     `json:"updatedAt"`
+}
+
+type ControlStateTransitionConnection struct {
+	Edges    []*ControlStateTransitionEdge `json:"edges"`
+	PageInfo *PageInfo                     `json:"pageInfo"`
+}
+
+type ControlStateTransitionEdge struct {
+	Cursor page.CursorKey          `json:"cursor"`
+	Node   *ControlStateTransition `json:"node"`
 }
 
 type Framework struct {
@@ -106,10 +126,10 @@ type TaskEdge struct {
 type ControlState string
 
 const (
-	ControlStateNotStarted    ControlState = "NotStarted"
-	ControlStateInProgress    ControlState = "InProgress"
-	ControlStateNotApplicable ControlState = "NotApplicable"
-	ControlStateImplemented   ControlState = "Implemented"
+	ControlStateNotStarted    ControlState = "NOT_STARTED"
+	ControlStateInProgress    ControlState = "IN_PROGRESS"
+	ControlStateNotApplicable ControlState = "NOT_APPLICABLE"
+	ControlStateImplemented   ControlState = "IMPLEMENTED"
 )
 
 var AllControlState = []ControlState{

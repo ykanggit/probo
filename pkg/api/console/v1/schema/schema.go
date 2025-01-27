@@ -52,13 +52,14 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Control struct {
-		CreatedAt   func(childComplexity int) int
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		State       func(childComplexity int) int
-		Tasks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
-		UpdatedAt   func(childComplexity int) int
+		CreatedAt        func(childComplexity int) int
+		Description      func(childComplexity int) int
+		ID               func(childComplexity int) int
+		Name             func(childComplexity int) int
+		State            func(childComplexity int) int
+		StateTransisions func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		Tasks            func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		UpdatedAt        func(childComplexity int) int
 	}
 
 	ControlConnection struct {
@@ -67,6 +68,25 @@ type ComplexityRoot struct {
 	}
 
 	ControlEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	ControlStateTransition struct {
+		CreatedAt func(childComplexity int) int
+		FromState func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Reason    func(childComplexity int) int
+		ToState   func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+	}
+
+	ControlStateTransitionConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	ControlStateTransitionEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
 	}
@@ -128,6 +148,7 @@ type ComplexityRoot struct {
 }
 
 type ControlResolver interface {
+	StateTransisions(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.ControlStateTransitionConnection, error)
 	Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskConnection, error)
 }
 type FrameworkResolver interface {
@@ -194,6 +215,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Control.State(childComplexity), true
 
+	case "Control.stateTransisions":
+		if e.complexity.Control.StateTransisions == nil {
+			break
+		}
+
+		args, err := ec.field_Control_stateTransisions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Control.StateTransisions(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+
 	case "Control.tasks":
 		if e.complexity.Control.Tasks == nil {
 			break
@@ -240,6 +273,76 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ControlEdge.Node(childComplexity), true
+
+	case "ControlStateTransition.createdAt":
+		if e.complexity.ControlStateTransition.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.ControlStateTransition.CreatedAt(childComplexity), true
+
+	case "ControlStateTransition.fromState":
+		if e.complexity.ControlStateTransition.FromState == nil {
+			break
+		}
+
+		return e.complexity.ControlStateTransition.FromState(childComplexity), true
+
+	case "ControlStateTransition.id":
+		if e.complexity.ControlStateTransition.ID == nil {
+			break
+		}
+
+		return e.complexity.ControlStateTransition.ID(childComplexity), true
+
+	case "ControlStateTransition.reason":
+		if e.complexity.ControlStateTransition.Reason == nil {
+			break
+		}
+
+		return e.complexity.ControlStateTransition.Reason(childComplexity), true
+
+	case "ControlStateTransition.toState":
+		if e.complexity.ControlStateTransition.ToState == nil {
+			break
+		}
+
+		return e.complexity.ControlStateTransition.ToState(childComplexity), true
+
+	case "ControlStateTransition.updatedAt":
+		if e.complexity.ControlStateTransition.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.ControlStateTransition.UpdatedAt(childComplexity), true
+
+	case "ControlStateTransitionConnection.edges":
+		if e.complexity.ControlStateTransitionConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.ControlStateTransitionConnection.Edges(childComplexity), true
+
+	case "ControlStateTransitionConnection.pageInfo":
+		if e.complexity.ControlStateTransitionConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.ControlStateTransitionConnection.PageInfo(childComplexity), true
+
+	case "ControlStateTransitionEdge.cursor":
+		if e.complexity.ControlStateTransitionEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.ControlStateTransitionEdge.Cursor(childComplexity), true
+
+	case "ControlStateTransitionEdge.node":
+		if e.complexity.ControlStateTransitionEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.ControlStateTransitionEdge.Node(childComplexity), true
 
 	case "Framework.controls":
 		if e.complexity.Framework.Controls == nil {
@@ -557,10 +660,10 @@ interface Node {
 }
 
 enum ControlState {
-  NotStarted
-  InProgress
-  NotApplicable
-  Implemented
+  NOT_STARTED
+  IN_PROGRESS
+  NOT_APPLICABLE
+  IMPLEMENTED
 }
 
 
@@ -628,6 +731,13 @@ type Control implements Node {
   description: String!
   state: ControlState!
 
+  stateTransisions(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): ControlStateTransitionConnection! @goField(forceResolver: true)
+
   tasks(
     first: Int
     after: CursorKey
@@ -635,6 +745,25 @@ type Control implements Node {
     before: CursorKey
   ): TaskConnection! @goField(forceResolver: true)
 
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type ControlStateTransitionConnection {
+  edges: [ControlStateTransitionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ControlStateTransitionEdge {
+  cursor: CursorKey!
+  node: ControlStateTransition!
+}
+
+type ControlStateTransition {
+  id: ID!
+  fromState: ControlState
+  toState: ControlState!
+  reason: String
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -666,6 +795,83 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Control_stateTransisions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Control_stateTransisions_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Control_stateTransisions_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Control_stateTransisions_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Control_stateTransisions_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	return args, nil
+}
+func (ec *executionContext) field_Control_stateTransisions_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_stateTransisions_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_stateTransisions_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_stateTransisions_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
 
 func (ec *executionContext) field_Control_tasks_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
@@ -1150,6 +1356,55 @@ func (ec *executionContext) fieldContext_Control_state(_ context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Control_stateTransisions(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_stateTransisions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Control().StateTransisions(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ControlStateTransitionConnection)
+	fc.Result = res
+	return ec.marshalNControlStateTransitionConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlStateTransitionConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_stateTransisions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_ControlStateTransitionConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_ControlStateTransitionConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlStateTransitionConnection", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Control_stateTransisions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Control_tasks(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Control_tasks(ctx, field)
 	if err != nil {
@@ -1446,6 +1701,8 @@ func (ec *executionContext) fieldContext_ControlEdge_node(_ context.Context, fie
 				return ec.fieldContext_Control_description(ctx, field)
 			case "state":
 				return ec.fieldContext_Control_state(ctx, field)
+			case "stateTransisions":
+				return ec.fieldContext_Control_stateTransisions(ctx, field)
 			case "tasks":
 				return ec.fieldContext_Control_tasks(ctx, field)
 			case "createdAt":
@@ -1454,6 +1711,410 @@ func (ec *executionContext) fieldContext_ControlEdge_node(_ context.Context, fie
 				return ec.fieldContext_Control_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Control", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlStateTransition_id(ctx context.Context, field graphql.CollectedField, obj *types.ControlStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlStateTransition_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlStateTransition_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlStateTransition_fromState(ctx context.Context, field graphql.CollectedField, obj *types.ControlStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlStateTransition_fromState(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FromState, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.ControlState)
+	fc.Result = res
+	return ec.marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlStateTransition_fromState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ControlState does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlStateTransition_toState(ctx context.Context, field graphql.CollectedField, obj *types.ControlStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlStateTransition_toState(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ToState, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(types.ControlState)
+	fc.Result = res
+	return ec.marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlStateTransition_toState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ControlState does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlStateTransition_reason(ctx context.Context, field graphql.CollectedField, obj *types.ControlStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlStateTransition_reason(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Reason, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlStateTransition_reason(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlStateTransition_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.ControlStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlStateTransition_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlStateTransition_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlStateTransition_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.ControlStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlStateTransition_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlStateTransition_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlStateTransitionConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.ControlStateTransitionConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlStateTransitionConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.ControlStateTransitionEdge)
+	fc.Result = res
+	return ec.marshalNControlStateTransitionEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlStateTransitionEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlStateTransitionConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlStateTransitionConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_ControlStateTransitionEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_ControlStateTransitionEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlStateTransitionEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlStateTransitionConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.ControlStateTransitionConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlStateTransitionConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlStateTransitionConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlStateTransitionConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlStateTransitionEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.ControlStateTransitionEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlStateTransitionEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlStateTransitionEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlStateTransitionEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlStateTransitionEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.ControlStateTransitionEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlStateTransitionEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ControlStateTransition)
+	fc.Result = res
+	return ec.marshalNControlStateTransition2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlStateTransition(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlStateTransitionEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlStateTransitionEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ControlStateTransition_id(ctx, field)
+			case "fromState":
+				return ec.fieldContext_ControlStateTransition_fromState(ctx, field)
+			case "toState":
+				return ec.fieldContext_ControlStateTransition_toState(ctx, field)
+			case "reason":
+				return ec.fieldContext_ControlStateTransition_reason(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ControlStateTransition_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ControlStateTransition_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlStateTransition", field.Name)
 		},
 	}
 	return fc, nil
@@ -4338,6 +4999,37 @@ func (ec *executionContext) _Control(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "stateTransisions":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				res = ec._Control_stateTransisions(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "tasks":
 			field := field
 
@@ -4464,6 +5156,152 @@ func (ec *executionContext) _ControlEdge(ctx context.Context, sel ast.SelectionS
 			}
 		case "node":
 			out.Values[i] = ec._ControlEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var controlStateTransitionImplementors = []string{"ControlStateTransition"}
+
+func (ec *executionContext) _ControlStateTransition(ctx context.Context, sel ast.SelectionSet, obj *types.ControlStateTransition) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, controlStateTransitionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ControlStateTransition")
+		case "id":
+			out.Values[i] = ec._ControlStateTransition_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fromState":
+			out.Values[i] = ec._ControlStateTransition_fromState(ctx, field, obj)
+		case "toState":
+			out.Values[i] = ec._ControlStateTransition_toState(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "reason":
+			out.Values[i] = ec._ControlStateTransition_reason(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._ControlStateTransition_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._ControlStateTransition_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var controlStateTransitionConnectionImplementors = []string{"ControlStateTransitionConnection"}
+
+func (ec *executionContext) _ControlStateTransitionConnection(ctx context.Context, sel ast.SelectionSet, obj *types.ControlStateTransitionConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, controlStateTransitionConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ControlStateTransitionConnection")
+		case "edges":
+			out.Values[i] = ec._ControlStateTransitionConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._ControlStateTransitionConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var controlStateTransitionEdgeImplementors = []string{"ControlStateTransitionEdge"}
+
+func (ec *executionContext) _ControlStateTransitionEdge(ctx context.Context, sel ast.SelectionSet, obj *types.ControlStateTransitionEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, controlStateTransitionEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ControlStateTransitionEdge")
+		case "cursor":
+			out.Values[i] = ec._ControlStateTransitionEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._ControlStateTransitionEdge_node(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -5433,6 +6271,78 @@ func (ec *executionContext) marshalNControlState2githubᚗcomᚋgetproboᚋprobo
 	return v
 }
 
+func (ec *executionContext) marshalNControlStateTransition2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlStateTransition(ctx context.Context, sel ast.SelectionSet, v *types.ControlStateTransition) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ControlStateTransition(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNControlStateTransitionConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlStateTransitionConnection(ctx context.Context, sel ast.SelectionSet, v types.ControlStateTransitionConnection) graphql.Marshaler {
+	return ec._ControlStateTransitionConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNControlStateTransitionConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlStateTransitionConnection(ctx context.Context, sel ast.SelectionSet, v *types.ControlStateTransitionConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ControlStateTransitionConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNControlStateTransitionEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlStateTransitionEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.ControlStateTransitionEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNControlStateTransitionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlStateTransitionEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNControlStateTransitionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlStateTransitionEdge(ctx context.Context, sel ast.SelectionSet, v *types.ControlStateTransitionEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ControlStateTransitionEdge(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx context.Context, v any) (page.CursorKey, error) {
 	res, err := types.UnmarshalCursorKeyScalar(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5910,6 +6820,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx context.Context, v any) (*types.ControlState, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(types.ControlState)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx context.Context, sel ast.SelectionSet, v *types.ControlState) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx context.Context, v any) (*page.CursorKey, error) {
