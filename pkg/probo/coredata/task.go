@@ -31,7 +31,7 @@ import (
 type (
 	Task struct {
 		ID         gid.GID
-		ControlID  string
+		ControlID  gid.GID
 		ContentRef string
 		CreatedAt  time.Time
 		UpdatedAt  time.Time
