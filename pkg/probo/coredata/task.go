@@ -30,11 +30,13 @@ import (
 
 type (
 	Task struct {
-		ID         gid.GID
-		ControlID  gid.GID
-		ContentRef string
-		CreatedAt  time.Time
-		UpdatedAt  time.Time
+		ID          gid.GID
+		ControlID   gid.GID
+		Name        string
+		Description string
+		ContentRef  string
+		CreatedAt   time.Time
+		UpdatedAt   time.Time
 	}
 
 	Tasks []*Task
@@ -48,6 +50,8 @@ func (t *Task) scan(r pgx.Row) error {
 	return r.Scan(
 		&t.ID,
 		&t.ControlID,
+		&t.Name,
+		&t.Description,
 		&t.ContentRef,
 		&t.CreatedAt,
 		&t.UpdatedAt,
@@ -66,6 +70,8 @@ WITH control_tasks AS (
     SELECT
         t.id,
         @control_id AS control_id,
+        t.name,
+        t.description,
         t.content_ref,
         t.created_at,
         t.updated_at
@@ -81,6 +87,8 @@ WITH control_tasks AS (
 SELECT
     id,
     control_id,
+    name,
+    description,
     content_ref,
     created_at,
     updated_at

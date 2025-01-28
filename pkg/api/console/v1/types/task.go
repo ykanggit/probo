@@ -41,8 +41,10 @@ func NewTaskEdge(t *coredata.Task) *TaskEdge {
 
 func NewTask(t *coredata.Task) *Task {
 	return &Task{
-		ID:        t.ID,
-		CreatedAt: t.CreatedAt,
-		UpdatedAt: t.UpdatedAt,
+		ID:          t.ID,
+		Name:        t.Name,
+		Description: t.Description,
+		CreatedAt:   t.CreatedAt,
+		UpdatedAt:   t.UpdatedAt,
 	}
 }

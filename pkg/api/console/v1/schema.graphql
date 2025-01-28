@@ -135,6 +135,7 @@ type TaskEdge {
 type Task implements Node {
   id: ID!
   name: String!
+  description: String!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
