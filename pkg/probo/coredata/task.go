@@ -62,6 +62,22 @@ func (t *Tasks) LoadByControlID(
 	cursor *page.Cursor,
 ) error {
 	q := `
+WITH control_tasks AS (
+    SELECT
+        t.id,
+        @control_id AS control_id,
+        t.content_ref,
+        t.created_at,
+        t.updated_at
+     FROM
+         tasks t
+     INNER JOIN
+         controls_tasks ct ON
+             ct.task_id = t.id
+             AND ct.control_id = @control_id
+     WHERE
+         %s
+)
 SELECT
     id,
     control_id,
@@ -69,11 +85,9 @@ SELECT
     created_at,
     updated_at
 FROM
-    tasks
+    control_tasks
 WHERE
     %s
-    AND control_id = @control_id
-    AND %s
 `
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
