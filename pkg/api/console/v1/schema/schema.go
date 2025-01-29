@@ -45,6 +45,7 @@ type ResolverRoot interface {
 	Framework() FrameworkResolver
 	Organization() OrganizationResolver
 	Query() QueryResolver
+	Task() TaskResolver
 }
 
 type DirectiveRoot struct {
@@ -91,6 +92,23 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	Evidence struct {
+		CreatedAt func(childComplexity int) int
+		FileURL   func(childComplexity int) int
+		ID        func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+	}
+
+	EvidenceConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	EvidenceEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	Framework struct {
 		Controls    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 		CreatedAt   func(childComplexity int) int
@@ -132,6 +150,7 @@ type ComplexityRoot struct {
 	Task struct {
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
+		Evidences   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
@@ -160,6 +179,9 @@ type OrganizationResolver interface {
 }
 type QueryResolver interface {
 	Node(ctx context.Context, id gid.GID) (types.Node, error)
+}
+type TaskResolver interface {
+	Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceConnection, error)
 }
 
 type executableSchema struct {
@@ -345,6 +367,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ControlStateTransitionEdge.Node(childComplexity), true
 
+	case "Evidence.createdAt":
+		if e.complexity.Evidence.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Evidence.CreatedAt(childComplexity), true
+
+	case "Evidence.fileUrl":
+		if e.complexity.Evidence.FileURL == nil {
+			break
+		}
+
+		return e.complexity.Evidence.FileURL(childComplexity), true
+
+	case "Evidence.id":
+		if e.complexity.Evidence.ID == nil {
+			break
+		}
+
+		return e.complexity.Evidence.ID(childComplexity), true
+
+	case "Evidence.updatedAt":
+		if e.complexity.Evidence.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Evidence.UpdatedAt(childComplexity), true
+
+	case "EvidenceConnection.edges":
+		if e.complexity.EvidenceConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.EvidenceConnection.Edges(childComplexity), true
+
+	case "EvidenceConnection.pageInfo":
+		if e.complexity.EvidenceConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.EvidenceConnection.PageInfo(childComplexity), true
+
+	case "EvidenceEdge.cursor":
+		if e.complexity.EvidenceEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.EvidenceEdge.Cursor(childComplexity), true
+
+	case "EvidenceEdge.node":
+		if e.complexity.EvidenceEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.EvidenceEdge.Node(childComplexity), true
+
 	case "Framework.controls":
 		if e.complexity.Framework.Controls == nil {
 			break
@@ -513,6 +591,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Task.Description(childComplexity), true
+
+	case "Task.evidences":
+		if e.complexity.Task.Evidences == nil {
+			break
+		}
+
+		args, err := ec.field_Task_evidences_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Task.Evidences(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
 
 	case "Task.id":
 		if e.complexity.Task.ID == nil {
@@ -790,6 +880,31 @@ type Task implements Node {
   id: ID!
   name: String!
   description: String!
+
+  evidences(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): EvidenceConnection! @goField(forceResolver: true)
+  
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type EvidenceConnection {
+  edges: [EvidenceEdge!]!
+  pageInfo: PageInfo!
+}
+
+type EvidenceEdge {
+  cursor: CursorKey!
+  node: Evidence!
+}
+
+type Evidence implements Node {
+  id: ID!
+  fileUrl: String!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -1156,6 +1271,83 @@ func (ec *executionContext) field_Query_node_argsID(
 	}
 
 	var zeroVal gid.GID
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Task_evidences_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Task_evidences_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Task_evidences_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Task_evidences_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Task_evidences_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	return args, nil
+}
+func (ec *executionContext) field_Task_evidences_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Task_evidences_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Task_evidences_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Task_evidences_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
 	return zeroVal, nil
 }
 
@@ -2124,6 +2316,336 @@ func (ec *executionContext) fieldContext_ControlStateTransitionEdge_node(_ conte
 				return ec.fieldContext_ControlStateTransition_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ControlStateTransition", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Evidence_id(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Evidence_fileUrl(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_fileUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_fileUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Evidence_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Evidence_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EvidenceConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.EvidenceConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EvidenceConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.EvidenceEdge)
+	fc.Result = res
+	return ec.marshalNEvidenceEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EvidenceConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EvidenceConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_EvidenceEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_EvidenceEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EvidenceEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EvidenceConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.EvidenceConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EvidenceConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EvidenceConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EvidenceConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EvidenceEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.EvidenceEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EvidenceEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EvidenceEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EvidenceEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EvidenceEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.EvidenceEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EvidenceEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Evidence)
+	fc.Result = res
+	return ec.marshalNEvidence2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidence(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EvidenceEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EvidenceEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Evidence_id(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_Evidence_fileUrl(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Evidence_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Evidence_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Evidence", field.Name)
 		},
 	}
 	return fc, nil
@@ -3165,6 +3687,55 @@ func (ec *executionContext) fieldContext_Task_description(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Task_evidences(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_evidences(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().Evidences(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.EvidenceConnection)
+	fc.Result = res
+	return ec.marshalNEvidenceConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_evidences(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_EvidenceConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_EvidenceConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EvidenceConnection", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Task_evidences_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Task_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_createdAt(ctx, field)
 	if err != nil {
@@ -3410,6 +3981,8 @@ func (ec *executionContext) fieldContext_TaskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Task_description(ctx, field)
+			case "evidences":
+				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Task_createdAt(ctx, field)
 			case "updatedAt":
@@ -5008,6 +5581,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Task(ctx, sel, obj)
+	case types.Evidence:
+		return ec._Evidence(ctx, sel, &obj)
+	case *types.Evidence:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Evidence(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -5351,6 +5931,148 @@ func (ec *executionContext) _ControlStateTransitionEdge(ctx context.Context, sel
 			}
 		case "node":
 			out.Values[i] = ec._ControlStateTransitionEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var evidenceImplementors = []string{"Evidence", "Node"}
+
+func (ec *executionContext) _Evidence(ctx context.Context, sel ast.SelectionSet, obj *types.Evidence) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, evidenceImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Evidence")
+		case "id":
+			out.Values[i] = ec._Evidence_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fileUrl":
+			out.Values[i] = ec._Evidence_fileUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Evidence_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Evidence_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var evidenceConnectionImplementors = []string{"EvidenceConnection"}
+
+func (ec *executionContext) _EvidenceConnection(ctx context.Context, sel ast.SelectionSet, obj *types.EvidenceConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, evidenceConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("EvidenceConnection")
+		case "edges":
+			out.Values[i] = ec._EvidenceConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._EvidenceConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var evidenceEdgeImplementors = []string{"EvidenceEdge"}
+
+func (ec *executionContext) _EvidenceEdge(ctx context.Context, sel ast.SelectionSet, obj *types.EvidenceEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, evidenceEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("EvidenceEdge")
+		case "cursor":
+			out.Values[i] = ec._EvidenceEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._EvidenceEdge_node(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -5769,27 +6491,58 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._Task_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Task_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "description":
 			out.Values[i] = ec._Task_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "evidences":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				res = ec._Task_evidences(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Task_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Task_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -6425,6 +7178,78 @@ func (ec *executionContext) marshalNDatetime2timeᚐTime(ctx context.Context, se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNEvidence2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidence(ctx context.Context, sel ast.SelectionSet, v *types.Evidence) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Evidence(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNEvidenceConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceConnection(ctx context.Context, sel ast.SelectionSet, v types.EvidenceConnection) graphql.Marshaler {
+	return ec._EvidenceConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNEvidenceConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceConnection(ctx context.Context, sel ast.SelectionSet, v *types.EvidenceConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._EvidenceConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNEvidenceEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.EvidenceEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNEvidenceEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNEvidenceEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceEdge(ctx context.Context, sel ast.SelectionSet, v *types.EvidenceEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._EvidenceEdge(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNFramework2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v *types.Framework) graphql.Marshaler {

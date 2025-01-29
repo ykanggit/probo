@@ -136,6 +136,31 @@ type Task implements Node {
   id: ID!
   name: String!
   description: String!
+
+  evidences(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): EvidenceConnection! @goField(forceResolver: true)
+  
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type EvidenceConnection {
+  edges: [EvidenceEdge!]!
+  pageInfo: PageInfo!
+}
+
+type EvidenceEdge {
+  cursor: CursorKey!
+  node: Evidence!
+}
+
+type Evidence implements Node {
+  id: ID!
+  fileUrl: String!
   createdAt: Datetime!
   updatedAt: Datetime!
 }

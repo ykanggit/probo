@@ -80,6 +80,18 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 	return nil, gqlerror.Errorf("node %q not found", id)
 }
 
+// Evidences is the resolver for the evidences field.
+func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceConnection, error) {
+	cursor := types.NewCursor(first, after, last, before)
+
+	page, err := r.svc.ListTaskEvidences(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
+	}
+
+	return types.NewEvidenceConnection(page), nil
+}
+
 // Control returns schema.ControlResolver implementation.
 func (r *Resolver) Control() schema.ControlResolver { return &controlResolver{r} }
 
@@ -92,7 +104,11 @@ func (r *Resolver) Organization() schema.OrganizationResolver { return &organiza
 // Query returns schema.QueryResolver implementation.
 func (r *Resolver) Query() schema.QueryResolver { return &queryResolver{r} }
 
+// Task returns schema.TaskResolver implementation.
+func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
+
 type controlResolver struct{ *Resolver }
 type frameworkResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type taskResolver struct{ *Resolver }

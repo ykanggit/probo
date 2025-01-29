@@ -177,3 +177,29 @@ func (s *Service) ListControlStateTransitions(
 	return page.NewPage(controlStateTransitions, cursor), nil
 }
 
+func (s *Service) ListTaskEvidences(
+	ctx context.Context,
+	taskID gid.GID,
+	cursor *page.Cursor,
+) (*page.Page[*coredata.Evidence], error) {
+	var evidences coredata.Evidences
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return evidences.LoadByTaskID(
+				ctx,
+				conn,
+				s.scope,
+				taskID,
+				cursor,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(evidences, cursor), nil
+}

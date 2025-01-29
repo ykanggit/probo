@@ -60,6 +60,26 @@ type ControlStateTransitionEdge struct {
 	Node   *ControlStateTransition `json:"node"`
 }
 
+type Evidence struct {
+	ID        gid.GID   `json:"id"`
+	FileURL   string    `json:"fileUrl"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+func (Evidence) IsNode()             {}
+func (this Evidence) GetID() gid.GID { return this.ID }
+
+type EvidenceConnection struct {
+	Edges    []*EvidenceEdge `json:"edges"`
+	PageInfo *PageInfo       `json:"pageInfo"`
+}
+
+type EvidenceEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Evidence      `json:"node"`
+}
+
 type Framework struct {
 	ID          gid.GID            `json:"id"`
 	Name        string             `json:"name"`
@@ -104,11 +124,12 @@ type Query struct {
 }
 
 type Task struct {
-	ID          gid.GID   `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          gid.GID             `json:"id"`
+	Name        string              `json:"name"`
+	Description string              `json:"description"`
+	Evidences   *EvidenceConnection `json:"evidences"`
+	CreatedAt   time.Time           `json:"createdAt"`
+	UpdatedAt   time.Time           `json:"updatedAt"`
 }
 
 func (Task) IsNode()             {}
