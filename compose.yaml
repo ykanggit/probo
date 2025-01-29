@@ -16,6 +16,20 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
 
+  minio:
+    image: "quay.io/minio/minio"
+    entrypoint: "sh"
+    command: |
+      -c 'mkdir -p /var/lib/minio/probod && minio server --json --console-address :9001 /var/lib/minio'
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - "minio-data:/var/lib/minio:rw"
+    environment:
+      MINIO_ROOT_USER: "probod"
+      MINIO_ROOT_PASSWORD: "thisisnotasecret"
+      
   grafana:
     image: "grafana/grafana:latest"
     ports:
@@ -64,6 +78,7 @@ services:
 
 volumes:
   postgres-data:
+  minio-data:
   grafana-data:
   prometheus-data:
   tempo-data:
