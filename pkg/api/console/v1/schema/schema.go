@@ -962,12 +962,10 @@ enum ControlState {
   IMPLEMENTED
 }
 
-
 enum TaskState {
   TODO
   DONE
 }
-
 
 type PageInfo {
   hasNextPage: Boolean!
