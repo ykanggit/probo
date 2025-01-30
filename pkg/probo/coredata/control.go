@@ -31,7 +31,7 @@ import (
 type (
 	Control struct {
 		ID          gid.GID
-		FrameworkID string
+		FrameworkID gid.GID
 		Name        string
 		Description string
 		State       ControlState
