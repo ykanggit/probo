@@ -44,7 +44,7 @@ func NewService(ctx context.Context, pgClient *pg.Client) (*Service, error) {
 	}, nil
 }
 
-func (s *Service) GetOrganization(
+func (s Service) GetOrganization(
 	ctx context.Context,
 	organizationID gid.GID,
 ) (*coredata.Organization, error) {
@@ -69,7 +69,7 @@ func (s *Service) GetOrganization(
 	return organization, nil
 }
 
-func (s *Service) ListOrganizationFrameworks(
+func (s Service) ListOrganizationFrameworks(
 	ctx context.Context,
 	organizationID gid.GID,
 	cursor *page.Cursor,
@@ -96,7 +96,7 @@ func (s *Service) ListOrganizationFrameworks(
 	return page.NewPage(frameworks, cursor), nil
 }
 
-func (s *Service) ListFrameworkControls(
+func (s Service) ListFrameworkControls(
 	ctx context.Context,
 	frameworkID gid.GID,
 	cursor *page.Cursor,
@@ -123,7 +123,7 @@ func (s *Service) ListFrameworkControls(
 	return page.NewPage(controls, cursor), nil
 }
 
-func (s *Service) ListControlTasks(
+func (s Service) ListControlTasks(
 	ctx context.Context,
 	controlID gid.GID,
 	cursor *page.Cursor,
@@ -150,7 +150,7 @@ func (s *Service) ListControlTasks(
 	return page.NewPage(tasks, cursor), nil
 }
 
-func (s *Service) ListControlStateTransitions(
+func (s Service) ListControlStateTransitions(
 	ctx context.Context,
 	controlID gid.GID,
 	cursor *page.Cursor,
@@ -177,7 +177,7 @@ func (s *Service) ListControlStateTransitions(
 	return page.NewPage(controlStateTransitions, cursor), nil
 }
 
-func (s *Service) ListTaskEvidences(
+func (s Service) ListTaskEvidences(
 	ctx context.Context,
 	taskID gid.GID,
 	cursor *page.Cursor,
