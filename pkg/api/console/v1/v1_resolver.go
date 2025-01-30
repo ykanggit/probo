@@ -64,6 +64,18 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 	return types.NewFrameworkConnection(page), nil
 }
 
+// Vendors is the resolver for the vendors field.
+func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.VendorConnection, error) {
+	cursor := types.NewCursor(first, after, last, before)
+
+	page, err := r.svc.ListOrganizationVendors(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
+	}
+
+	return types.NewVendorConnection(page), nil
+}
+
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error) {
 	switch id.EntityType() {

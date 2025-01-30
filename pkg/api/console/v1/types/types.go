@@ -106,6 +106,7 @@ type Organization struct {
 	ID         gid.GID              `json:"id"`
 	Name       string               `json:"name"`
 	Frameworks *FrameworkConnection `json:"frameworks"`
+	Vendors    *VendorConnection    `json:"vendors"`
 	CreatedAt  time.Time            `json:"createdAt"`
 	UpdatedAt  time.Time            `json:"updatedAt"`
 }
@@ -143,6 +144,23 @@ type TaskConnection struct {
 type TaskEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Task          `json:"node"`
+}
+
+type Vendor struct {
+	ID        gid.GID   `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+type VendorConnection struct {
+	Edges    []*VendorEdge `json:"edges"`
+	PageInfo *PageInfo     `json:"pageInfo"`
+}
+
+type VendorEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Vendor        `json:"node"`
 }
 
 type ControlState string

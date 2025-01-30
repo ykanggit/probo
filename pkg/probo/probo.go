@@ -203,3 +203,30 @@ func (s *Service) ListTaskEvidences(
 
 	return page.NewPage(evidences, cursor), nil
 }
+
+func (s Service) ListOrganizationVendors(
+	ctx context.Context,
+	organizationID gid.GID,
+	cursor *page.Cursor,
+) (*page.Page[*coredata.Vendor], error) {
+	var vendors coredata.Vendors
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return vendors.LoadByOrganizationID(
+				ctx,
+				conn,
+				s.scope,
+				organizationID,
+				cursor,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(vendors, cursor), nil
+}

@@ -39,6 +39,31 @@ type Organization implements Node {
     before: CursorKey
   ): FrameworkConnection! @goField(forceResolver: true)
 
+  vendors(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): VendorConnection! @goField(forceResolver: true)
+
+
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type VendorConnection {
+  edges: [VendorEdge!]!
+  pageInfo: PageInfo!
+}
+
+type VendorEdge {
+  cursor: CursorKey!
+  node: Vendor!
+}
+
+type Vendor {
+  id: ID!
+  name: String!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
