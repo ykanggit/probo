@@ -151,6 +151,7 @@ type Task struct {
 	ID          gid.GID             `json:"id"`
 	Name        string              `json:"name"`
 	Description string              `json:"description"`
+	State       TaskState           `json:"state"`
 	Evidences   *EvidenceConnection `json:"evidences"`
 	CreatedAt   time.Time           `json:"createdAt"`
 	UpdatedAt   time.Time           `json:"updatedAt"`
@@ -231,5 +232,46 @@ func (e *ControlState) UnmarshalGQL(v any) error {
 }
 
 func (e ControlState) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type TaskState string
+
+const (
+	TaskStateTodo TaskState = "TODO"
+	TaskStateDone TaskState = "DONE"
+)
+
+var AllTaskState = []TaskState{
+	TaskStateTodo,
+	TaskStateDone,
+}
+
+func (e TaskState) IsValid() bool {
+	switch e {
+	case TaskStateTodo, TaskStateDone:
+		return true
+	}
+	return false
+}
+
+func (e TaskState) String() string {
+	return string(e)
+}
+
+func (e *TaskState) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TaskState(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TaskState", str)
+	}
+	return nil
+}
+
+func (e TaskState) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

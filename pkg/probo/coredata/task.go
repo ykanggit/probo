@@ -34,6 +34,7 @@ type (
 		ControlID   gid.GID
 		Name        string
 		Description string
+		State       TaskState
 		ContentRef  string
 		CreatedAt   time.Time
 		UpdatedAt   time.Time
@@ -52,6 +53,7 @@ func (t *Task) scan(r pgx.Row) error {
 		&t.ControlID,
 		&t.Name,
 		&t.Description,
+		&t.State,
 		&t.ContentRef,
 		&t.CreatedAt,
 		&t.UpdatedAt,
@@ -72,6 +74,7 @@ WITH control_tasks AS (
         @control_id AS control_id,
         t.name,
         t.description,
+        t.state,
         t.content_ref,
         t.created_at,
         t.updated_at
@@ -89,6 +92,7 @@ SELECT
     control_id,
     name,
     description,
+    state,
     content_ref,
     created_at,
     updated_at

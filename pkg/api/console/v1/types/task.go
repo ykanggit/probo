@@ -44,6 +44,7 @@ func NewTask(t *coredata.Task) *Task {
 		ID:          t.ID,
 		Name:        t.Name,
 		Description: t.Description,
+		State:       TaskState(t.State.String()),
 		CreatedAt:   t.CreatedAt,
 		UpdatedAt:   t.UpdatedAt,
 	}

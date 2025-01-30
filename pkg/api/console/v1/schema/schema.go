@@ -174,6 +174,7 @@ type ComplexityRoot struct {
 		Evidences   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
+		State       func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 	}
 
@@ -752,6 +753,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.Name(childComplexity), true
 
+	case "Task.state":
+		if e.complexity.Task.State == nil {
+			break
+		}
+
+		return e.complexity.Task.State(childComplexity), true
+
 	case "Task.updatedAt":
 		if e.complexity.Task.UpdatedAt == nil {
 			break
@@ -955,6 +963,12 @@ enum ControlState {
 }
 
 
+enum TaskState {
+  TODO
+  DONE
+}
+
+
 type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
@@ -1120,6 +1134,7 @@ type Task implements Node {
   id: ID!
   name: String!
   description: String!
+  state: TaskState!
 
   evidences(
     first: Int
@@ -4589,6 +4604,44 @@ func (ec *executionContext) fieldContext_Task_description(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Task_state(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_state(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.State, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(types.TaskState)
+	fc.Result = res
+	return ec.marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_state(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type TaskState does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Task_evidences(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_evidences(ctx, field)
 	if err != nil {
@@ -4883,6 +4936,8 @@ func (ec *executionContext) fieldContext_TaskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Task_description(ctx, field)
+			case "state":
+				return ec.fieldContext_Task_state(ctx, field)
 			case "evidences":
 				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
@@ -7963,6 +8018,11 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "state":
+			out.Values[i] = ec._Task_state(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "evidences":
 			field := field
 
@@ -9150,6 +9210,16 @@ func (ec *executionContext) marshalNTaskEdge2ᚖgithubᚗcomᚋgetproboᚋprobo�
 		return graphql.Null
 	}
 	return ec._TaskEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx context.Context, v any) (types.TaskState, error) {
+	var res types.TaskState
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx context.Context, sel ast.SelectionSet, v types.TaskState) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx context.Context, sel ast.SelectionSet, v *types.Vendor) graphql.Marshaler {
