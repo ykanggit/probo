@@ -32,18 +32,18 @@ func NewVendorConnection(p *page.Page[*coredata.Vendor]) *VendorConnection {
 	}
 }
 
-func NewVendorEdge(f *coredata.Vendor) *VendorEdge {
+func NewVendorEdge(v *coredata.Vendor) *VendorEdge {
 	return &VendorEdge{
-		Cursor: f.CursorKey(),
-		Node:   NewVendor(f),
+		Cursor: v.CursorKey(),
+		Node:   NewVendor(v),
 	}
 }
 
-func NewVendor(f *coredata.Vendor) *Vendor {
+func NewVendor(v *coredata.Vendor) *Vendor {
 	return &Vendor{
-		ID:        f.ID,
-		Name:      f.Name,
-		CreatedAt: f.CreatedAt,
-		UpdatedAt: f.UpdatedAt,
+		ID:        v.ID,
+		Name:      v.Name,
+		CreatedAt: v.CreatedAt,
+		UpdatedAt: v.UpdatedAt,
 	}
 }
