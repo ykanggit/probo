@@ -70,10 +70,22 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 
 	page, err := r.svc.ListOrganizationVendors(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
+		return nil, fmt.Errorf("cannot list organization vendors: %w", err)
 	}
 
 	return types.NewVendorConnection(page), nil
+}
+
+// Peoples is the resolver for the peoples field.
+func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PeopleConnection, error) {
+	cursor := types.NewCursor(first, after, last, before)
+
+	page, err := r.svc.ListOrganizationPeoples(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list organization peoples: %w", err)
+	}
+
+	return types.NewPeopleConnection(page), nil
 }
 
 // Node is the resolver for the node field.

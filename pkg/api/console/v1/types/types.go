@@ -107,6 +107,7 @@ type Organization struct {
 	Name       string               `json:"name"`
 	Frameworks *FrameworkConnection `json:"frameworks"`
 	Vendors    *VendorConnection    `json:"vendors"`
+	Peoples    *PeopleConnection    `json:"peoples"`
 	CreatedAt  time.Time            `json:"createdAt"`
 	UpdatedAt  time.Time            `json:"updatedAt"`
 }
@@ -119,6 +120,28 @@ type PageInfo struct {
 	HasPreviousPage bool            `json:"hasPreviousPage"`
 	StartCursor     *page.CursorKey `json:"startCursor,omitempty"`
 	EndCursor       *page.CursorKey `json:"endCursor,omitempty"`
+}
+
+type People struct {
+	ID                       gid.GID   `json:"id"`
+	FullName                 string    `json:"fullName"`
+	PrimaryEmailAddress      string    `json:"primaryEmailAddress"`
+	AdditionalEmailAddresses []string  `json:"additionalEmailAddresses"`
+	CreatedAt                time.Time `json:"createdAt"`
+	UpdatedAt                time.Time `json:"updatedAt"`
+}
+
+func (People) IsNode()             {}
+func (this People) GetID() gid.GID { return this.ID }
+
+type PeopleConnection struct {
+	Edges    []*PeopleEdge `json:"edges"`
+	PageInfo *PageInfo     `json:"pageInfo"`
+}
+
+type PeopleEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *People        `json:"node"`
 }
 
 type Query struct {
@@ -152,6 +175,9 @@ type Vendor struct {
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
+
+func (Vendor) IsNode()             {}
+func (this Vendor) GetID() gid.GID { return this.ID }
 
 type VendorConnection struct {
 	Edges    []*VendorEdge `json:"edges"`

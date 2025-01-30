@@ -46,7 +46,32 @@ type Organization implements Node {
     before: CursorKey
   ): VendorConnection! @goField(forceResolver: true)
 
+  peoples(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): PeopleConnection! @goField(forceResolver: true)
 
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type PeopleConnection {
+  edges: [PeopleEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PeopleEdge {
+  cursor: CursorKey!
+  node: People!
+}
+
+type People implements Node {
+  id: ID!
+  fullName: String!
+  primaryEmailAddress: String!
+  additionalEmailAddresses: [String!]!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
