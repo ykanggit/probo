@@ -51,7 +51,7 @@ func (p *People) scan(r pgx.Row) error {
 		&p.OrganizationID,
 		&p.FullName,
 		&p.PrimaryEmailAddress,
-		&p.PrimaryEmailAddress,
+		&p.AdditionalEmailAddresses,
 		&p.CreatedAt,
 		&p.UpdatedAt,
 	)
