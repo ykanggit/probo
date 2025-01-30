@@ -192,6 +192,13 @@ type Task implements Node {
   description: String!
   state: TaskState!
 
+  stateTransisions(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): TaskStateTransitionConnection! @goField(forceResolver: true)
+
   evidences(
     first: Int
     after: CursorKey
@@ -199,6 +206,25 @@ type Task implements Node {
     before: CursorKey
   ): EvidenceConnection! @goField(forceResolver: true)
   
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type TaskStateTransitionConnection {
+  edges: [TaskStateTransitionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TaskStateTransitionEdge {
+  cursor: CursorKey!
+  node: TaskStateTransition!
+}
+
+type TaskStateTransition {
+  id: ID!
+  fromState: TaskState
+  toState: TaskState!
+  reason: String
   createdAt: Datetime!
   updatedAt: Datetime!
 }

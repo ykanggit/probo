@@ -169,13 +169,14 @@ type ComplexityRoot struct {
 	}
 
 	Task struct {
-		CreatedAt   func(childComplexity int) int
-		Description func(childComplexity int) int
-		Evidences   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		State       func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
+		CreatedAt        func(childComplexity int) int
+		Description      func(childComplexity int) int
+		Evidences        func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		ID               func(childComplexity int) int
+		Name             func(childComplexity int) int
+		State            func(childComplexity int) int
+		StateTransisions func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		UpdatedAt        func(childComplexity int) int
 	}
 
 	TaskConnection struct {
@@ -184,6 +185,25 @@ type ComplexityRoot struct {
 	}
 
 	TaskEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	TaskStateTransition struct {
+		CreatedAt func(childComplexity int) int
+		FromState func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Reason    func(childComplexity int) int
+		ToState   func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+	}
+
+	TaskStateTransitionConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	TaskStateTransitionEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
 	}
@@ -222,6 +242,7 @@ type QueryResolver interface {
 	Node(ctx context.Context, id gid.GID) (types.Node, error)
 }
 type TaskResolver interface {
+	StateTransisions(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskStateTransitionConnection, error)
 	Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceConnection, error)
 }
 
@@ -760,6 +781,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.State(childComplexity), true
 
+	case "Task.stateTransisions":
+		if e.complexity.Task.StateTransisions == nil {
+			break
+		}
+
+		args, err := ec.field_Task_stateTransisions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Task.StateTransisions(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+
 	case "Task.updatedAt":
 		if e.complexity.Task.UpdatedAt == nil {
 			break
@@ -794,6 +827,76 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TaskEdge.Node(childComplexity), true
+
+	case "TaskStateTransition.createdAt":
+		if e.complexity.TaskStateTransition.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.TaskStateTransition.CreatedAt(childComplexity), true
+
+	case "TaskStateTransition.fromState":
+		if e.complexity.TaskStateTransition.FromState == nil {
+			break
+		}
+
+		return e.complexity.TaskStateTransition.FromState(childComplexity), true
+
+	case "TaskStateTransition.id":
+		if e.complexity.TaskStateTransition.ID == nil {
+			break
+		}
+
+		return e.complexity.TaskStateTransition.ID(childComplexity), true
+
+	case "TaskStateTransition.reason":
+		if e.complexity.TaskStateTransition.Reason == nil {
+			break
+		}
+
+		return e.complexity.TaskStateTransition.Reason(childComplexity), true
+
+	case "TaskStateTransition.toState":
+		if e.complexity.TaskStateTransition.ToState == nil {
+			break
+		}
+
+		return e.complexity.TaskStateTransition.ToState(childComplexity), true
+
+	case "TaskStateTransition.updatedAt":
+		if e.complexity.TaskStateTransition.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.TaskStateTransition.UpdatedAt(childComplexity), true
+
+	case "TaskStateTransitionConnection.edges":
+		if e.complexity.TaskStateTransitionConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.TaskStateTransitionConnection.Edges(childComplexity), true
+
+	case "TaskStateTransitionConnection.pageInfo":
+		if e.complexity.TaskStateTransitionConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.TaskStateTransitionConnection.PageInfo(childComplexity), true
+
+	case "TaskStateTransitionEdge.cursor":
+		if e.complexity.TaskStateTransitionEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.TaskStateTransitionEdge.Cursor(childComplexity), true
+
+	case "TaskStateTransitionEdge.node":
+		if e.complexity.TaskStateTransitionEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.TaskStateTransitionEdge.Node(childComplexity), true
 
 	case "Vendor.createdAt":
 		if e.complexity.Vendor.CreatedAt == nil {
@@ -1134,6 +1237,13 @@ type Task implements Node {
   description: String!
   state: TaskState!
 
+  stateTransisions(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): TaskStateTransitionConnection! @goField(forceResolver: true)
+
   evidences(
     first: Int
     after: CursorKey
@@ -1141,6 +1251,25 @@ type Task implements Node {
     before: CursorKey
   ): EvidenceConnection! @goField(forceResolver: true)
   
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type TaskStateTransitionConnection {
+  edges: [TaskStateTransitionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TaskStateTransitionEdge {
+  cursor: CursorKey!
+  node: TaskStateTransition!
+}
+
+type TaskStateTransition {
+  id: ID!
+  fromState: TaskState
+  toState: TaskState!
+  reason: String
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -1746,6 +1875,83 @@ func (ec *executionContext) field_Task_evidences_argsLast(
 }
 
 func (ec *executionContext) field_Task_evidences_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Task_stateTransisions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Task_stateTransisions_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Task_stateTransisions_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Task_stateTransisions_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Task_stateTransisions_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	return args, nil
+}
+func (ec *executionContext) field_Task_stateTransisions_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Task_stateTransisions_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Task_stateTransisions_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Task_stateTransisions_argsBefore(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*page.CursorKey, error) {
@@ -4640,6 +4846,55 @@ func (ec *executionContext) fieldContext_Task_state(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Task_stateTransisions(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_stateTransisions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().StateTransisions(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TaskStateTransitionConnection)
+	fc.Result = res
+	return ec.marshalNTaskStateTransitionConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskStateTransitionConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_stateTransisions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_TaskStateTransitionConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_TaskStateTransitionConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TaskStateTransitionConnection", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Task_stateTransisions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Task_evidences(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_evidences(ctx, field)
 	if err != nil {
@@ -4936,6 +5191,8 @@ func (ec *executionContext) fieldContext_TaskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Task_description(ctx, field)
 			case "state":
 				return ec.fieldContext_Task_state(ctx, field)
+			case "stateTransisions":
+				return ec.fieldContext_Task_stateTransisions(ctx, field)
 			case "evidences":
 				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
@@ -4944,6 +5201,410 @@ func (ec *executionContext) fieldContext_TaskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Task_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskStateTransition_id(ctx context.Context, field graphql.CollectedField, obj *types.TaskStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskStateTransition_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskStateTransition_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskStateTransition_fromState(ctx context.Context, field graphql.CollectedField, obj *types.TaskStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskStateTransition_fromState(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FromState, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.TaskState)
+	fc.Result = res
+	return ec.marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskStateTransition_fromState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type TaskState does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskStateTransition_toState(ctx context.Context, field graphql.CollectedField, obj *types.TaskStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskStateTransition_toState(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ToState, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(types.TaskState)
+	fc.Result = res
+	return ec.marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskStateTransition_toState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type TaskState does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskStateTransition_reason(ctx context.Context, field graphql.CollectedField, obj *types.TaskStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskStateTransition_reason(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Reason, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskStateTransition_reason(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskStateTransition_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.TaskStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskStateTransition_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskStateTransition_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskStateTransition_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.TaskStateTransition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskStateTransition_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskStateTransition_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskStateTransition",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskStateTransitionConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.TaskStateTransitionConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskStateTransitionConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.TaskStateTransitionEdge)
+	fc.Result = res
+	return ec.marshalNTaskStateTransitionEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskStateTransitionEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskStateTransitionConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskStateTransitionConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_TaskStateTransitionEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_TaskStateTransitionEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TaskStateTransitionEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskStateTransitionConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.TaskStateTransitionConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskStateTransitionConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskStateTransitionConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskStateTransitionConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskStateTransitionEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.TaskStateTransitionEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskStateTransitionEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskStateTransitionEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskStateTransitionEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskStateTransitionEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.TaskStateTransitionEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskStateTransitionEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TaskStateTransition)
+	fc.Result = res
+	return ec.marshalNTaskStateTransition2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskStateTransition(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskStateTransitionEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskStateTransitionEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TaskStateTransition_id(ctx, field)
+			case "fromState":
+				return ec.fieldContext_TaskStateTransition_fromState(ctx, field)
+			case "toState":
+				return ec.fieldContext_TaskStateTransition_toState(ctx, field)
+			case "reason":
+				return ec.fieldContext_TaskStateTransition_reason(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_TaskStateTransition_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_TaskStateTransition_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TaskStateTransition", field.Name)
 		},
 	}
 	return fc, nil
@@ -8021,6 +8682,37 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "stateTransisions":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				res = ec._Task_stateTransisions(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "evidences":
 			field := field
 
@@ -8147,6 +8839,152 @@ func (ec *executionContext) _TaskEdge(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "node":
 			out.Values[i] = ec._TaskEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var taskStateTransitionImplementors = []string{"TaskStateTransition"}
+
+func (ec *executionContext) _TaskStateTransition(ctx context.Context, sel ast.SelectionSet, obj *types.TaskStateTransition) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, taskStateTransitionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TaskStateTransition")
+		case "id":
+			out.Values[i] = ec._TaskStateTransition_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fromState":
+			out.Values[i] = ec._TaskStateTransition_fromState(ctx, field, obj)
+		case "toState":
+			out.Values[i] = ec._TaskStateTransition_toState(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "reason":
+			out.Values[i] = ec._TaskStateTransition_reason(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._TaskStateTransition_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._TaskStateTransition_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var taskStateTransitionConnectionImplementors = []string{"TaskStateTransitionConnection"}
+
+func (ec *executionContext) _TaskStateTransitionConnection(ctx context.Context, sel ast.SelectionSet, obj *types.TaskStateTransitionConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, taskStateTransitionConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TaskStateTransitionConnection")
+		case "edges":
+			out.Values[i] = ec._TaskStateTransitionConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._TaskStateTransitionConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var taskStateTransitionEdgeImplementors = []string{"TaskStateTransitionEdge"}
+
+func (ec *executionContext) _TaskStateTransitionEdge(ctx context.Context, sel ast.SelectionSet, obj *types.TaskStateTransitionEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, taskStateTransitionEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TaskStateTransitionEdge")
+		case "cursor":
+			out.Values[i] = ec._TaskStateTransitionEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._TaskStateTransitionEdge_node(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9220,6 +10058,78 @@ func (ec *executionContext) marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋ
 	return v
 }
 
+func (ec *executionContext) marshalNTaskStateTransition2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskStateTransition(ctx context.Context, sel ast.SelectionSet, v *types.TaskStateTransition) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TaskStateTransition(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTaskStateTransitionConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskStateTransitionConnection(ctx context.Context, sel ast.SelectionSet, v types.TaskStateTransitionConnection) graphql.Marshaler {
+	return ec._TaskStateTransitionConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTaskStateTransitionConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskStateTransitionConnection(ctx context.Context, sel ast.SelectionSet, v *types.TaskStateTransitionConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TaskStateTransitionConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTaskStateTransitionEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskStateTransitionEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.TaskStateTransitionEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTaskStateTransitionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskStateTransitionEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTaskStateTransitionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskStateTransitionEdge(ctx context.Context, sel ast.SelectionSet, v *types.TaskStateTransitionEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TaskStateTransitionEdge(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx context.Context, sel ast.SelectionSet, v *types.Vendor) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -9609,6 +10519,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx context.Context, v any) (*types.TaskState, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(types.TaskState)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx context.Context, sel ast.SelectionSet, v *types.TaskState) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

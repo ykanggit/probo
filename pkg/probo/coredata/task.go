@@ -68,36 +68,49 @@ func (t *Tasks) LoadByControlID(
 	cursor *page.Cursor,
 ) error {
 	q := `
-WITH control_tasks AS (
-    SELECT
-        t.id,
-        @control_id AS control_id,
-        t.name,
-        t.description,
-        t.state,
-        t.content_ref,
-        t.created_at,
-        t.updated_at
-     FROM
-         tasks t
-     INNER JOIN
-         controls_tasks ct ON
-             ct.task_id = t.id
-             AND ct.control_id = @control_id
-     WHERE
-         %s
-)
+WITH
+    control_tasks AS (
+        SELECT
+            t.id,
+            @control_id AS control_id,
+            t.name,
+            t.description,
+            t.content_ref,
+            t.created_at,
+            t.updated_at
+         FROM
+             tasks t
+         INNER JOIN
+             controls_tasks ct ON
+                 ct.task_id = t.id
+                 AND ct.control_id = @control_id
+         WHERE
+             %s
+    ),
+    task_states AS (
+        SELECT
+            task_id,
+            to_state AS state,
+            reason,
+            RANK() OVER w
+        FROM
+            task_state_transitions
+        WINDOW
+            w AS (PARTITION BY task_id ORDER BY created_at DESC)
+    )
 SELECT
     id,
     control_id,
     name,
     description,
-    state,
+    ts.state AS state,
     content_ref,
     created_at,
     updated_at
 FROM
     control_tasks
+INNER JOIN
+    task_states ts ON ts.task_id = control_tasks.id
 WHERE
     %s
 `

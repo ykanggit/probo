@@ -148,13 +148,14 @@ type Query struct {
 }
 
 type Task struct {
-	ID          gid.GID             `json:"id"`
-	Name        string              `json:"name"`
-	Description string              `json:"description"`
-	State       TaskState           `json:"state"`
-	Evidences   *EvidenceConnection `json:"evidences"`
-	CreatedAt   time.Time           `json:"createdAt"`
-	UpdatedAt   time.Time           `json:"updatedAt"`
+	ID               gid.GID                        `json:"id"`
+	Name             string                         `json:"name"`
+	Description      string                         `json:"description"`
+	State            TaskState                      `json:"state"`
+	StateTransisions *TaskStateTransitionConnection `json:"stateTransisions"`
+	Evidences        *EvidenceConnection            `json:"evidences"`
+	CreatedAt        time.Time                      `json:"createdAt"`
+	UpdatedAt        time.Time                      `json:"updatedAt"`
 }
 
 func (Task) IsNode()             {}
@@ -168,6 +169,25 @@ type TaskConnection struct {
 type TaskEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Task          `json:"node"`
+}
+
+type TaskStateTransition struct {
+	ID        gid.GID    `json:"id"`
+	FromState *TaskState `json:"fromState,omitempty"`
+	ToState   TaskState  `json:"toState"`
+	Reason    *string    `json:"reason,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+}
+
+type TaskStateTransitionConnection struct {
+	Edges    []*TaskStateTransitionEdge `json:"edges"`
+	PageInfo *PageInfo                  `json:"pageInfo"`
+}
+
+type TaskStateTransitionEdge struct {
+	Cursor page.CursorKey       `json:"cursor"`
+	Node   *TaskStateTransition `json:"node"`
 }
 
 type Vendor struct {

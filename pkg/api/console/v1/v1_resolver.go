@@ -104,6 +104,18 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 	return nil, gqlerror.Errorf("node %q not found", id)
 }
 
+// StateTransisions is the resolver for the stateTransisions field.
+func (r *taskResolver) StateTransisions(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskStateTransitionConnection, error) {
+	cursor := types.NewCursor(first, after, last, before)
+
+	page, err := r.svc.ListTaskStateTransitions(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list control tasks: %w", err)
+	}
+
+	return types.NewTaskStateTransitionConnection(page), nil
+}
+
 // Evidences is the resolver for the evidences field.
 func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

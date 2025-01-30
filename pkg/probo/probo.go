@@ -257,3 +257,30 @@ func (s Service) ListOrganizationPeoples(
 
 	return page.NewPage(peoples, cursor), nil
 }
+
+func (s Service) ListTaskStateTransitions(
+	ctx context.Context,
+	taskID gid.GID,
+	cursor *page.Cursor,
+) (*page.Page[*coredata.TaskStateTransition], error) {
+	var taskStateTransitions coredata.TaskStateTransitions
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return taskStateTransitions.LoadByTaskID(
+				ctx,
+				conn,
+				s.scope,
+				taskID,
+				cursor,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(taskStateTransitions, cursor), nil
+}

@@ -27,58 +27,58 @@ import (
 )
 
 type (
-	ControlStateTransition struct {
-		StateTransition[ControlState]
+	TaskStateTransition struct {
+		TaskID gid.GID
 
-		ControlID gid.GID
+		StateTransition[TaskState]
 	}
 
-	ControlStateTransitions []*ControlStateTransition
+	TaskStateTransitions []*TaskStateTransition
 )
 
-func (cst ControlStateTransition) CursorKey() page.CursorKey {
-	return page.NewCursorKey(uuid.UUID(cst.ID), cst.CreatedAt)
+func (tst TaskStateTransition) CursorKey() page.CursorKey {
+	return page.NewCursorKey(uuid.UUID(tst.ID), tst.CreatedAt)
 }
 
-func (cst *ControlStateTransition) scan(r pgx.Row) error {
+func (tst *TaskStateTransition) scan(r pgx.Row) error {
 	return r.Scan(
-		&cst.ID,
-		&cst.ControlID,
-		&cst.FromState,
-		&cst.ToState,
-		&cst.Reason,
-		&cst.CreatedAt,
-		&cst.UpdatedAt,
+		&tst.ID,
+		&tst.TaskID,
+		&tst.FromState,
+		&tst.ToState,
+		&tst.Reason,
+		&tst.CreatedAt,
+		&tst.UpdatedAt,
 	)
 }
 
-func (cst *ControlStateTransitions) LoadByControlID(
+func (tst *TaskStateTransitions) LoadByTaskID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope *Scope,
-	controlID gid.GID,
+	taskID gid.GID,
 	cursor *page.Cursor,
 ) error {
 	q := `
 SELECT
     id,
-    control_id,
+    task_id,
     from_state,
     to_state,
     reason,
     created_at,
     updated_at
 FROM
-    control_state_transitions
+    task_state_transitions
 WHERE
     %s
-    AND control_id = @control_id
+    AND task_id = @task_id
     AND %s
 `
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.NamedArgs{"control_id": controlID}
+	args := pgx.NamedArgs{"task_id": taskID}
 	maps.Copy(args, scope.SQLArguments())
 
 	r, err := conn.Query(ctx, q, args)
@@ -87,21 +87,21 @@ WHERE
 	}
 	defer r.Close()
 
-	controlStateTransitions := ControlStateTransitions{}
+	taskStateTransitions := TaskStateTransitions{}
 	for r.Next() {
-		controlStateTransition := &ControlStateTransition{}
-		if err := controlStateTransition.scan(r); err != nil {
+		taskStateTransition := &TaskStateTransition{}
+		if err := taskStateTransition.scan(r); err != nil {
 			return err
 		}
 
-		controlStateTransitions = append(controlStateTransitions, controlStateTransition)
+		taskStateTransitions = append(taskStateTransitions, taskStateTransition)
 	}
 
 	if err := r.Err(); err != nil {
 		return err
 	}
 
-	*cst = controlStateTransitions
+	*tst = taskStateTransitions
 
 	return nil
 }

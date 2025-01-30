@@ -1,4 +1,3 @@
-// Copyright (c) 2025 Probo Inc <hello@getprobo.com>.
 //
 // Permission to use, copy, modify, and/or distribute this software for any
 // purpose with or without fee is hereby granted, provided that the above
@@ -14,14 +13,19 @@
 
 package coredata
 
-const (
-	OrganizationEntityType uint32 = iota
-	FrameworkEntityType
-	ControlEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ControlStateTransitionEntityType
-	TaskStateTransitionEntityType
-	VendorEntityType
-	PeopleEntityType
+import (
+	"time"
+
+	"github.com/getprobo/probo/pkg/probo/coredata/gid"
+)
+
+type (
+	StateTransition[T any] struct {
+		ID        gid.GID
+		FromState *T
+		ToState   T
+		Reason    *string
+		CreatedAt time.Time
+		UpdatedAt time.Time
+	}
 )
