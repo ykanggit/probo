@@ -61,7 +61,7 @@ type VendorEdge {
   node: Vendor!
 }
 
-type Vendor {
+type Vendor implements Node {
   id: ID!
   name: String!
   createdAt: Datetime!
