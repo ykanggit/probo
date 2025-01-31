@@ -145,6 +145,13 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 		}
 
 		return types.NewTask(task), nil
+	case coredata.EvidenceEntityType:
+		evidence, err := r.svc.GetEvidence(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+
+		return types.NewEvidence(evidence), nil
 	default:
 	}
 

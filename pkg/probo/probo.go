@@ -169,6 +169,26 @@ func (s Service) GetTask(
 	return task, nil
 }
 
+func (s Service) GetEvidence(
+	ctx context.Context,
+	evidenceID gid.GID,
+) (*coredata.Evidence, error) {
+	evidence := &coredata.Evidence{}
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return evidence.LoadByID(ctx, conn, s.scope, evidenceID)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return evidence, nil
+}
+
 func (s Service) ListOrganizationFrameworks(
 	ctx context.Context,
 	organizationID gid.GID,

@@ -59,6 +59,64 @@ func (e *Evidence) scan(r pgx.Row) error {
 	)
 }
 
+func (e *Evidence) LoadByID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+	evidenceID gid.GID,
+) error {
+	q := `
+WITH
+    evidence_states AS (
+        SELECT
+            evidence_id,
+            to_state AS state,
+            reason,
+            RANK() OVER w
+        FROM
+            evidence_state_transitions
+        WHERE
+            evidence_id = @evidence_id
+        WINDOW
+            w AS (PARTITION BY evidence_id ORDER BY created_at DESC)
+    )
+SELECT
+    id,
+    task_id,
+    es.state,
+    object_key,
+    mime_type,
+    size,
+    created_at,
+    updated_at
+FROM
+    evidences
+INNER JOIN
+    evidence_states es ON es.evidence_id = evidences.id
+WHERE
+    %s
+    AND id = @evidence_id
+    AND es.rank = 1
+LIMIT 1;
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{"evidence_id": evidenceID}
+	maps.Copy(args, scope.SQLArguments())
+
+	r := conn.QueryRow(ctx, q, args)
+
+	e2 := Evidence{}
+	if err := e2.scan(r); err != nil {
+		return err
+	}
+
+	*e = e2
+
+	return nil
+}
+
 func (e *Evidences) LoadByTaskID(
 	ctx context.Context,
 	conn pg.Conn,
