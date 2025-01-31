@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"maps"
-	"time"
 
 	"github.com/getprobo/probo/pkg/probo/coredata/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata/page"
@@ -28,82 +27,59 @@ import (
 )
 
 type (
-	Evidence struct {
-		ID        gid.GID
-		TaskID    gid.GID
-		State     EvidenceState
-		ObjectKey string
-		MimeType  string
-		Size      uint64
-		CreatedAt time.Time
-		UpdatedAt time.Time
+	EvidenceStateTransition struct {
+		StateTransition[EvidenceState]
+
+		EvidenceID gid.GID
 	}
 
-	Evidences []*Evidence
+	EvidenceStateTransitions []*EvidenceStateTransition
 )
 
-func (e Evidence) CursorKey() page.CursorKey {
-	return page.NewCursorKey(uuid.UUID(e.ID), e.CreatedAt)
+func (cst EvidenceStateTransition) CursorKey() page.CursorKey {
+	return page.NewCursorKey(uuid.UUID(cst.ID), cst.CreatedAt)
 }
 
-func (e *Evidence) scan(r pgx.Row) error {
+func (cst *EvidenceStateTransition) scan(r pgx.Row) error {
 	return r.Scan(
-		&e.ID,
-		&e.TaskID,
-		&e.State,
-		&e.ObjectKey,
-		&e.MimeType,
-		&e.Size,
-		&e.CreatedAt,
-		&e.UpdatedAt,
+		&cst.ID,
+		&cst.EvidenceID,
+		&cst.FromState,
+		&cst.ToState,
+		&cst.Reason,
+		&cst.CreatedAt,
+		&cst.UpdatedAt,
 	)
 }
 
-func (e *Evidences) LoadByTaskID(
+func (cst *EvidenceStateTransitions) LoadByEvidenceID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope *Scope,
-	taskID gid.GID,
+	evidenceID gid.GID,
 	cursor *page.Cursor,
 ) error {
 	q := `
-WITH
-    evidence_states AS (
-        SELECT
-            evidence_id,
-            to_state AS state,
-            reason,
-            RANK() OVER w
-        FROM
-            evidence_state_transitions
-        WINDOW
-            w AS (PARTITION BY evidence_id ORDER BY created_at DESC)
-    )
 SELECT
     id,
-    task_id,
-    es.state,
-    object_key,
-    mime_type,
-    size,
+    evidence_id,
+    from_state,
+    to_state,
+    reason,
     created_at,
     updated_at
 FROM
-    evidences
-INNER JOIN
-    evidence_states es ON es.evidence_id = evidences.id
+    evidence_state_transitions
 WHERE
     %s
-    AND task_id = @task_id
-    AND es.rank = 1
+    AND evidence_id = @evidence_id
     AND %s
 `
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.NamedArgs{"task_id": taskID}
+	args := pgx.NamedArgs{"evidence_id": evidenceID}
 	maps.Copy(args, scope.SQLArguments())
-	maps.Copy(args, cursor.SQLArguments())
 
 	r, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -111,21 +87,21 @@ WHERE
 	}
 	defer r.Close()
 
-	evidences := Evidences{}
+	evidenceStateTransitions := EvidenceStateTransitions{}
 	for r.Next() {
-		evidence := &Evidence{}
-		if err := evidence.scan(r); err != nil {
+		evidenceStateTransition := &EvidenceStateTransition{}
+		if err := evidenceStateTransition.scan(r); err != nil {
 			return err
 		}
 
-		evidences = append(evidences, evidence)
+		evidenceStateTransitions = append(evidenceStateTransitions, evidenceStateTransition)
 	}
 
 	if err := r.Err(); err != nil {
 		return err
 	}
 
-	*e = evidences
+	*cst = evidenceStateTransitions
 
 	return nil
 }

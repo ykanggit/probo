@@ -25,6 +25,12 @@ enum TaskState {
   DONE
 }
 
+enum EvidenceState {
+  VALID
+  INVALID
+  EXPIRED
+}
+
 type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
@@ -242,6 +248,7 @@ type EvidenceEdge {
 type Evidence implements Node {
   id: ID!
   fileUrl: String!
+  state: EvidenceState!
   createdAt: Datetime!
   updatedAt: Datetime!
 }

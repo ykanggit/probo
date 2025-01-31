@@ -39,11 +39,12 @@ func NewEvidenceEdge(e *coredata.Evidence) *EvidenceEdge {
 	}
 }
 
-func NewEvidence(c *coredata.Evidence) *Evidence {
+func NewEvidence(e *coredata.Evidence) *Evidence {
 	return &Evidence{
-		ID:        c.ID,
+		ID:        e.ID,
+		State:     EvidenceState(e.State.String()),
 		FileURL:   "",
-		CreatedAt: c.CreatedAt,
-		UpdatedAt: c.UpdatedAt,
+		CreatedAt: e.CreatedAt,
+		UpdatedAt: e.UpdatedAt,
 	}
 }

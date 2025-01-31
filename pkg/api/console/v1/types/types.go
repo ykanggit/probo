@@ -61,10 +61,11 @@ type ControlStateTransitionEdge struct {
 }
 
 type Evidence struct {
-	ID        gid.GID   `json:"id"`
-	FileURL   string    `json:"fileUrl"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID        gid.GID       `json:"id"`
+	FileURL   string        `json:"fileUrl"`
+	State     EvidenceState `json:"state"`
+	CreatedAt time.Time     `json:"createdAt"`
+	UpdatedAt time.Time     `json:"updatedAt"`
 }
 
 func (Evidence) IsNode()             {}
@@ -252,6 +253,49 @@ func (e *ControlState) UnmarshalGQL(v any) error {
 }
 
 func (e ControlState) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type EvidenceState string
+
+const (
+	EvidenceStateValid   EvidenceState = "VALID"
+	EvidenceStateInvalid EvidenceState = "INVALID"
+	EvidenceStateExpired EvidenceState = "EXPIRED"
+)
+
+var AllEvidenceState = []EvidenceState{
+	EvidenceStateValid,
+	EvidenceStateInvalid,
+	EvidenceStateExpired,
+}
+
+func (e EvidenceState) IsValid() bool {
+	switch e {
+	case EvidenceStateValid, EvidenceStateInvalid, EvidenceStateExpired:
+		return true
+	}
+	return false
+}
+
+func (e EvidenceState) String() string {
+	return string(e)
+}
+
+func (e *EvidenceState) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = EvidenceState(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid EvidenceState", str)
+	}
+	return nil
+}
+
+func (e EvidenceState) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
