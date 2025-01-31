@@ -284,3 +284,30 @@ func (s Service) ListTaskStateTransitions(
 
 	return page.NewPage(taskStateTransitions, cursor), nil
 }
+
+func (s Service) ListEvidenceStateTransitions(
+	ctx context.Context,
+	evidenceID gid.GID,
+	cursor *page.Cursor,
+) (*page.Page[*coredata.EvidenceStateTransition], error) {
+	var evidenceStateTransitions coredata.EvidenceStateTransitions
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return evidenceStateTransitions.LoadByEvidenceID(
+				ctx,
+				conn,
+				s.scope,
+				evidenceID,
+				cursor,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(evidenceStateTransitions, cursor), nil
+}

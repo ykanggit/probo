@@ -249,10 +249,37 @@ type Evidence implements Node {
   id: ID!
   fileUrl: String!
   state: EvidenceState!
+
+  stateTransisions(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): EvidenceStateTransitionConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
 
 type Query {
   node(id: ID!): Node!
+}
+
+type EvidenceStateTransitionConnection {
+  edges: [EvidenceStateTransitionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type EvidenceStateTransitionEdge {
+  cursor: CursorKey!
+  node: EvidenceStateTransition!
+}
+
+type EvidenceStateTransition {
+  id: ID!
+  fromState: EvidenceState
+  toState: EvidenceState!
+  reason: String
+  createdAt: Datetime!
+  updatedAt: Datetime!
 }

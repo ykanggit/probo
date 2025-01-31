@@ -61,11 +61,12 @@ type ControlStateTransitionEdge struct {
 }
 
 type Evidence struct {
-	ID        gid.GID       `json:"id"`
-	FileURL   string        `json:"fileUrl"`
-	State     EvidenceState `json:"state"`
-	CreatedAt time.Time     `json:"createdAt"`
-	UpdatedAt time.Time     `json:"updatedAt"`
+	ID               gid.GID                            `json:"id"`
+	FileURL          string                             `json:"fileUrl"`
+	State            EvidenceState                      `json:"state"`
+	StateTransisions *EvidenceStateTransitionConnection `json:"stateTransisions"`
+	CreatedAt        time.Time                          `json:"createdAt"`
+	UpdatedAt        time.Time                          `json:"updatedAt"`
 }
 
 func (Evidence) IsNode()             {}
@@ -79,6 +80,25 @@ type EvidenceConnection struct {
 type EvidenceEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Evidence      `json:"node"`
+}
+
+type EvidenceStateTransition struct {
+	ID        gid.GID        `json:"id"`
+	FromState *EvidenceState `json:"fromState,omitempty"`
+	ToState   EvidenceState  `json:"toState"`
+	Reason    *string        `json:"reason,omitempty"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
+}
+
+type EvidenceStateTransitionConnection struct {
+	Edges    []*EvidenceStateTransitionEdge `json:"edges"`
+	PageInfo *PageInfo                      `json:"pageInfo"`
+}
+
+type EvidenceStateTransitionEdge struct {
+	Cursor page.CursorKey           `json:"cursor"`
+	Node   *EvidenceStateTransition `json:"node"`
 }
 
 type Framework struct {
