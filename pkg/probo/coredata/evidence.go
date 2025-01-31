@@ -32,6 +32,8 @@ type (
 		ID        gid.GID
 		TaskID    gid.GID
 		ObjectKey string
+		MimeType  string
+		Size      uint64
 		CreatedAt time.Time
 		UpdatedAt time.Time
 	}
@@ -48,6 +50,8 @@ func (e *Evidence) scan(r pgx.Row) error {
 		&e.ID,
 		&e.TaskID,
 		&e.ObjectKey,
+		&e.MimeType,
+		&e.Size,
 		&e.CreatedAt,
 		&e.UpdatedAt,
 	)
@@ -65,6 +69,8 @@ SELECT
     id,
     task_id,
     object_key,
+    mime_type,
+    size,
     created_at,
     updated_at
 FROM
