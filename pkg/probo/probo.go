@@ -149,6 +149,26 @@ func (s Service) GetControl(
 	return control, nil
 }
 
+func (s Service) GetTask(
+	ctx context.Context,
+	taskID gid.GID,
+) (*coredata.Task, error) {
+	task := &coredata.Task{}
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return task.LoadByID(ctx, conn, s.scope, taskID)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return task, nil
+}
+
 func (s Service) ListOrganizationFrameworks(
 	ctx context.Context,
 	organizationID gid.GID,

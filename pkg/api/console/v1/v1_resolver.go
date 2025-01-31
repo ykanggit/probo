@@ -138,6 +138,13 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 		}
 
 		return types.NewControl(control), nil
+	case coredata.TaskEntityType:
+		task, err := r.svc.GetTask(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+
+		return types.NewTask(task), nil
 	default:
 	}
 

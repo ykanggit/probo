@@ -60,6 +60,81 @@ func (t *Task) scan(r pgx.Row) error {
 	)
 }
 
+func (t *Task) LoadByID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+	taskID gid.GID,
+) error {
+	q := `
+WITH
+    control_tasks AS (
+        SELECT
+            t.id,
+            ct.control_id AS control_id,
+            t.name,
+            t.description,
+            t.content_ref,
+            t.created_at,
+            t.updated_at
+         FROM
+             tasks t
+         INNER JOIN
+             controls_tasks ct ON
+                 ct.task_id = t.id
+         WHERE
+             %s
+             AND id = @task_id
+    ),
+    task_states AS (
+        SELECT
+            task_id,
+            to_state AS state,
+            reason,
+            RANK() OVER w
+        FROM
+            task_state_transitions
+        WHERE
+            task_id = @task_id
+        WINDOW
+            w AS (PARTITION BY task_id ORDER BY created_at DESC)
+    )
+SELECT
+    id,
+    control_id,
+    name,
+    description,
+    ts.state AS state,
+    content_ref,
+    created_at,
+    updated_at
+FROM
+    control_tasks
+INNER JOIN
+    task_states ts ON ts.task_id = control_tasks.id
+WHERE
+    ts.rank = 1
+    AND id = @task_id
+LIMIT 1;
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{"task_id": taskID}
+	maps.Copy(args, scope.SQLArguments())
+
+	r := conn.QueryRow(ctx, q, args)
+
+	t2 := Task{}
+	if err := t2.scan(r); err != nil {
+		return err
+	}
+
+	*t = t2
+
+	return nil
+}
+
 func (t *Tasks) LoadByControlID(
 	ctx context.Context,
 	conn pg.Conn,
