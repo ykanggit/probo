@@ -57,6 +57,46 @@ func (p *People) scan(r pgx.Row) error {
 	)
 }
 
+func (p *People) LoadByID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+	peopleID gid.GID,
+) error {
+	q := `
+SELECT
+    id,
+    organization_id,
+    full_name,
+    primary_email_address,
+    additional_email_addresses,
+    created_at,
+    updated_at
+FROM
+    peoples
+WHERE
+    %s
+    AND id = @people_id
+LIMIT 1;
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{"people_id": peopleID}
+	maps.Copy(args, scope.SQLArguments())
+
+	r := conn.QueryRow(ctx, q, args)
+
+	p2 := People{}
+	if err := p2.scan(r); err != nil {
+		return err
+	}
+
+	*p = p2
+
+	return nil
+}
+
 func (p *Peoples) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,

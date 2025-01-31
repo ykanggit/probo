@@ -69,6 +69,26 @@ func (s Service) GetOrganization(
 	return organization, nil
 }
 
+func (s Service) GetPeople(
+	ctx context.Context,
+	peopleID gid.GID,
+) (*coredata.People, error) {
+	people := &coredata.People{}
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return people.LoadByID(ctx, conn, s.scope, peopleID)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return people, nil
+}
+
 func (s Service) ListOrganizationFrameworks(
 	ctx context.Context,
 	organizationID gid.GID,
