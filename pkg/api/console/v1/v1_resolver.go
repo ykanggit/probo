@@ -117,6 +117,13 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 		}
 
 		return types.NewPeople(people), nil
+	case coredata.VendorEntityType:
+		vendor, err := r.svc.GetVendor(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+
+		return types.NewVendor(vendor), nil
 	default:
 	}
 

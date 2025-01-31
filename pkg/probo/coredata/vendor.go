@@ -53,6 +53,44 @@ func (v *Vendor) scan(r pgx.Row) error {
 	)
 }
 
+func (v *Vendor) LoadByID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+	vendorID gid.GID,
+) error {
+	q := `
+SELECT
+    id,
+    organization_id,
+    name,
+    created_at,
+    updated_at
+FROM
+    vendors
+WHERE
+    %s
+    AND id = @vendor_id
+LIMIT 1;
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{"vendor_id": vendorID}
+	maps.Copy(args, scope.SQLArguments())
+
+	r := conn.QueryRow(ctx, q, args)
+
+	v2 := Vendor{}
+	if err := v2.scan(r); err != nil {
+		return err
+	}
+
+	*v = v2
+
+	return nil
+}
+
 func (v *Vendors) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
