@@ -124,6 +124,13 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 		}
 
 		return types.NewVendor(vendor), nil
+	case coredata.FrameworkEntityType:
+		framework, err := r.svc.GetFramework(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+
+		return types.NewFramework(framework), nil
 	default:
 	}
 

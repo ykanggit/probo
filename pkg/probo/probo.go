@@ -109,6 +109,26 @@ func (s Service) GetVendor(
 	return vendor, nil
 }
 
+func (s Service) GetFramework(
+	ctx context.Context,
+	frameworkID gid.GID,
+) (*coredata.Framework, error) {
+	framework := &coredata.Framework{}
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return framework.LoadByID(ctx, conn, s.scope, frameworkID)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return framework, nil
+}
+
 func (s Service) ListOrganizationFrameworks(
 	ctx context.Context,
 	organizationID gid.GID,
