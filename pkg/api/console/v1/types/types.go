@@ -63,6 +63,8 @@ type ControlStateTransitionEdge struct {
 type Evidence struct {
 	ID               gid.GID                            `json:"id"`
 	FileURL          string                             `json:"fileUrl"`
+	MimeType         string                             `json:"mimeType"`
+	Size             int                                `json:"size"`
 	State            EvidenceState                      `json:"state"`
 	StateTransisions *EvidenceStateTransitionConnection `json:"stateTransisions"`
 	CreatedAt        time.Time                          `json:"createdAt"`

@@ -248,6 +248,8 @@ type EvidenceEdge {
 type Evidence implements Node {
   id: ID!
   fileUrl: String!
+  mimeType: String!
+  size: Int!
   state: EvidenceState!
 
   stateTransisions(

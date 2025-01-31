@@ -97,6 +97,8 @@ type ComplexityRoot struct {
 		CreatedAt        func(childComplexity int) int
 		FileURL          func(childComplexity int) int
 		ID               func(childComplexity int) int
+		MimeType         func(childComplexity int) int
+		Size             func(childComplexity int) int
 		State            func(childComplexity int) int
 		StateTransisions func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 		UpdatedAt        func(childComplexity int) int
@@ -474,6 +476,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Evidence.ID(childComplexity), true
+
+	case "Evidence.mimeType":
+		if e.complexity.Evidence.MimeType == nil {
+			break
+		}
+
+		return e.complexity.Evidence.MimeType(childComplexity), true
+
+	case "Evidence.size":
+		if e.complexity.Evidence.Size == nil {
+			break
+		}
+
+		return e.complexity.Evidence.Size(childComplexity), true
 
 	case "Evidence.state":
 		if e.complexity.Evidence.State == nil {
@@ -1407,6 +1423,8 @@ type EvidenceEdge {
 type Evidence implements Node {
   id: ID!
   fileUrl: String!
+  mimeType: String!
+  size: Int!
   state: EvidenceState!
 
   stateTransisions(
@@ -3235,6 +3253,82 @@ func (ec *executionContext) fieldContext_Evidence_fileUrl(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Evidence_mimeType(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_mimeType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MimeType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_mimeType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Evidence_size(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_size(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Size, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Evidence_state(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Evidence_state(ctx, field)
 	if err != nil {
@@ -3565,6 +3659,10 @@ func (ec *executionContext) fieldContext_EvidenceEdge_node(_ context.Context, fi
 				return ec.fieldContext_Evidence_id(ctx, field)
 			case "fileUrl":
 				return ec.fieldContext_Evidence_fileUrl(ctx, field)
+			case "mimeType":
+				return ec.fieldContext_Evidence_mimeType(ctx, field)
+			case "size":
+				return ec.fieldContext_Evidence_size(ctx, field)
 			case "state":
 				return ec.fieldContext_Evidence_state(ctx, field)
 			case "stateTransisions":
@@ -8658,6 +8756,16 @@ func (ec *executionContext) _Evidence(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "mimeType":
+			out.Values[i] = ec._Evidence_mimeType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "size":
+			out.Values[i] = ec._Evidence_size(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "state":
 			out.Values[i] = ec._Evidence_state(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -10813,6 +10921,21 @@ func (ec *executionContext) unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkg�
 
 func (ec *executionContext) marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚋgidᚐGID(ctx context.Context, sel ast.SelectionSet, v gid.GID) graphql.Marshaler {
 	res := types.MarshalGIDScalar(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v any) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
