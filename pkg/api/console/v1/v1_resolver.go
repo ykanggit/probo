@@ -131,6 +131,13 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 		}
 
 		return types.NewFramework(framework), nil
+	case coredata.ControlEntityType:
+		control, err := r.svc.GetControl(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+
+		return types.NewControl(control), nil
 	default:
 	}
 

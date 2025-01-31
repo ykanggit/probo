@@ -60,6 +60,63 @@ func (c *Control) scan(r pgx.Row) error {
 	)
 }
 
+func (v *Control) LoadByID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+	controlID gid.GID,
+) error {
+	q := `
+WITH control_states AS (
+    SELECT
+        control_id,
+        to_state,
+        reason,
+        RANK() OVER w
+    FROM
+        control_state_transitions
+    WHERE
+        control_id = @control_id
+    WINDOW
+        w AS (PARTITION BY control_id ORDER BY created_at DESC)
+)
+SELECT
+    id,
+    framework_id,
+    name,
+    description,
+    cs.to_state AS state,
+    content_ref,
+    created_at,
+    updated_at
+FROM
+    controls
+INNER JOIN
+    control_states cs ON cs.control_id = controls.id
+WHERE
+    %s
+    AND id = @control_id
+    AND cs.rank = 1
+LIMIT 1;
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{"control_id": controlID}
+	maps.Copy(args, scope.SQLArguments())
+
+	r := conn.QueryRow(ctx, q, args)
+
+	c2 := Control{}
+	if err := c2.scan(r); err != nil {
+		return err
+	}
+
+	*v = c2
+
+	return nil
+}
+
 func (c *Controls) LoadByFrameworkID(
 	ctx context.Context,
 	conn pg.Conn,

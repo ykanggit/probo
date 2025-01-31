@@ -129,6 +129,26 @@ func (s Service) GetFramework(
 	return framework, nil
 }
 
+func (s Service) GetControl(
+	ctx context.Context,
+	controlID gid.GID,
+) (*coredata.Control, error) {
+	control := &coredata.Control{}
+
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return control.LoadByID(ctx, conn, s.scope, controlID)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return control, nil
+}
+
 func (s Service) ListOrganizationFrameworks(
 	ctx context.Context,
 	organizationID gid.GID,
