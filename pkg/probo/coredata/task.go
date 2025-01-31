@@ -112,7 +112,8 @@ FROM
 INNER JOIN
     task_states ts ON ts.task_id = control_tasks.id
 WHERE
-    %s
+    ts.rank = 1
+    AND %s
 `
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
