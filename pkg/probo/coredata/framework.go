@@ -130,7 +130,7 @@ FROM
     frameworks
 WHERE
     %s
-    AND framework_id = @framework_id
+    AND id = @framework_id
 LIMIT 1;
 `
 
@@ -141,7 +141,7 @@ LIMIT 1;
 	r := conn.QueryRow(ctx, q, args)
 
 	f2 := Framework{}
-	if err := r.Scan(&f2); err != nil {
+	if err := f2.scan(r); err != nil {
 		return err
 	}
 
