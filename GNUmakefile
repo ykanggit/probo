@@ -1,3 +1,4 @@
+NPM?=	npm
 NPX?=	npx
 PRETTIER?=	$(NPX) prettier
 GO?=	go
@@ -34,7 +35,7 @@ vet:
 	$(GO) vet ./...
 
 .PHONY: build
-build: bin/probod docker-build
+build: bin/probod @probo/console docker-build
 
 .PHONY: docker-build
 docker-build:
@@ -43,6 +44,11 @@ docker-build:
 .PHONY: bin/probod
 bin/probod: pkg/api/console/v1/schema/schema.go pkg/api/console/v1/types/types.go pkg/api/console/v1/v1_resolver.go vet
 	$(GO_BUILD) -o $(PROBOD_BIN) $(PROBOD_SRC)
+
+.PHONY: @probo/console
+@probo/console: NODE_ENV=production
+@probo/console:
+	$(NPM) --workspace $@ run build
 
 pkg/api/console/v1/schema/schema.go \
 pkg/api/console/v1/types/types.go \
