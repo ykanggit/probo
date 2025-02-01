@@ -73,6 +73,8 @@ fmt-check:
 .PHONY: clean
 clean:
 	$(RM) -rf bin/*
+	$(RM) -rf node_modules
+	$(RM) -rf apps/console/{dist,node_modules}
 
 .PHONY: stack-up
 stack-up:
