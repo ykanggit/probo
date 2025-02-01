@@ -1438,10 +1438,6 @@ type Evidence implements Node {
   updatedAt: Datetime!
 }
 
-type Query {
-  node(id: ID!): Node!
-}
-
 type EvidenceStateTransitionConnection {
   edges: [EvidenceStateTransitionEdge!]!
   pageInfo: PageInfo!
@@ -1459,6 +1455,10 @@ type EvidenceStateTransition {
   reason: String
   createdAt: Datetime!
   updatedAt: Datetime!
+}
+
+type Query {
+  node(id: ID!): Node!
 }
 `, BuiltIn: false},
 }
