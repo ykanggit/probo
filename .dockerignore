@@ -1,3 +1,4 @@
 .git
 bin/
 tmp/
+node_modules/
