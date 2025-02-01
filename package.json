@@ -1,0 +1,19 @@
+{
+  "name": "probo",
+  "description": "Probo monorepo containing applications and shared packages",
+  "packageManager": "npm@11.1.0",
+  "engines": {
+    "node": "22.x"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "license": "MIT"
+}
