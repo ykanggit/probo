@@ -1,0 +1,14 @@
+export function buildEndpoint(path: string): string {
+  const host = process.env.API_SERVER_HOST!;
+  const formattedHost =
+    host.startsWith("http://") || host.startsWith("https://")
+      ? host
+      : `https://${host}`;
+  const url = new URL(formattedHost);
+
+  if (path) {
+    url.pathname = path.startsWith("/") ? path : `/${path}`;
+  }
+
+  return url.toString();
+}

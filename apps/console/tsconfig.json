@@ -1,0 +1,6 @@
+{
+  "extends": "@probo/tsconfig/react.json",
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}
+
