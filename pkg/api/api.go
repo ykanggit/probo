@@ -20,6 +20,7 @@ import (
 
 	console_v1 "github.com/getprobo/probo/pkg/api/console/v1"
 	"github.com/getprobo/probo/pkg/probo"
+	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"go.gearno.de/kit/httpserver"
@@ -29,6 +30,7 @@ type (
 	Config struct {
 		AllowedOrigins []string
 		Probo          *probo.Service
+		Usrmgr         *usrmgr.Service
 	}
 
 	Server struct {

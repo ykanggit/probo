@@ -25,6 +25,7 @@ import (
 
 	"github.com/getprobo/probo/pkg/api"
 	"github.com/getprobo/probo/pkg/probo"
+	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.gearno.de/kit/httpserver"
 	"go.gearno.de/kit/log"
@@ -94,6 +95,11 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot create pg client: %w", err)
 	}
 
+	usrmgr, err := usrmgr.NewService(ctx, pgClient)
+	if err != nil {
+		return fmt.Errorf("cannot create usrmgr service: %w", err)
+	}
+
 	probo, err := probo.NewService(ctx, pgClient)
 	if err != nil {
 		return fmt.Errorf("cannot create probo service: %w", err)
@@ -102,6 +108,7 @@ func (impl *Implm) Run(
 	apiServer, err := api.NewServer(
 		api.Config{
 			Probo:          probo,
+			Usrmgr:         usrmgr,
 			AllowedOrigins: impl.cfg.Api.Cors.AllowedOrigins,
 		},
 	)
