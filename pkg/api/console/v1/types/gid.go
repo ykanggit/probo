@@ -20,7 +20,7 @@ import (
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/getprobo/probo/pkg/probo/coredata/gid"
+	"github.com/getprobo/probo/pkg/gid"
 )
 
 func MarshalGIDScalar(id gid.GID) graphql.Marshaler {

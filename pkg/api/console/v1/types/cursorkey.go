@@ -20,7 +20,7 @@ import (
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/getprobo/probo/pkg/probo/coredata/page"
+	"github.com/getprobo/probo/pkg/page"
 )
 
 func NewCursor(

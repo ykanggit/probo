@@ -15,8 +15,8 @@
 package types
 
 import (
+	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/probo/coredata"
-	"github.com/getprobo/probo/pkg/probo/coredata/page"
 )
 
 func NewEvidenceConnection(p *page.Page[*coredata.Evidence]) *EvidenceConnection {

@@ -16,7 +16,7 @@ package types
 
 import (
 	"gearno.de/ref"
-	"github.com/getprobo/probo/pkg/probo/coredata/page"
+	"github.com/getprobo/probo/pkg/page"
 )
 
 func NewPageInfo[T page.Paginable](p *page.Page[T]) *PageInfo {

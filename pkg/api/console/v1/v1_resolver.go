@@ -10,9 +10,9 @@ import (
 
 	"github.com/getprobo/probo/pkg/api/console/v1/schema"
 	"github.com/getprobo/probo/pkg/api/console/v1/types"
+	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/probo/coredata"
-	"github.com/getprobo/probo/pkg/probo/coredata/gid"
-	"github.com/getprobo/probo/pkg/probo/coredata/page"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 

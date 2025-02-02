@@ -18,9 +18,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/probo/coredata"
-	"github.com/getprobo/probo/pkg/probo/coredata/gid"
-	"github.com/getprobo/probo/pkg/probo/coredata/page"
 	"go.gearno.de/kit/migrator"
 	"go.gearno.de/kit/pg"
 )

@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"maps"
 
-	"github.com/getprobo/probo/pkg/probo/coredata/gid"
-	"github.com/getprobo/probo/pkg/probo/coredata/page"
+	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/page"
 	"github.com/jackc/pgx/v5"
 	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"

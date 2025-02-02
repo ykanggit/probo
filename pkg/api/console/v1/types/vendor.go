@@ -15,8 +15,8 @@
 package types
 
 import (
+	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/probo/coredata"
-	"github.com/getprobo/probo/pkg/probo/coredata/page"
 )
 
 func NewVendorConnection(p *page.Page[*coredata.Vendor]) *VendorConnection {

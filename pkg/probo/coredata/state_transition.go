@@ -16,7 +16,7 @@ package coredata
 import (
 	"time"
 
-	"github.com/getprobo/probo/pkg/probo/coredata/gid"
+	"github.com/getprobo/probo/pkg/gid"
 )
 
 type (

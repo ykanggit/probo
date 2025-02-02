@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/getprobo/probo/pkg/probo/coredata/gid"
-	"github.com/getprobo/probo/pkg/probo/coredata/page"
+	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/page"
 )
 
 type Node interface {
