@@ -16,28 +16,33 @@ package probo
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata"
-	"go.gearno.de/kit/migrator"
 	"go.gearno.de/kit/pg"
 )
 
-type (
-	Service struct {
-		pg    *pg.Client
-		scope *coredata.Scope
-	}
-)
+func (s Service) GetOrganization(
+	ctx context.Context,
+	organizationID gid.GID,
+) (*coredata.Organization, error) {
+	organization := &coredata.Organization{}
 
-func NewService(ctx context.Context, pgClient *pg.Client) (*Service, error) {
-	err := migrator.NewMigrator(pgClient, coredata.Migrations).Run(ctx, "migrations")
+	err := s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return organization.LoadByID(
+				ctx,
+				conn,
+				s.scope,
+				organizationID,
+			)
+		},
+	)
+
 	if err != nil {
-		return nil, fmt.Errorf("cannot migrate database schema: %w", err)
+		return nil, err
 	}
 
-	return &Service{
-		pg:    pgClient,
-		scope: coredata.NewScope(), // must be created from auth
-	}, nil
+	return organization, nil
 }
