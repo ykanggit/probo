@@ -49,10 +49,10 @@ func (u *User) scan(r pgx.Row) error {
 	)
 }
 
-func (u *User) LoadByID(
+func (u *User) LoadByEmail(
 	ctx context.Context,
 	conn pg.Conn,
-	userID gid.GID,
+	email string,
 ) error {
 	q := `
 SELECT
@@ -64,11 +64,11 @@ SELECT
 FROM
     users
 WHERE
-    id = @user_id
+    email = @user_email
 LIMIT 1;
 `
 
-	args := pgx.NamedArgs{"user_id": userID}
+	args := pgx.NamedArgs{"user_email": email}
 
 	r := conn.QueryRow(ctx, q, args)
 
