@@ -30,6 +30,7 @@ type (
 	Session struct {
 		ID        gid.GID
 		UserID    gid.GID
+		ExpiredAt time.Time
 		CreatedAt time.Time
 		UpdatedAt time.Time
 	}
@@ -42,6 +43,8 @@ func (s Session) CursorKey() page.CursorKey {
 func (s *Session) scan(r pgx.Row) error {
 	return r.Scan(
 		&s.ID,
+		&s.UserID,
+		&s.ExpiredAt,
 		&s.CreatedAt,
 		&s.UpdatedAt,
 	)

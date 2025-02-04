@@ -16,7 +16,6 @@ package coredata
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/getprobo/probo/pkg/gid"
@@ -28,9 +27,11 @@ import (
 
 type (
 	User struct {
-		ID        gid.GID
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		ID             gid.GID
+		EmailAddress   string
+		HashedPassword []byte
+		CreatedAt      time.Time
+		UpdatedAt      time.Time
 	}
 )
 
@@ -41,6 +42,8 @@ func (u User) CursorKey() page.CursorKey {
 func (u *User) scan(r pgx.Row) error {
 	return r.Scan(
 		&u.ID,
+		&u.EmailAddress,
+		&u.HashedPassword,
 		&u.CreatedAt,
 		&u.UpdatedAt,
 	)
@@ -54,6 +57,8 @@ func (u *User) LoadByID(
 	q := `
 SELECT
     id,
+    email_address,
+    hashed_password,
     created_at,
     updated_at
 FROM
@@ -62,8 +67,6 @@ WHERE
     id = @user_id
 LIMIT 1;
 `
-
-	q = fmt.Sprintf(q)
 
 	args := pgx.NamedArgs{"user_id": userID}
 
