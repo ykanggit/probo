@@ -165,7 +165,7 @@ VALUES (
     @content_ref,
     @created_at,
     @updated_at
-)
+);
 `
 
 	args := pgx.NamedArgs{
@@ -177,6 +177,28 @@ VALUES (
 		"created_at": f.CreatedAt,
 		"updated_at": f.UpdatedAt,
 	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
+func (f Framework) Delete(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+) error {
+	q := `
+DELETE
+FROM
+    frameworks
+WHERE
+    %s
+    AND id = @framework_id;
+`
+
+	args := pgx.NamedArgs{"framework_id": f.ID}
+	maps.Copy(args, scope.SQLArguments())
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
 	_, err := conn.Exec(ctx, q, args)
 	return err
 }
