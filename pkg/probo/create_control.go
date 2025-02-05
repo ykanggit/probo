@@ -54,6 +54,7 @@ func (s Service) CreateControl(
 		FrameworkID: req.FrameworkID,
 		Name:        req.Name,
 		Description: req.Description,
+		State:       coredata.ControlStateNotStarted,
 		ContentRef:  req.ContentRef,
 		CreatedAt:   now,
 		UpdatedAt:   now,
@@ -63,7 +64,7 @@ func (s Service) CreateControl(
 		StateTransition: coredata.StateTransition[coredata.ControlState]{
 			ID:        controlStateTransitionID,
 			FromState: nil,
-			ToState:   coredata.ControlStateNotStarted,
+			ToState:   control.State,
 			Reason:    ref.Ref("Initial state"),
 			CreatedAt: now,
 			UpdatedAt: now,
