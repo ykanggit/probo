@@ -156,7 +156,15 @@ func (f Framework) Insert(
 ) error {
 	q := `
 INSERT INTO
-    frameworks
+    frameworks (
+        id,
+        organization_id,
+        name,
+        description,
+        content_ref,
+        created_at,
+        updated_at
+    )
 VALUES (
     @frameworkd_id,
     @organization_id,
