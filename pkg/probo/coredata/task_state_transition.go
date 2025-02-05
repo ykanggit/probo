@@ -52,6 +52,45 @@ func (tst *TaskStateTransition) scan(r pgx.Row) error {
 	)
 }
 
+func (tst TaskStateTransition) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO
+    task_state_transitions (
+        id,
+        control_id,
+        from_state
+        to_state,
+        reason,
+        created_at,
+        updated_at
+    )
+VALUES (
+    @task_state_transition_id,
+    @task_id,
+    @from_state,
+    @to_state,
+    @reason,
+    @created_at,
+    @updated_at
+);
+`
+
+	args := pgx.NamedArgs{
+		"task_state_transition_id": tst.ID,
+		"task_id":                  tst.TaskID,
+		"from_state":               tst.FromState,
+		"to_state":                 tst.ToState,
+		"reason":                   tst.Reason,
+		"created_at":               tst.CreatedAt,
+		"updated_at":               tst.UpdatedAt,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (tst *TaskStateTransitions) LoadByTaskID(
 	ctx context.Context,
 	conn pg.Conn,

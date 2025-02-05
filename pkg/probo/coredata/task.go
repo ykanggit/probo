@@ -135,6 +135,55 @@ LIMIT 1;
 	return nil
 }
 
+func (t Task) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+WITH task_insert AS (
+   INSERT INTO tasks (
+       id,
+       name,
+       description,
+       content_ref,
+       created_at,
+       updated_at
+   )
+   VALUES (
+       @task_id,
+       @name,
+       @description,
+       @content_ref,
+       @created_at,
+       @updated_at
+   )
+   RETURNING id
+)
+INSERT INTO controls_tasks (
+   task_id,
+   control_id,
+   created_at
+)
+VALUES (
+   (SELECT id FROM task_insert),
+   @control_id,
+   @created_at
+);
+`
+
+	args := pgx.NamedArgs{
+		"control_id":   t.ID,
+		"framework_id": t.ControlID,
+		"name":         t.Name,
+		"description":  t.Description,
+		"content_ref":  t.ContentRef,
+		"created_at":   t.CreatedAt,
+		"updated_at":   t.UpdatedAt,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (t *Tasks) LoadByControlID(
 	ctx context.Context,
 	conn pg.Conn,
