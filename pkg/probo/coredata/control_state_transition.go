@@ -52,6 +52,45 @@ func (cst *ControlStateTransition) scan(r pgx.Row) error {
 	)
 }
 
+func (cst ControlStateTransition) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO
+    control_state_transitions (
+        id,
+        control_id,
+        from_state
+        to_state,
+        reason,
+        created_at,
+        updated_at
+    )
+VALUES (
+    @control_state_transition_id,
+    @control_id,
+    @from_state,
+    @to_state,
+    @reason,
+    @created_at,
+    @updated_at
+);
+`
+
+	args := pgx.NamedArgs{
+		"control_state_transition_id": cst.ID,
+		"control_id":                  cst.ControlID,
+		"from_state":                  cst.FromState,
+		"to_state":                    cst.ToState,
+		"reason":                      cst.Reason,
+		"created_at":                  cst.CreatedAt,
+		"updated_at":                  cst.UpdatedAt,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (cst *ControlStateTransitions) LoadByControlID(
 	ctx context.Context,
 	conn pg.Conn,
