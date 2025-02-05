@@ -30,7 +30,7 @@ import (
 type (
 	Framework struct {
 		ID             gid.GID
-		OrganizationID string
+		OrganizationID gid.GID
 		Name           string
 		Description    string
 		ContentRef     string
@@ -148,4 +148,35 @@ LIMIT 1;
 	*f = f2
 
 	return nil
+}
+
+func (f Framework) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO
+    frameworks
+VALUES (
+    @frameworkd_id,
+    @organization_id,
+    @name,
+    @description,
+    @content_ref,
+    @created_at,
+    @updated_at
+)
+`
+
+	args := pgx.NamedArgs{
+		"framework_id": f.ID,
+		"organization_id": f.OrganizationID,
+		"name": f.Name,
+		"description": f.Description,
+		"content_ref": f.ContentRef,
+		"created_at": f.CreatedAt,
+		"updated_at": f.UpdatedAt,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
 }
