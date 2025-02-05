@@ -117,6 +117,47 @@ LIMIT 1;
 	return nil
 }
 
+func (c Control) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO
+    controls (
+        id,
+        control_id,
+        name,
+        description,
+        content_ref,
+        state,
+        created_at,
+        updated_at
+    )
+VALUES (
+    @control_id,
+    @framework_id,
+    @name,
+    @description,
+    @content_ref,
+    @state,
+    @created_at,
+    @updated_at
+);
+`
+
+	args := pgx.NamedArgs{
+		"control_id": c.ID,
+		"framework_id": c.FrameworkID,
+		"name": c.Name,
+		"description": c.Description,
+		"content_ref": c.ContentRef,
+		"created_at": c.CreatedAt,
+		"updated_at": c.UpdatedAt,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (c *Controls) LoadByFrameworkID(
 	ctx context.Context,
 	conn pg.Conn,
