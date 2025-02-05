@@ -82,3 +82,31 @@ LIMIT 1;
 
 	return nil
 }
+
+func (s *Session) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO
+    sessions (id, user_id, expired_at, created_at, updated_at)
+VALUES (
+    @session_id,
+    @user_id,
+    @expired_at,
+    @created_at,
+    @updated_at
+)
+`
+
+	args := pgx.NamedArgs{
+		"session_id": s.ID,
+		"user_id":    s.UserID,
+		"expired_at": s.ExpiredAt,
+		"created_at": s.CreatedAt,
+		"updated_at": s.UpdatedAt,
+	}
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}

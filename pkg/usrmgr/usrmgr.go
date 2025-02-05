@@ -17,7 +17,9 @@ package usrmgr
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/usrmgr/coredata"
 	"go.gearno.de/kit/migrator"
 	"go.gearno.de/kit/pg"
@@ -26,6 +28,7 @@ import (
 type (
 	Service struct {
 		pg *pg.Client
+		hp *HashingProfile
 	}
 )
 
@@ -43,7 +46,49 @@ func NewService(
 	}, nil
 }
 
-func (s Service) Login(email, password string) (*coredata.Session, error) {
+func (s Service) Login(
+	ctx context.Context,
+	email string,
+	password string,
+) (*coredata.Session, error) {
+	now := time.Now()
+	user := &coredata.User{}
+	session := &coredata.Session{
+		ID:        gid.GID{},
+		UserID:    user.ID,
+		ExpiredAt: now.Add(24 * time.Hour),
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	err := s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			if err := user.LoadByEmail(ctx, tx, email); err != nil {
+				return fmt.Errorf("cannot load user by email: %w", err)
+			}
+
+			ok, err := s.hp.ComparePasswordAndHash([]byte(password), user.HashedPassword)
+			if err != nil {
+				return fmt.Errorf("cannot constant compare byte: %w", err)
+			}
+
+			if !ok {
+				return fmt.Errorf("invalid password")
+			}
+
+			if err := session.Insert(ctx, tx); err != nil {
+				return fmt.Errorf("cannot insert session: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return nil, nil
 }
 
