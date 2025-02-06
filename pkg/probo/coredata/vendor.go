@@ -91,6 +91,39 @@ LIMIT 1;
 	return nil
 }
 
+func (v Vendor) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO
+    vendors (
+        id,
+        organization_id,
+        name,
+        created_at,
+        updated_at
+    )
+VALUES (
+    @vendor_id,
+    @organization_id,
+    @name,
+    @created_at,
+    @updated_at
+)
+`
+
+	args := pgx.NamedArgs{
+		"vendor_id":       v.ID,
+		"organization_id": v.OrganizationID,
+		"name":            v.Name,
+		"created_at":      v.CreatedAt,
+		"updated_at":      v.UpdatedAt,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (v *Vendors) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
