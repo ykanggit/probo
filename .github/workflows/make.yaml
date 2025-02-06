@@ -6,16 +6,13 @@ on:
   pull_request:
     branches:
       - "main"
-
-permissions:
-  content: "read"
-  pull-requests: "write"
   
 jobs:
   docker-build:
     name: "docker-build"
     runs-on: "ubuntu-22.04"
     permissions:
+      content: "read"
       packages: "write"
     steps:
       - uses: "actions/checkout@v4"
@@ -32,6 +29,8 @@ jobs:
   probod:
     name: "bin/probod"
     runs-on: "ubuntu-22.04"
+    permissions:
+      content: "read"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "actions/setup-node@v4"
@@ -39,6 +38,8 @@ jobs:
   fmt-check:
     name: "fmt-check"
     runs-on: "ubuntu-22.04"
+    permissions:
+      content: "read"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "actions/setup-node@v4"
