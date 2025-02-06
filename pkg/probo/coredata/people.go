@@ -97,6 +97,45 @@ LIMIT 1;
 	return nil
 }
 
+func (p People) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO
+    peoples (
+        id,
+        organization_id,
+        full_name,
+        primary_email_address,
+        additional_email_addresses,
+        created_at,
+        updated_at
+    )
+VALUES (
+    @people_id,
+    @organization_id,
+    @full_name,
+    @primary_email_address,
+    @additional_email_addresses,
+    @created_at,
+    @updated_at
+)
+`
+
+	args := pgx.NamedArgs{
+		"people_id":                  p.ID,
+		"organization_id":            p.OrganizationID,
+		"full_name":                  p.FullName,
+		"primary_email_address":      p.PrimaryEmailAddress,
+		"additional_email_addresses": p.AdditionalEmailAddresses,
+		"created_at":                 p.CreatedAt,
+		"updated_at":                 p.UpdatedAt,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (p *Peoples) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
