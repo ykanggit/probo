@@ -7,6 +7,10 @@ on:
     branches:
       - "main"
 
+permissions:
+  content: "read"
+  pull-requests: "write"
+  
 jobs:
   docker-build:
     name: "docker-build"
