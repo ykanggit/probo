@@ -30,6 +30,7 @@ type (
 		FullName                 string
 		PrimaryEmailAddress      string
 		AdditionalEmailAddresses []string
+		Kind                     coredata.PeopleKind
 	}
 )
 
@@ -47,6 +48,7 @@ func (s Service) CreatePeople(
 	people := &coredata.People{
 		ID:                       peopleID,
 		OrganizationID:           req.OrganizationID,
+		Kind:                     req.Kind,
 		FullName:                 req.FullName,
 		PrimaryEmailAddress:      req.PrimaryEmailAddress,
 		AdditionalEmailAddresses: req.AdditionalEmailAddresses,

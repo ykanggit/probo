@@ -31,6 +31,7 @@ type (
 	People struct {
 		ID                       gid.GID
 		OrganizationID           gid.GID
+		Kind                     PeopleKind
 		FullName                 string
 		PrimaryEmailAddress      string
 		AdditionalEmailAddresses []string
@@ -49,6 +50,7 @@ func (p *People) scan(r pgx.Row) error {
 	return r.Scan(
 		&p.ID,
 		&p.OrganizationID,
+		&p.Kind,
 		&p.FullName,
 		&p.PrimaryEmailAddress,
 		&p.AdditionalEmailAddresses,
@@ -67,6 +69,7 @@ func (p *People) LoadByID(
 SELECT
     id,
     organization_id,
+    kind,
     full_name,
     primary_email_address,
     additional_email_addresses,
@@ -106,6 +109,7 @@ INSERT INTO
     peoples (
         id,
         organization_id,
+        kind,
         full_name,
         primary_email_address,
         additional_email_addresses,
@@ -115,6 +119,7 @@ INSERT INTO
 VALUES (
     @people_id,
     @organization_id,
+    @kind,
     @full_name,
     @primary_email_address,
     @additional_email_addresses,
@@ -126,6 +131,7 @@ VALUES (
 	args := pgx.NamedArgs{
 		"people_id":                  p.ID,
 		"organization_id":            p.OrganizationID,
+		"kind":                       p.Kind,
 		"full_name":                  p.FullName,
 		"primary_email_address":      p.PrimaryEmailAddress,
 		"additional_email_addresses": p.AdditionalEmailAddresses,
@@ -147,6 +153,7 @@ func (p *Peoples) LoadByOrganizationID(
 SELECT
     id,
     organization_id,
+    kind,
     full_name,
     primary_email_address,
     additional_email_addresses,
