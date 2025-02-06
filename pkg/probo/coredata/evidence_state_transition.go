@@ -52,6 +52,45 @@ func (cst *EvidenceStateTransition) scan(r pgx.Row) error {
 	)
 }
 
+func (est EvidenceStateTransition) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO
+    evidence_state_transitions (
+        id,
+        control_id,
+        from_state
+        to_state,
+        reason,
+        created_at,
+        updated_at
+    )
+VALUES (
+    @evidence_state_transition_id,
+    @evidence_id,
+    @from_state,
+    @to_state,
+    @reason,
+    @created_at,
+    @updated_at
+);
+`
+
+	args := pgx.NamedArgs{
+		"evidence_state_transition_id": est.ID,
+		"evidence_id":                  est.EvidenceID,
+		"from_state":                   est.FromState,
+		"to_state":                     est.ToState,
+		"reason":                       est.Reason,
+		"created_at":                   est.CreatedAt,
+		"updated_at":                   est.UpdatedAt,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (cst *EvidenceStateTransitions) LoadByEvidenceID(
 	ctx context.Context,
 	conn pg.Conn,

@@ -59,6 +59,45 @@ func (e *Evidence) scan(r pgx.Row) error {
 	)
 }
 
+func (e Evidence) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO
+    evidences (
+        id,
+        task_id,
+        object_key,
+        mime_type,
+        size,
+        created_at,
+        updated_at,
+    )
+VALUES (
+    @evidence_id,
+    @task_id,
+    @object_key,
+    @mime_type,
+    @size,
+    @created_at,
+    @updated_at
+)
+`
+
+	args := pgx.NamedArgs{
+		"evidence_id": e.ID,
+		"task_id":     e.TaskID,
+		"object_key":  e.ObjectKey,
+		"mime_type":   e.MimeType,
+		"size":        e.Size,
+		"created_at":  e.CreatedAt,
+		"updated_at":  e.UpdatedAt,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (e *Evidence) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
