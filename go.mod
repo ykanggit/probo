@@ -13,6 +13,7 @@ require (
 	go.gearno.de/crypto/uuid v0.1.0
 	go.gearno.de/kit v0.0.0-20250124134658-f0d0f3b7f7b3
 	go.opentelemetry.io/otel/trace v1.34.0
+	golang.org/x/crypto v0.32.0
 )
 
 require (
@@ -48,7 +49,6 @@ require (
 	go.opentelemetry.io/otel/metric v1.34.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.34.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
-	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/mod v0.20.0 // indirect
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
