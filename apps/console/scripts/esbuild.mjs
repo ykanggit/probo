@@ -6,7 +6,7 @@ import * as esbuild from "esbuild";
 import fs from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
-import tailwindcss from "@tailwindcss/postcss";
+import tailwindcss from "tailwindcss";
 
 async function copyRecursive(src, dest) {
   await fs.mkdir(dest, { recursive: true });

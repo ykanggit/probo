@@ -10,13 +10,18 @@
     "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.475.0",
     "posthog-js": "^1.215.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet-async": "^2.0.5",
     "react-relay": "^18.2.0",
     "react-router": "^7.1.5",
-    "relay-runtime": "^18.2.0"
+    "relay-runtime": "^18.2.0",
+    "tailwind-merge": "^3.0.1",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.26.7",
@@ -24,7 +29,6 @@
     "@babel/preset-typescript": "^7.26.0",
     "@deanc/esbuild-plugin-postcss": "^1.0.2",
     "@probo/tsconfig": "^0.0.1",
-    "@tailwindcss/postcss": "^4.0.2",
     "@types/babel-core": "^6.25.10",
     "@types/node": "^22.13.0",
     "@types/react": "^18.3.18",
@@ -35,7 +39,7 @@
     "babel-plugin-relay": "^18.2.0",
     "esbuild": "^0.24.2",
     "relay-compiler": "^18.2.0",
-    "tailwindcss": "^4.0.2",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
   },
   "relay": {
