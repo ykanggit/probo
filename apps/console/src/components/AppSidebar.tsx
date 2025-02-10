@@ -37,6 +37,11 @@ const staticData = {
   },
   navMain: [
     {
+      title: "Frameworks",
+      url: "/frameworks",
+      icon: BookOpen,
+    },
+    {
       title: "Peoples",
       url: "/peoples",
       icon: Users,

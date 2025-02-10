@@ -24,6 +24,7 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const PeoplesPage = lazy(() => import("./pages/PeoplesPage"));
 const VendorsPage = lazy(() => import("./pages/VendorsPage"));
+const FrameworksPage = lazy(() => import("./pages/FrameworksPage"));
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
                       <Route index element={<HomePage />} />
                       <Route path="/peoples" element={<PeoplesPage />} />
                       <Route path="/vendors" element={<VendorsPage />} />
+                      <Route path="/frameworks" element={<FrameworksPage />} />
                     </Route>
                     <Route path="*" element={<NotFoundPage />} />
                   </Routes>
