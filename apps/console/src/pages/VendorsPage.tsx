@@ -36,7 +36,7 @@ function VendorsPageContent({
   queryRef: PreloadedQuery<VendorsPageQueryType>;
 }) {
   const data = usePreloadedQuery(VendorsPageQuery, queryRef);
-  const vendors = data.node?.vendors?.edges?.map(edge => edge?.node) ?? [];
+  const vendors = data.node.vendors?.edges.map(edge => edge?.node) ?? [];
 
   return (
     <div className="p-6 space-y-6">

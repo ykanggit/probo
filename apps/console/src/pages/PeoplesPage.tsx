@@ -38,7 +38,7 @@ function PeoplesPageContent({
   queryRef: PreloadedQuery<PeoplesPageQueryType>;
 }) {
   const data = usePreloadedQuery(PeoplesPageQuery, queryRef);
-  const peoples = data.node?.peoples?.edges?.map(edge => edge?.node) ?? [];
+  const peoples = data.node.peoples?.edges.map(edge => edge?.node) ?? [];
 
   return (
     <div className="p-6 space-y-6">
