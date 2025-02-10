@@ -1,5 +1,6 @@
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import { AppSidebar } from "@/components/AppSidebar";
+import React from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,9 +15,11 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { graphql } from "relay-runtime";
 
 export default function ConsoleLayout() {
+  const location = useLocation();
+  const pathSegments = location.pathname.split('/').filter(Boolean);
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -27,15 +30,30 @@ export default function ConsoleLayout() {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
                 </BreadcrumbItem>
+                {pathSegments.map((segment, index) => {
+                  const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
+                  const isLast = index === pathSegments.length - 1;
+                  
+                  return (
+                    <React.Fragment key={path}>
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
+                        {isLast ? (
+                          <BreadcrumbPage>
+                            {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                          </BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink href={path}>
+                            {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                          </BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                    </React.Fragment>
+                  );
+                })}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
