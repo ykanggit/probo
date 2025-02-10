@@ -29,6 +29,7 @@ type (
 	Organization struct {
 		ID        gid.GID
 		Name      string
+		LogoURL string
 		CreatedAt time.Time
 		UpdatedAt time.Time
 	}
@@ -38,6 +39,7 @@ func (o *Organization) scan(r pgx.Row) error {
 	return r.Scan(
 		&o.ID,
 		&o.Name,
+		&o.LogoURL,
 		&o.CreatedAt,
 		&o.UpdatedAt,
 	)
@@ -53,6 +55,7 @@ func (o *Organization) LoadByID(
 SELECT
     id,
     name,
+    logo_url,
     created_at,
     updated_at
 FROM

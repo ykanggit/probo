@@ -128,6 +128,7 @@ type FrameworkEdge struct {
 type Organization struct {
 	ID         gid.GID              `json:"id"`
 	Name       string               `json:"name"`
+	LogoURL    string               `json:"logoUrl"`
 	Frameworks *FrameworkConnection `json:"frameworks"`
 	Vendors    *VendorConnection    `json:"vendors"`
 	Peoples    *PeopleConnection    `json:"peoples"`

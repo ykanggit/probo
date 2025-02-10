@@ -22,6 +22,7 @@ func NewOrganization(o *coredata.Organization) *Organization {
 	return &Organization{
 		ID:        o.ID,
 		Name:      o.Name,
+		LogoURL:   o.LogoURL,
 		CreatedAt: o.CreatedAt,
 		UpdatedAt: o.UpdatedAt,
 	}

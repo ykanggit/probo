@@ -4,14 +4,10 @@ import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { RelayEnvironmentProvider } from "react-relay";
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-} from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import "App.css";
 import ErrorBoundary from "./components/ErrorBoundary";
-import AuthenticateLayout from "./layouts/AuthenticateLayout";
+import ConsoleLayout from "./layouts/ConsoleLayout";
 import { RelayEnvironment } from "./RelayEnvironment";
 
 posthog.init(process.env.POSTHOG_KEY!, {
@@ -37,7 +33,7 @@ function App() {
               <BrowserRouter>
                 <Suspense>
                   <Routes>
-                    <Route path="/" element={<AuthenticateLayout />}>
+                    <Route path="/" element={<ConsoleLayout />}>
                       <Route index element={<HomePage />} />
                     </Route>
                     <Route path="*" element={<NotFoundPage />} />

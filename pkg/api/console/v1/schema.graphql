@@ -41,6 +41,7 @@ type PageInfo {
 type Organization implements Node {
   id: ID!
   name: String!
+  logoUrl: String!
 
   frameworks(
     first: Int
