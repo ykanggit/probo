@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<51618c4ff52c6da6eb39cc0756d037e4>>
+ * @generated SignedSource<<f9715593419cda898b34a0056729d77c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,10 +10,10 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type FrameworkPageQuery$variables = {
+export type FrameworkOverviewPageQuery$variables = {
   frameworkId: string;
 };
-export type FrameworkPageQuery$data = {
+export type FrameworkOverviewPageQuery$data = {
   readonly node: {
     readonly controls?: {
       readonly edges: ReadonlyArray<{
@@ -30,9 +30,9 @@ export type FrameworkPageQuery$data = {
     readonly name?: string;
   };
 };
-export type FrameworkPageQuery = {
-  response: FrameworkPageQuery$data;
-  variables: FrameworkPageQuery$variables;
+export type FrameworkOverviewPageQuery = {
+  response: FrameworkOverviewPageQuery$data;
+  variables: FrameworkOverviewPageQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -128,7 +128,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "FrameworkPageQuery",
+    "name": "FrameworkOverviewPageQuery",
     "selections": [
       {
         "alias": null,
@@ -151,7 +151,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "FrameworkPageQuery",
+    "name": "FrameworkOverviewPageQuery",
     "selections": [
       {
         "alias": null,
@@ -176,16 +176,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "20c37c26ec0c229a526ba1f84a0bb22e",
+    "cacheID": "4190ee685492e95820ecb106f2dc7e3c",
     "id": null,
     "metadata": {},
-    "name": "FrameworkPageQuery",
+    "name": "FrameworkOverviewPageQuery",
     "operationKind": "query",
-    "text": "query FrameworkPageQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query FrameworkOverviewPageQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c018807d1942d694eceae254a3078c4d";
+(node as any).hash = "25fb6b72c598d19767825ac648654fcf";
 
 export default node;

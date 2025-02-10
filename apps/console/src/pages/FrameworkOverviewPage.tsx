@@ -22,10 +22,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { FrameworkPageQuery as FrameworkPageQueryType } from "./__generated__/FrameworkPageQuery.graphql";
+import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 
-const FrameworkPageQuery = graphql`
-  query FrameworkPageQuery($frameworkId: ID!) {
+const FrameworkOverviewPageQuery = graphql`
+  query FrameworkOverviewPageQuery($frameworkId: ID!) {
     node(id: $frameworkId) {
       id
       ... on Framework {
@@ -46,12 +46,12 @@ const FrameworkPageQuery = graphql`
   }
 `;
 
-function FrameworkPageContent({
+function FrameworkOverviewPageContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<FrameworkPageQueryType>;
+  queryRef: PreloadedQuery<FrameworkOverviewPageQueryType>;
 }) {
-  const data = usePreloadedQuery(FrameworkPageQuery, queryRef);
+  const data = usePreloadedQuery(FrameworkOverviewPageQuery, queryRef);
   const framework = data.node;
   const controls = framework.controls?.edges.map(edge => edge?.node) ?? [];
 
@@ -164,7 +164,7 @@ function FrameworkPageContent({
   );
 }
 
-function FrameworkPageFallback() {
+function FrameworkOverviewPageFallback() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mb-8">
@@ -189,17 +189,17 @@ function FrameworkPageFallback() {
   );
 }
 
-export default function FrameworkPage() {
+export default function FrameworkOverviewPage() {
   const { frameworkId } = useParams();
-  const [queryRef, loadQuery] = useQueryLoader<FrameworkPageQueryType>(FrameworkPageQuery);
+  const [queryRef, loadQuery] = useQueryLoader<FrameworkOverviewPageQueryType>(FrameworkOverviewPageQuery);
 
   useEffect(() => {
     loadQuery({ frameworkId });
   }, [loadQuery, frameworkId]);
 
   return (
-    <Suspense fallback={<FrameworkPageFallback />}>
-      {queryRef && <FrameworkPageContent queryRef={queryRef} />}
+    <Suspense fallback={<FrameworkOverviewPageFallback />}>
+      {queryRef && <FrameworkOverviewPageContent queryRef={queryRef} />}
     </Suspense>
   );
 }
