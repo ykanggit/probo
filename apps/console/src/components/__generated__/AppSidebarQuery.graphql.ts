@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<daed775f0362008ab63d9ea41047b955>>
+ * @generated SignedSource<<c76b330caf722464b0da18ad8a5f058a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,6 +14,7 @@ export type AppSidebarQuery$data = {
   readonly node: {
     readonly createdAt?: any;
     readonly id: string;
+    readonly logoUrl?: string;
     readonly name?: string;
     readonly updatedAt?: any;
   };
@@ -46,6 +47,13 @@ v2 = {
       "args": null,
       "kind": "ScalarField",
       "name": "name",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "logoUrl",
       "storageKey": null
     },
     {
@@ -119,16 +127,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "7afe463103b06ebb63c8db38cb99953c",
+    "cacheID": "c5135cf2fd79365dad2ea581b3e010de",
     "id": null,
     "metadata": {},
     "name": "AppSidebarQuery",
     "operationKind": "query",
-    "text": "query AppSidebarQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      name\n      createdAt\n      updatedAt\n    }\n  }\n}\n"
+    "text": "query AppSidebarQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      name\n      logoUrl\n      createdAt\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3fbcab1da780d1530edf38d7b9ac4ec9";
+(node as any).hash = "2aafa67cfe2e2c748605b224503c7463";
 
 export default node;
