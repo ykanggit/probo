@@ -23,6 +23,7 @@ posthog.init(process.env.POSTHOG_KEY!, {
 const HomePage = lazy(() => import("./pages/HomePage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const PeoplesPage = lazy(() => import("./pages/PeoplesPage"));
+const VendorsPage = lazy(() => import("./pages/VendorsPage"));
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
                     <Route path="/" element={<ConsoleLayout />}>
                       <Route index element={<HomePage />} />
                       <Route path="/peoples" element={<PeoplesPage />} />
+                      <Route path="/vendors" element={<VendorsPage />} />
                     </Route>
                     <Route path="*" element={<NotFoundPage />} />
                   </Routes>
