@@ -8,6 +8,7 @@ import {
 import { Globe2, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router";
 import type { FrameworksPageQuery as FrameworksPageQueryType } from "./__generated__/FrameworksPageQuery.graphql";
 
 const FrameworksPageQuery = graphql`
@@ -60,29 +61,31 @@ function FrameworksPageContent({
 
       <div className="grid gap-6 md:grid-cols-2">
         {frameworks.map((framework) => (
-          <Card key={framework?.id} className="bg-card/50">
-            <CardContent className="p-6">
-              <div className="relative mb-6">
-                <Badge className="absolute right-0 top-0 bg-green-500/10 text-green-500 hover:bg-green-500/20">
-                  Active
-                </Badge>
-                <div className="bg-green-500/10 w-24 h-24 rounded-full flex items-center justify-center mb-4">
-                  <Globe2 className="w-12 h-12 text-green-500" />
-                  <div className="absolute text-xs font-medium text-green-500">{framework?.name}</div>
+          <Link key={framework?.id} to={`/frameworks/${framework.id}`}>
+            <Card className="bg-card/50 hover:bg-card/70 transition-colors">
+              <CardContent className="p-6">
+                <div className="relative mb-6">
+                  <Badge className="absolute right-0 top-0 bg-green-500/10 text-green-500 hover:bg-green-500/20">
+                    Active
+                  </Badge>
+                  <div className="bg-green-500/10 w-24 h-24 rounded-full flex items-center justify-center mb-4">
+                    <Globe2 className="w-12 h-12 text-green-500" />
+                    <div className="absolute text-xs font-medium text-green-500">{framework?.name}</div>
+                  </div>
+                  <h2 className="text-xl font-semibold mb-2">{framework?.name}</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {framework?.description}
+                  </p>
                 </div>
-                <h2 className="text-xl font-semibold mb-2">{framework?.name}</h2>
-                <p className="text-sm text-muted-foreground">
-                  {framework?.description}
-                </p>
-              </div>
-              <div className="flex items-center text-muted-foreground text-sm">
-                <div className="flex items-center">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  {framework?.controls?.edges.length} Controls
+                <div className="flex items-center text-muted-foreground text-sm">
+                  <div className="flex items-center">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    {framework?.controls?.edges.length} Controls
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
     </div>

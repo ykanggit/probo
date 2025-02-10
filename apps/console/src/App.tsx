@@ -25,7 +25,7 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const PeoplesPage = lazy(() => import("./pages/PeoplesPage"));
 const VendorsPage = lazy(() => import("./pages/VendorsPage"));
 const FrameworksPage = lazy(() => import("./pages/FrameworksPage"));
-
+const FrameworkPage = lazy(() => import("./pages/FrameworkPage"));
 function App() {
   return (
     <StrictMode>
@@ -41,6 +41,7 @@ function App() {
                       <Route path="/peoples" element={<PeoplesPage />} />
                       <Route path="/vendors" element={<VendorsPage />} />
                       <Route path="/frameworks" element={<FrameworksPage />} />
+                      <Route path="/frameworks/:frameworkId" element={<FrameworkPage />} />
                     </Route>
                     <Route path="*" element={<NotFoundPage />} />
                   </Routes>
