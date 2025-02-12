@@ -4,7 +4,7 @@ import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { RelayEnvironmentProvider } from "react-relay";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "App.css";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ErrorPage } from "./pages/ErrorPage";
@@ -32,7 +32,7 @@ const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
 function App() {
   return (
     <StrictMode>
-      <ErrorBoundary>
+      <ErrorBoundary key={location.pathname}>
         <PostHogProvider client={posthog}>
           <RelayEnvironmentProvider environment={RelayEnvironment}>
             <HelmetProvider>
@@ -41,18 +41,18 @@ function App() {
                   <Route
                     path="/"
                     element={
-                      <ErrorBoundary>
+                      <ErrorBoundaryWithLocation>
                         <ConsoleLayout />
-                      </ErrorBoundary>
+                      </ErrorBoundaryWithLocation>
                     }
                   >
                     <Route
                       index
                       element={
                         <Suspense>
-                          <ErrorBoundary>
+                          <ErrorBoundaryWithLocation>
                             <HomePage />
-                          </ErrorBoundary>
+                          </ErrorBoundaryWithLocation>
                         </Suspense>
                       }
                     />
@@ -60,9 +60,9 @@ function App() {
                       path="/peoples"
                       element={
                         <Suspense>
-                          <ErrorBoundary>
+                          <ErrorBoundaryWithLocation>
                             <PeopleListPage />
-                          </ErrorBoundary>
+                          </ErrorBoundaryWithLocation>
                         </Suspense>
                       }
                     />
@@ -70,9 +70,9 @@ function App() {
                       path="/vendors"
                       element={
                         <Suspense>
-                          <ErrorBoundary>
+                          <ErrorBoundaryWithLocation>
                             <VendorListPage />
-                          </ErrorBoundary>
+                          </ErrorBoundaryWithLocation>
                         </Suspense>
                       }
                     />
@@ -80,10 +80,9 @@ function App() {
                       path="/frameworks"
                       element={
                         <Suspense>
-                          <ErrorBoundary>
-                            <FrameworksPage />
-                          </ErrorBoundary>
+                          <ErrorBoundaryWithLocation>
                             <FrameworkListPage />
+                          </ErrorBoundaryWithLocation>
                         </Suspense>
                       }
                     />
@@ -91,9 +90,9 @@ function App() {
                       path="/frameworks/:frameworkId"
                       element={
                         <Suspense>
-                          <ErrorBoundary>
+                          <ErrorBoundaryWithLocation>
                             <FrameworkOverviewPage />
-                          </ErrorBoundary>
+                          </ErrorBoundaryWithLocation>
                         </Suspense>
                       }
                     />
@@ -101,9 +100,9 @@ function App() {
                       path="/vendors/:vendorId"
                       element={
                         <Suspense>
-                          <ErrorBoundary>
+                          <ErrorBoundaryWithLocation>
                             <VendorOverviewPage />
-                          </ErrorBoundary>
+                          </ErrorBoundaryWithLocation>
                         </Suspense>
                       }
                     />
@@ -124,6 +123,11 @@ function App() {
       </ErrorBoundary>
     </StrictMode>
   );
+}
+
+function ErrorBoundaryWithLocation({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  return <ErrorBoundary key={location.pathname}>{children}</ErrorBoundary>;
 }
 
 const container = document.getElementById("root");
