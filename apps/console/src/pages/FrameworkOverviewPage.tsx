@@ -194,7 +194,7 @@ export default function FrameworkOverviewPage() {
   const [queryRef, loadQuery] = useQueryLoader<FrameworkOverviewPageQueryType>(FrameworkOverviewPageQuery);
 
   useEffect(() => {
-    loadQuery({ frameworkId });
+    loadQuery({ frameworkId: frameworkId! });
   }, [loadQuery, frameworkId]);
 
   return (

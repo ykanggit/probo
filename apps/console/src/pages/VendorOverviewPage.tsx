@@ -238,8 +238,8 @@ export default function VendorOverviewPage() {
   const [queryRef, loadQuery] = useQueryLoader<VendorOverviewPageQueryType>(VendorOverviewPageQuery);
 
   useEffect(() => {
-    loadQuery({ vendorId: vendorId });
-  }, [loadQuery]);
+    loadQuery({ vendorId: vendorId! });
+  }, [loadQuery, vendorId]);
 
   if (!queryRef) {
     return <VendorOverviewPageFallback />;
