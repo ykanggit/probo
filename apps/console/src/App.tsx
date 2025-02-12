@@ -25,7 +25,7 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const PeopleListPage = lazy(() => import("./pages/PeopleListPage"));
 const VendorListPage = lazy(() => import("./pages/VendorListPage"));
-const FrameworksPage = lazy(() => import("./pages/FrameworksPage"));
+const FrameworkListPage = lazy(() => import("./pages/FrameworkListPage"));
 const FrameworkOverviewPage = lazy(() => import("./pages/FrameworkOverviewPage"));
 const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
 
@@ -83,6 +83,7 @@ function App() {
                           <ErrorBoundary>
                             <FrameworksPage />
                           </ErrorBoundary>
+                            <FrameworkListPage />
                         </Suspense>
                       }
                     />

@@ -9,10 +9,10 @@ import { Globe2, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router";
-import type { FrameworksPageQuery as FrameworksPageQueryType } from "./__generated__/FrameworksPageQuery.graphql";
+import type { FrameworkListPageQuery as FrameworkListPageQueryType } from "./__generated__/FrameworkListPageQuery.graphql";
 
-const FrameworksPageQuery = graphql`
-  query FrameworksPageQuery {
+const FrameworkListPageQuery = graphql`
+  query FrameworkListPageQuery {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
@@ -40,12 +40,12 @@ const FrameworksPageQuery = graphql`
   }
 `;
 
-function FrameworksPageContent({
+function FrameworkListPageContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<FrameworksPageQueryType>;
+  queryRef: PreloadedQuery<FrameworkListPageQueryType>;
 }) {
-  const data = usePreloadedQuery(FrameworksPageQuery, queryRef);
+  const data = usePreloadedQuery(FrameworkListPageQuery, queryRef);
   const frameworks = data.node.frameworks?.edges.map(edge => edge?.node) ?? [];
 
   return (
@@ -92,7 +92,7 @@ function FrameworksPageContent({
   );
 }
 
-function FrameworksPageFallback() {
+function FrameworkListPageFallback() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mb-8">
@@ -117,16 +117,16 @@ function FrameworksPageFallback() {
   );
 }
 
-export default function FrameworksPage() {
-  const [queryRef, loadQuery] = useQueryLoader<FrameworksPageQueryType>(FrameworksPageQuery);
+export default function FrameworkListPage() {
+  const [queryRef, loadQuery] = useQueryLoader<FrameworkListPageQueryType>(FrameworkListPageQuery);
 
   useEffect(() => {
     loadQuery({});
   }, [loadQuery]);
 
   return (
-    <Suspense fallback={<FrameworksPageFallback />}>
-      {queryRef && <FrameworksPageContent queryRef={queryRef} />}
+    <Suspense fallback={<FrameworkListPageFallback />}>
+      {queryRef && <FrameworkListPageContent queryRef={queryRef} />}
     </Suspense>
   );
 }

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3bb5a1a7f62542ace96a9f256dada04e>>
+ * @generated SignedSource<<87f0a667163355b6f7d273a71aa65a93>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,8 +10,8 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type FrameworksPageQuery$variables = Record<PropertyKey, never>;
-export type FrameworksPageQuery$data = {
+export type FrameworkListPageQuery$variables = Record<PropertyKey, never>;
+export type FrameworkListPageQuery$data = {
   readonly node: {
     readonly frameworks?: {
       readonly edges: ReadonlyArray<{
@@ -35,9 +35,9 @@ export type FrameworksPageQuery$data = {
     readonly id: string;
   };
 };
-export type FrameworksPageQuery = {
-  response: FrameworksPageQuery$data;
-  variables: FrameworksPageQuery$variables;
+export type FrameworkListPageQuery = {
+  response: FrameworkListPageQuery$data;
+  variables: FrameworkListPageQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -170,7 +170,7 @@ return {
     "argumentDefinitions": [],
     "kind": "Fragment",
     "metadata": null,
-    "name": "FrameworksPageQuery",
+    "name": "FrameworkListPageQuery",
     "selections": [
       {
         "alias": null,
@@ -193,7 +193,7 @@ return {
   "operation": {
     "argumentDefinitions": [],
     "kind": "Operation",
-    "name": "FrameworksPageQuery",
+    "name": "FrameworkListPageQuery",
     "selections": [
       {
         "alias": null,
@@ -218,16 +218,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "1c8d130ae8ef94afc7a59fae8ac71e39",
+    "cacheID": "b9f11bd39a99da4a1693b67c60a85845",
     "id": null,
     "metadata": {},
-    "name": "FrameworksPageQuery",
+    "name": "FrameworkListPageQuery",
     "operationKind": "query",
-    "text": "query FrameworksPageQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      frameworks {\n        edges {\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query FrameworkListPageQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      frameworks {\n        edges {\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "fda9662b311a83b144af3c11c573d634";
+(node as any).hash = "cc761cbab629daf0587a9befff255256";
 
 export default node;
