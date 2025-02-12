@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import Fuse from "fuse.js";
 import type { VendorListPageQuery as VendorListPageQueryType } from "./__generated__/VendorListPageQuery.graphql";
-
+import { Helmet } from "react-helmet-async";
 const ITEMS_PER_PAGE = 2;
 
 const vendorListPageQuery = graphql`
@@ -290,8 +290,13 @@ export default function VendorListPage() {
   }
 
   return (
-    <Suspense fallback={<VendorListFallback />}>
-      <VendorListContent queryRef={queryRef} onPageChange={handlePageChange} />
-    </Suspense>
+    <>
+      <Helmet>
+        <title>Vendors - Probo Console</title>
+      </Helmet>
+      <Suspense fallback={<VendorListFallback />}>
+        <VendorListContent queryRef={queryRef} onPageChange={handlePageChange} />
+      </Suspense>
+    </>
   );
 }

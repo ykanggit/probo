@@ -43,10 +43,6 @@ function SettingsPageContent({
 
   return (
     <>
-      <Helmet>
-        <title>Settings - Probo Console</title>
-      </Helmet>
-      
       <div className="container mx-auto p-6 space-y-6">
         <div>
           <h1 className="text-4xl font-medium tracking-tight">Settings</h1>
@@ -187,8 +183,13 @@ export default function SettingsPage() {
   }
 
   return (
-    <Suspense fallback={<SettingsPageFallback />}>
-      <SettingsPageContent queryRef={queryRef} />
-    </Suspense>
+    <>
+      <Helmet>
+        <title>Settings - Probo Console</title>
+      </Helmet>
+      <Suspense fallback={<SettingsPageFallback />}>
+        <SettingsPageContent queryRef={queryRef} />
+      </Suspense>
+    </>
   );
 }

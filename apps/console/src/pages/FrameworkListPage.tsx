@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router";
 import type { FrameworkListPageQuery as FrameworkListPageQueryType } from "./__generated__/FrameworkListPageQuery.graphql";
-
+import { Helmet } from "react-helmet-async";
 const FrameworkListPageQuery = graphql`
   query FrameworkListPageQuery {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
@@ -125,8 +125,13 @@ export default function FrameworkListPage() {
   }, [loadQuery]);
 
   return (
-    <Suspense fallback={<FrameworkListPageFallback />}>
-      {queryRef && <FrameworkListPageContent queryRef={queryRef} />}
-    </Suspense>
+    <>
+      <Helmet>
+        <title>Frameworks - Probo Console</title>
+      </Helmet>
+      <Suspense fallback={<FrameworkListPageFallback />}>
+        {queryRef && <FrameworkListPageContent queryRef={queryRef} />}
+      </Suspense>
+    </>
   );
 }

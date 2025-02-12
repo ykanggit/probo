@@ -23,7 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
-
+import { Helmet } from "react-helmet-async";
 const FrameworkOverviewPageQuery = graphql`
   query FrameworkOverviewPageQuery($frameworkId: ID!) {
     node(id: $frameworkId) {
@@ -198,9 +198,14 @@ export default function FrameworkOverviewPage() {
   }, [loadQuery, frameworkId]);
 
   return (
-    <Suspense fallback={<FrameworkOverviewPageFallback />}>
-      {queryRef && <FrameworkOverviewPageContent queryRef={queryRef} />}
-    </Suspense>
+    <>
+      <Helmet>
+        <title>Framework Overview - Probo Console</title>
+      </Helmet>
+      <Suspense fallback={<FrameworkOverviewPageFallback />}>
+        {queryRef && <FrameworkOverviewPageContent queryRef={queryRef} />}
+      </Suspense>
+    </>
   );
 }
 

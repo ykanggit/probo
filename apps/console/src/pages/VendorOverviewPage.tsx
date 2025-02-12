@@ -10,7 +10,7 @@ import { graphql, PreloadedQuery, usePreloadedQuery, useQueryLoader } from "reac
 import { Suspense, useEffect } from "react"
 import type { VendorOverviewPageQuery as VendorOverviewPageQueryType } from "./__generated__/VendorOverviewPageQuery.graphql"
 import { useParams } from "react-router";
-
+import { Helmet } from "react-helmet-async";
 const VendorOverviewPageQuery = graphql`
   query VendorOverviewPageQuery($vendorId: ID!) {
     node(id: $vendorId) {
@@ -246,8 +246,13 @@ export default function VendorOverviewPage() {
   }
 
   return (
-    <Suspense fallback={<VendorOverviewPageFallback />}>
-      <VendorOverviewPageContent queryRef={queryRef} />
-    </Suspense>
+    <>
+      <Helmet>
+        <title>Vendor Overview - Probo Console</title>
+      </Helmet>
+      <Suspense fallback={<VendorOverviewPageFallback />}>
+        <VendorOverviewPageContent queryRef={queryRef} />
+      </Suspense>
+    </>
   );
 }

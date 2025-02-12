@@ -8,6 +8,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CircleUser, Globe, Shield } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generated__/PeopleListPageQuery.graphql";
 
 const PeopleListPageQuery = graphql`
@@ -131,8 +132,13 @@ export default function PeopleListPage() {
   }
 
   return (
-    <Suspense fallback={<PeopleListPageFallback />}>
+    <>
+      <Helmet>
+        <title>People - Probo Console</title>
+      </Helmet>
+      <Suspense fallback={<PeopleListPageFallback />}>
       <PeopleListPageContent queryRef={queryRef} />
     </Suspense>
+    </>
   );
 }
