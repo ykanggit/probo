@@ -7,11 +7,13 @@ import {
 } from "react-relay";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { CircleUser, Globe, Shield } from "lucide-react";
+import { CircleUser, Globe, Shield, Store } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import type { VendorsPageQuery as VendorsPageQueryType } from "./__generated__/VendorsPageQuery.graphql";
 
-const VendorsPageQuery = graphql`
-  query VendorsPageQuery {
+const VendorListQuery = graphql`
+  query VendorListQuery {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
@@ -30,12 +32,12 @@ const VendorsPageQuery = graphql`
   }
 `;
 
-function VendorsPageContent({
+function VendorListContent({
   queryRef,
 }: {
   queryRef: PreloadedQuery<VendorsPageQueryType>;
 }) {
-  const data = usePreloadedQuery(VendorsPageQuery, queryRef);
+  const data = usePreloadedQuery(VendorListQuery, queryRef);
   const vendors = data.node.vendors?.edges.map(edge => edge?.node) ?? [];
 
   return (
@@ -46,6 +48,34 @@ function VendorsPageContent({
           Keep track of your company's vendors and their compliance status.
         </p>
       </div>
+
+      <div className="rounded-lg border p-4 shadow-sm bg-card text-card-foreground">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-10 w-10">
+              <AvatarFallback>+</AvatarFallback>
+            </Avatar>
+            <div className="space-y-1">
+              <p className="text-sm font-medium leading-none">Add a vendor</p>
+              <p className="text-sm text-muted-foreground">Search and add new vendors</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex gap-3">
+              <Input
+                type="text"
+                placeholder="Type vendor's name"
+                className="w-64"
+              />
+              <Button variant="secondary">
+                Search
+                <span className="ml-2">→</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="space-y-2">
         {vendors.map((vendor) => (
           <div
@@ -81,7 +111,7 @@ function VendorsPageContent({
   );
 }
 
-function VendorsPageFallback() {
+function VendorListFallback() {
   return (
     <div className="p-6 space-y-6">
       <div className="space-y-1">
@@ -97,20 +127,20 @@ function VendorsPageFallback() {
   );
 }
 
-export default function VendorsPage() {
-  const [queryRef, loadQuery] = useQueryLoader<VendorsPageQueryType>(VendorsPageQuery);
+export default function VendorList() {
+  const [queryRef, loadQuery] = useQueryLoader<VendorsPageQueryType>(VendorListQuery);
 
   useEffect(() => {
     loadQuery({});
   }, [loadQuery]);
 
   if (!queryRef) {
-    return <VendorsPageFallback />;
+    return <VendorListFallback />;
   }
 
   return (
-    <Suspense fallback={<VendorsPageFallback />}>
-      <VendorsPageContent queryRef={queryRef} />
+    <Suspense fallback={<VendorListFallback />}>
+      <VendorListContent queryRef={queryRef} />
     </Suspense>
   );
 }

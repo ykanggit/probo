@@ -23,7 +23,7 @@ posthog.init(process.env.POSTHOG_KEY!, {
 const HomePage = lazy(() => import("./pages/HomePage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const PeoplesPage = lazy(() => import("./pages/PeoplesPage"));
-const VendorsPage = lazy(() => import("./pages/VendorsPage"));
+const VendorList = lazy(() => import("./pages/VendorList"));
 const FrameworksPage = lazy(() => import("./pages/FrameworksPage"));
 const FrameworkOverviewPage = lazy(() => import("./pages/FrameworkOverviewPage"));
 
@@ -40,7 +40,7 @@ function App() {
                     <Route path="/" element={<ConsoleLayout />}>
                       <Route index element={<HomePage />} />
                       <Route path="/peoples" element={<PeoplesPage />} />
-                      <Route path="/vendors" element={<VendorsPage />} />
+                      <Route path="/vendors" element={<VendorList />} />
                       <Route path="/frameworks" element={<FrameworksPage />} />
                       <Route path="/frameworks/:frameworkId" element={<FrameworkOverviewPage />} />
                     </Route>
