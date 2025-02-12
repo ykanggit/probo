@@ -28,6 +28,7 @@ const VendorListPage = lazy(() => import("./pages/VendorListPage"));
 const FrameworkListPage = lazy(() => import("./pages/FrameworkListPage"));
 const FrameworkOverviewPage = lazy(() => import("./pages/FrameworkOverviewPage"));
 const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 
 function App() {
   return (
@@ -102,6 +103,16 @@ function App() {
                         <Suspense>
                           <ErrorBoundaryWithLocation>
                             <VendorOverviewPage />
+                          </ErrorBoundaryWithLocation>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/settings"
+                      element={
+                        <Suspense>
+                          <ErrorBoundaryWithLocation>
+                            <SettingsPage />
                           </ErrorBoundaryWithLocation>
                         </Suspense>
                       }

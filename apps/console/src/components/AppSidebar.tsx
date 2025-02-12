@@ -7,6 +7,7 @@ import {
   Command,
   LifeBuoy,
   Send,
+  Settings,
 } from "lucide-react";
 import {
   graphql,
@@ -50,6 +51,11 @@ const staticData = {
       title: "Vendors",
       url: "/vendors",
       icon: ToyBrick,
+    },
+    {
+      title: "Settings",
+      url: "/settings",
+      icon: Settings,
     },
   ],
   navSecondary: [
