@@ -54,7 +54,7 @@ function VendorListContent({
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredVendors, setFilteredVendors] = useState<Array<typeof vendors[0]>>([]);
 
-  const fuse = new Fuse(vendorsList, {
+  const fuse = new Fuse<typeof vendorsList[0]>(vendorsList, {
     keys: ['name'],
     threshold: 0.3,
   });
