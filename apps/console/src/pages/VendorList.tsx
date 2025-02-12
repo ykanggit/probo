@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import {
   graphql,
   PreloadedQuery,
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { CircleUser, Globe, Shield, Store } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Fuse from "fuse.js";
 import type { VendorListQuery as VendorListQueryType } from "./__generated__/VendorListQuery.graphql";
 
 const VendorListQuery = graphql`
@@ -32,13 +33,30 @@ const VendorListQuery = graphql`
   }
 `;
 
+// TODO: Remove this once we have a real list of vendors
+const vendorsList = [
+  { id: '1', name: 'Amazon Web Services', createdAt: new Date().toISOString() },
+  { id: '2', name: 'Google Cloud Platform', createdAt: new Date().toISOString() },
+  { id: '3', name: 'Microsoft Azure', createdAt: new Date().toISOString() },
+  { id: '4', name: 'Salesforce', createdAt: new Date().toISOString() },
+  { id: '5', name: 'Slack', createdAt: new Date().toISOString() },
+];
+
+
 function VendorListContent({
   queryRef,
 }: {
   queryRef: PreloadedQuery<VendorListQueryType>;
 }) {
   const data = usePreloadedQuery(VendorListQuery, queryRef);
-  const vendors = data.node.vendors?.edges.map(edge => edge?.node) ?? [];
+  const vendors = data.node?.vendors?.edges?.map(edge => edge?.node) ?? [];
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredVendors, setFilteredVendors] = useState<Array<typeof vendors[0]>>([]);
+
+  const fuse = new Fuse(vendorsList, {
+    keys: ['name'],
+    threshold: 0.3,
+  });
 
   return (
     <div className="p-6 space-y-6">
@@ -61,12 +79,44 @@ function VendorListContent({
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 relative">
               <Input
                 type="text"
                 placeholder="Type vendor's name"
                 className="w-64"
+                value={searchTerm}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSearchTerm(value);
+                  if (value.trim() === "") {
+                    setFilteredVendors([]);
+                  } else {
+                    const results = fuse.search(value).map(result => result.item);
+                    setFilteredVendors(results);
+                  }
+                }}
               />
+              {searchTerm.trim() !== "" && filteredVendors.length > 0 && (
+                <div className="absolute top-full mt-1 w-64 max-h-48 overflow-y-auto rounded-md border bg-white shadow-lg z-10">
+                  {filteredVendors.map((vendor) => (
+                    <div
+                      key={vendor?.id}
+                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        // Handle vendor selection
+                        console.log('Selected vendor:', vendor);
+                        setSearchTerm("");
+                        setFilteredVendors([]);
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Store className="h-4 w-4" />
+                        <span>{vendor?.name}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
               <Button variant="secondary">
                 Search
                 <span className="ml-2">→</span>
