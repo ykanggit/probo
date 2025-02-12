@@ -1,13 +1,12 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useTransition } from "react";
 import {
   graphql,
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
   useMutation,
-  loadQuery,
-  useLazyLoadQuery,
 } from "react-relay";
+import { useSearchParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CircleUser, Globe, Shield, Store } from "lucide-react";
@@ -17,12 +16,14 @@ import { Link } from "react-router";
 import Fuse from "fuse.js";
 import type { VendorListPageQuery as VendorListPageQueryType } from "./__generated__/VendorListPageQuery.graphql";
 
+const ITEMS_PER_PAGE = 2;
+
 const vendorListPageQuery = graphql`
-  query VendorListPageQuery {
+  query VendorListPageQuery($count: Int!, $after: CursorKey, $before: CursorKey) {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
-        vendors {
+        vendors(first: $count, after: $after, before: $before) {
           edges {
             node {
               id
@@ -30,6 +31,13 @@ const vendorListPageQuery = graphql`
               createdAt
               updatedAt
             }
+            cursor
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
           }
         }
       }
@@ -59,20 +67,51 @@ const vendorsList = [
 
 function VendorListContent({
   queryRef,
+  onPageChange,
 }: {
   queryRef: PreloadedQuery<VendorListPageQueryType>;
+  onPageChange: (params: { before?: string; after?: string }) => void;
 }) {
   const data = usePreloadedQuery(vendorListPageQuery, queryRef);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isPending, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredVendors, setFilteredVendors] = useState<Array<typeof vendorsList[0]>>([]);
+  const [filteredVendors, setFilteredVendors] = useState<Array<any>>([]);
   const [createVendor] = useMutation(createVendorMutation);
-  const [_, loadQuery] = useQueryLoader<VendorListPageQueryType>(vendorListPageQuery);
-  const fuse = new Fuse<typeof vendorsList[0]>(vendorsList, {
+
+  const vendors = data.node?.vendors?.edges?.map(edge => edge?.node) ?? [];
+  const pageInfo = data.node?.vendors?.pageInfo;
+
+  const fuse = new Fuse(vendors, {
     keys: ['name'],
     threshold: 0.3,
   });
 
-  const vendors = data.node.vendors?.edges.map(edge => edge.node) ?? [];
+  const handlePageChange = (direction: 'next' | 'prev') => {
+    if (!pageInfo) return;
+    
+    if (direction === 'next' && !pageInfo.hasNextPage) return;
+    if (direction === 'prev' && !pageInfo.hasPreviousPage) return;
+    
+    startTransition(() => {
+      const params = direction === 'next' 
+        ? { after: pageInfo.endCursor }
+        : { before: pageInfo.startCursor };
+
+      setSearchParams(prev => {
+        if (direction === 'next') {
+          prev.set('after', pageInfo.endCursor!);
+          prev.delete('before');
+        } else {
+          prev.set('before', pageInfo.startCursor!);
+          prev.delete('after');
+        }
+        return prev;
+      });
+
+      onPageChange(params);
+    });
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -129,7 +168,6 @@ function VendorListContent({
                           onCompleted(response: any) {
                             setSearchTerm("");
                             setFilteredVendors([]);
-                            loadQuery({}, {fetchPolicy: 'network-only'});
                           },
                         });
                       }}
@@ -182,6 +220,23 @@ function VendorListContent({
             </Link>
           </div>
         ))}
+
+        <div className="flex gap-2 justify-end mt-4">
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange('prev')}
+            disabled={isPending || !pageInfo?.hasPreviousPage}
+          >
+            {isPending ? "Loading..." : "Previous"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange('next')}
+            disabled={isPending || !pageInfo?.hasNextPage}
+          >
+            {isPending ? "Loading..." : "Next"}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -204,11 +259,31 @@ function VendorListFallback() {
 }
 
 export default function VendorListPage() {
+  const [searchParams] = useSearchParams();
   const [queryRef, loadQuery] = useQueryLoader<VendorListPageQueryType>(vendorListPageQuery);
 
+  // Initialize with URL params
   useEffect(() => {
-    loadQuery({});
-  }, [loadQuery]);
+    const after = searchParams.get('after');
+    const before = searchParams.get('before');
+    
+    loadQuery({ 
+      count: ITEMS_PER_PAGE,
+      after: after || undefined,
+      before: before || undefined,
+    });
+  }, [loadQuery, searchParams]);
+
+  const handlePageChange = ({ before, after }: { before?: string; after?: string }) => {
+    loadQuery(
+      { 
+        count: ITEMS_PER_PAGE, 
+        before: before || undefined,
+        after: after || undefined,
+      },
+      { fetchPolicy: 'network-only' }
+    );
+  };
 
   if (!queryRef) {
     return <VendorListFallback />;
@@ -216,7 +291,7 @@ export default function VendorListPage() {
 
   return (
     <Suspense fallback={<VendorListFallback />}>
-      <VendorListContent queryRef={queryRef} />
+      <VendorListContent queryRef={queryRef} onPageChange={handlePageChange} />
     </Suspense>
   );
 }
