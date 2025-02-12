@@ -82,7 +82,7 @@ function VendorListContent({
   const vendors = data.node?.vendors?.edges?.map(edge => edge?.node) ?? [];
   const pageInfo = data.node?.vendors?.pageInfo;
 
-  const fuse = new Fuse(vendors, {
+  const fuse = new Fuse(vendorsList, {
     keys: ['name'],
     threshold: 0.3,
   });
