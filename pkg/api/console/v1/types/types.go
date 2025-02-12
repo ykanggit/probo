@@ -60,6 +60,11 @@ type ControlStateTransitionEdge struct {
 	Node   *ControlStateTransition `json:"node"`
 }
 
+type CreateVendorInput struct {
+	OrganizationID gid.GID `json:"organizationId"`
+	Name           string  `json:"name"`
+}
+
 type Evidence struct {
 	ID               gid.GID                            `json:"id"`
 	FileURL          string                             `json:"fileUrl"`
@@ -123,6 +128,9 @@ type FrameworkConnection struct {
 type FrameworkEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Framework     `json:"node"`
+}
+
+type Mutation struct {
 }
 
 type Organization struct {

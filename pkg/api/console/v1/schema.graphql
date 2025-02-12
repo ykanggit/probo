@@ -286,3 +286,12 @@ type EvidenceStateTransition {
 type Query {
   node(id: ID!): Node!
 }
+
+type Mutation {
+  createVendor(input: CreateVendorInput!): Vendor!
+}
+
+input CreateVendorInput {
+  organizationId: ID!
+  name: String!
+}

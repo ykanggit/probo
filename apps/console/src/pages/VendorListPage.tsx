@@ -4,6 +4,9 @@ import {
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
+  useMutation,
+  loadQuery,
+  useLazyLoadQuery,
 } from "react-relay";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +17,7 @@ import { Link } from "react-router";
 import Fuse from "fuse.js";
 import type { VendorListPageQuery as VendorListPageQueryType } from "./__generated__/VendorListPageQuery.graphql";
 
-const VendorListPageQuery = graphql`
+const vendorListPageQuery = graphql`
   query VendorListPageQuery {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
@@ -34,6 +37,17 @@ const VendorListPageQuery = graphql`
   }
 `;
 
+const createVendorMutation = graphql`
+  mutation VendorListPageCreateVendorMutation($input: CreateVendorInput!) {
+    createVendor(input: $input) {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 // TODO: Remove this once we have a real list of vendors
 const vendorsList = [
   { id: '1', name: 'Amazon Web Services', createdAt: new Date().toISOString() },
@@ -43,20 +57,22 @@ const vendorsList = [
   { id: '5', name: 'Slack', createdAt: new Date().toISOString() },
 ];
 
-
 function VendorListContent({
   queryRef,
 }: {
   queryRef: PreloadedQuery<VendorListPageQueryType>;
 }) {
-  const data = usePreloadedQuery(VendorListPageQuery, queryRef);
-  const vendors = data.node?.vendors?.edges?.map(edge => edge?.node) ?? [];
+  const data = usePreloadedQuery(vendorListPageQuery, queryRef);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredVendors, setFilteredVendors] = useState<Array<typeof vendorsList[0]>>([]);
+  const [createVendor] = useMutation(createVendorMutation);
+  const [_, loadQuery] = useQueryLoader<VendorListPageQueryType>(vendorListPageQuery);
   const fuse = new Fuse<typeof vendorsList[0]>(vendorsList, {
     keys: ['name'],
     threshold: 0.3,
   });
+
+  const vendors = data.node.vendors?.edges.map(edge => edge.node) ?? [];
 
   return (
     <div className="p-6 space-y-6">
@@ -103,10 +119,19 @@ function VendorListContent({
                       key={vendor?.id}
                       className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
-                        // Handle vendor selection
-                        console.log('Selected vendor:', vendor);
-                        setSearchTerm("");
-                        setFilteredVendors([]);
+                        createVendor({
+                          variables: {
+                            input: {
+                              organizationId: data.node.id,
+                              name: vendor.name
+                            }
+                          },
+                          onCompleted(response: any) {
+                            setSearchTerm("");
+                            setFilteredVendors([]);
+                            loadQuery({}, {fetchPolicy: 'network-only'});
+                          },
+                        });
                       }}
                     >
                       <div className="flex items-center gap-2">
@@ -179,7 +204,7 @@ function VendorListFallback() {
 }
 
 export default function VendorListPage() {
-  const [queryRef, loadQuery] = useQueryLoader<VendorListPageQueryType>(VendorListPageQuery);
+  const [queryRef, loadQuery] = useQueryLoader<VendorListPageQueryType>(vendorListPageQuery);
 
   useEffect(() => {
     loadQuery({});

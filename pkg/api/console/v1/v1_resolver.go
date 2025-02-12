@@ -12,6 +12,7 @@ import (
 	"github.com/getprobo/probo/pkg/api/console/v1/types"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
+	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/probo/coredata"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
@@ -62,6 +63,19 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 	}
 
 	return types.NewControlConnection(page), nil
+}
+
+// CreateVendor is the resolver for the createVendor field.
+func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.Vendor, error) {
+	vendor, err := r.svc.CreateVendor(ctx, probo.CreateVendorRequest{
+		OrganizationID: input.OrganizationID,
+		Name:           input.Name,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create vendor: %w", err)
+	}
+
+	return types.NewVendor(vendor), nil
 }
 
 // Frameworks is the resolver for the frameworks field.
@@ -191,6 +205,9 @@ func (r *Resolver) Evidence() schema.EvidenceResolver { return &evidenceResolver
 // Framework returns schema.FrameworkResolver implementation.
 func (r *Resolver) Framework() schema.FrameworkResolver { return &frameworkResolver{r} }
 
+// Mutation returns schema.MutationResolver implementation.
+func (r *Resolver) Mutation() schema.MutationResolver { return &mutationResolver{r} }
+
 // Organization returns schema.OrganizationResolver implementation.
 func (r *Resolver) Organization() schema.OrganizationResolver { return &organizationResolver{r} }
 
@@ -203,6 +220,7 @@ func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 type controlResolver struct{ *Resolver }
 type evidenceResolver struct{ *Resolver }
 type frameworkResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
