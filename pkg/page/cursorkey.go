@@ -20,7 +20,7 @@ import (
 	"errors"
 	"time"
 
-	"go.gearno.de/crypto/uuid"
+	"github.com/getprobo/probo/pkg/gid"
 )
 
 type (
@@ -63,7 +63,7 @@ func CursorKeyFromBytes(b []byte) (CursorKey, error) {
 	return ck, nil
 }
 
-func NewCursorKey(id uuid.UUID, t time.Time) CursorKey {
+func NewCursorKey(id gid.GID, t time.Time) CursorKey {
 	var cursorKey CursorKey
 	copy(cursorKey[:16], id[:])
 	_ = binary.PutVarint(cursorKey[16:], t.UnixMicro())
@@ -88,9 +88,8 @@ func (ck CursorKey) Timestamp() time.Time {
 	return time.Unix(seconds, nanoseconds)
 }
 
-func (ck CursorKey) ID() uuid.UUID {
-	id, _ := uuid.FromBytes(ck[:])
-	return id
+func (ck CursorKey) ID() gid.GID {
+	return gid.GID(ck[:16])
 }
 
 func (ck CursorKey) MarshalText() ([]byte, error) {

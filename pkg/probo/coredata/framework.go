@@ -23,7 +23,6 @@ import (
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 	"github.com/jackc/pgx/v5"
-	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
 
@@ -42,7 +41,7 @@ type (
 )
 
 func (f Framework) CursorKey() page.CursorKey {
-	return page.NewCursorKey(uuid.UUID(f.ID), f.CreatedAt)
+	return page.NewCursorKey(f.ID, f.CreatedAt)
 }
 
 func (f *Framework) scan(r pgx.Row) error {
@@ -177,13 +176,13 @@ VALUES (
 `
 
 	args := pgx.NamedArgs{
-		"framework_id": f.ID,
+		"framework_id":    f.ID,
 		"organization_id": f.OrganizationID,
-		"name": f.Name,
-		"description": f.Description,
-		"content_ref": f.ContentRef,
-		"created_at": f.CreatedAt,
-		"updated_at": f.UpdatedAt,
+		"name":            f.Name,
+		"description":     f.Description,
+		"content_ref":     f.ContentRef,
+		"created_at":      f.CreatedAt,
+		"updated_at":      f.UpdatedAt,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err

@@ -22,7 +22,6 @@ import (
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 	"github.com/jackc/pgx/v5"
-	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
 
@@ -37,7 +36,7 @@ type (
 )
 
 func (cst EvidenceStateTransition) CursorKey() page.CursorKey {
-	return page.NewCursorKey(uuid.UUID(cst.ID), cst.CreatedAt)
+	return page.NewCursorKey(cst.ID, cst.CreatedAt)
 }
 
 func (cst *EvidenceStateTransition) scan(r pgx.Row) error {

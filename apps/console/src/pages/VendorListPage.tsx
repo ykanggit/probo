@@ -16,14 +16,14 @@ import { Link } from "react-router";
 import Fuse from "fuse.js";
 import type { VendorListPageQuery as VendorListPageQueryType } from "./__generated__/VendorListPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 4;
 
 const vendorListPageQuery = graphql`
-  query VendorListPageQuery($count: Int!, $after: CursorKey, $before: CursorKey) {
+  query VendorListPageQuery($first: Int, $after: CursorKey, $last: Int, $before: CursorKey) {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
-        vendors(first: $count, after: $after, before: $before) {
+        vendors(first: $first, after: $after, last: $last, before: $before) {
           edges {
             node {
               id
@@ -70,7 +70,7 @@ function VendorListContent({
   onPageChange,
 }: {
   queryRef: PreloadedQuery<VendorListPageQueryType>;
-  onPageChange: (params: { before?: string; after?: string }) => void;
+  onPageChange: (params: { first?: number; after?: string; last?: number; before?: string }) => void;
 }) {
   const data = usePreloadedQuery(vendorListPageQuery, queryRef);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -95,8 +95,8 @@ function VendorListContent({
     
     startTransition(() => {
       const params = direction === 'next' 
-        ? { after: pageInfo.endCursor }
-        : { before: pageInfo.startCursor };
+        ? { first: ITEMS_PER_PAGE, after: pageInfo.endCursor }
+        : { last: ITEMS_PER_PAGE, before: pageInfo.startCursor };
 
       setSearchParams(prev => {
         if (direction === 'next') {
@@ -268,18 +268,20 @@ export default function VendorListPage() {
     const before = searchParams.get('before');
     
     loadQuery({ 
-      count: ITEMS_PER_PAGE,
+      first: before ? undefined : ITEMS_PER_PAGE,
       after: after || undefined,
+      last: before ? ITEMS_PER_PAGE : undefined,
       before: before || undefined,
     });
   }, [loadQuery, searchParams]);
 
-  const handlePageChange = ({ before, after }: { before?: string; after?: string }) => {
+  const handlePageChange = ({ first, after, last, before }: { first?: number; after?: string; last?: number; before?: string }) => {
     loadQuery(
       { 
-        count: ITEMS_PER_PAGE, 
-        before: before || undefined,
-        after: after || undefined,
+        first,
+        after,
+        last,
+        before,
       },
       { fetchPolicy: 'network-only' }
     );
