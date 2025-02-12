@@ -4,8 +4,43 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Helmet } from "react-helmet-async"
+import { Suspense, useEffect } from "react"
+import {
+  graphql,
+  PreloadedQuery,
+  usePreloadedQuery,
+  useQueryLoader,
+} from "react-relay"
+import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__/SettingsPageQuery.graphql"
 
-export default function SettingsPage() {
+const settingsPageQuery = graphql`
+  query SettingsPageQuery {
+    node(id: "AZSfP_xAcAC5IAAAAAAltA") {
+      id
+      ... on Organization {
+        name
+        logoUrl
+      }
+    }
+  }
+`
+
+interface Member {
+  id: string;
+  fullName: string;
+  primaryEmailAddress: string;
+  role: string;
+}
+
+function SettingsPageContent({
+  queryRef,
+}: {
+  queryRef: PreloadedQuery<SettingsPageQueryType>;
+}) {
+  const data = usePreloadedQuery(settingsPageQuery, queryRef);
+  const organization = data.node;
+  const members: Member[] = [];
+
   return (
     <>
       <Helmet>
@@ -44,9 +79,13 @@ export default function SettingsPage() {
               <label className="text-sm font-medium">Organization logo</label>
               <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border">
-                    <Upload className="h-5 w-5 text-muted-foreground" />
-                  </div>
+                  {organization.logoUrl ? (
+                    <img src={organization.logoUrl} alt="Logo" className="h-10 w-10 rounded-lg object-cover" />
+                  ) : (
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border">
+                      <Upload className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                  )}
                   <span className="text-muted-foreground">
                     Upload a logo to be displayed at the top of your trust page
                   </span>
@@ -63,7 +102,7 @@ export default function SettingsPage() {
                   <span className="text-muted-foreground">Set the name of the organization</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm">ACME</span>
+                  <span className="text-sm">{organization.name}</span>
                   <Button variant="outline" size="sm">
                     Edit
                   </Button>
@@ -84,19 +123,15 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                { name: "Antoine Bouchardy", email: "antoine.bouchardy@hexa.com", role: "Admin" },
-                { name: "Bryan Frimin", email: "bryan.frimin@hexa.com", role: "Admin" },
-              ].map((member) => (
-                <div key={member.email} className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+              {members.map((member) => (
+                <div key={member.id} className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
                   <div className="flex items-center gap-3">
                     <Avatar>
-                      <AvatarImage src={`/placeholder.svg?height=32&width=32`} />
-                      <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{member.fullName.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">{member.name}</span>
-                      <span className="text-sm text-muted-foreground">{member.email}</span>
+                      <span className="text-sm font-medium">{member.fullName}</span>
+                      <span className="text-sm text-muted-foreground">{member.primaryEmailAddress}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -122,4 +157,38 @@ export default function SettingsPage() {
       </div>
     </>
   )
-} 
+}
+
+function SettingsPageFallback() {
+  return (
+    <div className="p-6 space-y-6">
+      <div className="space-y-1">
+        <div className="h-8 w-48 bg-muted animate-pulse rounded" />
+        <div className="h-4 w-96 bg-muted animate-pulse rounded" />
+      </div>
+      <div className="space-y-2">
+        {[1, 2].map((i) => (
+          <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function SettingsPage() {
+  const [queryRef, loadQuery] = useQueryLoader<SettingsPageQueryType>(settingsPageQuery);
+
+  useEffect(() => {
+    loadQuery({});
+  }, [loadQuery]);
+
+  if (!queryRef) {
+    return <SettingsPageFallback />;
+  }
+
+  return (
+    <Suspense fallback={<SettingsPageFallback />}>
+      <SettingsPageContent queryRef={queryRef} />
+    </Suspense>
+  );
+}
