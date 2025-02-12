@@ -52,8 +52,7 @@ function VendorListContent({
   const data = usePreloadedQuery(VendorListPageQuery, queryRef);
   const vendors = data.node?.vendors?.edges?.map(edge => edge?.node) ?? [];
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredVendors, setFilteredVendors] = useState<Array<typeof vendors[0]>>([]);
-
+  const [filteredVendors, setFilteredVendors] = useState<Array<typeof vendorsList[0]>>([]);
   const fuse = new Fuse<typeof vendorsList[0]>(vendorsList, {
     keys: ['name'],
     threshold: 0.3,
