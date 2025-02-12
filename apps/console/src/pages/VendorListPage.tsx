@@ -16,7 +16,7 @@ import { Link } from "react-router";
 import Fuse from "fuse.js";
 import type { VendorListPageQuery as VendorListPageQueryType } from "./__generated__/VendorListPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
-const ITEMS_PER_PAGE = 4;
+const ITEMS_PER_PAGE = 20;
 
 const vendorListPageQuery = graphql`
   query VendorListPageQuery($first: Int, $after: CursorKey, $last: Int, $before: CursorKey) {
