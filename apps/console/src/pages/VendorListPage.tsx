@@ -186,7 +186,7 @@ function VendorListContent({
                     >
                       <div className="flex items-center gap-2">
                         <Store className="h-4 w-4" />
-                        <span>{vendor?.name}</span>
+                        <span>{vendor.name}</span>
                       </div>
                     </div>
                   ))}
