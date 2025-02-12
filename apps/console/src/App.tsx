@@ -7,6 +7,7 @@ import { RelayEnvironmentProvider } from "react-relay";
 import { BrowserRouter, Route, Routes } from "react-router";
 import "App.css";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { ErrorPage } from "./pages/ErrorPage";
 import ConsoleLayout from "./layouts/ConsoleLayout";
 import { RelayEnvironment } from "./RelayEnvironment";
 
@@ -30,23 +31,80 @@ const FrameworkOverviewPage = lazy(() => import("./pages/FrameworkOverviewPage")
 function App() {
   return (
     <StrictMode>
-      <ErrorBoundary fallback={<p>Something went wrong</p>}>
+      <ErrorBoundary>
         <PostHogProvider client={posthog}>
           <RelayEnvironmentProvider environment={RelayEnvironment}>
             <HelmetProvider>
               <BrowserRouter>
-                <Suspense>
-                  <Routes>
-                    <Route path="/" element={<ConsoleLayout />}>
-                      <Route index element={<HomePage />} />
-                      <Route path="/peoples" element={<PeoplesPage />} />
-                      <Route path="/vendors" element={<VendorList />} />
-                      <Route path="/frameworks" element={<FrameworksPage />} />
-                      <Route path="/frameworks/:frameworkId" element={<FrameworkOverviewPage />} />
-                    </Route>
-                    <Route path="*" element={<NotFoundPage />} />
-                  </Routes>
-                </Suspense>
+                <Routes>
+                  <Route
+                    path="/"
+                    element={
+                      <ErrorBoundary>
+                        <ConsoleLayout />
+                      </ErrorBoundary>
+                    }
+                  >
+                    <Route
+                      index
+                      element={
+                        <Suspense>
+                          <ErrorBoundary>
+                            <HomePage />
+                          </ErrorBoundary>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/peoples"
+                      element={
+                        <Suspense>
+                          <ErrorBoundary>
+                            <PeoplesPage />
+                          </ErrorBoundary>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/vendors"
+                      element={
+                        <Suspense>
+                          <ErrorBoundary>
+                            <VendorList />
+                          </ErrorBoundary>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/frameworks"
+                      element={
+                        <Suspense>
+                          <ErrorBoundary>
+                            <FrameworksPage />
+                          </ErrorBoundary>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/frameworks/:frameworkId"
+                      element={
+                        <Suspense>
+                          <ErrorBoundary>
+                            <FrameworkOverviewPage />
+                          </ErrorBoundary>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="*"
+                      element={
+                        <Suspense>
+                          <NotFoundPage />
+                        </Suspense>
+                      }
+                    />
+                  </Route>
+                </Routes>
               </BrowserRouter>
             </HelmetProvider>
           </RelayEnvironmentProvider>
