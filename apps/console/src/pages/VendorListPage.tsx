@@ -77,6 +77,8 @@ const vendorsList = [
   { id: '17', name: 'CircleCI', createdAt: new Date().toISOString() },
 ];
 
+type LoadQueryType = ReturnType<typeof useQueryLoader<VendorListPageQueryType>>[1];
+
 function VendorListContent({
   queryRef,
   onPageChange,
@@ -84,7 +86,7 @@ function VendorListContent({
 }: {
   queryRef: PreloadedQuery<VendorListPageQueryType>;
   onPageChange: (params: { first?: number; after?: string; last?: number; before?: string }) => void;
-  loadQuery: (params: any) => void;
+  loadQuery: LoadQueryType;
 }) {
   const data = usePreloadedQuery(vendorListPageQuery, queryRef);
   const [searchParams, setSearchParams] = useSearchParams();
