@@ -27,6 +27,7 @@ const PeoplesPage = lazy(() => import("./pages/PeoplesPage"));
 const VendorList = lazy(() => import("./pages/VendorList"));
 const FrameworksPage = lazy(() => import("./pages/FrameworksPage"));
 const FrameworkOverviewPage = lazy(() => import("./pages/FrameworkOverviewPage"));
+const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
 
 function App() {
   return (
@@ -91,6 +92,16 @@ function App() {
                         <Suspense>
                           <ErrorBoundary>
                             <FrameworkOverviewPage />
+                          </ErrorBoundary>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/vendors/:vendorId"
+                      element={
+                        <Suspense>
+                          <ErrorBoundary>
+                            <VendorOverviewPage />
                           </ErrorBoundary>
                         </Suspense>
                       }

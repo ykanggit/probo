@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<825817de2398615779403c0817995f9f>>
+ * @generated SignedSource<<a55cac2889d9749005056d4fe1d88935>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,8 +9,8 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type VendorListQuery$variables = Record<PropertyKey, never>;
-export type VendorListQuery$data = {
+export type VendorListPageQuery$variables = Record<PropertyKey, never>;
+export type VendorListPageQuery$data = {
   readonly node: {
     readonly id: string;
     readonly vendors?: {
@@ -25,9 +25,9 @@ export type VendorListQuery$data = {
     };
   };
 };
-export type VendorListQuery = {
-  response: VendorListQuery$data;
-  variables: VendorListQuery$variables;
+export type VendorListPageQuery = {
+  response: VendorListPageQuery$data;
+  variables: VendorListPageQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -112,7 +112,7 @@ return {
     "argumentDefinitions": [],
     "kind": "Fragment",
     "metadata": null,
-    "name": "VendorListQuery",
+    "name": "VendorListPageQuery",
     "selections": [
       {
         "alias": null,
@@ -135,7 +135,7 @@ return {
   "operation": {
     "argumentDefinitions": [],
     "kind": "Operation",
-    "name": "VendorListQuery",
+    "name": "VendorListPageQuery",
     "selections": [
       {
         "alias": null,
@@ -160,16 +160,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ced04a7cfd00f4525d09d6bf5303167b",
+    "cacheID": "1661d7e75c833a569efafa55c204d894",
     "id": null,
     "metadata": {},
-    "name": "VendorListQuery",
+    "name": "VendorListPageQuery",
     "operationKind": "query",
-    "text": "query VendorListQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      vendors {\n        edges {\n          node {\n            id\n            name\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query VendorListPageQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      vendors {\n        edges {\n          node {\n            id\n            name\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "4f125111c515f868693b33e5209d05fd";
+(node as any).hash = "e869cdf6203c1a7f42c4c697f574b0c0";
 
 export default node;
