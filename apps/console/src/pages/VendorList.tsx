@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { CircleUser, Globe, Shield, Store } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { VendorsPageQuery as VendorsPageQueryType } from "./__generated__/VendorsPageQuery.graphql";
+import type { VendorListQuery as VendorListQueryType } from "./__generated__/VendorListQuery.graphql";
 
 const VendorListQuery = graphql`
   query VendorListQuery {
@@ -35,7 +35,7 @@ const VendorListQuery = graphql`
 function VendorListContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<VendorsPageQueryType>;
+  queryRef: PreloadedQuery<VendorListQueryType>;
 }) {
   const data = usePreloadedQuery(VendorListQuery, queryRef);
   const vendors = data.node.vendors?.edges.map(edge => edge?.node) ?? [];
@@ -128,7 +128,7 @@ function VendorListFallback() {
 }
 
 export default function VendorList() {
-  const [queryRef, loadQuery] = useQueryLoader<VendorsPageQueryType>(VendorListQuery);
+  const [queryRef, loadQuery] = useQueryLoader<VendorListQueryType>(VendorListQuery);
 
   useEffect(() => {
     loadQuery({});
