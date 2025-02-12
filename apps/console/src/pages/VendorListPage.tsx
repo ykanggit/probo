@@ -63,6 +63,18 @@ const vendorsList = [
   { id: '3', name: 'Microsoft Azure', createdAt: new Date().toISOString() },
   { id: '4', name: 'Salesforce', createdAt: new Date().toISOString() },
   { id: '5', name: 'Slack', createdAt: new Date().toISOString() },
+  { id: '6', name: 'Zoom', createdAt: new Date().toISOString() },
+  { id: '7', name: 'Dropbox', createdAt: new Date().toISOString() },
+  { id: '8', name: 'Trello', createdAt: new Date().toISOString() },
+  { id: '9', name: 'Asana', createdAt: new Date().toISOString() },
+  { id: '10', name: 'Notion', createdAt: new Date().toISOString() },
+  { id: '11', name: 'GitHub', createdAt: new Date().toISOString() },
+  { id: '12', name: 'GitLab', createdAt: new Date().toISOString() },
+  { id: '13', name: 'Bitbucket', createdAt: new Date().toISOString() },
+  { id: '14', name: 'Docker', createdAt: new Date().toISOString() },
+  { id: '15', name: 'Kubernetes', createdAt: new Date().toISOString() },
+  { id: '16', name: 'Jenkins', createdAt: new Date().toISOString() },
+  { id: '17', name: 'CircleCI', createdAt: new Date().toISOString() },
 ];
 
 function VendorListContent({
