@@ -35,7 +35,6 @@ function VendorOverviewPageContent({
   return (
     <div className="space-y-6 p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-4xl space-y-6">
-        {/* Header */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <img
@@ -48,7 +47,6 @@ function VendorOverviewPageContent({
           <p className="text-gray-600">Use this form to assess the risk of using Google Workspace as a vendor.</p>
         </div>
 
-        {/* Asset Storage Type */}
         <Card className="p-6">
           <div className="space-y-4">
             <div className="space-y-2">
@@ -69,7 +67,6 @@ function VendorOverviewPageContent({
           </div>
         </Card>
 
-        {/* Data Storage and Handling */}
         <Card className="p-6">
           <div className="space-y-4">
             <div className="space-y-2">
@@ -141,7 +138,6 @@ function VendorOverviewPageContent({
           </div>
         </Card>
 
-        {/* Vendor Reliability and Continuity */}
         <Card className="p-6">
           <div className="space-y-4">
             <div className="space-y-2">
@@ -203,7 +199,6 @@ function VendorOverviewPageContent({
           </div>
         </Card>
 
-        {/* Risk Level */}
         <Card className="p-6">
           <div className="space-y-4">
             <div className="space-y-2">
