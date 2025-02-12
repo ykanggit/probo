@@ -80,9 +80,11 @@ const vendorsList = [
 function VendorListContent({
   queryRef,
   onPageChange,
+  loadQuery
 }: {
   queryRef: PreloadedQuery<VendorListPageQueryType>;
   onPageChange: (params: { first?: number; after?: string; last?: number; before?: string }) => void;
+  loadQuery: (params: any) => void;
 }) {
   const data = usePreloadedQuery(vendorListPageQuery, queryRef);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -180,6 +182,12 @@ function VendorListContent({
                           onCompleted(response: any) {
                             setSearchTerm("");
                             setFilteredVendors([]);
+                            loadQuery({ 
+                              first: ITEMS_PER_PAGE,
+                              after: undefined,
+                              last: undefined,
+                              before: undefined,
+                            }, { fetchPolicy: 'network-only' });
                           },
                         });
                       }}
@@ -309,7 +317,11 @@ export default function VendorListPage() {
         <title>Vendors - Probo Console</title>
       </Helmet>
       <Suspense fallback={<VendorListFallback />}>
-        <VendorListContent queryRef={queryRef} onPageChange={handlePageChange} />
+        <VendorListContent 
+          queryRef={queryRef} 
+          onPageChange={handlePageChange}
+          loadQuery={loadQuery} 
+        />
       </Suspense>
     </>
   );
