@@ -65,6 +65,10 @@ type CreateVendorInput struct {
 	Name           string  `json:"name"`
 }
 
+type DeleteVendorInput struct {
+	VendorID gid.GID `json:"vendorId"`
+}
+
 type Evidence struct {
 	ID               gid.GID                            `json:"id"`
 	FileURL          string                             `json:"fileUrl"`

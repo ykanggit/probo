@@ -78,6 +78,16 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 	return types.NewVendor(vendor), nil
 }
 
+// DeleteVendor is the resolver for the deleteVendor field.
+func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (string, error) {
+	err := r.svc.DeleteVendor(ctx, input.VendorID)
+	if err != nil {
+		return "", fmt.Errorf("cannot delete vendor: %w", err)
+	}
+
+	return "", nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

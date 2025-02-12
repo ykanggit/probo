@@ -56,6 +56,12 @@ const createVendorMutation = graphql`
   }
 `;
 
+const deleteVendorMutation = graphql`
+  mutation VendorListPageDeleteVendorMutation($input: DeleteVendorInput!) {
+    deleteVendor(input: $input)
+  }
+`;
+
 // TODO: Remove this once we have a real list of vendors
 const vendorsList = [
   { id: '1', name: 'Amazon Web Services', createdAt: new Date().toISOString() },
@@ -94,6 +100,7 @@ function VendorListContent({
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredVendors, setFilteredVendors] = useState<Array<any>>([]);
   const [createVendor] = useMutation(createVendorMutation);
+  const [deleteVendor] = useMutation(deleteVendorMutation);
 
   const vendors = data.node?.vendors?.edges?.map(edge => edge?.node) ?? [];
   const pageInfo = data.node?.vendors?.pageInfo;
@@ -213,19 +220,21 @@ function VendorListContent({
       <div className="space-y-2">
         {vendors.map((vendor) => (
           <div key={vendor?.id} className="block hover:bg-accent/50 transition-colors">
-            <Link 
-              to={`/vendors/${vendor?.id}`}
-              className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm"
-            >
-              <div className="flex items-center gap-4">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
-                </Avatar>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium leading-none">{vendor?.name}</p>
-                  <p className="text-sm text-muted-foreground">Vendor since {new Date(vendor?.createdAt).toLocaleDateString()}</p>
+            <div className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm">
+              <Link 
+                to={`/vendors/${vendor?.id}`}
+                className="flex items-center gap-4 flex-1"
+              >
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium leading-none">{vendor?.name}</p>
+                    <p className="text-sm text-muted-foreground">Vendor since {new Date(vendor?.createdAt).toLocaleDateString()}</p>
+                  </div>
                 </div>
-              </div>
+              </Link>
               <div className="flex items-center gap-4">
                 <Badge variant="secondary" className="font-medium">
                   Active
@@ -238,8 +247,35 @@ function VendorListContent({
                 <Badge variant="outline" className="text-muted-foreground">
                   Not assessed
                 </Badge>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (window.confirm('Are you sure you want to delete this vendor?')) {
+                      deleteVendor({
+                        variables: {
+                          input: {
+                            vendorId: vendor.id
+                          }
+                        },
+                        onCompleted() {
+                          loadQuery({ 
+                            first: ITEMS_PER_PAGE,
+                            after: undefined,
+                            last: undefined,
+                            before: undefined,
+                          }, { fetchPolicy: 'network-only' });
+                        },
+                      });
+                    }
+                  }}
+                >
+                  Delete
+                </Button>
               </div>
-            </Link>
+            </div>
           </div>
         ))}
 

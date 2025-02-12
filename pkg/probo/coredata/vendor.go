@@ -123,6 +123,24 @@ VALUES (
 	return err
 }
 
+func (v Vendor) Delete(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+) error {
+	q := `
+DELETE FROM vendors WHERE %s AND id = @vendor_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{"vendor_id": v.ID}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (v *Vendors) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,

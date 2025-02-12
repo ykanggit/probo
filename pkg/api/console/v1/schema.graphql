@@ -289,9 +289,14 @@ type Query {
 
 type Mutation {
   createVendor(input: CreateVendorInput!): Vendor!
+  deleteVendor(input: DeleteVendorInput!): Void!
 }
 
 input CreateVendorInput {
   organizationId: ID!
   name: String!
+}
+
+input DeleteVendorInput {
+  vendorId: ID!
 }
