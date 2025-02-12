@@ -24,7 +24,7 @@ posthog.init(process.env.POSTHOG_KEY!, {
 const HomePage = lazy(() => import("./pages/HomePage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const PeoplesPage = lazy(() => import("./pages/PeoplesPage"));
-const VendorList = lazy(() => import("./pages/VendorList"));
+const VendorListPage = lazy(() => import("./pages/VendorListPage"));
 const FrameworksPage = lazy(() => import("./pages/FrameworksPage"));
 const FrameworkOverviewPage = lazy(() => import("./pages/FrameworkOverviewPage"));
 const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
@@ -71,7 +71,7 @@ function App() {
                       element={
                         <Suspense>
                           <ErrorBoundary>
-                            <VendorList />
+                            <VendorListPage />
                           </ErrorBoundary>
                         </Suspense>
                       }

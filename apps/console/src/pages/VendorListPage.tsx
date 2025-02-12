@@ -10,11 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { CircleUser, Globe, Shield, Store } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router";
 import Fuse from "fuse.js";
-import type { VendorListQuery as VendorListQueryType } from "./__generated__/VendorListQuery.graphql";
+import type { VendorListPageQuery as VendorListPageQueryType } from "./__generated__/VendorListPageQuery.graphql";
 
-const VendorListQuery = graphql`
-  query VendorListQuery {
+const VendorListPageQuery = graphql`
+  query VendorListPageQuery {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
@@ -46,9 +47,9 @@ const vendorsList = [
 function VendorListContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<VendorListQueryType>;
+  queryRef: PreloadedQuery<VendorListPageQueryType>;
 }) {
-  const data = usePreloadedQuery(VendorListQuery, queryRef);
+  const data = usePreloadedQuery(VendorListPageQuery, queryRef);
   const vendors = data.node?.vendors?.edges?.map(edge => edge?.node) ?? [];
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredVendors, setFilteredVendors] = useState<Array<typeof vendors[0]>>([]);
@@ -125,35 +126,36 @@ function VendorListContent({
           </div>
         </div>
       </div>
-
       <div className="space-y-2">
         {vendors.map((vendor) => (
-          <div
-            key={vendor?.id}
-            className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm"
-          >
-            <div className="flex items-center gap-4">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
-              </Avatar>
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">{vendor?.name}</p>
-                <p className="text-sm text-muted-foreground">Vendor since {new Date(vendor?.createdAt).toLocaleDateString()}</p>
+          <div key={vendor?.id} className="block hover:bg-accent/50 transition-colors">
+            <Link 
+              to={`/vendors/${vendor?.id}`}
+              className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm"
+            >
+              <div className="flex items-center gap-4">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
+                </Avatar>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium leading-none">{vendor?.name}</p>
+                  <p className="text-sm text-muted-foreground">Vendor since {new Date(vendor?.createdAt).toLocaleDateString()}</p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="font-medium">
-                Active
-              </Badge>
-              <div className="flex gap-1">
-                <CircleUser className="h-4 w-4 text-muted-foreground" />
-                <Globe className="h-4 w-4 text-muted-foreground" />
-                <Shield className="h-4 w-4 text-muted-foreground" />
+              <div className="flex items-center gap-4">
+                <Badge variant="secondary" className="font-medium">
+                  Active
+                </Badge>
+                <div className="flex gap-1">
+                  <CircleUser className="h-4 w-4 text-muted-foreground" />
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <Badge variant="outline" className="text-muted-foreground">
+                  Not assessed
+                </Badge>
               </div>
-              <Badge variant="outline" className="text-muted-foreground">
-                Not assessed
-              </Badge>
-            </div>
+            </Link>
           </div>
         ))}
       </div>
@@ -177,8 +179,8 @@ function VendorListFallback() {
   );
 }
 
-export default function VendorList() {
-  const [queryRef, loadQuery] = useQueryLoader<VendorListQueryType>(VendorListQuery);
+export default function VendorListPage() {
+  const [queryRef, loadQuery] = useQueryLoader<VendorListPageQueryType>(VendorListPageQuery);
 
   useEffect(() => {
     loadQuery({});
