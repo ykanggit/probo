@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router";
+import { Link, Outlet, useLocation } from "react-router";
 import { AppSidebar } from "@/components/AppSidebar";
 import React from "react";
 import {
@@ -31,7 +31,11 @@ export default function ConsoleLayout() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                  <BreadcrumbLink asChild>
+                    <Link to="/">
+                      Home
+                    </Link>
+                  </BreadcrumbLink>
                 </BreadcrumbItem>
                 {pathSegments.map((segment, index) => {
                   const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
@@ -46,8 +50,10 @@ export default function ConsoleLayout() {
                             {segment.charAt(0).toUpperCase() + segment.slice(1)}
                           </BreadcrumbPage>
                         ) : (
-                          <BreadcrumbLink href={path}>
-                            {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                          <BreadcrumbLink asChild>
+                            <Link to={path}>
+                              {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                            </Link>
                           </BreadcrumbLink>
                         )}
                       </BreadcrumbItem>
