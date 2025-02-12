@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2ba907db688f627158201c0998785612>>
+ * @generated SignedSource<<2b0f0d83fcebe25d4dfe1209c757c792>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,12 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type PeopleListPageQuery$variables = Record<PropertyKey, never>;
+export type PeopleListPageQuery$variables = {
+  after?: any | null | undefined;
+  before?: any | null | undefined;
+  first?: number | null | undefined;
+  last?: number | null | undefined;
+};
 export type PeopleListPageQuery$data = {
   readonly node: {
     readonly id: string;
     readonly peoples?: {
       readonly edges: ReadonlyArray<{
+        readonly cursor: any;
         readonly node: {
           readonly additionalEmailAddresses: ReadonlyArray<string>;
           readonly createdAt: any;
@@ -24,6 +30,12 @@ export type PeopleListPageQuery$data = {
           readonly updatedAt: any;
         };
       }>;
+      readonly pageInfo: {
+        readonly endCursor: any | null | undefined;
+        readonly hasNextPage: boolean;
+        readonly hasPreviousPage: boolean;
+        readonly startCursor: any | null | undefined;
+      };
     };
   };
 };
@@ -33,26 +45,67 @@ export type PeopleListPageQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
+var v0 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "after"
+},
+v1 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "before"
+},
+v2 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "first"
+},
+v3 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "last"
+},
+v4 = [
   {
     "kind": "Literal",
     "name": "id",
     "value": "AZSfP_xAcAC5IAAAAAAltA"
   }
 ],
-v1 = {
+v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v2 = {
+v6 = {
   "kind": "InlineFragment",
   "selections": [
     {
       "alias": null,
-      "args": null,
+      "args": [
+        {
+          "kind": "Variable",
+          "name": "after",
+          "variableName": "after"
+        },
+        {
+          "kind": "Variable",
+          "name": "before",
+          "variableName": "before"
+        },
+        {
+          "kind": "Variable",
+          "name": "first",
+          "variableName": "first"
+        },
+        {
+          "kind": "Variable",
+          "name": "last",
+          "variableName": "last"
+        }
+      ],
       "concreteType": "PeopleConnection",
       "kind": "LinkedField",
       "name": "peoples",
@@ -74,7 +127,7 @@ v2 = {
               "name": "node",
               "plural": false,
               "selections": [
-                (v1/*: any*/),
+                (v5/*: any*/),
                 {
                   "alias": null,
                   "args": null,
@@ -112,6 +165,52 @@ v2 = {
                 }
               ],
               "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "cursor",
+              "storageKey": null
+            }
+          ],
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "concreteType": "PageInfo",
+          "kind": "LinkedField",
+          "name": "pageInfo",
+          "plural": false,
+          "selections": [
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "hasNextPage",
+              "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "hasPreviousPage",
+              "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "startCursor",
+              "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "endCursor",
+              "storageKey": null
             }
           ],
           "storageKey": null
@@ -125,21 +224,26 @@ v2 = {
 };
 return {
   "fragment": {
-    "argumentDefinitions": [],
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/),
+      (v2/*: any*/),
+      (v3/*: any*/)
+    ],
     "kind": "Fragment",
     "metadata": null,
     "name": "PeopleListPageQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v0/*: any*/),
+        "args": (v4/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v1/*: any*/),
-          (v2/*: any*/)
+          (v5/*: any*/),
+          (v6/*: any*/)
         ],
         "storageKey": "node(id:\"AZSfP_xAcAC5IAAAAAAltA\")"
       }
@@ -149,13 +253,18 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": [],
+    "argumentDefinitions": [
+      (v2/*: any*/),
+      (v0/*: any*/),
+      (v3/*: any*/),
+      (v1/*: any*/)
+    ],
     "kind": "Operation",
     "name": "PeopleListPageQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v0/*: any*/),
+        "args": (v4/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
@@ -168,24 +277,24 @@ return {
             "name": "__typename",
             "storageKey": null
           },
-          (v1/*: any*/),
-          (v2/*: any*/)
+          (v5/*: any*/),
+          (v6/*: any*/)
         ],
         "storageKey": "node(id:\"AZSfP_xAcAC5IAAAAAAltA\")"
       }
     ]
   },
   "params": {
-    "cacheID": "ce78c7ac266c38015ae2d44366f19579",
+    "cacheID": "0074149682b4e4a31aa559fe8431d567",
     "id": null,
     "metadata": {},
     "name": "PeopleListPageQuery",
     "operationKind": "query",
-    "text": "query PeopleListPageQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      peoples {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            additionalEmailAddresses\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query PeopleListPageQuery(\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      peoples(first: $first, after: $after, last: $last, before: $before) {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            additionalEmailAddresses\n            createdAt\n            updatedAt\n          }\n          cursor\n        }\n        pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a3892026d3bf2753f6d1ff00ddf0526c";
+(node as any).hash = "5ca962add045876503cb7290d20b9f8b";
 
 export default node;

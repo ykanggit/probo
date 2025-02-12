@@ -1,22 +1,26 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useTransition } from "react";
 import {
   graphql,
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
 } from "react-relay";
+import { useSearchParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CircleUser, Globe, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
 import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generated__/PeopleListPageQuery.graphql";
 
+const ITEMS_PER_PAGE = 20;
+
 const PeopleListPageQuery = graphql`
-  query PeopleListPageQuery {
+  query PeopleListPageQuery($first: Int, $after: CursorKey, $last: Int, $before: CursorKey) {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
-        peoples {
+        peoples(first: $first, after: $after, last: $last, before: $before) {
           edges {
             node {
               id
@@ -26,6 +30,13 @@ const PeopleListPageQuery = graphql`
               createdAt
               updatedAt
             }
+            cursor
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
           }
         }
       }
@@ -35,11 +46,31 @@ const PeopleListPageQuery = graphql`
 
 function PeopleListPageContent({
   queryRef,
+  onPageChange,
 }: {
   queryRef: PreloadedQuery<PeopleListPageQueryType>;
+  onPageChange: (params: { first?: number; after?: string; last?: number; before?: string }) => void;
 }) {
   const data = usePreloadedQuery(PeopleListPageQuery, queryRef);
   const peoples = data.node.peoples?.edges.map(edge => edge?.node) ?? [];
+  const pageInfo = data.node.peoples?.pageInfo;
+  const [isPending, startTransition] = useTransition();
+
+  const handlePageChange = (direction: 'prev' | 'next') => {
+    startTransition(() => {
+      if (direction === 'prev') {
+        onPageChange({
+          last: ITEMS_PER_PAGE,
+          before: pageInfo?.startCursor,
+        });
+      } else {
+        onPageChange({
+          first: ITEMS_PER_PAGE,
+          after: pageInfo?.endCursor,
+        });
+      }
+    });
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -79,6 +110,23 @@ function PeopleListPageContent({
             </div>
           </div>
         ))}
+
+        <div className="flex gap-2 justify-end mt-4">
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange('prev')}
+            disabled={isPending || !pageInfo?.hasPreviousPage}
+          >
+            {isPending ? "Loading..." : "Previous"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange('next')}
+            disabled={isPending || !pageInfo?.hasNextPage}
+          >
+            {isPending ? "Loading..." : "Next"}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -121,11 +169,32 @@ function PeopleListPageFallback() {
 }
 
 export default function PeopleListPage() {
+  const [searchParams] = useSearchParams();
   const [queryRef, loadQuery] = useQueryLoader<PeopleListPageQueryType>(PeopleListPageQuery);
 
   useEffect(() => {
-    loadQuery({});
-  }, [loadQuery]);
+    const after = searchParams.get('after');
+    const before = searchParams.get('before');
+    
+    loadQuery({ 
+      first: before ? undefined : ITEMS_PER_PAGE,
+      after: after || undefined,
+      last: before ? ITEMS_PER_PAGE : undefined,
+      before: before || undefined,
+    });
+  }, [loadQuery, searchParams]);
+
+  const handlePageChange = ({ first, after, last, before }: { first?: number; after?: string; last?: number; before?: string }) => {
+    loadQuery(
+      { 
+        first,
+        after,
+        last,
+        before,
+      },
+      { fetchPolicy: 'network-only' }
+    );
+  };
 
   if (!queryRef) {
     return <PeopleListPageFallback />;
@@ -137,8 +206,8 @@ export default function PeopleListPage() {
         <title>People - Probo Console</title>
       </Helmet>
       <Suspense fallback={<PeopleListPageFallback />}>
-      <PeopleListPageContent queryRef={queryRef} />
-    </Suspense>
+        <PeopleListPageContent queryRef={queryRef} onPageChange={handlePageChange} />
+      </Suspense>
     </>
   );
 }
