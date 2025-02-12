@@ -8,10 +8,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CircleUser, Globe, Shield } from "lucide-react";
-import type { PeoplesPageQuery as PeoplesPageQueryType } from "./__generated__/PeoplesPageQuery.graphql";
+import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generated__/PeopleListPageQuery.graphql";
 
-const PeoplesPageQuery = graphql`
-  query PeoplesPageQuery {
+const PeopleListPageQuery = graphql`
+  query PeopleListPageQuery {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
@@ -32,12 +32,12 @@ const PeoplesPageQuery = graphql`
   }
 `;
 
-function PeoplesPageContent({
+function PeopleListPageContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<PeoplesPageQueryType>;
+  queryRef: PreloadedQuery<PeopleListPageQueryType>;
 }) {
-  const data = usePreloadedQuery(PeoplesPageQuery, queryRef);
+  const data = usePreloadedQuery(PeopleListPageQuery, queryRef);
   const peoples = data.node.peoples?.edges.map(edge => edge?.node) ?? [];
 
   return (
@@ -83,7 +83,7 @@ function PeoplesPageContent({
   );
 }
 
-function PeoplesPageFallback() {
+function PeopleListPageFallback() {
   return (
     <div className="p-6 space-y-6">
       <div className="space-y-1">
@@ -119,20 +119,20 @@ function PeoplesPageFallback() {
   );
 }
 
-export default function PeoplesPage() {
-  const [queryRef, loadQuery] = useQueryLoader<PeoplesPageQueryType>(PeoplesPageQuery);
+export default function PeopleListPage() {
+  const [queryRef, loadQuery] = useQueryLoader<PeopleListPageQueryType>(PeopleListPageQuery);
 
   useEffect(() => {
     loadQuery({});
   }, [loadQuery]);
 
   if (!queryRef) {
-    return <PeoplesPageFallback />;
+    return <PeopleListPageFallback />;
   }
 
   return (
-    <Suspense fallback={<PeoplesPageFallback />}>
-      <PeoplesPageContent queryRef={queryRef} />
+    <Suspense fallback={<PeopleListPageFallback />}>
+      <PeopleListPageContent queryRef={queryRef} />
     </Suspense>
   );
 }

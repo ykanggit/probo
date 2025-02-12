@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e0bd568420e8442ebe1e1f968d206979>>
+ * @generated SignedSource<<2ba907db688f627158201c0998785612>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,8 +9,8 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type PeoplesPageQuery$variables = Record<PropertyKey, never>;
-export type PeoplesPageQuery$data = {
+export type PeopleListPageQuery$variables = Record<PropertyKey, never>;
+export type PeopleListPageQuery$data = {
   readonly node: {
     readonly id: string;
     readonly peoples?: {
@@ -27,9 +27,9 @@ export type PeoplesPageQuery$data = {
     };
   };
 };
-export type PeoplesPageQuery = {
-  response: PeoplesPageQuery$data;
-  variables: PeoplesPageQuery$variables;
+export type PeopleListPageQuery = {
+  response: PeopleListPageQuery$data;
+  variables: PeopleListPageQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -128,7 +128,7 @@ return {
     "argumentDefinitions": [],
     "kind": "Fragment",
     "metadata": null,
-    "name": "PeoplesPageQuery",
+    "name": "PeopleListPageQuery",
     "selections": [
       {
         "alias": null,
@@ -151,7 +151,7 @@ return {
   "operation": {
     "argumentDefinitions": [],
     "kind": "Operation",
-    "name": "PeoplesPageQuery",
+    "name": "PeopleListPageQuery",
     "selections": [
       {
         "alias": null,
@@ -176,16 +176,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "98a9fdbb092f803bd997c417aed8b9a4",
+    "cacheID": "ce78c7ac266c38015ae2d44366f19579",
     "id": null,
     "metadata": {},
-    "name": "PeoplesPageQuery",
+    "name": "PeopleListPageQuery",
     "operationKind": "query",
-    "text": "query PeoplesPageQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      peoples {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            additionalEmailAddresses\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query PeopleListPageQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      peoples {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            additionalEmailAddresses\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "72495143e41518eb0c6bc2e1af81bded";
+(node as any).hash = "a3892026d3bf2753f6d1ff00ddf0526c";
 
 export default node;
