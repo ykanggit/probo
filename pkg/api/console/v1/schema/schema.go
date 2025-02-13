@@ -155,6 +155,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateVendor func(childComplexity int, input types.CreateVendorInput) int
+		DeletePeople func(childComplexity int, input types.DeletePeopleInput) int
 		DeleteVendor func(childComplexity int, input types.DeleteVendorInput) int
 	}
 
@@ -270,6 +271,7 @@ type FrameworkResolver interface {
 type MutationResolver interface {
 	CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.Vendor, error)
 	DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (string, error)
+	DeletePeople(ctx context.Context, input types.DeletePeopleInput) (string, error)
 }
 type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
@@ -713,6 +715,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateVendor(childComplexity, args["input"].(types.CreateVendorInput)), true
 
+	case "Mutation.deletePeople":
+		if e.complexity.Mutation.DeletePeople == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deletePeople_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeletePeople(childComplexity, args["input"].(types.DeletePeopleInput)), true
+
 	case "Mutation.deleteVendor":
 		if e.complexity.Mutation.DeleteVendor == nil {
 			break
@@ -1135,6 +1149,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateVendorInput,
+		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeleteVendorInput,
 	)
 	first := true
@@ -1525,6 +1540,7 @@ type Query {
 type Mutation {
   createVendor(input: CreateVendorInput!): Vendor!
   deleteVendor(input: DeleteVendorInput!): Void!
+  deletePeople(input: DeletePeopleInput!): Void!
 }
 
 input CreateVendorInput {
@@ -1535,7 +1551,10 @@ input CreateVendorInput {
 input DeleteVendorInput {
   vendorId: ID!
 }
-`, BuiltIn: false},
+
+input DeletePeopleInput {
+  peopleId: ID!
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -1871,6 +1890,29 @@ func (ec *executionContext) field_Mutation_createVendor_argsInput(
 	}
 
 	var zeroVal types.CreateVendorInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deletePeople_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deletePeople_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deletePeople_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeletePeopleInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeletePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeletePeopleInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeletePeopleInput
 	return zeroVal, nil
 }
 
@@ -4714,6 +4756,49 @@ func (ec *executionContext) fieldContext_Mutation_deleteVendor(ctx context.Conte
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deletePeople(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deletePeople(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeletePeople(rctx, fc.Args["input"].(types.DeletePeopleInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNVoid2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deletePeople(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Void does not have child fields")
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deletePeople_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8598,6 +8683,33 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeletePeopleInput(ctx context.Context, obj any) (types.DeletePeopleInput, error) {
+	var it types.DeletePeopleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"peopleId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "peopleId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("peopleId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PeopleID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDeleteVendorInput(ctx context.Context, obj any) (types.DeleteVendorInput, error) {
 	var it types.DeleteVendorInput
 	asMap := map[string]any{}
@@ -9592,6 +9704,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteVendor":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteVendor(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletePeople":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deletePeople(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -11068,6 +11187,11 @@ func (ec *executionContext) marshalNDatetime2timeᚐTime(ctx context.Context, se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNDeletePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeletePeopleInput(ctx context.Context, v any) (types.DeletePeopleInput, error) {
+	res, err := ec.unmarshalInputDeletePeopleInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNDeleteVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorInput(ctx context.Context, v any) (types.DeleteVendorInput, error) {

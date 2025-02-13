@@ -4,6 +4,7 @@ import {
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
+  useMutation,
 } from "react-relay";
 import { useSearchParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -44,17 +45,26 @@ const PeopleListPageQuery = graphql`
   }
 `;
 
+const deletePeopleMutation = graphql`
+  mutation PeopleListPageDeletePeopleMutation($input: DeletePeopleInput!) {
+    deletePeople(input: $input)
+  }
+`;
+
 function PeopleListPageContent({
   queryRef,
   onPageChange,
+  loadQuery
 }: {
   queryRef: PreloadedQuery<PeopleListPageQueryType>;
   onPageChange: (params: { first?: number; after?: string; last?: number; before?: string }) => void;
+  loadQuery: LoadQueryType;
 }) {
   const data = usePreloadedQuery(PeopleListPageQuery, queryRef);
   const peoples = data.node.peoples?.edges.map(edge => edge?.node) ?? [];
   const pageInfo = data.node.peoples?.pageInfo;
   const [isPending, startTransition] = useTransition();
+  const [deletePeople] = useMutation(deletePeopleMutation);
 
   const handlePageChange = (direction: 'prev' | 'next') => {
     startTransition(() => {
@@ -107,6 +117,33 @@ function PeopleListPageContent({
               <Badge variant="outline" className="text-muted-foreground">
                 Not onboarded
               </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (window.confirm('Are you sure you want to delete this person?')) {
+                    deletePeople({
+                      variables: {
+                        input: {
+                          peopleId: person.id
+                        }
+                      },
+                      onCompleted() {
+                        loadQuery({ 
+                          first: ITEMS_PER_PAGE,
+                          after: undefined,
+                          last: undefined,
+                          before: undefined,
+                        }, { fetchPolicy: 'network-only' });
+                      },
+                    });
+                  }
+                }}
+              >
+                Delete
+              </Button>
             </div>
           </div>
         ))}
@@ -168,6 +205,8 @@ function PeopleListPageFallback() {
   );
 }
 
+type LoadQueryType = ReturnType<typeof useQueryLoader<PeopleListPageQueryType>>[1];
+
 export default function PeopleListPage() {
   const [searchParams] = useSearchParams();
   const [queryRef, loadQuery] = useQueryLoader<PeopleListPageQueryType>(PeopleListPageQuery);
@@ -206,7 +245,7 @@ export default function PeopleListPage() {
         <title>People - Probo Console</title>
       </Helmet>
       <Suspense fallback={<PeopleListPageFallback />}>
-        <PeopleListPageContent queryRef={queryRef} onPageChange={handlePageChange} />
+        <PeopleListPageContent queryRef={queryRef} onPageChange={handlePageChange} loadQuery={loadQuery} />
       </Suspense>
     </>
   );

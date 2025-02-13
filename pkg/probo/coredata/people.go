@@ -141,6 +141,24 @@ VALUES (
 	return err
 }
 
+func (p People) Delete(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+) error {
+	q := `
+DELETE FROM peoples WHERE %s AND id = @people_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{"people_id": p.ID}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (p *Peoples) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,

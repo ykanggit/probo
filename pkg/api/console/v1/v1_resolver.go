@@ -88,6 +88,16 @@ func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteV
 	return "", nil
 }
 
+// DeletePeople is the resolver for the deletePeople field.
+func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (string, error) {
+	err := r.svc.DeletePeople(ctx, input.PeopleID)
+	if err != nil {
+		return "", fmt.Errorf("cannot delete people: %w", err)
+	}
+
+	return "", nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

@@ -290,6 +290,7 @@ type Query {
 type Mutation {
   createVendor(input: CreateVendorInput!): Vendor!
   deleteVendor(input: DeleteVendorInput!): Void!
+  deletePeople(input: DeletePeopleInput!): Void!
 }
 
 input CreateVendorInput {
@@ -299,4 +300,8 @@ input CreateVendorInput {
 
 input DeleteVendorInput {
   vendorId: ID!
+}
+
+input DeletePeopleInput {
+  peopleId: ID!
 }
