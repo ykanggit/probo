@@ -20,12 +20,18 @@ Soon, we will add:
 - Integration with Google Workplaces, Github, GCP & AWS
 - Support for ISO 27001 and GDPR
 
+## Contributing
+
+We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
+
 ## Join the community
 
-- Star the repo
-- [Join our Discord →](https://discord.gg/8qfdJYfvpY)
-- [Contributions](CONTRIBUTING.md) are most welcomed
-- Submit a [feature request](https://github.com/getprobo/probo/issues/new) or [bug report](https://github.com/getprobo/probo/issues/new)
+- 🌟 Star the repo to show your support
+- 💬 [Join our Discord →](https://discord.gg/8qfdJYfvpY)
+- 🐛 [Report bugs](https://github.com/getprobo/probo/issues/new)
+- 💡 [Request features](https://github.com/getprobo/probo/issues/new)
+- 📖 [Read the docs](coming soon)
+
 
 ## License
 
