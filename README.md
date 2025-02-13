@@ -20,6 +20,25 @@ Soon, we will add:
 - Integration with Google Workplaces, Github, GCP & AWS
 - Support for ISO 27001 and GDPR
 
+## Tech Stack
+
+Probo is built with the following technologies:
+
+**Backend:**
+- [Go](https://go.dev/) for the API server
+- [PostgreSQL](https://www.postgresql.org/) for data storage
+- [GraphQL](https://graphql.org/) for the API layer
+
+**Frontend:**
+- [React](https://react.dev/) with [TypeScript](https://www.typescriptlang.org/)
+- [Relay](https://relay.dev/) for data fetching
+- [TailwindCSS](https://tailwindcss.com/) for styling
+
+**Infrastructure:**
+- [Docker](https://www.docker.com/) for containerization
+- [OpenTelemetry](https://opentelemetry.io/) for observability
+- [GitHub Actions](https://github.com/features/actions) for CI/CD
+
 ## Contributing
 
 We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
