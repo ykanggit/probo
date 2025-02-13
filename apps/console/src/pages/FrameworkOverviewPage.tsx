@@ -39,6 +39,7 @@ const FrameworkOverviewPageQuery = graphql`
               name
               description
               state
+              category
             }
           }
         }
@@ -56,49 +57,22 @@ function FrameworkOverviewPageContent({
   const framework = data.node;
   const controls = framework.controls?.edges.map((edge) => edge?.node) ?? [];
 
-  const controlsByCategory = {
-    office: controls.filter((c) => c?.name.toLowerCase().includes("office")),
-    computer: controls.filter((c) =>
-      c?.name.toLowerCase().includes("computer"),
-    ),
-    employees: controls.filter((c) =>
-      c?.name.toLowerCase().includes("employee"),
-    ),
-    email: controls.filter((c) => c?.name.toLowerCase().includes("email")),
-    code: controls.filter((c) => c?.name.toLowerCase().includes("code")),
-    infrastructure: controls.filter((c) =>
-      c?.name.toLowerCase().includes("infrastructure"),
-    ),
-    network: controls.filter((c) => c?.name.toLowerCase().includes("network")),
-    data: controls.filter((c) => c?.name.toLowerCase().includes("data")),
-    logging: controls.filter((c) => c?.name.toLowerCase().includes("log")),
-    incidents: controls.filter((c) =>
-      c?.name.toLowerCase().includes("incident"),
-    ),
-    vendors: controls.filter((c) => c?.name.toLowerCase().includes("vendor")),
-    sharing: controls.filter((c) => c?.name.toLowerCase().includes("share")),
-  };
+  // Group controls by their category
+  const controlsByCategory = controls.reduce((acc, control) => {
+    if (!control?.category) return acc;
+    if (!acc[control.category]) {
+      acc[control.category] = [];
+    }
+    acc[control.category].push(control);
+    return acc;
+  }, {} as Record<string, typeof controls>);
 
-  const controlCards = [
-    {
-      icon: <Building2 className="w-4 h-4" />,
-      title: "Secure your offices and internet access",
-      controls: controlsByCategory.office,
-      completed: controlsByCategory.office.filter(
-        (c) => c?.state === "IMPLEMENTED",
-      ).length,
-      total: controlsByCategory.office.length,
-    },
-    {
-      icon: <Computer className="w-4 h-4" />,
-      title: "Manage your computers",
-      controls: controlsByCategory.computer,
-      completed: controlsByCategory.computer.filter(
-        (c) => c?.state === "IMPLEMENTED",
-      ).length,
-      total: controlsByCategory.computer.length,
-    },
-  ];
+  const controlCards = Object.entries(controlsByCategory).map(([category, controls]) => ({
+    title: category,
+    controls,
+    completed: controls.filter((c) => c?.state === "IMPLEMENTED").length,
+    total: controls.length,
+  }));
 
   const totalImplemented = controls.filter(
     (c) => c?.state === "IMPLEMENTED",
@@ -106,7 +80,6 @@ function FrameworkOverviewPageContent({
 
   return (
     <div className="min-h-screen bg-background p-6">
-      {/* Header */}
       <div className="space-y-4 mb-8">
         <h1 className="text-2xl font-semibold">{framework.name}</h1>
         <p className="text-muted-foreground max-w-3xl">
@@ -114,7 +87,6 @@ function FrameworkOverviewPageContent({
         </p>
       </div>
 
-      {/* Timeline */}
       <div className="mb-8 space-y-4">
         <div className="flex items-center gap-2 text-sm">
           <div className="bg-primary/10 text-primary px-3 py-1 rounded-md flex items-center gap-2">
@@ -150,7 +122,7 @@ function FrameworkOverviewPageContent({
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                {card.icon}
+                <Shield className="w-4 h-4" />
                 {card.title}
               </CardTitle>
               <Avatar className="h-6 w-6">

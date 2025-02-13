@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f9715593419cda898b34a0056729d77c>>
+ * @generated SignedSource<<27e925c9f55d555878de5cbe0c131d44>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,6 +18,7 @@ export type FrameworkOverviewPageQuery$data = {
     readonly controls?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
+          readonly category: string;
           readonly description: string;
           readonly id: string;
           readonly name: string;
@@ -109,6 +110,13 @@ v5 = {
                   "kind": "ScalarField",
                   "name": "state",
                   "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "category",
+                  "storageKey": null
                 }
               ],
               "storageKey": null
@@ -176,16 +184,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "4190ee685492e95820ecb106f2dc7e3c",
+    "cacheID": "c02ad61a9b6ce13a83576ad58aa0a7f4",
     "id": null,
     "metadata": {},
     "name": "FrameworkOverviewPageQuery",
     "operationKind": "query",
-    "text": "query FrameworkOverviewPageQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query FrameworkOverviewPageQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            category\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "25fb6b72c598d19767825ac648654fcf";
+(node as any).hash = "3103fb6eba6ddf2625aa5b50bcdb43f6";
 
 export default node;
