@@ -43,6 +43,52 @@ Signed-off-by: John Doe <john.doe@example.org>
 - Follow existing code style
 - Update documentation if needed
 
+## Development Setup
+
+### Prerequisites
+- Go 1.21+
+- Node.js 22+
+- Docker
+
+### Installation Steps
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/getprobo/probo.git
+   cd probo
+   ```
+
+2. Install Go dependencies:
+   ```bash
+   go mod download
+   ```
+
+3. Install JavaScript dependencies:
+   ```bash
+   npm ci
+   ```
+
+4. Build the project:
+   ```bash
+   make build
+   ```
+
+5. Start docker containers:
+   ```bash
+   make stack-up
+   ```
+
+5. Start the development servers:
+   ```bash
+   # In one terminal - start the API server
+   bin/probod
+
+   # In another terminal - start the frontend
+   npm -w @probo/console run dev
+   ```
+
+The application should now be running at `http://localhost:3000`
+
 ## Need Help?
 
 Create an issue if you:
