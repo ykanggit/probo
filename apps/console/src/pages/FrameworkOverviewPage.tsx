@@ -6,19 +6,7 @@ import {
   usePreloadedQuery,
   useQueryLoader,
 } from "react-relay";
-import {
-  Building2,
-  Computer,
-  Mail,
-  Shield,
-  Network,
-  Database,
-  FileText,
-  Share2,
-  AlertTriangle,
-  Users,
-  Clock,
-} from "lucide-react";
+import { Shield, FileText, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -58,21 +46,26 @@ function FrameworkOverviewPageContent({
   const controls = framework.controls?.edges.map((edge) => edge?.node) ?? [];
 
   // Group controls by their category
-  const controlsByCategory = controls.reduce((acc, control) => {
-    if (!control?.category) return acc;
-    if (!acc[control.category]) {
-      acc[control.category] = [];
-    }
-    acc[control.category].push(control);
-    return acc;
-  }, {} as Record<string, typeof controls>);
+  const controlsByCategory = controls.reduce(
+    (acc, control) => {
+      if (!control?.category) return acc;
+      if (!acc[control.category]) {
+        acc[control.category] = [];
+      }
+      acc[control.category].push(control);
+      return acc;
+    },
+    {} as Record<string, typeof controls>,
+  );
 
-  const controlCards = Object.entries(controlsByCategory).map(([category, controls]) => ({
-    title: category,
-    controls,
-    completed: controls.filter((c) => c?.state === "IMPLEMENTED").length,
-    total: controls.length,
-  }));
+  const controlCards = Object.entries(controlsByCategory).map(
+    ([category, controls]) => ({
+      title: category,
+      controls,
+      completed: controls.filter((c) => c?.state === "IMPLEMENTED").length,
+      total: controls.length,
+    }),
+  );
 
   const totalImplemented = controls.filter(
     (c) => c?.state === "IMPLEMENTED",
