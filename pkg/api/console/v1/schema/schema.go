@@ -17,6 +17,7 @@ import (
 	"github.com/getprobo/probo/pkg/api/console/v1/types"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
+	"github.com/getprobo/probo/pkg/probo/coredata"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -1277,6 +1278,15 @@ var sources = []*ast.Source{
   omittable: Boolean
 ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
+directive @goModel(
+    model: String
+    models: [String!]
+) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
+
+directive @goEnum(
+    value: String
+) on ENUM_VALUE
+
 scalar CursorKey
 scalar Void
 scalar Datetime
@@ -1304,10 +1314,9 @@ enum EvidenceState {
   EXPIRED
 }
 
-enum PeopleKind {
-  EMPLOYEE
-  CONTRACTOR
-  VENDOR
+enum PeopleKind @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKind") {
+  EMPLOYEE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindEmployee")
+  CONTRACTOR @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindContractor")
 }
 
 type PageInfo {
@@ -5580,9 +5589,9 @@ func (ec *executionContext) _People_kind(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(types.PeopleKind)
+	res := resTmp.(coredata.PeopleKind)
 	fc.Result = res
-	return ec.marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleKind(ctx, field.Selections, res)
+	return ec.marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_People_kind(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8846,7 +8855,7 @@ func (ec *executionContext) unmarshalInputCreatePeopleInput(ctx context.Context,
 			it.PrimaryEmailAddress = data
 		case "kind":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("kind"))
-			data, err := ec.unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleKind(ctx, v)
+			data, err := ec.unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11776,15 +11785,32 @@ func (ec *executionContext) marshalNPeopleEdge2ᚖgithubᚗcomᚋgetproboᚋprob
 	return ec._PeopleEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleKind(ctx context.Context, v any) (types.PeopleKind, error) {
-	var res types.PeopleKind
-	err := res.UnmarshalGQL(v)
+func (ec *executionContext) unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx context.Context, v any) (coredata.PeopleKind, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleKind(ctx context.Context, sel ast.SelectionSet, v types.PeopleKind) graphql.Marshaler {
-	return v
+func (ec *executionContext) marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx context.Context, sel ast.SelectionSet, v coredata.PeopleKind) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
+
+var (
+	unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind = map[string]coredata.PeopleKind{
+		"EMPLOYEE":   coredata.PeopleKindEmployee,
+		"CONTRACTOR": coredata.PeopleKindContractor,
+	}
+	marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind = map[coredata.PeopleKind]string{
+		coredata.PeopleKindEmployee:   "EMPLOYEE",
+		coredata.PeopleKindContractor: "CONTRACTOR",
+	}
+)
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
@@ -12395,6 +12421,44 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	}
 	res := graphql.MarshalInt(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {

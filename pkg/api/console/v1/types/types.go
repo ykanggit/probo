@@ -10,6 +10,7 @@ import (
 
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
+	"github.com/getprobo/probo/pkg/probo/coredata"
 )
 
 type Node interface {
@@ -61,10 +62,10 @@ type ControlStateTransitionEdge struct {
 }
 
 type CreatePeopleInput struct {
-	OrganizationID      gid.GID    `json:"organizationId"`
-	FullName            string     `json:"fullName"`
-	PrimaryEmailAddress string     `json:"primaryEmailAddress"`
-	Kind                PeopleKind `json:"kind"`
+	OrganizationID      gid.GID             `json:"organizationId"`
+	FullName            string              `json:"fullName"`
+	PrimaryEmailAddress string              `json:"primaryEmailAddress"`
+	Kind                coredata.PeopleKind `json:"kind"`
 }
 
 type CreateVendorInput struct {
@@ -170,13 +171,13 @@ type PageInfo struct {
 }
 
 type People struct {
-	ID                       gid.GID    `json:"id"`
-	FullName                 string     `json:"fullName"`
-	PrimaryEmailAddress      string     `json:"primaryEmailAddress"`
-	AdditionalEmailAddresses []string   `json:"additionalEmailAddresses"`
-	Kind                     PeopleKind `json:"kind"`
-	CreatedAt                time.Time  `json:"createdAt"`
-	UpdatedAt                time.Time  `json:"updatedAt"`
+	ID                       gid.GID             `json:"id"`
+	FullName                 string              `json:"fullName"`
+	PrimaryEmailAddress      string              `json:"primaryEmailAddress"`
+	AdditionalEmailAddresses []string            `json:"additionalEmailAddresses"`
+	Kind                     coredata.PeopleKind `json:"kind"`
+	CreatedAt                time.Time           `json:"createdAt"`
+	UpdatedAt                time.Time           `json:"updatedAt"`
 }
 
 func (People) IsNode()             {}
@@ -343,49 +344,6 @@ func (e *EvidenceState) UnmarshalGQL(v any) error {
 }
 
 func (e EvidenceState) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type PeopleKind string
-
-const (
-	PeopleKindEmployee   PeopleKind = "EMPLOYEE"
-	PeopleKindContractor PeopleKind = "CONTRACTOR"
-	PeopleKindVendor     PeopleKind = "VENDOR"
-)
-
-var AllPeopleKind = []PeopleKind{
-	PeopleKindEmployee,
-	PeopleKindContractor,
-	PeopleKindVendor,
-}
-
-func (e PeopleKind) IsValid() bool {
-	switch e {
-	case PeopleKindEmployee, PeopleKindContractor, PeopleKindVendor:
-		return true
-	}
-	return false
-}
-
-func (e PeopleKind) String() string {
-	return string(e)
-}
-
-func (e *PeopleKind) UnmarshalGQL(v any) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = PeopleKind(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid PeopleKind", str)
-	}
-	return nil
-}
-
-func (e PeopleKind) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

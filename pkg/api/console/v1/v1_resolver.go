@@ -105,7 +105,7 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 		FullName:                 input.FullName,
 		PrimaryEmailAddress:      input.PrimaryEmailAddress,
 		AdditionalEmailAddresses: []string{},
-		Kind:                     coredata.PeopleKindEmployee,
+		Kind:                     input.Kind,
 	})
 
 	if err != nil {
