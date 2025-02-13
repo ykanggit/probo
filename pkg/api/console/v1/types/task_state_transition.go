@@ -42,16 +42,15 @@ func NewTaskStateTransitionEdge(tst *coredata.TaskStateTransition) *TaskStateTra
 }
 
 func NewTaskStateTransition(tst *coredata.TaskStateTransition) *TaskStateTransition {
-	var fromState *TaskState
+	var fromState *coredata.TaskState
 	if tst.FromState != nil {
-		val := TaskState((*tst.FromState).String())
-		fromState = &val
+		fromState = tst.FromState
 	}
 
 	return &TaskStateTransition{
 		ID:        tst.ID,
 		FromState: fromState,
-		ToState:   TaskState(tst.ToState.String()),
+		ToState:   tst.ToState,
 		Reason:    tst.Reason,
 		CreatedAt: tst.CreatedAt,
 		UpdatedAt: tst.UpdatedAt,

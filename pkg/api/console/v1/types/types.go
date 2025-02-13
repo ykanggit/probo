@@ -3,9 +3,6 @@
 package types
 
 import (
-	"fmt"
-	"io"
-	"strconv"
 	"time"
 
 	"github.com/getprobo/probo/pkg/gid"
@@ -22,7 +19,7 @@ type Control struct {
 	ID               gid.GID                           `json:"id"`
 	Name             string                            `json:"name"`
 	Description      string                            `json:"description"`
-	State            ControlState                      `json:"state"`
+	State            coredata.ControlState             `json:"state"`
 	StateTransisions *ControlStateTransitionConnection `json:"stateTransisions"`
 	Tasks            *TaskConnection                   `json:"tasks"`
 	CreatedAt        time.Time                         `json:"createdAt"`
@@ -43,12 +40,12 @@ type ControlEdge struct {
 }
 
 type ControlStateTransition struct {
-	ID        gid.GID       `json:"id"`
-	FromState *ControlState `json:"fromState,omitempty"`
-	ToState   ControlState  `json:"toState"`
-	Reason    *string       `json:"reason,omitempty"`
-	CreatedAt time.Time     `json:"createdAt"`
-	UpdatedAt time.Time     `json:"updatedAt"`
+	ID        gid.GID                `json:"id"`
+	FromState *coredata.ControlState `json:"fromState,omitempty"`
+	ToState   coredata.ControlState  `json:"toState"`
+	Reason    *string                `json:"reason,omitempty"`
+	CreatedAt time.Time              `json:"createdAt"`
+	UpdatedAt time.Time              `json:"updatedAt"`
 }
 
 type ControlStateTransitionConnection struct {
@@ -86,7 +83,7 @@ type Evidence struct {
 	FileURL          string                             `json:"fileUrl"`
 	MimeType         string                             `json:"mimeType"`
 	Size             int                                `json:"size"`
-	State            EvidenceState                      `json:"state"`
+	State            coredata.EvidenceState             `json:"state"`
 	StateTransisions *EvidenceStateTransitionConnection `json:"stateTransisions"`
 	CreatedAt        time.Time                          `json:"createdAt"`
 	UpdatedAt        time.Time                          `json:"updatedAt"`
@@ -106,12 +103,12 @@ type EvidenceEdge struct {
 }
 
 type EvidenceStateTransition struct {
-	ID        gid.GID        `json:"id"`
-	FromState *EvidenceState `json:"fromState,omitempty"`
-	ToState   EvidenceState  `json:"toState"`
-	Reason    *string        `json:"reason,omitempty"`
-	CreatedAt time.Time      `json:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt"`
+	ID        gid.GID                 `json:"id"`
+	FromState *coredata.EvidenceState `json:"fromState,omitempty"`
+	ToState   coredata.EvidenceState  `json:"toState"`
+	Reason    *string                 `json:"reason,omitempty"`
+	CreatedAt time.Time               `json:"createdAt"`
+	UpdatedAt time.Time               `json:"updatedAt"`
 }
 
 type EvidenceStateTransitionConnection struct {
@@ -200,7 +197,7 @@ type Task struct {
 	ID               gid.GID                        `json:"id"`
 	Name             string                         `json:"name"`
 	Description      string                         `json:"description"`
-	State            TaskState                      `json:"state"`
+	State            coredata.TaskState             `json:"state"`
 	StateTransisions *TaskStateTransitionConnection `json:"stateTransisions"`
 	Evidences        *EvidenceConnection            `json:"evidences"`
 	CreatedAt        time.Time                      `json:"createdAt"`
@@ -221,12 +218,12 @@ type TaskEdge struct {
 }
 
 type TaskStateTransition struct {
-	ID        gid.GID    `json:"id"`
-	FromState *TaskState `json:"fromState,omitempty"`
-	ToState   TaskState  `json:"toState"`
-	Reason    *string    `json:"reason,omitempty"`
-	CreatedAt time.Time  `json:"createdAt"`
-	UpdatedAt time.Time  `json:"updatedAt"`
+	ID        gid.GID             `json:"id"`
+	FromState *coredata.TaskState `json:"fromState,omitempty"`
+	ToState   coredata.TaskState  `json:"toState"`
+	Reason    *string             `json:"reason,omitempty"`
+	CreatedAt time.Time           `json:"createdAt"`
+	UpdatedAt time.Time           `json:"updatedAt"`
 }
 
 type TaskStateTransitionConnection struct {
@@ -257,133 +254,4 @@ type VendorConnection struct {
 type VendorEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Vendor        `json:"node"`
-}
-
-type ControlState string
-
-const (
-	ControlStateNotStarted    ControlState = "NOT_STARTED"
-	ControlStateInProgress    ControlState = "IN_PROGRESS"
-	ControlStateNotApplicable ControlState = "NOT_APPLICABLE"
-	ControlStateImplemented   ControlState = "IMPLEMENTED"
-)
-
-var AllControlState = []ControlState{
-	ControlStateNotStarted,
-	ControlStateInProgress,
-	ControlStateNotApplicable,
-	ControlStateImplemented,
-}
-
-func (e ControlState) IsValid() bool {
-	switch e {
-	case ControlStateNotStarted, ControlStateInProgress, ControlStateNotApplicable, ControlStateImplemented:
-		return true
-	}
-	return false
-}
-
-func (e ControlState) String() string {
-	return string(e)
-}
-
-func (e *ControlState) UnmarshalGQL(v any) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = ControlState(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid ControlState", str)
-	}
-	return nil
-}
-
-func (e ControlState) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type EvidenceState string
-
-const (
-	EvidenceStateValid   EvidenceState = "VALID"
-	EvidenceStateInvalid EvidenceState = "INVALID"
-	EvidenceStateExpired EvidenceState = "EXPIRED"
-)
-
-var AllEvidenceState = []EvidenceState{
-	EvidenceStateValid,
-	EvidenceStateInvalid,
-	EvidenceStateExpired,
-}
-
-func (e EvidenceState) IsValid() bool {
-	switch e {
-	case EvidenceStateValid, EvidenceStateInvalid, EvidenceStateExpired:
-		return true
-	}
-	return false
-}
-
-func (e EvidenceState) String() string {
-	return string(e)
-}
-
-func (e *EvidenceState) UnmarshalGQL(v any) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = EvidenceState(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid EvidenceState", str)
-	}
-	return nil
-}
-
-func (e EvidenceState) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type TaskState string
-
-const (
-	TaskStateTodo TaskState = "TODO"
-	TaskStateDone TaskState = "DONE"
-)
-
-var AllTaskState = []TaskState{
-	TaskStateTodo,
-	TaskStateDone,
-}
-
-func (e TaskState) IsValid() bool {
-	switch e {
-	case TaskStateTodo, TaskStateDone:
-		return true
-	}
-	return false
-}
-
-func (e TaskState) String() string {
-	return string(e)
-}
-
-func (e *TaskState) UnmarshalGQL(v any) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = TaskState(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid TaskState", str)
-	}
-	return nil
-}
-
-func (e TaskState) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
 }

@@ -42,16 +42,15 @@ func NewEvidenceStateTransitionEdge(est *coredata.EvidenceStateTransition) *Evid
 }
 
 func NewEvidenceStateTransition(est *coredata.EvidenceStateTransition) *EvidenceStateTransition {
-	var fromState *EvidenceState
+	var fromState *coredata.EvidenceState
 	if est.FromState != nil {
-		val := EvidenceState((*est.FromState).String())
-		fromState = &val
+		fromState = est.FromState
 	}
 
 	return &EvidenceStateTransition{
 		ID:        est.ID,
 		FromState: fromState,
-		ToState:   EvidenceState(est.ToState.String()),
+		ToState:   est.ToState,
 		Reason:    est.Reason,
 		CreatedAt: est.CreatedAt,
 		UpdatedAt: est.UpdatedAt,

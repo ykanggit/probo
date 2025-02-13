@@ -42,7 +42,7 @@ func NewEvidenceEdge(e *coredata.Evidence) *EvidenceEdge {
 func NewEvidence(e *coredata.Evidence) *Evidence {
 	return &Evidence{
 		ID:        e.ID,
-		State:     EvidenceState(e.State.String()),
+		State:     e.State,
 		FileURL:   "",
 		MimeType:  e.MimeType,
 		Size:      int(e.Size),

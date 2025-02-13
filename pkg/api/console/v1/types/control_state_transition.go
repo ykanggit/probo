@@ -42,16 +42,15 @@ func NewControlStateTransitionEdge(cst *coredata.ControlStateTransition) *Contro
 }
 
 func NewControlStateTransition(cst *coredata.ControlStateTransition) *ControlStateTransition {
-	var fromState *ControlState
+	var fromState *coredata.ControlState
 	if cst.FromState != nil {
-		val := ControlState((*cst.FromState).String())
-		fromState = &val
+		fromState = cst.FromState
 	}
 
 	return &ControlStateTransition{
 		ID:        cst.ID,
 		FromState: fromState,
-		ToState:   ControlState(cst.ToState.String()),
+		ToState:   cst.ToState,
 		Reason:    cst.Reason,
 		CreatedAt: cst.CreatedAt,
 		UpdatedAt: cst.UpdatedAt,

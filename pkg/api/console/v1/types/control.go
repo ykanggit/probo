@@ -44,7 +44,7 @@ func NewControl(c *coredata.Control) *Control {
 		ID:          c.ID,
 		Name:        c.Name,
 		Description: c.Description,
-		State:       ControlState(c.State.String()),
+		State:       c.State,
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
 	}

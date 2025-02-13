@@ -22,22 +22,22 @@ interface Node {
   id: ID!
 }
 
-enum ControlState {
-  NOT_STARTED
-  IN_PROGRESS
-  NOT_APPLICABLE
-  IMPLEMENTED
+enum ControlState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ControlState") {
+  NOT_STARTED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotStarted")
+  IN_PROGRESS @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateInProgress")
+  NOT_APPLICABLE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotApplicable")
+  IMPLEMENTED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateImplemented")
 }
 
-enum TaskState {
-  TODO
-  DONE
+enum TaskState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.TaskState") {
+  TODO @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateTodo")
+  DONE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateDone")
 }
 
-enum EvidenceState {
-  VALID
-  INVALID
-  EXPIRED
+enum EvidenceState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceState") {
+  VALID @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateValid")
+  INVALID @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateInvalid")
+  EXPIRED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateExpired")
 }
 
 enum PeopleKind @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKind") {

@@ -1296,22 +1296,22 @@ interface Node {
   id: ID!
 }
 
-enum ControlState {
-  NOT_STARTED
-  IN_PROGRESS
-  NOT_APPLICABLE
-  IMPLEMENTED
+enum ControlState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ControlState") {
+  NOT_STARTED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotStarted")
+  IN_PROGRESS @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateInProgress")
+  NOT_APPLICABLE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotApplicable")
+  IMPLEMENTED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateImplemented")
 }
 
-enum TaskState {
-  TODO
-  DONE
+enum TaskState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.TaskState") {
+  TODO @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateTodo")
+  DONE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateDone")
 }
 
-enum EvidenceState {
-  VALID
-  INVALID
-  EXPIRED
+enum EvidenceState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceState") {
+  VALID @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateValid")
+  INVALID @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateInvalid")
+  EXPIRED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateExpired")
 }
 
 enum PeopleKind @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKind") {
@@ -2628,9 +2628,9 @@ func (ec *executionContext) _Control_state(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(types.ControlState)
+	res := resTmp.(coredata.ControlState)
 	fc.Result = res
-	return ec.marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx, field.Selections, res)
+	return ec.marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Control_state(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3061,9 +3061,9 @@ func (ec *executionContext) _ControlStateTransition_fromState(ctx context.Contex
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*types.ControlState)
+	res := resTmp.(*coredata.ControlState)
 	fc.Result = res
-	return ec.marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx, field.Selections, res)
+	return ec.marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ControlStateTransition_fromState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3099,9 +3099,9 @@ func (ec *executionContext) _ControlStateTransition_toState(ctx context.Context,
 		}
 		return graphql.Null
 	}
-	res := resTmp.(types.ControlState)
+	res := resTmp.(coredata.ControlState)
 	fc.Result = res
-	return ec.marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx, field.Selections, res)
+	return ec.marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ControlStateTransition_toState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3582,9 +3582,9 @@ func (ec *executionContext) _Evidence_state(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(types.EvidenceState)
+	res := resTmp.(coredata.EvidenceState)
 	fc.Result = res
-	return ec.marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceState(ctx, field.Selections, res)
+	return ec.marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Evidence_state(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3966,9 +3966,9 @@ func (ec *executionContext) _EvidenceStateTransition_fromState(ctx context.Conte
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*types.EvidenceState)
+	res := resTmp.(*coredata.EvidenceState)
 	fc.Result = res
-	return ec.marshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceState(ctx, field.Selections, res)
+	return ec.marshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_EvidenceStateTransition_fromState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4004,9 +4004,9 @@ func (ec *executionContext) _EvidenceStateTransition_toState(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(types.EvidenceState)
+	res := resTmp.(coredata.EvidenceState)
 	fc.Result = res
-	return ec.marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceState(ctx, field.Selections, res)
+	return ec.marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_EvidenceStateTransition_toState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6155,9 +6155,9 @@ func (ec *executionContext) _Task_state(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(types.TaskState)
+	res := resTmp.(coredata.TaskState)
 	fc.Result = res
-	return ec.marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx, field.Selections, res)
+	return ec.marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Task_state(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6588,9 +6588,9 @@ func (ec *executionContext) _TaskStateTransition_fromState(ctx context.Context, 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*types.TaskState)
+	res := resTmp.(*coredata.TaskState)
 	fc.Result = res
-	return ec.marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx, field.Selections, res)
+	return ec.marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_TaskStateTransition_fromState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6626,9 +6626,9 @@ func (ec *executionContext) _TaskStateTransition_toState(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(types.TaskState)
+	res := resTmp.(coredata.TaskState)
 	fc.Result = res
-	return ec.marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx, field.Selections, res)
+	return ec.marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_TaskStateTransition_toState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11301,15 +11301,36 @@ func (ec *executionContext) marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋpro
 	return ec._ControlEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx context.Context, v any) (types.ControlState, error) {
-	var res types.ControlState
-	err := res.UnmarshalGQL(v)
+func (ec *executionContext) unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx context.Context, v any) (coredata.ControlState, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx context.Context, sel ast.SelectionSet, v types.ControlState) graphql.Marshaler {
-	return v
+func (ec *executionContext) marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx context.Context, sel ast.SelectionSet, v coredata.ControlState) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
+
+var (
+	unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState = map[string]coredata.ControlState{
+		"NOT_STARTED":    coredata.ControlStateNotStarted,
+		"IN_PROGRESS":    coredata.ControlStateInProgress,
+		"NOT_APPLICABLE": coredata.ControlStateNotApplicable,
+		"IMPLEMENTED":    coredata.ControlStateImplemented,
+	}
+	marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState = map[coredata.ControlState]string{
+		coredata.ControlStateNotStarted:    "NOT_STARTED",
+		coredata.ControlStateInProgress:    "IN_PROGRESS",
+		coredata.ControlStateNotApplicable: "NOT_APPLICABLE",
+		coredata.ControlStateImplemented:   "IMPLEMENTED",
+	}
+)
 
 func (ec *executionContext) marshalNControlStateTransition2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlStateTransition(ctx context.Context, sel ast.SelectionSet, v *types.ControlStateTransition) graphql.Marshaler {
 	if v == nil {
@@ -11505,15 +11526,34 @@ func (ec *executionContext) marshalNEvidenceEdge2ᚖgithubᚗcomᚋgetproboᚋpr
 	return ec._EvidenceEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceState(ctx context.Context, v any) (types.EvidenceState, error) {
-	var res types.EvidenceState
-	err := res.UnmarshalGQL(v)
+func (ec *executionContext) unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx context.Context, v any) (coredata.EvidenceState, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceState(ctx context.Context, sel ast.SelectionSet, v types.EvidenceState) graphql.Marshaler {
-	return v
+func (ec *executionContext) marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx context.Context, sel ast.SelectionSet, v coredata.EvidenceState) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
+
+var (
+	unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState = map[string]coredata.EvidenceState{
+		"VALID":   coredata.EvidenceStateValid,
+		"INVALID": coredata.EvidenceStateInvalid,
+		"EXPIRED": coredata.EvidenceStateExpired,
+	}
+	marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState = map[coredata.EvidenceState]string{
+		coredata.EvidenceStateValid:   "VALID",
+		coredata.EvidenceStateInvalid: "INVALID",
+		coredata.EvidenceStateExpired: "EXPIRED",
+	}
+)
 
 func (ec *executionContext) marshalNEvidenceStateTransition2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceStateTransition(ctx context.Context, sel ast.SelectionSet, v *types.EvidenceStateTransition) graphql.Marshaler {
 	if v == nil {
@@ -11931,15 +11971,32 @@ func (ec *executionContext) marshalNTaskEdge2ᚖgithubᚗcomᚋgetproboᚋprobo�
 	return ec._TaskEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx context.Context, v any) (types.TaskState, error) {
-	var res types.TaskState
-	err := res.UnmarshalGQL(v)
+func (ec *executionContext) unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx context.Context, v any) (coredata.TaskState, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx context.Context, sel ast.SelectionSet, v types.TaskState) graphql.Marshaler {
-	return v
+func (ec *executionContext) marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx context.Context, sel ast.SelectionSet, v coredata.TaskState) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
+
+var (
+	unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState = map[string]coredata.TaskState{
+		"TODO": coredata.TaskStateTodo,
+		"DONE": coredata.TaskStateDone,
+	}
+	marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState = map[coredata.TaskState]string{
+		coredata.TaskStateTodo: "TODO",
+		coredata.TaskStateDone: "DONE",
+	}
+)
 
 func (ec *executionContext) marshalNTaskStateTransition2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskStateTransition(ctx context.Context, sel ast.SelectionSet, v *types.TaskStateTransition) graphql.Marshaler {
 	if v == nil {
@@ -12359,21 +12416,37 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx context.Context, v any) (*types.ControlState, error) {
+func (ec *executionContext) unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx context.Context, v any) (*coredata.ControlState, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var res = new(types.ControlState)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlState(ctx context.Context, sel ast.SelectionSet, v *types.ControlState) graphql.Marshaler {
+func (ec *executionContext) marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx context.Context, sel ast.SelectionSet, v *coredata.ControlState) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return v
+	res := graphql.MarshalString(marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState[*v])
+	return res
 }
+
+var (
+	unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState = map[string]coredata.ControlState{
+		"NOT_STARTED":    coredata.ControlStateNotStarted,
+		"IN_PROGRESS":    coredata.ControlStateInProgress,
+		"NOT_APPLICABLE": coredata.ControlStateNotApplicable,
+		"IMPLEMENTED":    coredata.ControlStateImplemented,
+	}
+	marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState = map[coredata.ControlState]string{
+		coredata.ControlStateNotStarted:    "NOT_STARTED",
+		coredata.ControlStateInProgress:    "IN_PROGRESS",
+		coredata.ControlStateNotApplicable: "NOT_APPLICABLE",
+		coredata.ControlStateImplemented:   "IMPLEMENTED",
+	}
+)
 
 func (ec *executionContext) unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx context.Context, v any) (*page.CursorKey, error) {
 	if v == nil {
@@ -12391,21 +12464,35 @@ func (ec *executionContext) marshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋprobo
 	return res
 }
 
-func (ec *executionContext) unmarshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceState(ctx context.Context, v any) (*types.EvidenceState, error) {
+func (ec *executionContext) unmarshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx context.Context, v any) (*coredata.EvidenceState, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var res = new(types.EvidenceState)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceState(ctx context.Context, sel ast.SelectionSet, v *types.EvidenceState) graphql.Marshaler {
+func (ec *executionContext) marshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx context.Context, sel ast.SelectionSet, v *coredata.EvidenceState) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return v
+	res := graphql.MarshalString(marshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState[*v])
+	return res
 }
+
+var (
+	unmarshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState = map[string]coredata.EvidenceState{
+		"VALID":   coredata.EvidenceStateValid,
+		"INVALID": coredata.EvidenceStateInvalid,
+		"EXPIRED": coredata.EvidenceStateExpired,
+	}
+	marshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState = map[coredata.EvidenceState]string{
+		coredata.EvidenceStateValid:   "VALID",
+		coredata.EvidenceStateInvalid: "INVALID",
+		coredata.EvidenceStateExpired: "EXPIRED",
+	}
+)
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
 	if v == nil {
@@ -12477,21 +12564,33 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx context.Context, v any) (*types.TaskState, error) {
+func (ec *executionContext) unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx context.Context, v any) (*coredata.TaskState, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var res = new(types.TaskState)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskState(ctx context.Context, sel ast.SelectionSet, v *types.TaskState) graphql.Marshaler {
+func (ec *executionContext) marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx context.Context, sel ast.SelectionSet, v *coredata.TaskState) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return v
+	res := graphql.MarshalString(marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState[*v])
+	return res
 }
+
+var (
+	unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState = map[string]coredata.TaskState{
+		"TODO": coredata.TaskStateTodo,
+		"DONE": coredata.TaskStateDone,
+	}
+	marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState = map[coredata.TaskState]string{
+		coredata.TaskStateTodo: "TODO",
+		coredata.TaskStateDone: "DONE",
+	}
+)
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
 	if v == nil {
