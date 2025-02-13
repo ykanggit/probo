@@ -42,6 +42,7 @@ func NewControlEdge(c *coredata.Control) *ControlEdge {
 func NewControl(c *coredata.Control) *Control {
 	return &Control{
 		ID:          c.ID,
+		Category:    c.Category,
 		Name:        c.Name,
 		Description: c.Description,
 		State:       c.State,

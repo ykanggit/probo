@@ -31,6 +31,7 @@ type (
 	Control struct {
 		ID          gid.GID
 		FrameworkID gid.GID
+		Category    string
 		Name        string
 		Description string
 		State       ControlState
@@ -50,6 +51,7 @@ func (c *Control) scan(r pgx.Row) error {
 	return r.Scan(
 		&c.ID,
 		&c.FrameworkID,
+		&c.Category,
 		&c.Name,
 		&c.Description,
 		&c.State,
@@ -82,6 +84,7 @@ WITH control_states AS (
 SELECT
     id,
     framework_id,
+    category,
     name,
     description,
     cs.to_state AS state,
@@ -125,6 +128,7 @@ INSERT INTO
     controls (
         id,
         control_id,
+		category,
         name,
         description,
         content_ref,
@@ -179,6 +183,7 @@ WITH control_states AS (
 SELECT
     id,
     framework_id,
+	category,
     name,
     description,
     cs.to_state AS state,

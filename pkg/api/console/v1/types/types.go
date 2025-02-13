@@ -17,6 +17,7 @@ type Node interface {
 
 type Control struct {
 	ID               gid.GID                           `json:"id"`
+	Category         string                            `json:"category"`
 	Name             string                            `json:"name"`
 	Description      string                            `json:"description"`
 	State            coredata.ControlState             `json:"state"`

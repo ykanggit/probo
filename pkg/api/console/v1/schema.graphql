@@ -157,6 +157,7 @@ type ControlEdge {
 
 type Control implements Node {
   id: ID!
+  category: String!
   name: String!
   description: String!
   state: ControlState!

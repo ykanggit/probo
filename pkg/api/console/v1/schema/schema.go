@@ -56,6 +56,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Control struct {
+		Category         func(childComplexity int) int
 		CreatedAt        func(childComplexity int) int
 		Description      func(childComplexity int) int
 		ID               func(childComplexity int) int
@@ -308,6 +309,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Control.category":
+		if e.complexity.Control.Category == nil {
+			break
+		}
+
+		return e.complexity.Control.Category(childComplexity), true
 
 	case "Control.createdAt":
 		if e.complexity.Control.CreatedAt == nil {
@@ -1431,6 +1439,7 @@ type ControlEdge {
 
 type Control implements Node {
   id: ID!
+  category: String!
   name: String!
   description: String!
   state: ControlState!
@@ -2532,6 +2541,44 @@ func (ec *executionContext) fieldContext_Control_id(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Control_category(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_category(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Category, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_category(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Control_name(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Control_name(ctx, field)
 	if err != nil {
@@ -2985,6 +3032,8 @@ func (ec *executionContext) fieldContext_ControlEdge_node(_ context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Control_id(ctx, field)
+			case "category":
+				return ec.fieldContext_Control_category(ctx, field)
 			case "name":
 				return ec.fieldContext_Control_name(ctx, field)
 			case "description":
@@ -9033,6 +9082,11 @@ func (ec *executionContext) _Control(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = graphql.MarshalString("Control")
 		case "id":
 			out.Values[i] = ec._Control_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "category":
+			out.Values[i] = ec._Control_category(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
