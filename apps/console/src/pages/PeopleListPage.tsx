@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CircleUser, Globe, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generated__/PeopleListPageQuery.graphql";
 
@@ -21,13 +22,15 @@ const PeopleListPageQuery = graphql`
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
-        peoples(first: $first, after: $after, last: $last, before: $before) {
+        peoples(first: $first, after: $after, last: $last, before: $before)
+          @connection(key: "PeopleListPageQuery_peoples") {
           edges {
             node {
               id
               fullName
               primaryEmailAddress
               additionalEmailAddresses
+              kind
               createdAt
               updatedAt
             }
@@ -85,10 +88,19 @@ function PeopleListPageContent({
   return (
     <div className="p-6 space-y-6">
       <div className="space-y-1">
-        <h2 className="text-2xl font-semibold tracking-tight">Peoples</h2>
-        <p className="text-sm text-muted-foreground">
-          Keep track of your company's workforce and their progress towards completing tasks assigned to them.
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">People</h2>
+            <p className="text-sm text-muted-foreground">
+              Manage your organization's people.
+            </p>
+          </div>
+          <Button asChild>
+            <Link to="/peoples/create">
+              Create People
+            </Link>
+          </Button>
+        </div>
       </div>
       <div className="space-y-2">
         {peoples.map((person) => (
@@ -107,7 +119,8 @@ function PeopleListPageContent({
             </div>
             <div className="flex items-center gap-4">
               <Badge variant="secondary" className="font-medium">
-                Admin
+                {person?.kind === 'EMPLOYEE' ? 'Employee' : 
+                 person?.kind === 'CONTRACTOR' ? 'Contractor' : 'Vendor'}
               </Badge>
               <div className="flex gap-1">
                 <CircleUser className="h-4 w-4 text-muted-foreground" />

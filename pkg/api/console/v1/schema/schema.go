@@ -154,6 +154,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		CreatePeople func(childComplexity int, input types.CreatePeopleInput) int
 		CreateVendor func(childComplexity int, input types.CreateVendorInput) int
 		DeletePeople func(childComplexity int, input types.DeletePeopleInput) int
 		DeleteVendor func(childComplexity int, input types.DeleteVendorInput) int
@@ -182,6 +183,7 @@ type ComplexityRoot struct {
 		CreatedAt                func(childComplexity int) int
 		FullName                 func(childComplexity int) int
 		ID                       func(childComplexity int) int
+		Kind                     func(childComplexity int) int
 		PrimaryEmailAddress      func(childComplexity int) int
 		UpdatedAt                func(childComplexity int) int
 	}
@@ -272,6 +274,7 @@ type MutationResolver interface {
 	CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.Vendor, error)
 	DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (string, error)
 	DeletePeople(ctx context.Context, input types.DeletePeopleInput) (string, error)
+	CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.People, error)
 }
 type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
@@ -703,6 +706,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.FrameworkEdge.Node(childComplexity), true
 
+	case "Mutation.createPeople":
+		if e.complexity.Mutation.CreatePeople == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createPeople_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreatePeople(childComplexity, args["input"].(types.CreatePeopleInput)), true
+
 	case "Mutation.createVendor":
 		if e.complexity.Mutation.CreateVendor == nil {
 			break
@@ -865,6 +880,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.People.ID(childComplexity), true
+
+	case "People.kind":
+		if e.complexity.People.Kind == nil {
+			break
+		}
+
+		return e.complexity.People.Kind(childComplexity), true
 
 	case "People.primaryEmailAddress":
 		if e.complexity.People.PrimaryEmailAddress == nil {
@@ -1148,6 +1170,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputCreatePeopleInput,
 		ec.unmarshalInputCreateVendorInput,
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeleteVendorInput,
@@ -1281,6 +1304,12 @@ enum EvidenceState {
   EXPIRED
 }
 
+enum PeopleKind {
+  EMPLOYEE
+  CONTRACTOR
+  VENDOR
+}
+
 type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
@@ -1333,6 +1362,7 @@ type People implements Node {
   fullName: String!
   primaryEmailAddress: String!
   additionalEmailAddresses: [String!]!
+  kind: PeopleKind!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -1541,6 +1571,7 @@ type Mutation {
   createVendor(input: CreateVendorInput!): Vendor!
   deleteVendor(input: DeleteVendorInput!): Void!
   deletePeople(input: DeletePeopleInput!): Void!
+  createPeople(input: CreatePeopleInput!): People!
 }
 
 input CreateVendorInput {
@@ -1554,6 +1585,13 @@ input DeleteVendorInput {
 
 input DeletePeopleInput {
   peopleId: ID!
+}
+
+input CreatePeopleInput {
+  organizationId: ID!
+  fullName: String!
+  primaryEmailAddress: String!
+  kind: PeopleKind!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1867,6 +1905,29 @@ func (ec *executionContext) field_Framework_controls_argsBefore(
 	}
 
 	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createPeople_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createPeople_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createPeople_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreatePeopleInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreatePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePeopleInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreatePeopleInput
 	return zeroVal, nil
 }
 
@@ -4805,6 +4866,65 @@ func (ec *executionContext) fieldContext_Mutation_deletePeople(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createPeople(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createPeople(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreatePeople(rctx, fc.Args["input"].(types.CreatePeopleInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createPeople(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createPeople_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Organization_id(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Organization_id(ctx, field)
 	if err != nil {
@@ -5440,6 +5560,44 @@ func (ec *executionContext) fieldContext_People_additionalEmailAddresses(_ conte
 	return fc, nil
 }
 
+func (ec *executionContext) _People_kind(ctx context.Context, field graphql.CollectedField, obj *types.People) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_People_kind(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kind, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(types.PeopleKind)
+	fc.Result = res
+	return ec.marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleKind(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_People_kind(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "People",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PeopleKind does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _People_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.People) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_People_createdAt(ctx, field)
 	if err != nil {
@@ -5687,6 +5845,8 @@ func (ec *executionContext) fieldContext_PeopleEdge_node(_ context.Context, fiel
 				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
 			case "additionalEmailAddresses":
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -8649,6 +8809,54 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCreatePeopleInput(ctx context.Context, obj any) (types.CreatePeopleInput, error) {
+	var it types.CreatePeopleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"organizationId", "fullName", "primaryEmailAddress", "kind"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
+		case "fullName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FullName = data
+		case "primaryEmailAddress":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryEmailAddress"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryEmailAddress = data
+		case "kind":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("kind"))
+			data, err := ec.unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleKind(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Kind = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context, obj any) (types.CreateVendorInput, error) {
 	var it types.CreateVendorInput
 	asMap := map[string]any{}
@@ -9715,6 +9923,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createPeople":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createPeople(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9966,6 +10181,11 @@ func (ec *executionContext) _People(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "additionalEmailAddresses":
 			out.Values[i] = ec._People_additionalEmailAddresses(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "kind":
+			out.Values[i] = ec._People_kind(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -11154,6 +11374,11 @@ func (ec *executionContext) marshalNControlStateTransitionEdge2ᚖgithubᚗcom�
 	return ec._ControlStateTransitionEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreatePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePeopleInput(ctx context.Context, v any) (types.CreatePeopleInput, error) {
+	res, err := ec.unmarshalInputCreatePeopleInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorInput(ctx context.Context, v any) (types.CreateVendorInput, error) {
 	res, err := ec.unmarshalInputCreateVendorInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -11475,6 +11700,10 @@ func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋprobo�
 	return ec._PageInfo(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNPeople2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx context.Context, sel ast.SelectionSet, v types.People) graphql.Marshaler {
+	return ec._People(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx context.Context, sel ast.SelectionSet, v *types.People) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -11545,6 +11774,16 @@ func (ec *executionContext) marshalNPeopleEdge2ᚖgithubᚗcomᚋgetproboᚋprob
 		return graphql.Null
 	}
 	return ec._PeopleEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleKind(ctx context.Context, v any) (types.PeopleKind, error) {
+	var res types.PeopleKind
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleKind(ctx context.Context, sel ast.SelectionSet, v types.PeopleKind) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {

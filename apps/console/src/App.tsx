@@ -29,6 +29,7 @@ const FrameworkListPage = lazy(() => import("./pages/FrameworkListPage"));
 const FrameworkOverviewPage = lazy(() => import("./pages/FrameworkOverviewPage"));
 const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const CreatePeoplePage = lazy(() => import("./pages/CreatePeoplePage"));
 
 function App() {
   return (
@@ -63,6 +64,16 @@ function App() {
                         <Suspense>
                           <ErrorBoundaryWithLocation>
                             <PeopleListPage />
+                          </ErrorBoundaryWithLocation>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/peoples/create"
+                      element={
+                        <Suspense>
+                          <ErrorBoundaryWithLocation>
+                            <CreatePeoplePage />
                           </ErrorBoundaryWithLocation>
                         </Suspense>
                       }

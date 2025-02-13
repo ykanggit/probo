@@ -60,6 +60,13 @@ type ControlStateTransitionEdge struct {
 	Node   *ControlStateTransition `json:"node"`
 }
 
+type CreatePeopleInput struct {
+	OrganizationID      gid.GID    `json:"organizationId"`
+	FullName            string     `json:"fullName"`
+	PrimaryEmailAddress string     `json:"primaryEmailAddress"`
+	Kind                PeopleKind `json:"kind"`
+}
+
 type CreateVendorInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 	Name           string  `json:"name"`
@@ -163,12 +170,13 @@ type PageInfo struct {
 }
 
 type People struct {
-	ID                       gid.GID   `json:"id"`
-	FullName                 string    `json:"fullName"`
-	PrimaryEmailAddress      string    `json:"primaryEmailAddress"`
-	AdditionalEmailAddresses []string  `json:"additionalEmailAddresses"`
-	CreatedAt                time.Time `json:"createdAt"`
-	UpdatedAt                time.Time `json:"updatedAt"`
+	ID                       gid.GID    `json:"id"`
+	FullName                 string     `json:"fullName"`
+	PrimaryEmailAddress      string     `json:"primaryEmailAddress"`
+	AdditionalEmailAddresses []string   `json:"additionalEmailAddresses"`
+	Kind                     PeopleKind `json:"kind"`
+	CreatedAt                time.Time  `json:"createdAt"`
+	UpdatedAt                time.Time  `json:"updatedAt"`
 }
 
 func (People) IsNode()             {}
@@ -335,6 +343,49 @@ func (e *EvidenceState) UnmarshalGQL(v any) error {
 }
 
 func (e EvidenceState) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type PeopleKind string
+
+const (
+	PeopleKindEmployee   PeopleKind = "EMPLOYEE"
+	PeopleKindContractor PeopleKind = "CONTRACTOR"
+	PeopleKindVendor     PeopleKind = "VENDOR"
+)
+
+var AllPeopleKind = []PeopleKind{
+	PeopleKindEmployee,
+	PeopleKindContractor,
+	PeopleKindVendor,
+}
+
+func (e PeopleKind) IsValid() bool {
+	switch e {
+	case PeopleKindEmployee, PeopleKindContractor, PeopleKindVendor:
+		return true
+	}
+	return false
+}
+
+func (e PeopleKind) String() string {
+	return string(e)
+}
+
+func (e *PeopleKind) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PeopleKind(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PeopleKind", str)
+	}
+	return nil
+}
+
+func (e PeopleKind) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

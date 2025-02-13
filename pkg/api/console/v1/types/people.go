@@ -45,6 +45,7 @@ func NewPeople(p *coredata.People) *People {
 		FullName:                 p.FullName,
 		PrimaryEmailAddress:      p.PrimaryEmailAddress,
 		AdditionalEmailAddresses: p.AdditionalEmailAddresses,
+		Kind:                     PeopleKind(p.Kind.String()),
 		CreatedAt:                p.CreatedAt,
 		UpdatedAt:                p.UpdatedAt,
 	}

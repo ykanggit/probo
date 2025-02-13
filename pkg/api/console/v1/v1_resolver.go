@@ -98,6 +98,23 @@ func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeleteP
 	return "", nil
 }
 
+// CreatePeople is the resolver for the createPeople field.
+func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.People, error) {
+	people, err := r.svc.CreatePeople(ctx, probo.CreatePeopleRequest{
+		OrganizationID:           input.OrganizationID,
+		FullName:                 input.FullName,
+		PrimaryEmailAddress:      input.PrimaryEmailAddress,
+		AdditionalEmailAddresses: []string{},
+		Kind:                     coredata.PeopleKindEmployee,
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot create people: %w", err)
+	}
+
+	return types.NewPeople(people), nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

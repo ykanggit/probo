@@ -31,6 +31,12 @@ enum EvidenceState {
   EXPIRED
 }
 
+enum PeopleKind {
+  EMPLOYEE
+  CONTRACTOR
+  VENDOR
+}
+
 type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
@@ -83,6 +89,7 @@ type People implements Node {
   fullName: String!
   primaryEmailAddress: String!
   additionalEmailAddresses: [String!]!
+  kind: PeopleKind!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -291,6 +298,7 @@ type Mutation {
   createVendor(input: CreateVendorInput!): Vendor!
   deleteVendor(input: DeleteVendorInput!): Void!
   deletePeople(input: DeletePeopleInput!): Void!
+  createPeople(input: CreatePeopleInput!): People!
 }
 
 input CreateVendorInput {
@@ -304,4 +312,11 @@ input DeleteVendorInput {
 
 input DeletePeopleInput {
   peopleId: ID!
+}
+
+input CreatePeopleInput {
+  organizationId: ID!
+  fullName: String!
+  primaryEmailAddress: String!
+  kind: PeopleKind!
 }
