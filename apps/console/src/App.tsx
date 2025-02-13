@@ -26,7 +26,9 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const PeopleListPage = lazy(() => import("./pages/PeopleListPage"));
 const VendorListPage = lazy(() => import("./pages/VendorListPage"));
 const FrameworkListPage = lazy(() => import("./pages/FrameworkListPage"));
-const FrameworkOverviewPage = lazy(() => import("./pages/FrameworkOverviewPage"));
+const FrameworkOverviewPage = lazy(
+  () => import("./pages/FrameworkOverviewPage"),
+);
 const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const CreatePeoplePage = lazy(() => import("./pages/CreatePeoplePage"));
@@ -147,7 +149,11 @@ function App() {
   );
 }
 
-function ErrorBoundaryWithLocation({ children }: { children: React.ReactNode }) {
+function ErrorBoundaryWithLocation({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const location = useLocation();
   return <ErrorBoundary key={location.pathname}>{children}</ErrorBoundary>;
 }

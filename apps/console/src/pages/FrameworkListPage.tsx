@@ -46,16 +46,19 @@ function FrameworkListPageContent({
   queryRef: PreloadedQuery<FrameworkListPageQueryType>;
 }) {
   const data = usePreloadedQuery(FrameworkListPageQuery, queryRef);
-  const frameworks = data.node.frameworks?.edges.map(edge => edge?.node) ?? [];
+  const frameworks =
+    data.node.frameworks?.edges.map((edge) => edge?.node) ?? [];
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold mb-2">Framework</h1>
         <p className="text-muted-foreground">
-          Compliance frameworks like SOC 2 and ISO 27001 provide guidelines to secure sensitive data, manage risks, and
-          build trust. SOC 2 focuses on customer data protection via five Trust Principles, while ISO 27001 establishes
-          a comprehensive Information Security Management System for global standards.
+          Compliance frameworks like SOC 2 and ISO 27001 provide guidelines to
+          secure sensitive data, manage risks, and build trust. SOC 2 focuses on
+          customer data protection via five Trust Principles, while ISO 27001
+          establishes a comprehensive Information Security Management System for
+          global standards.
         </p>
       </div>
 
@@ -70,9 +73,13 @@ function FrameworkListPageContent({
                   </Badge>
                   <div className="bg-green-500/10 w-24 h-24 rounded-full flex items-center justify-center mb-4">
                     <Globe2 className="w-12 h-12 text-green-500" />
-                    <div className="absolute text-xs font-medium text-green-500">{framework?.name}</div>
+                    <div className="absolute text-xs font-medium text-green-500">
+                      {framework?.name}
+                    </div>
                   </div>
-                  <h2 className="text-xl font-semibold mb-2">{framework?.name}</h2>
+                  <h2 className="text-xl font-semibold mb-2">
+                    {framework?.name}
+                  </h2>
                   <p className="text-sm text-muted-foreground">
                     {framework?.description}
                   </p>
@@ -118,7 +125,9 @@ function FrameworkListPageFallback() {
 }
 
 export default function FrameworkListPage() {
-  const [queryRef, loadQuery] = useQueryLoader<FrameworkListPageQueryType>(FrameworkListPageQuery);
+  const [queryRef, loadQuery] = useQueryLoader<FrameworkListPageQueryType>(
+    FrameworkListPageQuery,
+  );
 
   useEffect(() => {
     loadQuery({});

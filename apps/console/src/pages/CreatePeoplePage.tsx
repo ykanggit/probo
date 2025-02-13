@@ -54,7 +54,9 @@ function CreatePeoplePageContent({
   const environment = useRelayEnvironment();
   const data = usePreloadedQuery(createPeoplePageQuery, queryRef);
   const [createPeople, isCreatingPeople] = useMutation(createPeopleMutation);
-  const [kind, setKind] = useState<'EMPLOYEE' | 'CONTRACTOR' | 'VENDOR'>('EMPLOYEE');
+  const [kind, setKind] = useState<"EMPLOYEE" | "CONTRACTOR" | "VENDOR">(
+    "EMPLOYEE",
+  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -64,8 +66,8 @@ function CreatePeoplePageContent({
       variables: {
         input: {
           organizationId: data.node.id,
-          fullName: formData.get('fullName') as string,
-          primaryEmailAddress: formData.get('primaryEmailAddress') as string,
+          fullName: formData.get("fullName") as string,
+          primaryEmailAddress: formData.get("primaryEmailAddress") as string,
           kind,
         },
       },
@@ -77,8 +79,8 @@ function CreatePeoplePageContent({
             organization.invalidateRecord();
           }
         });
-        
-        navigate('/peoples');
+
+        navigate("/peoples");
       },
     });
   };
@@ -91,7 +93,9 @@ function CreatePeoplePageContent({
 
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Create People</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Create People
+          </h1>
           <p className="text-sm text-muted-foreground">
             Add a new person to your organization.
           </p>
@@ -145,7 +149,7 @@ function CreatePeoplePageContent({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate('/peoples')}
+                  onClick={() => navigate("/peoples")}
                 >
                   Cancel
                 </Button>
@@ -162,7 +166,9 @@ function CreatePeoplePageContent({
 }
 
 export default function CreatePeoplePage() {
-  const [queryRef, loadQuery] = useQueryLoader<CreatePeoplePageQueryType>(createPeoplePageQuery);
+  const [queryRef, loadQuery] = useQueryLoader<CreatePeoplePageQueryType>(
+    createPeoplePageQuery,
+  );
 
   useEffect(() => {
     loadQuery({});
@@ -177,4 +183,4 @@ export default function CreatePeoplePage() {
       <CreatePeoplePageContent queryRef={queryRef} />
     </Suspense>
   );
-} 
+}

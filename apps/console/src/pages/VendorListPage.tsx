@@ -19,7 +19,12 @@ import { Helmet } from "react-helmet-async";
 const ITEMS_PER_PAGE = 20;
 
 const vendorListPageQuery = graphql`
-  query VendorListPageQuery($first: Int, $after: CursorKey, $last: Int, $before: CursorKey) {
+  query VendorListPageQuery(
+    $first: Int
+    $after: CursorKey
+    $last: Int
+    $before: CursorKey
+  ) {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
@@ -64,34 +69,45 @@ const deleteVendorMutation = graphql`
 
 // TODO: Remove this once we have a real list of vendors
 const vendorsList = [
-  { id: '1', name: 'Amazon Web Services', createdAt: new Date().toISOString() },
-  { id: '2', name: 'Google Cloud Platform', createdAt: new Date().toISOString() },
-  { id: '3', name: 'Microsoft Azure', createdAt: new Date().toISOString() },
-  { id: '4', name: 'Salesforce', createdAt: new Date().toISOString() },
-  { id: '5', name: 'Slack', createdAt: new Date().toISOString() },
-  { id: '6', name: 'Zoom', createdAt: new Date().toISOString() },
-  { id: '7', name: 'Dropbox', createdAt: new Date().toISOString() },
-  { id: '8', name: 'Trello', createdAt: new Date().toISOString() },
-  { id: '9', name: 'Asana', createdAt: new Date().toISOString() },
-  { id: '10', name: 'Notion', createdAt: new Date().toISOString() },
-  { id: '11', name: 'GitHub', createdAt: new Date().toISOString() },
-  { id: '12', name: 'GitLab', createdAt: new Date().toISOString() },
-  { id: '13', name: 'Bitbucket', createdAt: new Date().toISOString() },
-  { id: '14', name: 'Docker', createdAt: new Date().toISOString() },
-  { id: '15', name: 'Kubernetes', createdAt: new Date().toISOString() },
-  { id: '16', name: 'Jenkins', createdAt: new Date().toISOString() },
-  { id: '17', name: 'CircleCI', createdAt: new Date().toISOString() },
+  { id: "1", name: "Amazon Web Services", createdAt: new Date().toISOString() },
+  {
+    id: "2",
+    name: "Google Cloud Platform",
+    createdAt: new Date().toISOString(),
+  },
+  { id: "3", name: "Microsoft Azure", createdAt: new Date().toISOString() },
+  { id: "4", name: "Salesforce", createdAt: new Date().toISOString() },
+  { id: "5", name: "Slack", createdAt: new Date().toISOString() },
+  { id: "6", name: "Zoom", createdAt: new Date().toISOString() },
+  { id: "7", name: "Dropbox", createdAt: new Date().toISOString() },
+  { id: "8", name: "Trello", createdAt: new Date().toISOString() },
+  { id: "9", name: "Asana", createdAt: new Date().toISOString() },
+  { id: "10", name: "Notion", createdAt: new Date().toISOString() },
+  { id: "11", name: "GitHub", createdAt: new Date().toISOString() },
+  { id: "12", name: "GitLab", createdAt: new Date().toISOString() },
+  { id: "13", name: "Bitbucket", createdAt: new Date().toISOString() },
+  { id: "14", name: "Docker", createdAt: new Date().toISOString() },
+  { id: "15", name: "Kubernetes", createdAt: new Date().toISOString() },
+  { id: "16", name: "Jenkins", createdAt: new Date().toISOString() },
+  { id: "17", name: "CircleCI", createdAt: new Date().toISOString() },
 ];
 
-type LoadQueryType = ReturnType<typeof useQueryLoader<VendorListPageQueryType>>[1];
+type LoadQueryType = ReturnType<
+  typeof useQueryLoader<VendorListPageQueryType>
+>[1];
 
 function VendorListContent({
   queryRef,
   onPageChange,
-  loadQuery
+  loadQuery,
 }: {
   queryRef: PreloadedQuery<VendorListPageQueryType>;
-  onPageChange: (params: { first?: number; after?: string; last?: number; before?: string }) => void;
+  onPageChange: (params: {
+    first?: number;
+    after?: string;
+    last?: number;
+    before?: string;
+  }) => void;
   loadQuery: LoadQueryType;
 }) {
   const data = usePreloadedQuery(vendorListPageQuery, queryRef);
@@ -102,32 +118,33 @@ function VendorListContent({
   const [createVendor] = useMutation(createVendorMutation);
   const [deleteVendor] = useMutation(deleteVendorMutation);
 
-  const vendors = data.node?.vendors?.edges?.map(edge => edge?.node) ?? [];
+  const vendors = data.node?.vendors?.edges?.map((edge) => edge?.node) ?? [];
   const pageInfo = data.node?.vendors?.pageInfo;
 
   const fuse = new Fuse(vendorsList, {
-    keys: ['name'],
+    keys: ["name"],
     threshold: 0.3,
   });
 
-  const handlePageChange = (direction: 'next' | 'prev') => {
+  const handlePageChange = (direction: "next" | "prev") => {
     if (!pageInfo) return;
-    
-    if (direction === 'next' && !pageInfo.hasNextPage) return;
-    if (direction === 'prev' && !pageInfo.hasPreviousPage) return;
-    
-    startTransition(() => {
-      const params = direction === 'next' 
-        ? { first: ITEMS_PER_PAGE, after: pageInfo.endCursor }
-        : { last: ITEMS_PER_PAGE, before: pageInfo.startCursor };
 
-      setSearchParams(prev => {
-        if (direction === 'next') {
-          prev.set('after', pageInfo.endCursor!);
-          prev.delete('before');
+    if (direction === "next" && !pageInfo.hasNextPage) return;
+    if (direction === "prev" && !pageInfo.hasPreviousPage) return;
+
+    startTransition(() => {
+      const params =
+        direction === "next"
+          ? { first: ITEMS_PER_PAGE, after: pageInfo.endCursor }
+          : { last: ITEMS_PER_PAGE, before: pageInfo.startCursor };
+
+      setSearchParams((prev) => {
+        if (direction === "next") {
+          prev.set("after", pageInfo.endCursor!);
+          prev.delete("before");
         } else {
-          prev.set('before', pageInfo.startCursor!);
-          prev.delete('after');
+          prev.set("before", pageInfo.startCursor!);
+          prev.delete("after");
         }
         return prev;
       });
@@ -153,7 +170,9 @@ function VendorListContent({
             </Avatar>
             <div className="space-y-1">
               <p className="text-sm font-medium leading-none">Add a vendor</p>
-              <p className="text-sm text-muted-foreground">Search and add new vendors</p>
+              <p className="text-sm text-muted-foreground">
+                Search and add new vendors
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -169,7 +188,9 @@ function VendorListContent({
                   if (value.trim() === "") {
                     setFilteredVendors([]);
                   } else {
-                    const results = fuse.search(value).map(result => result.item);
+                    const results = fuse
+                      .search(value)
+                      .map((result) => result.item);
                     setFilteredVendors(results);
                   }
                 }}
@@ -185,18 +206,21 @@ function VendorListContent({
                           variables: {
                             input: {
                               organizationId: data.node.id,
-                              name: vendor.name
-                            }
+                              name: vendor.name,
+                            },
                           },
                           onCompleted(response: any) {
                             setSearchTerm("");
                             setFilteredVendors([]);
-                            loadQuery({ 
-                              first: ITEMS_PER_PAGE,
-                              after: undefined,
-                              last: undefined,
-                              before: undefined,
-                            }, { fetchPolicy: 'network-only' });
+                            loadQuery(
+                              {
+                                first: ITEMS_PER_PAGE,
+                                after: undefined,
+                                last: undefined,
+                                before: undefined,
+                              },
+                              { fetchPolicy: "network-only" },
+                            );
                           },
                         });
                       }}
@@ -219,9 +243,12 @@ function VendorListContent({
       </div>
       <div className="space-y-2">
         {vendors.map((vendor) => (
-          <div key={vendor?.id} className="block hover:bg-accent/50 transition-colors">
+          <div
+            key={vendor?.id}
+            className="block hover:bg-accent/50 transition-colors"
+          >
             <div className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm">
-              <Link 
+              <Link
                 to={`/vendors/${vendor?.id}`}
                 className="flex items-center gap-4 flex-1"
               >
@@ -230,8 +257,13 @@ function VendorListContent({
                     <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
                   </Avatar>
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">{vendor?.name}</p>
-                    <p className="text-sm text-muted-foreground">Vendor since {new Date(vendor?.createdAt).toLocaleDateString()}</p>
+                    <p className="text-sm font-medium leading-none">
+                      {vendor?.name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Vendor since{" "}
+                      {new Date(vendor?.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
               </Link>
@@ -247,26 +279,33 @@ function VendorListContent({
                 <Badge variant="outline" className="text-muted-foreground">
                   Not assessed
                 </Badge>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   className="text-destructive hover:text-destructive hover:bg-destructive/10"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (window.confirm('Are you sure you want to delete this vendor?')) {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to delete this vendor?",
+                      )
+                    ) {
                       deleteVendor({
                         variables: {
                           input: {
-                            vendorId: vendor.id
-                          }
+                            vendorId: vendor.id,
+                          },
                         },
                         onCompleted() {
-                          loadQuery({ 
-                            first: ITEMS_PER_PAGE,
-                            after: undefined,
-                            last: undefined,
-                            before: undefined,
-                          }, { fetchPolicy: 'network-only' });
+                          loadQuery(
+                            {
+                              first: ITEMS_PER_PAGE,
+                              after: undefined,
+                              last: undefined,
+                              before: undefined,
+                            },
+                            { fetchPolicy: "network-only" },
+                          );
                         },
                       });
                     }
@@ -282,14 +321,14 @@ function VendorListContent({
         <div className="flex gap-2 justify-end mt-4">
           <Button
             variant="outline"
-            onClick={() => handlePageChange('prev')}
+            onClick={() => handlePageChange("prev")}
             disabled={isPending || !pageInfo?.hasPreviousPage}
           >
             {isPending ? "Loading..." : "Previous"}
           </Button>
           <Button
             variant="outline"
-            onClick={() => handlePageChange('next')}
+            onClick={() => handlePageChange("next")}
             disabled={isPending || !pageInfo?.hasNextPage}
           >
             {isPending ? "Loading..." : "Next"}
@@ -318,14 +357,15 @@ function VendorListFallback() {
 
 export default function VendorListPage() {
   const [searchParams] = useSearchParams();
-  const [queryRef, loadQuery] = useQueryLoader<VendorListPageQueryType>(vendorListPageQuery);
+  const [queryRef, loadQuery] =
+    useQueryLoader<VendorListPageQueryType>(vendorListPageQuery);
 
   // Initialize with URL params
   useEffect(() => {
-    const after = searchParams.get('after');
-    const before = searchParams.get('before');
-    
-    loadQuery({ 
+    const after = searchParams.get("after");
+    const before = searchParams.get("before");
+
+    loadQuery({
       first: before ? undefined : ITEMS_PER_PAGE,
       after: after || undefined,
       last: before ? ITEMS_PER_PAGE : undefined,
@@ -333,15 +373,25 @@ export default function VendorListPage() {
     });
   }, [loadQuery, searchParams]);
 
-  const handlePageChange = ({ first, after, last, before }: { first?: number; after?: string; last?: number; before?: string }) => {
+  const handlePageChange = ({
+    first,
+    after,
+    last,
+    before,
+  }: {
+    first?: number;
+    after?: string;
+    last?: number;
+    before?: string;
+  }) => {
     loadQuery(
-      { 
+      {
         first,
         after,
         last,
         before,
       },
-      { fetchPolicy: 'network-only' }
+      { fetchPolicy: "network-only" },
     );
   };
 
@@ -355,10 +405,10 @@ export default function VendorListPage() {
         <title>Vendors - Probo Console</title>
       </Helmet>
       <Suspense fallback={<VendorListFallback />}>
-        <VendorListContent 
-          queryRef={queryRef} 
+        <VendorListContent
+          queryRef={queryRef}
           onPageChange={handlePageChange}
-          loadQuery={loadQuery} 
+          loadQuery={loadQuery}
         />
       </Suspense>
     </>

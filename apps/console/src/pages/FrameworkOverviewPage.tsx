@@ -24,6 +24,7 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
+
 const FrameworkOverviewPageQuery = graphql`
   query FrameworkOverviewPageQuery($frameworkId: ID!) {
     node(id: $frameworkId) {
@@ -53,21 +54,29 @@ function FrameworkOverviewPageContent({
 }) {
   const data = usePreloadedQuery(FrameworkOverviewPageQuery, queryRef);
   const framework = data.node;
-  const controls = framework.controls?.edges.map(edge => edge?.node) ?? [];
+  const controls = framework.controls?.edges.map((edge) => edge?.node) ?? [];
 
   const controlsByCategory = {
-    office: controls.filter(c => c?.name.toLowerCase().includes('office')),
-    computer: controls.filter(c => c?.name.toLowerCase().includes('computer')),
-    employees: controls.filter(c => c?.name.toLowerCase().includes('employee')),
-    email: controls.filter(c => c?.name.toLowerCase().includes('email')),
-    code: controls.filter(c => c?.name.toLowerCase().includes('code')),
-    infrastructure: controls.filter(c => c?.name.toLowerCase().includes('infrastructure')),
-    network: controls.filter(c => c?.name.toLowerCase().includes('network')),
-    data: controls.filter(c => c?.name.toLowerCase().includes('data')),
-    logging: controls.filter(c => c?.name.toLowerCase().includes('log')),
-    incidents: controls.filter(c => c?.name.toLowerCase().includes('incident')),
-    vendors: controls.filter(c => c?.name.toLowerCase().includes('vendor')),
-    sharing: controls.filter(c => c?.name.toLowerCase().includes('share'))
+    office: controls.filter((c) => c?.name.toLowerCase().includes("office")),
+    computer: controls.filter((c) =>
+      c?.name.toLowerCase().includes("computer"),
+    ),
+    employees: controls.filter((c) =>
+      c?.name.toLowerCase().includes("employee"),
+    ),
+    email: controls.filter((c) => c?.name.toLowerCase().includes("email")),
+    code: controls.filter((c) => c?.name.toLowerCase().includes("code")),
+    infrastructure: controls.filter((c) =>
+      c?.name.toLowerCase().includes("infrastructure"),
+    ),
+    network: controls.filter((c) => c?.name.toLowerCase().includes("network")),
+    data: controls.filter((c) => c?.name.toLowerCase().includes("data")),
+    logging: controls.filter((c) => c?.name.toLowerCase().includes("log")),
+    incidents: controls.filter((c) =>
+      c?.name.toLowerCase().includes("incident"),
+    ),
+    vendors: controls.filter((c) => c?.name.toLowerCase().includes("vendor")),
+    sharing: controls.filter((c) => c?.name.toLowerCase().includes("share")),
   };
 
   const controlCards = [
@@ -75,19 +84,25 @@ function FrameworkOverviewPageContent({
       icon: <Building2 className="w-4 h-4" />,
       title: "Secure your offices and internet access",
       controls: controlsByCategory.office,
-      completed: controlsByCategory.office.filter(c => c?.state === 'IMPLEMENTED').length,
+      completed: controlsByCategory.office.filter(
+        (c) => c?.state === "IMPLEMENTED",
+      ).length,
       total: controlsByCategory.office.length,
     },
     {
       icon: <Computer className="w-4 h-4" />,
       title: "Manage your computers",
       controls: controlsByCategory.computer,
-      completed: controlsByCategory.computer.filter(c => c?.state === 'IMPLEMENTED').length,
+      completed: controlsByCategory.computer.filter(
+        (c) => c?.state === "IMPLEMENTED",
+      ).length,
       total: controlsByCategory.computer.length,
     },
   ];
 
-  const totalImplemented = controls.filter(c => c?.state === 'IMPLEMENTED').length;
+  const totalImplemented = controls.filter(
+    (c) => c?.state === "IMPLEMENTED",
+  ).length;
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -125,7 +140,9 @@ function FrameworkOverviewPageContent({
 
       <div className="mb-6 flex justify-between items-center">
         <h2 className="text-xl font-semibold">Controls</h2>
-        <div className="text-primary">{totalImplemented} out of {controls.length} validated</div>
+        <div className="text-primary">
+          {totalImplemented} out of {controls.length} validated
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -191,7 +208,9 @@ function FrameworkOverviewPageFallback() {
 
 export default function FrameworkOverviewPage() {
   const { frameworkId } = useParams();
-  const [queryRef, loadQuery] = useQueryLoader<FrameworkOverviewPageQueryType>(FrameworkOverviewPageQuery);
+  const [queryRef, loadQuery] = useQueryLoader<FrameworkOverviewPageQueryType>(
+    FrameworkOverviewPageQuery,
+  );
 
   useEffect(() => {
     loadQuery({ frameworkId: frameworkId! });
@@ -208,4 +227,3 @@ export default function FrameworkOverviewPage() {
     </>
   );
 }
-

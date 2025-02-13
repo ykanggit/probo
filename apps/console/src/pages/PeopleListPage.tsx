@@ -18,7 +18,12 @@ import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generat
 const ITEMS_PER_PAGE = 20;
 
 const PeopleListPageQuery = graphql`
-  query PeopleListPageQuery($first: Int, $after: CursorKey, $last: Int, $before: CursorKey) {
+  query PeopleListPageQuery(
+    $first: Int
+    $after: CursorKey
+    $last: Int
+    $before: CursorKey
+  ) {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
@@ -57,21 +62,26 @@ const deletePeopleMutation = graphql`
 function PeopleListPageContent({
   queryRef,
   onPageChange,
-  loadQuery
+  loadQuery,
 }: {
   queryRef: PreloadedQuery<PeopleListPageQueryType>;
-  onPageChange: (params: { first?: number; after?: string; last?: number; before?: string }) => void;
+  onPageChange: (params: {
+    first?: number;
+    after?: string;
+    last?: number;
+    before?: string;
+  }) => void;
   loadQuery: LoadQueryType;
 }) {
   const data = usePreloadedQuery(PeopleListPageQuery, queryRef);
-  const peoples = data.node.peoples?.edges.map(edge => edge?.node) ?? [];
+  const peoples = data.node.peoples?.edges.map((edge) => edge?.node) ?? [];
   const pageInfo = data.node.peoples?.pageInfo;
   const [isPending, startTransition] = useTransition();
   const [deletePeople] = useMutation(deletePeopleMutation);
 
-  const handlePageChange = (direction: 'prev' | 'next') => {
+  const handlePageChange = (direction: "prev" | "next") => {
     startTransition(() => {
-      if (direction === 'prev') {
+      if (direction === "prev") {
         onPageChange({
           last: ITEMS_PER_PAGE,
           before: pageInfo?.startCursor,
@@ -96,9 +106,7 @@ function PeopleListPageContent({
             </p>
           </div>
           <Button asChild>
-            <Link to="/peoples/create">
-              Create People
-            </Link>
+            <Link to="/peoples/create">Create People</Link>
           </Button>
         </div>
       </div>
@@ -113,14 +121,21 @@ function PeopleListPageContent({
                 <AvatarFallback>{person?.fullName?.[0]}</AvatarFallback>
               </Avatar>
               <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">{person?.fullName}</p>
-                <p className="text-sm text-muted-foreground">{person?.primaryEmailAddress}</p>
+                <p className="text-sm font-medium leading-none">
+                  {person?.fullName}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {person?.primaryEmailAddress}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <Badge variant="secondary" className="font-medium">
-                {person?.kind === 'EMPLOYEE' ? 'Employee' : 
-                 person?.kind === 'CONTRACTOR' ? 'Contractor' : 'Vendor'}
+                {person?.kind === "EMPLOYEE"
+                  ? "Employee"
+                  : person?.kind === "CONTRACTOR"
+                    ? "Contractor"
+                    : "Vendor"}
               </Badge>
               <div className="flex gap-1">
                 <CircleUser className="h-4 w-4 text-muted-foreground" />
@@ -136,20 +151,27 @@ function PeopleListPageContent({
                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (window.confirm('Are you sure you want to delete this person?')) {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to delete this person?",
+                    )
+                  ) {
                     deletePeople({
                       variables: {
                         input: {
-                          peopleId: person.id
-                        }
+                          peopleId: person.id,
+                        },
                       },
                       onCompleted() {
-                        loadQuery({ 
-                          first: ITEMS_PER_PAGE,
-                          after: undefined,
-                          last: undefined,
-                          before: undefined,
-                        }, { fetchPolicy: 'network-only' });
+                        loadQuery(
+                          {
+                            first: ITEMS_PER_PAGE,
+                            after: undefined,
+                            last: undefined,
+                            before: undefined,
+                          },
+                          { fetchPolicy: "network-only" },
+                        );
                       },
                     });
                   }
@@ -164,14 +186,14 @@ function PeopleListPageContent({
         <div className="flex gap-2 justify-end mt-4">
           <Button
             variant="outline"
-            onClick={() => handlePageChange('prev')}
+            onClick={() => handlePageChange("prev")}
             disabled={isPending || !pageInfo?.hasPreviousPage}
           >
             {isPending ? "Loading..." : "Previous"}
           </Button>
           <Button
             variant="outline"
-            onClick={() => handlePageChange('next')}
+            onClick={() => handlePageChange("next")}
             disabled={isPending || !pageInfo?.hasNextPage}
           >
             {isPending ? "Loading..." : "Next"}
@@ -190,7 +212,7 @@ function PeopleListPageFallback() {
         <div className="h-4 w-96 bg-muted animate-pulse rounded" />
       </div>
       <div className="space-y-2">
-        {[1,2,3].map((i) => (
+        {[1, 2, 3].map((i) => (
           <div
             key={i}
             className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm"
@@ -205,8 +227,11 @@ function PeopleListPageFallback() {
             <div className="flex items-center gap-4">
               <div className="h-6 w-16 bg-muted animate-pulse rounded-full" />
               <div className="flex gap-1">
-                {[1,2,3].map((j) => (
-                  <div key={j} className="h-4 w-4 bg-muted animate-pulse rounded" />
+                {[1, 2, 3].map((j) => (
+                  <div
+                    key={j}
+                    className="h-4 w-4 bg-muted animate-pulse rounded"
+                  />
                 ))}
               </div>
               <div className="h-6 w-24 bg-muted animate-pulse rounded-full" />
@@ -218,17 +243,20 @@ function PeopleListPageFallback() {
   );
 }
 
-type LoadQueryType = ReturnType<typeof useQueryLoader<PeopleListPageQueryType>>[1];
+type LoadQueryType = ReturnType<
+  typeof useQueryLoader<PeopleListPageQueryType>
+>[1];
 
 export default function PeopleListPage() {
   const [searchParams] = useSearchParams();
-  const [queryRef, loadQuery] = useQueryLoader<PeopleListPageQueryType>(PeopleListPageQuery);
+  const [queryRef, loadQuery] =
+    useQueryLoader<PeopleListPageQueryType>(PeopleListPageQuery);
 
   useEffect(() => {
-    const after = searchParams.get('after');
-    const before = searchParams.get('before');
-    
-    loadQuery({ 
+    const after = searchParams.get("after");
+    const before = searchParams.get("before");
+
+    loadQuery({
       first: before ? undefined : ITEMS_PER_PAGE,
       after: after || undefined,
       last: before ? ITEMS_PER_PAGE : undefined,
@@ -236,15 +264,25 @@ export default function PeopleListPage() {
     });
   }, [loadQuery, searchParams]);
 
-  const handlePageChange = ({ first, after, last, before }: { first?: number; after?: string; last?: number; before?: string }) => {
+  const handlePageChange = ({
+    first,
+    after,
+    last,
+    before,
+  }: {
+    first?: number;
+    after?: string;
+    last?: number;
+    before?: string;
+  }) => {
     loadQuery(
-      { 
+      {
         first,
         after,
         last,
         before,
       },
-      { fetchPolicy: 'network-only' }
+      { fetchPolicy: "network-only" },
     );
   };
 
@@ -258,7 +296,11 @@ export default function PeopleListPage() {
         <title>People - Probo Console</title>
       </Helmet>
       <Suspense fallback={<PeopleListPageFallback />}>
-        <PeopleListPageContent queryRef={queryRef} onPageChange={handlePageChange} loadQuery={loadQuery} />
+        <PeopleListPageContent
+          queryRef={queryRef}
+          onPageChange={handlePageChange}
+          loadQuery={loadQuery}
+        />
       </Suspense>
     </>
   );

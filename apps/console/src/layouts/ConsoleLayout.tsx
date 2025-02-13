@@ -18,7 +18,7 @@ import {
 
 export default function ConsoleLayout() {
   const location = useLocation();
-  const pathSegments = location.pathname.split('/').filter(Boolean);
+  const pathSegments = location.pathname.split("/").filter(Boolean);
 
   return (
     <SidebarProvider>
@@ -32,15 +32,13 @@ export default function ConsoleLayout() {
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to="/">
-                      Home
-                    </Link>
+                    <Link to="/">Home</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 {pathSegments.map((segment, index) => {
-                  const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
+                  const path = `/${pathSegments.slice(0, index + 1).join("/")}`;
                   const isLast = index === pathSegments.length - 1;
-                  
+
                   return (
                     <React.Fragment key={path}>
                       <BreadcrumbSeparator />
@@ -52,7 +50,8 @@ export default function ConsoleLayout() {
                         ) : (
                           <BreadcrumbLink asChild>
                             <Link to={path}>
-                              {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                              {segment.charAt(0).toUpperCase() +
+                                segment.slice(1)}
                             </Link>
                           </BreadcrumbLink>
                         )}

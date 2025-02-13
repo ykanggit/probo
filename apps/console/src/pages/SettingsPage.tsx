@@ -1,17 +1,28 @@
-import { Mail, Building2, Upload, MoreVertical } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Helmet } from "react-helmet-async"
-import { Suspense, useEffect } from "react"
+import { Mail, Building2, Upload, MoreVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Helmet } from "react-helmet-async";
+import { Suspense, useEffect } from "react";
 import {
   graphql,
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
-} from "react-relay"
-import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__/SettingsPageQuery.graphql"
+} from "react-relay";
+import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__/SettingsPageQuery.graphql";
 
 const settingsPageQuery = graphql`
   query SettingsPageQuery {
@@ -23,7 +34,7 @@ const settingsPageQuery = graphql`
       }
     }
   }
-`
+`;
 
 interface Member {
   id: string;
@@ -46,13 +57,17 @@ function SettingsPageContent({
       <div className="container mx-auto p-6 space-y-6">
         <div>
           <h1 className="text-4xl font-medium tracking-tight">Settings</h1>
-          <p className="text-lg text-muted-foreground">Manage your details and personal preferences here.</p>
+          <p className="text-lg text-muted-foreground">
+            Manage your details and personal preferences here.
+          </p>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle>User & Organisation information</CardTitle>
-            <CardDescription>Publish your trust page to the web</CardDescription>
+            <CardDescription>
+              Publish your trust page to the web
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -60,10 +75,14 @@ function SettingsPageContent({
               <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
                 <div className="flex items-center gap-2">
                   <Mail className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-muted-foreground">This is your email to connect to Probo</span>
+                  <span className="text-muted-foreground">
+                    This is your email to connect to Probo
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-green-600">john.doe@example.com</span>
+                  <span className="text-sm text-green-600">
+                    john.doe@example.com
+                  </span>
                   <Button variant="outline" size="sm">
                     Edit
                   </Button>
@@ -76,7 +95,11 @@ function SettingsPageContent({
               <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
                 <div className="flex items-center gap-3">
                   {organization.logoUrl ? (
-                    <img src={organization.logoUrl} alt="Logo" className="h-10 w-10 rounded-lg object-cover" />
+                    <img
+                      src={organization.logoUrl}
+                      alt="Logo"
+                      className="h-10 w-10 rounded-lg object-cover"
+                    />
                   ) : (
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg border">
                       <Upload className="h-5 w-5 text-muted-foreground" />
@@ -95,7 +118,9 @@ function SettingsPageContent({
               <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-muted-foreground">Set the name of the organization</span>
+                  <span className="text-muted-foreground">
+                    Set the name of the organization
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm">{organization.name}</span>
@@ -115,23 +140,37 @@ function SettingsPageContent({
         <Card>
           <CardHeader>
             <CardTitle>Workspace members</CardTitle>
-            <CardDescription>Manage who has privileged access to your workspace and their permissions.</CardDescription>
+            <CardDescription>
+              Manage who has privileged access to your workspace and their
+              permissions.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {members.map((member) => (
-                <div key={member.id} className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between rounded-lg border p-3 shadow-sm"
+                >
                   <div className="flex items-center gap-3">
                     <Avatar>
-                      <AvatarFallback>{member.fullName.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>
+                        {member.fullName.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">{member.fullName}</span>
-                      <span className="text-sm text-muted-foreground">{member.primaryEmailAddress}</span>
+                      <span className="text-sm font-medium">
+                        {member.fullName}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {member.primaryEmailAddress}
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">{member.role}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {member.role}
+                    </span>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -141,7 +180,9 @@ function SettingsPageContent({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>Change role</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">Remove member</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600">
+                          Remove member
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -152,7 +193,7 @@ function SettingsPageContent({
         </Card>
       </div>
     </>
-  )
+  );
 }
 
 function SettingsPageFallback() {
@@ -172,7 +213,8 @@ function SettingsPageFallback() {
 }
 
 export default function SettingsPage() {
-  const [queryRef, loadQuery] = useQueryLoader<SettingsPageQueryType>(settingsPageQuery);
+  const [queryRef, loadQuery] =
+    useQueryLoader<SettingsPageQueryType>(settingsPageQuery);
 
   useEffect(() => {
     loadQuery({});
