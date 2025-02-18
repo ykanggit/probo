@@ -254,6 +254,7 @@ type ComplexityRoot struct {
 		ServiceStartDate       func(childComplexity int) int
 		ServiceTerminationDate func(childComplexity int) int
 		StatusPageURL          func(childComplexity int) int
+		TermsOfServiceURL      func(childComplexity int) int
 		UpdatedAt              func(childComplexity int) int
 	}
 
@@ -1184,6 +1185,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Vendor.StatusPageURL(childComplexity), true
 
+	case "Vendor.termsOfServiceUrl":
+		if e.complexity.Vendor.TermsOfServiceURL == nil {
+			break
+		}
+
+		return e.complexity.Vendor.TermsOfServiceURL(childComplexity), true
+
 	case "Vendor.updatedAt":
 		if e.complexity.Vendor.UpdatedAt == nil {
 			break
@@ -1454,6 +1462,7 @@ type Vendor implements Node {
   serviceCriticality: ServiceCriticality!
   riskTier: RiskTier!
   statusPageUrl: String
+  termsOfServiceUrl: String
 }
 
 type FrameworkConnection {
@@ -1689,6 +1698,7 @@ input UpdateVendorInput {
   serviceCriticality: ServiceCriticality
   riskTier: RiskTier
   statusPageUrl: String
+  termsOfServiceUrl: String
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -4917,6 +4927,8 @@ func (ec *executionContext) fieldContext_Mutation_createVendor(ctx context.Conte
 				return ec.fieldContext_Vendor_riskTier(ctx, field)
 			case "statusPageUrl":
 				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
+			case "termsOfServiceUrl":
+				return ec.fieldContext_Vendor_termsOfServiceUrl(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
 		},
@@ -7451,6 +7463,41 @@ func (ec *executionContext) fieldContext_Vendor_statusPageUrl(_ context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Vendor_termsOfServiceUrl(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_termsOfServiceUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TermsOfServiceURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_termsOfServiceUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _VendorConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.VendorConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_VendorConnection_edges(ctx, field)
 	if err != nil {
@@ -7634,6 +7681,8 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_riskTier(ctx, field)
 			case "statusPageUrl":
 				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
+			case "termsOfServiceUrl":
+				return ec.fieldContext_Vendor_termsOfServiceUrl(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
 		},
@@ -9342,7 +9391,7 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartDate", "serviceTerminationDate", "serviceCriticality", "riskTier", "statusPageUrl"}
+	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartDate", "serviceTerminationDate", "serviceCriticality", "riskTier", "statusPageUrl", "termsOfServiceUrl"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9405,6 +9454,13 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.StatusPageURL = data
+		case "termsOfServiceUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("termsOfServiceUrl"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TermsOfServiceURL = data
 		}
 	}
 
@@ -11263,6 +11319,8 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "statusPageUrl":
 			out.Values[i] = ec._Vendor_statusPageUrl(ctx, field, obj)
+		case "termsOfServiceUrl":
+			out.Values[i] = ec._Vendor_termsOfServiceUrl(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

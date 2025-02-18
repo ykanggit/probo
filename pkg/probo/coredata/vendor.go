@@ -37,6 +37,7 @@ type (
 		ServiceCriticality     ServiceCriticality
 		RiskTier               RiskTier
 		StatusPageURL          *string
+		TermsOfServiceURL      *string
 		CreatedAt              time.Time
 		UpdatedAt              time.Time
 	}
@@ -59,6 +60,7 @@ func (v *Vendor) scan(r pgx.Row) error {
 		&v.ServiceCriticality,
 		&v.RiskTier,
 		&v.StatusPageURL,
+		&v.TermsOfServiceURL,
 		&v.CreatedAt,
 		&v.UpdatedAt,
 	)
@@ -81,6 +83,7 @@ SELECT
     service_criticality,
     risk_tier,
     status_page_url,
+    terms_of_service_url,
     created_at,
     updated_at
 FROM
@@ -124,6 +127,7 @@ INSERT INTO
         service_criticality,
         risk_tier,
         status_page_url,
+        terms_of_service_url,
         created_at,
         updated_at
     )
@@ -137,6 +141,7 @@ VALUES (
     @service_criticality,
     @risk_tier,
     @status_page_url,
+    @terms_of_service_url,
     @created_at,
     @updated_at
 )
@@ -152,6 +157,7 @@ VALUES (
 		"service_criticality":      v.ServiceCriticality,
 		"risk_tier":                v.RiskTier,
 		"status_page_url":          v.StatusPageURL,
+		"terms_of_service_url":     v.TermsOfServiceURL,
 		"created_at":               v.CreatedAt,
 		"updated_at":               v.UpdatedAt,
 	}
@@ -195,6 +201,7 @@ SELECT
     service_criticality,
     risk_tier,
     status_page_url,
+    terms_of_service_url,
     created_at,
     updated_at
 FROM

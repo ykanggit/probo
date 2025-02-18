@@ -247,6 +247,7 @@ type UpdateVendorInput struct {
 	ServiceCriticality     *coredata.ServiceCriticality `json:"serviceCriticality,omitempty"`
 	RiskTier               *coredata.RiskTier           `json:"riskTier,omitempty"`
 	StatusPageURL          *string                      `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL      *string                      `json:"termsOfServiceUrl,omitempty"`
 }
 
 type Vendor struct {
@@ -260,6 +261,7 @@ type Vendor struct {
 	ServiceCriticality     coredata.ServiceCriticality `json:"serviceCriticality"`
 	RiskTier               coredata.RiskTier           `json:"riskTier"`
 	StatusPageURL          *string                     `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL      *string                     `json:"termsOfServiceUrl,omitempty"`
 }
 
 func (Vendor) IsNode()             {}

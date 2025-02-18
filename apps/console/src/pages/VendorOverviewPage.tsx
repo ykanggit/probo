@@ -28,6 +28,7 @@ const vendorOverviewPageQuery = graphql`
         serviceCriticality
         riskTier
         statusPageUrl
+        termsOfServiceUrl
         createdAt
         updatedAt
       }
@@ -206,6 +207,24 @@ function VendorOverviewPageContent({
                     rel="noopener noreferrer"
                   >
                     View Status Page
+                    <ArrowUpRight className="h-4 w-4" />
+                  </a>
+                </div>
+              )}
+
+              {data.node.termsOfServiceUrl && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <HelpCircle className="h-4 w-4 text-gray-400" />
+                    <Label className="text-sm">Terms of Service</Label>
+                  </div>
+                  <a 
+                    href={data.node.termsOfServiceUrl}
+                    className="text-primary hover:underline inline-flex items-center gap-1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Terms of Service
                     <ArrowUpRight className="h-4 w-4" />
                   </a>
                 </div>
