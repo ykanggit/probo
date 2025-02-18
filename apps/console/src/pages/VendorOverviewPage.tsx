@@ -29,6 +29,7 @@ const vendorOverviewPageQuery = graphql`
         riskTier
         statusPageUrl
         termsOfServiceUrl
+        privacyPolicyUrl
         createdAt
         updatedAt
       }
@@ -225,6 +226,24 @@ function VendorOverviewPageContent({
                     rel="noopener noreferrer"
                   >
                     View Terms of Service
+                    <ArrowUpRight className="h-4 w-4" />
+                  </a>
+                </div>
+              )}
+
+              {data.node.privacyPolicyUrl && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <HelpCircle className="h-4 w-4 text-gray-400" />
+                    <Label className="text-sm">Privacy Policy</Label>
+                  </div>
+                  <a 
+                    href={data.node.privacyPolicyUrl}
+                    className="text-primary hover:underline inline-flex items-center gap-1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Privacy Policy
                     <ArrowUpRight className="h-4 w-4" />
                   </a>
                 </div>

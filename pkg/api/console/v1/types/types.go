@@ -248,6 +248,7 @@ type UpdateVendorInput struct {
 	RiskTier               *coredata.RiskTier           `json:"riskTier,omitempty"`
 	StatusPageURL          *string                      `json:"statusPageUrl,omitempty"`
 	TermsOfServiceURL      *string                      `json:"termsOfServiceUrl,omitempty"`
+	PrivacyPolicyURL       *string                      `json:"privacyPolicyUrl,omitempty"`
 }
 
 type Vendor struct {
@@ -262,6 +263,7 @@ type Vendor struct {
 	RiskTier               coredata.RiskTier           `json:"riskTier"`
 	StatusPageURL          *string                     `json:"statusPageUrl,omitempty"`
 	TermsOfServiceURL      *string                     `json:"termsOfServiceUrl,omitempty"`
+	PrivacyPolicyURL       *string                     `json:"privacyPolicyUrl,omitempty"`
 }
 
 func (Vendor) IsNode()             {}

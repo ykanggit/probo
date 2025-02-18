@@ -38,6 +38,7 @@ type (
 		RiskTier               RiskTier
 		StatusPageURL          *string
 		TermsOfServiceURL      *string
+		PrivacyPolicyURL       *string
 		CreatedAt              time.Time
 		UpdatedAt              time.Time
 	}
@@ -61,6 +62,7 @@ func (v *Vendor) scan(r pgx.Row) error {
 		&v.RiskTier,
 		&v.StatusPageURL,
 		&v.TermsOfServiceURL,
+		&v.PrivacyPolicyURL,
 		&v.CreatedAt,
 		&v.UpdatedAt,
 	)
@@ -84,6 +86,7 @@ SELECT
     risk_tier,
     status_page_url,
     terms_of_service_url,
+    privacy_policy_url,
     created_at,
     updated_at
 FROM
@@ -128,6 +131,7 @@ INSERT INTO
         risk_tier,
         status_page_url,
         terms_of_service_url,
+        privacy_policy_url,
         created_at,
         updated_at
     )
@@ -142,6 +146,7 @@ VALUES (
     @risk_tier,
     @status_page_url,
     @terms_of_service_url,
+    @privacy_policy_url,
     @created_at,
     @updated_at
 )
@@ -158,6 +163,7 @@ VALUES (
 		"risk_tier":                v.RiskTier,
 		"status_page_url":          v.StatusPageURL,
 		"terms_of_service_url":     v.TermsOfServiceURL,
+		"privacy_policy_url":       v.PrivacyPolicyURL,
 		"created_at":               v.CreatedAt,
 		"updated_at":               v.UpdatedAt,
 	}
@@ -202,6 +208,7 @@ SELECT
     risk_tier,
     status_page_url,
     terms_of_service_url,
+    privacy_policy_url,
     created_at,
     updated_at
 FROM

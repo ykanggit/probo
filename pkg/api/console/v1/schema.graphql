@@ -124,6 +124,7 @@ type Vendor implements Node {
   riskTier: RiskTier!
   statusPageUrl: String
   termsOfServiceUrl: String
+  privacyPolicyUrl: String
 }
 
 type FrameworkConnection {
@@ -360,4 +361,5 @@ input UpdateVendorInput {
   riskTier: RiskTier
   statusPageUrl: String
   termsOfServiceUrl: String
+  privacyPolicyUrl: String
 }

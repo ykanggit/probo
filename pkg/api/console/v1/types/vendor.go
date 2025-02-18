@@ -52,5 +52,6 @@ func NewVendor(v *coredata.Vendor) *Vendor {
 		RiskTier:               v.RiskTier,
 		StatusPageURL:          v.StatusPageURL,
 		TermsOfServiceURL:      v.TermsOfServiceURL,
+		PrivacyPolicyURL:       v.PrivacyPolicyURL,
 	}
 }
