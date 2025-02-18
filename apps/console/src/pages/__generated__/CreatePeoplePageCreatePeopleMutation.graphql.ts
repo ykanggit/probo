@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<26992373ce2e1751c6d070a6bbf6c8db>>
+ * @generated SignedSource<<ea3c61409629d685dbb651ca60a8d0b7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,6 +11,7 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type PeopleKind = "CONTRACTOR" | "EMPLOYEE";
 export type CreatePeopleInput = {
+  additionalEmailAddresses?: ReadonlyArray<string> | null | undefined;
   fullName: string;
   kind: PeopleKind;
   organizationId: string;
@@ -21,6 +22,7 @@ export type CreatePeoplePageCreatePeopleMutation$variables = {
 };
 export type CreatePeoplePageCreatePeopleMutation$data = {
   readonly createPeople: {
+    readonly additionalEmailAddresses: ReadonlyArray<string>;
     readonly fullName: string;
     readonly id: string;
     readonly kind: PeopleKind;
@@ -80,6 +82,13 @@ v1 = [
         "alias": null,
         "args": null,
         "kind": "ScalarField",
+        "name": "additionalEmailAddresses",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
         "name": "kind",
         "storageKey": null
       }
@@ -105,16 +114,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "6438f79d9a2e3d3e5cfcc98c4107e512",
+    "cacheID": "6674304ecdd07af45a837b942faed8f3",
     "id": null,
     "metadata": {},
     "name": "CreatePeoplePageCreatePeopleMutation",
     "operationKind": "mutation",
-    "text": "mutation CreatePeoplePageCreatePeopleMutation(\n  $input: CreatePeopleInput!\n) {\n  createPeople(input: $input) {\n    id\n    fullName\n    primaryEmailAddress\n    kind\n  }\n}\n"
+    "text": "mutation CreatePeoplePageCreatePeopleMutation(\n  $input: CreatePeopleInput!\n) {\n  createPeople(input: $input) {\n    id\n    fullName\n    primaryEmailAddress\n    additionalEmailAddresses\n    kind\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "55f9379fac4d33ca3b2c21acf80094de";
+(node as any).hash = "c2962b44f158d7899d7e5b4d071e9238";
 
 export default node;

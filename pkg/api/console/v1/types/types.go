@@ -60,10 +60,11 @@ type ControlStateTransitionEdge struct {
 }
 
 type CreatePeopleInput struct {
-	OrganizationID      gid.GID             `json:"organizationId"`
-	FullName            string              `json:"fullName"`
-	PrimaryEmailAddress string              `json:"primaryEmailAddress"`
-	Kind                coredata.PeopleKind `json:"kind"`
+	OrganizationID           gid.GID             `json:"organizationId"`
+	FullName                 string              `json:"fullName"`
+	PrimaryEmailAddress      string              `json:"primaryEmailAddress"`
+	AdditionalEmailAddresses []string            `json:"additionalEmailAddresses,omitempty"`
+	Kind                     coredata.PeopleKind `json:"kind"`
 }
 
 type CreateVendorInput struct {

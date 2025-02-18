@@ -1732,6 +1732,7 @@ input CreatePeopleInput {
   organizationId: ID!
   fullName: String!
   primaryEmailAddress: String!
+  additionalEmailAddresses: [String!]
   kind: PeopleKind!
 }
 
@@ -9619,7 +9620,7 @@ func (ec *executionContext) unmarshalInputCreatePeopleInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "fullName", "primaryEmailAddress", "kind"}
+	fieldsInOrder := [...]string{"organizationId", "fullName", "primaryEmailAddress", "additionalEmailAddresses", "kind"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9647,6 +9648,13 @@ func (ec *executionContext) unmarshalInputCreatePeopleInput(ctx context.Context,
 				return it, err
 			}
 			it.PrimaryEmailAddress = data
+		case "additionalEmailAddresses":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("additionalEmailAddresses"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdditionalEmailAddresses = data
 		case "kind":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("kind"))
 			data, err := ec.unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx, v)

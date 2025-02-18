@@ -22,6 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { CreatePeoplePageQuery as CreatePeoplePageQueryType } from "./__generated__/CreatePeoplePageQuery.graphql";
+import { useToast } from "@/hooks/use-toast";
+import { HelpCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const createPeoplePageQuery = graphql`
   query CreatePeoplePageQuery {
@@ -40,10 +43,45 @@ const createPeopleMutation = graphql`
       id
       fullName
       primaryEmailAddress
+      additionalEmailAddresses
       kind
     }
   }
 `;
+
+function EditableField({
+  label,
+  value,
+  onChange,
+  type = "text",
+  helpText,
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  helpText?: string;
+  required?: boolean;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <HelpCircle className="h-4 w-4 text-gray-400" />
+        <Label className="text-sm">{label}</Label>
+      </div>
+      <div className="space-y-2">
+        <Input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          required={required}
+        />
+        {helpText && <p className="text-sm text-gray-500">{helpText}</p>}
+      </div>
+    </div>
+  );
+}
 
 function CreatePeoplePageContent({
   queryRef,
@@ -53,115 +91,187 @@ function CreatePeoplePageContent({
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
   const data = usePreloadedQuery(createPeoplePageQuery, queryRef);
-  const [createPeople, isCreatingPeople] = useMutation(createPeopleMutation);
-  const [kind, setKind] = useState<"EMPLOYEE" | "CONTRACTOR" | "VENDOR">(
-    "EMPLOYEE",
-  );
+  const [commit] = useMutation(createPeopleMutation);
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    fullName: '',
+    primaryEmailAddress: '',
+    additionalEmailAddresses: [] as string[],
+    kind: 'EMPLOYEE' as 'EMPLOYEE' | 'CONTRACTOR',
+  });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFieldChange = (field: keyof typeof formData, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
-    createPeople({
+    commit({
       variables: {
         input: {
           organizationId: data.node.id,
-          fullName: formData.get("fullName") as string,
-          primaryEmailAddress: formData.get("primaryEmailAddress") as string,
-          kind,
+          fullName: formData.fullName,
+          primaryEmailAddress: formData.primaryEmailAddress,
+          additionalEmailAddresses: formData.additionalEmailAddresses,
+          kind: formData.kind,
         },
       },
-      onCompleted() {
-        // Invalidate the peoples list query
+      onCompleted: (response) => {
         environment.commitUpdate((store) => {
           const organization = store.get(data.node.id);
           if (organization) {
             organization.invalidateRecord();
           }
+        })
+        toast({
+          title: "Success",
+          description: "Person created successfully",
+          variant: "default",
         });
-
-        navigate("/peoples");
+        navigate(`/peoples/${(response as any).createPeople.id}`);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to create person",
+          variant: "destructive",
+        });
       },
     });
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <>
       <Helmet>
-        <title>Create People - Probo Console</title>
+        <title>Create Person - Probo Console</title>
       </Helmet>
 
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Create People
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Add a new person to your organization.
-          </p>
-        </div>
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-6 p-4 md:p-6 lg:p-8">
+          <div className="mx-auto max-w-4xl space-y-6">
+            <EditableField
+              label="Full Name"
+              value={formData.fullName}
+              onChange={(value) => handleFieldChange('fullName', value)}
+              required
+            />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>People Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="kind">Kind</Label>
-                <Select
-                  value={kind}
-                  onValueChange={(value) => setKind(value as typeof kind)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a kind" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="EMPLOYEE">Employee</SelectItem>
-                    <SelectItem value="CONTRACTOR">Contractor</SelectItem>
-                    <SelectItem value="VENDOR">Vendor</SelectItem>
-                  </SelectContent>
-                </Select>
+            <EditableField
+              label="Primary Email"
+              value={formData.primaryEmailAddress}
+              type="email"
+              onChange={(value) => handleFieldChange('primaryEmailAddress', value)}
+              required
+            />
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <HelpCircle className="h-4 w-4 text-gray-400" />
+                <Label className="text-sm">Additional Email Addresses</Label>
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input
-                  id="fullName"
-                  name="fullName"
-                  placeholder="John Doe"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="primaryEmailAddress">Email Address</Label>
-                <Input
-                  id="primaryEmailAddress"
-                  name="primaryEmailAddress"
-                  type="email"
-                  placeholder="john@example.com"
-                  required
-                />
-              </div>
-
-              <div className="flex justify-end gap-4">
+                {formData.additionalEmailAddresses.map((email, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => {
+                        const newEmails = [...formData.additionalEmailAddresses];
+                        newEmails[index] = e.target.value;
+                        handleFieldChange('additionalEmailAddresses', newEmails);
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        const newEmails = formData.additionalEmailAddresses.filter((_, i) => i !== index);
+                        handleFieldChange('additionalEmailAddresses', newEmails);
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate("/peoples")}
+                  onClick={() => {
+                    handleFieldChange('additionalEmailAddresses', [...formData.additionalEmailAddresses, '']);
+                  }}
                 >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isCreatingPeople}>
-                  {isCreatingPeople ? "Creating..." : "Create People"}
+                  Add Email
                 </Button>
               </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+            </div>
+
+            <Card className="p-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h2 className="text-lg font-medium">Additional Information</h2>
+                  <p className="text-sm text-gray-500">
+                    Additional details about the person
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <HelpCircle className="h-4 w-4 text-gray-400" />
+                      <Label className="text-sm">Kind</Label>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleFieldChange('kind', 'EMPLOYEE')}
+                        className={cn(
+                          "rounded-full px-4 py-1 text-sm transition-colors",
+                          formData.kind === 'EMPLOYEE'
+                            ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        )}
+                      >
+                        Employee
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleFieldChange('kind', 'CONTRACTOR')}
+                        className={cn(
+                          "rounded-full px-4 py-1 text-sm transition-colors",
+                          formData.kind === 'CONTRACTOR'
+                            ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        )}
+                      >
+                        Contractor
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+        <div className="fixed bottom-6 right-6 flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate(-1)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            Create Person
+          </Button>
+        </div>
+      </form>
+    </>
   );
 }
 
