@@ -8,7 +8,7 @@ import {
   useQueryLoader,
 } from "react-relay";
 import { Suspense, useEffect } from "react";
-import type { PeopleOverviewPageQuery as PeopleOverviewPageQueryType } from "./__generated__/peopleOverviewPageQuery.graphql";
+import type { PeopleOverviewPageQuery as PeopleOverviewPageQueryType } from "./__generated__/PeopleOverviewPageQuery.graphql";
 import { useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
