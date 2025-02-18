@@ -69,6 +69,7 @@ type CreatePeopleInput struct {
 type CreateVendorInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 	Name           string  `json:"name"`
+	Description    string  `json:"description"`
 }
 
 type DeletePeopleInput struct {
@@ -240,6 +241,7 @@ type TaskStateTransitionEdge struct {
 type UpdateVendorInput struct {
 	ID                     gid.GID                      `json:"id"`
 	Name                   *string                      `json:"name,omitempty"`
+	Description            *string                      `json:"description,omitempty"`
 	ServiceStartDate       *time.Time                   `json:"serviceStartDate,omitempty"`
 	ServiceTerminationDate *time.Time                   `json:"serviceTerminationDate,omitempty"`
 	ServiceCriticality     *coredata.ServiceCriticality `json:"serviceCriticality,omitempty"`
@@ -250,6 +252,7 @@ type UpdateVendorInput struct {
 type Vendor struct {
 	ID                     gid.GID                     `json:"id"`
 	Name                   string                      `json:"name"`
+	Description            string                      `json:"description"`
 	CreatedAt              time.Time                   `json:"createdAt"`
 	UpdatedAt              time.Time                   `json:"updatedAt"`
 	ServiceStartDate       time.Time                   `json:"serviceStartDate"`

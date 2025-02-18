@@ -246,6 +246,7 @@ type ComplexityRoot struct {
 
 	Vendor struct {
 		CreatedAt              func(childComplexity int) int
+		Description            func(childComplexity int) int
 		ID                     func(childComplexity int) int
 		Name                   func(childComplexity int) int
 		RiskTier               func(childComplexity int) int
@@ -1127,6 +1128,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Vendor.CreatedAt(childComplexity), true
 
+	case "Vendor.description":
+		if e.complexity.Vendor.Description == nil {
+			break
+		}
+
+		return e.complexity.Vendor.Description(childComplexity), true
+
 	case "Vendor.id":
 		if e.complexity.Vendor.ID == nil {
 			break
@@ -1438,6 +1446,7 @@ type VendorEdge {
 type Vendor implements Node {
   id: ID!
   name: String!
+  description: String!
   createdAt: Datetime!
   updatedAt: Datetime!
   serviceStartDate: Datetime!
@@ -1641,6 +1650,7 @@ type Mutation {
 input CreateVendorInput {
   organizationId: ID!
   name: String!
+  description: String!
 }
 
 input DeleteVendorInput {
@@ -1673,6 +1683,7 @@ enum RiskTier @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.Risk
 input UpdateVendorInput {
   id: ID!
   name: String
+  description: String
   serviceStartDate: Datetime
   serviceTerminationDate: Datetime
   serviceCriticality: ServiceCriticality
@@ -4890,6 +4901,8 @@ func (ec *executionContext) fieldContext_Mutation_createVendor(ctx context.Conte
 				return ec.fieldContext_Vendor_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Vendor_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Vendor_description(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Vendor_createdAt(ctx, field)
 			case "updatedAt":
@@ -7140,6 +7153,44 @@ func (ec *executionContext) fieldContext_Vendor_name(_ context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _Vendor_description(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Vendor_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Vendor_createdAt(ctx, field)
 	if err != nil {
@@ -7567,6 +7618,8 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Vendor_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Vendor_description(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Vendor_createdAt(ctx, field)
 			case "updatedAt":
@@ -9194,7 +9247,7 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name"}
+	fieldsInOrder := [...]string{"organizationId", "name", "description"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9215,6 +9268,13 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
 		}
 	}
 
@@ -9282,7 +9342,7 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "serviceStartDate", "serviceTerminationDate", "serviceCriticality", "riskTier", "statusPageUrl"}
+	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartDate", "serviceTerminationDate", "serviceCriticality", "riskTier", "statusPageUrl"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9303,6 +9363,13 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
 		case "serviceStartDate":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceStartDate"))
 			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
@@ -11159,6 +11226,11 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "name":
 			out.Values[i] = ec._Vendor_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description":
+			out.Values[i] = ec._Vendor_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

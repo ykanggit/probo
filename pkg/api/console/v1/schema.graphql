@@ -115,6 +115,7 @@ type VendorEdge {
 type Vendor implements Node {
   id: ID!
   name: String!
+  description: String!
   createdAt: Datetime!
   updatedAt: Datetime!
   serviceStartDate: Datetime!
@@ -318,6 +319,7 @@ type Mutation {
 input CreateVendorInput {
   organizationId: ID!
   name: String!
+  description: String!
 }
 
 input DeleteVendorInput {
@@ -350,6 +352,7 @@ enum RiskTier @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.Risk
 input UpdateVendorInput {
   id: ID!
   name: String
+  description: String
   serviceStartDate: Datetime
   serviceTerminationDate: Datetime
   serviceCriticality: ServiceCriticality

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c905d68569a5158d7e5a0ee5eb600a2b>>
+ * @generated SignedSource<<055f5292e2ca7bfecd0d701ce34c8d34>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,6 +10,7 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type CreateVendorInput = {
+  description: string;
   name: string;
   organizationId: string;
 };

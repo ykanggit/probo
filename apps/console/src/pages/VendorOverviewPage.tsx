@@ -22,6 +22,7 @@ const vendorOverviewPageQuery = graphql`
       ... on Vendor {
         id
         name
+        description
         serviceStartDate
         serviceTerminationDate
         serviceCriticality
@@ -55,9 +56,9 @@ function VendorOverviewPageContent({
       <div className="mx-auto max-w-4xl space-y-6">
         <div className="space-y-2">
           <h1 className="text-xl font-semibold text-gray-900">
-            {data.node?.name}
+            {data.node.name}
           </h1>
-          <p className="text-gray-600">View and manage vendor details</p>
+          <p className="text-gray-600">{data.node.description}</p>
         </div>
 
         <Card className="p-6">
@@ -76,7 +77,7 @@ function VendorOverviewPageContent({
                   <Label className="text-sm">Service Start Date</Label>
                 </div>
                 <p className="text-sm text-gray-600">
-                  {new Date(data.node?.serviceStartDate).toLocaleDateString()}
+                  {new Date(data.node.serviceStartDate).toLocaleDateString()}
                 </p>
               </div>
 
@@ -87,7 +88,7 @@ function VendorOverviewPageContent({
                     <Label className="text-sm">Service Termination Date</Label>
                   </div>
                   <p className="text-sm text-gray-600">
-                    {new Date(data.node?.serviceTerminationDate).toLocaleDateString()}
+                    {new Date(data.node.serviceTerminationDate).toLocaleDateString()}
                   </p>
                 </div>
               )}

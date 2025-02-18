@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<939b83dd396154844197ee10514be613>>
+ * @generated SignedSource<<5e9e499f91b8d971375b191b9ce35f5d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,6 +17,7 @@ export type VendorOverviewPageQuery$variables = {
 export type VendorOverviewPageQuery$data = {
   readonly node: {
     readonly createdAt?: any;
+    readonly description?: string;
     readonly id?: string;
     readonly name?: string;
     readonly riskTier?: RiskTier;
@@ -65,45 +66,52 @@ v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "serviceStartDate",
+  "name": "description",
   "storageKey": null
 },
 v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "serviceTerminationDate",
+  "name": "serviceStartDate",
   "storageKey": null
 },
 v6 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "serviceCriticality",
+  "name": "serviceTerminationDate",
   "storageKey": null
 },
 v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "riskTier",
+  "name": "serviceCriticality",
   "storageKey": null
 },
 v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "statusPageUrl",
+  "name": "riskTier",
   "storageKey": null
 },
 v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "createdAt",
+  "name": "statusPageUrl",
   "storageKey": null
 },
 v10 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "createdAt",
+  "storageKey": null
+},
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
@@ -136,7 +144,8 @@ return {
               (v7/*: any*/),
               (v8/*: any*/),
               (v9/*: any*/),
-              (v10/*: any*/)
+              (v10/*: any*/),
+              (v11/*: any*/)
             ],
             "type": "Vendor",
             "abstractKey": null
@@ -180,7 +189,8 @@ return {
               (v7/*: any*/),
               (v8/*: any*/),
               (v9/*: any*/),
-              (v10/*: any*/)
+              (v10/*: any*/),
+              (v11/*: any*/)
             ],
             "type": "Vendor",
             "abstractKey": null
@@ -191,16 +201,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "c9d7bade02d1802838f6ac3b02ef7c9a",
+    "cacheID": "04e4ae3f0c7613bf50b59368d02ba937",
     "id": null,
     "metadata": {},
     "name": "VendorOverviewPageQuery",
     "operationKind": "query",
-    "text": "query VendorOverviewPageQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      serviceStartDate\n      serviceTerminationDate\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
+    "text": "query VendorOverviewPageQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartDate\n      serviceTerminationDate\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "92a640f674261d28028d752f027ec141";
+(node as any).hash = "474b8b7350d917a50c91a0b8239370ea";
 
 export default node;

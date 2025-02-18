@@ -31,6 +31,7 @@ type (
 		ID                     gid.GID
 		OrganizationID         gid.GID
 		Name                   string
+		Description            string
 		ServiceStartDate       time.Time
 		ServiceTerminationDate *time.Time
 		ServiceCriticality     ServiceCriticality
@@ -52,6 +53,7 @@ func (v *Vendor) scan(r pgx.Row) error {
 		&v.ID,
 		&v.OrganizationID,
 		&v.Name,
+		&v.Description,
 		&v.ServiceStartDate,
 		&v.ServiceTerminationDate,
 		&v.ServiceCriticality,
@@ -73,6 +75,7 @@ SELECT
     id,
     organization_id,
     name,
+    description,
     service_start_date,
     service_termination_date,
     service_criticality,
@@ -115,6 +118,7 @@ INSERT INTO
         id,
         organization_id,
         name,
+        description,
         service_start_date,
         service_termination_date,
         service_criticality,
@@ -127,6 +131,7 @@ VALUES (
     @vendor_id,
     @organization_id,
     @name,
+    @description,
     @service_start_date,
     @service_termination_date,
     @service_criticality,
@@ -141,6 +146,7 @@ VALUES (
 		"vendor_id":                v.ID,
 		"organization_id":          v.OrganizationID,
 		"name":                     v.Name,
+		"description":              v.Description,
 		"service_start_date":       v.ServiceStartDate,
 		"service_termination_date": v.ServiceTerminationDate,
 		"service_criticality":      v.ServiceCriticality,
@@ -183,6 +189,7 @@ SELECT
     id,
     organization_id,
     name,
+    description,
     service_start_date,
     service_termination_date,
     service_criticality,

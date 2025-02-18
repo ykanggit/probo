@@ -43,6 +43,7 @@ func NewVendor(v *coredata.Vendor) *Vendor {
 	return &Vendor{
 		ID:                     v.ID,
 		Name:                   v.Name,
+		Description:            v.Description,
 		CreatedAt:              v.CreatedAt,
 		UpdatedAt:              v.UpdatedAt,
 		ServiceStartDate:       v.ServiceStartDate,
