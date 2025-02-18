@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<180daebbc0ea7b69991d7bad2005ea13>>
+ * @generated SignedSource<<2d865a3f5deae54eed7c54b08df7bf0a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -28,6 +28,7 @@ export type VendorOverviewPageQuery$data = {
     readonly statusPageUrl?: string | null | undefined;
     readonly termsOfServiceUrl?: string | null | undefined;
     readonly updatedAt?: any;
+    readonly version?: number;
   };
 };
 export type VendorOverviewPageQuery = {
@@ -133,6 +134,13 @@ v13 = {
   "kind": "ScalarField",
   "name": "updatedAt",
   "storageKey": null
+},
+v14 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "version",
+  "storageKey": null
 };
 return {
   "fragment": {
@@ -163,7 +171,8 @@ return {
               (v10/*: any*/),
               (v11/*: any*/),
               (v12/*: any*/),
-              (v13/*: any*/)
+              (v13/*: any*/),
+              (v14/*: any*/)
             ],
             "type": "Vendor",
             "abstractKey": null
@@ -210,7 +219,8 @@ return {
               (v10/*: any*/),
               (v11/*: any*/),
               (v12/*: any*/),
-              (v13/*: any*/)
+              (v13/*: any*/),
+              (v14/*: any*/)
             ],
             "type": "Vendor",
             "abstractKey": null
@@ -221,16 +231,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d732d532dc450d86b3e790500c59e0ee",
+    "cacheID": "9163462a149138110e8573e0b28350f9",
     "id": null,
     "metadata": {},
     "name": "VendorOverviewPageQuery",
     "operationKind": "query",
-    "text": "query VendorOverviewPageQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
+    "text": "query VendorOverviewPageQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      createdAt\n      updatedAt\n      version\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "0b7427451e68a951e2eecbc3f5c59456";
+(node as any).hash = "56567f61e1016e70d6993ac132ca8382";
 
 export default node;

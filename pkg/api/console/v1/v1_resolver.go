@@ -78,6 +78,28 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 	return types.NewVendor(vendor), nil
 }
 
+// UpdateVendor is the resolver for the updateVendor field.
+func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.Vendor, error) {
+	vendor, err := r.svc.UpdateVendor(ctx, probo.UpdateVendorRequest{
+		ID:                   input.ID,
+		ExpectedVersion:      input.ExpectedVersion,
+		Name:                 input.Name,
+		Description:          input.Description,
+		ServiceStartAt:       input.ServiceStartAt,
+		ServiceTerminationAt: input.ServiceTerminationAt,
+		ServiceCriticality:   input.ServiceCriticality,
+		RiskTier:             input.RiskTier,
+		StatusPageURL:        input.StatusPageURL,
+		TermsOfServiceURL:    input.TermsOfServiceURL,
+		PrivacyPolicyURL:     input.PrivacyPolicyURL,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update vendor: %w", err)
+	}
+
+	return types.NewVendor(vendor), nil
+}
+
 // DeleteVendor is the resolver for the deleteVendor field.
 func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (string, error) {
 	err := r.svc.DeleteVendor(ctx, input.VendorID)

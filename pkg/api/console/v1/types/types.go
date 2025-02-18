@@ -240,6 +240,7 @@ type TaskStateTransitionEdge struct {
 
 type UpdateVendorInput struct {
 	ID                   gid.GID                      `json:"id"`
+	ExpectedVersion      int                          `json:"expectedVersion"`
 	Name                 *string                      `json:"name,omitempty"`
 	Description          *string                      `json:"description,omitempty"`
 	ServiceStartAt       *time.Time                   `json:"serviceStartAt,omitempty"`
@@ -255,8 +256,6 @@ type Vendor struct {
 	ID                   gid.GID                     `json:"id"`
 	Name                 string                      `json:"name"`
 	Description          string                      `json:"description"`
-	CreatedAt            time.Time                   `json:"createdAt"`
-	UpdatedAt            time.Time                   `json:"updatedAt"`
 	ServiceStartAt       time.Time                   `json:"serviceStartAt"`
 	ServiceTerminationAt *time.Time                  `json:"serviceTerminationAt,omitempty"`
 	ServiceCriticality   coredata.ServiceCriticality `json:"serviceCriticality"`
@@ -264,6 +263,9 @@ type Vendor struct {
 	StatusPageURL        *string                     `json:"statusPageUrl,omitempty"`
 	TermsOfServiceURL    *string                     `json:"termsOfServiceUrl,omitempty"`
 	PrivacyPolicyURL     *string                     `json:"privacyPolicyUrl,omitempty"`
+	CreatedAt            time.Time                   `json:"createdAt"`
+	UpdatedAt            time.Time                   `json:"updatedAt"`
+	Version              int                         `json:"version"`
 }
 
 func (Vendor) IsNode()             {}

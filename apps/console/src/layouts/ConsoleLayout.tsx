@@ -19,6 +19,7 @@ import {
   BreadcrumbProvider,
   useBreadcrumb,
 } from "@/contexts/BreadcrumbContext";
+import { Toaster } from "@/components/ui/toaster";
 
 function BreadcrumbNavigation() {
   const location = useLocation();
@@ -90,6 +91,7 @@ export default function ConsoleLayout() {
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
             <Outlet />
+            <Toaster />
           </div>
         </SidebarInset>
       </SidebarProvider>

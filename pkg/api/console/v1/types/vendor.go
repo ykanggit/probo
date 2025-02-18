@@ -53,5 +53,6 @@ func NewVendor(v *coredata.Vendor) *Vendor {
 		StatusPageURL:        v.StatusPageURL,
 		TermsOfServiceURL:    v.TermsOfServiceURL,
 		PrivacyPolicyURL:     v.PrivacyPolicyURL,
+		Version:              v.Version,
 	}
 }

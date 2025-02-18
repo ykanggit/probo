@@ -116,8 +116,6 @@ type Vendor implements Node {
   id: ID!
   name: String!
   description: String!
-  createdAt: Datetime!
-  updatedAt: Datetime!
   serviceStartAt: Datetime!
   serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality!
@@ -125,6 +123,9 @@ type Vendor implements Node {
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
+  createdAt: Datetime!
+  updatedAt: Datetime!
+  version: Int!
 }
 
 type FrameworkConnection {
@@ -313,6 +314,7 @@ type Query {
 
 type Mutation {
   createVendor(input: CreateVendorInput!): Vendor!
+  updateVendor(input: UpdateVendorInput!): Vendor!
   deleteVendor(input: DeleteVendorInput!): Void!
   deletePeople(input: DeletePeopleInput!): Void!
   createPeople(input: CreatePeopleInput!): People!
@@ -353,6 +355,7 @@ enum RiskTier @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.Risk
 
 input UpdateVendorInput {
   id: ID!
+  expectedVersion: Int!
   name: String
   description: String
   serviceStartAt: Datetime

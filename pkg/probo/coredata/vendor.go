@@ -16,6 +16,7 @@ package coredata
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"maps"
 	"time"
@@ -25,6 +26,8 @@ import (
 	"github.com/jackc/pgx/v5"
 	"go.gearno.de/kit/pg"
 )
+
+var ErrConcurrentModification = errors.New("concurrent modification")
 
 type (
 	Vendor struct {
@@ -41,9 +44,23 @@ type (
 		PrivacyPolicyURL     *string
 		CreatedAt            time.Time
 		UpdatedAt            time.Time
+		Version              int
 	}
 
 	Vendors []*Vendor
+
+	UpdateVendorParams struct {
+		ExpectedVersion      int
+		Name                 *string
+		Description          *string
+		ServiceStartAt       *time.Time
+		ServiceTerminationAt *time.Time
+		ServiceCriticality   *ServiceCriticality
+		RiskTier             *RiskTier
+		StatusPageURL        *string
+		TermsOfServiceURL    *string
+		PrivacyPolicyURL     *string
+	}
 )
 
 func (v Vendor) CursorKey() page.CursorKey {
@@ -65,6 +82,7 @@ func (v *Vendor) scan(r pgx.Row) error {
 		&v.PrivacyPolicyURL,
 		&v.CreatedAt,
 		&v.UpdatedAt,
+		&v.Version,
 	)
 }
 
@@ -88,7 +106,8 @@ SELECT
     terms_of_service_url,
     privacy_policy_url,
     created_at,
-    updated_at
+    updated_at,
+    version
 FROM
     vendors
 WHERE
@@ -133,7 +152,8 @@ INSERT INTO
         terms_of_service_url,
         privacy_policy_url,
         created_at,
-        updated_at
+        updated_at,
+        version
     )
 VALUES (
     @vendor_id,
@@ -148,7 +168,8 @@ VALUES (
     @terms_of_service_url,
     @privacy_policy_url,
     @created_at,
-    @updated_at
+    @updated_at,
+    1
 )
 `
 
@@ -210,7 +231,8 @@ SELECT
     terms_of_service_url,
     privacy_policy_url,
     created_at,
-    updated_at
+    updated_at,
+    version
 FROM
     vendors
 WHERE
@@ -247,5 +269,95 @@ WHERE
 
 	*v = vendors
 
+	return nil
+}
+
+func (v *Vendor) Update(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+	params UpdateVendorParams,
+) error {
+	q := `
+UPDATE vendors SET
+    name = COALESCE(@name, name),
+    description = COALESCE(@description, description),
+    service_start_at = COALESCE(@service_start_at, service_start_at),
+    service_termination_at = COALESCE(@service_termination_at, service_termination_at),
+    service_criticality = COALESCE(@service_criticality, service_criticality),
+    risk_tier = COALESCE(@risk_tier, risk_tier),
+    status_page_url = COALESCE(@status_page_url, status_page_url),
+    terms_of_service_url = COALESCE(@terms_of_service_url, terms_of_service_url),
+    privacy_policy_url = COALESCE(@privacy_policy_url, privacy_policy_url),
+    updated_at = @updated_at,
+    version = version + 1
+WHERE %s
+    AND id = @vendor_id
+    AND version = @expected_version
+RETURNING 
+    id,
+    organization_id,
+    name,
+    description,
+    service_start_at,
+    service_termination_at,
+    service_criticality,
+    risk_tier,
+    status_page_url,
+    terms_of_service_url,
+    privacy_policy_url,
+    created_at,
+    updated_at,
+    version
+`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{
+		"vendor_id":        v.ID,
+		"expected_version": params.ExpectedVersion,
+		"updated_at":       time.Now(),
+	}
+
+	if params.Name != nil {
+		args["name"] = *params.Name
+	}
+	if params.Description != nil {
+		args["description"] = *params.Description
+	}
+	if params.ServiceStartAt != nil {
+		args["service_start_at"] = *params.ServiceStartAt
+	}
+	if params.ServiceTerminationAt != nil {
+		args["service_termination_at"] = *params.ServiceTerminationAt
+	}
+	if params.ServiceCriticality != nil {
+		args["service_criticality"] = *params.ServiceCriticality
+	}
+	if params.RiskTier != nil {
+		args["risk_tier"] = *params.RiskTier
+	}
+	if params.StatusPageURL != nil {
+		args["status_page_url"] = *params.StatusPageURL
+	}
+	if params.TermsOfServiceURL != nil {
+		args["terms_of_service_url"] = *params.TermsOfServiceURL
+	}
+	if params.PrivacyPolicyURL != nil {
+		args["privacy_policy_url"] = *params.PrivacyPolicyURL
+	}
+
+	maps.Copy(args, scope.SQLArguments())
+
+	r := conn.QueryRow(ctx, q, args)
+
+	v2 := Vendor{}
+	if err := v2.scan(r); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrConcurrentModification
+		}
+		return err
+	}
+
+	*v = v2
 	return nil
 }
