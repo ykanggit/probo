@@ -28,11 +28,16 @@ import (
 
 type (
 	Vendor struct {
-		ID             gid.GID
-		OrganizationID gid.GID
-		Name           string
-		CreatedAt      time.Time
-		UpdatedAt      time.Time
+		ID                     gid.GID
+		OrganizationID         gid.GID
+		Name                   string
+		ServiceStartDate       time.Time
+		ServiceTerminationDate *time.Time
+		ServiceCriticality     ServiceCriticality
+		RiskTier               RiskTier
+		StatusPageURL          *string
+		CreatedAt              time.Time
+		UpdatedAt              time.Time
 	}
 
 	Vendors []*Vendor
@@ -47,6 +52,11 @@ func (v *Vendor) scan(r pgx.Row) error {
 		&v.ID,
 		&v.OrganizationID,
 		&v.Name,
+		&v.ServiceStartDate,
+		&v.ServiceTerminationDate,
+		&v.ServiceCriticality,
+		&v.RiskTier,
+		&v.StatusPageURL,
 		&v.CreatedAt,
 		&v.UpdatedAt,
 	)
@@ -63,6 +73,11 @@ SELECT
     id,
     organization_id,
     name,
+    service_start_date,
+    service_termination_date,
+    service_criticality,
+    risk_tier,
+    status_page_url,
     created_at,
     updated_at
 FROM
@@ -100,6 +115,11 @@ INSERT INTO
         id,
         organization_id,
         name,
+        service_start_date,
+        service_termination_date,
+        service_criticality,
+        risk_tier,
+        status_page_url,
         created_at,
         updated_at
     )
@@ -107,17 +127,27 @@ VALUES (
     @vendor_id,
     @organization_id,
     @name,
+    @service_start_date,
+    @service_termination_date,
+    @service_criticality,
+    @risk_tier,
+    @status_page_url,
     @created_at,
     @updated_at
 )
 `
 
 	args := pgx.NamedArgs{
-		"vendor_id":       v.ID,
-		"organization_id": v.OrganizationID,
-		"name":            v.Name,
-		"created_at":      v.CreatedAt,
-		"updated_at":      v.UpdatedAt,
+		"vendor_id":                v.ID,
+		"organization_id":          v.OrganizationID,
+		"name":                     v.Name,
+		"service_start_date":       v.ServiceStartDate,
+		"service_termination_date": v.ServiceTerminationDate,
+		"service_criticality":      v.ServiceCriticality,
+		"risk_tier":                v.RiskTier,
+		"status_page_url":          v.StatusPageURL,
+		"created_at":               v.CreatedAt,
+		"updated_at":               v.UpdatedAt,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -153,6 +183,11 @@ SELECT
     id,
     organization_id,
     name,
+    service_start_date,
+    service_termination_date,
+    service_criticality,
+    risk_tier,
+    status_page_url,
     created_at,
     updated_at
 FROM
@@ -167,7 +202,7 @@ WHERE
 
 	args := pgx.NamedArgs{"organization_id": organizationID}
 	maps.Copy(args, cursor.SQLArguments())
-	maps.Copy(args, cursor.SQLArguments())
+	maps.Copy(args, scope.SQLArguments())
 
 	r, err := conn.Query(ctx, q, args)
 	if err != nil {

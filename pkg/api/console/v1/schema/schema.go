@@ -245,10 +245,15 @@ type ComplexityRoot struct {
 	}
 
 	Vendor struct {
-		CreatedAt func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Name      func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
+		CreatedAt              func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		Name                   func(childComplexity int) int
+		RiskTier               func(childComplexity int) int
+		ServiceCriticality     func(childComplexity int) int
+		ServiceStartDate       func(childComplexity int) int
+		ServiceTerminationDate func(childComplexity int) int
+		StatusPageURL          func(childComplexity int) int
+		UpdatedAt              func(childComplexity int) int
 	}
 
 	VendorConnection struct {
@@ -1136,6 +1141,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Vendor.Name(childComplexity), true
 
+	case "Vendor.riskTier":
+		if e.complexity.Vendor.RiskTier == nil {
+			break
+		}
+
+		return e.complexity.Vendor.RiskTier(childComplexity), true
+
+	case "Vendor.serviceCriticality":
+		if e.complexity.Vendor.ServiceCriticality == nil {
+			break
+		}
+
+		return e.complexity.Vendor.ServiceCriticality(childComplexity), true
+
+	case "Vendor.serviceStartDate":
+		if e.complexity.Vendor.ServiceStartDate == nil {
+			break
+		}
+
+		return e.complexity.Vendor.ServiceStartDate(childComplexity), true
+
+	case "Vendor.serviceTerminationDate":
+		if e.complexity.Vendor.ServiceTerminationDate == nil {
+			break
+		}
+
+		return e.complexity.Vendor.ServiceTerminationDate(childComplexity), true
+
+	case "Vendor.statusPageUrl":
+		if e.complexity.Vendor.StatusPageURL == nil {
+			break
+		}
+
+		return e.complexity.Vendor.StatusPageURL(childComplexity), true
+
 	case "Vendor.updatedAt":
 		if e.complexity.Vendor.UpdatedAt == nil {
 			break
@@ -1183,6 +1223,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateVendorInput,
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeleteVendorInput,
+		ec.unmarshalInputUpdateVendorInput,
 	)
 	first := true
 
@@ -1399,6 +1440,11 @@ type Vendor implements Node {
   name: String!
   createdAt: Datetime!
   updatedAt: Datetime!
+  serviceStartDate: Datetime!
+  serviceTerminationDate: Datetime
+  serviceCriticality: ServiceCriticality!
+  riskTier: RiskTier!
+  statusPageUrl: String
 }
 
 type FrameworkConnection {
@@ -1610,6 +1656,28 @@ input CreatePeopleInput {
   fullName: String!
   primaryEmailAddress: String!
   kind: PeopleKind!
+}
+
+enum ServiceCriticality @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticality") {
+  LOW @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityLow")
+  MEDIUM @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityMedium") 
+  HIGH @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityHigh")
+}
+
+enum RiskTier @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.RiskTier") {
+  CRITICAL @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierCritical")
+  SIGNIFICANT @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierSignificant")
+  GENERAL @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierGeneral")
+}
+
+input UpdateVendorInput {
+  id: ID!
+  name: String
+  serviceStartDate: Datetime
+  serviceTerminationDate: Datetime
+  serviceCriticality: ServiceCriticality
+  riskTier: RiskTier
+  statusPageUrl: String
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -4826,6 +4894,16 @@ func (ec *executionContext) fieldContext_Mutation_createVendor(ctx context.Conte
 				return ec.fieldContext_Vendor_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Vendor_updatedAt(ctx, field)
+			case "serviceStartDate":
+				return ec.fieldContext_Vendor_serviceStartDate(ctx, field)
+			case "serviceTerminationDate":
+				return ec.fieldContext_Vendor_serviceTerminationDate(ctx, field)
+			case "serviceCriticality":
+				return ec.fieldContext_Vendor_serviceCriticality(ctx, field)
+			case "riskTier":
+				return ec.fieldContext_Vendor_riskTier(ctx, field)
+			case "statusPageUrl":
+				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
 		},
@@ -7138,6 +7216,190 @@ func (ec *executionContext) fieldContext_Vendor_updatedAt(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Vendor_serviceStartDate(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_serviceStartDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ServiceStartDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_serviceStartDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_serviceTerminationDate(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_serviceTerminationDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ServiceTerminationDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_serviceTerminationDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_serviceCriticality(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_serviceCriticality(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ServiceCriticality, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.ServiceCriticality)
+	fc.Result = res
+	return ec.marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_serviceCriticality(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ServiceCriticality does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_riskTier(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_riskTier(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RiskTier, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.RiskTier)
+	fc.Result = res
+	return ec.marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_riskTier(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type RiskTier does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_statusPageUrl(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_statusPageUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StatusPageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_statusPageUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _VendorConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.VendorConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_VendorConnection_edges(ctx, field)
 	if err != nil {
@@ -7309,6 +7571,16 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Vendor_updatedAt(ctx, field)
+			case "serviceStartDate":
+				return ec.fieldContext_Vendor_serviceStartDate(ctx, field)
+			case "serviceTerminationDate":
+				return ec.fieldContext_Vendor_serviceTerminationDate(ctx, field)
+			case "serviceCriticality":
+				return ec.fieldContext_Vendor_serviceCriticality(ctx, field)
+			case "riskTier":
+				return ec.fieldContext_Vendor_riskTier(ctx, field)
+			case "statusPageUrl":
+				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
 		},
@@ -8997,6 +9269,75 @@ func (ec *executionContext) unmarshalInputDeleteVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.VendorID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context, obj any) (types.UpdateVendorInput, error) {
+	var it types.UpdateVendorInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "name", "serviceStartDate", "serviceTerminationDate", "serviceCriticality", "riskTier", "statusPageUrl"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "serviceStartDate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceStartDate"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ServiceStartDate = data
+		case "serviceTerminationDate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceTerminationDate"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ServiceTerminationDate = data
+		case "serviceCriticality":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceCriticality"))
+			data, err := ec.unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ServiceCriticality = data
+		case "riskTier":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("riskTier"))
+			data, err := ec.unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RiskTier = data
+		case "statusPageUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusPageUrl"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StatusPageURL = data
 		}
 	}
 
@@ -10831,6 +11172,25 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "serviceStartDate":
+			out.Values[i] = ec._Vendor_serviceStartDate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "serviceTerminationDate":
+			out.Values[i] = ec._Vendor_serviceTerminationDate(ctx, field, obj)
+		case "serviceCriticality":
+			out.Values[i] = ec._Vendor_serviceCriticality(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "riskTier":
+			out.Values[i] = ec._Vendor_riskTier(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "statusPageUrl":
+			out.Values[i] = ec._Vendor_statusPageUrl(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11906,6 +12266,64 @@ var (
 	}
 )
 
+func (ec *executionContext) unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx context.Context, v any) (coredata.RiskTier, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx context.Context, sel ast.SelectionSet, v coredata.RiskTier) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier = map[string]coredata.RiskTier{
+		"CRITICAL":    coredata.RiskTierCritical,
+		"SIGNIFICANT": coredata.RiskTierSignificant,
+		"GENERAL":     coredata.RiskTierGeneral,
+	}
+	marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier = map[coredata.RiskTier]string{
+		coredata.RiskTierCritical:    "CRITICAL",
+		coredata.RiskTierSignificant: "SIGNIFICANT",
+		coredata.RiskTierGeneral:     "GENERAL",
+	}
+)
+
+func (ec *executionContext) unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx context.Context, v any) (coredata.ServiceCriticality, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx context.Context, sel ast.SelectionSet, v coredata.ServiceCriticality) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality = map[string]coredata.ServiceCriticality{
+		"LOW":    coredata.ServiceCriticalityLow,
+		"MEDIUM": coredata.ServiceCriticalityMedium,
+		"HIGH":   coredata.ServiceCriticalityHigh,
+	}
+	marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality = map[coredata.ServiceCriticality]string{
+		coredata.ServiceCriticalityLow:    "LOW",
+		coredata.ServiceCriticalityMedium: "MEDIUM",
+		coredata.ServiceCriticalityHigh:   "HIGH",
+	}
+)
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -12518,6 +12936,22 @@ func (ec *executionContext) marshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋprobo
 	return res
 }
 
+func (ec *executionContext) unmarshalODatetime2ᚖtimeᚐTime(ctx context.Context, v any) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalODatetime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalTime(*v)
+	return res
+}
+
 func (ec *executionContext) unmarshalOEvidenceState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx context.Context, v any) (*coredata.EvidenceState, error) {
 	if v == nil {
 		return nil, nil
@@ -12563,6 +12997,66 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	res := graphql.MarshalInt(*v)
 	return res
 }
+
+func (ec *executionContext) unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx context.Context, v any) (*coredata.RiskTier, error) {
+	if v == nil {
+		return nil, nil
+	}
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx context.Context, sel ast.SelectionSet, v *coredata.RiskTier) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalString(marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier[*v])
+	return res
+}
+
+var (
+	unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier = map[string]coredata.RiskTier{
+		"CRITICAL":    coredata.RiskTierCritical,
+		"SIGNIFICANT": coredata.RiskTierSignificant,
+		"GENERAL":     coredata.RiskTierGeneral,
+	}
+	marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier = map[coredata.RiskTier]string{
+		coredata.RiskTierCritical:    "CRITICAL",
+		coredata.RiskTierSignificant: "SIGNIFICANT",
+		coredata.RiskTierGeneral:     "GENERAL",
+	}
+)
+
+func (ec *executionContext) unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx context.Context, v any) (*coredata.ServiceCriticality, error) {
+	if v == nil {
+		return nil, nil
+	}
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx context.Context, sel ast.SelectionSet, v *coredata.ServiceCriticality) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalString(marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality[*v])
+	return res
+}
+
+var (
+	unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality = map[string]coredata.ServiceCriticality{
+		"LOW":    coredata.ServiceCriticalityLow,
+		"MEDIUM": coredata.ServiceCriticalityMedium,
+		"HIGH":   coredata.ServiceCriticalityHigh,
+	}
+	marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality = map[coredata.ServiceCriticality]string{
+		coredata.ServiceCriticalityLow:    "LOW",
+		coredata.ServiceCriticalityMedium: "MEDIUM",
+		coredata.ServiceCriticalityHigh:   "HIGH",
+	}
+)
 
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
 	if v == nil {

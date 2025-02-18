@@ -117,6 +117,11 @@ type Vendor implements Node {
   name: String!
   createdAt: Datetime!
   updatedAt: Datetime!
+  serviceStartDate: Datetime!
+  serviceTerminationDate: Datetime
+  serviceCriticality: ServiceCriticality!
+  riskTier: RiskTier!
+  statusPageUrl: String
 }
 
 type FrameworkConnection {
@@ -328,4 +333,26 @@ input CreatePeopleInput {
   fullName: String!
   primaryEmailAddress: String!
   kind: PeopleKind!
+}
+
+enum ServiceCriticality @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticality") {
+  LOW @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityLow")
+  MEDIUM @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityMedium") 
+  HIGH @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityHigh")
+}
+
+enum RiskTier @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.RiskTier") {
+  CRITICAL @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierCritical")
+  SIGNIFICANT @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierSignificant")
+  GENERAL @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierGeneral")
+}
+
+input UpdateVendorInput {
+  id: ID!
+  name: String
+  serviceStartDate: Datetime
+  serviceTerminationDate: Datetime
+  serviceCriticality: ServiceCriticality
+  riskTier: RiskTier
+  statusPageUrl: String
 }

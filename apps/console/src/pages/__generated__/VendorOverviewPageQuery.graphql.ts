@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a9ec0002895dd62d2845ae4fd6df3a53>>
+ * @generated SignedSource<<939b83dd396154844197ee10514be613>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,8 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
+export type ServiceCriticality = "HIGH" | "LOW" | "MEDIUM";
 export type VendorOverviewPageQuery$variables = {
   vendorId: string;
 };
@@ -17,6 +19,11 @@ export type VendorOverviewPageQuery$data = {
     readonly createdAt?: any;
     readonly id?: string;
     readonly name?: string;
+    readonly riskTier?: RiskTier;
+    readonly serviceCriticality?: ServiceCriticality;
+    readonly serviceStartDate?: any;
+    readonly serviceTerminationDate?: any | null | undefined;
+    readonly statusPageUrl?: string | null | undefined;
     readonly updatedAt?: any;
   };
 };
@@ -58,10 +65,45 @@ v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "createdAt",
+  "name": "serviceStartDate",
   "storageKey": null
 },
 v5 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "serviceTerminationDate",
+  "storageKey": null
+},
+v6 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "serviceCriticality",
+  "storageKey": null
+},
+v7 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "riskTier",
+  "storageKey": null
+},
+v8 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "statusPageUrl",
+  "storageKey": null
+},
+v9 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "createdAt",
+  "storageKey": null
+},
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
@@ -89,7 +131,12 @@ return {
               (v2/*: any*/),
               (v3/*: any*/),
               (v4/*: any*/),
-              (v5/*: any*/)
+              (v5/*: any*/),
+              (v6/*: any*/),
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/),
+              (v10/*: any*/)
             ],
             "type": "Vendor",
             "abstractKey": null
@@ -128,7 +175,12 @@ return {
             "selections": [
               (v3/*: any*/),
               (v4/*: any*/),
-              (v5/*: any*/)
+              (v5/*: any*/),
+              (v6/*: any*/),
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/),
+              (v10/*: any*/)
             ],
             "type": "Vendor",
             "abstractKey": null
@@ -139,16 +191,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "93086ca61d518fce9c6ed49fa9bd841e",
+    "cacheID": "c9d7bade02d1802838f6ac3b02ef7c9a",
     "id": null,
     "metadata": {},
     "name": "VendorOverviewPageQuery",
     "operationKind": "query",
-    "text": "query VendorOverviewPageQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
+    "text": "query VendorOverviewPageQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      serviceStartDate\n      serviceTerminationDate\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "7959720cf1a6376d406ac5f478f6d9c3";
+(node as any).hash = "92a640f674261d28028d752f027ec141";
 
 export default node;
