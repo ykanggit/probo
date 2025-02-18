@@ -112,9 +112,10 @@ function PeopleListPageContent({
       </div>
       <div className="space-y-2">
         {peoples.map((person) => (
-          <div
+          <Link
             key={person?.id}
-            className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm"
+            to={`/peoples/${person?.id}`}
+            className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50"
           >
             <div className="flex items-center gap-4">
               <Avatar className="h-10 w-10">
@@ -180,7 +181,7 @@ function PeopleListPageContent({
                 Delete
               </Button>
             </div>
-          </div>
+          </Link>
         ))}
 
         <div className="flex gap-2 justify-end mt-4">

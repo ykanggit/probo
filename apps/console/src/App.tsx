@@ -10,6 +10,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ErrorPage } from "./pages/ErrorPage";
 import ConsoleLayout from "./layouts/ConsoleLayout";
 import { RelayEnvironment } from "./RelayEnvironment";
+import PeopleOverviewPage from "@/pages/PeopleOverviewPage";
 
 posthog.init(process.env.POSTHOG_KEY!, {
   api_host: process.env.POSTHOG_HOST,
@@ -81,6 +82,16 @@ function App() {
                       }
                     />
                     <Route
+                      path="/peoples/:peopleId"
+                      element={
+                        <Suspense>
+                          <ErrorBoundaryWithLocation>
+                            <PeopleOverviewPage />
+                          </ErrorBoundaryWithLocation>
+                        </Suspense>
+                      }
+                    />
+                    <Route
                       path="/vendors"
                       element={
                         <Suspense>
@@ -98,8 +109,8 @@ function App() {
                             <FrameworkListPage />
                           </ErrorBoundaryWithLocation>
                         </Suspense>
-                      }
-                    />
+                        }
+                      />
                     <Route
                       path="/frameworks/:frameworkId"
                       element={
@@ -118,8 +129,8 @@ function App() {
                             <VendorOverviewPage />
                           </ErrorBoundaryWithLocation>
                         </Suspense>
-                      }
-                    />
+                        }
+                      />
                     <Route
                       path="/settings"
                       element={
