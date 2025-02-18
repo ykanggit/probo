@@ -16,6 +16,8 @@ import { Suspense, useEffect } from "react";
 import type { VendorOverviewPageQuery as VendorOverviewPageQueryType } from "./__generated__/VendorOverviewPageQuery.graphql";
 import { useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
+
 const VendorOverviewPageQuery = graphql`
   query VendorOverviewPageQuery($vendorId: ID!) {
     node(id: $vendorId) {
@@ -36,6 +38,13 @@ function VendorOverviewPageContent({
 }) {
   const data = usePreloadedQuery(VendorOverviewPageQuery, queryRef);
   const [riskLevel, setRiskLevel] = useState("medium");
+  const { setBreadcrumbSegment } = useBreadcrumb();
+
+  useEffect(() => {
+    if (data.node?.name) {
+      setBreadcrumbSegment('vendors/:id', data.node.name);
+    }
+  }, [data.node?.name, setBreadcrumbSegment]);
 
   return (
     <div className="space-y-6 p-4 md:p-6 lg:p-8">
