@@ -153,6 +153,7 @@ function VendorOverviewPageContent({
           description: "Changes saved successfully",
           variant: "default",
         });
+        setEditedFields(new Set());
       },
       onError: (error) => {
         if (error.message?.includes('concurrent modification')) {
