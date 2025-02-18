@@ -42,7 +42,7 @@ function VendorOverviewPageContent({
 
   useEffect(() => {
     if (data.node?.name) {
-      setBreadcrumbSegment('vendors/:id', data.node.name);
+      setBreadcrumbSegment("vendors/:id", data.node.name);
     }
   }, [data.node?.name, setBreadcrumbSegment]);
 

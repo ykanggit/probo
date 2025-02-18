@@ -15,7 +15,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { BreadcrumbProvider, useBreadcrumb } from "@/contexts/BreadcrumbContext";
+import {
+  BreadcrumbProvider,
+  useBreadcrumb,
+} from "@/contexts/BreadcrumbContext";
 
 function BreadcrumbNavigation() {
   const location = useLocation();
@@ -26,10 +29,10 @@ function BreadcrumbNavigation() {
     // Check if we have a custom segment name
     const fullPath = pathSegments
       .slice(0, pathSegments.indexOf(segment) + 1)
-      .join('/');
-    
+      .join("/");
+
     // Look for patterns like 'vendors/:id' in our segments
-    const patternPath = fullPath.replace(/\/[^/]+$/, '/:id');
+    const patternPath = fullPath.replace(/\/[^/]+$/, "/:id");
     if (segments[patternPath]) {
       return segments[patternPath];
     }
@@ -60,9 +63,7 @@ function BreadcrumbNavigation() {
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
-                    <Link to={path}>
-                      {getBreadcrumbText(segment, path)}
-                    </Link>
+                    <Link to={path}>{getBreadcrumbText(segment, path)}</Link>
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>

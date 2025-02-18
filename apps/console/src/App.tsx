@@ -109,8 +109,8 @@ function App() {
                             <FrameworkListPage />
                           </ErrorBoundaryWithLocation>
                         </Suspense>
-                        }
-                      />
+                      }
+                    />
                     <Route
                       path="/frameworks/:frameworkId"
                       element={
@@ -129,8 +129,8 @@ function App() {
                             <VendorOverviewPage />
                           </ErrorBoundaryWithLocation>
                         </Suspense>
-                        }
-                      />
+                      }
+                    />
                     <Route
                       path="/settings"
                       element={

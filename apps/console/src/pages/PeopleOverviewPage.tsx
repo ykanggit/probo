@@ -37,7 +37,7 @@ function PeopleOverviewPageContent({
 
   useEffect(() => {
     if (data.node?.primaryEmailAddress) {
-      setBreadcrumbSegment('peoples/:id', data.node.primaryEmailAddress);
+      setBreadcrumbSegment("peoples/:id", data.node.primaryEmailAddress);
     }
   }, [data.node?.primaryEmailAddress, setBreadcrumbSegment]);
 
@@ -48,9 +48,7 @@ function PeopleOverviewPageContent({
           <h1 className="text-xl font-semibold text-gray-900">
             {data.node?.fullName}
           </h1>
-          <p className="text-gray-600">
-            View and manage person details
-          </p>
+          <p className="text-gray-600">View and manage person details</p>
         </div>
 
         <Card className="p-6">
@@ -64,11 +62,15 @@ function PeopleOverviewPageContent({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
-                <label className="text-sm font-medium text-gray-700">Full Name</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Full Name
+                </label>
                 <p className="mt-1">{data.node?.fullName}</p>
               </div>
               <div className="col-span-2">
-                <label className="text-sm font-medium text-gray-700">Email</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Email
+                </label>
                 <p className="mt-1">{data.node?.primaryEmailAddress}</p>
               </div>
             </div>
@@ -86,12 +88,20 @@ function PeopleOverviewPageContent({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-700">Created At</label>
-                <p className="mt-1">{new Date(data.node?.createdAt).toLocaleString()}</p>
+                <label className="text-sm font-medium text-gray-700">
+                  Created At
+                </label>
+                <p className="mt-1">
+                  {new Date(data.node?.createdAt).toLocaleString()}
+                </p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">Last Updated</label>
-                <p className="mt-1">{new Date(data.node?.updatedAt).toLocaleString()}</p>
+                <label className="text-sm font-medium text-gray-700">
+                  Last Updated
+                </label>
+                <p className="mt-1">
+                  {new Date(data.node?.updatedAt).toLocaleString()}
+                </p>
               </div>
             </div>
           </div>
@@ -141,4 +151,4 @@ export default function PeopleOverviewPage() {
       </Suspense>
     </>
   );
-} 
+}

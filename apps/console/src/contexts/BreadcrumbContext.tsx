@@ -1,19 +1,25 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback } from "react";
 
 type BreadcrumbContextType = {
   segments: Record<string, string>;
   setBreadcrumbSegment: (path: string, display: string) => void;
 };
 
-const BreadcrumbContext = createContext<BreadcrumbContextType | undefined>(undefined);
+const BreadcrumbContext = createContext<BreadcrumbContextType | undefined>(
+  undefined,
+);
 
-export function BreadcrumbProvider({ children }: { children: React.ReactNode }) {
+export function BreadcrumbProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [segments, setSegments] = useState<Record<string, string>>({});
 
   const setBreadcrumbSegment = useCallback((path: string, display: string) => {
-    setSegments(prev => ({
+    setSegments((prev) => ({
       ...prev,
-      [path]: display
+      [path]: display,
     }));
   }, []);
 
@@ -27,7 +33,7 @@ export function BreadcrumbProvider({ children }: { children: React.ReactNode }) 
 export function useBreadcrumb() {
   const context = useContext(BreadcrumbContext);
   if (context === undefined) {
-    throw new Error('useBreadcrumb must be used within a BreadcrumbProvider');
+    throw new Error("useBreadcrumb must be used within a BreadcrumbProvider");
   }
   return context;
-} 
+}
