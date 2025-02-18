@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7a271eaf4694d17694f97b2326dd865f>>
+ * @generated SignedSource<<180daebbc0ea7b69991d7bad2005ea13>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -23,8 +23,8 @@ export type VendorOverviewPageQuery$data = {
     readonly privacyPolicyUrl?: string | null | undefined;
     readonly riskTier?: RiskTier;
     readonly serviceCriticality?: ServiceCriticality;
-    readonly serviceStartDate?: any;
-    readonly serviceTerminationDate?: any | null | undefined;
+    readonly serviceStartAt?: any;
+    readonly serviceTerminationAt?: any | null | undefined;
     readonly statusPageUrl?: string | null | undefined;
     readonly termsOfServiceUrl?: string | null | undefined;
     readonly updatedAt?: any;
@@ -75,14 +75,14 @@ v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "serviceStartDate",
+  "name": "serviceStartAt",
   "storageKey": null
 },
 v6 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "serviceTerminationDate",
+  "name": "serviceTerminationAt",
   "storageKey": null
 },
 v7 = {
@@ -221,16 +221,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ad3e9f79ffd96f45f653bc45311f162e",
+    "cacheID": "d732d532dc450d86b3e790500c59e0ee",
     "id": null,
     "metadata": {},
     "name": "VendorOverviewPageQuery",
     "operationKind": "query",
-    "text": "query VendorOverviewPageQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartDate\n      serviceTerminationDate\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
+    "text": "query VendorOverviewPageQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "8fe48d1033182deff812f17769927ef2";
+(node as any).hash = "0b7427451e68a951e2eecbc3f5c59456";
 
 export default node;

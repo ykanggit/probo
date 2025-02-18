@@ -245,18 +245,18 @@ type ComplexityRoot struct {
 	}
 
 	Vendor struct {
-		CreatedAt              func(childComplexity int) int
-		Description            func(childComplexity int) int
-		ID                     func(childComplexity int) int
-		Name                   func(childComplexity int) int
-		PrivacyPolicyURL       func(childComplexity int) int
-		RiskTier               func(childComplexity int) int
-		ServiceCriticality     func(childComplexity int) int
-		ServiceStartDate       func(childComplexity int) int
-		ServiceTerminationDate func(childComplexity int) int
-		StatusPageURL          func(childComplexity int) int
-		TermsOfServiceURL      func(childComplexity int) int
-		UpdatedAt              func(childComplexity int) int
+		CreatedAt            func(childComplexity int) int
+		Description          func(childComplexity int) int
+		ID                   func(childComplexity int) int
+		Name                 func(childComplexity int) int
+		PrivacyPolicyURL     func(childComplexity int) int
+		RiskTier             func(childComplexity int) int
+		ServiceCriticality   func(childComplexity int) int
+		ServiceStartAt       func(childComplexity int) int
+		ServiceTerminationAt func(childComplexity int) int
+		StatusPageURL        func(childComplexity int) int
+		TermsOfServiceURL    func(childComplexity int) int
+		UpdatedAt            func(childComplexity int) int
 	}
 
 	VendorConnection struct {
@@ -1172,19 +1172,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Vendor.ServiceCriticality(childComplexity), true
 
-	case "Vendor.serviceStartDate":
-		if e.complexity.Vendor.ServiceStartDate == nil {
+	case "Vendor.serviceStartAt":
+		if e.complexity.Vendor.ServiceStartAt == nil {
 			break
 		}
 
-		return e.complexity.Vendor.ServiceStartDate(childComplexity), true
+		return e.complexity.Vendor.ServiceStartAt(childComplexity), true
 
-	case "Vendor.serviceTerminationDate":
-		if e.complexity.Vendor.ServiceTerminationDate == nil {
+	case "Vendor.serviceTerminationAt":
+		if e.complexity.Vendor.ServiceTerminationAt == nil {
 			break
 		}
 
-		return e.complexity.Vendor.ServiceTerminationDate(childComplexity), true
+		return e.complexity.Vendor.ServiceTerminationAt(childComplexity), true
 
 	case "Vendor.statusPageUrl":
 		if e.complexity.Vendor.StatusPageURL == nil {
@@ -1465,8 +1465,8 @@ type Vendor implements Node {
   description: String!
   createdAt: Datetime!
   updatedAt: Datetime!
-  serviceStartDate: Datetime!
-  serviceTerminationDate: Datetime
+  serviceStartAt: Datetime!
+  serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality!
   riskTier: RiskTier!
   statusPageUrl: String
@@ -1702,8 +1702,8 @@ input UpdateVendorInput {
   id: ID!
   name: String
   description: String
-  serviceStartDate: Datetime
-  serviceTerminationDate: Datetime
+  serviceStartAt: Datetime
+  serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality
   riskTier: RiskTier
   statusPageUrl: String
@@ -4927,10 +4927,10 @@ func (ec *executionContext) fieldContext_Mutation_createVendor(ctx context.Conte
 				return ec.fieldContext_Vendor_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Vendor_updatedAt(ctx, field)
-			case "serviceStartDate":
-				return ec.fieldContext_Vendor_serviceStartDate(ctx, field)
-			case "serviceTerminationDate":
-				return ec.fieldContext_Vendor_serviceTerminationDate(ctx, field)
+			case "serviceStartAt":
+				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
+			case "serviceTerminationAt":
+				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
 			case "serviceCriticality":
 				return ec.fieldContext_Vendor_serviceCriticality(ctx, field)
 			case "riskTier":
@@ -7291,15 +7291,15 @@ func (ec *executionContext) fieldContext_Vendor_updatedAt(_ context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Vendor_serviceStartDate(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Vendor_serviceStartDate(ctx, field)
+func (ec *executionContext) _Vendor_serviceStartAt(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_serviceStartAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ServiceStartDate, nil
+		return obj.ServiceStartAt, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7316,7 +7316,7 @@ func (ec *executionContext) _Vendor_serviceStartDate(ctx context.Context, field 
 	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Vendor_serviceStartDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Vendor_serviceStartAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Vendor",
 		Field:      field,
@@ -7329,15 +7329,15 @@ func (ec *executionContext) fieldContext_Vendor_serviceStartDate(_ context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Vendor_serviceTerminationDate(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Vendor_serviceTerminationDate(ctx, field)
+func (ec *executionContext) _Vendor_serviceTerminationAt(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ServiceTerminationDate, nil
+		return obj.ServiceTerminationAt, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7351,7 +7351,7 @@ func (ec *executionContext) _Vendor_serviceTerminationDate(ctx context.Context, 
 	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Vendor_serviceTerminationDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Vendor_serviceTerminationAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Vendor",
 		Field:      field,
@@ -7718,10 +7718,10 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Vendor_updatedAt(ctx, field)
-			case "serviceStartDate":
-				return ec.fieldContext_Vendor_serviceStartDate(ctx, field)
-			case "serviceTerminationDate":
-				return ec.fieldContext_Vendor_serviceTerminationDate(ctx, field)
+			case "serviceStartAt":
+				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
+			case "serviceTerminationAt":
+				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
 			case "serviceCriticality":
 				return ec.fieldContext_Vendor_serviceCriticality(ctx, field)
 			case "riskTier":
@@ -9440,7 +9440,7 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartDate", "serviceTerminationDate", "serviceCriticality", "riskTier", "statusPageUrl", "termsOfServiceUrl", "privacyPolicyUrl"}
+	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartAt", "serviceTerminationAt", "serviceCriticality", "riskTier", "statusPageUrl", "termsOfServiceUrl", "privacyPolicyUrl"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9468,20 +9468,20 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.Description = data
-		case "serviceStartDate":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceStartDate"))
+		case "serviceStartAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceStartAt"))
 			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ServiceStartDate = data
-		case "serviceTerminationDate":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceTerminationDate"))
+			it.ServiceStartAt = data
+		case "serviceTerminationAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceTerminationAt"))
 			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ServiceTerminationDate = data
+			it.ServiceTerminationAt = data
 		case "serviceCriticality":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceCriticality"))
 			data, err := ec.unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx, v)
@@ -11356,13 +11356,13 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "serviceStartDate":
-			out.Values[i] = ec._Vendor_serviceStartDate(ctx, field, obj)
+		case "serviceStartAt":
+			out.Values[i] = ec._Vendor_serviceStartAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "serviceTerminationDate":
-			out.Values[i] = ec._Vendor_serviceTerminationDate(ctx, field, obj)
+		case "serviceTerminationAt":
+			out.Values[i] = ec._Vendor_serviceTerminationAt(ctx, field, obj)
 		case "serviceCriticality":
 			out.Values[i] = ec._Vendor_serviceCriticality(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

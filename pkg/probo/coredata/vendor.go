@@ -28,19 +28,19 @@ import (
 
 type (
 	Vendor struct {
-		ID                     gid.GID
-		OrganizationID         gid.GID
-		Name                   string
-		Description            string
-		ServiceStartDate       time.Time
-		ServiceTerminationDate *time.Time
-		ServiceCriticality     ServiceCriticality
-		RiskTier               RiskTier
-		StatusPageURL          *string
-		TermsOfServiceURL      *string
-		PrivacyPolicyURL       *string
-		CreatedAt              time.Time
-		UpdatedAt              time.Time
+		ID                   gid.GID
+		OrganizationID       gid.GID
+		Name                 string
+		Description          string
+		ServiceStartAt       time.Time
+		ServiceTerminationAt *time.Time
+		ServiceCriticality   ServiceCriticality
+		RiskTier             RiskTier
+		StatusPageURL        *string
+		TermsOfServiceURL    *string
+		PrivacyPolicyURL     *string
+		CreatedAt            time.Time
+		UpdatedAt            time.Time
 	}
 
 	Vendors []*Vendor
@@ -56,8 +56,8 @@ func (v *Vendor) scan(r pgx.Row) error {
 		&v.OrganizationID,
 		&v.Name,
 		&v.Description,
-		&v.ServiceStartDate,
-		&v.ServiceTerminationDate,
+		&v.ServiceStartAt,
+		&v.ServiceTerminationAt,
 		&v.ServiceCriticality,
 		&v.RiskTier,
 		&v.StatusPageURL,
@@ -80,8 +80,8 @@ SELECT
     organization_id,
     name,
     description,
-    service_start_date,
-    service_termination_date,
+    service_start_at,
+    service_termination_at,
     service_criticality,
     risk_tier,
     status_page_url,
@@ -125,8 +125,8 @@ INSERT INTO
         organization_id,
         name,
         description,
-        service_start_date,
-        service_termination_date,
+        service_start_at,
+        service_termination_at,
         service_criticality,
         risk_tier,
         status_page_url,
@@ -140,8 +140,8 @@ VALUES (
     @organization_id,
     @name,
     @description,
-    @service_start_date,
-    @service_termination_date,
+    @service_start_at,
+    @service_termination_at,
     @service_criticality,
     @risk_tier,
     @status_page_url,
@@ -153,19 +153,19 @@ VALUES (
 `
 
 	args := pgx.NamedArgs{
-		"vendor_id":                v.ID,
-		"organization_id":          v.OrganizationID,
-		"name":                     v.Name,
-		"description":              v.Description,
-		"service_start_date":       v.ServiceStartDate,
-		"service_termination_date": v.ServiceTerminationDate,
-		"service_criticality":      v.ServiceCriticality,
-		"risk_tier":                v.RiskTier,
-		"status_page_url":          v.StatusPageURL,
-		"terms_of_service_url":     v.TermsOfServiceURL,
-		"privacy_policy_url":       v.PrivacyPolicyURL,
-		"created_at":               v.CreatedAt,
-		"updated_at":               v.UpdatedAt,
+		"vendor_id":              v.ID,
+		"organization_id":        v.OrganizationID,
+		"name":                   v.Name,
+		"description":            v.Description,
+		"service_start_at":       v.ServiceStartAt,
+		"service_termination_at": v.ServiceTerminationAt,
+		"service_criticality":    v.ServiceCriticality,
+		"risk_tier":              v.RiskTier,
+		"status_page_url":        v.StatusPageURL,
+		"terms_of_service_url":   v.TermsOfServiceURL,
+		"privacy_policy_url":     v.PrivacyPolicyURL,
+		"created_at":             v.CreatedAt,
+		"updated_at":             v.UpdatedAt,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -202,8 +202,8 @@ SELECT
     organization_id,
     name,
     description,
-    service_start_date,
-    service_termination_date,
+    service_start_at,
+    service_termination_at,
     service_criticality,
     risk_tier,
     status_page_url,

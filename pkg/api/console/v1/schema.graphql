@@ -118,8 +118,8 @@ type Vendor implements Node {
   description: String!
   createdAt: Datetime!
   updatedAt: Datetime!
-  serviceStartDate: Datetime!
-  serviceTerminationDate: Datetime
+  serviceStartAt: Datetime!
+  serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality!
   riskTier: RiskTier!
   statusPageUrl: String
@@ -355,8 +355,8 @@ input UpdateVendorInput {
   id: ID!
   name: String
   description: String
-  serviceStartDate: Datetime
-  serviceTerminationDate: Datetime
+  serviceStartAt: Datetime
+  serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality
   riskTier: RiskTier
   statusPageUrl: String

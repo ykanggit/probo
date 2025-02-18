@@ -239,31 +239,31 @@ type TaskStateTransitionEdge struct {
 }
 
 type UpdateVendorInput struct {
-	ID                     gid.GID                      `json:"id"`
-	Name                   *string                      `json:"name,omitempty"`
-	Description            *string                      `json:"description,omitempty"`
-	ServiceStartDate       *time.Time                   `json:"serviceStartDate,omitempty"`
-	ServiceTerminationDate *time.Time                   `json:"serviceTerminationDate,omitempty"`
-	ServiceCriticality     *coredata.ServiceCriticality `json:"serviceCriticality,omitempty"`
-	RiskTier               *coredata.RiskTier           `json:"riskTier,omitempty"`
-	StatusPageURL          *string                      `json:"statusPageUrl,omitempty"`
-	TermsOfServiceURL      *string                      `json:"termsOfServiceUrl,omitempty"`
-	PrivacyPolicyURL       *string                      `json:"privacyPolicyUrl,omitempty"`
+	ID                   gid.GID                      `json:"id"`
+	Name                 *string                      `json:"name,omitempty"`
+	Description          *string                      `json:"description,omitempty"`
+	ServiceStartAt       *time.Time                   `json:"serviceStartAt,omitempty"`
+	ServiceTerminationAt *time.Time                   `json:"serviceTerminationAt,omitempty"`
+	ServiceCriticality   *coredata.ServiceCriticality `json:"serviceCriticality,omitempty"`
+	RiskTier             *coredata.RiskTier           `json:"riskTier,omitempty"`
+	StatusPageURL        *string                      `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL    *string                      `json:"termsOfServiceUrl,omitempty"`
+	PrivacyPolicyURL     *string                      `json:"privacyPolicyUrl,omitempty"`
 }
 
 type Vendor struct {
-	ID                     gid.GID                     `json:"id"`
-	Name                   string                      `json:"name"`
-	Description            string                      `json:"description"`
-	CreatedAt              time.Time                   `json:"createdAt"`
-	UpdatedAt              time.Time                   `json:"updatedAt"`
-	ServiceStartDate       time.Time                   `json:"serviceStartDate"`
-	ServiceTerminationDate *time.Time                  `json:"serviceTerminationDate,omitempty"`
-	ServiceCriticality     coredata.ServiceCriticality `json:"serviceCriticality"`
-	RiskTier               coredata.RiskTier           `json:"riskTier"`
-	StatusPageURL          *string                     `json:"statusPageUrl,omitempty"`
-	TermsOfServiceURL      *string                     `json:"termsOfServiceUrl,omitempty"`
-	PrivacyPolicyURL       *string                     `json:"privacyPolicyUrl,omitempty"`
+	ID                   gid.GID                     `json:"id"`
+	Name                 string                      `json:"name"`
+	Description          string                      `json:"description"`
+	CreatedAt            time.Time                   `json:"createdAt"`
+	UpdatedAt            time.Time                   `json:"updatedAt"`
+	ServiceStartAt       time.Time                   `json:"serviceStartAt"`
+	ServiceTerminationAt *time.Time                  `json:"serviceTerminationAt,omitempty"`
+	ServiceCriticality   coredata.ServiceCriticality `json:"serviceCriticality"`
+	RiskTier             coredata.RiskTier           `json:"riskTier"`
+	StatusPageURL        *string                     `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL    *string                     `json:"termsOfServiceUrl,omitempty"`
+	PrivacyPolicyURL     *string                     `json:"privacyPolicyUrl,omitempty"`
 }
 
 func (Vendor) IsNode()             {}

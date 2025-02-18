@@ -41,17 +41,17 @@ func NewVendorEdge(v *coredata.Vendor) *VendorEdge {
 
 func NewVendor(v *coredata.Vendor) *Vendor {
 	return &Vendor{
-		ID:                     v.ID,
-		Name:                   v.Name,
-		Description:            v.Description,
-		CreatedAt:              v.CreatedAt,
-		UpdatedAt:              v.UpdatedAt,
-		ServiceStartDate:       v.ServiceStartDate,
-		ServiceTerminationDate: v.ServiceTerminationDate,
-		ServiceCriticality:     v.ServiceCriticality,
-		RiskTier:               v.RiskTier,
-		StatusPageURL:          v.StatusPageURL,
-		TermsOfServiceURL:      v.TermsOfServiceURL,
-		PrivacyPolicyURL:       v.PrivacyPolicyURL,
+		ID:                   v.ID,
+		Name:                 v.Name,
+		Description:          v.Description,
+		CreatedAt:            v.CreatedAt,
+		UpdatedAt:            v.UpdatedAt,
+		ServiceStartAt:       v.ServiceStartAt,
+		ServiceTerminationAt: v.ServiceTerminationAt,
+		ServiceCriticality:   v.ServiceCriticality,
+		RiskTier:             v.RiskTier,
+		StatusPageURL:        v.StatusPageURL,
+		TermsOfServiceURL:    v.TermsOfServiceURL,
+		PrivacyPolicyURL:     v.PrivacyPolicyURL,
 	}
 }

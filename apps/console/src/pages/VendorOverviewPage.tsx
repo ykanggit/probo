@@ -23,8 +23,8 @@ const vendorOverviewPageQuery = graphql`
         id
         name
         description
-        serviceStartDate
-        serviceTerminationDate
+        serviceStartAt
+        serviceTerminationAt
         serviceCriticality
         riskTier
         statusPageUrl
@@ -79,18 +79,18 @@ function VendorOverviewPageContent({
                   <Label className="text-sm">Service Start Date</Label>
                 </div>
                 <p className="text-sm text-gray-600">
-                  {new Date(data.node.serviceStartDate).toLocaleDateString()}
+                  {new Date(data.node.serviceStartAt).toLocaleDateString()}
                 </p>
               </div>
 
-              {data.node?.serviceTerminationDate && (
+              {data.node?.serviceTerminationAt && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <HelpCircle className="h-4 w-4 text-gray-400" />
-                    <Label className="text-sm">Service Termination Date</Label>
+                    <Label className="text-sm">Service Termination At</Label>
                   </div>
                   <p className="text-sm text-gray-600">
-                    {new Date(data.node.serviceTerminationDate).toLocaleDateString()}
+                    {new Date(data.node.serviceTerminationAt).toLocaleDateString()}
                   </p>
                 </div>
               )}
