@@ -110,16 +110,6 @@ func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteV
 	return "", nil
 }
 
-// DeletePeople is the resolver for the deletePeople field.
-func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (string, error) {
-	err := r.svc.DeletePeople(ctx, input.PeopleID)
-	if err != nil {
-		return "", fmt.Errorf("cannot delete people: %w", err)
-	}
-
-	return "", nil
-}
-
 // CreatePeople is the resolver for the createPeople field.
 func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.People, error) {
 	people, err := r.svc.CreatePeople(ctx, probo.CreatePeopleRequest{
@@ -135,6 +125,33 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 	}
 
 	return types.NewPeople(people), nil
+}
+
+// UpdatePeople is the resolver for the updatePeople field.
+func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.People, error) {
+	people, err := r.svc.UpdatePeople(ctx, probo.UpdatePeopleRequest{
+		ID:                       input.ID,
+		ExpectedVersion:          input.ExpectedVersion,
+		FullName:                 input.FullName,
+		PrimaryEmailAddress:      input.PrimaryEmailAddress,
+		AdditionalEmailAddresses: &input.AdditionalEmailAddresses,
+		Kind:                     input.Kind,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update people: %w", err)
+	}
+
+	return types.NewPeople(people), nil
+}
+
+// DeletePeople is the resolver for the deletePeople field.
+func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (string, error) {
+	err := r.svc.DeletePeople(ctx, input.PeopleID)
+	if err != nil {
+		return "", fmt.Errorf("cannot delete people: %w", err)
+	}
+
+	return "", nil
 }
 
 // Frameworks is the resolver for the frameworks field.

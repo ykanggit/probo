@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ee2731bf27a12fb704f79cf4058e2d80>>
+ * @generated SignedSource<<528ad6b0a104964c9d947ef1e9c41b46>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,16 +9,20 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type PeopleKind = "CONTRACTOR" | "EMPLOYEE";
 export type PeopleOverviewPageQuery$variables = {
   peopleId: string;
 };
 export type PeopleOverviewPageQuery$data = {
   readonly node: {
+    readonly additionalEmailAddresses?: ReadonlyArray<string>;
     readonly createdAt?: any;
     readonly fullName?: string;
     readonly id?: string;
+    readonly kind?: PeopleKind;
     readonly primaryEmailAddress?: string;
     readonly updatedAt?: any;
+    readonly version?: number;
   };
 };
 export type PeopleOverviewPageQuery = {
@@ -66,14 +70,35 @@ v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "createdAt",
+  "name": "additionalEmailAddresses",
   "storageKey": null
 },
 v6 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
+  "name": "kind",
+  "storageKey": null
+},
+v7 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "createdAt",
+  "storageKey": null
+},
+v8 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
   "name": "updatedAt",
+  "storageKey": null
+},
+v9 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "version",
   "storageKey": null
 };
 return {
@@ -98,7 +123,10 @@ return {
               (v3/*: any*/),
               (v4/*: any*/),
               (v5/*: any*/),
-              (v6/*: any*/)
+              (v6/*: any*/),
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/)
             ],
             "type": "People",
             "abstractKey": null
@@ -138,7 +166,10 @@ return {
               (v3/*: any*/),
               (v4/*: any*/),
               (v5/*: any*/),
-              (v6/*: any*/)
+              (v6/*: any*/),
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/)
             ],
             "type": "People",
             "abstractKey": null
@@ -149,16 +180,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "0cd0dd96cb7a84c2016bfe1f088f8245",
+    "cacheID": "1383ca6e8c8b205082cc68223bec1833",
     "id": null,
     "metadata": {},
     "name": "PeopleOverviewPageQuery",
     "operationKind": "query",
-    "text": "query PeopleOverviewPageQuery(\n  $peopleId: ID!\n) {\n  node(id: $peopleId) {\n    __typename\n    ... on People {\n      id\n      fullName\n      primaryEmailAddress\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
+    "text": "query PeopleOverviewPageQuery(\n  $peopleId: ID!\n) {\n  node(id: $peopleId) {\n    __typename\n    ... on People {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      createdAt\n      updatedAt\n      version\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "16b3f0915f69d8475d745b0c7f13b029";
+(node as any).hash = "fa229186ad9e51f3a60b23fa88a882aa";
 
 export default node;

@@ -177,6 +177,7 @@ type People struct {
 	Kind                     coredata.PeopleKind `json:"kind"`
 	CreatedAt                time.Time           `json:"createdAt"`
 	UpdatedAt                time.Time           `json:"updatedAt"`
+	Version                  int                 `json:"version"`
 }
 
 func (People) IsNode()             {}
@@ -236,6 +237,15 @@ type TaskStateTransitionConnection struct {
 type TaskStateTransitionEdge struct {
 	Cursor page.CursorKey       `json:"cursor"`
 	Node   *TaskStateTransition `json:"node"`
+}
+
+type UpdatePeopleInput struct {
+	ID                       gid.GID              `json:"id"`
+	ExpectedVersion          int                  `json:"expectedVersion"`
+	FullName                 *string              `json:"fullName,omitempty"`
+	PrimaryEmailAddress      *string              `json:"primaryEmailAddress,omitempty"`
+	AdditionalEmailAddresses []string             `json:"additionalEmailAddresses,omitempty"`
+	Kind                     *coredata.PeopleKind `json:"kind,omitempty"`
 }
 
 type UpdateVendorInput struct {

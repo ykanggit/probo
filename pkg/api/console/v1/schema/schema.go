@@ -160,6 +160,7 @@ type ComplexityRoot struct {
 		CreateVendor func(childComplexity int, input types.CreateVendorInput) int
 		DeletePeople func(childComplexity int, input types.DeletePeopleInput) int
 		DeleteVendor func(childComplexity int, input types.DeleteVendorInput) int
+		UpdatePeople func(childComplexity int, input types.UpdatePeopleInput) int
 		UpdateVendor func(childComplexity int, input types.UpdateVendorInput) int
 	}
 
@@ -189,6 +190,7 @@ type ComplexityRoot struct {
 		Kind                     func(childComplexity int) int
 		PrimaryEmailAddress      func(childComplexity int) int
 		UpdatedAt                func(childComplexity int) int
+		Version                  func(childComplexity int) int
 	}
 
 	PeopleConnection struct {
@@ -286,8 +288,9 @@ type MutationResolver interface {
 	CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.Vendor, error)
 	UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.Vendor, error)
 	DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (string, error)
-	DeletePeople(ctx context.Context, input types.DeletePeopleInput) (string, error)
 	CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.People, error)
+	UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.People, error)
+	DeletePeople(ctx context.Context, input types.DeletePeopleInput) (string, error)
 }
 type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
@@ -774,6 +777,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteVendor(childComplexity, args["input"].(types.DeleteVendorInput)), true
 
+	case "Mutation.updatePeople":
+		if e.complexity.Mutation.UpdatePeople == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePeople_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePeople(childComplexity, args["input"].(types.UpdatePeopleInput)), true
+
 	case "Mutation.updateVendor":
 		if e.complexity.Mutation.UpdateVendor == nil {
 			break
@@ -933,6 +948,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.People.UpdatedAt(childComplexity), true
+
+	case "People.version":
+		if e.complexity.People.Version == nil {
+			break
+		}
+
+		return e.complexity.People.Version(childComplexity), true
 
 	case "PeopleConnection.edges":
 		if e.complexity.PeopleConnection.Edges == nil {
@@ -1269,6 +1291,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateVendorInput,
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeleteVendorInput,
+		ec.unmarshalInputUpdatePeopleInput,
 		ec.unmarshalInputUpdateVendorInput,
 	)
 	first := true
@@ -1469,6 +1492,7 @@ type People implements Node {
   kind: PeopleKind!
   createdAt: Datetime!
   updatedAt: Datetime!
+  version: Int!
 }
 
 type VendorConnection {
@@ -1685,8 +1709,9 @@ type Mutation {
   createVendor(input: CreateVendorInput!): Vendor!
   updateVendor(input: UpdateVendorInput!): Vendor!
   deleteVendor(input: DeleteVendorInput!): Void!
-  deletePeople(input: DeletePeopleInput!): Void!
   createPeople(input: CreatePeopleInput!): People!
+  updatePeople(input: UpdatePeopleInput!): People!
+  deletePeople(input: DeletePeopleInput!): Void!
 }
 
 input CreateVendorInput {
@@ -1708,6 +1733,15 @@ input CreatePeopleInput {
   fullName: String!
   primaryEmailAddress: String!
   kind: PeopleKind!
+}
+
+input UpdatePeopleInput {
+  id: ID!
+  expectedVersion: Int!
+  fullName: String
+  primaryEmailAddress: String
+  additionalEmailAddresses: [String!]
+  kind: PeopleKind
 }
 
 enum ServiceCriticality @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticality") {
@@ -2140,6 +2174,29 @@ func (ec *executionContext) field_Mutation_deleteVendor_argsInput(
 	}
 
 	var zeroVal types.DeleteVendorInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePeople_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updatePeople_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updatePeople_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UpdatePeopleInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdatePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePeopleInput(ctx, tmp)
+	}
+
+	var zeroVal types.UpdatePeopleInput
 	return zeroVal, nil
 }
 
@@ -5118,49 +5175,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteVendor(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_deletePeople(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deletePeople(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeletePeople(rctx, fc.Args["input"].(types.DeletePeopleInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNVoid2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deletePeople(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Void does not have child fields")
-		},
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deletePeople_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_createPeople(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createPeople(ctx, field)
 	if err != nil {
@@ -5208,12 +5222,118 @@ func (ec *executionContext) fieldContext_Mutation_createPeople(ctx context.Conte
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_People_updatedAt(ctx, field)
+			case "version":
+				return ec.fieldContext_People_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
 		},
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createPeople_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updatePeople(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePeople(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePeople(rctx, fc.Args["input"].(types.UpdatePeopleInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePeople(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			case "version":
+				return ec.fieldContext_People_version(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePeople_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deletePeople(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deletePeople(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeletePeople(rctx, fc.Args["input"].(types.DeletePeopleInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNVoid2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deletePeople(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Void does not have child fields")
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deletePeople_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5969,6 +6089,44 @@ func (ec *executionContext) fieldContext_People_updatedAt(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _People_version(ctx context.Context, field graphql.CollectedField, obj *types.People) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_People_version(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Version, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_People_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "People",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _PeopleConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.PeopleConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_PeopleConnection_edges(ctx, field)
 	if err != nil {
@@ -6146,6 +6304,8 @@ func (ec *executionContext) fieldContext_PeopleEdge_node(_ context.Context, fiel
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_People_updatedAt(ctx, field)
+			case "version":
+				return ec.fieldContext_People_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
 		},
@@ -9595,6 +9755,68 @@ func (ec *executionContext) unmarshalInputDeleteVendorInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdatePeopleInput(ctx context.Context, obj any) (types.UpdatePeopleInput, error) {
+	var it types.UpdatePeopleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "expectedVersion", "fullName", "primaryEmailAddress", "additionalEmailAddresses", "kind"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "expectedVersion":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expectedVersion"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExpectedVersion = data
+		case "fullName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FullName = data
+		case "primaryEmailAddress":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryEmailAddress"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryEmailAddress = data
+		case "additionalEmailAddresses":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("additionalEmailAddresses"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdditionalEmailAddresses = data
+		case "kind":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("kind"))
+			data, err := ec.unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Kind = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context, obj any) (types.UpdateVendorInput, error) {
 	var it types.UpdateVendorInput
 	asMap := map[string]any{}
@@ -10675,16 +10897,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "deletePeople":
+		case "createPeople":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deletePeople(ctx, field)
+				return ec._Mutation_createPeople(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createPeople":
+		case "updatePeople":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createPeople(ctx, field)
+				return ec._Mutation_updatePeople(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletePeople":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deletePeople(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -10955,6 +11184,11 @@ func (ec *executionContext) _People(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "updatedAt":
 			out.Values[i] = ec._People_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "version":
+			out.Values[i] = ec._People_version(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -12911,6 +13145,11 @@ func (ec *executionContext) marshalNTaskStateTransitionEdge2ᚖgithubᚗcomᚋge
 	return ec._TaskStateTransitionEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNUpdatePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePeopleInput(ctx context.Context, v any) (types.UpdatePeopleInput, error) {
+	res, err := ec.unmarshalInputUpdatePeopleInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorInput(ctx context.Context, v any) (types.UpdateVendorInput, error) {
 	res, err := ec.unmarshalInputUpdateVendorInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -13371,6 +13610,34 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	res := graphql.MarshalInt(*v)
 	return res
 }
+
+func (ec *executionContext) unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx context.Context, v any) (*coredata.PeopleKind, error) {
+	if v == nil {
+		return nil, nil
+	}
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx context.Context, sel ast.SelectionSet, v *coredata.PeopleKind) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalString(marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind[*v])
+	return res
+}
+
+var (
+	unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind = map[string]coredata.PeopleKind{
+		"EMPLOYEE":   coredata.PeopleKindEmployee,
+		"CONTRACTOR": coredata.PeopleKindContractor,
+	}
+	marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind = map[coredata.PeopleKind]string{
+		coredata.PeopleKindEmployee:   "EMPLOYEE",
+		coredata.PeopleKindContractor: "CONTRACTOR",
+	}
+)
 
 func (ec *executionContext) unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx context.Context, v any) (*coredata.RiskTier, error) {
 	if v == nil {

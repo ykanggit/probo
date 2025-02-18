@@ -16,6 +16,7 @@ package coredata
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"maps"
 	"time"
@@ -36,9 +37,18 @@ type (
 		AdditionalEmailAddresses []string
 		CreatedAt                time.Time
 		UpdatedAt                time.Time
+		Version                  int
 	}
 
 	Peoples []*People
+
+	UpdatePeopleParams struct {
+		ExpectedVersion          int
+		FullName                 *string
+		PrimaryEmailAddress      *string
+		AdditionalEmailAddresses *[]string
+		Kind                     *PeopleKind
+	}
 )
 
 func (p People) CursorKey() page.CursorKey {
@@ -55,6 +65,7 @@ func (p *People) scan(r pgx.Row) error {
 		&p.AdditionalEmailAddresses,
 		&p.CreatedAt,
 		&p.UpdatedAt,
+		&p.Version,
 	)
 }
 
@@ -73,7 +84,8 @@ SELECT
     primary_email_address,
     additional_email_addresses,
     created_at,
-    updated_at
+    updated_at,
+    version
 FROM
     peoples
 WHERE
@@ -113,7 +125,8 @@ INSERT INTO
         primary_email_address,
         additional_email_addresses,
         created_at,
-        updated_at
+        updated_at,
+        version
     )
 VALUES (
     @people_id,
@@ -123,7 +136,8 @@ VALUES (
     @primary_email_address,
     @additional_email_addresses,
     @created_at,
-    @updated_at
+    @updated_at,
+    @version
 )
 `
 
@@ -136,6 +150,7 @@ VALUES (
 		"additional_email_addresses": p.AdditionalEmailAddresses,
 		"created_at":                 p.CreatedAt,
 		"updated_at":                 p.UpdatedAt,
+		"version":                    p.Version,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -175,7 +190,8 @@ SELECT
     primary_email_address,
     additional_email_addresses,
     created_at,
-    updated_at
+    updated_at,
+    version
 FROM
     peoples
 WHERE
@@ -212,5 +228,70 @@ WHERE
 
 	*p = peoples
 
+	return nil
+}
+
+func (p *People) Update(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+	params UpdatePeopleParams,
+) error {
+	q := `
+UPDATE peoples SET
+    full_name = COALESCE(@full_name, full_name),
+    primary_email_address = COALESCE(@primary_email_address, primary_email_address),
+    additional_email_addresses = COALESCE(@additional_email_addresses, additional_email_addresses),
+    kind = COALESCE(@kind, kind),
+    updated_at = @updated_at,
+    version = version + 1
+WHERE %s
+    AND id = @people_id
+    AND version = @expected_version
+RETURNING 
+   	id,
+	organization_id,
+	kind,
+	full_name,
+	primary_email_address,
+	additional_email_addresses,
+	created_at,
+	updated_at,
+	version
+`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{
+		"people_id":        p.ID,
+		"expected_version": params.ExpectedVersion,
+		"updated_at":       time.Now(),
+	}
+
+	if params.FullName != nil {
+		args["full_name"] = *params.FullName
+	}
+	if params.PrimaryEmailAddress != nil {
+		args["primary_email_address"] = *params.PrimaryEmailAddress
+	}
+	if params.AdditionalEmailAddresses != nil {
+		args["additional_email_addresses"] = *params.AdditionalEmailAddresses
+	}
+	if params.Kind != nil {
+		args["kind"] = *params.Kind
+	}
+
+	maps.Copy(args, scope.SQLArguments())
+
+	r := conn.QueryRow(ctx, q, args)
+
+	p2 := People{}
+	if err := p2.scan(r); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrConcurrentModification
+		}
+		return err
+	}
+
+	*p = p2
 	return nil
 }
