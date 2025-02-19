@@ -147,7 +147,8 @@ function PeopleListContent({
     PeopleListPage_peoples$key
   >(peopleListFragment, data.currentOrganization);
 
-  const peoples = peoplesConnection.peoples.edges.map((edge) => edge.node) ?? [];
+  const peoples =
+    peoplesConnection.peoples.edges.map((edge) => edge.node) ?? [];
   const pageInfo = peoplesConnection.peoples.pageInfo;
 
   return (

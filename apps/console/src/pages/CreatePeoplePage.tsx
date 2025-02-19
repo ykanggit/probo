@@ -32,7 +32,10 @@ const createPeoplePageQuery = graphql`
 `;
 
 const createPeopleMutation = graphql`
-  mutation CreatePeoplePageCreatePeopleMutation($input: CreatePeopleInput!, $connections: [ID!]!) {
+  mutation CreatePeoplePageCreatePeopleMutation(
+    $input: CreatePeopleInput!
+    $connections: [ID!]!
+  ) {
     createPeople(input: $input) {
       peopleEdge @prependEdge(connections: $connections) {
         node {
@@ -89,17 +92,18 @@ function CreatePeoplePageContent({
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
   const data = usePreloadedQuery(createPeoplePageQuery, queryRef);
-  const [createPeople] = useMutation<CreatePeoplePageCreatePeopleMutation>(createPeopleMutation);
+  const [createPeople] =
+    useMutation<CreatePeoplePageCreatePeopleMutation>(createPeopleMutation);
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    fullName: '',
-    primaryEmailAddress: '',
+    fullName: "",
+    primaryEmailAddress: "",
     additionalEmailAddresses: [] as string[],
-    kind: 'EMPLOYEE' as 'EMPLOYEE' | 'CONTRACTOR',
+    kind: "EMPLOYEE" as "EMPLOYEE" | "CONTRACTOR",
   });
 
   const handleFieldChange = (field: keyof typeof formData, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -107,7 +111,10 @@ function CreatePeoplePageContent({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const peopleConnectionId = ConnectionHandler.getConnectionID(data.currentOrganization.id, "PeopleListPage_peoples");
+    const peopleConnectionId = ConnectionHandler.getConnectionID(
+      data.currentOrganization.id,
+      "PeopleListPage_peoples",
+    );
 
     createPeople({
       variables: {
@@ -150,7 +157,7 @@ function CreatePeoplePageContent({
             <EditableField
               label="Full Name"
               value={formData.fullName}
-              onChange={(value) => handleFieldChange('fullName', value)}
+              onChange={(value) => handleFieldChange("fullName", value)}
               required
             />
 
@@ -158,7 +165,9 @@ function CreatePeoplePageContent({
               label="Primary Email"
               value={formData.primaryEmailAddress}
               type="email"
-              onChange={(value) => handleFieldChange('primaryEmailAddress', value)}
+              onChange={(value) =>
+                handleFieldChange("primaryEmailAddress", value)
+              }
               required
             />
 
@@ -174,17 +183,28 @@ function CreatePeoplePageContent({
                       type="email"
                       value={email}
                       onChange={(e) => {
-                        const newEmails = [...formData.additionalEmailAddresses];
+                        const newEmails = [
+                          ...formData.additionalEmailAddresses,
+                        ];
                         newEmails[index] = e.target.value;
-                        handleFieldChange('additionalEmailAddresses', newEmails);
+                        handleFieldChange(
+                          "additionalEmailAddresses",
+                          newEmails,
+                        );
                       }}
                     />
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => {
-                        const newEmails = formData.additionalEmailAddresses.filter((_, i) => i !== index);
-                        handleFieldChange('additionalEmailAddresses', newEmails);
+                        const newEmails =
+                          formData.additionalEmailAddresses.filter(
+                            (_, i) => i !== index,
+                          );
+                        handleFieldChange(
+                          "additionalEmailAddresses",
+                          newEmails,
+                        );
                       }}
                     >
                       Remove
@@ -195,7 +215,10 @@ function CreatePeoplePageContent({
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    handleFieldChange('additionalEmailAddresses', [...formData.additionalEmailAddresses, '']);
+                    handleFieldChange("additionalEmailAddresses", [
+                      ...formData.additionalEmailAddresses,
+                      "",
+                    ]);
                   }}
                 >
                   Add Email
@@ -206,7 +229,9 @@ function CreatePeoplePageContent({
             <Card className="p-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <h2 className="text-lg font-medium">Additional Information</h2>
+                  <h2 className="text-lg font-medium">
+                    Additional Information
+                  </h2>
                   <p className="text-sm text-gray-500">
                     Additional details about the person
                   </p>
@@ -221,24 +246,24 @@ function CreatePeoplePageContent({
                     <div className="flex gap-2">
                       <button
                         type="button"
-                        onClick={() => handleFieldChange('kind', 'EMPLOYEE')}
+                        onClick={() => handleFieldChange("kind", "EMPLOYEE")}
                         className={cn(
                           "rounded-full px-4 py-1 text-sm transition-colors",
-                          formData.kind === 'EMPLOYEE'
+                          formData.kind === "EMPLOYEE"
                             ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                         )}
                       >
                         Employee
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleFieldChange('kind', 'CONTRACTOR')}
+                        onClick={() => handleFieldChange("kind", "CONTRACTOR")}
                         className={cn(
                           "rounded-full px-4 py-1 text-sm transition-colors",
-                          formData.kind === 'CONTRACTOR'
+                          formData.kind === "CONTRACTOR"
                             ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                         )}
                       >
                         Contractor
@@ -251,11 +276,7 @@ function CreatePeoplePageContent({
           </div>
         </div>
         <div className="fixed bottom-6 right-6 flex gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate(-1)}
-          >
+          <Button type="button" variant="outline" onClick={() => navigate(-1)}>
             Cancel
           </Button>
           <Button

@@ -46,18 +46,18 @@ const vendorOverviewPageQuery = graphql`
 const updateVendorMutation = graphql`
   mutation VendorOverviewPageUpdateVendorMutation($input: UpdateVendorInput!) {
     updateVendor(input: $input) {
-        id
-        name
-        description
-        serviceStartAt
-        serviceTerminationAt
-        serviceCriticality
-        riskTier
-        statusPageUrl
-        termsOfServiceUrl
-        privacyPolicyUrl
-        updatedAt
-        version
+      id
+      name
+      description
+      serviceStartAt
+      serviceTerminationAt
+      serviceCriticality
+      riskTier
+      statusPageUrl
+      termsOfServiceUrl
+      privacyPolicyUrl
+      updatedAt
+      version
     }
   }
 `;
@@ -95,13 +95,13 @@ function EditableField({
 
 // Format date for input field (YYYY-MM-DDTHH:mm)
 function formatDateForInput(date: string | null | undefined): string {
-  if (!date) return '';
+  if (!date) return "";
   return new Date(date).toISOString().slice(0, 16);
 }
 
 // Format date for API (2006-01-02T15:04:05.999999999Z07:00)
 function formatDateForAPI(dateStr: string): string {
-  if (!dateStr) return '';
+  if (!dateStr) return "";
   const date = new Date(dateStr);
   return date.toISOString();
 }
@@ -115,19 +115,21 @@ function VendorOverviewPageContent({
   const { setBreadcrumbSegment } = useBreadcrumb();
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
-    name: data.node.name || '',
-    description: data.node.description || '',
+    name: data.node.name || "",
+    description: data.node.description || "",
     // Format dates properly for datetime-local input
     serviceStartAt: formatDateForInput(data.node.serviceStartAt),
     serviceTerminationAt: formatDateForInput(data.node.serviceTerminationAt),
     serviceCriticality: data.node.serviceCriticality,
     riskTier: data.node.riskTier,
-    statusPageUrl: data.node.statusPageUrl || '',
-    termsOfServiceUrl: data.node.termsOfServiceUrl || '',
-    privacyPolicyUrl: data.node.privacyPolicyUrl || '',
+    statusPageUrl: data.node.statusPageUrl || "",
+    termsOfServiceUrl: data.node.termsOfServiceUrl || "",
+    privacyPolicyUrl: data.node.privacyPolicyUrl || "",
   });
   const [commit] = useMutation(updateVendorMutation);
-  const [_, loadQuery] = useQueryLoader<VendorOverviewPageQueryType>(vendorOverviewPageQuery);
+  const [_, loadQuery] = useQueryLoader<VendorOverviewPageQueryType>(
+    vendorOverviewPageQuery,
+  );
   const { toast } = useToast();
 
   const hasChanges = editedFields.size > 0;
@@ -136,7 +138,9 @@ function VendorOverviewPageContent({
     const formattedData = {
       ...formData,
       serviceStartAt: formatDateForAPI(formData.serviceStartAt),
-      serviceTerminationAt: formData.serviceTerminationAt ? formatDateForAPI(formData.serviceTerminationAt) : null,
+      serviceTerminationAt: formData.serviceTerminationAt
+        ? formatDateForAPI(formData.serviceTerminationAt)
+        : null,
     };
 
     commit({
@@ -156,15 +160,15 @@ function VendorOverviewPageContent({
         setEditedFields(new Set());
       },
       onError: (error) => {
-        if (error.message?.includes('concurrent modification')) {
+        if (error.message?.includes("concurrent modification")) {
           toast({
             title: "Error",
-            description: "Someone else modified this vendor. Reloading latest data.",
+            description:
+              "Someone else modified this vendor. Reloading latest data.",
             variant: "destructive",
           });
 
           loadQuery({ vendorId: data.node.id! });
-
         } else {
           toast({
             title: "Error",
@@ -180,25 +184,25 @@ function VendorOverviewPageContent({
   }, [commit, data.node.id, data.node.version, formData, loadQuery, toast]);
 
   const handleFieldChange = (field: keyof typeof formData, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-    setEditedFields(prev => new Set(prev).add(field));
+    setEditedFields((prev) => new Set(prev).add(field));
   };
 
   // Update the cancel handler to also format dates
   const handleCancel = () => {
     setFormData({
-      name: data.node.name || '',
-      description: data.node.description || '',
+      name: data.node.name || "",
+      description: data.node.description || "",
       serviceStartAt: formatDateForInput(data.node.serviceStartAt),
       serviceTerminationAt: formatDateForInput(data.node.serviceTerminationAt),
       serviceCriticality: data.node.serviceCriticality,
       riskTier: data.node.riskTier,
-      statusPageUrl: data.node.statusPageUrl || '',
-      termsOfServiceUrl: data.node.termsOfServiceUrl || '',
-      privacyPolicyUrl: data.node.privacyPolicyUrl || '',
+      statusPageUrl: data.node.statusPageUrl || "",
+      termsOfServiceUrl: data.node.termsOfServiceUrl || "",
+      privacyPolicyUrl: data.node.privacyPolicyUrl || "",
     });
     setEditedFields(new Set());
   };
@@ -216,13 +220,13 @@ function VendorOverviewPageContent({
           <EditableField
             label="Name"
             value={formData.name}
-            onChange={(value) => handleFieldChange('name', value)}
+            onChange={(value) => handleFieldChange("name", value)}
           />
 
           <EditableField
             label="Description"
             value={formData.description}
-            onChange={(value) => handleFieldChange('description', value)}
+            onChange={(value) => handleFieldChange("description", value)}
           />
 
           <Card className="p-6">
@@ -239,14 +243,18 @@ function VendorOverviewPageContent({
                   label="Service Start At"
                   value={formData.serviceStartAt}
                   type="datetime-local"
-                  onChange={(value) => handleFieldChange('serviceStartAt', value)}
+                  onChange={(value) =>
+                    handleFieldChange("serviceStartAt", value)
+                  }
                 />
 
                 <EditableField
                   label="Service Termination At"
                   value={formData.serviceTerminationAt}
                   type="datetime-local"
-                  onChange={(value) => handleFieldChange('serviceTerminationAt', value)}
+                  onChange={(value) =>
+                    handleFieldChange("serviceTerminationAt", value)
+                  }
                 />
 
                 <div className="space-y-2">
@@ -255,46 +263,52 @@ function VendorOverviewPageContent({
                     <Label className="text-sm">Service Criticality</Label>
                   </div>
                   <div className="flex gap-2">
-                    <button 
-                      onClick={() => handleFieldChange('serviceCriticality', 'LOW')}
+                    <button
+                      onClick={() =>
+                        handleFieldChange("serviceCriticality", "LOW")
+                      }
                       className={cn(
                         "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.serviceCriticality === 'LOW'
-                          ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2" 
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        formData.serviceCriticality === "LOW"
+                          ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Low
                     </button>
-                    <button 
-                      onClick={() => handleFieldChange('serviceCriticality', 'MEDIUM')}
+                    <button
+                      onClick={() =>
+                        handleFieldChange("serviceCriticality", "MEDIUM")
+                      }
                       className={cn(
                         "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.serviceCriticality === 'MEDIUM'
+                        formData.serviceCriticality === "MEDIUM"
                           ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Medium
                     </button>
-                    <button 
-                      onClick={() => handleFieldChange('serviceCriticality', 'HIGH')}
+                    <button
+                      onClick={() =>
+                        handleFieldChange("serviceCriticality", "HIGH")
+                      }
                       className={cn(
                         "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.serviceCriticality === 'HIGH'
+                        formData.serviceCriticality === "HIGH"
                           ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       High
                     </button>
                   </div>
                   <p className="text-sm text-gray-500">
-                    {formData.serviceCriticality === 'HIGH' && 
+                    {formData.serviceCriticality === "HIGH" &&
                       "Critical service - downtime severely impacts end-users"}
-                    {formData.serviceCriticality === 'MEDIUM' && 
+                    {formData.serviceCriticality === "MEDIUM" &&
                       "Important service - downtime moderately affects end-users"}
-                    {formData.serviceCriticality === 'LOW' && 
+                    {formData.serviceCriticality === "LOW" &&
                       "Non-critical service - minimal end-user impact if down"}
                   </p>
                 </div>
@@ -305,46 +319,48 @@ function VendorOverviewPageContent({
                     <Label className="text-sm">Risk Tier</Label>
                   </div>
                   <div className="flex gap-2">
-                    <button 
-                      onClick={() => handleFieldChange('riskTier', 'CRITICAL')}
+                    <button
+                      onClick={() => handleFieldChange("riskTier", "CRITICAL")}
                       className={cn(
                         "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.riskTier === 'CRITICAL'
+                        formData.riskTier === "CRITICAL"
                           ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Critical
                     </button>
-                    <button 
-                      onClick={() => handleFieldChange('riskTier', 'SIGNIFICANT')}
+                    <button
+                      onClick={() =>
+                        handleFieldChange("riskTier", "SIGNIFICANT")
+                      }
                       className={cn(
                         "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.riskTier === 'SIGNIFICANT'
+                        formData.riskTier === "SIGNIFICANT"
                           ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Significant
                     </button>
-                    <button 
-                      onClick={() => handleFieldChange('riskTier', 'GENERAL')}
+                    <button
+                      onClick={() => handleFieldChange("riskTier", "GENERAL")}
                       className={cn(
                         "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.riskTier === 'GENERAL'
+                        formData.riskTier === "GENERAL"
                           ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       General
                     </button>
                   </div>
                   <p className="text-sm text-gray-500">
-                    {formData.riskTier === 'CRITICAL' && 
+                    {formData.riskTier === "CRITICAL" &&
                       "Handles sensitive data, critical for platform operation"}
-                    {formData.riskTier === 'SIGNIFICANT' && 
+                    {formData.riskTier === "SIGNIFICANT" &&
                       "No user data access, but important for platform management"}
-                    {formData.riskTier === 'GENERAL' && 
+                    {formData.riskTier === "GENERAL" &&
                       "General vendor with minimal risk"}
                   </p>
                 </div>
@@ -352,19 +368,25 @@ function VendorOverviewPageContent({
                 <EditableField
                   label="Status Page URL"
                   value={formData.statusPageUrl || ""}
-                  onChange={(value) => handleFieldChange('statusPageUrl', value)}
+                  onChange={(value) =>
+                    handleFieldChange("statusPageUrl", value)
+                  }
                 />
 
                 <EditableField
                   label="Terms of Service URL"
                   value={formData.termsOfServiceUrl || ""}
-                  onChange={(value) => handleFieldChange('termsOfServiceUrl', value)}
+                  onChange={(value) =>
+                    handleFieldChange("termsOfServiceUrl", value)
+                  }
                 />
 
                 <EditableField
                   label="Privacy Policy URL"
                   value={formData.privacyPolicyUrl || ""}
-                  onChange={(value) => handleFieldChange('privacyPolicyUrl', value)}
+                  onChange={(value) =>
+                    handleFieldChange("privacyPolicyUrl", value)
+                  }
                 />
               </div>
             </div>
@@ -374,13 +396,10 @@ function VendorOverviewPageContent({
 
       {hasChanges && (
         <div className="fixed bottom-6 right-6 flex gap-2">
-          <Button
-            variant="outline"
-            onClick={handleCancel}
-          >
+          <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleSave}
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >

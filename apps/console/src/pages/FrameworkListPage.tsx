@@ -55,10 +55,8 @@ function FrameworkCard({
   return (
     <Card className="relative overflow-hidden border bg-card p-6">
       <div className="flex flex-col gap-4">
-        <div className="size-16">
-          {icon}
-        </div>
-        
+        <div className="size-16">{icon}</div>
+
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold">{title}</h3>
@@ -100,10 +98,10 @@ function FrameworkListPageContent({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {frameworks.map((framework) => {
           const validatedControls = framework.controls.edges.filter(
-            edge => edge?.node?.state === "IMPLEMENTED"
+            (edge) => edge?.node?.state === "IMPLEMENTED",
           ).length;
           const totalControls = framework.controls.edges.length;
-          
+
           return (
             <Link key={framework.id} to={`/frameworks/${framework.id}`}>
               <FrameworkCard
@@ -112,11 +110,13 @@ function FrameworkListPageContent({
                 icon={
                   <div className="flex size-full items-center justify-center rounded-full bg-blue-100">
                     <span className="text-lg font-semibold text-blue-900">
-                      {framework.name.split(' ')[0]}
+                      {framework.name.split(" ")[0]}
                     </span>
                   </div>
                 }
-                status={validatedControls === totalControls ? "Compliant" : undefined}
+                status={
+                  validatedControls === totalControls ? "Compliant" : undefined
+                }
                 progress={
                   validatedControls === totalControls
                     ? "All controls validated"

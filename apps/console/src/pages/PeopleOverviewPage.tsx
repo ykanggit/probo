@@ -91,13 +91,15 @@ function PeopleOverviewPageContent({
   const { setBreadcrumbSegment } = useBreadcrumb();
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
-    fullName: data.node.fullName || '',
-    primaryEmailAddress: data.node.primaryEmailAddress || '',
+    fullName: data.node.fullName || "",
+    primaryEmailAddress: data.node.primaryEmailAddress || "",
     additionalEmailAddresses: data.node.additionalEmailAddresses || [],
     kind: data.node.kind,
   });
   const [commit] = useMutation(updatePeopleMutation);
-  const [_, loadQuery] = useQueryLoader<PeopleOverviewPageQueryType>(peopleOverviewPageQuery);
+  const [_, loadQuery] = useQueryLoader<PeopleOverviewPageQueryType>(
+    peopleOverviewPageQuery,
+  );
   const { toast } = useToast();
 
   const hasChanges = editedFields.size > 0;
@@ -120,10 +122,11 @@ function PeopleOverviewPageContent({
         setEditedFields(new Set());
       },
       onError: (error) => {
-        if (error.message?.includes('concurrent modification')) {
+        if (error.message?.includes("concurrent modification")) {
           toast({
             title: "Error",
-            description: "Someone else modified this person. Reloading latest data.",
+            description:
+              "Someone else modified this person. Reloading latest data.",
             variant: "destructive",
           });
           loadQuery({ peopleId: data.node.id! });
@@ -139,17 +142,17 @@ function PeopleOverviewPageContent({
   }, [commit, data.node.id, data.node.version, formData, loadQuery, toast]);
 
   const handleFieldChange = (field: keyof typeof formData, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-    setEditedFields(prev => new Set(prev).add(field));
+    setEditedFields((prev) => new Set(prev).add(field));
   };
 
   const handleCancel = () => {
     setFormData({
-      fullName: data.node.fullName || '',
-      primaryEmailAddress: data.node.primaryEmailAddress || '',
+      fullName: data.node.fullName || "",
+      primaryEmailAddress: data.node.primaryEmailAddress || "",
       additionalEmailAddresses: data.node.additionalEmailAddresses || [],
       kind: data.node.kind,
     });
@@ -169,14 +172,16 @@ function PeopleOverviewPageContent({
           <EditableField
             label="Full Name"
             value={formData.fullName}
-            onChange={(value) => handleFieldChange('fullName', value)}
+            onChange={(value) => handleFieldChange("fullName", value)}
           />
 
           <EditableField
             label="Primary Email"
             value={formData.primaryEmailAddress}
             type="email"
-            onChange={(value) => handleFieldChange('primaryEmailAddress', value)}
+            onChange={(value) =>
+              handleFieldChange("primaryEmailAddress", value)
+            }
           />
 
           <div className="space-y-2">
@@ -193,14 +198,17 @@ function PeopleOverviewPageContent({
                     onChange={(e) => {
                       const newEmails = [...formData.additionalEmailAddresses];
                       newEmails[index] = e.target.value;
-                      handleFieldChange('additionalEmailAddresses', newEmails);
+                      handleFieldChange("additionalEmailAddresses", newEmails);
                     }}
                   />
                   <Button
                     variant="outline"
                     onClick={() => {
-                      const newEmails = formData.additionalEmailAddresses.filter((_, i) => i !== index);
-                      handleFieldChange('additionalEmailAddresses', newEmails);
+                      const newEmails =
+                        formData.additionalEmailAddresses.filter(
+                          (_, i) => i !== index,
+                        );
+                      handleFieldChange("additionalEmailAddresses", newEmails);
                     }}
                   >
                     Remove
@@ -210,7 +218,10 @@ function PeopleOverviewPageContent({
               <Button
                 variant="outline"
                 onClick={() => {
-                  handleFieldChange('additionalEmailAddresses', [...formData.additionalEmailAddresses, '']);
+                  handleFieldChange("additionalEmailAddresses", [
+                    ...formData.additionalEmailAddresses,
+                    "",
+                  ]);
                 }}
               >
                 Add Email
@@ -234,24 +245,24 @@ function PeopleOverviewPageContent({
                     <Label className="text-sm">Kind</Label>
                   </div>
                   <div className="flex gap-2">
-                    <button 
-                      onClick={() => handleFieldChange('kind', 'EMPLOYEE')}
+                    <button
+                      onClick={() => handleFieldChange("kind", "EMPLOYEE")}
                       className={cn(
                         "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.kind === 'EMPLOYEE'
-                          ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2" 
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        formData.kind === "EMPLOYEE"
+                          ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Employee
                     </button>
-                    <button 
-                      onClick={() => handleFieldChange('kind', 'CONTRACTOR')}
+                    <button
+                      onClick={() => handleFieldChange("kind", "CONTRACTOR")}
                       className={cn(
                         "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.kind === 'CONTRACTOR'
+                        formData.kind === "CONTRACTOR"
                           ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Contractor
@@ -266,13 +277,10 @@ function PeopleOverviewPageContent({
 
       {hasChanges && (
         <div className="fixed bottom-6 right-6 flex gap-2">
-          <Button
-            variant="outline"
-            onClick={handleCancel}
-          >
+          <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleSave}
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
