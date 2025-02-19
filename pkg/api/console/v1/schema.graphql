@@ -319,7 +319,7 @@ type Mutation {
   deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
   createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
   updatePeople(input: UpdatePeopleInput!): People!
-  deletePeople(input: DeletePeopleInput!): Void!
+  deletePeople(input: DeletePeopleInput!): DeletePeoplePayload!
 }
 
 input CreateVendorInput {
@@ -395,6 +395,9 @@ type CreateVendorPayload {
 }
 
 type DeleteVendorPayload {
-  vendorEdge: VendorEdge!
   deletedVendorId: ID!
+}
+
+type DeletePeoplePayload {
+  deletedPeopleId: ID!
 }

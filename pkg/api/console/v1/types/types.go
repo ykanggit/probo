@@ -92,13 +92,16 @@ type DeletePeopleInput struct {
 	PeopleID gid.GID `json:"peopleId"`
 }
 
+type DeletePeoplePayload struct {
+	DeletedPeopleID gid.GID `json:"deletedPeopleId"`
+}
+
 type DeleteVendorInput struct {
 	VendorID gid.GID `json:"vendorId"`
 }
 
 type DeleteVendorPayload struct {
-	VendorEdge      *VendorEdge `json:"vendorEdge"`
-	DeletedVendorID gid.GID     `json:"deletedVendorId"`
+	DeletedVendorID gid.GID `json:"deletedVendorId"`
 }
 
 type Evidence struct {

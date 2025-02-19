@@ -158,13 +158,15 @@ func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdateP
 }
 
 // DeletePeople is the resolver for the deletePeople field.
-func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (string, error) {
+func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error) {
 	err := r.svc.DeletePeople(ctx, input.PeopleID)
 	if err != nil {
-		return "", fmt.Errorf("cannot delete people: %w", err)
+		return nil, fmt.Errorf("cannot delete people: %w", err)
 	}
 
-	return "", nil
+	return &types.DeletePeoplePayload{
+		DeletedPeopleID: input.PeopleID,
+	}, nil
 }
 
 // Frameworks is the resolver for the frameworks field.

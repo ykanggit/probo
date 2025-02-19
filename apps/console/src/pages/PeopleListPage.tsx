@@ -5,6 +5,7 @@ import {
   usePreloadedQuery,
   useQueryLoader,
   useMutation,
+  usePaginationFragment,
 } from "react-relay";
 import { useSearchParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,148 +15,140 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generated__/PeopleListPageQuery.graphql";
+import { PeopleListPagePaginationQuery } from "./__generated__/PeopleListPagePaginationQuery.graphql";
+import { PeopleListPage_peoples$key } from "./__generated__/PeopleListPage_peoples.graphql";
 
 const ITEMS_PER_PAGE = 25;
 
-const PeopleListPageQuery = graphql`
+const peopleListPageQuery = graphql`
   query PeopleListPageQuery(
     $first: Int
     $after: CursorKey
     $last: Int
     $before: CursorKey
   ) {
-    node(id: "AZSfP_xAcAC5IAAAAAAltA") {
+    currentOrganization: node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
-        peoples(first: $first, after: $after, last: $last, before: $before)
-          @connection(key: "PeopleListPageQuery_peoples") {
-          edges {
-            node {
-              id
-              fullName
-              primaryEmailAddress
-              additionalEmailAddresses
-              kind
-              createdAt
-              updatedAt
-            }
-            cursor
-          }
-          pageInfo {
-            hasNextPage
-            hasPreviousPage
-            startCursor
-            endCursor
-          }
+        ...PeopleListPage_peoples
+      }
+    }
+  }
+`;
+
+const peopleListFragment = graphql`
+  fragment PeopleListPage_peoples on Organization
+  @refetchable(queryName: "PeopleListPagePaginationQuery") {
+    id
+    peoples(first: $first, after: $after, last: $last, before: $before)
+      @connection(key: "PeopleListPage_peoples") {
+      __id
+      edges {
+        node {
+          id
+          fullName
+          primaryEmailAddress
+          additionalEmailAddresses
+          kind
+          createdAt
+          updatedAt
         }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
       }
     }
   }
 `;
 
 const deletePeopleMutation = graphql`
-  mutation PeopleListPageDeletePeopleMutation($input: DeletePeopleInput!) {
-    deletePeople(input: $input)
+  mutation PeopleListPageDeletePeopleMutation(
+    $input: DeletePeopleInput!
+    $connections: [ID!]!
+  ) {
+    deletePeople(input: $input) {
+      deletedPeopleId @deleteEdge(connections: $connections)
+    }
   }
 `;
 
 function LoadAboveButton({
-  pageInfo,
-  isPending,
-  onPageChange,
+  isLoading,
+  hasMore,
+  onLoadMore,
 }: {
-  pageInfo: {
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  } | null | undefined;
-  isPending: boolean;
-  onPageChange: (direction: "prev") => void;
+  isLoading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
 }) {
   return (
     <div className="flex justify-center">
       <Button
         variant="outline"
-        onClick={() => onPageChange("prev")}
-        disabled={isPending || !pageInfo?.hasPreviousPage}
+        onClick={onLoadMore}
+        disabled={isLoading || !hasMore}
         className="w-full"
       >
-        {isPending ? "Loading..." : "Load above"}
+        {isLoading ? "Loading..." : "Load above"}
       </Button>
     </div>
   );
 }
 
 function LoadBelowButton({
-  pageInfo,
-  isPending,
-  onPageChange,
+  isLoading,
+  hasMore,
+  onLoadMore,
 }: {
-  pageInfo: {
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  } | null | undefined;
-  isPending: boolean;
-  onPageChange: (direction: "next") => void;
+  isLoading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
 }) {
   return (
     <div className="flex justify-center">
       <Button
         variant="outline"
-        onClick={() => onPageChange("next")}
-        disabled={isPending || !pageInfo?.hasNextPage}
+        onClick={onLoadMore}
+        disabled={isLoading || !hasMore}
         className="w-full"
       >
-        {isPending ? "Loading..." : "Load below"}
+        {isLoading ? "Loading..." : "Load below"}
       </Button>
     </div>
   );
 }
 
-function PeopleListPageContent({
+function PeopleListContent({
   queryRef,
-  onPageChange,
 }: {
   queryRef: PreloadedQuery<PeopleListPageQueryType>;
-  onPageChange: (params: {
-    first?: number;
-    after?: string;
-    last?: number;
-    before?: string;
-  }) => void;
 }) {
-  const data = usePreloadedQuery(PeopleListPageQuery, queryRef);
+  const data = usePreloadedQuery<PeopleListPageQueryType>(
+    peopleListPageQuery,
+    queryRef,
+  );
   const [searchParams, setSearchParams] = useSearchParams();
-  const peoples = data.node.peoples?.edges.map((edge) => edge?.node) ?? [];
-  const pageInfo = data.node.peoples?.pageInfo;
   const [isPending, startTransition] = useTransition();
   const [deletePeople] = useMutation(deletePeopleMutation);
 
-  const handlePageChange = (direction: "prev" | "next") => {
-    if (!pageInfo) return;
+  const {
+    data: peoplesConnection,
+    loadNext,
+    loadPrevious,
+    hasNext,
+    hasPrevious,
+    isLoadingNext,
+    isLoadingPrevious,
+  } = usePaginationFragment<
+    PeopleListPagePaginationQuery,
+    PeopleListPage_peoples$key
+  >(peopleListFragment, data.currentOrganization);
 
-    if (direction === "next" && !pageInfo.hasNextPage) return;
-    if (direction === "prev" && !pageInfo.hasPreviousPage) return;
-
-    startTransition(() => {
-      const params =
-        direction === "next"
-          ? { first: ITEMS_PER_PAGE, after: pageInfo.endCursor }
-          : { last: ITEMS_PER_PAGE, before: pageInfo.startCursor };
-
-      setSearchParams((prev) => {
-        if (direction === "next") {
-          prev.set("after", pageInfo.endCursor!);
-          prev.delete("before");
-        } else {
-          prev.set("before", pageInfo.startCursor!);
-          prev.delete("after");
-        }
-        return prev;
-      });
-
-      onPageChange(params);
-    });
-  };
+  const peoples = peoplesConnection.peoples.edges.map((edge) => edge.node) ?? [];
+  const pageInfo = peoplesConnection.peoples.pageInfo;
 
   return (
     <div className="p-6 space-y-6">
@@ -174,9 +167,18 @@ function PeopleListPageContent({
       </div>
 
       <LoadAboveButton
-        pageInfo={pageInfo}
-        isPending={isPending}
-        onPageChange={() => handlePageChange("prev")}
+        isLoading={isLoadingPrevious}
+        hasMore={hasPrevious}
+        onLoadMore={() => {
+          startTransition(() => {
+            setSearchParams((prev) => {
+              prev.set("before", pageInfo?.startCursor || "");
+              prev.delete("after");
+              return prev;
+            });
+            loadPrevious(ITEMS_PER_PAGE);
+          });
+        }}
       />
 
       <div className="space-y-2">
@@ -228,17 +230,10 @@ function PeopleListPageContent({
                   ) {
                     deletePeople({
                       variables: {
+                        connections: [peoplesConnection.peoples.__id],
                         input: {
                           peopleId: person.id,
                         },
-                      },
-                      onCompleted() {
-                        onPageChange({
-                          first: ITEMS_PER_PAGE,
-                          after: undefined,
-                          last: undefined,
-                          before: undefined,
-                        });
                       },
                     });
                   }
@@ -249,13 +244,22 @@ function PeopleListPageContent({
             </div>
           </Link>
         ))}
-
-        <LoadBelowButton
-          pageInfo={pageInfo}
-          isPending={isPending}
-          onPageChange={() => handlePageChange("next")}
-        />
       </div>
+
+      <LoadBelowButton
+        isLoading={isLoadingNext}
+        hasMore={hasNext}
+        onLoadMore={() => {
+          startTransition(() => {
+            setSearchParams((prev) => {
+              prev.set("after", pageInfo?.endCursor || "");
+              prev.delete("before");
+              return prev;
+            });
+            loadNext(ITEMS_PER_PAGE);
+          });
+        }}
+      />
     </div>
   );
 }
@@ -299,14 +303,10 @@ function PeopleListPageFallback() {
   );
 }
 
-type LoadQueryType = ReturnType<
-  typeof useQueryLoader<PeopleListPageQueryType>
->[1];
-
 export default function PeopleListPage() {
   const [searchParams] = useSearchParams();
   const [queryRef, loadQuery] =
-    useQueryLoader<PeopleListPageQueryType>(PeopleListPageQuery);
+    useQueryLoader<PeopleListPageQueryType>(peopleListPageQuery);
 
   useEffect(() => {
     const after = searchParams.get("after");
@@ -318,29 +318,7 @@ export default function PeopleListPage() {
       last: before ? ITEMS_PER_PAGE : undefined,
       before: before || undefined,
     });
-  }, [loadQuery, searchParams]);
-
-  const handlePageChange = ({
-    first,
-    after,
-    last,
-    before,
-  }: {
-    first?: number;
-    after?: string;
-    last?: number;
-    before?: string;
-  }) => {
-    loadQuery(
-      {
-        first,
-        after,
-        last,
-        before,
-      },
-      { fetchPolicy: "network-only" },
-    );
-  };
+  }, [loadQuery]);
 
   if (!queryRef) {
     return <PeopleListPageFallback />;
@@ -352,10 +330,7 @@ export default function PeopleListPage() {
         <title>People - Probo Console</title>
       </Helmet>
       <Suspense fallback={<PeopleListPageFallback />}>
-        <PeopleListPageContent
-          queryRef={queryRef}
-          onPageChange={handlePageChange}
-        />
+        <PeopleListContent queryRef={queryRef} />
       </Suspense>
     </>
   );
