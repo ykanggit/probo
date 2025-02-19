@@ -89,7 +89,7 @@ function CreatePeoplePageContent({
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
   const data = usePreloadedQuery(createPeoplePageQuery, queryRef);
-  const [commit] = useMutation<CreatePeoplePageCreatePeopleMutation>(createPeopleMutation);
+  const [createPeople] = useMutation<CreatePeoplePageCreatePeopleMutation>(createPeopleMutation);
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     fullName: '',
@@ -109,7 +109,7 @@ function CreatePeoplePageContent({
     e.preventDefault();
     const connecttionId = ConnectionHandler.getConnectionID(data.currentOrganization.id, "PeopleListPageQuery_peoples");
 
-    commit({
+    createPeople({
       variables: {
         connections: [connecttionId],
         input: {
