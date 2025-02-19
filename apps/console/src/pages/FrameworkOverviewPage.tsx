@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import {
   graphql,
@@ -6,13 +6,14 @@ import {
   usePreloadedQuery,
   useQueryLoader,
 } from "react-relay";
-import { Shield, FileText, Clock } from "lucide-react";
+import { Shield, FileText, Clock, MoveUpRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
 import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
+import { createPortal } from "react-dom";
 
 const FrameworkOverviewPageQuery = graphql`
   query FrameworkOverviewPageQuery($frameworkId: ID!) {
@@ -46,6 +47,14 @@ function FrameworkOverviewPageContent({
   const { setBreadcrumbSegment } = useBreadcrumb();
   const framework = data.node;
   const controls = framework.controls?.edges.map((edge) => edge?.node) ?? [];
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [hoveredControl, setHoveredControl] = useState<number | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<{
+    x: number;
+    y: number;
+    width: number;
+  } | null>(null);
+  const [isTooltipHovered, setIsTooltipHovered] = useState(false);
 
   useEffect(() => {
     if (framework?.name) {
@@ -91,43 +100,45 @@ function FrameworkOverviewPageContent({
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Timeline</h2>
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#2A2A2A] text-[#A3E635] text-sm">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#F3F4F6] text-[#059669] text-sm">
             <Clock className="w-4 h-4" />
             <span>12 hours left</span>
           </div>
         </div>
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="font-medium mb-4">Preparation phase</h3>
-          <div className="relative">
-            <div className="flex w-full">
-              <div className="w-[20%]">
-                <div className="h-2 rounded-md bg-gradient-to-r from-blue-400 via-green-300 to-yellow-300" />
+        <div className="rounded-xl border border-gray-200 bg-card">
+          <div className="p-6">
+            <h3 className="font-medium mb-4">Preparation phase</h3>
+            <div className="relative">
+              <div className="flex w-full">
+                <div className="w-[10%]">
+                  <div className="h-2 rounded-sm bg-[#D1FA84]" />
+                </div>
+                <div className="w-[8px] bg-transparent z-10" />
+                <div className="w-[70%]">
+                  <div className="h-2 rounded-sm bg-muted" />
+                </div>
+                <div className="w-[8px] bg-transparent z-10" />
+                <div className="w-[10%]">
+                  <div className="h-2 rounded-sm bg-muted" />
+                </div>
+                <div className="w-[8px] bg-transparent z-10" />
+                <div className="w-[10%]">
+                  <div className="h-2 rounded-sm bg-muted" />
+                </div>
               </div>
-              <div className="w-[8px] bg-transparent z-10" />
-              <div className="w-[45%]">
-                <div className="h-2 rounded-md bg-muted" />
-              </div>
-              <div className="w-[8px] bg-transparent z-10" />
-              <div className="w-[15%]">
-                <div className="h-2 rounded-md bg-muted" />
-              </div>
-              <div className="w-[8px] bg-transparent z-10" />
-              <div className="w-[20%]">
-                <div className="h-2 rounded-md bg-muted" />
-              </div>
-            </div>
-            <div className="mt-2 flex w-full text-sm text-muted-foreground">
-              <div className="w-[20%]">
-                <span>Preparation</span>
-              </div>
-              <div className="w-[45%]">
-                <span>Observation period: 3 month</span>
-              </div>
-              <div className="w-[15%]">
-                <span>Audit: 6-9 days</span>
-              </div>
-              <div className="w-[20%]">
-                <span>Report: 10-14 days</span>
+              <div className="mt-2 flex w-full text-sm text-muted-foreground">
+                <div className="w-[10%]">
+                  <span>Preparation</span>
+                </div>
+                <div className="w-[70%]">
+                  <span>Observation period: 3 month</span>
+                </div>
+                <div className="w-[10%]">
+                  <span>Audit: 6-9 days</span>
+                </div>
+                <div className="w-[10%]">
+                  <span>Report: 10-14 days</span>
+                </div>
               </div>
             </div>
           </div>
@@ -145,37 +156,126 @@ function FrameworkOverviewPageContent({
         {controlCards.map((card, index) => (
           <div
             key={index}
-            className="block p-4 rounded-lg border bg-card text-card-foreground"
+            className="rounded-xl border border-gray-200 relative"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{card.title}</span>
+            <div className="p-4 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">{card.title}</span>
+                </div>
+                <Avatar className="h-6 w-6 rounded-full">
+                  <AvatarFallback>U</AvatarFallback>
+                </Avatar>
               </div>
-              <Avatar className="h-6 w-6">
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
-            </div>
-            <div className="mt-4 space-y-2">
-              <div className="flex gap-1">
-                {Array(card.total)
-                  .fill(0)
-                  .map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-4 w-4 ${
-                        i < card.completed ? "bg-[#D1FA84] rounded" : "bg-muted rounded"
-                      }`}
-                    />
-                  ))}
+              <div className="mt-4 space-y-2">
+                <div className="flex gap-1">
+                  {Array(card.total)
+                    .fill(0)
+                    .map((_, i) => {
+                      const control = card.controls[i];
+                      return (
+                        <div
+                          key={i}
+                          className={`h-4 w-4 ${
+                            control?.state === "IMPLEMENTED"
+                              ? "bg-[#D1FA84]"
+                              : "bg-[#E5E7EB]"
+                          } rounded-md hover:scale-110 hover:shadow-md transition-all duration-200 cursor-pointer`}
+                          onMouseEnter={(e) => {
+                            setHoveredCard(index);
+                            setHoveredControl(i);
+                            const rect =
+                              e.currentTarget.getBoundingClientRect();
+
+                            setTooltipPosition({
+                              x: rect.left,
+                              y: rect.top - 10,
+                              width: 400,
+                            });
+                          }}
+                          onMouseLeave={() => {
+                            setTimeout(() => {
+                              if (!isTooltipHovered) {
+                                setHoveredCard(null);
+                                setHoveredControl(null);
+                                setTooltipPosition(null);
+                              }
+                            }, 500);
+                          }}
+                          title={control?.name}
+                        />
+                      );
+                    })}
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {card.completed}/{card.total} Controls validated
+                </span>
               </div>
-              <span className="text-sm text-muted-foreground">
-                {card.completed}/{card.total} Controls validated
-              </span>
             </div>
           </div>
         ))}
       </div>
+
+      {hoveredCard !== null &&
+        hoveredControl !== null &&
+        tooltipPosition &&
+        createPortal(
+          <div
+            className="fixed z-50"
+            onMouseEnter={() => setIsTooltipHovered(true)}
+            onMouseLeave={() => {
+              setIsTooltipHovered(false);
+              setHoveredCard(null);
+              setHoveredControl(null);
+              setTooltipPosition(null);
+            }}
+            style={{
+              left: tooltipPosition.x,
+              transform: `translate(-50%, -100%)`,
+              top: tooltipPosition.y - 20,
+              width: tooltipPosition.width + "px",
+            }}
+          >
+            <div className="bg-[#1C1C1C] text-white p-4 rounded-xl shadow-lg space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="bg-[#A3E635] text-[#1C1C1C] px-2 py-1 rounded-full text-xs">
+                    30 min
+                  </div>
+                  <div className="bg-[#2A2A2A] text-white px-2 py-1 rounded-full text-xs">
+                    Mandatory
+                  </div>
+                  <div className="bg-[#2A2A2A] text-white px-2 py-1 rounded-full text-xs">
+                    Assigned to you
+                  </div>
+                </div>
+                <MoveUpRight className="w-4 h-4 cursor-pointer hover:text-[#A3E635] transition-colors" />
+              </div>
+              <div className="text-sm font-medium mb-2">
+                {controlCards[hoveredCard]?.controls[hoveredControl]?.name}
+              </div>
+              <div className="text-sm text-gray-400 mb-4">
+                {
+                  controlCards[hoveredCard]?.controls[hoveredControl]
+                    ?.description
+                }
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-[#2A2A2A] flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-[#A3E635]" />
+                </div>
+                <span className="text-sm text-gray-400">
+                  {controlCards[hoveredCard]?.controls[hoveredControl]
+                    ?.state === "IMPLEMENTED"
+                    ? "Validated"
+                    : "Not validated"}
+                </span>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
