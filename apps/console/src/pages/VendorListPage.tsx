@@ -21,7 +21,7 @@ import { VendorListPageCreateVendorMutation } from "./__generated__/VendorListPa
 import { VendorListPageDeleteVendorMutation } from "./__generated__/VendorListPageDeleteVendorMutation.graphql";
 import { toast } from "@/hooks/use-toast";
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 25;
 
 const vendorListPageQuery = graphql`
   query VendorListPageQuery(
@@ -101,6 +101,58 @@ const vendorsList = [
   { id: "16", name: "Jenkins", createdAt: new Date().toISOString() },
   { id: "17", name: "CircleCI", createdAt: new Date().toISOString() },
 ];
+
+function LoadAboveButton({
+  pageInfo,
+  isPending,
+  onPageChange,
+}: {
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  } | null | undefined;
+  isPending: boolean;
+  onPageChange: (direction: "prev") => void;
+}) {
+  return (
+    <div className="flex justify-center">
+      <Button
+        variant="outline"
+        onClick={() => onPageChange("prev")}
+        disabled={isPending || !pageInfo?.hasPreviousPage}
+        className="w-full"
+      >
+        {isPending ? "Loading..." : "Load above"}
+      </Button>
+    </div>
+  );
+}
+
+function LoadBelowButton({
+  pageInfo,
+  isPending,
+  onPageChange,
+}: {
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  } | null | undefined;
+  isPending: boolean;
+  onPageChange: (direction: "next") => void;
+}) {
+  return (
+    <div className="flex justify-center">
+      <Button
+        variant="outline"
+        onClick={() => onPageChange("next")}
+        disabled={isPending || !pageInfo?.hasNextPage}
+        className="w-full"
+      >
+        {isPending ? "Loading..." : "Load below"}
+      </Button>
+    </div>
+  );
+}
 
 function VendorListContent({
   queryRef,
@@ -245,6 +297,13 @@ function VendorListContent({
           </div>
         </div>
       </div>
+
+      <LoadAboveButton
+        pageInfo={pageInfo}
+        isPending={isPending}
+        onPageChange={() => handlePageChange("prev")}
+      />
+
       <div className="space-y-2">
         {vendors.map((vendor) => (
           <div
@@ -316,24 +375,13 @@ function VendorListContent({
             </div>
           </div>
         ))}
-
-        <div className="flex gap-2 justify-end mt-4">
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange("prev")}
-            disabled={isPending || !pageInfo?.hasPreviousPage}
-          >
-            {isPending ? "Loading..." : "Previous"}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange("next")}
-            disabled={isPending || !pageInfo?.hasNextPage}
-          >
-            {isPending ? "Loading..." : "Next"}
-          </Button>
-        </div>
       </div>
+
+      <LoadBelowButton
+        pageInfo={pageInfo}
+        isPending={isPending}
+        onPageChange={() => handlePageChange("next")}
+      />
     </div>
   );
 }
