@@ -27,12 +27,13 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const PeopleListPage = lazy(() => import("./pages/PeopleListPage"));
 const VendorListPage = lazy(() => import("./pages/VendorListPage"));
 const FrameworkListPage = lazy(() => import("./pages/FrameworkListPage"));
-const FrameworkOverviewPage = lazy(
-  () => import("./pages/FrameworkOverviewPage"),
-);
 const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const CreatePeoplePage = lazy(() => import("./pages/CreatePeoplePage"));
+const FrameworkOverviewPage = lazy(
+  () => import("./pages/FrameworkOverviewPage"),
+);
+const ControlOverviewPage = lazy(() => import("./pages/ControlOverviewPage"));
 
 function App() {
   return (
@@ -117,6 +118,16 @@ function App() {
                         <Suspense>
                           <ErrorBoundaryWithLocation>
                             <FrameworkOverviewPage />
+                          </ErrorBoundaryWithLocation>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/frameworks/:frameworkId/:controlId"
+                      element={
+                        <Suspense>
+                          <ErrorBoundaryWithLocation>
+                            <ControlOverviewPage />
                           </ErrorBoundaryWithLocation>
                         </Suspense>
                       }

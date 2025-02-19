@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import {
   graphql,
   PreloadedQuery,
@@ -55,6 +55,7 @@ function FrameworkOverviewPageContent({
     width: number;
   } | null>(null);
   const [isTooltipHovered, setIsTooltipHovered] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (framework?.name) {
@@ -193,6 +194,13 @@ function FrameworkOverviewPageContent({
                               y: rect.top - 10,
                               width: 400,
                             });
+                          }}
+                          onClick={() => {
+                            if (control?.id) {
+                              navigate(
+                                `/frameworks/${framework.id}/${control.id}`,
+                              );
+                            }
                           }}
                           onMouseLeave={() => {
                             setTimeout(() => {
