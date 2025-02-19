@@ -18,7 +18,7 @@ import type { CreatePeoplePageQuery as CreatePeoplePageQueryType } from "./__gen
 import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { CreatePeoplePageCreatePeopleMutation as CreatePeoplePageCreatePeopleMutationType } from "./__generated__/CreatePeoplePageCreatePeopleMutation.graphql";
+import { CreatePeoplePageCreatePeopleMutation } from "./__generated__/CreatePeoplePageCreatePeopleMutation.graphql";
 
 const createPeoplePageQuery = graphql`
   query CreatePeoplePageQuery {
@@ -89,7 +89,7 @@ function CreatePeoplePageContent({
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
   const data = usePreloadedQuery(createPeoplePageQuery, queryRef);
-  const [commit] = useMutation<CreatePeoplePageCreatePeopleMutationType>(createPeopleMutation);
+  const [commit] = useMutation<CreatePeoplePageCreatePeopleMutation>(createPeopleMutation);
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     fullName: '',
