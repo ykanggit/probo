@@ -5,6 +5,7 @@ import {
   usePreloadedQuery,
   useQueryLoader,
   useMutation,
+  ConnectionHandler,
 } from "react-relay";
 import { useSearchParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,6 +17,10 @@ import { Link } from "react-router";
 import Fuse from "fuse.js";
 import type { VendorListPageQuery as VendorListPageQueryType } from "./__generated__/VendorListPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
+import { VendorListPageCreateVendorMutation } from "./__generated__/VendorListPageCreateVendorMutation.graphql";
+import { VendorListPageDeleteVendorMutation } from "./__generated__/VendorListPageDeleteVendorMutation.graphql";
+import { toast } from "@/hooks/use-toast";
+
 const ITEMS_PER_PAGE = 20;
 
 const vendorListPageQuery = graphql`
@@ -25,10 +30,11 @@ const vendorListPageQuery = graphql`
     $last: Int
     $before: CursorKey
   ) {
-    node(id: "AZSfP_xAcAC5IAAAAAAltA") {
+    currentOrganization: node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
-        vendors(first: $first, after: $after, last: $last, before: $before) {
+        vendors(first: $first, after: $after, last: $last, before: $before)
+          @connection(key: "VendorListPageQuery_vendors") {
           edges {
             node {
               id
@@ -51,12 +57,16 @@ const vendorListPageQuery = graphql`
 `;
 
 const createVendorMutation = graphql`
-  mutation VendorListPageCreateVendorMutation($input: CreateVendorInput!) {
+  mutation VendorListPageCreateVendorMutation($input: CreateVendorInput!, $connections: [ID!]!) {
     createVendor(input: $input) {
-      id
-      name
-      createdAt
-      updatedAt
+      vendorEdge @prependEdge(connections: $connections) {
+        node {
+          id
+          name
+          createdAt
+          updatedAt
+        }
+      }
     }
   }
 `;
@@ -92,14 +102,9 @@ const vendorsList = [
   { id: "17", name: "CircleCI", createdAt: new Date().toISOString() },
 ];
 
-type LoadQueryType = ReturnType<
-  typeof useQueryLoader<VendorListPageQueryType>
->[1];
-
 function VendorListContent({
   queryRef,
   onPageChange,
-  loadQuery,
 }: {
   queryRef: PreloadedQuery<VendorListPageQueryType>;
   onPageChange: (params: {
@@ -108,18 +113,17 @@ function VendorListContent({
     last?: number;
     before?: string;
   }) => void;
-  loadQuery: LoadQueryType;
 }) {
   const data = usePreloadedQuery(vendorListPageQuery, queryRef);
   const [searchParams, setSearchParams] = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredVendors, setFilteredVendors] = useState<Array<any>>([]);
-  const [createVendor] = useMutation(createVendorMutation);
-  const [deleteVendor] = useMutation(deleteVendorMutation);
+  const [createVendor] = useMutation<VendorListPageCreateVendorMutation>(createVendorMutation);
+  const [deleteVendor] = useMutation<VendorListPageDeleteVendorMutation>(deleteVendorMutation);
 
-  const vendors = data.node?.vendors?.edges?.map((edge) => edge?.node) ?? [];
-  const pageInfo = data.node?.vendors?.pageInfo;
+  const vendors = data.currentOrganization.vendors?.edges.map((edge) => edge.node) ?? [];
+  const pageInfo = data.currentOrganization.vendors?.pageInfo;
 
   const fuse = new Fuse(vendorsList, {
     keys: ["name"],
@@ -204,23 +208,23 @@ function VendorListContent({
                       onClick={() => {
                         createVendor({
                           variables: {
+                            connections: [ConnectionHandler.getConnectionID(data.currentOrganization.id, "VendorListPageQuery_vendors")],
                             input: {
-                              organizationId: data.node.id,
+                              organizationId: data.currentOrganization.id,
                               name: vendor.name,
+                              description: "",
+                              serviceStartAt: new Date().toISOString(),
+                              serviceCriticality: "LOW",
+                              riskTier: "GENERAL",
                             },
                           },
-                          onCompleted(response: any) {
+                          onCompleted(response) {
                             setSearchTerm("");
                             setFilteredVendors([]);
-                            loadQuery(
-                              {
-                                first: ITEMS_PER_PAGE,
-                                after: undefined,
-                                last: undefined,
-                                before: undefined,
-                              },
-                              { fetchPolicy: "network-only" },
-                            );
+                            toast({
+                              title: "Vendor added",
+                              description: "The vendor has been added successfully",
+                            });
                           },
                         });
                       }}
@@ -297,15 +301,10 @@ function VendorListContent({
                           },
                         },
                         onCompleted() {
-                          loadQuery(
-                            {
-                              first: ITEMS_PER_PAGE,
-                              after: undefined,
-                              last: undefined,
-                              before: undefined,
-                            },
-                            { fetchPolicy: "network-only" },
-                          );
+                          toast({
+                            title: "Vendor deleted",
+                            description: "The vendor has been deleted successfully",
+                          });
                         },
                       });
                     }
@@ -360,7 +359,6 @@ export default function VendorListPage() {
   const [queryRef, loadQuery] =
     useQueryLoader<VendorListPageQueryType>(vendorListPageQuery);
 
-  // Initialize with URL params
   useEffect(() => {
     const after = searchParams.get("after");
     const before = searchParams.get("before");
@@ -408,7 +406,6 @@ export default function VendorListPage() {
         <VendorListContent
           queryRef={queryRef}
           onPageChange={handlePageChange}
-          loadQuery={loadQuery}
         />
       </Suspense>
     </>

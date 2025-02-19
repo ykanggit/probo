@@ -26,8 +26,16 @@ import (
 
 type (
 	CreateVendorRequest struct {
-		OrganizationID gid.GID
-		Name           string
+		OrganizationID       gid.GID
+		Name                 string
+		Description          string
+		ServiceStartAt       time.Time
+		ServiceTerminationAt *time.Time
+		ServiceCriticality   coredata.ServiceCriticality
+		RiskTier             coredata.RiskTier
+		StatusPageURL        *string
+		TermsOfServiceURL    *string
+		PrivacyPolicyURL     *string
 	}
 )
 
@@ -43,11 +51,19 @@ func (s Service) CreateVendor(
 
 	organization := &coredata.Organization{}
 	vendor := &coredata.Vendor{
-		ID:             vendorID,
-		OrganizationID: req.OrganizationID,
-		Name:           req.Name,
-		CreatedAt:      now,
-		UpdatedAt:      now,
+		ID:                   vendorID,
+		OrganizationID:       req.OrganizationID,
+		Name:                 req.Name,
+		CreatedAt:            now,
+		UpdatedAt:            now,
+		Description:          req.Description,
+		ServiceStartAt:       req.ServiceStartAt,
+		ServiceTerminationAt: req.ServiceTerminationAt,
+		ServiceCriticality:   req.ServiceCriticality,
+		RiskTier:             req.RiskTier,
+		StatusPageURL:        req.StatusPageURL,
+		TermsOfServiceURL:    req.TermsOfServiceURL,
+		PrivacyPolicyURL:     req.PrivacyPolicyURL,
 	}
 
 	err = s.pg.WithTx(

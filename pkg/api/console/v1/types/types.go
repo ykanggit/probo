@@ -72,9 +72,20 @@ type CreatePeoplePayload struct {
 }
 
 type CreateVendorInput struct {
-	OrganizationID gid.GID `json:"organizationId"`
-	Name           string  `json:"name"`
-	Description    string  `json:"description"`
+	OrganizationID       gid.GID                     `json:"organizationId"`
+	Name                 string                      `json:"name"`
+	Description          string                      `json:"description"`
+	ServiceStartAt       time.Time                   `json:"serviceStartAt"`
+	ServiceTerminationAt *time.Time                  `json:"serviceTerminationAt,omitempty"`
+	ServiceCriticality   coredata.ServiceCriticality `json:"serviceCriticality"`
+	RiskTier             coredata.RiskTier           `json:"riskTier"`
+	StatusPageURL        *string                     `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL    *string                     `json:"termsOfServiceUrl,omitempty"`
+	PrivacyPolicyURL     *string                     `json:"privacyPolicyUrl,omitempty"`
+}
+
+type CreateVendorPayload struct {
+	VendorEdge *VendorEdge `json:"vendorEdge"`
 }
 
 type DeletePeopleInput struct {

@@ -314,7 +314,7 @@ type Query {
 }
 
 type Mutation {
-  createVendor(input: CreateVendorInput!): Vendor!
+  createVendor(input: CreateVendorInput!): CreateVendorPayload!
   updateVendor(input: UpdateVendorInput!): Vendor!
   deleteVendor(input: DeleteVendorInput!): Void!
   createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
@@ -326,6 +326,13 @@ input CreateVendorInput {
   organizationId: ID!
   name: String!
   description: String!
+  serviceStartAt: Datetime!
+  serviceTerminationAt: Datetime
+  serviceCriticality: ServiceCriticality!
+  riskTier: RiskTier!
+  statusPageUrl: String
+  termsOfServiceUrl: String
+  privacyPolicyUrl: String
 }
 
 input DeleteVendorInput {
@@ -381,4 +388,8 @@ input UpdateVendorInput {
 
 type CreatePeoplePayload {
   peopleEdge: PeopleEdge!
+}
+
+type CreateVendorPayload {
+  vendorEdge: VendorEdge!
 }

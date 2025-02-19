@@ -66,16 +66,25 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 }
 
 // CreateVendor is the resolver for the createVendor field.
-func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.Vendor, error) {
+func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error) {
 	vendor, err := r.svc.CreateVendor(ctx, probo.CreateVendorRequest{
-		OrganizationID: input.OrganizationID,
-		Name:           input.Name,
+		OrganizationID:       input.OrganizationID,
+		Name:                 input.Name,
+		Description:          input.Description,
+		ServiceStartAt:       input.ServiceStartAt,
+		ServiceTerminationAt: input.ServiceTerminationAt,
+		ServiceCriticality:   input.ServiceCriticality,
+		RiskTier:             input.RiskTier,
+		StatusPageURL:        input.StatusPageURL,
+		TermsOfServiceURL:    input.TermsOfServiceURL,
+		PrivacyPolicyURL:     input.PrivacyPolicyURL,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot create vendor: %w", err)
 	}
-
-	return types.NewVendor(vendor), nil
+	return &types.CreateVendorPayload{
+		VendorEdge: types.NewVendorEdge(vendor),
+	}, nil
 }
 
 // UpdateVendor is the resolver for the updateVendor field.
