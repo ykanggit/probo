@@ -257,9 +257,7 @@ function VendorListContent({
                       onClick={() => {
                         createVendor({
                           variables: {
-                            connections: [
-                              vendorsConnection.vendors.__id,
-                            ],
+                            connections: [vendorsConnection.vendors.__id],
                             input: {
                               organizationId: data.currentOrganization.id,
                               name: vendor.name,
@@ -364,9 +362,7 @@ function VendorListContent({
                     ) {
                       deleteVendor({
                         variables: {
-                          connections: [
-                            vendorsConnection.vendors.__id
-                          ],
+                          connections: [vendorsConnection.vendors.__id],
                           input: {
                             vendorId: vendor.id,
                           },
