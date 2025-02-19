@@ -22,7 +22,7 @@ import { CreatePeoplePageCreatePeopleMutation } from "./__generated__/CreatePeop
 
 const createPeoplePageQuery = graphql`
   query CreatePeoplePageQuery {
-    node(id: "AZSfP_xAcAC5IAAAAAAltA") {
+    currentOrganization: node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
         name
@@ -107,13 +107,13 @@ function CreatePeoplePageContent({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const connecttionId = ConnectionHandler.getConnectionID(data.node.id, "PeopleListPageQuery_peoples");
+    const connecttionId = ConnectionHandler.getConnectionID(data.currentOrganization.id, "PeopleListPageQuery_peoples");
 
     commit({
       variables: {
         connections: [connecttionId],
         input: {
-          organizationId: data.node.id,
+          organizationId: data.currentOrganization.id,
           fullName: formData.fullName,
           primaryEmailAddress: formData.primaryEmailAddress,
           additionalEmailAddresses: formData.additionalEmailAddresses,

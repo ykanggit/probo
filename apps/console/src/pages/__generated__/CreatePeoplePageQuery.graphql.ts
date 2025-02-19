@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1440fead35c1cf239edc5574dcdf9dc3>>
+ * @generated SignedSource<<90c9055cb59db9172002bc02e6e9429d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,7 +11,7 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type CreatePeoplePageQuery$variables = Record<PropertyKey, never>;
 export type CreatePeoplePageQuery$data = {
-  readonly node: {
+  readonly currentOrganization: {
     readonly id: string;
     readonly name?: string;
   };
@@ -58,7 +58,7 @@ return {
     "name": "CreatePeoplePageQuery",
     "selections": [
       {
-        "alias": null,
+        "alias": "currentOrganization",
         "args": (v0/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -81,7 +81,7 @@ return {
     "name": "CreatePeoplePageQuery",
     "selections": [
       {
-        "alias": null,
+        "alias": "currentOrganization",
         "args": (v0/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -103,16 +103,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "e3812048d135626b79aa289d77ecd630",
+    "cacheID": "816d745d1a69d598b3507fa4df1e878f",
     "id": null,
     "metadata": {},
     "name": "CreatePeoplePageQuery",
     "operationKind": "query",
-    "text": "query CreatePeoplePageQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      name\n    }\n  }\n}\n"
+    "text": "query CreatePeoplePageQuery {\n  currentOrganization: node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "629fdb563382b22be4a6c1f17fafda96";
+(node as any).hash = "54148a2bd398d4fda7c72b60c7210e6d";
 
 export default node;
