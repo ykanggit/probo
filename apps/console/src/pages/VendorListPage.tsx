@@ -6,6 +6,7 @@ import {
   useQueryLoader,
   useMutation,
   ConnectionHandler,
+  usePaginationFragment,
 } from "react-relay";
 import { useSearchParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,37 +21,45 @@ import { Helmet } from "react-helmet-async";
 import { VendorListPageCreateVendorMutation } from "./__generated__/VendorListPageCreateVendorMutation.graphql";
 import { VendorListPageDeleteVendorMutation } from "./__generated__/VendorListPageDeleteVendorMutation.graphql";
 import { toast } from "@/hooks/use-toast";
+import { VendorListPagePaginationQuery } from "./__generated__/VendorListPagePaginationQuery.graphql";
+import { VendorListPage_vendors$key } from "./__generated__/VendorListPage_vendors.graphql";
 
 const ITEMS_PER_PAGE = 25;
 
 const vendorListPageQuery = graphql`
-  query VendorListPageQuery(
-    $first: Int
-    $after: CursorKey
-    $last: Int
-    $before: CursorKey
-  ) {
+  query VendorListPageQuery($first: Int, $after: CursorKey, $last: Int, $before: CursorKey) {
     currentOrganization: node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
-        vendors(first: $first, after: $after, last: $last, before: $before)
-          @connection(key: "VendorListPageQuery_vendors") {
-          edges {
-            node {
-              id
-              name
-              createdAt
-              updatedAt
-            }
-            cursor
-          }
-          pageInfo {
-            hasNextPage
-            hasPreviousPage
-            startCursor
-            endCursor
-          }
+        ...VendorListPage_vendors
+      }
+    }
+  }
+`;
+
+const vendorListFragment = graphql`
+  fragment VendorListPage_vendors on Organization 
+  @refetchable(queryName: "VendorListPagePaginationQuery") {
+    id
+    vendors(
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+    ) @connection(key: "VendorListPage_vendors") {
+      edges {
+        node {
+          id
+          name
+          createdAt
+          updatedAt
         }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
       }
     }
   }
@@ -103,52 +112,46 @@ const vendorsList = [
 ];
 
 function LoadAboveButton({
-  pageInfo,
-  isPending,
-  onPageChange,
+  isLoading,
+  hasMore,
+  onLoadMore,
 }: {
-  pageInfo: {
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  } | null | undefined;
-  isPending: boolean;
-  onPageChange: (direction: "prev") => void;
+  isLoading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
 }) {
   return (
     <div className="flex justify-center">
       <Button
         variant="outline"
-        onClick={() => onPageChange("prev")}
-        disabled={isPending || !pageInfo?.hasPreviousPage}
+        onClick={onLoadMore}
+        disabled={isLoading || !hasMore}
         className="w-full"
       >
-        {isPending ? "Loading..." : "Load above"}
+        {isLoading ? "Loading..." : "Load above"}
       </Button>
     </div>
   );
 }
 
 function LoadBelowButton({
-  pageInfo,
-  isPending,
-  onPageChange,
+  isLoading,
+  hasMore,
+  onLoadMore,
 }: {
-  pageInfo: {
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  } | null | undefined;
-  isPending: boolean;
-  onPageChange: (direction: "next") => void;
+  isLoading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
 }) {
   return (
     <div className="flex justify-center">
       <Button
         variant="outline"
-        onClick={() => onPageChange("next")}
-        disabled={isPending || !pageInfo?.hasNextPage}
+        onClick={onLoadMore}
+        disabled={isLoading || !hasMore}
         className="w-full"
       >
-        {isPending ? "Loading..." : "Load below"}
+        {isLoading ? "Loading..." : "Load below"}
       </Button>
     </div>
   );
@@ -156,17 +159,10 @@ function LoadBelowButton({
 
 function VendorListContent({
   queryRef,
-  onPageChange,
 }: {
   queryRef: PreloadedQuery<VendorListPageQueryType>;
-  onPageChange: (params: {
-    first?: number;
-    after?: string;
-    last?: number;
-    before?: string;
-  }) => void;
 }) {
-  const data = usePreloadedQuery(vendorListPageQuery, queryRef);
+  const data = usePreloadedQuery<VendorListPageQueryType>(vendorListPageQuery, queryRef);
   const [searchParams, setSearchParams] = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
@@ -174,40 +170,23 @@ function VendorListContent({
   const [createVendor] = useMutation<VendorListPageCreateVendorMutation>(createVendorMutation);
   const [deleteVendor] = useMutation<VendorListPageDeleteVendorMutation>(deleteVendorMutation);
 
-  const vendors = data.currentOrganization.vendors?.edges.map((edge) => edge.node) ?? [];
-  const pageInfo = data.currentOrganization.vendors?.pageInfo;
+  const {
+    data: vendorsConnection,
+    loadNext,
+    loadPrevious,
+    hasNext,
+    hasPrevious,
+    isLoadingNext,
+    isLoadingPrevious,
+  } = usePaginationFragment<VendorListPagePaginationQuery, VendorListPage_vendors$key>(vendorListFragment, data.currentOrganization);
+
+  const vendors = vendorsConnection.vendors.edges.map((edge) => edge.node) ?? [];
+  const pageInfo = vendorsConnection.vendors.pageInfo;
 
   const fuse = new Fuse(vendorsList, {
     keys: ["name"],
     threshold: 0.3,
   });
-
-  const handlePageChange = (direction: "next" | "prev") => {
-    if (!pageInfo) return;
-
-    if (direction === "next" && !pageInfo.hasNextPage) return;
-    if (direction === "prev" && !pageInfo.hasPreviousPage) return;
-
-    startTransition(() => {
-      const params =
-        direction === "next"
-          ? { first: ITEMS_PER_PAGE, after: pageInfo.endCursor }
-          : { last: ITEMS_PER_PAGE, before: pageInfo.startCursor };
-
-      setSearchParams((prev) => {
-        if (direction === "next") {
-          prev.set("after", pageInfo.endCursor!);
-          prev.delete("before");
-        } else {
-          prev.set("before", pageInfo.startCursor!);
-          prev.delete("after");
-        }
-        return prev;
-      });
-
-      onPageChange(params);
-    });
-  };
 
   return (
     <div className="p-6 space-y-6">
@@ -299,9 +278,18 @@ function VendorListContent({
       </div>
 
       <LoadAboveButton
-        pageInfo={pageInfo}
-        isPending={isPending}
-        onPageChange={() => handlePageChange("prev")}
+        isLoading={isLoadingPrevious}
+        hasMore={hasPrevious}
+        onLoadMore={() => {
+          startTransition(() => {
+            setSearchParams((prev) => {
+              prev.set("before", pageInfo?.startCursor || "");
+              prev.delete("after");
+              return prev;
+            });
+            loadPrevious(ITEMS_PER_PAGE);
+          });
+        }}
       />
 
       <div className="space-y-2">
@@ -378,9 +366,18 @@ function VendorListContent({
       </div>
 
       <LoadBelowButton
-        pageInfo={pageInfo}
-        isPending={isPending}
-        onPageChange={() => handlePageChange("next")}
+        isLoading={isLoadingNext}
+        hasMore={hasNext}
+        onLoadMore={() => {
+          startTransition(() => {
+            setSearchParams((prev) => {
+              prev.set("after", pageInfo?.endCursor || "");
+              prev.delete("before");
+              return prev;
+            });
+            loadNext(ITEMS_PER_PAGE);
+          });
+        }}
       />
     </div>
   );
@@ -417,29 +414,7 @@ export default function VendorListPage() {
       last: before ? ITEMS_PER_PAGE : undefined,
       before: before || undefined,
     });
-  }, [loadQuery, searchParams]);
-
-  const handlePageChange = ({
-    first,
-    after,
-    last,
-    before,
-  }: {
-    first?: number;
-    after?: string;
-    last?: number;
-    before?: string;
-  }) => {
-    loadQuery(
-      {
-        first,
-        after,
-        last,
-        before,
-      },
-      { fetchPolicy: "network-only" },
-    );
-  };
+  }, [loadQuery]);
 
   if (!queryRef) {
     return <VendorListFallback />;
@@ -451,10 +426,7 @@ export default function VendorListPage() {
         <title>Vendors - Probo Console</title>
       </Helmet>
       <Suspense fallback={<VendorListFallback />}>
-        <VendorListContent
-          queryRef={queryRef}
-          onPageChange={handlePageChange}
-        />
+        <VendorListContent queryRef={queryRef} />
       </Suspense>
     </>
   );

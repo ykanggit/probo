@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<874e734a238db8fc4ab486da7d49ceee>>
+ * @generated SignedSource<<23fdb7f13c0e5f5c25485a6c4800dcb5>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+import { FragmentRefs } from "relay-runtime";
 export type VendorListPageQuery$variables = {
   after?: any | null | undefined;
   before?: any | null | undefined;
@@ -18,23 +19,7 @@ export type VendorListPageQuery$variables = {
 export type VendorListPageQuery$data = {
   readonly currentOrganization: {
     readonly id: string;
-    readonly vendors?: {
-      readonly edges: ReadonlyArray<{
-        readonly cursor: any;
-        readonly node: {
-          readonly createdAt: any;
-          readonly id: string;
-          readonly name: string;
-          readonly updatedAt: any;
-        };
-      }>;
-      readonly pageInfo: {
-        readonly endCursor: any | null | undefined;
-        readonly hasNextPage: boolean;
-        readonly hasPreviousPage: boolean;
-        readonly startCursor: any | null | undefined;
-      };
-    };
+    readonly " $fragmentSpreads": FragmentRefs<"VendorListPage_vendors">;
   };
 };
 export type VendorListPageQuery = {
@@ -86,99 +71,6 @@ v6 = {
 },
 v7 = [
   {
-    "alias": null,
-    "args": null,
-    "concreteType": "VendorEdge",
-    "kind": "LinkedField",
-    "name": "edges",
-    "plural": true,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "concreteType": "Vendor",
-        "kind": "LinkedField",
-        "name": "node",
-        "plural": false,
-        "selections": [
-          (v5/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "name",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "createdAt",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "updatedAt",
-            "storageKey": null
-          },
-          (v6/*: any*/)
-        ],
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "cursor",
-        "storageKey": null
-      }
-    ],
-    "storageKey": null
-  },
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "PageInfo",
-    "kind": "LinkedField",
-    "name": "pageInfo",
-    "plural": false,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "hasNextPage",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "hasPreviousPage",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "startCursor",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "endCursor",
-        "storageKey": null
-      }
-    ],
-    "storageKey": null
-  }
-],
-v8 = [
-  {
     "kind": "Variable",
     "name": "after",
     "variableName": "after"
@@ -224,14 +116,9 @@ return {
             "kind": "InlineFragment",
             "selections": [
               {
-                "alias": "vendors",
                 "args": null,
-                "concreteType": "VendorConnection",
-                "kind": "LinkedField",
-                "name": "__VendorListPageQuery_vendors_connection",
-                "plural": false,
-                "selections": (v7/*: any*/),
-                "storageKey": null
+                "kind": "FragmentSpread",
+                "name": "VendorListPage_vendors"
               }
             ],
             "type": "Organization",
@@ -270,20 +157,112 @@ return {
             "selections": [
               {
                 "alias": null,
-                "args": (v8/*: any*/),
+                "args": (v7/*: any*/),
                 "concreteType": "VendorConnection",
                 "kind": "LinkedField",
                 "name": "vendors",
                 "plural": false,
-                "selections": (v7/*: any*/),
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "VendorEdge",
+                    "kind": "LinkedField",
+                    "name": "edges",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "Vendor",
+                        "kind": "LinkedField",
+                        "name": "node",
+                        "plural": false,
+                        "selections": [
+                          (v5/*: any*/),
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "name",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "createdAt",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "updatedAt",
+                            "storageKey": null
+                          },
+                          (v6/*: any*/)
+                        ],
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "cursor",
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "PageInfo",
+                    "kind": "LinkedField",
+                    "name": "pageInfo",
+                    "plural": false,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "hasNextPage",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "hasPreviousPage",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "startCursor",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "endCursor",
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  }
+                ],
                 "storageKey": null
               },
               {
                 "alias": null,
-                "args": (v8/*: any*/),
+                "args": (v7/*: any*/),
                 "filters": null,
                 "handle": "connection",
-                "key": "VendorListPageQuery_vendors",
+                "key": "VendorListPage_vendors",
                 "kind": "LinkedHandle",
                 "name": "vendors"
               }
@@ -297,28 +276,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "079490495e96d3609a263570f185673b",
+    "cacheID": "b910bb15ebb2e9b5aae2f20e0f5266db",
     "id": null,
-    "metadata": {
-      "connection": [
-        {
-          "count": null,
-          "cursor": null,
-          "direction": "bidirectional",
-          "path": [
-            "currentOrganization",
-            "vendors"
-          ]
-        }
-      ]
-    },
+    "metadata": {},
     "name": "VendorListPageQuery",
     "operationKind": "query",
-    "text": "query VendorListPageQuery(\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  currentOrganization: node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      vendors(first: $first, after: $after, last: $last, before: $before) {\n        edges {\n          node {\n            id\n            name\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query VendorListPageQuery(\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  currentOrganization: node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      ...VendorListPage_vendors\n    }\n  }\n}\n\nfragment VendorListPage_vendors on Organization {\n  id\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "9613eb9b1e34b2ebffda69c5909f5f5b";
+(node as any).hash = "a1f88bf5287abaffb051993051d0e2a7";
 
 export default node;
