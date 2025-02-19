@@ -5,12 +5,11 @@ import {
   usePreloadedQuery,
   useQueryLoader,
 } from "react-relay";
-import { Globe2, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router";
 import type { FrameworkListPageQuery as FrameworkListPageQueryType } from "./__generated__/FrameworkListPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
+
 const FrameworkListPageQuery = graphql`
   query FrameworkListPageQuery {
     node(id: "AZSfP_xAcAC5IAAAAAAltA") {
@@ -40,6 +39,49 @@ const FrameworkListPageQuery = graphql`
   }
 `;
 
+function FrameworkCard({
+  title,
+  description,
+  icon,
+  status,
+  progress,
+}: {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  status?: string;
+  progress?: string;
+}) {
+  return (
+    <Card className="relative overflow-hidden border bg-card p-6">
+      <div className="flex flex-col gap-4">
+        <div className="size-16">
+          {icon}
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">{title}</h3>
+            {status && (
+              <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">
+                {status}
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+
+        {progress && (
+          <div className="flex items-center gap-2 text-sm">
+            <span className="size-2 rounded-full bg-yellow-400" />
+            {progress}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
 function FrameworkListPageContent({
   queryRef,
 }: {
@@ -50,50 +92,40 @@ function FrameworkListPageContent({
     data.node.frameworks?.edges.map((edge) => edge?.node) ?? [];
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold mb-2">Framework</h1>
-        <p className="text-muted-foreground">
-          Compliance frameworks like SOC 2 and ISO 27001 provide guidelines to
-          secure sensitive data, manage risks, and build trust. SOC 2 focuses on
-          customer data protection via five Trust Principles, while ISO 27001
-          establishes a comprehensive Information Security Management System for
-          global standards.
-        </p>
+    <div className="container space-y-6 p-4 md:p-6 lg:p-8">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">Framework</h1>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {frameworks.map((framework) => (
-          <Link key={framework?.id} to={`/frameworks/${framework.id}`}>
-            <Card className="bg-card/50 hover:bg-card/70 transition-colors">
-              <CardContent className="p-6">
-                <div className="relative mb-6">
-                  <Badge className="absolute right-0 top-0 bg-green-500/10 text-green-500 hover:bg-green-500/20">
-                    Active
-                  </Badge>
-                  <div className="bg-green-500/10 w-24 h-24 rounded-full flex items-center justify-center mb-4">
-                    <Globe2 className="w-12 h-12 text-green-500" />
-                    <div className="absolute text-xs font-medium text-green-500">
-                      {framework?.name}
-                    </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {frameworks.map((framework) => {
+          const validatedControls = framework.controls.edges.filter(
+            edge => edge?.node?.state === "IMPLEMENTED"
+          ).length;
+          const totalControls = framework.controls.edges.length;
+          
+          return (
+            <Link key={framework.id} to={`/frameworks/${framework.id}`}>
+              <FrameworkCard
+                title={framework.name}
+                description={framework.description}
+                icon={
+                  <div className="flex size-full items-center justify-center rounded-full bg-blue-100">
+                    <span className="text-lg font-semibold text-blue-900">
+                      {framework.name.split(' ')[0]}
+                    </span>
                   </div>
-                  <h2 className="text-xl font-semibold mb-2">
-                    {framework?.name}
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    {framework?.description}
-                  </p>
-                </div>
-                <div className="flex items-center text-muted-foreground text-sm">
-                  <div className="flex items-center">
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    {framework?.controls?.edges.length} Controls
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+                }
+                status={validatedControls === totalControls ? "Compliant" : undefined}
+                progress={
+                  validatedControls === totalControls
+                    ? "All controls validated"
+                    : `${validatedControls}/${totalControls} Controls validated`
+                }
+              />
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
