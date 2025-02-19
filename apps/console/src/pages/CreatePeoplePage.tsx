@@ -107,7 +107,7 @@ function CreatePeoplePageContent({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const peopleConnectionId = ConnectionHandler.getConnectionID(data.currentOrganization.id, "PeopleListPageQuery_peoples");
+    const peopleConnectionId = ConnectionHandler.getConnectionID(data.currentOrganization.id, "PeopleListPage_peoples");
 
     createPeople({
       variables: {
