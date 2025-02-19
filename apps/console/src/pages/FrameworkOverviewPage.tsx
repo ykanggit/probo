@@ -80,7 +80,7 @@ function FrameworkOverviewPageContent({
   ).length;
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-6 space-y-6">
       <div className="space-y-4 mb-8">
         <h1 className="text-2xl font-semibold">{framework.name}</h1>
         <p className="text-muted-foreground max-w-3xl">
@@ -88,25 +88,48 @@ function FrameworkOverviewPageContent({
         </p>
       </div>
 
-      <div className="mb-8 space-y-4">
-        <div className="flex items-center gap-2 text-sm">
-          <div className="bg-primary/10 text-primary px-3 py-1 rounded-md flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            Frame 153
-          </div>
-          <div className="bg-warning/10 text-warning px-3 py-1 rounded-md flex items-center gap-2">
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Timeline</h2>
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#2A2A2A] text-[#A3E635] text-sm">
             <Clock className="w-4 h-4" />
-            12 hours left
+            <span>12 hours left</span>
           </div>
         </div>
-        <div className="bg-card p-4 rounded-lg space-y-4">
-          <h3 className="font-medium">Preparation phase</h3>
-          <Progress value={30} className="h-2" />
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Preparation</span>
-            <span>Observation period: 3 month</span>
-            <span>Audit: 6-9 days</span>
-            <span>Report: 10-14 days</span>
+        <div className="rounded-lg border bg-card p-6">
+          <h3 className="font-medium mb-4">Preparation phase</h3>
+          <div className="relative">
+            <div className="flex w-full">
+              <div className="w-[20%]">
+                <div className="h-2 rounded-md bg-gradient-to-r from-blue-400 via-green-300 to-yellow-300" />
+              </div>
+              <div className="w-[8px] bg-transparent z-10" />
+              <div className="w-[45%]">
+                <div className="h-2 rounded-md bg-muted" />
+              </div>
+              <div className="w-[8px] bg-transparent z-10" />
+              <div className="w-[15%]">
+                <div className="h-2 rounded-md bg-muted" />
+              </div>
+              <div className="w-[8px] bg-transparent z-10" />
+              <div className="w-[20%]">
+                <div className="h-2 rounded-md bg-muted" />
+              </div>
+            </div>
+            <div className="mt-2 flex w-full text-sm text-muted-foreground">
+              <div className="w-[20%]">
+                <span>Preparation</span>
+              </div>
+              <div className="w-[45%]">
+                <span>Observation period: 3 month</span>
+              </div>
+              <div className="w-[15%]">
+                <span>Audit: 6-9 days</span>
+              </div>
+              <div className="w-[20%]">
+                <span>Report: 10-14 days</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -118,36 +141,39 @@ function FrameworkOverviewPageContent({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2">
         {controlCards.map((card, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Shield className="w-4 h-4" />
-                {card.title}
-              </CardTitle>
+          <div
+            key={index}
+            className="block p-4 rounded-lg border bg-card text-card-foreground"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium">{card.title}</span>
+              </div>
               <Avatar className="h-6 w-6">
                 <AvatarFallback>U</AvatarFallback>
               </Avatar>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-1 my-2">
+            </div>
+            <div className="mt-4 space-y-2">
+              <div className="flex gap-1">
                 {Array(card.total)
                   .fill(0)
                   .map((_, i) => (
                     <div
                       key={i}
-                      className={`h-2 w-2 rounded-sm ${
-                        i < card.completed ? "bg-primary" : "bg-muted"
+                      className={`h-4 w-4 ${
+                        i < card.completed ? "bg-[#D1FA84] rounded" : "bg-muted rounded"
                       }`}
                     />
                   ))}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <span className="text-sm text-muted-foreground">
                 {card.completed}/{card.total} Controls validated
-              </p>
-            </CardContent>
-          </Card>
+              </span>
+            </div>
+          </div>
         ))}
       </div>
     </div>
