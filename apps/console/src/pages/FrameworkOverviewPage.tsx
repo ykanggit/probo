@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 
 const FrameworkOverviewPageQuery = graphql`
   query FrameworkOverviewPageQuery($frameworkId: ID!) {
@@ -42,8 +43,15 @@ function FrameworkOverviewPageContent({
   queryRef: PreloadedQuery<FrameworkOverviewPageQueryType>;
 }) {
   const data = usePreloadedQuery(FrameworkOverviewPageQuery, queryRef);
+  const { setBreadcrumbSegment } = useBreadcrumb();
   const framework = data.node;
   const controls = framework.controls?.edges.map((edge) => edge?.node) ?? [];
+
+  useEffect(() => {
+    if (framework?.name) {
+      setBreadcrumbSegment("frameworks/:id", framework.name);
+    }
+  }, [framework?.name, setBreadcrumbSegment]);
 
   // Group controls by their category
   const controlsByCategory = controls.reduce(
