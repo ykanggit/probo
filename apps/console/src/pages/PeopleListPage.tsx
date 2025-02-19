@@ -15,7 +15,7 @@ import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generated__/PeopleListPageQuery.graphql";
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 25;
 
 const PeopleListPageQuery = graphql`
   query PeopleListPageQuery(
@@ -59,10 +59,61 @@ const deletePeopleMutation = graphql`
   }
 `;
 
+function LoadAboveButton({
+  pageInfo,
+  isPending,
+  onPageChange,
+}: {
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  } | null | undefined;
+  isPending: boolean;
+  onPageChange: (direction: "prev") => void;
+}) {
+  return (
+    <div className="flex justify-center">
+      <Button
+        variant="outline"
+        onClick={() => onPageChange("prev")}
+        disabled={isPending || !pageInfo?.hasPreviousPage}
+        className="w-full"
+      >
+        {isPending ? "Loading..." : "Load above"}
+      </Button>
+    </div>
+  );
+}
+
+function LoadBelowButton({
+  pageInfo,
+  isPending,
+  onPageChange,
+}: {
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  } | null | undefined;
+  isPending: boolean;
+  onPageChange: (direction: "next") => void;
+}) {
+  return (
+    <div className="flex justify-center">
+      <Button
+        variant="outline"
+        onClick={() => onPageChange("next")}
+        disabled={isPending || !pageInfo?.hasNextPage}
+        className="w-full"
+      >
+        {isPending ? "Loading..." : "Load below"}
+      </Button>
+    </div>
+  );
+}
+
 function PeopleListPageContent({
   queryRef,
   onPageChange,
-  loadQuery,
 }: {
   queryRef: PreloadedQuery<PeopleListPageQueryType>;
   onPageChange: (params: {
@@ -71,27 +122,38 @@ function PeopleListPageContent({
     last?: number;
     before?: string;
   }) => void;
-  loadQuery: LoadQueryType;
 }) {
   const data = usePreloadedQuery(PeopleListPageQuery, queryRef);
+  const [searchParams, setSearchParams] = useSearchParams();
   const peoples = data.node.peoples?.edges.map((edge) => edge?.node) ?? [];
   const pageInfo = data.node.peoples?.pageInfo;
   const [isPending, startTransition] = useTransition();
   const [deletePeople] = useMutation(deletePeopleMutation);
 
   const handlePageChange = (direction: "prev" | "next") => {
+    if (!pageInfo) return;
+
+    if (direction === "next" && !pageInfo.hasNextPage) return;
+    if (direction === "prev" && !pageInfo.hasPreviousPage) return;
+
     startTransition(() => {
-      if (direction === "prev") {
-        onPageChange({
-          last: ITEMS_PER_PAGE,
-          before: pageInfo?.startCursor,
-        });
-      } else {
-        onPageChange({
-          first: ITEMS_PER_PAGE,
-          after: pageInfo?.endCursor,
-        });
-      }
+      const params =
+        direction === "next"
+          ? { first: ITEMS_PER_PAGE, after: pageInfo.endCursor }
+          : { last: ITEMS_PER_PAGE, before: pageInfo.startCursor };
+
+      setSearchParams((prev) => {
+        if (direction === "next") {
+          prev.set("after", pageInfo.endCursor!);
+          prev.delete("before");
+        } else {
+          prev.set("before", pageInfo.startCursor!);
+          prev.delete("after");
+        }
+        return prev;
+      });
+
+      onPageChange(params);
     });
   };
 
@@ -110,6 +172,13 @@ function PeopleListPageContent({
           </Button>
         </div>
       </div>
+
+      <LoadAboveButton
+        pageInfo={pageInfo}
+        isPending={isPending}
+        onPageChange={() => handlePageChange("prev")}
+      />
+
       <div className="space-y-2">
         {peoples.map((person) => (
           <Link
@@ -164,15 +233,12 @@ function PeopleListPageContent({
                         },
                       },
                       onCompleted() {
-                        loadQuery(
-                          {
-                            first: ITEMS_PER_PAGE,
-                            after: undefined,
-                            last: undefined,
-                            before: undefined,
-                          },
-                          { fetchPolicy: "network-only" },
-                        );
+                        onPageChange({
+                          first: ITEMS_PER_PAGE,
+                          after: undefined,
+                          last: undefined,
+                          before: undefined,
+                        });
                       },
                     });
                   }
@@ -184,22 +250,11 @@ function PeopleListPageContent({
           </Link>
         ))}
 
-        <div className="flex gap-2 justify-end mt-4">
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange("prev")}
-            disabled={isPending || !pageInfo?.hasPreviousPage}
-          >
-            {isPending ? "Loading..." : "Previous"}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange("next")}
-            disabled={isPending || !pageInfo?.hasNextPage}
-          >
-            {isPending ? "Loading..." : "Next"}
-          </Button>
-        </div>
+        <LoadBelowButton
+          pageInfo={pageInfo}
+          isPending={isPending}
+          onPageChange={() => handlePageChange("next")}
+        />
       </div>
     </div>
   );
@@ -300,7 +355,6 @@ export default function PeopleListPage() {
         <PeopleListPageContent
           queryRef={queryRef}
           onPageChange={handlePageChange}
-          loadQuery={loadQuery}
         />
       </Suspense>
     </>
