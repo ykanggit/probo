@@ -317,7 +317,7 @@ type Mutation {
   createVendor(input: CreateVendorInput!): Vendor!
   updateVendor(input: UpdateVendorInput!): Vendor!
   deleteVendor(input: DeleteVendorInput!): Void!
-  createPeople(input: CreatePeopleInput!): People!
+  createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
   updatePeople(input: UpdatePeopleInput!): People!
   deletePeople(input: DeletePeopleInput!): Void!
 }
@@ -377,4 +377,8 @@ input UpdateVendorInput {
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
+}
+
+type CreatePeoplePayload {
+  peopleEdge: PeopleEdge!
 }

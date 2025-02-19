@@ -6,25 +6,19 @@ import {
   usePreloadedQuery,
   useQueryLoader,
   useMutation,
-  ConnectionHandler,
   useRelayEnvironment,
+  ConnectionHandler,
 } from "react-relay";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { CreatePeoplePageQuery as CreatePeoplePageQueryType } from "./__generated__/CreatePeoplePageQuery.graphql";
 import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { CreatePeoplePageCreatePeopleMutation as CreatePeoplePageCreatePeopleMutationType } from "./__generated__/CreatePeoplePageCreatePeopleMutation.graphql";
 
 const createPeoplePageQuery = graphql`
   query CreatePeoplePageQuery {
@@ -38,13 +32,17 @@ const createPeoplePageQuery = graphql`
 `;
 
 const createPeopleMutation = graphql`
-  mutation CreatePeoplePageCreatePeopleMutation($input: CreatePeopleInput!) {
+  mutation CreatePeoplePageCreatePeopleMutation($input: CreatePeopleInput!, $connections: [ID!]!) {
     createPeople(input: $input) {
-      id
-      fullName
-      primaryEmailAddress
-      additionalEmailAddresses
-      kind
+      peopleEdge @prependEdge(connections: $connections) {
+        node {
+          id
+          fullName
+          primaryEmailAddress
+          additionalEmailAddresses
+          kind
+        }
+      }
     }
   }
 `;
@@ -91,7 +89,7 @@ function CreatePeoplePageContent({
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
   const data = usePreloadedQuery(createPeoplePageQuery, queryRef);
-  const [commit] = useMutation(createPeopleMutation);
+  const [commit] = useMutation<CreatePeoplePageCreatePeopleMutationType>(createPeopleMutation);
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     fullName: '',
@@ -109,8 +107,11 @@ function CreatePeoplePageContent({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const connecttionId = ConnectionHandler.getConnectionID(data.node.id, "PeopleListPageQuery_peoples");
+
     commit({
       variables: {
+        connections: [connecttionId],
         input: {
           organizationId: data.node.id,
           fullName: formData.fullName,
@@ -120,18 +121,12 @@ function CreatePeoplePageContent({
         },
       },
       onCompleted: (response) => {
-        environment.commitUpdate((store) => {
-          const organization = store.get(data.node.id);
-          if (organization) {
-            organization.invalidateRecord();
-          }
-        })
         toast({
           title: "Success",
           description: "Person created successfully",
           variant: "default",
         });
-        navigate(`/peoples/${(response as any).createPeople.id}`);
+        navigate(`/peoples/${response.createPeople.peopleEdge.node.id}`);
       },
       onError: (error) => {
         toast({

@@ -111,7 +111,7 @@ func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteV
 }
 
 // CreatePeople is the resolver for the createPeople field.
-func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.People, error) {
+func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error) {
 	people, err := r.svc.CreatePeople(ctx, probo.CreatePeopleRequest{
 		OrganizationID:           input.OrganizationID,
 		FullName:                 input.FullName,
@@ -124,7 +124,9 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 		return nil, fmt.Errorf("cannot create people: %w", err)
 	}
 
-	return types.NewPeople(people), nil
+	return &types.CreatePeoplePayload{
+		PeopleEdge: types.NewPeopleEdge(people),
+	}, nil
 }
 
 // UpdatePeople is the resolver for the updatePeople field.

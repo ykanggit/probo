@@ -67,6 +67,10 @@ type CreatePeopleInput struct {
 	Kind                     coredata.PeopleKind `json:"kind"`
 }
 
+type CreatePeoplePayload struct {
+	PeopleEdge *PeopleEdge `json:"peopleEdge"`
+}
+
 type CreateVendorInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 	Name           string  `json:"name"`

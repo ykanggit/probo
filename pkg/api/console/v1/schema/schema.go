@@ -96,6 +96,10 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	CreatePeoplePayload struct {
+		PeopleEdge func(childComplexity int) int
+	}
+
 	Evidence struct {
 		CreatedAt        func(childComplexity int) int
 		FileURL          func(childComplexity int) int
@@ -288,7 +292,7 @@ type MutationResolver interface {
 	CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.Vendor, error)
 	UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.Vendor, error)
 	DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (string, error)
-	CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.People, error)
+	CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error)
 	UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.People, error)
 	DeletePeople(ctx context.Context, input types.DeletePeopleInput) (string, error)
 }
@@ -494,6 +498,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ControlStateTransitionEdge.Node(childComplexity), true
+
+	case "CreatePeoplePayload.peopleEdge":
+		if e.complexity.CreatePeoplePayload.PeopleEdge == nil {
+			break
+		}
+
+		return e.complexity.CreatePeoplePayload.PeopleEdge(childComplexity), true
 
 	case "Evidence.createdAt":
 		if e.complexity.Evidence.CreatedAt == nil {
@@ -1709,7 +1720,7 @@ type Mutation {
   createVendor(input: CreateVendorInput!): Vendor!
   updateVendor(input: UpdateVendorInput!): Vendor!
   deleteVendor(input: DeleteVendorInput!): Void!
-  createPeople(input: CreatePeopleInput!): People!
+  createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
   updatePeople(input: UpdatePeopleInput!): People!
   deletePeople(input: DeletePeopleInput!): Void!
 }
@@ -1770,7 +1781,10 @@ input UpdateVendorInput {
   termsOfServiceUrl: String
   privacyPolicyUrl: String
 }
-`, BuiltIn: false},
+
+type CreatePeoplePayload {
+  peopleEdge: PeopleEdge!
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -3665,6 +3679,50 @@ func (ec *executionContext) fieldContext_ControlStateTransitionEdge_node(_ conte
 	return fc, nil
 }
 
+func (ec *executionContext) _CreatePeoplePayload_peopleEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreatePeoplePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreatePeoplePayload_peopleEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PeopleEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PeopleEdge)
+	fc.Result = res
+	return ec.marshalNPeopleEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreatePeoplePayload_peopleEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreatePeoplePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_PeopleEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_PeopleEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PeopleEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Evidence_id(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Evidence_id(ctx, field)
 	if err != nil {
@@ -5196,9 +5254,9 @@ func (ec *executionContext) _Mutation_createPeople(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.People)
+	res := resTmp.(*types.CreatePeoplePayload)
 	fc.Result = res
-	return ec.marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+	return ec.marshalNCreatePeoplePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePeoplePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createPeople(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5209,24 +5267,10 @@ func (ec *executionContext) fieldContext_Mutation_createPeople(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_People_id(ctx, field)
-			case "fullName":
-				return ec.fieldContext_People_fullName(ctx, field)
-			case "primaryEmailAddress":
-				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
-			case "additionalEmailAddresses":
-				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
-			case "kind":
-				return ec.fieldContext_People_kind(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_People_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_People_updatedAt(ctx, field)
-			case "version":
-				return ec.fieldContext_People_version(ctx, field)
+			case "peopleEdge":
+				return ec.fieldContext_CreatePeoplePayload_peopleEdge(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type CreatePeoplePayload", field.Name)
 		},
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
@@ -10353,6 +10397,45 @@ func (ec *executionContext) _ControlStateTransitionEdge(ctx context.Context, sel
 	return out
 }
 
+var createPeoplePayloadImplementors = []string{"CreatePeoplePayload"}
+
+func (ec *executionContext) _CreatePeoplePayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreatePeoplePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createPeoplePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreatePeoplePayload")
+		case "peopleEdge":
+			out.Values[i] = ec._CreatePeoplePayload_peopleEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var evidenceImplementors = []string{"Evidence", "Node"}
 
 func (ec *executionContext) _Evidence(ctx context.Context, sel ast.SelectionSet, obj *types.Evidence) graphql.Marshaler {
@@ -12432,6 +12515,20 @@ func (ec *executionContext) marshalNControlStateTransitionEdge2ᚖgithubᚗcom�
 func (ec *executionContext) unmarshalNCreatePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePeopleInput(ctx context.Context, v any) (types.CreatePeopleInput, error) {
 	res, err := ec.unmarshalInputCreatePeopleInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreatePeoplePayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePeoplePayload(ctx context.Context, sel ast.SelectionSet, v types.CreatePeoplePayload) graphql.Marshaler {
+	return ec._CreatePeoplePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreatePeoplePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePeoplePayload(ctx context.Context, sel ast.SelectionSet, v *types.CreatePeoplePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreatePeoplePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNCreateVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorInput(ctx context.Context, v any) (types.CreateVendorInput, error) {
