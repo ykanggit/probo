@@ -5,7 +5,6 @@ import {
   usePreloadedQuery,
   useQueryLoader,
   useMutation,
-  ConnectionHandler,
   usePaginationFragment,
 } from "react-relay";
 import { useSearchParams } from "react-router";
@@ -48,6 +47,7 @@ const vendorListFragment = graphql`
     id
     vendors(first: $first, after: $after, last: $last, before: $before)
       @connection(key: "VendorListPage_vendors") {
+      __id
       edges {
         node {
           id
@@ -258,10 +258,7 @@ function VendorListContent({
                         createVendor({
                           variables: {
                             connections: [
-                              ConnectionHandler.getConnectionID(
-                                data.currentOrganization.id,
-                                "VendorListPageQuery_vendors",
-                              ),
+                              vendorsConnection.vendors.__id,
                             ],
                             input: {
                               organizationId: data.currentOrganization.id,
@@ -368,10 +365,7 @@ function VendorListContent({
                       deleteVendor({
                         variables: {
                           connections: [
-                            ConnectionHandler.getConnectionID(
-                              data.currentOrganization.id,
-                              "VendorListPage_vendors",
-                            ),
+                            vendorsConnection.vendors.__id
                           ],
                           input: {
                             vendorId: vendor.id,

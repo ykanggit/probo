@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<36562961e8a3be3e68279a6d56f3ef1a>>
+ * @generated SignedSource<<9f827470f46558fd3946d0c714a4a713>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,6 +13,7 @@ import { FragmentRefs } from "relay-runtime";
 export type VendorListPage_vendors$data = {
   readonly id: string;
   readonly vendors: {
+    readonly __id: string;
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly createdAt: any;
@@ -204,6 +205,18 @@ return {
             }
           ],
           "storageKey": null
+        },
+        {
+          "kind": "ClientExtension",
+          "selections": [
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "__id",
+              "storageKey": null
+            }
+          ]
         }
       ],
       "storageKey": null
@@ -214,6 +227,6 @@ return {
 };
 })();
 
-(node as any).hash = "7f084d24023bc4dd68d22cdd6e75f174";
+(node as any).hash = "e8f708324eb6ffe29b4f80d62179d324";
 
 export default node;
