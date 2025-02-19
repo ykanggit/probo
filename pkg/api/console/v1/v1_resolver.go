@@ -110,13 +110,15 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 }
 
 // DeleteVendor is the resolver for the deleteVendor field.
-func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (string, error) {
+func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error) {
 	err := r.svc.DeleteVendor(ctx, input.VendorID)
 	if err != nil {
-		return "", fmt.Errorf("cannot delete vendor: %w", err)
+		return nil, fmt.Errorf("cannot delete vendor: %w", err)
 	}
 
-	return "", nil
+	return &types.DeleteVendorPayload{
+		DeletedVendorID: input.VendorID,
+	}, nil
 }
 
 // CreatePeople is the resolver for the createPeople field.

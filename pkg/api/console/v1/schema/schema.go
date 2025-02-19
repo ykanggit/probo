@@ -104,6 +104,11 @@ type ComplexityRoot struct {
 		VendorEdge func(childComplexity int) int
 	}
 
+	DeleteVendorPayload struct {
+		DeletedVendorID func(childComplexity int) int
+		VendorEdge      func(childComplexity int) int
+	}
+
 	Evidence struct {
 		CreatedAt        func(childComplexity int) int
 		FileURL          func(childComplexity int) int
@@ -295,7 +300,7 @@ type FrameworkResolver interface {
 type MutationResolver interface {
 	CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error)
 	UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.Vendor, error)
-	DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (string, error)
+	DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error)
 	CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error)
 	UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.People, error)
 	DeletePeople(ctx context.Context, input types.DeletePeopleInput) (string, error)
@@ -516,6 +521,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreateVendorPayload.VendorEdge(childComplexity), true
+
+	case "DeleteVendorPayload.deletedVendorId":
+		if e.complexity.DeleteVendorPayload.DeletedVendorID == nil {
+			break
+		}
+
+		return e.complexity.DeleteVendorPayload.DeletedVendorID(childComplexity), true
+
+	case "DeleteVendorPayload.vendorEdge":
+		if e.complexity.DeleteVendorPayload.VendorEdge == nil {
+			break
+		}
+
+		return e.complexity.DeleteVendorPayload.VendorEdge(childComplexity), true
 
 	case "Evidence.createdAt":
 		if e.complexity.Evidence.CreatedAt == nil {
@@ -1730,7 +1749,7 @@ type Query {
 type Mutation {
   createVendor(input: CreateVendorInput!): CreateVendorPayload!
   updateVendor(input: UpdateVendorInput!): Vendor!
-  deleteVendor(input: DeleteVendorInput!): Void!
+  deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
   createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
   updatePeople(input: UpdatePeopleInput!): People!
   deletePeople(input: DeletePeopleInput!): Void!
@@ -1806,7 +1825,13 @@ type CreatePeoplePayload {
 
 type CreateVendorPayload {
   vendorEdge: VendorEdge!
-}`, BuiltIn: false},
+}
+
+type DeleteVendorPayload {
+  vendorEdge: VendorEdge!
+  deletedVendorId: ID!
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -3789,6 +3814,88 @@ func (ec *executionContext) fieldContext_CreateVendorPayload_vendorEdge(_ contex
 	return fc, nil
 }
 
+func (ec *executionContext) _DeleteVendorPayload_vendorEdge(ctx context.Context, field graphql.CollectedField, obj *types.DeleteVendorPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteVendorPayload_vendorEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VendorEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorEdge)
+	fc.Result = res
+	return ec.marshalNVendorEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteVendorPayload_vendorEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteVendorPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_VendorEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_VendorEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteVendorPayload_deletedVendorId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteVendorPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteVendorPayload_deletedVendorId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedVendorID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteVendorPayload_deletedVendorId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteVendorPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Evidence_id(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Evidence_id(ctx, field)
 	if err != nil {
@@ -5253,9 +5360,9 @@ func (ec *executionContext) _Mutation_deleteVendor(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*types.DeleteVendorPayload)
 	fc.Result = res
-	return ec.marshalNVoid2string(ctx, field.Selections, res)
+	return ec.marshalNDeleteVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5265,7 +5372,13 @@ func (ec *executionContext) fieldContext_Mutation_deleteVendor(ctx context.Conte
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Void does not have child fields")
+			switch field.Name {
+			case "vendorEdge":
+				return ec.fieldContext_DeleteVendorPayload_vendorEdge(ctx, field)
+			case "deletedVendorId":
+				return ec.fieldContext_DeleteVendorPayload_deletedVendorId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteVendorPayload", field.Name)
 		},
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
@@ -10566,6 +10679,50 @@ func (ec *executionContext) _CreateVendorPayload(ctx context.Context, sel ast.Se
 	return out
 }
 
+var deleteVendorPayloadImplementors = []string{"DeleteVendorPayload"}
+
+func (ec *executionContext) _DeleteVendorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteVendorPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteVendorPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteVendorPayload")
+		case "vendorEdge":
+			out.Values[i] = ec._DeleteVendorPayload_vendorEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletedVendorId":
+			out.Values[i] = ec._DeleteVendorPayload_deletedVendorId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var evidenceImplementors = []string{"Evidence", "Node"}
 
 func (ec *executionContext) _Evidence(ctx context.Context, sel ast.SelectionSet, obj *types.Evidence) graphql.Marshaler {
@@ -12718,6 +12875,20 @@ func (ec *executionContext) unmarshalNDeletePeopleInput2githubᚗcomᚋgetprobo�
 func (ec *executionContext) unmarshalNDeleteVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorInput(ctx context.Context, v any) (types.DeleteVendorInput, error) {
 	res, err := ec.unmarshalInputDeleteVendorInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteVendorPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteVendorPayload) graphql.Marshaler {
+	return ec._DeleteVendorPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteVendorPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteVendorPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNEvidence2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidence(ctx context.Context, sel ast.SelectionSet, v *types.Evidence) graphql.Marshaler {

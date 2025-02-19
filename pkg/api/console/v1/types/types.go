@@ -96,6 +96,11 @@ type DeleteVendorInput struct {
 	VendorID gid.GID `json:"vendorId"`
 }
 
+type DeleteVendorPayload struct {
+	VendorEdge      *VendorEdge `json:"vendorEdge"`
+	DeletedVendorID gid.GID     `json:"deletedVendorId"`
+}
+
 type Evidence struct {
 	ID               gid.GID                            `json:"id"`
 	FileURL          string                             `json:"fileUrl"`

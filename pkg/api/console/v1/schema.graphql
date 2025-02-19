@@ -316,7 +316,7 @@ type Query {
 type Mutation {
   createVendor(input: CreateVendorInput!): CreateVendorPayload!
   updateVendor(input: UpdateVendorInput!): Vendor!
-  deleteVendor(input: DeleteVendorInput!): Void!
+  deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
   createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
   updatePeople(input: UpdatePeopleInput!): People!
   deletePeople(input: DeletePeopleInput!): Void!
@@ -392,4 +392,9 @@ type CreatePeoplePayload {
 
 type CreateVendorPayload {
   vendorEdge: VendorEdge!
+}
+
+type DeleteVendorPayload {
+  vendorEdge: VendorEdge!
+  deletedVendorId: ID!
 }

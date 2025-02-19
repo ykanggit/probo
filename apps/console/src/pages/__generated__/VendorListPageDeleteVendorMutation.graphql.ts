@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b97adcd0ae4816dc772fcbf3b3c6b3d7>>
+ * @generated SignedSource<<ff037e64f503f247a68922f86248bb10>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,10 +13,13 @@ export type DeleteVendorInput = {
   vendorId: string;
 };
 export type VendorListPageDeleteVendorMutation$variables = {
+  connections: ReadonlyArray<string>;
   input: DeleteVendorInput;
 };
 export type VendorListPageDeleteVendorMutation$data = {
-  readonly deleteVendor: any;
+  readonly deleteVendor: {
+    readonly deletedVendorId: string;
+  };
 };
 export type VendorListPageDeleteVendorMutation = {
   response: VendorListPageDeleteVendorMutation$data;
@@ -24,56 +27,106 @@ export type VendorListPageDeleteVendorMutation = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
+var v0 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "connections"
+},
+v1 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "input"
+},
+v2 = [
   {
-    "defaultValue": null,
-    "kind": "LocalArgument",
-    "name": "input"
+    "kind": "Variable",
+    "name": "input",
+    "variableName": "input"
   }
 ],
-v1 = [
-  {
-    "alias": null,
-    "args": [
-      {
-        "kind": "Variable",
-        "name": "input",
-        "variableName": "input"
-      }
-    ],
-    "kind": "ScalarField",
-    "name": "deleteVendor",
-    "storageKey": null
-  }
-];
+v3 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "deletedVendorId",
+  "storageKey": null
+};
 return {
   "fragment": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/)
+    ],
     "kind": "Fragment",
     "metadata": null,
     "name": "VendorListPageDeleteVendorMutation",
-    "selections": (v1/*: any*/),
+    "selections": [
+      {
+        "alias": null,
+        "args": (v2/*: any*/),
+        "concreteType": "DeleteVendorPayload",
+        "kind": "LinkedField",
+        "name": "deleteVendor",
+        "plural": false,
+        "selections": [
+          (v3/*: any*/)
+        ],
+        "storageKey": null
+      }
+    ],
     "type": "Mutation",
     "abstractKey": null
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v1/*: any*/),
+      (v0/*: any*/)
+    ],
     "kind": "Operation",
     "name": "VendorListPageDeleteVendorMutation",
-    "selections": (v1/*: any*/)
+    "selections": [
+      {
+        "alias": null,
+        "args": (v2/*: any*/),
+        "concreteType": "DeleteVendorPayload",
+        "kind": "LinkedField",
+        "name": "deleteVendor",
+        "plural": false,
+        "selections": [
+          (v3/*: any*/),
+          {
+            "alias": null,
+            "args": null,
+            "filters": null,
+            "handle": "deleteEdge",
+            "key": "",
+            "kind": "ScalarHandle",
+            "name": "deletedVendorId",
+            "handleArgs": [
+              {
+                "kind": "Variable",
+                "name": "connections",
+                "variableName": "connections"
+              }
+            ]
+          }
+        ],
+        "storageKey": null
+      }
+    ]
   },
   "params": {
-    "cacheID": "6b9ec06210106cc8f8905fbfda5c60b0",
+    "cacheID": "278e42c6c988a64d4c863198f02df901",
     "id": null,
     "metadata": {},
     "name": "VendorListPageDeleteVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorListPageDeleteVendorMutation(\n  $input: DeleteVendorInput!\n) {\n  deleteVendor(input: $input)\n}\n"
+    "text": "mutation VendorListPageDeleteVendorMutation(\n  $input: DeleteVendorInput!\n) {\n  deleteVendor(input: $input) {\n    deletedVendorId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a435b00067d595fc8a1dec393ed1d0b6";
+(node as any).hash = "20a320191535706246ae00aa05df991e";
 
 export default node;

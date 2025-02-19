@@ -27,7 +27,12 @@ import { VendorListPage_vendors$key } from "./__generated__/VendorListPage_vendo
 const ITEMS_PER_PAGE = 25;
 
 const vendorListPageQuery = graphql`
-  query VendorListPageQuery($first: Int, $after: CursorKey, $last: Int, $before: CursorKey) {
+  query VendorListPageQuery(
+    $first: Int
+    $after: CursorKey
+    $last: Int
+    $before: CursorKey
+  ) {
     currentOrganization: node(id: "AZSfP_xAcAC5IAAAAAAltA") {
       id
       ... on Organization {
@@ -38,15 +43,11 @@ const vendorListPageQuery = graphql`
 `;
 
 const vendorListFragment = graphql`
-  fragment VendorListPage_vendors on Organization 
+  fragment VendorListPage_vendors on Organization
   @refetchable(queryName: "VendorListPagePaginationQuery") {
     id
-    vendors(
-      first: $first
-      after: $after
-      last: $last
-      before: $before
-    ) @connection(key: "VendorListPage_vendors") {
+    vendors(first: $first, after: $after, last: $last, before: $before)
+      @connection(key: "VendorListPage_vendors") {
       edges {
         node {
           id
@@ -66,7 +67,10 @@ const vendorListFragment = graphql`
 `;
 
 const createVendorMutation = graphql`
-  mutation VendorListPageCreateVendorMutation($input: CreateVendorInput!, $connections: [ID!]!) {
+  mutation VendorListPageCreateVendorMutation(
+    $input: CreateVendorInput!
+    $connections: [ID!]!
+  ) {
     createVendor(input: $input) {
       vendorEdge @prependEdge(connections: $connections) {
         node {
@@ -81,8 +85,13 @@ const createVendorMutation = graphql`
 `;
 
 const deleteVendorMutation = graphql`
-  mutation VendorListPageDeleteVendorMutation($input: DeleteVendorInput!) {
-    deleteVendor(input: $input)
+  mutation VendorListPageDeleteVendorMutation(
+    $input: DeleteVendorInput!
+    $connections: [ID!]!
+  ) {
+    deleteVendor(input: $input) {
+      deletedVendorId @deleteEdge(connections: $connections)
+    }
   }
 `;
 
@@ -162,13 +171,18 @@ function VendorListContent({
 }: {
   queryRef: PreloadedQuery<VendorListPageQueryType>;
 }) {
-  const data = usePreloadedQuery<VendorListPageQueryType>(vendorListPageQuery, queryRef);
+  const data = usePreloadedQuery<VendorListPageQueryType>(
+    vendorListPageQuery,
+    queryRef,
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredVendors, setFilteredVendors] = useState<Array<any>>([]);
-  const [createVendor] = useMutation<VendorListPageCreateVendorMutation>(createVendorMutation);
-  const [deleteVendor] = useMutation<VendorListPageDeleteVendorMutation>(deleteVendorMutation);
+  const [createVendor] =
+    useMutation<VendorListPageCreateVendorMutation>(createVendorMutation);
+  const [deleteVendor] =
+    useMutation<VendorListPageDeleteVendorMutation>(deleteVendorMutation);
 
   const {
     data: vendorsConnection,
@@ -178,9 +192,13 @@ function VendorListContent({
     hasPrevious,
     isLoadingNext,
     isLoadingPrevious,
-  } = usePaginationFragment<VendorListPagePaginationQuery, VendorListPage_vendors$key>(vendorListFragment, data.currentOrganization);
+  } = usePaginationFragment<
+    VendorListPagePaginationQuery,
+    VendorListPage_vendors$key
+  >(vendorListFragment, data.currentOrganization);
 
-  const vendors = vendorsConnection.vendors.edges.map((edge) => edge.node) ?? [];
+  const vendors =
+    vendorsConnection.vendors.edges.map((edge) => edge.node) ?? [];
   const pageInfo = vendorsConnection.vendors.pageInfo;
 
   const fuse = new Fuse(vendorsList, {
@@ -239,7 +257,12 @@ function VendorListContent({
                       onClick={() => {
                         createVendor({
                           variables: {
-                            connections: [ConnectionHandler.getConnectionID(data.currentOrganization.id, "VendorListPageQuery_vendors")],
+                            connections: [
+                              ConnectionHandler.getConnectionID(
+                                data.currentOrganization.id,
+                                "VendorListPageQuery_vendors",
+                              ),
+                            ],
                             input: {
                               organizationId: data.currentOrganization.id,
                               name: vendor.name,
@@ -254,7 +277,8 @@ function VendorListContent({
                             setFilteredVendors([]);
                             toast({
                               title: "Vendor added",
-                              description: "The vendor has been added successfully",
+                              description:
+                                "The vendor has been added successfully",
                             });
                           },
                         });
@@ -343,6 +367,12 @@ function VendorListContent({
                     ) {
                       deleteVendor({
                         variables: {
+                          connections: [
+                            ConnectionHandler.getConnectionID(
+                              data.currentOrganization.id,
+                              "VendorListPage_vendors",
+                            ),
+                          ],
                           input: {
                             vendorId: vendor.id,
                           },
@@ -350,7 +380,8 @@ function VendorListContent({
                         onCompleted() {
                           toast({
                             title: "Vendor deleted",
-                            description: "The vendor has been deleted successfully",
+                            description:
+                              "The vendor has been deleted successfully",
                           });
                         },
                       });
