@@ -105,6 +105,20 @@ function BreadcrumbPeopleList() {
   );
 }
 
+function BreadcrumbCreatePeople() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to="/peoples/create">Create People</Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
 function BreadcrumbPeopleOverview() {
   const { peopleId } = useParams();
   const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbPeopleOverviewQuery>(
@@ -254,6 +268,10 @@ export default function ConsoleLayout() {
                   <Route
                     path="/peoples/:peopleId"
                     element={<BreadcrumbPeopleOverview />}
+                  />
+                  <Route
+                    path="/peoples/create"
+                    element={<BreadcrumbCreatePeople />}
                   />
                 </Route>
                 <Route path="/vendors" element={<BreadcrumbVendorList />}>
