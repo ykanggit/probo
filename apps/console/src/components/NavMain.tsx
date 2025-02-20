@@ -42,7 +42,7 @@ export function NavMain({
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title}>
-                <Link to={item.url}>
+                <Link to={item.url ?? "#"}>
                   <item.icon />
                   <span>{item.title}</span>
                 </Link>
