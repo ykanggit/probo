@@ -7,7 +7,6 @@ import { RelayEnvironmentProvider } from "react-relay";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "App.css";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { ErrorPage } from "./pages/ErrorPage";
 import ConsoleLayout from "./layouts/ConsoleLayout";
 import { RelayEnvironment } from "./RelayEnvironment";
 
