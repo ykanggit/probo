@@ -10,7 +10,7 @@ import {
 import { useSearchParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { CircleUser, Globe, Shield } from "lucide-react";
+import { CircleUser, Globe, Shield, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
@@ -154,19 +154,87 @@ function PeopleListContent({
   const pageInfo = peoplesConnection.peoples.pageInfo;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="space-y-1">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">People</h2>
-            <p className="text-sm text-muted-foreground">
-              Manage your organization's people.
-            </p>
-          </div>
-          <Button asChild>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-semibold mb-1">People</h2>
+        <p className="text-muted-foreground">
+          Manage your organization's people.
+        </p>
+      </div>
+
+      {/* Add Person Section */}
+      <div className="rounded-xl border bg-card p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <CircleUser className="h-5 w-5" />
+          <h3 className="font-medium">Add a person</h3>
+        </div>
+        <div className="flex gap-2">
+          <Button asChild className="w-full" variant="secondary">
             <Link to="/peoples/create">Create People</Link>
           </Button>
         </div>
+      </div>
+
+      <div className="space-y-2">
+        {peoples.map((person) => (
+          <Link
+            key={person?.id}
+            to={`/peoples/${person?.id}`}
+            className="block"
+          >
+            <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>{person?.fullName?.[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">{person?.fullName}</p>
+                  {person?.primaryEmailAddress && (
+                    <>
+                      <span className="text-muted-foreground">•</span>
+                      <p className="text-sm text-muted-foreground">
+                        {person.primaryEmailAddress}
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge 
+                  variant="secondary"
+                  className="bg-[#8BB563] text-white rounded-full px-3 py-0.5 text-xs font-medium"
+                >
+                  {person?.kind === "EMPLOYEE"
+                    ? "Employee"
+                    : person?.kind === "CONTRACTOR"
+                      ? "Contractor"
+                      : "Vendor"}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:bg-transparent [&>svg]:hover:text-destructive"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (window.confirm("Are you sure you want to delete this person?")) {
+                      deletePeople({
+                        variables: {
+                          connections: [peoplesConnection.peoples.__id],
+                          input: {
+                            peopleId: person.id,
+                          },
+                        },
+                      });
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 transition-colors" />
+                </Button>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
 
       <LoadAboveButton
@@ -183,72 +251,6 @@ function PeopleListContent({
           });
         }}
       />
-
-      <div className="space-y-2">
-        {peoples.map((person) => (
-          <Link
-            key={person?.id}
-            to={`/peoples/${person?.id}`}
-            className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50"
-          >
-            <div className="flex items-center gap-4">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback>{person?.fullName?.[0]}</AvatarFallback>
-              </Avatar>
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  {person?.fullName}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {person?.primaryEmailAddress}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="font-medium">
-                {person?.kind === "EMPLOYEE"
-                  ? "Employee"
-                  : person?.kind === "CONTRACTOR"
-                    ? "Contractor"
-                    : "Vendor"}
-              </Badge>
-              <div className="flex gap-1">
-                <CircleUser className="h-4 w-4 text-muted-foreground" />
-                <Globe className="h-4 w-4 text-muted-foreground" />
-                <Shield className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <Badge variant="outline" className="text-muted-foreground">
-                Not onboarded
-              </Badge>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (
-                    window.confirm(
-                      "Are you sure you want to delete this person?",
-                    )
-                  ) {
-                    deletePeople({
-                      variables: {
-                        connections: [peoplesConnection.peoples.__id],
-                        input: {
-                          peopleId: person.id,
-                        },
-                      },
-                    });
-                  }
-                }}
-              >
-                Delete
-              </Button>
-            </div>
-          </Link>
-        ))}
-      </div>
-
       <LoadBelowButton
         isLoading={isLoadingNext}
         hasMore={hasNext}
@@ -269,37 +271,18 @@ function PeopleListContent({
 
 function PeopleListPageFallback() {
   return (
-    <div className="p-6 space-y-6">
-      <div className="space-y-1">
+    <div className="space-y-6">
+      <div>
         <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-        <div className="h-4 w-96 bg-muted animate-pulse rounded" />
+        <div className="h-4 w-96 bg-muted animate-pulse rounded mt-1" />
+      </div>
+      <div className="rounded-xl border bg-card p-4 space-y-4">
+        <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+        <div className="h-10 w-full bg-muted animate-pulse rounded" />
       </div>
       <div className="space-y-2">
         {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm"
-          >
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
-              <div className="space-y-1">
-                <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                <div className="h-3 w-48 bg-muted animate-pulse rounded" />
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="h-6 w-16 bg-muted animate-pulse rounded-full" />
-              <div className="flex gap-1">
-                {[1, 2, 3].map((j) => (
-                  <div
-                    key={j}
-                    className="h-4 w-4 bg-muted animate-pulse rounded"
-                  />
-                ))}
-              </div>
-              <div className="h-6 w-24 bg-muted animate-pulse rounded-full" />
-            </div>
-          </div>
+          <div key={i} className="h-[72px] bg-muted animate-pulse rounded-xl" />
         ))}
       </div>
     </div>
