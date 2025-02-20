@@ -9,6 +9,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router";
 import type { FrameworkListPageQuery as FrameworkListPageQueryType } from "./__generated__/FrameworkListPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ChevronRight } from "lucide-react";
+import { Shield } from "lucide-react";
 
 const FrameworkListPageQuery = graphql`
   query FrameworkListPageQuery {
@@ -90,9 +94,12 @@ function FrameworkListPageContent({
     data.node.frameworks?.edges.map((edge) => edge?.node) ?? [];
 
   return (
-    <div className="container space-y-6 p-4 md:p-6 lg:p-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Framework</h1>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-semibold mb-1">Framework</h2>
+        <p className="text-muted-foreground">
+          Track and manage your compliance frameworks and their controls.
+        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
@@ -133,10 +140,10 @@ function FrameworkListPageContent({
 
 function FrameworkListPageFallback() {
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="mb-8">
+    <div className="space-y-6">
+      <div>
         <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-        <div className="h-4 w-96 bg-muted animate-pulse rounded mt-2" />
+        <div className="h-4 w-96 bg-muted animate-pulse rounded mt-1" />
       </div>
       <div className="grid gap-6 md:grid-cols-2">
         {[1, 2].map((i) => (
