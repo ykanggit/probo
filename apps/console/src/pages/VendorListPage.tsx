@@ -10,7 +10,7 @@ import {
 import { useSearchParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { CircleUser, Globe, Shield, Store } from "lucide-react";
+import { CircleUser, Globe, Shield, Store, ChevronRight, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
@@ -52,6 +52,7 @@ const vendorListFragment = graphql`
         node {
           id
           name
+          description
           createdAt
           updatedAt
         }
@@ -207,93 +208,139 @@ function VendorListContent({
   });
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="space-y-1">
-        <h2 className="text-2xl font-semibold tracking-tight">Vendors</h2>
-        <p className="text-sm text-muted-foreground">
-          Keep track of your company's vendors and their compliance status.
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-semibold mb-1">Vendors</h2>
+        <p className="text-muted-foreground">
+          Vendors are third-party services that your company uses. Add them to keep track of their risk and compliance status.
         </p>
       </div>
 
-      <div className="rounded-lg border p-4 shadow-sm bg-card text-card-foreground">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback>+</AvatarFallback>
-            </Avatar>
-            <div className="space-y-1">
-              <p className="text-sm font-medium leading-none">Add a vendor</p>
-              <p className="text-sm text-muted-foreground">
-                Search and add new vendors
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col gap-3 relative">
-              <Input
-                type="text"
-                placeholder="Type vendor's name"
-                className="w-64"
-                value={searchTerm}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setSearchTerm(value);
-                  if (value.trim() === "") {
-                    setFilteredVendors([]);
-                  } else {
-                    const results = fuse
-                      .search(value)
-                      .map((result) => result.item);
-                    setFilteredVendors(results);
-                  }
-                }}
-              />
-              {searchTerm.trim() !== "" && filteredVendors.length > 0 && (
-                <div className="absolute top-full mt-1 w-64 max-h-48 overflow-y-auto rounded-md border bg-white shadow-lg z-10">
-                  {filteredVendors.map((vendor) => (
-                    <div
-                      key={vendor?.id}
-                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => {
-                        createVendor({
-                          variables: {
-                            connections: [vendorsConnection.vendors.__id],
-                            input: {
-                              organizationId: data.currentOrganization.id,
-                              name: vendor.name,
-                              description: "",
-                              serviceStartAt: new Date().toISOString(),
-                              serviceCriticality: "LOW",
-                              riskTier: "GENERAL",
-                            },
-                          },
-                          onCompleted(response) {
-                            setSearchTerm("");
-                            setFilteredVendors([]);
-                            toast({
-                              title: "Vendor added",
-                              description:
-                                "The vendor has been added successfully",
-                            });
-                          },
-                        });
-                      }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Store className="h-4 w-4" />
-                        <span>{vendor.name}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <Button variant="secondary">
-                Search
-                <span className="ml-2">→</span>
-              </Button>
-            </div>
-          </div>
+      <div className="rounded-xl border bg-card p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Store className="h-5 w-5" />
+          <h3 className="font-medium">Add a vendor</h3>
         </div>
+        <div className="flex gap-2 relative">
+          <Input
+            type="text"
+            placeholder="Type vendor's name"
+            value={searchTerm}
+            style={{ borderRadius: "0.3rem" }}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearchTerm(value);
+              if (value.trim() === "") {
+                setFilteredVendors([]);
+              } else {
+                const results = fuse
+                  .search(value)
+                  .map((result) => result.item);
+                setFilteredVendors(results);
+              }
+            }}
+          />
+          
+          {searchTerm.trim() !== "" && filteredVendors.length > 0 && (
+            <div style={{ borderRadius: "0.3rem" }} className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-popover shadow-md z-10">
+              {filteredVendors.map((vendor) => (
+                <button
+                  key={vendor.id}
+                  className="w-full px-3 py-2 text-left hover:bg-accent"
+                  onClick={() => {
+                    createVendor({
+                      variables: {
+                        connections: [vendorsConnection.vendors.__id],
+                        input: {
+                          organizationId: data.currentOrganization.id,
+                          name: vendor.name,
+                          description: "",
+                          serviceStartAt: new Date().toISOString(),
+                          serviceCriticality: "LOW",
+                          riskTier: "GENERAL",
+                        },
+                      },
+                      onCompleted() {
+                        setSearchTerm("");
+                        setFilteredVendors([]);
+                        toast({
+                          title: "Vendor added",
+                          description: "The vendor has been added successfully",
+                        });
+                      },
+                    });
+                  }}
+                >
+                  {vendor.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        {vendors.map((vendor) => (
+          <Link
+            key={vendor?.id}
+            to={`/vendors/${vendor?.id}`}
+            className="block"
+          >
+            <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">{vendor?.name}</p>
+                  {vendor?.description && (
+                    <>
+                      <span className="text-muted-foreground">•</span>
+                      <p className="text-sm text-muted-foreground">
+                        {vendor.description}
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge 
+                  variant="secondary"
+                  className="bg-[#8BB563] text-white rounded-full px-3 py-0.5 text-xs font-medium"
+                >
+                  Low Risk
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:bg-transparent [&>svg]:hover:text-destructive"
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent navigation
+                    if (window.confirm("Are you sure you want to delete this vendor?")) {
+                      deleteVendor({
+                        variables: {
+                          connections: [vendorsConnection.vendors.__id],
+                          input: {
+                            vendorId: vendor.id,
+                          },
+                        },
+                        onCompleted() {
+                          toast({
+                            title: "Vendor deleted",
+                            description: "The vendor has been deleted successfully",
+                          });
+                        },
+                      });
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 transition-colors" />
+                </Button>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
 
       <LoadAboveButton
@@ -310,82 +357,6 @@ function VendorListContent({
           });
         }}
       />
-
-      <div className="space-y-2">
-        {vendors.map((vendor) => (
-          <div
-            key={vendor?.id}
-            className="block hover:bg-accent/50 transition-colors"
-          >
-            <div className="flex items-center justify-between p-4 rounded-lg border bg-card text-card-foreground shadow-sm">
-              <Link
-                to={`/vendors/${vendor?.id}`}
-                className="flex items-center gap-4 flex-1"
-              >
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {vendor?.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Vendor since{" "}
-                      {new Date(vendor?.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-              <div className="flex items-center gap-4">
-                <Badge variant="secondary" className="font-medium">
-                  Active
-                </Badge>
-                <div className="flex gap-1">
-                  <CircleUser className="h-4 w-4 text-muted-foreground" />
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                  <Shield className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <Badge variant="outline" className="text-muted-foreground">
-                  Not assessed
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (
-                      window.confirm(
-                        "Are you sure you want to delete this vendor?",
-                      )
-                    ) {
-                      deleteVendor({
-                        variables: {
-                          connections: [vendorsConnection.vendors.__id],
-                          input: {
-                            vendorId: vendor.id,
-                          },
-                        },
-                        onCompleted() {
-                          toast({
-                            title: "Vendor deleted",
-                            description:
-                              "The vendor has been deleted successfully",
-                          });
-                        },
-                      });
-                    }
-                  }}
-                >
-                  Delete
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
       <LoadBelowButton
         isLoading={isLoadingNext}
         hasMore={hasNext}
@@ -406,14 +377,21 @@ function VendorListContent({
 
 function VendorListFallback() {
   return (
-    <div className="p-6 space-y-6">
-      <div className="space-y-1">
+    <div className="space-y-6">
+      <div>
         <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-        <div className="h-4 w-96 bg-muted animate-pulse rounded" />
+        <div className="h-4 w-96 bg-muted animate-pulse rounded mt-1" />
+      </div>
+      <div className="rounded-xl border bg-card p-4 space-y-4">
+        <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+        <div className="flex gap-2">
+          <div className="h-10 flex-1 bg-muted animate-pulse rounded" />
+          <div className="h-10 w-32 bg-muted animate-pulse rounded" />
+        </div>
       </div>
       <div className="space-y-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
+          <div key={i} className="h-[72px] bg-muted animate-pulse rounded-xl" />
         ))}
       </div>
     </div>

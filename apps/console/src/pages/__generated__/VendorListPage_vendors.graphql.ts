@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9f827470f46558fd3946d0c714a4a713>>
+ * @generated SignedSource<<aa140c75b78a370fac81e7180d3537fc>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,6 +17,7 @@ export type VendorListPage_vendors$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly createdAt: any;
+        readonly description: string;
         readonly id: string;
         readonly name: string;
         readonly updatedAt: any;
@@ -137,6 +138,13 @@ return {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
+                  "name": "description",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
                   "name": "createdAt",
                   "storageKey": null
                 },
@@ -227,6 +235,6 @@ return {
 };
 })();
 
-(node as any).hash = "e8f708324eb6ffe29b4f80d62179d324";
+(node as any).hash = "b5d797660f73e909467c3ab4e988001f";
 
 export default node;

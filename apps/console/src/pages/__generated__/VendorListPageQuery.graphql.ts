@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<229adb1cb5f4f80a57bb742ddae67448>>
+ * @generated SignedSource<<65ad922b0229a2d1840687c46d5cea29>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -191,6 +191,13 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
+                            "name": "description",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
                             "name": "createdAt",
                             "storageKey": null
                           },
@@ -288,12 +295,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b910bb15ebb2e9b5aae2f20e0f5266db",
+    "cacheID": "8150b3303765174bbf41ebf4cd12534c",
     "id": null,
     "metadata": {},
     "name": "VendorListPageQuery",
     "operationKind": "query",
-    "text": "query VendorListPageQuery(\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  currentOrganization: node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      ...VendorListPage_vendors\n    }\n  }\n}\n\nfragment VendorListPage_vendors on Organization {\n  id\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
+    "text": "query VendorListPageQuery(\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  currentOrganization: node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      ...VendorListPage_vendors\n    }\n  }\n}\n\nfragment VendorListPage_vendors on Organization {\n  id\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
   }
 };
 })();

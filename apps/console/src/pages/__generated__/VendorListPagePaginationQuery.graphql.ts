@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<86f3151a87bc97ed9d37df57377f1cce>>
+ * @generated SignedSource<<035db05f931b88ee09b1bbdd2c39a7e7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -190,6 +190,13 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
+                            "name": "description",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
                             "name": "createdAt",
                             "storageKey": null
                           },
@@ -287,16 +294,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "3ce437d0d8e4415db28f78cf8c9aac7c",
+    "cacheID": "61e9346ec50a3f4b1397fa2e6165ab3e",
     "id": null,
     "metadata": {},
     "name": "VendorListPagePaginationQuery",
     "operationKind": "query",
-    "text": "query VendorListPagePaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...VendorListPage_vendors\n    id\n  }\n}\n\nfragment VendorListPage_vendors on Organization {\n  id\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
+    "text": "query VendorListPagePaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...VendorListPage_vendors\n    id\n  }\n}\n\nfragment VendorListPage_vendors on Organization {\n  id\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "e8f708324eb6ffe29b4f80d62179d324";
+(node as any).hash = "b5d797660f73e909467c3ab4e988001f";
 
 export default node;
