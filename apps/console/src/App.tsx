@@ -45,7 +45,7 @@ function App() {
               <BrowserRouter>
                 <Routes>
                   <Route
-                    path="/"
+                    path="/*"
                     element={
                       <ErrorBoundaryWithLocation>
                         <ConsoleLayout />
@@ -63,7 +63,7 @@ function App() {
                       }
                     />
                     <Route
-                      path="/peoples"
+                      path="peoples"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -73,7 +73,7 @@ function App() {
                       }
                     />
                     <Route
-                      path="/peoples/create"
+                      path="peoples/create"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -83,7 +83,7 @@ function App() {
                       }
                     />
                     <Route
-                      path="/peoples/:peopleId"
+                      path="peoples/:peopleId"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -93,7 +93,7 @@ function App() {
                       }
                     />
                     <Route
-                      path="/vendors"
+                      path="vendors"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -103,7 +103,7 @@ function App() {
                       }
                     />
                     <Route
-                      path="/frameworks"
+                      path="frameworks"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -113,7 +113,7 @@ function App() {
                       }
                     />
                     <Route
-                      path="/frameworks/:frameworkId"
+                      path="frameworks/:frameworkId"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -123,7 +123,7 @@ function App() {
                       }
                     />
                     <Route
-                      path="/frameworks/:frameworkId/controls/:controlId"
+                      path="frameworks/:frameworkId/controls/:controlId"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -133,7 +133,7 @@ function App() {
                       }
                     />
                     <Route
-                      path="/vendors/:vendorId"
+                      path="vendors/:vendorId"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -143,7 +143,7 @@ function App() {
                       }
                     />
                     <Route
-                      path="/settings"
+                      path="settings"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>

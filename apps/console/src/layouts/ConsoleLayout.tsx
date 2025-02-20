@@ -30,7 +30,7 @@ import { ConsoleLayoutBreadcrumbPeopleOverviewQuery } from "./__generated__/Cons
 import { ConsoleLayoutBreadcrumbVendorOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbVendorOverviewQuery.graphql";
 import { ConsoleLayoutBreadcrumbControlOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbControlOverviewQuery.graphql";
 
-function BreadcrumbHome() {
+function BreadcrumbHome({ children }: { children: React.ReactNode }) {
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -39,7 +39,7 @@ function BreadcrumbHome() {
             <Link to="/">Home</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        <Outlet />
+        {children}
       </BreadcrumbList>
     </Breadcrumb>
   );
@@ -238,8 +238,8 @@ export default function ConsoleLayout() {
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <Routes>
-              <Route path="/" element={<BreadcrumbHome />}>
+            <BreadcrumbHome>
+              <Routes>
                 <Route path="/frameworks" element={<BreadcrumbFrameworkList />}>
                   <Route
                     path="/frameworks/:frameworkId"
@@ -262,12 +262,14 @@ export default function ConsoleLayout() {
                     element={<BreadcrumbVendorOverview />}
                   />
                 </Route>
-              </Route>
-            </Routes>
+              </Routes>
+            </BreadcrumbHome>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <Outlet />
+          <div className="w-full max-w-[1000px] px-6">
+            <Outlet />
+          </div>
           <Toaster />
         </div>
       </SidebarInset>
