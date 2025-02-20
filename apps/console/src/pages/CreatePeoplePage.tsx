@@ -90,7 +90,6 @@ function CreatePeoplePageContent({
   queryRef: PreloadedQuery<CreatePeoplePageQueryType>;
 }) {
   const navigate = useNavigate();
-  const environment = useRelayEnvironment();
   const data = usePreloadedQuery(createPeoplePageQuery, queryRef);
   const [createPeople] =
     useMutation<CreatePeoplePageCreatePeopleMutation>(createPeopleMutation);
