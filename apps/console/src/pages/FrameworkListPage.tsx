@@ -95,7 +95,7 @@ function FrameworkListPageContent({
         <h1 className="text-3xl font-bold tracking-tight">Framework</h1>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
         {frameworks.map((framework) => {
           const validatedControls = framework.controls.edges.filter(
             (edge) => edge?.node?.state === "IMPLEMENTED",
