@@ -17,9 +17,7 @@ import { Suspense, useEffect, useState, useCallback, useMemo } from "react";
 import type { VendorOverviewPageQuery as VendorOverviewPageQueryType } from "./__generated__/VendorOverviewPageQuery.graphql";
 import { useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 import { cn } from "@/lib/utils";
-import type { UpdateVendorInput } from "./__generated__/VendorOverviewPageUpdateVendorMutation.graphql";
 
 const vendorOverviewPageQuery = graphql`
   query VendorOverviewPageQuery($vendorId: ID!) {
@@ -112,7 +110,6 @@ function VendorOverviewPageContent({
   queryRef: PreloadedQuery<VendorOverviewPageQueryType>;
 }) {
   const data = usePreloadedQuery(vendorOverviewPageQuery, queryRef);
-  const { setBreadcrumbSegment } = useBreadcrumb();
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     name: data.node.name || "",
@@ -206,12 +203,6 @@ function VendorOverviewPageContent({
     });
     setEditedFields(new Set());
   };
-
-  useEffect(() => {
-    if (data.node?.name) {
-      setBreadcrumbSegment("vendors/:id", data.node.name);
-    }
-  }, [data.node?.name, setBreadcrumbSegment]);
 
   return (
     <>

@@ -1,4 +1,11 @@
-import { Link, Outlet, useLocation } from "react-router";
+import {
+  Link,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useParams,
+} from "react-router";
 import { AppSidebar } from "@/components/AppSidebar";
 import React from "react";
 import {
@@ -15,33 +22,15 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import {
-  BreadcrumbProvider,
-  useBreadcrumb,
-} from "@/contexts/BreadcrumbContext";
 import { Toaster } from "@/components/ui/toaster";
+import { graphql } from "react-relay";
+import { useLazyLoadQuery } from "react-relay";
+import { ConsoleLayoutBreadcrumbFrameworkOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbFrameworkOverviewQuery.graphql";
+import { ConsoleLayoutBreadcrumbPeopleOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbPeopleOverviewQuery.graphql";
+import { ConsoleLayoutBreadcrumbVendorOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbVendorOverviewQuery.graphql";
+import { ConsoleLayoutBreadcrumbControlOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbControlOverviewQuery.graphql";
 
-function BreadcrumbNavigation() {
-  const location = useLocation();
-  const pathSegments = location.pathname.split("/").filter(Boolean);
-  const { segments } = useBreadcrumb();
-
-  const getBreadcrumbText = (segment: string, path: string) => {
-    // Check if we have a custom segment name
-    const fullPath = pathSegments
-      .slice(0, pathSegments.indexOf(segment) + 1)
-      .join("/");
-
-    // Look for patterns like 'vendors/:id' in our segments
-    const patternPath = fullPath.replace(/\/[^/]+$/, "/:id");
-    if (segments[patternPath]) {
-      return segments[patternPath];
-    }
-
-    // Default to capitalized segment
-    return segment.charAt(0).toUpperCase() + segment.slice(1);
-  };
-
+function BreadcrumbHome() {
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -50,51 +39,238 @@ function BreadcrumbNavigation() {
             <Link to="/">Home</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        {pathSegments.map((segment, index) => {
-          const path = `/${pathSegments.slice(0, index + 1).join("/")}`;
-          const isLast = index === pathSegments.length - 1;
-
-          return (
-            <React.Fragment key={path}>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                {isLast ? (
-                  <BreadcrumbPage>
-                    {getBreadcrumbText(segment, path)}
-                  </BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <Link to={path}>{getBreadcrumbText(segment, path)}</Link>
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-            </React.Fragment>
-          );
-        })}
+        <Outlet />
       </BreadcrumbList>
     </Breadcrumb>
   );
 }
 
+function BreadcrumbFrameworkList() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to="/frameworks">Frameworks</Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbFrameworkOverview() {
+  const { frameworkId } = useParams();
+  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbFrameworkOverviewQuery>(
+    graphql`
+      query ConsoleLayoutBreadcrumbFrameworkOverviewQuery($frameworkId: ID!) {
+        framework: node(id: $frameworkId) {
+          id
+          ... on Framework {
+            name
+          }
+        }
+      }
+    `,
+    { frameworkId: frameworkId! },
+    { fetchPolicy: "store-or-network" },
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to={`/frameworks/${data.framework.id}`}>
+            {data.framework.name}
+          </Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbPeopleList() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to="/peoples">People</Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbPeopleOverview() {
+  const { peopleId } = useParams();
+  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbPeopleOverviewQuery>(
+    graphql`
+      query ConsoleLayoutBreadcrumbPeopleOverviewQuery($peopleId: ID!) {
+        people: node(id: $peopleId) {
+          id
+          ... on People {
+            fullName
+          }
+        }
+      }
+    `,
+    { peopleId: peopleId! },
+    { fetchPolicy: "store-or-network" },
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to={`/peoples/${data.people.id}`}>{data.people.fullName}</Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbVendorList() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to="/vendors">Vendors</Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbVendorOverview() {
+  const { vendorId } = useParams();
+  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbVendorOverviewQuery>(
+    graphql`
+      query ConsoleLayoutBreadcrumbVendorOverviewQuery($vendorId: ID!) {
+        vendor: node(id: $vendorId) {
+          id
+          ... on Vendor {
+            name
+          }
+        }
+      }
+    `,
+    { vendorId: vendorId! },
+    { fetchPolicy: "store-or-network" },
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to={`/vendors/${data.vendor.id}`}>{data.vendor.name}</Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbControlOverview() {
+  const { frameworkId, controlId } = useParams();
+  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbControlOverviewQuery>(
+    graphql`
+      query ConsoleLayoutBreadcrumbControlOverviewQuery(
+        $frameworkId: ID!
+        $controlId: ID!
+      ) {
+        framework: node(id: $frameworkId) {
+          id
+          ... on Framework {
+            name
+          }
+        }
+        control: node(id: $controlId) {
+          id
+          ... on Control {
+            name
+          }
+        }
+      }
+    `,
+    { frameworkId: frameworkId!, controlId: controlId! },
+    { fetchPolicy: "store-or-network" },
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to={`/frameworks/${data.framework.id}`}>
+            {data.framework.name}
+          </Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link
+            to={`/frameworks/${data.framework.id}/controls/${data.control.id}`}
+          >
+            {data.control.name}
+          </Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
 export default function ConsoleLayout() {
   return (
-    <BreadcrumbProvider>
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2">
-            <div className="flex items-center gap-2 px-4">
-              <SidebarTrigger className="-ml-1" />
-              <Separator orientation="vertical" className="mr-2 h-4" />
-              <BreadcrumbNavigation />
-            </div>
-          </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-            <Outlet />
-            <Toaster />
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Routes>
+              <Route path="/" element={<BreadcrumbHome />}>
+                <Route path="/frameworks" element={<BreadcrumbFrameworkList />}>
+                  <Route
+                    path="/frameworks/:frameworkId"
+                    element={<BreadcrumbFrameworkOverview />}
+                  />
+                  <Route
+                    path="/frameworks/:frameworkId/controls/:controlId"
+                    element={<BreadcrumbControlOverview />}
+                  />
+                </Route>
+                <Route path="/peoples" element={<BreadcrumbPeopleList />}>
+                  <Route
+                    path="/peoples/:peopleId"
+                    element={<BreadcrumbPeopleOverview />}
+                  />
+                </Route>
+                <Route path="/vendors" element={<BreadcrumbVendorList />}>
+                  <Route
+                    path="/vendors/:vendorId"
+                    element={<BreadcrumbVendorOverview />}
+                  />
+                </Route>
+              </Route>
+            </Routes>
           </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </BreadcrumbProvider>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <Outlet />
+          <Toaster />
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

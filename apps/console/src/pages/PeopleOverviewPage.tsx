@@ -17,7 +17,6 @@ import { Suspense, useEffect, useState, useCallback } from "react";
 import type { PeopleOverviewPageQuery as PeopleOverviewPageQueryType } from "./__generated__/PeopleOverviewPageQuery.graphql";
 import { useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 import { cn } from "@/lib/utils";
 
 const peopleOverviewPageQuery = graphql`
@@ -88,7 +87,6 @@ function PeopleOverviewPageContent({
   queryRef: PreloadedQuery<PeopleOverviewPageQueryType>;
 }) {
   const data = usePreloadedQuery(peopleOverviewPageQuery, queryRef);
-  const { setBreadcrumbSegment } = useBreadcrumb();
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     fullName: data.node.fullName || "",
@@ -158,12 +156,6 @@ function PeopleOverviewPageContent({
     });
     setEditedFields(new Set());
   };
-
-  useEffect(() => {
-    if (data.node?.fullName) {
-      setBreadcrumbSegment("peoples/:id", data.node.fullName);
-    }
-  }, [data.node?.fullName, setBreadcrumbSegment]);
 
   return (
     <>

@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generated__/PeopleListPageQuery.graphql";
+import type { PeopleListPageDeletePeopleMutation } from "./__generated__/PeopleListPageDeletePeopleMutation.graphql";
 import { PeopleListPagePaginationQuery } from "./__generated__/PeopleListPagePaginationQuery.graphql";
 import { PeopleListPage_peoples$key } from "./__generated__/PeopleListPage_peoples.graphql";
 
@@ -132,7 +133,8 @@ function PeopleListContent({
   );
   const [searchParams, setSearchParams] = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const [deletePeople] = useMutation(deletePeopleMutation);
+  const [deletePeople] =
+    useMutation<PeopleListPageDeletePeopleMutation>(deletePeopleMutation);
 
   const {
     data: peoplesConnection,

@@ -12,7 +12,6 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
-import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 import { createPortal } from "react-dom";
 
 const FrameworkOverviewPageQuery = graphql`
@@ -44,7 +43,6 @@ function FrameworkOverviewPageContent({
   queryRef: PreloadedQuery<FrameworkOverviewPageQueryType>;
 }) {
   const data = usePreloadedQuery(FrameworkOverviewPageQuery, queryRef);
-  const { setBreadcrumbSegment } = useBreadcrumb();
   const framework = data.node;
   const controls = framework.controls?.edges.map((edge) => edge?.node) ?? [];
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
@@ -56,12 +54,6 @@ function FrameworkOverviewPageContent({
   } | null>(null);
   const [isTooltipHovered, setIsTooltipHovered] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (framework?.name) {
-      setBreadcrumbSegment("frameworks/:id", framework.name);
-    }
-  }, [framework?.name, setBreadcrumbSegment]);
 
   // Group controls by their category
   const controlsByCategory = controls.reduce(
@@ -198,7 +190,7 @@ function FrameworkOverviewPageContent({
                           onClick={() => {
                             if (control?.id) {
                               navigate(
-                                `/frameworks/${framework.id}/${control.id}`,
+                                `/frameworks/${framework.id}/controls/${control.id}`,
                               );
                             }
                           }}

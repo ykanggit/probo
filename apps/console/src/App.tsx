@@ -123,7 +123,7 @@ function App() {
                       }
                     />
                     <Route
-                      path="/frameworks/:frameworkId/:controlId"
+                      path="/frameworks/:frameworkId/controls/:controlId"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
