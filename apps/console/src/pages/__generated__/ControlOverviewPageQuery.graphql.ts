@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<fd114b0d31a2f605a3ab904fd12d48a2>>
+ * @generated SignedSource<<3e556c8d6b7896963c5433de8acca792>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,7 +15,7 @@ export type ControlOverviewPageQuery$variables = {
   controlId: string;
 };
 export type ControlOverviewPageQuery$data = {
-  readonly node: {
+  readonly control: {
     readonly category?: string;
     readonly description?: string;
     readonly id: string;
@@ -143,7 +143,7 @@ return {
     "name": "ControlOverviewPageQuery",
     "selections": [
       {
-        "alias": null,
+        "alias": "control",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -166,7 +166,7 @@ return {
     "name": "ControlOverviewPageQuery",
     "selections": [
       {
-        "alias": null,
+        "alias": "control",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -188,16 +188,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "adb3dd88c138a9168b25c35df888af86",
+    "cacheID": "130c195db0e9055a63b88ea5eee8b3aa",
     "id": null,
     "metadata": {},
     "name": "ControlOverviewPageQuery",
     "operationKind": "query",
-    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3db82e512ed61585e9825785e1685240";
+(node as any).hash = "1feb1b6d25907ac45205183c39092d35";
 
 export default node;

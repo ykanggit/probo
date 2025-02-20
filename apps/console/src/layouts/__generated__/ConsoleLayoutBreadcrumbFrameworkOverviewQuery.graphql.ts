@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b762e82a823e00ae26cd82eff55352b7>>
+ * @generated SignedSource<<1706f11580339ff248a8fa9b53862829>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,12 +10,12 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type ConsoleLayoutBreadcrumbFrameworkOverviewQuery$variables = {
-  peopleId: string;
+  frameworkId: string;
 };
 export type ConsoleLayoutBreadcrumbFrameworkOverviewQuery$data = {
-  readonly people: {
-    readonly fullName?: string;
+  readonly framework: {
     readonly id: string;
+    readonly name?: string;
   };
 };
 export type ConsoleLayoutBreadcrumbFrameworkOverviewQuery = {
@@ -28,14 +28,14 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "peopleId"
+    "name": "frameworkId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "peopleId"
+    "variableName": "frameworkId"
   }
 ],
 v2 = {
@@ -52,11 +52,11 @@ v3 = {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
-      "name": "fullName",
+      "name": "name",
       "storageKey": null
     }
   ],
-  "type": "People",
+  "type": "Framework",
   "abstractKey": null
 };
 return {
@@ -67,7 +67,7 @@ return {
     "name": "ConsoleLayoutBreadcrumbFrameworkOverviewQuery",
     "selections": [
       {
-        "alias": "people",
+        "alias": "framework",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -90,7 +90,7 @@ return {
     "name": "ConsoleLayoutBreadcrumbFrameworkOverviewQuery",
     "selections": [
       {
-        "alias": "people",
+        "alias": "framework",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -112,16 +112,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "38bda48229b0d45b23dff36b33fa3adb",
+    "cacheID": "287decd67859fe4c2248b6d6b0a3d56d",
     "id": null,
     "metadata": {},
     "name": "ConsoleLayoutBreadcrumbFrameworkOverviewQuery",
     "operationKind": "query",
-    "text": "query ConsoleLayoutBreadcrumbFrameworkOverviewQuery(\n  $peopleId: ID!\n) {\n  people: node(id: $peopleId) {\n    __typename\n    id\n    ... on People {\n      fullName\n    }\n  }\n}\n"
+    "text": "query ConsoleLayoutBreadcrumbFrameworkOverviewQuery(\n  $frameworkId: ID!\n) {\n  framework: node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "1f4b25d943e1d8a79c3e77936833e998";
+(node as any).hash = "a4c4f857eb13cf154a01f70874f0fd58";
 
 export default node;

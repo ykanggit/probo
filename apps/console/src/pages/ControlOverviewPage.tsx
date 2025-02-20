@@ -13,14 +13,7 @@ import { Helmet } from "react-helmet-async";
 import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from "./__generated__/ControlOverviewPageQuery.graphql";
 
 const controlOverviewPageQuery = graphql`
-  query ControlOverviewPageQuery($frameworkId: ID!, $controlId: ID!) {
-    framework: node(id: $frameworkId) {
-      id
-      ... on Framework {
-        name
-      }
-    }
-
+  query ControlOverviewPageQuery($controlId: ID!) {
     control: node(id: $controlId) {
       id
       ... on Control {
@@ -53,7 +46,6 @@ function ControlOverviewPageContent({
     queryRef,
   );
   const control = data.control;
-  const framework = data.framework;
   const tasks = control?.tasks?.edges.map((edge) => edge?.node) ?? [];
 
   return (
@@ -171,14 +163,14 @@ function ControlOverviewPageFallback() {
 }
 
 export default function ControlOverviewPage() {
-  const { frameworkId, controlId } = useParams();
+  const { controlId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<ControlOverviewPageQueryType>(
     controlOverviewPageQuery,
   );
 
   useEffect(() => {
-    loadQuery({ frameworkId: frameworkId!, controlId: controlId! });
-  }, [loadQuery, frameworkId, controlId]);
+    loadQuery({ controlId: controlId! });
+  }, [loadQuery, controlId]);
 
   return (
     <>
