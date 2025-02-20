@@ -8,6 +8,7 @@ import {
   LifeBuoy,
   Send,
   Settings,
+  Building,
 } from "lucide-react";
 import {
   graphql,
@@ -43,14 +44,21 @@ const staticData = {
       icon: BookOpen,
     },
     {
-      title: "Peoples",
-      url: "/peoples",
-      icon: Users,
-    },
-    {
-      title: "Vendors",
-      url: "/vendors",
-      icon: ToyBrick,
+      title: "Organizations",
+      icon: Building,
+      isActive: true,
+      items: [
+        {
+          title: "Peoples",
+          url: "/peoples",
+          icon: Users,
+        },
+        {
+          title: "Vendors",
+          url: "/vendors",
+          icon: ToyBrick,
+        },
+      ]
     },
     {
       title: "Settings",
