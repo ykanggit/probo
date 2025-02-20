@@ -10,7 +10,6 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ErrorPage } from "./pages/ErrorPage";
 import ConsoleLayout from "./layouts/ConsoleLayout";
 import { RelayEnvironment } from "./RelayEnvironment";
-import PeopleOverviewPage from "@/pages/PeopleOverviewPage";
 
 posthog.init(process.env.POSTHOG_KEY!, {
   api_host: process.env.POSTHOG_HOST,
@@ -34,6 +33,8 @@ const FrameworkOverviewPage = lazy(
   () => import("./pages/FrameworkOverviewPage"),
 );
 const ControlOverviewPage = lazy(() => import("./pages/ControlOverviewPage"));
+const PeopleOverviewPage = lazy(() => import("./pages/PeopleOverviewPage"));
+
 
 function App() {
   return (
