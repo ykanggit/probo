@@ -10,7 +10,7 @@ import {
 import { useSearchParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { CircleUser, Globe, Shield, Trash2, ChevronRight } from "lucide-react";
+import { UserPlus, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
@@ -156,23 +156,20 @@ function PeopleListContent({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold mb-1">People</h2>
+        <h2 className="text-2xl font-semibold mb-1">Employees</h2>
         <p className="text-muted-foreground">
-          Manage your organization's people.
+          Keep track of your company's workforce and their progress towards completing tasks assigned to them.
         </p>
       </div>
 
-      {/* Add Person Section */}
-      <div className="rounded-xl border bg-card p-4">
-        <div className="flex items-center gap-2 mb-4">
-          <CircleUser className="h-5 w-5" />
-          <h3 className="font-medium">Add a person</h3>
-        </div>
-        <div className="flex gap-2">
-          <Button asChild className="w-full" variant="secondary">
-            <Link to="/peoples/create">Create People</Link>
-          </Button>
-        </div>
+      <div className="flex items-center justify-between">
+        <p className="text-muted-foreground">1 people needs to get onboarded</p>
+        <Button asChild variant="outline" style={{borderRadius: "0.5rem"}} className="gap-2">
+          <Link to="/peoples/create">
+            <UserPlus className="h-4 w-4" />
+            Add a people
+          </Link>
+        </Button>
       </div>
 
       <div className="space-y-2">
