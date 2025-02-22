@@ -9,44 +9,35 @@
 
 </div>
 
-Probo is an open-source compliance platform built for startups that helps you achieve SOC-2 compliance quickly and efficiently. Unlike traditional solutions, Probo is designed to be accessible, transparent, and community-driven.
+Probo is an open-source compliance platform built for startups that helps you
+achieve SOC-2 compliance quickly and efficiently. Unlike traditional solutions,
+Probo is designed to be accessible, transparent, and community-driven.
 
 ## ✨ Features
 
-- ⚡️ **Lightning-Fast Automation**
+- 💡 **Focus on relevance**
 
-  - Get SOC-2 ready in just 20 hours instead of months
-  - AI-powered policy generation tailored to your stack
-  - Automated evidence collection from your tools
+  - Tailored program: only what matters, so you get SOC-2 ready in just 20
+    hours.
+  - Context-aware security controls.
+  - Smart task prioritization based on your risk profile.
 
-- 🤖 **Smart Vendor Management**
+- ⚡️ **Smart automation**
 
-  - Automatic vendor risk assessment in minutes
-  - AI-driven security questionnaire responses
-  - Continuous vendor monitoring and alerts
-
-- 🔄 **Continuous Compliance**
-
-  - Real-time compliance monitoring
-  - Automated evidence collection from GitHub, AWS, GCP
-  - Instant alerts for compliance drift
-
-- 💡 **Intelligent Guidance**
-
-  - AI-powered compliance recommendations
-  - Context-aware security controls
-  - Smart task prioritization based on your risk profile
+  - Automated risk assessment.
+  - AI-powered policy generation tailored to your stack.
+  - Pre-filled vendor risk assessment.
 
 - 🔓 **No Vendor Lock-in**
 
-  - Own your compliance data
-  - Export everything, anytime
-  - Open-source transparency
+  - Own your compliance data.
+  - Export everything, anytime.
+  - Open-source transparency.
 
 - 💰 **Cost-Effective**
-  - Free to use
-  - Pay only for audits when needed
-  - No hidden fees or forced costs
+  - Free to use.
+  - Pay for the services you need only.
+  - No hidden fees or forced costs.
 
 ## 🚀 Getting Started
 
@@ -101,7 +92,8 @@ For detailed setup instructions, see our [Contributing Guide](CONTRIBUTING.md).
 
 ## 🏗️ Current Status
 
-Probo is in early development, focusing on building a solid foundation for compliance management. Here's our current focus:
+Probo is in early development, focusing on building a solid foundation for
+compliance management. Here's our current focus:
 
 ### Under Development (V0)
 
@@ -155,15 +147,19 @@ We love contributions from our community! There are many ways to contribute:
 - 🔧 Submit pull requests
 - 📖 Improve documentation
 
-Please read our [Contributing Guide](CONTRIBUTING.md) before making a pull request.
+Please read our [Contributing Guide](CONTRIBUTING.md) before making a pull
+request.
 
 ## 🌟 Why Probo?
 
-1. **Accessible Compliance**: Traditional solutions are often behind expensive paywalls. We believe security measures should be accessible to all.
+1. **Accessible Compliance**: Traditional solutions are often behind expensive
+   paywalls. We believe security measures should be accessible to all.
 
-2. **Fresh Approach**: Built from scratch, learning from past issues to create a better compliance experience.
+2. **Fresh Approach**: Built from scratch, learning from past issues to create a
+   better compliance experience.
 
-3. **Community-Driven**: As an open-source project, we believe the entire ecosystem should benefit from improvements and innovations.
+3. **Community-Driven**: As an open-source project, we believe the entire
+   ecosystem should benefit from improvements and innovations.
 
 ## 📚 Documentation
 
