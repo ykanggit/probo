@@ -58,7 +58,7 @@ const staticData = {
           url: "/vendors",
           icon: ToyBrick,
         },
-      ]
+      ],
     },
     {
       title: "Settings",
@@ -82,9 +82,9 @@ const staticData = {
 
 const AppSidebarQuery = graphql`
   query AppSidebarQuery {
-    node(id: "AZSfP_xAcAC5IAAAAAAltA") {
+    viewer {
       id
-      ... on Organization {
+      organization {
         name
         logoUrl
         createdAt
@@ -101,7 +101,7 @@ function AppSidebarContent({
   queryRef: PreloadedQuery<AppSidebarQueryType>;
 }) {
   const data = usePreloadedQuery(AppSidebarQuery, queryRef);
-  const organization = data.node;
+  const organization = data.viewer.organization;
 
   return (
     <Sidebar variant="inset" {...props}>

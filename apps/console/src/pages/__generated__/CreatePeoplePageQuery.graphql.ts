@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<90c9055cb59db9172002bc02e6e9429d>>
+ * @generated SignedSource<<25866c1f4e6fb640f91b8d05651df9f4>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,9 +11,12 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type CreatePeoplePageQuery$variables = Record<PropertyKey, never>;
 export type CreatePeoplePageQuery$data = {
-  readonly currentOrganization: {
+  readonly viewer: {
     readonly id: string;
-    readonly name?: string;
+    readonly organization: {
+      readonly id: string;
+      readonly name: string;
+    };
   };
 };
 export type CreatePeoplePageQuery = {
@@ -22,55 +25,53 @@ export type CreatePeoplePageQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "kind": "Literal",
-    "name": "id",
-    "value": "AZSfP_xAcAC5IAAAAAAltA"
-  }
-],
-v1 = {
+var v0 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v2 = {
-  "kind": "InlineFragment",
-  "selections": [
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "name",
-      "storageKey": null
-    }
-  ],
-  "type": "Organization",
-  "abstractKey": null
-};
+v1 = [
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "Viewer",
+    "kind": "LinkedField",
+    "name": "viewer",
+    "plural": false,
+    "selections": [
+      (v0/*: any*/),
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": "Organization",
+        "kind": "LinkedField",
+        "name": "organization",
+        "plural": false,
+        "selections": [
+          (v0/*: any*/),
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "name",
+            "storageKey": null
+          }
+        ],
+        "storageKey": null
+      }
+    ],
+    "storageKey": null
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": [],
     "kind": "Fragment",
     "metadata": null,
     "name": "CreatePeoplePageQuery",
-    "selections": [
-      {
-        "alias": "currentOrganization",
-        "args": (v0/*: any*/),
-        "concreteType": null,
-        "kind": "LinkedField",
-        "name": "node",
-        "plural": false,
-        "selections": [
-          (v1/*: any*/),
-          (v2/*: any*/)
-        ],
-        "storageKey": "node(id:\"AZSfP_xAcAC5IAAAAAAltA\")"
-      }
-    ],
+    "selections": (v1/*: any*/),
     "type": "Query",
     "abstractKey": null
   },
@@ -79,40 +80,19 @@ return {
     "argumentDefinitions": [],
     "kind": "Operation",
     "name": "CreatePeoplePageQuery",
-    "selections": [
-      {
-        "alias": "currentOrganization",
-        "args": (v0/*: any*/),
-        "concreteType": null,
-        "kind": "LinkedField",
-        "name": "node",
-        "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "__typename",
-            "storageKey": null
-          },
-          (v1/*: any*/),
-          (v2/*: any*/)
-        ],
-        "storageKey": "node(id:\"AZSfP_xAcAC5IAAAAAAltA\")"
-      }
-    ]
+    "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "816d745d1a69d598b3507fa4df1e878f",
+    "cacheID": "e0b72d4317b700564caa46c609276aed",
     "id": null,
     "metadata": {},
     "name": "CreatePeoplePageQuery",
     "operationKind": "query",
-    "text": "query CreatePeoplePageQuery {\n  currentOrganization: node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      name\n    }\n  }\n}\n"
+    "text": "query CreatePeoplePageQuery {\n  viewer {\n    id\n    organization {\n      id\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "54148a2bd398d4fda7c72b60c7210e6d";
+(node as any).hash = "89be7e6fd93829bdc8ac374983ca0a9b";
 
 export default node;

@@ -10,9 +10,9 @@ import type { HomePageQuery as HomePageQueryType } from "./__generated__/HomePag
 
 export const HomePageQuery = graphql`
   query HomePageQuery {
-    node(id: "AZSfP_xAcAC5IAAAAAAltA") {
+    viewer {
       id
-      ... on Organization {
+      organization {
         name
         createdAt
         updatedAt

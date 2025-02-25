@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1daa3e6f3ef43392ed73ce9ddb46aa47>>
+ * @generated SignedSource<<fab1b817b8d6876b5bf4dc9320c4deef>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,10 +11,12 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type SettingsPageQuery$variables = Record<PropertyKey, never>;
 export type SettingsPageQuery$data = {
-  readonly node: {
+  readonly viewer: {
     readonly id: string;
-    readonly logoUrl?: string;
-    readonly name?: string;
+    readonly organization: {
+      readonly logoUrl: string;
+      readonly name: string;
+    };
   };
 };
 export type SettingsPageQuery = {
@@ -23,40 +25,26 @@ export type SettingsPageQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "kind": "Literal",
-    "name": "id",
-    "value": "AZSfP_xAcAC5IAAAAAAltA"
-  }
-],
-v1 = {
+var v0 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
+v1 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+},
 v2 = {
-  "kind": "InlineFragment",
-  "selections": [
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "name",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "logoUrl",
-      "storageKey": null
-    }
-  ],
-  "type": "Organization",
-  "abstractKey": null
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "logoUrl",
+  "storageKey": null
 };
 return {
   "fragment": {
@@ -67,16 +55,28 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v0/*: any*/),
-        "concreteType": null,
+        "args": null,
+        "concreteType": "Viewer",
         "kind": "LinkedField",
-        "name": "node",
+        "name": "viewer",
         "plural": false,
         "selections": [
-          (v1/*: any*/),
-          (v2/*: any*/)
+          (v0/*: any*/),
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "Organization",
+            "kind": "LinkedField",
+            "name": "organization",
+            "plural": false,
+            "selections": [
+              (v1/*: any*/),
+              (v2/*: any*/)
+            ],
+            "storageKey": null
+          }
         ],
-        "storageKey": "node(id:\"AZSfP_xAcAC5IAAAAAAltA\")"
+        "storageKey": null
       }
     ],
     "type": "Query",
@@ -90,37 +90,43 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v0/*: any*/),
-        "concreteType": null,
+        "args": null,
+        "concreteType": "Viewer",
         "kind": "LinkedField",
-        "name": "node",
+        "name": "viewer",
         "plural": false,
         "selections": [
+          (v0/*: any*/),
           {
             "alias": null,
             "args": null,
-            "kind": "ScalarField",
-            "name": "__typename",
+            "concreteType": "Organization",
+            "kind": "LinkedField",
+            "name": "organization",
+            "plural": false,
+            "selections": [
+              (v1/*: any*/),
+              (v2/*: any*/),
+              (v0/*: any*/)
+            ],
             "storageKey": null
-          },
-          (v1/*: any*/),
-          (v2/*: any*/)
+          }
         ],
-        "storageKey": "node(id:\"AZSfP_xAcAC5IAAAAAAltA\")"
+        "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "911c50f40d00159bd8201b7193fe6686",
+    "cacheID": "77d3f8660df07b02aa515461c9ec1449",
     "id": null,
     "metadata": {},
     "name": "SettingsPageQuery",
     "operationKind": "query",
-    "text": "query SettingsPageQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      name\n      logoUrl\n    }\n  }\n}\n"
+    "text": "query SettingsPageQuery {\n  viewer {\n    id\n    organization {\n      name\n      logoUrl\n      id\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "fc0474b3b161e0a1e6c41f9898afa5b0";
+(node as any).hash = "c639e9c45b175beec64550bb72fe5111";
 
 export default node;

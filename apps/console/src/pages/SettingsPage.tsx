@@ -26,9 +26,9 @@ import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__
 
 const settingsPageQuery = graphql`
   query SettingsPageQuery {
-    node(id: "AZSfP_xAcAC5IAAAAAAltA") {
+    viewer {
       id
-      ... on Organization {
+      organization {
         name
         logoUrl
       }
@@ -49,7 +49,7 @@ function SettingsPageContent({
   queryRef: PreloadedQuery<SettingsPageQueryType>;
 }) {
   const data = usePreloadedQuery(settingsPageQuery, queryRef);
-  const organization = data.node;
+  const organization = data.viewer.organization;
   const members: Member[] = [];
 
   return (

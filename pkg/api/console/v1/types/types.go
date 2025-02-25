@@ -314,3 +314,8 @@ type VendorEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Vendor        `json:"node"`
 }
+
+type Viewer struct {
+	ID           gid.GID       `json:"id"`
+	Organization *Organization `json:"organization"`
+}

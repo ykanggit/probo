@@ -49,6 +49,7 @@ type ResolverRoot interface {
 	Organization() OrganizationResolver
 	Query() QueryResolver
 	Task() TaskResolver
+	Viewer() ViewerResolver
 }
 
 type DirectiveRoot struct {
@@ -220,7 +221,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Node func(childComplexity int, id gid.GID) int
+		Node   func(childComplexity int, id gid.GID) int
+		Viewer func(childComplexity int) int
 	}
 
 	Task struct {
@@ -288,6 +290,11 @@ type ComplexityRoot struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
 	}
+
+	Viewer struct {
+		ID           func(childComplexity int) int
+		Organization func(childComplexity int) int
+	}
 }
 
 type ControlResolver interface {
@@ -315,10 +322,14 @@ type OrganizationResolver interface {
 }
 type QueryResolver interface {
 	Node(ctx context.Context, id gid.GID) (types.Node, error)
+	Viewer(ctx context.Context) (*types.Viewer, error)
 }
 type TaskResolver interface {
 	StateTransisions(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskStateTransitionConnection, error)
 	Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceConnection, error)
+}
+type ViewerResolver interface {
+	Organization(ctx context.Context, obj *types.Viewer) (*types.Organization, error)
 }
 
 type executableSchema struct {
@@ -1040,6 +1051,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Node(childComplexity, args["id"].(gid.GID)), true
 
+	case "Query.viewer":
+		if e.complexity.Query.Viewer == nil {
+			break
+		}
+
+		return e.complexity.Query.Viewer(childComplexity), true
+
 	case "Task.createdAt":
 		if e.complexity.Task.CreatedAt == nil {
 			break
@@ -1323,6 +1341,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.VendorEdge.Node(childComplexity), true
 
+	case "Viewer.id":
+		if e.complexity.Viewer.ID == nil {
+			break
+		}
+
+		return e.complexity.Viewer.ID(childComplexity), true
+
+	case "Viewer.organization":
+		if e.complexity.Viewer.Organization == nil {
+			break
+		}
+
+		return e.complexity.Viewer.Organization(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -1441,13 +1473,11 @@ var sources = []*ast.Source{
 ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
 directive @goModel(
-    model: String
-    models: [String!]
+  model: String
+  models: [String!]
 ) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
 
-directive @goEnum(
-    value: String
-) on ENUM_VALUE
+directive @goEnum(value: String) on ENUM_VALUE
 
 scalar CursorKey
 scalar Void
@@ -1458,27 +1488,62 @@ interface Node {
   id: ID!
 }
 
-enum ControlState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ControlState") {
-  NOT_STARTED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotStarted")
-  IN_PROGRESS @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateInProgress")
-  NOT_APPLICABLE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotApplicable")
-  IMPLEMENTED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateImplemented")
+enum ControlState
+  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ControlState") {
+  NOT_STARTED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotStarted"
+    )
+  IN_PROGRESS
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateInProgress"
+    )
+  NOT_APPLICABLE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotApplicable"
+    )
+  IMPLEMENTED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateImplemented"
+    )
 }
 
-enum TaskState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.TaskState") {
-  TODO @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateTodo")
-  DONE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateDone")
+enum TaskState
+  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.TaskState") {
+  TODO
+    @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateTodo")
+  DONE
+    @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateDone")
 }
 
-enum EvidenceState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceState") {
-  VALID @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateValid")
-  INVALID @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateInvalid")
-  EXPIRED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateExpired")
+enum EvidenceState
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceState"
+  ) {
+  VALID
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateValid"
+    )
+  INVALID
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateInvalid"
+    )
+  EXPIRED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateExpired"
+    )
 }
 
-enum PeopleKind @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKind") {
-  EMPLOYEE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindEmployee")
-  CONTRACTOR @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindContractor")
+enum PeopleKind
+  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKind") {
+  EMPLOYEE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindEmployee"
+    )
+  CONTRACTOR
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindContractor"
+    )
 }
 
 type PageInfo {
@@ -1674,7 +1739,7 @@ type Task implements Node {
     last: Int
     before: CursorKey
   ): EvidenceConnection! @goField(forceResolver: true)
-  
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -1747,6 +1812,12 @@ type EvidenceStateTransition {
 
 type Query {
   node(id: ID!): Node!
+  viewer: Viewer!
+}
+
+type Viewer {
+  id: ID!
+  organization: Organization! @goField(forceResolver: true)
 }
 
 type Mutation {
@@ -1796,16 +1867,38 @@ input UpdatePeopleInput {
   kind: PeopleKind
 }
 
-enum ServiceCriticality @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticality") {
-  LOW @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityLow")
-  MEDIUM @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityMedium") 
-  HIGH @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityHigh")
+enum ServiceCriticality
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticality"
+  ) {
+  LOW
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityLow"
+    )
+  MEDIUM
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityMedium"
+    )
+  HIGH
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityHigh"
+    )
 }
 
-enum RiskTier @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.RiskTier") {
-  CRITICAL @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierCritical")
-  SIGNIFICANT @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierSignificant")
-  GENERAL @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierGeneral")
+enum RiskTier
+  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.RiskTier") {
+  CRITICAL
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierCritical"
+    )
+  SIGNIFICANT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierSignificant"
+    )
+  GENERAL
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierGeneral"
+    )
 }
 
 input UpdateVendorInput {
@@ -6558,6 +6651,50 @@ func (ec *executionContext) fieldContext_Query_node(ctx context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_viewer(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_viewer(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Viewer(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Viewer)
+	fc.Result = res
+	return ec.marshalNViewer2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐViewer(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_viewer(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Viewer_id(ctx, field)
+			case "organization":
+				return ec.fieldContext_Viewer_organization(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Viewer", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -8258,6 +8395,100 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Viewer_id(ctx context.Context, field graphql.CollectedField, obj *types.Viewer) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Viewer_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Viewer_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Viewer",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Viewer_organization(ctx context.Context, field graphql.CollectedField, obj *types.Viewer) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Viewer_organization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Viewer().Organization(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Organization)
+	fc.Result = res
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Viewer_organization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Viewer",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Organization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Organization_name(ctx, field)
+			case "logoUrl":
+				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "frameworks":
+				return ec.fieldContext_Organization_frameworks(ctx, field)
+			case "vendors":
+				return ec.fieldContext_Organization_vendors(ctx, field)
+			case "peoples":
+				return ec.fieldContext_Organization_peoples(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Organization_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Organization_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -11753,6 +11984,23 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "viewer":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				res = ec._Query_viewer(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -12296,6 +12544,76 @@ func (ec *executionContext) _VendorEdge(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var viewerImplementors = []string{"Viewer"}
+
+func (ec *executionContext) _Viewer(ctx context.Context, sel ast.SelectionSet, obj *types.Viewer) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, viewerImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Viewer")
+		case "id":
+			out.Values[i] = ec._Viewer_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "organization":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				res = ec._Viewer_organization(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13226,6 +13544,20 @@ func (ec *executionContext) marshalNNode2githubᚗcomᚋgetproboᚋproboᚋpkg�
 	return ec._Node(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNOrganization2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx context.Context, sel ast.SelectionSet, v types.Organization) graphql.Marshaler {
+	return ec._Organization(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx context.Context, sel ast.SelectionSet, v *types.Organization) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Organization(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *types.PageInfo) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -13699,6 +14031,20 @@ func (ec *executionContext) marshalNVendorEdge2ᚖgithubᚗcomᚋgetproboᚋprob
 		return graphql.Null
 	}
 	return ec._VendorEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNViewer2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐViewer(ctx context.Context, sel ast.SelectionSet, v types.Viewer) graphql.Marshaler {
+	return ec._Viewer(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNViewer2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐViewer(ctx context.Context, sel ast.SelectionSet, v *types.Viewer) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Viewer(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

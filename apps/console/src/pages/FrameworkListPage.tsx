@@ -9,16 +9,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router";
 import type { FrameworkListPageQuery as FrameworkListPageQueryType } from "./__generated__/FrameworkListPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ChevronRight } from "lucide-react";
-import { Shield } from "lucide-react";
 
 const FrameworkListPageQuery = graphql`
   query FrameworkListPageQuery {
-    node(id: "AZSfP_xAcAC5IAAAAAAltA") {
+    viewer {
       id
-      ... on Organization {
+      organization {
         frameworks {
           edges {
             node {
@@ -91,7 +87,7 @@ function FrameworkListPageContent({
 }) {
   const data = usePreloadedQuery(FrameworkListPageQuery, queryRef);
   const frameworks =
-    data.node.frameworks?.edges.map((edge) => edge?.node) ?? [];
+    data.viewer.organization.frameworks?.edges.map((edge) => edge?.node) ?? [];
 
   return (
     <div className="space-y-6">
@@ -105,7 +101,7 @@ function FrameworkListPageContent({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
         {frameworks.map((framework) => {
           const validatedControls = framework.controls.edges.filter(
-            (edge) => edge?.node?.state === "IMPLEMENTED",
+            (edge) => edge?.node?.state === "IMPLEMENTED"
           ).length;
           const totalControls = framework.controls.edges.length;
 
@@ -165,7 +161,7 @@ function FrameworkListPageFallback() {
 
 export default function FrameworkListPage() {
   const [queryRef, loadQuery] = useQueryLoader<FrameworkListPageQueryType>(
-    FrameworkListPageQuery,
+    FrameworkListPageQuery
   );
 
   useEffect(() => {

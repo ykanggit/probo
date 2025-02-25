@@ -10,7 +10,7 @@ import {
 import { useSearchParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { CircleUser, Globe, Shield, Store, ChevronRight, Trash2 } from "lucide-react";
+import { Store, ChevronRight, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
@@ -32,9 +32,9 @@ const vendorListPageQuery = graphql`
     $last: Int
     $before: CursorKey
   ) {
-    currentOrganization: node(id: "AZSfP_xAcAC5IAAAAAAltA") {
+    viewer {
       id
-      ... on Organization {
+      organization {
         ...VendorListPage_vendors
       }
     }
@@ -174,7 +174,7 @@ function VendorListContent({
 }) {
   const data = usePreloadedQuery<VendorListPageQueryType>(
     vendorListPageQuery,
-    queryRef,
+    queryRef
   );
   const [searchParams, setSearchParams] = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -196,7 +196,7 @@ function VendorListContent({
   } = usePaginationFragment<
     VendorListPagePaginationQuery,
     VendorListPage_vendors$key
-  >(vendorListFragment, data.currentOrganization);
+  >(vendorListFragment, data.viewer.organization);
 
   const vendors =
     vendorsConnection.vendors.edges.map((edge) => edge.node) ?? [];
@@ -212,7 +212,8 @@ function VendorListContent({
       <div>
         <h2 className="text-2xl font-semibold mb-1">Vendors</h2>
         <p className="text-muted-foreground">
-          Vendors are third-party services that your company uses. Add them to keep track of their risk and compliance status.
+          Vendors are third-party services that your company uses. Add them to
+          keep track of their risk and compliance status.
         </p>
       </div>
 
@@ -233,16 +234,17 @@ function VendorListContent({
               if (value.trim() === "") {
                 setFilteredVendors([]);
               } else {
-                const results = fuse
-                  .search(value)
-                  .map((result) => result.item);
+                const results = fuse.search(value).map((result) => result.item);
                 setFilteredVendors(results);
               }
             }}
           />
-          
+
           {searchTerm.trim() !== "" && filteredVendors.length > 0 && (
-            <div style={{ borderRadius: "0.3rem" }} className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-popover shadow-md z-10">
+            <div
+              style={{ borderRadius: "0.3rem" }}
+              className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-popover shadow-md z-10"
+            >
               {filteredVendors.map((vendor) => (
                 <button
                   key={vendor.id}
@@ -252,7 +254,7 @@ function VendorListContent({
                       variables: {
                         connections: [vendorsConnection.vendors.__id],
                         input: {
-                          organizationId: data.currentOrganization.id,
+                          organizationId: data.viewer.organization.id,
                           name: vendor.name,
                           description: "",
                           serviceStartAt: new Date().toISOString(),
@@ -304,7 +306,7 @@ function VendorListContent({
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge 
+                <Badge
                   variant="secondary"
                   className="bg-[#8BB563] text-white rounded-full px-3 py-0.5 text-xs font-medium"
                 >
@@ -316,7 +318,11 @@ function VendorListContent({
                   className="h-8 w-8 text-muted-foreground hover:bg-transparent [&>svg]:hover:text-destructive"
                   onClick={(e) => {
                     e.preventDefault(); // Prevent navigation
-                    if (window.confirm("Are you sure you want to delete this vendor?")) {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to delete this vendor?"
+                      )
+                    ) {
                       deleteVendor({
                         variables: {
                           connections: [vendorsConnection.vendors.__id],
@@ -327,7 +333,8 @@ function VendorListContent({
                         onCompleted() {
                           toast({
                             title: "Vendor deleted",
-                            description: "The vendor has been deleted successfully",
+                            description:
+                              "The vendor has been deleted successfully",
                           });
                         },
                       });

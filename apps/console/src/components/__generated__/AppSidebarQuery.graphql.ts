@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c76b330caf722464b0da18ad8a5f058a>>
+ * @generated SignedSource<<578d66fa0d0065452d9fa64611b7cfda>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,12 +11,14 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type AppSidebarQuery$variables = Record<PropertyKey, never>;
 export type AppSidebarQuery$data = {
-  readonly node: {
-    readonly createdAt?: any;
+  readonly viewer: {
     readonly id: string;
-    readonly logoUrl?: string;
-    readonly name?: string;
-    readonly updatedAt?: any;
+    readonly organization: {
+      readonly createdAt: any;
+      readonly logoUrl: string;
+      readonly name: string;
+      readonly updatedAt: any;
+    };
   };
 };
 export type AppSidebarQuery = {
@@ -25,54 +27,40 @@ export type AppSidebarQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "kind": "Literal",
-    "name": "id",
-    "value": "AZSfP_xAcAC5IAAAAAAltA"
-  }
-],
-v1 = {
+var v0 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
+v1 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+},
 v2 = {
-  "kind": "InlineFragment",
-  "selections": [
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "name",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "logoUrl",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "createdAt",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "updatedAt",
-      "storageKey": null
-    }
-  ],
-  "type": "Organization",
-  "abstractKey": null
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "logoUrl",
+  "storageKey": null
+},
+v3 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "createdAt",
+  "storageKey": null
+},
+v4 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "updatedAt",
+  "storageKey": null
 };
 return {
   "fragment": {
@@ -83,16 +71,30 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v0/*: any*/),
-        "concreteType": null,
+        "args": null,
+        "concreteType": "Viewer",
         "kind": "LinkedField",
-        "name": "node",
+        "name": "viewer",
         "plural": false,
         "selections": [
-          (v1/*: any*/),
-          (v2/*: any*/)
+          (v0/*: any*/),
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "Organization",
+            "kind": "LinkedField",
+            "name": "organization",
+            "plural": false,
+            "selections": [
+              (v1/*: any*/),
+              (v2/*: any*/),
+              (v3/*: any*/),
+              (v4/*: any*/)
+            ],
+            "storageKey": null
+          }
         ],
-        "storageKey": "node(id:\"AZSfP_xAcAC5IAAAAAAltA\")"
+        "storageKey": null
       }
     ],
     "type": "Query",
@@ -106,37 +108,45 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v0/*: any*/),
-        "concreteType": null,
+        "args": null,
+        "concreteType": "Viewer",
         "kind": "LinkedField",
-        "name": "node",
+        "name": "viewer",
         "plural": false,
         "selections": [
+          (v0/*: any*/),
           {
             "alias": null,
             "args": null,
-            "kind": "ScalarField",
-            "name": "__typename",
+            "concreteType": "Organization",
+            "kind": "LinkedField",
+            "name": "organization",
+            "plural": false,
+            "selections": [
+              (v1/*: any*/),
+              (v2/*: any*/),
+              (v3/*: any*/),
+              (v4/*: any*/),
+              (v0/*: any*/)
+            ],
             "storageKey": null
-          },
-          (v1/*: any*/),
-          (v2/*: any*/)
+          }
         ],
-        "storageKey": "node(id:\"AZSfP_xAcAC5IAAAAAAltA\")"
+        "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "c5135cf2fd79365dad2ea581b3e010de",
+    "cacheID": "e50b9b44daf91d53b07f8912e6c2088f",
     "id": null,
     "metadata": {},
     "name": "AppSidebarQuery",
     "operationKind": "query",
-    "text": "query AppSidebarQuery {\n  node(id: \"AZSfP_xAcAC5IAAAAAAltA\") {\n    __typename\n    id\n    ... on Organization {\n      name\n      logoUrl\n      createdAt\n      updatedAt\n    }\n  }\n}\n"
+    "text": "query AppSidebarQuery {\n  viewer {\n    id\n    organization {\n      name\n      logoUrl\n      createdAt\n      updatedAt\n      id\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "2aafa67cfe2e2c748605b224503c7463";
+(node as any).hash = "d450e65862def2f7ebd6f4b8d0475be0";
 
 export default node;

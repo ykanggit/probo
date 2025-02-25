@@ -263,6 +263,11 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 	return nil, gqlerror.Errorf("node %q not found", id)
 }
 
+// Viewer is the resolver for the viewer field.
+func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
+	return &types.Viewer{}, nil
+}
+
 // StateTransisions is the resolver for the stateTransisions field.
 func (r *taskResolver) StateTransisions(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskStateTransitionConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
@@ -287,6 +292,17 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 	return types.NewEvidenceConnection(page), nil
 }
 
+// Organization is the resolver for the organization field.
+func (r *viewerResolver) Organization(ctx context.Context, obj *types.Viewer) (*types.Organization, error) {
+	organizationID, _ := gid.ParseGID("AZSfP_xAcAC5IAAAAAAltA") // TODO: remove this
+	organization, err := r.svc.GetOrganization(ctx, organizationID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get organization: %w", err)
+	}
+
+	return types.NewOrganization(organization), nil
+}
+
 // Control returns schema.ControlResolver implementation.
 func (r *Resolver) Control() schema.ControlResolver { return &controlResolver{r} }
 
@@ -308,6 +324,9 @@ func (r *Resolver) Query() schema.QueryResolver { return &queryResolver{r} }
 // Task returns schema.TaskResolver implementation.
 func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 
+// Viewer returns schema.ViewerResolver implementation.
+func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
+
 type controlResolver struct{ *Resolver }
 type evidenceResolver struct{ *Resolver }
 type frameworkResolver struct{ *Resolver }
@@ -315,3 +334,4 @@ type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
+type viewerResolver struct{ *Resolver }

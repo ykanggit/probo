@@ -5,13 +5,11 @@ directive @goField(
 ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
 directive @goModel(
-    model: String
-    models: [String!]
+  model: String
+  models: [String!]
 ) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
 
-directive @goEnum(
-    value: String
-) on ENUM_VALUE
+directive @goEnum(value: String) on ENUM_VALUE
 
 scalar CursorKey
 scalar Void
@@ -22,27 +20,62 @@ interface Node {
   id: ID!
 }
 
-enum ControlState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ControlState") {
-  NOT_STARTED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotStarted")
-  IN_PROGRESS @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateInProgress")
-  NOT_APPLICABLE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotApplicable")
-  IMPLEMENTED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateImplemented")
+enum ControlState
+  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ControlState") {
+  NOT_STARTED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotStarted"
+    )
+  IN_PROGRESS
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateInProgress"
+    )
+  NOT_APPLICABLE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotApplicable"
+    )
+  IMPLEMENTED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateImplemented"
+    )
 }
 
-enum TaskState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.TaskState") {
-  TODO @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateTodo")
-  DONE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateDone")
+enum TaskState
+  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.TaskState") {
+  TODO
+    @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateTodo")
+  DONE
+    @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateDone")
 }
 
-enum EvidenceState @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceState") {
-  VALID @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateValid")
-  INVALID @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateInvalid")
-  EXPIRED @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateExpired")
+enum EvidenceState
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceState"
+  ) {
+  VALID
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateValid"
+    )
+  INVALID
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateInvalid"
+    )
+  EXPIRED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateExpired"
+    )
 }
 
-enum PeopleKind @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKind") {
-  EMPLOYEE @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindEmployee")
-  CONTRACTOR @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindContractor")
+enum PeopleKind
+  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKind") {
+  EMPLOYEE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindEmployee"
+    )
+  CONTRACTOR
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindContractor"
+    )
 }
 
 type PageInfo {
@@ -238,7 +271,7 @@ type Task implements Node {
     last: Int
     before: CursorKey
   ): EvidenceConnection! @goField(forceResolver: true)
-  
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -311,6 +344,12 @@ type EvidenceStateTransition {
 
 type Query {
   node(id: ID!): Node!
+  viewer: Viewer!
+}
+
+type Viewer {
+  id: ID!
+  organization: Organization! @goField(forceResolver: true)
 }
 
 type Mutation {
@@ -360,16 +399,38 @@ input UpdatePeopleInput {
   kind: PeopleKind
 }
 
-enum ServiceCriticality @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticality") {
-  LOW @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityLow")
-  MEDIUM @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityMedium") 
-  HIGH @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityHigh")
+enum ServiceCriticality
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticality"
+  ) {
+  LOW
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityLow"
+    )
+  MEDIUM
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityMedium"
+    )
+  HIGH
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityHigh"
+    )
 }
 
-enum RiskTier @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.RiskTier") {
-  CRITICAL @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierCritical")
-  SIGNIFICANT @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierSignificant")
-  GENERAL @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierGeneral")
+enum RiskTier
+  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.RiskTier") {
+  CRITICAL
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierCritical"
+    )
+  SIGNIFICANT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierSignificant"
+    )
+  GENERAL
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierGeneral"
+    )
 }
 
 input UpdateVendorInput {

@@ -28,9 +28,9 @@ const peopleListPageQuery = graphql`
     $last: Int
     $before: CursorKey
   ) {
-    currentOrganization: node(id: "AZSfP_xAcAC5IAAAAAAltA") {
+    viewer {
       id
-      ... on Organization {
+      organization {
         ...PeopleListPage_peoples
       }
     }
@@ -129,7 +129,7 @@ function PeopleListContent({
 }) {
   const data = usePreloadedQuery<PeopleListPageQueryType>(
     peopleListPageQuery,
-    queryRef,
+    queryRef
   );
   const [searchParams, setSearchParams] = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -147,7 +147,7 @@ function PeopleListContent({
   } = usePaginationFragment<
     PeopleListPagePaginationQuery,
     PeopleListPage_peoples$key
-  >(peopleListFragment, data.currentOrganization);
+  >(peopleListFragment, data.viewer.organization);
 
   const peoples =
     peoplesConnection.peoples.edges.map((edge) => edge.node) ?? [];
@@ -158,13 +158,19 @@ function PeopleListContent({
       <div>
         <h2 className="text-2xl font-semibold mb-1">Employees</h2>
         <p className="text-muted-foreground">
-          Keep track of your company's workforce and their progress towards completing tasks assigned to them.
+          Keep track of your company's workforce and their progress towards
+          completing tasks assigned to them.
         </p>
       </div>
 
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground">1 people needs to get onboarded</p>
-        <Button asChild variant="outline" style={{borderRadius: "0.5rem"}} className="gap-2">
+        <Button
+          asChild
+          variant="outline"
+          style={{ borderRadius: "0.5rem" }}
+          className="gap-2"
+        >
           <Link to="/peoples/create">
             <UserPlus className="h-4 w-4" />
             Add a people
@@ -197,15 +203,15 @@ function PeopleListContent({
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge 
+                <Badge
                   variant="secondary"
                   className="bg-[#8BB563] text-white rounded-full px-3 py-0.5 text-xs font-medium"
                 >
                   {person?.kind === "EMPLOYEE"
                     ? "Employee"
                     : person?.kind === "CONTRACTOR"
-                      ? "Contractor"
-                      : "Vendor"}
+                    ? "Contractor"
+                    : "Vendor"}
                 </Badge>
                 <Button
                   variant="ghost"
@@ -213,7 +219,11 @@ function PeopleListContent({
                   className="h-8 w-8 text-muted-foreground hover:bg-transparent [&>svg]:hover:text-destructive"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (window.confirm("Are you sure you want to delete this person?")) {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to delete this person?"
+                      )
+                    ) {
                       deletePeople({
                         variables: {
                           connections: [peoplesConnection.peoples.__id],
