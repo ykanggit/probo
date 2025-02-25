@@ -73,7 +73,7 @@ function BreadcrumbFrameworkOverview() {
       }
     `,
     { frameworkId: frameworkId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (
@@ -133,7 +133,7 @@ function BreadcrumbPeopleOverview() {
       }
     `,
     { peopleId: peopleId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (
@@ -177,7 +177,7 @@ function BreadcrumbVendorOverview() {
       }
     `,
     { vendorId: vendorId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (
@@ -215,7 +215,7 @@ function BreadcrumbControlOverview() {
       }
     `,
     { frameworkId: frameworkId!, controlId: controlId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (

@@ -12,14 +12,14 @@ interface OrganizationContextType {
 }
 
 const OrganizationContext = createContext<OrganizationContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function useOrganization() {
   const context = useContext(OrganizationContext);
   if (context === undefined) {
     throw new Error(
-      "useOrganization must be used within an OrganizationProvider"
+      "useOrganization must be used within an OrganizationProvider",
     );
   }
   return context;

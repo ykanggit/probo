@@ -101,7 +101,7 @@ function FrameworkListPageContent({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
         {frameworks.map((framework) => {
           const validatedControls = framework.controls.edges.filter(
-            (edge) => edge?.node?.state === "IMPLEMENTED"
+            (edge) => edge?.node?.state === "IMPLEMENTED",
           ).length;
           const totalControls = framework.controls.edges.length;
 
@@ -161,7 +161,7 @@ function FrameworkListPageFallback() {
 
 export default function FrameworkListPage() {
   const [queryRef, loadQuery] = useQueryLoader<FrameworkListPageQueryType>(
-    FrameworkListPageQuery
+    FrameworkListPageQuery,
   );
 
   const { currentOrganization } = useOrganization();

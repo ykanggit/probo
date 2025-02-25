@@ -33,7 +33,7 @@ const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const CreatePeoplePage = lazy(() => import("./pages/CreatePeoplePage"));
 const FrameworkOverviewPage = lazy(
-  () => import("./pages/FrameworkOverviewPage")
+  () => import("./pages/FrameworkOverviewPage"),
 );
 const ControlOverviewPage = lazy(() => import("./pages/ControlOverviewPage"));
 const PeopleOverviewPage = lazy(() => import("./pages/PeopleOverviewPage"));
