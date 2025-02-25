@@ -2,7 +2,7 @@ CREATE TYPE control_state AS ENUM (
     'NOT_STARTED',
     'IN_PROGRESS',
     'NOT_APPLICABLE',
-    'IMPLEMENTED',
+    'IMPLEMENTED'
 );
 
 CREATE TABLE control_state_transitions (
