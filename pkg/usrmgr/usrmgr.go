@@ -35,6 +35,7 @@ type (
 	RegisterUserParams struct {
 		Email    string
 		Password string
+		FullName string
 	}
 
 	ErrInvalidCredentials struct {
@@ -95,8 +96,8 @@ func (s Service) RegisterUser(
 	ctx context.Context,
 	params RegisterUserParams,
 ) (*coredata.User, error) {
-	if params.Email == "" || params.Password == "" {
-		return nil, fmt.Errorf("email and password are required")
+	if params.Email == "" || params.Password == "" || params.FullName == "" {
+		return nil, fmt.Errorf("email, password, and full name are required")
 	}
 
 	// Use a high iteration count for password hashing
@@ -111,6 +112,7 @@ func (s Service) RegisterUser(
 		ID:             gid.New(),
 		EmailAddress:   params.Email,
 		HashedPassword: hashedPassword,
+		FullName:       params.FullName,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}

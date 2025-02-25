@@ -16,6 +16,7 @@ type (
 	RegisterRequest struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
+		FullName string `json:"fullName"`
 	}
 
 	// LoginRequest represents the request body for user login
@@ -34,6 +35,7 @@ type (
 	UserResponse struct {
 		ID        gid.GID   `json:"id"`
 		Email     string    `json:"email"`
+		FullName  string    `json:"fullName"`
 		CreatedAt time.Time `json:"createdAt"`
 		UpdatedAt time.Time `json:"updatedAt"`
 	}
@@ -67,10 +69,18 @@ func RegisterHandler(usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.Handler
 			usrmgr.RegisterUserParams{
 				Email:    req.Email,
 				Password: req.Password,
+				FullName: req.FullName,
 			},
 		)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Failed to register user: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		organizationID, _ := gid.ParseGID("AZSfP_xAcAC5IAAAAAAltA")
+		err = usrmgrSvc.AddUserToOrganization(r.Context(), user.ID, organizationID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to add user to organization: %v", err), http.StatusInternalServerError)
 			return
 		}
 
@@ -89,6 +99,7 @@ func RegisterHandler(usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.Handler
 			User: UserResponse{
 				ID:        user.ID,
 				Email:     user.EmailAddress,
+				FullName:  user.FullName,
 				CreatedAt: user.CreatedAt,
 				UpdatedAt: user.UpdatedAt,
 			},
@@ -144,6 +155,7 @@ func LoginHandler(usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.HandlerFun
 			User: UserResponse{
 				ID:        user.ID,
 				Email:     user.EmailAddress,
+				FullName:  user.FullName,
 				CreatedAt: user.CreatedAt,
 				UpdatedAt: user.UpdatedAt,
 			},
