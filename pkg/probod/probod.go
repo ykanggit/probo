@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/getprobo/probo/pkg/api"
+	console_v1 "github.com/getprobo/probo/pkg/api/console/v1"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/prometheus/client_golang/prometheus"
@@ -40,8 +41,9 @@ type (
 	}
 
 	config struct {
-		Pg  pgConfig  `json:"pg"`
-		Api apiConfig `json:"api"`
+		Pg   pgConfig   `json:"pg"`
+		Api  apiConfig  `json:"api"`
+		Auth authConfig `json:"auth"`
 	}
 )
 
@@ -65,6 +67,15 @@ func New() *Implm {
 				Password: "probod",
 				Database: "probod",
 				PoolSize: 100,
+			},
+			Auth: authConfig{
+				Pepper:          "this-is-a-secure-pepper-for-password-hashing-at-least-32-bytes",
+				SessionDuration: 24,
+				CookieName:      "SSID",
+				CookieSecure:    false,
+				CookieHTTPOnly:  true,
+				CookieDomain:    "localhost",
+				CookiePath:      "/",
 			},
 		},
 	}
@@ -95,21 +106,36 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot create pg client: %w", err)
 	}
 
-	usrmgr, err := usrmgr.NewService(ctx, pgClient)
+	// Get the pepper bytes for password hashing
+	pepper, err := impl.cfg.Auth.GetPepperBytes()
+	if err != nil {
+		return fmt.Errorf("cannot get pepper bytes: %w", err)
+	}
+
+	// Initialize the user management service with the pepper
+	usrmgrService, err := usrmgr.NewService(ctx, pgClient, pepper)
 	if err != nil {
 		return fmt.Errorf("cannot create usrmgr service: %w", err)
 	}
 
-	probo, err := probo.NewService(ctx, pgClient)
+	proboService, err := probo.NewService(ctx, pgClient)
 	if err != nil {
 		return fmt.Errorf("cannot create probo service: %w", err)
 	}
 
 	apiServer, err := api.NewServer(
 		api.Config{
-			Probo:          probo,
-			Usrmgr:         usrmgr,
+			Probo:          proboService,
+			Usrmgr:         usrmgrService,
 			AllowedOrigins: impl.cfg.Api.Cors.AllowedOrigins,
+			Auth: console_v1.AuthConfig{
+				CookieName:      impl.cfg.Auth.CookieName,
+				CookieSecure:    impl.cfg.Auth.CookieSecure,
+				CookieHTTPOnly:  impl.cfg.Auth.CookieHTTPOnly,
+				CookieDomain:    impl.cfg.Auth.CookieDomain,
+				CookiePath:      impl.cfg.Auth.CookiePath,
+				SessionDuration: time.Duration(impl.cfg.Auth.SessionDuration) * time.Hour,
+			},
 		},
 	)
 	if err != nil {

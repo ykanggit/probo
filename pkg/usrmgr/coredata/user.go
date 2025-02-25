@@ -29,6 +29,7 @@ type (
 		ID             gid.GID
 		EmailAddress   string
 		HashedPassword []byte
+		OrganizationID gid.GID
 		CreatedAt      time.Time
 		UpdatedAt      time.Time
 	}
@@ -43,6 +44,7 @@ func (u *User) scan(r pgx.Row) error {
 		&u.ID,
 		&u.EmailAddress,
 		&u.HashedPassword,
+		&u.OrganizationID,
 		&u.CreatedAt,
 		&u.UpdatedAt,
 	)
@@ -58,12 +60,13 @@ SELECT
     id,
     email_address,
     hashed_password,
+    organization_id,
     created_at,
     updated_at
 FROM
-    users
+    usrmgr_users
 WHERE
-    email = @user_email
+    email_address = @user_email
 LIMIT 1;
 `
 
@@ -79,4 +82,68 @@ LIMIT 1;
 	*u = u2
 
 	return nil
+}
+
+func (u *User) LoadByID(
+	ctx context.Context,
+	conn pg.Conn,
+	userID gid.GID,
+) error {
+	q := `
+SELECT
+    id,
+    email_address,
+    hashed_password,
+    organization_id,
+    created_at,
+    updated_at
+FROM
+    usrmgr_users
+WHERE
+    id = @user_id
+LIMIT 1;
+`
+
+	args := pgx.NamedArgs{"user_id": userID}
+
+	r := conn.QueryRow(ctx, q, args)
+
+	u2 := User{}
+	if err := u2.scan(r); err != nil {
+		return err
+	}
+
+	*u = u2
+
+	return nil
+}
+
+func (u *User) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO
+    usrmgr_users (id, email_address, hashed_password, organization_id, created_at, updated_at)
+VALUES (
+    @user_id,
+    @email_address,
+    @hashed_password,
+    @organization_id,
+    @created_at,
+    @updated_at
+)
+`
+
+	args := pgx.NamedArgs{
+		"user_id":         u.ID,
+		"email_address":   u.EmailAddress,
+		"hashed_password": u.HashedPassword,
+		"organization_id": "AZSfP_xAcAC5IAAAAAAltA",
+		"created_at":      u.CreatedAt,
+		"updated_at":      u.UpdatedAt,
+	}
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
 }

@@ -16,7 +16,6 @@ package coredata
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/getprobo/probo/pkg/gid"
@@ -57,16 +56,16 @@ func (s *Session) LoadByID(
 	q := `
 SELECT
     id,
+    user_id,
+    expired_at,
     created_at,
     updated_at
 FROM
-    sessions
+    usrmgr_sessions
 WHERE
     id = @session_id
 LIMIT 1;
 `
-
-	q = fmt.Sprintf(q)
 
 	args := pgx.NamedArgs{"session_id": sessionID}
 
@@ -88,7 +87,7 @@ func (s *Session) Insert(
 ) error {
 	q := `
 INSERT INTO
-    sessions (id, user_id, expired_at, created_at, updated_at)
+    usrmgr_sessions (id, user_id, expired_at, created_at, updated_at)
 VALUES (
     @session_id,
     @user_id,
@@ -105,6 +104,47 @@ VALUES (
 		"created_at": s.CreatedAt,
 		"updated_at": s.UpdatedAt,
 	}
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
+func (s *Session) Update(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+UPDATE usrmgr_sessions
+SET
+    expired_at = @expired_at,
+    updated_at = @updated_at
+WHERE
+    id = @session_id
+`
+
+	args := pgx.NamedArgs{
+		"session_id": s.ID,
+		"expired_at": s.ExpiredAt,
+		"updated_at": s.UpdatedAt,
+	}
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
+func DeleteSession(
+	ctx context.Context,
+	conn pg.Conn,
+	sessionID gid.GID,
+) error {
+	q := `
+DELETE FROM
+    usrmgr_sessions
+WHERE
+    id = @session_id
+`
+
+	args := pgx.NamedArgs{"session_id": sessionID}
 
 	_, err := conn.Exec(ctx, q, args)
 	return err

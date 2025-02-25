@@ -31,6 +31,7 @@ type (
 		AllowedOrigins []string
 		Probo          *probo.Service
 		Usrmgr         *usrmgr.Service
+		Auth           console_v1.AuthConfig
 	}
 
 	Server struct {
@@ -39,7 +40,8 @@ type (
 )
 
 var (
-	ErrMissingProboService = errors.New("server configuration requires a valid probo.Service instance")
+	ErrMissingProboService  = errors.New("server configuration requires a valid probo.Service instance")
+	ErrMissingUsrmgrService = errors.New("server configuration requires a valid usrmgr.Service instance")
 )
 
 func methodNotAllowed(w http.ResponseWriter, r *http.Request) {
@@ -71,6 +73,10 @@ func NewServer(cfg Config) (*Server, error) {
 		return nil, ErrMissingProboService
 	}
 
+	if cfg.Usrmgr == nil {
+		return nil, ErrMissingUsrmgrService
+	}
+
 	return &Server{
 		cfg: cfg,
 	}, nil
@@ -94,7 +100,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	router.Use(cors.Handler(corsOpts))
 
-	router.Mount("/console/v1", console_v1.NewMux(s.cfg.Probo))
+	// Mount the console API with authentication
+	router.Mount("/console/v1", console_v1.NewMux(s.cfg.Probo, s.cfg.Usrmgr, s.cfg.Auth))
 
 	router.ServeHTTP(w, r)
 }

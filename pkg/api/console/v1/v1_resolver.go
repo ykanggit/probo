@@ -21,7 +21,7 @@ import (
 func (r *controlResolver) StateTransisions(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.ControlStateTransitionConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := r.svc.ListControlStateTransitions(ctx, obj.ID, cursor)
+	page, err := r.proboSvc.ListControlStateTransitions(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list control tasks: %w", err)
 	}
@@ -33,7 +33,7 @@ func (r *controlResolver) StateTransisions(ctx context.Context, obj *types.Contr
 func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := r.svc.ListControlTasks(ctx, obj.ID, cursor)
+	page, err := r.proboSvc.ListControlTasks(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list control tasks: %w", err)
 	}
@@ -45,7 +45,7 @@ func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *
 func (r *evidenceResolver) StateTransisions(ctx context.Context, obj *types.Evidence, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceStateTransitionConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := r.svc.ListEvidenceStateTransitions(ctx, obj.ID, cursor)
+	page, err := r.proboSvc.ListEvidenceStateTransitions(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list evidence state transitions: %w", err)
 	}
@@ -57,7 +57,7 @@ func (r *evidenceResolver) StateTransisions(ctx context.Context, obj *types.Evid
 func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.ControlConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := r.svc.ListFrameworkControls(ctx, obj.ID, cursor)
+	page, err := r.proboSvc.ListFrameworkControls(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list framework controls: %w", err)
 	}
@@ -67,7 +67,7 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 
 // CreateVendor is the resolver for the createVendor field.
 func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error) {
-	vendor, err := r.svc.CreateVendor(ctx, probo.CreateVendorRequest{
+	vendor, err := r.proboSvc.CreateVendor(ctx, probo.CreateVendorRequest{
 		OrganizationID:       input.OrganizationID,
 		Name:                 input.Name,
 		Description:          input.Description,
@@ -89,7 +89,7 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 
 // UpdateVendor is the resolver for the updateVendor field.
 func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.Vendor, error) {
-	vendor, err := r.svc.UpdateVendor(ctx, probo.UpdateVendorRequest{
+	vendor, err := r.proboSvc.UpdateVendor(ctx, probo.UpdateVendorRequest{
 		ID:                   input.ID,
 		ExpectedVersion:      input.ExpectedVersion,
 		Name:                 input.Name,
@@ -111,7 +111,7 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 
 // DeleteVendor is the resolver for the deleteVendor field.
 func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error) {
-	err := r.svc.DeleteVendor(ctx, input.VendorID)
+	err := r.proboSvc.DeleteVendor(ctx, input.VendorID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete vendor: %w", err)
 	}
@@ -123,7 +123,7 @@ func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteV
 
 // CreatePeople is the resolver for the createPeople field.
 func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error) {
-	people, err := r.svc.CreatePeople(ctx, probo.CreatePeopleRequest{
+	people, err := r.proboSvc.CreatePeople(ctx, probo.CreatePeopleRequest{
 		OrganizationID:           input.OrganizationID,
 		FullName:                 input.FullName,
 		PrimaryEmailAddress:      input.PrimaryEmailAddress,
@@ -142,7 +142,7 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 
 // UpdatePeople is the resolver for the updatePeople field.
 func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.People, error) {
-	people, err := r.svc.UpdatePeople(ctx, probo.UpdatePeopleRequest{
+	people, err := r.proboSvc.UpdatePeople(ctx, probo.UpdatePeopleRequest{
 		ID:                       input.ID,
 		ExpectedVersion:          input.ExpectedVersion,
 		FullName:                 input.FullName,
@@ -159,7 +159,7 @@ func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdateP
 
 // DeletePeople is the resolver for the deletePeople field.
 func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error) {
-	err := r.svc.DeletePeople(ctx, input.PeopleID)
+	err := r.proboSvc.DeletePeople(ctx, input.PeopleID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete people: %w", err)
 	}
@@ -173,7 +173,7 @@ func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeleteP
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := r.svc.ListOrganizationFrameworks(ctx, obj.ID, cursor)
+	page, err := r.proboSvc.ListOrganizationFrameworks(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
 	}
@@ -185,7 +185,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.VendorConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := r.svc.ListOrganizationVendors(ctx, obj.ID, cursor)
+	page, err := r.proboSvc.ListOrganizationVendors(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list organization vendors: %w", err)
 	}
@@ -197,7 +197,7 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PeopleConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := r.svc.ListOrganizationPeoples(ctx, obj.ID, cursor)
+	page, err := r.proboSvc.ListOrganizationPeoples(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list organization peoples: %w", err)
 	}
@@ -209,49 +209,49 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error) {
 	switch id.EntityType() {
 	case coredata.OrganizationEntityType:
-		organization, err := r.svc.GetOrganization(ctx, id)
+		organization, err := r.proboSvc.GetOrganization(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewOrganization(organization), nil
 	case coredata.PeopleEntityType:
-		people, err := r.svc.GetPeople(ctx, id)
+		people, err := r.proboSvc.GetPeople(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewPeople(people), nil
 	case coredata.VendorEntityType:
-		vendor, err := r.svc.GetVendor(ctx, id)
+		vendor, err := r.proboSvc.GetVendor(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewVendor(vendor), nil
 	case coredata.FrameworkEntityType:
-		framework, err := r.svc.GetFramework(ctx, id)
+		framework, err := r.proboSvc.GetFramework(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewFramework(framework), nil
 	case coredata.ControlEntityType:
-		control, err := r.svc.GetControl(ctx, id)
+		control, err := r.proboSvc.GetControl(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewControl(control), nil
 	case coredata.TaskEntityType:
-		task, err := r.svc.GetTask(ctx, id)
+		task, err := r.proboSvc.GetTask(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewTask(task), nil
 	case coredata.EvidenceEntityType:
-		evidence, err := r.svc.GetEvidence(ctx, id)
+		evidence, err := r.proboSvc.GetEvidence(ctx, id)
 		if err != nil {
 			return nil, err
 		}
@@ -264,15 +264,21 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 }
 
 // Viewer is the resolver for the viewer field.
-func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
-	return &types.Viewer{}, nil
+func (r *queryResolver) Viewer(ctx context.Context) (*types.User, error) {
+	user := UserFromContext(ctx)
+	return &types.User{
+		ID:        user.ID,
+		Email:     user.EmailAddress,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}, nil
 }
 
 // StateTransisions is the resolver for the stateTransisions field.
 func (r *taskResolver) StateTransisions(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskStateTransitionConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := r.svc.ListTaskStateTransitions(ctx, obj.ID, cursor)
+	page, err := r.proboSvc.ListTaskStateTransitions(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list control tasks: %w", err)
 	}
@@ -284,7 +290,7 @@ func (r *taskResolver) StateTransisions(ctx context.Context, obj *types.Task, fi
 func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := r.svc.ListTaskEvidences(ctx, obj.ID, cursor)
+	page, err := r.proboSvc.ListTaskEvidences(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
 	}
@@ -293,11 +299,22 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 }
 
 // Organization is the resolver for the organization field.
-func (r *viewerResolver) Organization(ctx context.Context, obj *types.Viewer) (*types.Organization, error) {
-	organizationID, _ := gid.ParseGID("AZSfP_xAcAC5IAAAAAAltA") // TODO: remove this
-	organization, err := r.svc.GetOrganization(ctx, organizationID)
+func (r *userResolver) Organization(ctx context.Context, obj *types.User) (*types.Organization, error) {
+	// Get the user's organization ID
+	organizationID, err := r.usrmgrSvc.GetUserOrganization(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get organization: %w", err)
+		return nil, fmt.Errorf("failed to get user organization: %w", err)
+	}
+
+	// If the user doesn't have an organization, return nil
+	if organizationID == gid.Nil {
+		return nil, nil
+	}
+
+	// Get the organization details
+	organization, err := r.proboSvc.GetOrganization(ctx, organizationID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get organization details: %w", err)
 	}
 
 	return types.NewOrganization(organization), nil
@@ -324,8 +341,8 @@ func (r *Resolver) Query() schema.QueryResolver { return &queryResolver{r} }
 // Task returns schema.TaskResolver implementation.
 func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 
-// Viewer returns schema.ViewerResolver implementation.
-func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
+// User returns schema.UserResolver implementation.
+func (r *Resolver) User() schema.UserResolver { return &userResolver{r} }
 
 type controlResolver struct{ *Resolver }
 type evidenceResolver struct{ *Resolver }
@@ -334,4 +351,4 @@ type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
-type viewerResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }

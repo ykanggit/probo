@@ -220,6 +220,11 @@ type PeopleEdge struct {
 type Query struct {
 }
 
+type Session struct {
+	ID        gid.GID   `json:"id"`
+	ExpiresAt time.Time `json:"expiresAt"`
+}
+
 type Task struct {
 	ID               gid.GID                        `json:"id"`
 	Name             string                         `json:"name"`
@@ -286,6 +291,14 @@ type UpdateVendorInput struct {
 	PrivacyPolicyURL     *string                      `json:"privacyPolicyUrl,omitempty"`
 }
 
+type User struct {
+	ID           gid.GID       `json:"id"`
+	Email        string        `json:"email"`
+	Organization *Organization `json:"organization"`
+	CreatedAt    time.Time     `json:"createdAt"`
+	UpdatedAt    time.Time     `json:"updatedAt"`
+}
+
 type Vendor struct {
 	ID                   gid.GID                     `json:"id"`
 	Name                 string                      `json:"name"`
@@ -313,9 +326,4 @@ type VendorConnection struct {
 type VendorEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Vendor        `json:"node"`
-}
-
-type Viewer struct {
-	ID           gid.GID       `json:"id"`
-	Organization *Organization `json:"organization"`
 }

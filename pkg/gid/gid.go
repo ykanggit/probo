@@ -31,6 +31,7 @@ var (
 	Nil = GID(uuid.Nil)
 )
 
+// ParseGID parses a string representation of a GID
 func ParseGID(encoded string) (GID, error) {
 	gid := GID{}
 
@@ -42,6 +43,17 @@ func ParseGID(encoded string) (GID, error) {
 	return gid, nil
 }
 
+// New creates a new GID with a default entity type of 0
+func New() GID {
+	id, err := NewGID(0)
+	if err != nil {
+		// This should never happen with a valid random source
+		panic(fmt.Sprintf("failed to generate GID: %v", err))
+	}
+	return id
+}
+
+// NewGID creates a new GID with the specified entity type
 func NewGID(et uint32) (GID, error) {
 	id, err := uuid.NewV7()
 	if err != nil {

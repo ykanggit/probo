@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<dde370798e95a61988dd69cdde3acaad>>
+ * @generated SignedSource<<fd54290261cf29d9b3cf42b70a68f398>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -94,7 +94,7 @@ return {
       {
         "alias": null,
         "args": null,
-        "concreteType": "Viewer",
+        "concreteType": "User",
         "kind": "LinkedField",
         "name": "viewer",
         "plural": false,
@@ -137,7 +137,7 @@ return {
       {
         "alias": null,
         "args": null,
-        "concreteType": "Viewer",
+        "concreteType": "User",
         "kind": "LinkedField",
         "name": "viewer",
         "plural": false,

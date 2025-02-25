@@ -17,36 +17,86 @@
 package console_v1
 
 import (
+	"context"
 	"net/http"
+	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/getprobo/probo/pkg/api/console/v1/schema"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo"
+	"github.com/getprobo/probo/pkg/usrmgr"
+	"github.com/getprobo/probo/pkg/usrmgr/coredata"
 	"github.com/go-chi/chi/v5"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 type (
+	AuthConfig struct {
+		CookieName      string
+		CookieSecure    bool
+		CookieHTTPOnly  bool
+		CookieDomain    string
+		CookiePath      string
+		SessionDuration time.Duration
+	}
+
 	Resolver struct {
-		svc *probo.Service
+		proboSvc  *probo.Service
+		usrmgrSvc *usrmgr.Service
+		authCfg   AuthConfig
+	}
+
+	contextKey string
+
+	httpContext struct {
+		ResponseWriter http.ResponseWriter
+		Request        *http.Request
 	}
 )
 
-func NewMux(probo *probo.Service) *chi.Mux {
+const (
+	sessionContextKey contextKey = "session"
+	userContextKey    contextKey = "user"
+	httpContextKey    contextKey = "http"
+)
+
+// SessionFromContext retrieves the session from the context
+func SessionFromContext(ctx context.Context) *coredata.Session {
+	session, _ := ctx.Value(sessionContextKey).(*coredata.Session)
+	return session
+}
+
+// UserFromContext retrieves the user from the context
+func UserFromContext(ctx context.Context) *coredata.User {
+	user, _ := ctx.Value(userContextKey).(*coredata.User)
+	return user
+}
+
+func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig) *chi.Mux {
 	r := chi.NewMux()
+
+	// Register authentication routes
+	RegisterAuthRoutes(r, usrmgrSvc, authCfg)
+
+	// GraphQL playground and query endpoint
 	r.Get("/", playground.Handler("GraphQL", "/console/v1/query"))
-	r.Post("/query", graphql(probo))
+	r.Post("/query", graphqlHandler(proboSvc, usrmgrSvc, authCfg))
 
 	return r
 }
 
-func graphql(probo *probo.Service) http.HandlerFunc {
+func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.HandlerFunc {
 	es := schema.NewExecutableSchema(
 		schema.Config{
 			Resolvers: &Resolver{
-				svc: probo,
+				proboSvc:  proboSvc,
+				usrmgrSvc: usrmgrSvc,
+				authCfg:   authCfg,
 			},
 		},
 	)
@@ -54,7 +104,60 @@ func graphql(probo *probo.Service) http.HandlerFunc {
 	srv.AddTransport(transport.POST{})
 	srv.Use(extension.Introspection{})
 
+	// Add operation middleware for authentication
+	srv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
+		// Skip authentication for introspection queries
+		if op := graphql.GetOperationContext(ctx); op.OperationName == "IntrospectionQuery" {
+			return next(ctx)
+		}
+
+		// Get the user from context
+		user := UserFromContext(ctx)
+		if user == nil {
+			return func(ctx context.Context) *graphql.Response {
+				return &graphql.Response{
+					Errors: gqlerror.List{gqlerror.Errorf("authentication required")},
+				}
+			}
+		}
+
+		// Continue with the operation
+		return next(ctx)
+	})
+
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Create HTTP context
+		httpCtx := &httpContext{
+			ResponseWriter: w,
+			Request:        r,
+		}
+		ctx := context.WithValue(r.Context(), httpContextKey, httpCtx)
+
+		// Extract session from cookie
+		cookie, err := r.Cookie(authCfg.CookieName)
+		if err == nil && cookie.Value != "" {
+			// Parse the session ID
+			sessionID, err := gid.ParseGID(cookie.Value)
+			if err == nil {
+				// Get the session
+				session, err := usrmgrSvc.GetSession(r.Context(), sessionID)
+				if err == nil {
+					// Add session to context
+					ctx = context.WithValue(ctx, sessionContextKey, session)
+
+					// Get the user
+					user, err := usrmgrSvc.GetUserBySession(r.Context(), sessionID)
+					if err == nil {
+						// Add user to context
+						ctx = context.WithValue(ctx, userContextKey, user)
+					}
+				}
+			}
+		}
+
+		// Update the request with the new context
+		r = r.WithContext(ctx)
+
 		srv.ServeHTTP(w, r)
 	}
 }

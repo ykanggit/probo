@@ -21,6 +21,7 @@ import (
 
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/usrmgr/coredata"
+	"github.com/jackc/pgx/v5"
 	"go.gearno.de/kit/migrator"
 	"go.gearno.de/kit/pg"
 )
@@ -30,20 +31,114 @@ type (
 		pg *pg.Client
 		hp *HashingProfile
 	}
+
+	RegisterUserParams struct {
+		Email    string
+		Password string
+	}
+
+	ErrInvalidCredentials struct {
+		message string
+	}
+
+	ErrUserAlreadyExists struct {
+		message string
+	}
+
+	ErrSessionNotFound struct {
+		message string
+	}
+
+	ErrSessionExpired struct {
+		message string
+	}
 )
+
+func (e ErrInvalidCredentials) Error() string {
+	return e.message
+}
+
+func (e ErrUserAlreadyExists) Error() string {
+	return e.message
+}
+
+func (e ErrSessionNotFound) Error() string {
+	return e.message
+}
+
+func (e ErrSessionExpired) Error() string {
+	return e.message
+}
 
 func NewService(
 	ctx context.Context,
 	pgClient *pg.Client,
+	pepper []byte,
 ) (*Service, error) {
 	err := migrator.NewMigrator(pgClient, coredata.Migrations).Run(ctx, "migrations")
 	if err != nil {
 		return nil, fmt.Errorf("cannot migrate database schema: %w", err)
 	}
 
+	hp, err := NewHashingProfile(pepper)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create hashing profile: %w", err)
+	}
+
 	return &Service{
 		pg: pgClient,
+		hp: hp,
 	}, nil
+}
+
+func (s Service) RegisterUser(
+	ctx context.Context,
+	params RegisterUserParams,
+) (*coredata.User, error) {
+	if params.Email == "" || params.Password == "" {
+		return nil, fmt.Errorf("email and password are required")
+	}
+
+	// Use a high iteration count for password hashing
+	const iterations = 600000
+	hashedPassword, err := s.hp.HashPassword([]byte(params.Password), iterations)
+	if err != nil {
+		return nil, fmt.Errorf("cannot hash password: %w", err)
+	}
+
+	now := time.Now()
+	user := &coredata.User{
+		ID:             gid.New(),
+		EmailAddress:   params.Email,
+		HashedPassword: hashedPassword,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+	}
+
+	err = s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			// Check if user already exists
+			existingUser := &coredata.User{}
+			err := existingUser.LoadByEmail(ctx, tx, params.Email)
+			if err == nil {
+				return &ErrUserAlreadyExists{message: "user with this email already exists"}
+			}
+
+			// Insert the new user
+			if err := user.Insert(ctx, tx); err != nil {
+				return fmt.Errorf("cannot insert user: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s Service) Login(
@@ -54,8 +149,8 @@ func (s Service) Login(
 	now := time.Now()
 	user := &coredata.User{}
 	session := &coredata.Session{
-		ID:        gid.GID{},
-		UserID:    user.ID,
+		ID:        gid.New(),
+		UserID:    gid.GID{}, // Will be set after user is loaded
 		ExpiredAt: now.Add(24 * time.Hour),
 		CreatedAt: now,
 		UpdatedAt: now,
@@ -65,17 +160,20 @@ func (s Service) Login(
 		ctx,
 		func(tx pg.Conn) error {
 			if err := user.LoadByEmail(ctx, tx, email); err != nil {
-				return fmt.Errorf("cannot load user by email: %w", err)
+				return &ErrInvalidCredentials{message: "invalid email or password"}
 			}
 
 			ok, err := s.hp.ComparePasswordAndHash([]byte(password), user.HashedPassword)
 			if err != nil {
-				return fmt.Errorf("cannot constant compare byte: %w", err)
+				return fmt.Errorf("cannot compare password: %w", err)
 			}
 
 			if !ok {
-				return fmt.Errorf("invalid password")
+				return &ErrInvalidCredentials{message: "invalid email or password"}
 			}
+
+			// Set the user ID in the session
+			session.UserID = user.ID
 
 			if err := session.Insert(ctx, tx); err != nil {
 				return fmt.Errorf("cannot insert session: %w", err)
@@ -89,13 +187,176 @@ func (s Service) Login(
 		return nil, err
 	}
 
-	return nil, nil
+	return session, nil
 }
 
-func (s Service) Logout(sessionID string) error {
-	return nil
+func (s Service) Logout(
+	ctx context.Context,
+	sessionID gid.GID,
+) error {
+	return s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			return coredata.DeleteSession(ctx, tx, sessionID)
+		},
+	)
 }
 
-func (s Service) GetSession(sessionID string) (*coredata.Session, error) {
-	return nil, nil
+func (s Service) GetSession(
+	ctx context.Context,
+	sessionID gid.GID,
+) (*coredata.Session, error) {
+	session := &coredata.Session{}
+
+	err := s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			if err := session.LoadByID(ctx, tx, sessionID); err != nil {
+				return &ErrSessionNotFound{message: "session not found"}
+			}
+
+			// Check if session is expired
+			if time.Now().After(session.ExpiredAt) {
+				// Delete expired session
+				if err := coredata.DeleteSession(ctx, tx, sessionID); err != nil {
+					return fmt.Errorf("cannot delete expired session: %w", err)
+				}
+				return &ErrSessionExpired{message: "session expired"}
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return session, nil
+}
+
+func (s Service) RefreshSession(
+	ctx context.Context,
+	sessionID gid.GID,
+) (*coredata.Session, error) {
+	session := &coredata.Session{}
+
+	err := s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			if err := session.LoadByID(ctx, tx, sessionID); err != nil {
+				return &ErrSessionNotFound{message: "session not found"}
+			}
+
+			// Check if session is expired
+			if time.Now().After(session.ExpiredAt) {
+				return &ErrSessionExpired{message: "session expired"}
+			}
+
+			// Update session expiration
+			now := time.Now()
+			session.ExpiredAt = now.Add(24 * time.Hour)
+			session.UpdatedAt = now
+
+			if err := session.Update(ctx, tx); err != nil {
+				return fmt.Errorf("cannot update session: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return session, nil
+}
+
+func (s Service) GetUserByID(
+	ctx context.Context,
+	userID gid.GID,
+) (*coredata.User, error) {
+	user := &coredata.User{}
+
+	err := s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			if err := user.LoadByID(ctx, tx, userID); err != nil {
+				return fmt.Errorf("user not found: %w", err)
+			}
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (s Service) GetUserBySession(
+	ctx context.Context,
+	sessionID gid.GID,
+) (*coredata.User, error) {
+	session, err := s.GetSession(ctx, sessionID)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.GetUserByID(ctx, session.UserID)
+}
+
+// SetUserOrganization sets the organization for a user
+func (s Service) SetUserOrganization(
+	ctx context.Context,
+	userID gid.GID,
+	organizationID gid.GID,
+) error {
+	return s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			user := &coredata.User{}
+			if err := user.LoadByID(ctx, tx, userID); err != nil {
+				return fmt.Errorf("user not found: %w", err)
+			}
+
+			// Update the organization ID
+			user.OrganizationID = organizationID
+			user.UpdatedAt = time.Now()
+
+			// Update the user in the database
+			q := `
+UPDATE usrmgr_users
+SET organization_id = @organization_id, updated_at = @updated_at
+WHERE id = @user_id
+`
+			args := pgx.NamedArgs{
+				"user_id":         user.ID,
+				"organization_id": user.OrganizationID,
+				"updated_at":      user.UpdatedAt,
+			}
+
+			_, err := tx.Exec(ctx, q, args)
+			if err != nil {
+				return fmt.Errorf("cannot update user organization: %w", err)
+			}
+
+			return nil
+		},
+	)
+}
+
+// GetUserOrganization gets the organization ID for a user
+func (s Service) GetUserOrganization(
+	ctx context.Context,
+	userID gid.GID,
+) (gid.GID, error) {
+	user, err := s.GetUserByID(ctx, userID)
+	if err != nil {
+		return gid.GID{}, err
+	}
+
+	return user.OrganizationID, nil
 }

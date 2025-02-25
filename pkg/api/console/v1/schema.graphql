@@ -342,14 +342,25 @@ type EvidenceStateTransition {
   updatedAt: Datetime!
 }
 
-type Query {
-  node(id: ID!): Node!
-  viewer: Viewer!
+# Authentication types
+type User {
+  id: ID!
+  email: String!
+
+  organization: Organization! @goField(forceResolver: true)
+
+  createdAt: Datetime!
+  updatedAt: Datetime!
 }
 
-type Viewer {
+type Session {
   id: ID!
-  organization: Organization! @goField(forceResolver: true)
+  expiresAt: Datetime!
+}
+
+type Query {
+  node(id: ID!): Node!
+  viewer: User!
 }
 
 type Mutation {
