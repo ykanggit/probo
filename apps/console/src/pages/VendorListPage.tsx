@@ -19,7 +19,6 @@ import type { VendorListPageQuery as VendorListPageQueryType } from "./__generat
 import { Helmet } from "react-helmet-async";
 import { VendorListPageCreateVendorMutation } from "./__generated__/VendorListPageCreateVendorMutation.graphql";
 import { VendorListPageDeleteVendorMutation } from "./__generated__/VendorListPageDeleteVendorMutation.graphql";
-import { toast } from "@/hooks/use-toast";
 import { VendorListPagePaginationQuery } from "./__generated__/VendorListPagePaginationQuery.graphql";
 import { VendorListPage_vendors$key } from "./__generated__/VendorListPage_vendors.graphql";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +35,8 @@ const vendorListPageQuery = graphql`
     $before: CursorKey
   ) {
     organization: node(id: $organizationId) {
+      id
+
       ...VendorListPage_vendors
         @arguments(first: $first, after: $after, last: $last, before: $before)
     }
@@ -51,7 +52,6 @@ const vendorListFragment = graphql`
     last: { type: "Int" }
     before: { type: "CursorKey" }
   ) {
-    id
     vendors(first: $first, after: $after, last: $last, before: $before)
       @connection(key: "VendorListPage_vendors") {
       __id
@@ -189,7 +189,7 @@ function VendorListContent({
   const { toast } = useToast();
   const data = usePreloadedQuery<VendorListPageQueryType>(
     vendorListPageQuery,
-    queryRef,
+    queryRef
   );
   const [searchParams, setSearchParams] = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -269,7 +269,7 @@ function VendorListContent({
                       variables: {
                         connections: [vendorsConnection.vendors.__id],
                         input: {
-                          organizationId: organization.id,
+                          organizationId: data.organization.id,
                           name: vendor.name,
                           description: "",
                           serviceStartAt: new Date().toISOString(),
@@ -335,7 +335,7 @@ function VendorListContent({
                     e.preventDefault(); // Prevent navigation
                     if (
                       window.confirm(
-                        "Are you sure you want to delete this vendor?",
+                        "Are you sure you want to delete this vendor?"
                       )
                     ) {
                       deleteVendor({

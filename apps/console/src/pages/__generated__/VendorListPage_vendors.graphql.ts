@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d8da23ca67cc47188e916e129dac0be0>>
+ * @generated SignedSource<<193d632d808f2238377dab9c47d89f49>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -105,7 +105,6 @@ return {
   },
   "name": "VendorListPage_vendors",
   "selections": [
-    (v1/*: any*/),
     {
       "alias": "vendors",
       "args": null,
@@ -232,13 +231,14 @@ return {
         }
       ],
       "storageKey": null
-    }
+    },
+    (v1/*: any*/)
   ],
   "type": "Organization",
   "abstractKey": null
 };
 })();
 
-(node as any).hash = "7ab226392b5cd58f332515753f1099ae";
+(node as any).hash = "3e2b7b3ee9248d288c34bcd156a0604d";
 
 export default node;

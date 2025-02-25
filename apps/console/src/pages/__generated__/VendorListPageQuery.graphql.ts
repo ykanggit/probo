@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<15bedd2878042e53e79e430f79d767cb>>
+ * @generated SignedSource<<116a0717d13f9b7f35da0cfb4f01de44>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -19,6 +19,7 @@ export type VendorListPageQuery$variables = {
 };
 export type VendorListPageQuery$data = {
   readonly organization: {
+    readonly id: string;
     readonly " $fragmentSpreads": FragmentRefs<"VendorListPage_vendors">;
   };
 };
@@ -60,7 +61,14 @@ v5 = [
     "variableName": "organizationId"
   }
 ],
-v6 = [
+v6 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v7 = [
   {
     "kind": "Variable",
     "name": "after",
@@ -82,18 +90,11 @@ v6 = [
     "variableName": "last"
   }
 ],
-v7 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "__typename",
-  "storageKey": null
-},
 v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "id",
+  "name": "__typename",
   "storageKey": null
 };
 return {
@@ -117,8 +118,9 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
+          (v6/*: any*/),
           {
-            "args": (v6/*: any*/),
+            "args": (v7/*: any*/),
             "kind": "FragmentSpread",
             "name": "VendorListPage_vendors"
           }
@@ -149,14 +151,14 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v7/*: any*/),
           (v8/*: any*/),
+          (v6/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v6/*: any*/),
+                "args": (v7/*: any*/),
                 "concreteType": "VendorConnection",
                 "kind": "LinkedField",
                 "name": "vendors",
@@ -178,7 +180,7 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v8/*: any*/),
+                          (v6/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -207,7 +209,7 @@ return {
                             "name": "updatedAt",
                             "storageKey": null
                           },
-                          (v7/*: any*/)
+                          (v8/*: any*/)
                         ],
                         "storageKey": null
                       },
@@ -277,7 +279,7 @@ return {
               },
               {
                 "alias": null,
-                "args": (v6/*: any*/),
+                "args": (v7/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "VendorListPage_vendors",
@@ -294,16 +296,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "4f036b643119ac6840eede9bc148c6ac",
+    "cacheID": "7aa223f9a0e9a5f57269b5dbdd339625",
     "id": null,
     "metadata": {},
     "name": "VendorListPageQuery",
     "operationKind": "query",
-    "text": "query VendorListPageQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...VendorListPage_vendors_pbnwq\n    id\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  id\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
+    "text": "query VendorListPageQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...VendorListPage_vendors_pbnwq\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a0a4881ec7e60051fa196830f5c62f45";
+(node as any).hash = "1dc54deae9707bee0ab9beba6d844df3";
 
 export default node;

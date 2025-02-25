@@ -14,23 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { CreatePeoplePageQuery as CreatePeoplePageQueryType } from "./__generated__/CreatePeoplePageQuery.graphql";
 import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CreatePeoplePageCreatePeopleMutation } from "./__generated__/CreatePeoplePageCreatePeopleMutation.graphql";
-
-const createPeoplePageQuery = graphql`
-  query CreatePeoplePageQuery {
-    viewer {
-      id
-      organizations {
-        id
-        name
-      }
-    }
-  }
-`;
+import { useOrganization } from "@/contexts/OrganizationContext";
 
 const createPeopleMutation = graphql`
   mutation CreatePeoplePageCreatePeopleMutation(
@@ -85,13 +73,10 @@ function EditableField({
   );
 }
 
-function CreatePeoplePageContent({
-  queryRef,
-}: {
-  queryRef: PreloadedQuery<CreatePeoplePageQueryType>;
-}) {
+function CreatePeoplePageContent() {
   const navigate = useNavigate();
-  const data = usePreloadedQuery(createPeoplePageQuery, queryRef);
+  const { currentOrganization } = useOrganization();
+
   const [createPeople] =
     useMutation<CreatePeoplePageCreatePeopleMutation>(createPeopleMutation);
   const { toast } = useToast();
@@ -112,15 +97,15 @@ function CreatePeoplePageContent({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const peopleConnectionId = ConnectionHandler.getConnectionID(
-      data.viewer.organization.id,
-      "PeopleListPage_peoples",
+      currentOrganization!.id,
+      "PeopleListPage_peoples"
     );
 
     createPeople({
       variables: {
         connections: [peopleConnectionId],
         input: {
-          organizationId: data.viewer.organization.id,
+          organizationId: currentOrganization!.id,
           fullName: formData.fullName,
           primaryEmailAddress: formData.primaryEmailAddress,
           additionalEmailAddresses: formData.additionalEmailAddresses,
@@ -189,7 +174,7 @@ function CreatePeoplePageContent({
                         newEmails[index] = e.target.value;
                         handleFieldChange(
                           "additionalEmailAddresses",
-                          newEmails,
+                          newEmails
                         );
                       }}
                     />
@@ -199,11 +184,11 @@ function CreatePeoplePageContent({
                       onClick={() => {
                         const newEmails =
                           formData.additionalEmailAddresses.filter(
-                            (_, i) => i !== index,
+                            (_, i) => i !== index
                           );
                         handleFieldChange(
                           "additionalEmailAddresses",
-                          newEmails,
+                          newEmails
                         );
                       }}
                     >
@@ -251,7 +236,7 @@ function CreatePeoplePageContent({
                           "rounded-full px-4 py-1 text-sm transition-colors",
                           formData.kind === "EMPLOYEE"
                             ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-200",
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                         )}
                       >
                         Employee
@@ -263,7 +248,7 @@ function CreatePeoplePageContent({
                           "rounded-full px-4 py-1 text-sm transition-colors",
                           formData.kind === "CONTRACTOR"
                             ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-200",
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                         )}
                       >
                         Contractor
@@ -292,21 +277,9 @@ function CreatePeoplePageContent({
 }
 
 export default function CreatePeoplePage() {
-  const [queryRef, loadQuery] = useQueryLoader<CreatePeoplePageQueryType>(
-    createPeoplePageQuery,
-  );
-
-  useEffect(() => {
-    loadQuery({});
-  }, [loadQuery]);
-
-  if (!queryRef) {
-    return null;
-  }
-
   return (
     <Suspense fallback={null}>
-      <CreatePeoplePageContent queryRef={queryRef} />
+      <CreatePeoplePageContent />
     </Suspense>
   );
 }

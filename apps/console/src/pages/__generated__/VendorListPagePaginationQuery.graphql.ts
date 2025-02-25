@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8a3c352a16aeb823ac25ee61446cc573>>
+ * @generated SignedSource<<4088732e27ad0219fc1d7a47b156bc6e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -294,16 +294,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "8fa8530a89995a836fec656b1d141b89",
+    "cacheID": "3ebbf3bc033c96f10ad0e06f53ef3551",
     "id": null,
     "metadata": {},
     "name": "VendorListPagePaginationQuery",
     "operationKind": "query",
-    "text": "query VendorListPagePaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...VendorListPage_vendors_pbnwq\n    id\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  id\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
+    "text": "query VendorListPagePaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...VendorListPage_vendors_pbnwq\n    id\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "7ab226392b5cd58f332515753f1099ae";
+(node as any).hash = "3e2b7b3ee9248d288c34bcd156a0604d";
 
 export default node;
