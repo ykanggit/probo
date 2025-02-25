@@ -292,11 +292,12 @@ type UpdateVendorInput struct {
 }
 
 type User struct {
-	ID           gid.GID       `json:"id"`
-	Email        string        `json:"email"`
-	Organization *Organization `json:"organization"`
-	CreatedAt    time.Time     `json:"createdAt"`
-	UpdatedAt    time.Time     `json:"updatedAt"`
+	ID            gid.GID         `json:"id"`
+	FullName      string          `json:"fullName"`
+	Email         string          `json:"email"`
+	Organizations []*Organization `json:"organizations"`
+	CreatedAt     time.Time       `json:"createdAt"`
+	UpdatedAt     time.Time       `json:"updatedAt"`
 }
 
 type Vendor struct {

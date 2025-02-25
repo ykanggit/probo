@@ -24,8 +24,7 @@ const createPeoplePageQuery = graphql`
   query CreatePeoplePageQuery {
     viewer {
       id
-
-      organization {
+      organizations {
         id
         name
       }

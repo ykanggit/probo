@@ -308,46 +308,6 @@ func (s Service) GetUserBySession(
 	return s.GetUserByID(ctx, session.UserID)
 }
 
-// SetUserOrganization sets the organization for a user
-func (s Service) SetUserOrganization(
-	ctx context.Context,
-	userID gid.GID,
-	organizationID gid.GID,
-) error {
-	return s.pg.WithTx(
-		ctx,
-		func(tx pg.Conn) error {
-			user := &coredata.User{}
-			if err := user.LoadByID(ctx, tx, userID); err != nil {
-				return fmt.Errorf("user not found: %w", err)
-			}
-
-			// Update the organization ID
-			user.OrganizationID = organizationID
-			user.UpdatedAt = time.Now()
-
-			// Update the user in the database
-			q := `
-UPDATE usrmgr_users
-SET organization_id = @organization_id, updated_at = @updated_at
-WHERE id = @user_id
-`
-			args := pgx.NamedArgs{
-				"user_id":         user.ID,
-				"organization_id": user.OrganizationID,
-				"updated_at":      user.UpdatedAt,
-			}
-
-			_, err := tx.Exec(ctx, q, args)
-			if err != nil {
-				return fmt.Errorf("cannot update user organization: %w", err)
-			}
-
-			return nil
-		},
-	)
-}
-
 // GetUserOrganization gets the organization ID for a user
 func (s Service) GetUserOrganization(
 	ctx context.Context,
@@ -359,4 +319,102 @@ func (s Service) GetUserOrganization(
 	}
 
 	return user.OrganizationID, nil
+}
+
+// GetUserOrganizations gets all organizations for a user
+func (s Service) GetUserOrganizations(
+	ctx context.Context,
+	userID gid.GID,
+) ([]gid.GID, error) {
+	q := `
+SELECT
+    organization_id
+FROM
+    usrmgr_user_organizations
+WHERE
+    user_id = @user_id;
+`
+
+	args := pgx.NamedArgs{"user_id": userID}
+
+	var organizationIDs []gid.GID
+
+	err := s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			rows, err := tx.Query(ctx, q, args)
+			if err != nil {
+				return fmt.Errorf("failed to query user organizations: %w", err)
+			}
+			defer rows.Close()
+
+			for rows.Next() {
+				var organizationID gid.GID
+				if err := rows.Scan(&organizationID); err != nil {
+					return fmt.Errorf("failed to scan organization ID: %w", err)
+				}
+				organizationIDs = append(organizationIDs, organizationID)
+			}
+
+			if err := rows.Err(); err != nil {
+				return fmt.Errorf("error iterating over rows: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return organizationIDs, nil
+}
+
+// AddUserToOrganization adds a user to an organization
+func (s Service) AddUserToOrganization(
+	ctx context.Context,
+	userID gid.GID,
+	organizationID gid.GID,
+) error {
+	q := `
+INSERT INTO
+    usrmgr_user_organizations (user_id, organization_id, created_at)
+VALUES
+    (@user_id, @organization_id, NOW())
+ON CONFLICT (user_id, organization_id) DO NOTHING;
+`
+
+	args := pgx.NamedArgs{
+		"user_id":         userID,
+		"organization_id": organizationID,
+	}
+
+	return s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			_, err := tx.Exec(ctx, q, args)
+			if err != nil {
+				return fmt.Errorf("failed to add user to organization: %w", err)
+			}
+			return nil
+		},
+	)
+}
+
+// GetUserIDFromContext gets the user ID from the context
+func (s Service) GetUserIDFromContext(ctx context.Context) (gid.GID, error) {
+	// Get the session ID from the context
+	sessionID, ok := ctx.Value("session_id").(gid.GID)
+	if !ok {
+		return gid.GID{}, fmt.Errorf("no session ID in context")
+	}
+
+	// Get the session
+	session, err := s.GetSession(ctx, sessionID)
+	if err != nil {
+		return gid.GID{}, fmt.Errorf("failed to get session: %w", err)
+	}
+
+	return session.UserID, nil
 }

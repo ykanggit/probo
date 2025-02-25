@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5e071fe96262050a43c9471c27ff667e>>
+ * @generated SignedSource<<4291ff1f33eb226774e68544740b4331>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -54,19 +54,23 @@ v1 = {
 return {
   "argumentDefinitions": [
     {
-      "kind": "RootArgument",
+      "defaultValue": null,
+      "kind": "LocalArgument",
       "name": "after"
     },
     {
-      "kind": "RootArgument",
+      "defaultValue": null,
+      "kind": "LocalArgument",
       "name": "before"
     },
     {
-      "kind": "RootArgument",
+      "defaultValue": null,
+      "kind": "LocalArgument",
       "name": "first"
     },
     {
-      "kind": "RootArgument",
+      "defaultValue": null,
+      "kind": "LocalArgument",
       "name": "last"
     }
   ],
@@ -252,6 +256,6 @@ return {
 };
 })();
 
-(node as any).hash = "6602dd60c3adf0db89580e752495c910";
+(node as any).hash = "3d7335649a48a459415be45828b7e265";
 
 export default node;

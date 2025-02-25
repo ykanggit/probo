@@ -18,28 +18,34 @@ import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generat
 import type { PeopleListPageDeletePeopleMutation } from "./__generated__/PeopleListPageDeletePeopleMutation.graphql";
 import { PeopleListPagePaginationQuery } from "./__generated__/PeopleListPagePaginationQuery.graphql";
 import { PeopleListPage_peoples$key } from "./__generated__/PeopleListPage_peoples.graphql";
+import { useOrganization } from "@/contexts/OrganizationContext";
 
 const ITEMS_PER_PAGE = 25;
 
 const peopleListPageQuery = graphql`
   query PeopleListPageQuery(
+    $organizationId: ID!
     $first: Int
     $after: CursorKey
     $last: Int
     $before: CursorKey
   ) {
-    viewer {
-      id
-      organization {
-        ...PeopleListPage_peoples
-      }
+    organization: node(id: $organizationId) {
+      ...PeopleListPage_peoples
+        @arguments(first: $first, after: $after, last: $last, before: $before)
     }
   }
 `;
 
 const peopleListFragment = graphql`
   fragment PeopleListPage_peoples on Organization
-  @refetchable(queryName: "PeopleListPagePaginationQuery") {
+  @refetchable(queryName: "PeopleListPagePaginationQuery")
+  @argumentDefinitions(
+    first: { type: "Int" }
+    after: { type: "CursorKey" }
+    last: { type: "Int" }
+    before: { type: "CursorKey" }
+  ) {
     id
     peoples(first: $first, after: $after, last: $last, before: $before)
       @connection(key: "PeopleListPage_peoples") {
@@ -147,7 +153,7 @@ function PeopleListContent({
   } = usePaginationFragment<
     PeopleListPagePaginationQuery,
     PeopleListPage_peoples$key
-  >(peopleListFragment, data.viewer.organization);
+  >(peopleListFragment, data.organization);
 
   const peoples =
     peoplesConnection.peoples.edges.map((edge) => edge.node) ?? [];
@@ -301,17 +307,20 @@ export default function PeopleListPage() {
   const [queryRef, loadQuery] =
     useQueryLoader<PeopleListPageQueryType>(peopleListPageQuery);
 
+  const { currentOrganization } = useOrganization();
+
   useEffect(() => {
     const after = searchParams.get("after");
     const before = searchParams.get("before");
 
     loadQuery({
+      organizationId: currentOrganization!.id,
       first: before ? undefined : ITEMS_PER_PAGE,
       after: after || undefined,
       last: before ? ITEMS_PER_PAGE : undefined,
       before: before || undefined,
     });
-  }, [loadQuery]);
+  }, [loadQuery, currentOrganization]);
 
   if (!queryRef) {
     return <PeopleListPageFallback />;

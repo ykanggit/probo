@@ -9,12 +9,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router";
 import type { FrameworkListPageQuery as FrameworkListPageQueryType } from "./__generated__/FrameworkListPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
+import { useOrganization } from "@/contexts/OrganizationContext";
 
 const FrameworkListPageQuery = graphql`
-  query FrameworkListPageQuery {
-    viewer {
-      id
-      organization {
+  query FrameworkListPageQuery($organizationId: ID!) {
+    organization: node(id: $organizationId) {
+      ... on Organization {
         frameworks {
           edges {
             node {
@@ -87,7 +87,7 @@ function FrameworkListPageContent({
 }) {
   const data = usePreloadedQuery(FrameworkListPageQuery, queryRef);
   const frameworks =
-    data.viewer.organization.frameworks?.edges.map((edge) => edge?.node) ?? [];
+    data.organization.frameworks?.edges.map((edge) => edge?.node) ?? [];
 
   return (
     <div className="space-y-6">
@@ -164,9 +164,11 @@ export default function FrameworkListPage() {
     FrameworkListPageQuery
   );
 
+  const { currentOrganization } = useOrganization();
+
   useEffect(() => {
-    loadQuery({});
-  }, [loadQuery]);
+    loadQuery({ organizationId: currentOrganization!.id });
+  }, [loadQuery, currentOrganization]);
 
   return (
     <>

@@ -12,7 +12,7 @@ export const HomePageQuery = graphql`
   query HomePageQuery {
     viewer {
       id
-      organization {
+      organizations {
         name
         createdAt
         updatedAt

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9ff37ab5131d3343de8f2d0c843377d1>>
+ * @generated SignedSource<<48cb6bd6a591f9b4a0c44d3ac0b54ee4>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -60,21 +60,7 @@ v5 = [
     "variableName": "id"
   }
 ],
-v6 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "__typename",
-  "storageKey": null
-},
-v7 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
-},
-v8 = [
+v6 = [
   {
     "kind": "Variable",
     "name": "after",
@@ -95,7 +81,21 @@ v8 = [
     "name": "last",
     "variableName": "last"
   }
-];
+],
+v7 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v8 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+};
 return {
   "fragment": {
     "argumentDefinitions": [
@@ -118,7 +118,7 @@ return {
         "plural": false,
         "selections": [
           {
-            "args": null,
+            "args": (v6/*: any*/),
             "kind": "FragmentSpread",
             "name": "PeopleListPage_peoples"
           }
@@ -149,14 +149,14 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v6/*: any*/),
           (v7/*: any*/),
+          (v8/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v8/*: any*/),
+                "args": (v6/*: any*/),
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
                 "name": "peoples",
@@ -178,7 +178,7 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v7/*: any*/),
+                          (v8/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -221,7 +221,7 @@ return {
                             "name": "updatedAt",
                             "storageKey": null
                           },
-                          (v6/*: any*/)
+                          (v7/*: any*/)
                         ],
                         "storageKey": null
                       },
@@ -291,7 +291,7 @@ return {
               },
               {
                 "alias": null,
-                "args": (v8/*: any*/),
+                "args": (v6/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "PeopleListPage_peoples",
@@ -308,16 +308,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "17a418660f5fd222c0400f2825634ed4",
+    "cacheID": "f20190ee884fd80e3f9157895667cb9e",
     "id": null,
     "metadata": {},
     "name": "PeopleListPagePaginationQuery",
     "operationKind": "query",
-    "text": "query PeopleListPagePaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...PeopleListPage_peoples\n    id\n  }\n}\n\nfragment PeopleListPage_peoples on Organization {\n  id\n  peoples(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        additionalEmailAddresses\n        kind\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
+    "text": "query PeopleListPagePaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...PeopleListPage_peoples_pbnwq\n    id\n  }\n}\n\nfragment PeopleListPage_peoples_pbnwq on Organization {\n  id\n  peoples(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        additionalEmailAddresses\n        kind\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "6602dd60c3adf0db89580e752495c910";
+(node as any).hash = "3d7335649a48a459415be45828b7e265";
 
 export default node;

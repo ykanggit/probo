@@ -22,28 +22,35 @@ import { VendorListPageDeleteVendorMutation } from "./__generated__/VendorListPa
 import { toast } from "@/hooks/use-toast";
 import { VendorListPagePaginationQuery } from "./__generated__/VendorListPagePaginationQuery.graphql";
 import { VendorListPage_vendors$key } from "./__generated__/VendorListPage_vendors.graphql";
+import { useToast } from "@/hooks/use-toast";
+import { useOrganization } from "@/contexts/OrganizationContext";
 
 const ITEMS_PER_PAGE = 25;
 
 const vendorListPageQuery = graphql`
   query VendorListPageQuery(
+    $organizationId: ID!
     $first: Int
     $after: CursorKey
     $last: Int
     $before: CursorKey
   ) {
-    viewer {
-      id
-      organization {
-        ...VendorListPage_vendors
-      }
+    organization: node(id: $organizationId) {
+      ...VendorListPage_vendors
+        @arguments(first: $first, after: $after, last: $last, before: $before)
     }
   }
 `;
 
 const vendorListFragment = graphql`
   fragment VendorListPage_vendors on Organization
-  @refetchable(queryName: "VendorListPagePaginationQuery") {
+  @refetchable(queryName: "VendorListPagePaginationQuery")
+  @argumentDefinitions(
+    first: { type: "Int" }
+    after: { type: "CursorKey" }
+    last: { type: "Int" }
+    before: { type: "CursorKey" }
+  ) {
     id
     vendors(first: $first, after: $after, last: $last, before: $before)
       @connection(key: "VendorListPage_vendors") {
@@ -96,8 +103,15 @@ const deleteVendorMutation = graphql`
   }
 `;
 
+// Define a proper type for the vendor items
+interface VendorItem {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
 // TODO: Remove this once we have a real list of vendors
-const vendorsList = [
+const vendorsList: VendorItem[] = [
   { id: "1", name: "Amazon Web Services", createdAt: new Date().toISOString() },
   {
     id: "2",
@@ -172,6 +186,7 @@ function VendorListContent({
 }: {
   queryRef: PreloadedQuery<VendorListPageQueryType>;
 }) {
+  const { toast } = useToast();
   const data = usePreloadedQuery<VendorListPageQueryType>(
     vendorListPageQuery,
     queryRef
@@ -179,7 +194,7 @@ function VendorListContent({
   const [searchParams, setSearchParams] = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredVendors, setFilteredVendors] = useState<Array<any>>([]);
+  const [filteredVendors, setFilteredVendors] = useState<VendorItem[]>([]);
   const [createVendor] =
     useMutation<VendorListPageCreateVendorMutation>(createVendorMutation);
   const [deleteVendor] =
@@ -196,7 +211,7 @@ function VendorListContent({
   } = usePaginationFragment<
     VendorListPagePaginationQuery,
     VendorListPage_vendors$key
-  >(vendorListFragment, data.viewer.organization);
+  >(vendorListFragment, data.organization);
 
   const vendors =
     vendorsConnection.vendors.edges.map((edge) => edge.node) ?? [];
@@ -245,7 +260,7 @@ function VendorListContent({
               style={{ borderRadius: "0.3rem" }}
               className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-popover shadow-md z-10"
             >
-              {filteredVendors.map((vendor) => (
+              {filteredVendors.map((vendor: VendorItem) => (
                 <button
                   key={vendor.id}
                   className="w-full px-3 py-2 text-left hover:bg-accent"
@@ -254,7 +269,7 @@ function VendorListContent({
                       variables: {
                         connections: [vendorsConnection.vendors.__id],
                         input: {
-                          organizationId: data.viewer.organization.id,
+                          organizationId: organization.id,
                           name: vendor.name,
                           description: "",
                           serviceStartAt: new Date().toISOString(),
@@ -410,17 +425,20 @@ export default function VendorListPage() {
   const [queryRef, loadQuery] =
     useQueryLoader<VendorListPageQueryType>(vendorListPageQuery);
 
+  const { currentOrganization } = useOrganization();
+
   useEffect(() => {
     const after = searchParams.get("after");
     const before = searchParams.get("before");
 
     loadQuery({
+      organizationId: currentOrganization!.id,
       first: before ? undefined : ITEMS_PER_PAGE,
       after: after || undefined,
       last: before ? ITEMS_PER_PAGE : undefined,
       before: before || undefined,
     });
-  }, [loadQuery]);
+  }, [loadQuery, currentOrganization]);
 
   if (!queryRef) {
     return <VendorListFallback />;

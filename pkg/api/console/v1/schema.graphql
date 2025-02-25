@@ -345,9 +345,10 @@ type EvidenceStateTransition {
 # Authentication types
 type User {
   id: ID!
+  fullName: String!
   email: String!
 
-  organization: Organization! @goField(forceResolver: true)
+  organizations: [Organization!]! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!

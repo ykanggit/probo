@@ -269,6 +269,7 @@ func (r *queryResolver) Viewer(ctx context.Context) (*types.User, error) {
 	return &types.User{
 		ID:        user.ID,
 		Email:     user.EmailAddress,
+		FullName:  user.FullName,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}, nil
@@ -298,26 +299,30 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 	return types.NewEvidenceConnection(page), nil
 }
 
-// Organization is the resolver for the organization field.
-func (r *userResolver) Organization(ctx context.Context, obj *types.User) (*types.Organization, error) {
-	// Get the user's organization ID
-	organizationID, err := r.usrmgrSvc.GetUserOrganization(ctx, obj.ID)
+// Organizations is the resolver for the organizations field.
+func (r *userResolver) Organizations(ctx context.Context, obj *types.User) ([]*types.Organization, error) {
+	// Get the user's organization IDs
+	organizationIDs, err := r.usrmgrSvc.GetUserOrganizations(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user organization: %w", err)
+		return nil, fmt.Errorf("failed to get user organizations: %w", err)
 	}
 
-	// If the user doesn't have an organization, return nil
-	if organizationID == gid.Nil {
-		return nil, nil
+	// If the user doesn't have any organizations, return an empty slice
+	if len(organizationIDs) == 0 {
+		return []*types.Organization{}, nil
 	}
 
-	// Get the organization details
-	organization, err := r.proboSvc.GetOrganization(ctx, organizationID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get organization details: %w", err)
+	// Get the organization details for each organization ID
+	var organizations []*types.Organization
+	for _, organizationID := range organizationIDs {
+		organization, err := r.proboSvc.GetOrganization(ctx, organizationID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get organization details: %w", err)
+		}
+		organizations = append(organizations, types.NewOrganization(organization))
 	}
 
-	return types.NewOrganization(organization), nil
+	return organizations, nil
 }
 
 // Control returns schema.ControlResolver implementation.

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<717a5c6c939c65b7e0790f84e2c41bcd>>
+ * @generated SignedSource<<d060c85c907876f442133c643b917eee>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,16 +9,12 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+import { FragmentRefs } from "relay-runtime";
 export type AppSidebarQuery$variables = Record<PropertyKey, never>;
 export type AppSidebarQuery$data = {
   readonly viewer: {
     readonly id: string;
-    readonly organization: {
-      readonly createdAt: any;
-      readonly logoUrl: string;
-      readonly name: string;
-      readonly updatedAt: any;
-    };
+    readonly " $fragmentSpreads": FragmentRefs<"NavUser_viewer" | "TeamSwitcher_organizations">;
   };
 };
 export type AppSidebarQuery = {
@@ -32,34 +28,6 @@ var v0 = {
   "args": null,
   "kind": "ScalarField",
   "name": "id",
-  "storageKey": null
-},
-v1 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "name",
-  "storageKey": null
-},
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "logoUrl",
-  "storageKey": null
-},
-v3 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "createdAt",
-  "storageKey": null
-},
-v4 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "updatedAt",
   "storageKey": null
 };
 return {
@@ -79,19 +47,14 @@ return {
         "selections": [
           (v0/*: any*/),
           {
-            "alias": null,
             "args": null,
-            "concreteType": "Organization",
-            "kind": "LinkedField",
-            "name": "organization",
-            "plural": false,
-            "selections": [
-              (v1/*: any*/),
-              (v2/*: any*/),
-              (v3/*: any*/),
-              (v4/*: any*/)
-            ],
-            "storageKey": null
+            "kind": "FragmentSpread",
+            "name": "TeamSwitcher_organizations"
+          },
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "NavUser_viewer"
           }
         ],
         "storageKey": null
@@ -120,15 +83,39 @@ return {
             "args": null,
             "concreteType": "Organization",
             "kind": "LinkedField",
-            "name": "organization",
-            "plural": false,
+            "name": "organizations",
+            "plural": true,
             "selections": [
-              (v1/*: any*/),
-              (v2/*: any*/),
-              (v3/*: any*/),
-              (v4/*: any*/),
-              (v0/*: any*/)
+              (v0/*: any*/),
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "name",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "logoUrl",
+                "storageKey": null
+              }
             ],
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "fullName",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "email",
             "storageKey": null
           }
         ],
@@ -137,16 +124,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "e50b9b44daf91d53b07f8912e6c2088f",
+    "cacheID": "48137f101a20a5ce116cbf46c2a8cd63",
     "id": null,
     "metadata": {},
     "name": "AppSidebarQuery",
     "operationKind": "query",
-    "text": "query AppSidebarQuery {\n  viewer {\n    id\n    organization {\n      name\n      logoUrl\n      createdAt\n      updatedAt\n      id\n    }\n  }\n}\n"
+    "text": "query AppSidebarQuery {\n  viewer {\n    id\n    ...TeamSwitcher_organizations\n    ...NavUser_viewer\n  }\n}\n\nfragment NavUser_viewer on User {\n  id\n  fullName\n  email\n}\n\nfragment TeamSwitcher_organizations on User {\n  organizations {\n    id\n    name\n    logoUrl\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d450e65862def2f7ebd6f4b8d0475be0";
+(node as any).hash = "d5e28d934b5913169dd822042f4eca07";
 
 export default node;

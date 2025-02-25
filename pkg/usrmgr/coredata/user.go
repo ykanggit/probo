@@ -29,6 +29,7 @@ type (
 		ID             gid.GID
 		EmailAddress   string
 		HashedPassword []byte
+		FullName       string
 		OrganizationID gid.GID
 		CreatedAt      time.Time
 		UpdatedAt      time.Time
@@ -44,6 +45,7 @@ func (u *User) scan(r pgx.Row) error {
 		&u.ID,
 		&u.EmailAddress,
 		&u.HashedPassword,
+		&u.FullName,
 		&u.OrganizationID,
 		&u.CreatedAt,
 		&u.UpdatedAt,
@@ -60,6 +62,7 @@ SELECT
     id,
     email_address,
     hashed_password,
+    fullname,
     organization_id,
     created_at,
     updated_at
@@ -94,6 +97,7 @@ SELECT
     id,
     email_address,
     hashed_password,
+    fullname,
     organization_id,
     created_at,
     updated_at
@@ -124,11 +128,12 @@ func (u *User) Insert(
 ) error {
 	q := `
 INSERT INTO
-    usrmgr_users (id, email_address, hashed_password, organization_id, created_at, updated_at)
+    usrmgr_users (id, email_address, hashed_password, fullname, organization_id, created_at, updated_at)
 VALUES (
     @user_id,
     @email_address,
     @hashed_password,
+    @fullname,
     @organization_id,
     @created_at,
     @updated_at
@@ -139,6 +144,7 @@ VALUES (
 		"user_id":         u.ID,
 		"email_address":   u.EmailAddress,
 		"hashed_password": u.HashedPassword,
+		"fullname":        u.FullName,
 		"organization_id": "AZSfP_xAcAC5IAAAAAAltA",
 		"created_at":      u.CreatedAt,
 		"updated_at":      u.UpdatedAt,

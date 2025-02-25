@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<bcc0482212bee6fc9682545cc8255139>>
+ * @generated SignedSource<<9453bfb4e947c003e812ae63a4f1ed0a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,10 +13,10 @@ export type CreatePeoplePageQuery$variables = Record<PropertyKey, never>;
 export type CreatePeoplePageQuery$data = {
   readonly viewer: {
     readonly id: string;
-    readonly organization: {
+    readonly organizations: ReadonlyArray<{
       readonly id: string;
       readonly name: string;
-    };
+    }>;
   };
 };
 export type CreatePeoplePageQuery = {
@@ -47,8 +47,8 @@ v1 = [
         "args": null,
         "concreteType": "Organization",
         "kind": "LinkedField",
-        "name": "organization",
-        "plural": false,
+        "name": "organizations",
+        "plural": true,
         "selections": [
           (v0/*: any*/),
           {
@@ -83,16 +83,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "e0b72d4317b700564caa46c609276aed",
+    "cacheID": "74b036184be646c06a001772776c445b",
     "id": null,
     "metadata": {},
     "name": "CreatePeoplePageQuery",
     "operationKind": "query",
-    "text": "query CreatePeoplePageQuery {\n  viewer {\n    id\n    organization {\n      id\n      name\n    }\n  }\n}\n"
+    "text": "query CreatePeoplePageQuery {\n  viewer {\n    id\n    organizations {\n      id\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "89be7e6fd93829bdc8ac374983ca0a9b";
+(node as any).hash = "751fa313df4e5ed06f8100d1e7e2d4ea";
 
 export default node;

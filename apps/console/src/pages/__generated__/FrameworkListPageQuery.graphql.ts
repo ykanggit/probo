@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<903f19e5b3c193151107de5969fe5259>>
+ * @generated SignedSource<<ea02ef2ebc2c52a72d443c130a44087c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,30 +10,29 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type FrameworkListPageQuery$variables = Record<PropertyKey, never>;
+export type FrameworkListPageQuery$variables = {
+  organizationId: string;
+};
 export type FrameworkListPageQuery$data = {
-  readonly viewer: {
-    readonly id: string;
-    readonly organization: {
-      readonly frameworks: {
-        readonly edges: ReadonlyArray<{
-          readonly node: {
-            readonly controls: {
-              readonly edges: ReadonlyArray<{
-                readonly node: {
-                  readonly id: string;
-                  readonly state: ControlState;
-                };
-              }>;
-            };
-            readonly createdAt: any;
-            readonly description: string;
-            readonly id: string;
-            readonly name: string;
-            readonly updatedAt: any;
+  readonly organization: {
+    readonly frameworks?: {
+      readonly edges: ReadonlyArray<{
+        readonly node: {
+          readonly controls: {
+            readonly edges: ReadonlyArray<{
+              readonly node: {
+                readonly id: string;
+                readonly state: ControlState;
+              };
+            }>;
           };
-        }>;
-      };
+          readonly createdAt: any;
+          readonly description: string;
+          readonly id: string;
+          readonly name: string;
+          readonly updatedAt: any;
+        };
+      }>;
     };
   };
 };
@@ -43,82 +42,102 @@ export type FrameworkListPageQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = {
+var v0 = [
+  {
+    "defaultValue": null,
+    "kind": "LocalArgument",
+    "name": "organizationId"
+  }
+],
+v1 = [
+  {
+    "kind": "Variable",
+    "name": "id",
+    "variableName": "organizationId"
+  }
+],
+v2 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v1 = {
-  "alias": null,
-  "args": null,
-  "concreteType": "FrameworkConnection",
-  "kind": "LinkedField",
-  "name": "frameworks",
-  "plural": false,
+v3 = {
+  "kind": "InlineFragment",
   "selections": [
     {
       "alias": null,
       "args": null,
-      "concreteType": "FrameworkEdge",
+      "concreteType": "FrameworkConnection",
       "kind": "LinkedField",
-      "name": "edges",
-      "plural": true,
+      "name": "frameworks",
+      "plural": false,
       "selections": [
         {
           "alias": null,
           "args": null,
-          "concreteType": "Framework",
+          "concreteType": "FrameworkEdge",
           "kind": "LinkedField",
-          "name": "node",
-          "plural": false,
+          "name": "edges",
+          "plural": true,
           "selections": [
-            (v0/*: any*/),
             {
               "alias": null,
               "args": null,
-              "kind": "ScalarField",
-              "name": "name",
-              "storageKey": null
-            },
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "description",
-              "storageKey": null
-            },
-            {
-              "alias": null,
-              "args": null,
-              "concreteType": "ControlConnection",
+              "concreteType": "Framework",
               "kind": "LinkedField",
-              "name": "controls",
+              "name": "node",
               "plural": false,
               "selections": [
+                (v2/*: any*/),
                 {
                   "alias": null,
                   "args": null,
-                  "concreteType": "ControlEdge",
+                  "kind": "ScalarField",
+                  "name": "name",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "description",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "concreteType": "ControlConnection",
                   "kind": "LinkedField",
-                  "name": "edges",
-                  "plural": true,
+                  "name": "controls",
+                  "plural": false,
                   "selections": [
                     {
                       "alias": null,
                       "args": null,
-                      "concreteType": "Control",
+                      "concreteType": "ControlEdge",
                       "kind": "LinkedField",
-                      "name": "node",
-                      "plural": false,
+                      "name": "edges",
+                      "plural": true,
                       "selections": [
-                        (v0/*: any*/),
                         {
                           "alias": null,
                           "args": null,
-                          "kind": "ScalarField",
-                          "name": "state",
+                          "concreteType": "Control",
+                          "kind": "LinkedField",
+                          "name": "node",
+                          "plural": false,
+                          "selections": [
+                            (v2/*: any*/),
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "state",
+                              "storageKey": null
+                            }
+                          ],
                           "storageKey": null
                         }
                       ],
@@ -126,22 +145,22 @@ v1 = {
                     }
                   ],
                   "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "createdAt",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "updatedAt",
+                  "storageKey": null
                 }
               ],
-              "storageKey": null
-            },
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "createdAt",
-              "storageKey": null
-            },
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "updatedAt",
               "storageKey": null
             }
           ],
@@ -151,36 +170,25 @@ v1 = {
       "storageKey": null
     }
   ],
-  "storageKey": null
+  "type": "Organization",
+  "abstractKey": null
 };
 return {
   "fragment": {
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
     "name": "FrameworkListPageQuery",
     "selections": [
       {
-        "alias": null,
-        "args": null,
-        "concreteType": "User",
+        "alias": "organization",
+        "args": (v1/*: any*/),
+        "concreteType": null,
         "kind": "LinkedField",
-        "name": "viewer",
+        "name": "node",
         "plural": false,
         "selections": [
-          (v0/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Organization",
-            "kind": "LinkedField",
-            "name": "organization",
-            "plural": false,
-            "selections": [
-              (v1/*: any*/)
-            ],
-            "storageKey": null
-          }
+          (v3/*: any*/)
         ],
         "storageKey": null
       }
@@ -190,48 +198,43 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
     "name": "FrameworkListPageQuery",
     "selections": [
       {
-        "alias": null,
-        "args": null,
-        "concreteType": "User",
+        "alias": "organization",
+        "args": (v1/*: any*/),
+        "concreteType": null,
         "kind": "LinkedField",
-        "name": "viewer",
+        "name": "node",
         "plural": false,
         "selections": [
-          (v0/*: any*/),
           {
             "alias": null,
             "args": null,
-            "concreteType": "Organization",
-            "kind": "LinkedField",
-            "name": "organization",
-            "plural": false,
-            "selections": [
-              (v1/*: any*/),
-              (v0/*: any*/)
-            ],
+            "kind": "ScalarField",
+            "name": "__typename",
             "storageKey": null
-          }
+          },
+          (v3/*: any*/),
+          (v2/*: any*/)
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "8f573b1a89e302e61a765711c1c6e73a",
+    "cacheID": "e45d4e64a00b3e27cd6dc52179f47d52",
     "id": null,
     "metadata": {},
     "name": "FrameworkListPageQuery",
     "operationKind": "query",
-    "text": "query FrameworkListPageQuery {\n  viewer {\n    id\n    organization {\n      frameworks {\n        edges {\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n          }\n        }\n      }\n      id\n    }\n  }\n}\n"
+    "text": "query FrameworkListPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks {\n        edges {\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ac0337411177ab9b1c8ef81e6bb47a06";
+(node as any).hash = "5cd314faffe31e716de2336e70cca4ee";
 
 export default node;

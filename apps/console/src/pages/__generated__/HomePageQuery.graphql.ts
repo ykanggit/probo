@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7ca2f2186b657853d9fce4c7a21a7db1>>
+ * @generated SignedSource<<17467071cb25b3e291532a4fb9074d67>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,7 +16,7 @@ export type HomePageQuery$variables = Record<PropertyKey, never>;
 export type HomePageQuery$data = {
   readonly viewer: {
     readonly id: string;
-    readonly organization: {
+    readonly organizations: ReadonlyArray<{
       readonly createdAt: any;
       readonly frameworks: {
         readonly edges: ReadonlyArray<{
@@ -124,7 +124,7 @@ export type HomePageQuery$data = {
           };
         }>;
       };
-    };
+    }>;
   };
 };
 export type HomePageQuery = {
@@ -626,8 +626,8 @@ return {
             "args": null,
             "concreteType": "Organization",
             "kind": "LinkedField",
-            "name": "organization",
-            "plural": false,
+            "name": "organizations",
+            "plural": true,
             "selections": [
               (v1/*: any*/),
               (v2/*: any*/),
@@ -665,8 +665,8 @@ return {
             "args": null,
             "concreteType": "Organization",
             "kind": "LinkedField",
-            "name": "organization",
-            "plural": false,
+            "name": "organizations",
+            "plural": true,
             "selections": [
               (v1/*: any*/),
               (v2/*: any*/),
@@ -684,16 +684,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9f8dd0b1a2698dd2d944e75de5d32087",
+    "cacheID": "d40cf8a4787ed129284c566abd99fdaf",
     "id": null,
     "metadata": {},
     "name": "HomePageQuery",
     "operationKind": "query",
-    "text": "query HomePageQuery {\n  viewer {\n    id\n    organization {\n      name\n      createdAt\n      updatedAt\n      vendors {\n        edges {\n          node {\n            id\n            name\n            createdAt\n            updatedAt\n          }\n        }\n      }\n      peoples {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            additionalEmailAddresses\n            createdAt\n            updatedAt\n          }\n        }\n      }\n      frameworks {\n        pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n        }\n        edges {\n          cursor\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  name\n                  state\n                  stateTransisions {\n                    edges {\n                      node {\n                        id\n                        toState\n                        fromState\n                        createdAt\n                        updatedAt\n                      }\n                    }\n                  }\n                  tasks {\n                    edges {\n                      node {\n                        id\n                        name\n                        state\n                        evidences {\n                          edges {\n                            node {\n                              id\n                              state\n                              fileUrl\n                              stateTransisions {\n                                edges {\n                                  node {\n                                    id\n                                    fromState\n                                    toState\n                                    reason\n                                    createdAt\n                                    updatedAt\n                                  }\n                                }\n                              }\n                              createdAt\n                              updatedAt\n                            }\n                          }\n                        }\n                        stateTransisions {\n                          edges {\n                            node {\n                              id\n                              toState\n                              fromState\n                              reason\n                              createdAt\n                              updatedAt\n                            }\n                          }\n                        }\n                        createdAt\n                        updatedAt\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n      id\n    }\n  }\n}\n"
+    "text": "query HomePageQuery {\n  viewer {\n    id\n    organizations {\n      name\n      createdAt\n      updatedAt\n      vendors {\n        edges {\n          node {\n            id\n            name\n            createdAt\n            updatedAt\n          }\n        }\n      }\n      peoples {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            additionalEmailAddresses\n            createdAt\n            updatedAt\n          }\n        }\n      }\n      frameworks {\n        pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n        }\n        edges {\n          cursor\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  name\n                  state\n                  stateTransisions {\n                    edges {\n                      node {\n                        id\n                        toState\n                        fromState\n                        createdAt\n                        updatedAt\n                      }\n                    }\n                  }\n                  tasks {\n                    edges {\n                      node {\n                        id\n                        name\n                        state\n                        evidences {\n                          edges {\n                            node {\n                              id\n                              state\n                              fileUrl\n                              stateTransisions {\n                                edges {\n                                  node {\n                                    id\n                                    fromState\n                                    toState\n                                    reason\n                                    createdAt\n                                    updatedAt\n                                  }\n                                }\n                              }\n                              createdAt\n                              updatedAt\n                            }\n                          }\n                        }\n                        stateTransisions {\n                          edges {\n                            node {\n                              id\n                              toState\n                              fromState\n                              reason\n                              createdAt\n                              updatedAt\n                            }\n                          }\n                        }\n                        createdAt\n                        updatedAt\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n      id\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "875e681cb7e936d3f1a543e88c4cb2d0";
+(node as any).hash = "e9da69d4e7095f003eb28bf51e7c399d";
 
 export default node;

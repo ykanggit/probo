@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0b5e0bcf4f6519e1ccb1d7ffa3e488cb>>
+ * @generated SignedSource<<f2e46ea14241587a319e9a6af9072bb9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,10 +13,10 @@ export type SettingsPageQuery$variables = Record<PropertyKey, never>;
 export type SettingsPageQuery$data = {
   readonly viewer: {
     readonly id: string;
-    readonly organization: {
+    readonly organizations: ReadonlyArray<{
       readonly logoUrl: string;
       readonly name: string;
-    };
+    }>;
   };
 };
 export type SettingsPageQuery = {
@@ -67,8 +67,8 @@ return {
             "args": null,
             "concreteType": "Organization",
             "kind": "LinkedField",
-            "name": "organization",
-            "plural": false,
+            "name": "organizations",
+            "plural": true,
             "selections": [
               (v1/*: any*/),
               (v2/*: any*/)
@@ -102,8 +102,8 @@ return {
             "args": null,
             "concreteType": "Organization",
             "kind": "LinkedField",
-            "name": "organization",
-            "plural": false,
+            "name": "organizations",
+            "plural": true,
             "selections": [
               (v1/*: any*/),
               (v2/*: any*/),
@@ -117,16 +117,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "77d3f8660df07b02aa515461c9ec1449",
+    "cacheID": "5a3f5c431e1f886a330d220fd33a33f3",
     "id": null,
     "metadata": {},
     "name": "SettingsPageQuery",
     "operationKind": "query",
-    "text": "query SettingsPageQuery {\n  viewer {\n    id\n    organization {\n      name\n      logoUrl\n      id\n    }\n  }\n}\n"
+    "text": "query SettingsPageQuery {\n  viewer {\n    id\n    organizations {\n      name\n      logoUrl\n      id\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c639e9c45b175beec64550bb72fe5111";
+(node as any).hash = "cef332dd829051516fa47315c3a60d1f";
 
 export default node;

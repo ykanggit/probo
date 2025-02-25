@@ -28,7 +28,7 @@ const settingsPageQuery = graphql`
   query SettingsPageQuery {
     viewer {
       id
-      organization {
+      organizations {
         name
         logoUrl
       }
@@ -49,7 +49,7 @@ function SettingsPageContent({
   queryRef: PreloadedQuery<SettingsPageQueryType>;
 }) {
   const data = usePreloadedQuery(settingsPageQuery, queryRef);
-  const organization = data.viewer.organization;
+  const organization = data.viewer.organizations[0];
   const members: Member[] = [];
 
   return (

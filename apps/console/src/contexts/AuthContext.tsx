@@ -9,6 +9,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
+// TODO: should be remove when backend returns proper authenticated error
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

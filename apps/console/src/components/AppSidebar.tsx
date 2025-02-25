@@ -30,7 +30,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import type { AppSidebarQuery as AppSidebarQueryType } from "./__generated__/AppSidebarQuery.graphql";
-
+import { TeamSwitcher } from "@/components/TeamSwitcher";
 const staticData = {
   user: {
     name: "shadcn",
@@ -84,12 +84,8 @@ const AppSidebarQuery = graphql`
   query AppSidebarQuery {
     viewer {
       id
-      organization {
-        name
-        logoUrl
-        createdAt
-        updatedAt
-      }
+      ...TeamSwitcher_organizations
+      ...NavUser_viewer
     }
   }
 `;
@@ -101,37 +97,18 @@ function AppSidebarContent({
   queryRef: PreloadedQuery<AppSidebarQueryType>;
 }) {
   const data = usePreloadedQuery(AppSidebarQuery, queryRef);
-  const organization = data.viewer.organization;
 
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <img
-                  src={organization.logoUrl}
-                  alt={organization.name}
-                  className="size-8 rounded-lg object-cover"
-                />
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    {organization.name}
-                  </span>
-                  <span className="truncate text-xs">Enterprise</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <TeamSwitcher organizations={data.viewer} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={staticData.navMain} />
         <NavSecondary items={staticData.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={staticData.user} />
+        <NavUser viewer={data.viewer} />
       </SidebarFooter>
     </Sidebar>
   );
@@ -162,7 +139,23 @@ function AppSidebarFallback(props: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={staticData.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={staticData.user} />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <a href="#">
+                <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">
+                    <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+                  </span>
+                  <span className="truncate text-xs">
+                    <div className="h-3 w-32 animate-pulse rounded bg-muted" />
+                  </span>
+                </div>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

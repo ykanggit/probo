@@ -12,6 +12,7 @@ import AuthLayout from "./layouts/AuthLayout";
 import { RelayEnvironment } from "./RelayEnvironment";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { OrganizationProvider } from "./contexts/OrganizationContext";
 
 posthog.init(process.env.POSTHOG_KEY!, {
   api_host: process.env.POSTHOG_HOST,
@@ -48,55 +49,14 @@ function App() {
             <HelmetProvider>
               <BrowserRouter>
                 <AuthProvider>
-                  <Routes>
-                    {/* Authentication Routes - Accessible without login */}
-                    <Route
-                      path="/login"
-                      element={
-                        <ErrorBoundaryWithLocation>
-                          <AuthLayout />
-                        </ErrorBoundaryWithLocation>
-                      }
-                    >
+                  <OrganizationProvider>
+                    <Routes>
+                      {/* Authentication Routes - Accessible without login */}
                       <Route
-                        index
-                        element={
-                          <Suspense>
-                            <ErrorBoundaryWithLocation>
-                              <LoginPage />
-                            </ErrorBoundaryWithLocation>
-                          </Suspense>
-                        }
-                      />
-                    </Route>
-
-                    <Route
-                      path="/register"
-                      element={
-                        <ErrorBoundaryWithLocation>
-                          <AuthLayout />
-                        </ErrorBoundaryWithLocation>
-                      }
-                    >
-                      <Route
-                        index
-                        element={
-                          <Suspense>
-                            <ErrorBoundaryWithLocation>
-                              <RegisterPage />
-                            </ErrorBoundaryWithLocation>
-                          </Suspense>
-                        }
-                      />
-                    </Route>
-
-                    {/* Protected Routes - Require authentication */}
-                    <Route element={<ProtectedRoute />}>
-                      <Route
-                        path="/*"
+                        path="/login"
                         element={
                           <ErrorBoundaryWithLocation>
-                            <ConsoleLayout />
+                            <AuthLayout />
                           </ErrorBoundaryWithLocation>
                         }
                       >
@@ -105,112 +65,155 @@ function App() {
                           element={
                             <Suspense>
                               <ErrorBoundaryWithLocation>
-                                <HomePage />
+                                <LoginPage />
                               </ErrorBoundaryWithLocation>
-                            </Suspense>
-                          }
-                        />
-                        <Route
-                          path="peoples"
-                          element={
-                            <Suspense>
-                              <ErrorBoundaryWithLocation>
-                                <PeopleListPage />
-                              </ErrorBoundaryWithLocation>
-                            </Suspense>
-                          }
-                        />
-                        <Route
-                          path="peoples/create"
-                          element={
-                            <Suspense>
-                              <ErrorBoundaryWithLocation>
-                                <CreatePeoplePage />
-                              </ErrorBoundaryWithLocation>
-                            </Suspense>
-                          }
-                        />
-                        <Route
-                          path="peoples/:peopleId"
-                          element={
-                            <Suspense>
-                              <ErrorBoundaryWithLocation>
-                                <PeopleOverviewPage />
-                              </ErrorBoundaryWithLocation>
-                            </Suspense>
-                          }
-                        />
-                        <Route
-                          path="vendors"
-                          element={
-                            <Suspense>
-                              <ErrorBoundaryWithLocation>
-                                <VendorListPage />
-                              </ErrorBoundaryWithLocation>
-                            </Suspense>
-                          }
-                        />
-                        <Route
-                          path="frameworks"
-                          element={
-                            <Suspense>
-                              <ErrorBoundaryWithLocation>
-                                <FrameworkListPage />
-                              </ErrorBoundaryWithLocation>
-                            </Suspense>
-                          }
-                        />
-                        <Route
-                          path="frameworks/:frameworkId"
-                          element={
-                            <Suspense>
-                              <ErrorBoundaryWithLocation>
-                                <FrameworkOverviewPage />
-                              </ErrorBoundaryWithLocation>
-                            </Suspense>
-                          }
-                        />
-                        <Route
-                          path="frameworks/:frameworkId/controls/:controlId"
-                          element={
-                            <Suspense>
-                              <ErrorBoundaryWithLocation>
-                                <ControlOverviewPage />
-                              </ErrorBoundaryWithLocation>
-                            </Suspense>
-                          }
-                        />
-                        <Route
-                          path="vendors/:vendorId"
-                          element={
-                            <Suspense>
-                              <ErrorBoundaryWithLocation>
-                                <VendorOverviewPage />
-                              </ErrorBoundaryWithLocation>
-                            </Suspense>
-                          }
-                        />
-                        <Route
-                          path="settings"
-                          element={
-                            <Suspense>
-                              <ErrorBoundaryWithLocation>
-                                <SettingsPage />
-                              </ErrorBoundaryWithLocation>
-                            </Suspense>
-                          }
-                        />
-                        <Route
-                          path="*"
-                          element={
-                            <Suspense>
-                              <NotFoundPage />
                             </Suspense>
                           }
                         />
                       </Route>
-                    </Route>
-                  </Routes>
+
+                      <Route
+                        path="/register"
+                        element={
+                          <ErrorBoundaryWithLocation>
+                            <AuthLayout />
+                          </ErrorBoundaryWithLocation>
+                        }
+                      >
+                        <Route
+                          index
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <RegisterPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                      </Route>
+
+                      {/* Protected Routes - Require authentication */}
+                      <Route element={<ProtectedRoute />}>
+                        <Route
+                          path="/*"
+                          element={
+                            <ErrorBoundaryWithLocation>
+                              <ConsoleLayout />
+                            </ErrorBoundaryWithLocation>
+                          }
+                        >
+                          <Route
+                            index
+                            element={
+                              <Suspense>
+                                <ErrorBoundaryWithLocation>
+                                  <HomePage />
+                                </ErrorBoundaryWithLocation>
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="peoples"
+                            element={
+                              <Suspense>
+                                <ErrorBoundaryWithLocation>
+                                  <PeopleListPage />
+                                </ErrorBoundaryWithLocation>
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="peoples/create"
+                            element={
+                              <Suspense>
+                                <ErrorBoundaryWithLocation>
+                                  <CreatePeoplePage />
+                                </ErrorBoundaryWithLocation>
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="peoples/:peopleId"
+                            element={
+                              <Suspense>
+                                <ErrorBoundaryWithLocation>
+                                  <PeopleOverviewPage />
+                                </ErrorBoundaryWithLocation>
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="vendors"
+                            element={
+                              <Suspense>
+                                <ErrorBoundaryWithLocation>
+                                  <VendorListPage />
+                                </ErrorBoundaryWithLocation>
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="frameworks"
+                            element={
+                              <Suspense>
+                                <ErrorBoundaryWithLocation>
+                                  <FrameworkListPage />
+                                </ErrorBoundaryWithLocation>
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="frameworks/:frameworkId"
+                            element={
+                              <Suspense>
+                                <ErrorBoundaryWithLocation>
+                                  <FrameworkOverviewPage />
+                                </ErrorBoundaryWithLocation>
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="frameworks/:frameworkId/controls/:controlId"
+                            element={
+                              <Suspense>
+                                <ErrorBoundaryWithLocation>
+                                  <ControlOverviewPage />
+                                </ErrorBoundaryWithLocation>
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="vendors/:vendorId"
+                            element={
+                              <Suspense>
+                                <ErrorBoundaryWithLocation>
+                                  <VendorOverviewPage />
+                                </ErrorBoundaryWithLocation>
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="settings"
+                            element={
+                              <Suspense>
+                                <ErrorBoundaryWithLocation>
+                                  <SettingsPage />
+                                </ErrorBoundaryWithLocation>
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="*"
+                            element={
+                              <Suspense>
+                                <NotFoundPage />
+                              </Suspense>
+                            }
+                          />
+                        </Route>
+                      </Route>
+                    </Routes>
+                  </OrganizationProvider>
                 </AuthProvider>
               </BrowserRouter>
             </HelmetProvider>
