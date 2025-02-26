@@ -4,13 +4,7 @@ import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { RelayEnvironmentProvider } from "react-relay";
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-  useLocation,
-  Navigate,
-} from "react-router";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "App.css";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ConsoleLayout from "./layouts/ConsoleLayout";
@@ -122,11 +116,22 @@ function App() {
                         element={
                           <Suspense>
                             <ErrorBoundaryWithLocation>
-                              <CreateOrganizationPage />
+                              <ConsoleLayout />
                             </ErrorBoundaryWithLocation>
                           </Suspense>
                         }
-                      />
+                      >
+                        <Route
+                          index
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <CreateOrganizationPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                      </Route>
 
                       {/* Organization-specific Routes */}
                       <Route
@@ -143,6 +148,16 @@ function App() {
                             <Suspense>
                               <ErrorBoundaryWithLocation>
                                 <HomePage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="create"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <CreateOrganizationPage />
                               </ErrorBoundaryWithLocation>
                             </Suspense>
                           }

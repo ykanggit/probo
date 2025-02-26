@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { Helmet } from "react-helmet-async";

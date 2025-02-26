@@ -1,11 +1,4 @@
-import {
-  Link,
-  Outlet,
-  Route,
-  Routes,
-  useLocation,
-  useParams,
-} from "react-router";
+import { Link, Outlet, Route, Routes, useParams } from "react-router";
 import { AppSidebar } from "@/components/AppSidebar";
 import React from "react";
 import {
@@ -33,6 +26,26 @@ import { ConsoleLayoutOrganizationQuery } from "./__generated__/ConsoleLayoutOrg
 
 function BreadcrumbHome({ children }: { children: React.ReactNode }) {
   const { organizationId } = useParams();
+
+  // If there's no organizationId, we're on the create organization page
+  if (!organizationId) {
+    return (
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Create Organization</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    );
+  }
+
   const data = useLazyLoadQuery<ConsoleLayoutOrganizationQuery>(
     graphql`
       query ConsoleLayoutOrganizationQuery($organizationId: ID!) {
@@ -223,17 +236,6 @@ function BreadcrumbPeopleOverview() {
   );
 }
 
-function BreadcrumbCreateOrganization() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbPage>Create Organization</BreadcrumbPage>
-      </BreadcrumbItem>
-    </>
-  );
-}
-
 function BreadcrumbControlOverview() {
   const { organizationId, frameworkId, controlId } = useParams();
   const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbControlOverviewQuery>(
@@ -289,6 +291,7 @@ function BreadcrumbControlOverview() {
 
 export default function ConsoleLayout() {
   const { organizationId } = useParams();
+  const showBreadcrumb = !!organizationId;
 
   return (
     <SidebarProvider>
@@ -299,31 +302,36 @@ export default function ConsoleLayout() {
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <BreadcrumbHome>
-              <Routes>
-                <Route path="frameworks" element={<BreadcrumbFrameworkList />}>
+              {showBreadcrumb && (
+                <Routes>
                   <Route
-                    path=":frameworkId"
-                    element={<BreadcrumbFrameworkOverview />}
-                  />
-                  <Route
-                    path=":frameworkId/controls/:controlId"
-                    element={<BreadcrumbControlOverview />}
-                  />
-                </Route>
-                <Route path="peoples" element={<BreadcrumbPeopleList />}>
-                  <Route
-                    path=":peopleId"
-                    element={<BreadcrumbPeopleOverview />}
-                  />
-                  <Route path="create" element={<BreadcrumbCreatePeople />} />
-                </Route>
-                <Route path="vendors" element={<BreadcrumbVendorList />}>
-                  <Route
-                    path=":vendorId"
-                    element={<BreadcrumbVendorOverview />}
-                  />
-                </Route>
-              </Routes>
+                    path="frameworks"
+                    element={<BreadcrumbFrameworkList />}
+                  >
+                    <Route
+                      path=":frameworkId"
+                      element={<BreadcrumbFrameworkOverview />}
+                    />
+                    <Route
+                      path=":frameworkId/controls/:controlId"
+                      element={<BreadcrumbControlOverview />}
+                    />
+                  </Route>
+                  <Route path="peoples" element={<BreadcrumbPeopleList />}>
+                    <Route
+                      path=":peopleId"
+                      element={<BreadcrumbPeopleOverview />}
+                    />
+                    <Route path="create" element={<BreadcrumbCreatePeople />} />
+                  </Route>
+                  <Route path="vendors" element={<BreadcrumbVendorList />}>
+                    <Route
+                      path=":vendorId"
+                      element={<BreadcrumbVendorOverview />}
+                    />
+                  </Route>
+                </Routes>
+              )}
             </BreadcrumbHome>
           </div>
         </header>

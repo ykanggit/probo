@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { HelpCircle, ArrowUpRight, Pencil, Check, X } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import {
   graphql,
   PreloadedQuery,
@@ -13,7 +13,7 @@ import {
   useQueryLoader,
   useMutation,
 } from "react-relay";
-import { Suspense, useEffect, useState, useCallback, useMemo } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import type { VendorOverviewPageQuery as VendorOverviewPageQueryType } from "./__generated__/VendorOverviewPageQuery.graphql";
 import { useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
@@ -124,8 +124,8 @@ function VendorOverviewPageContent({
     privacyPolicyUrl: data.node.privacyPolicyUrl || "",
   });
   const [commit] = useMutation(updateVendorMutation);
-  const [_, loadQuery] = useQueryLoader<VendorOverviewPageQueryType>(
-    vendorOverviewPageQuery,
+  const [, loadQuery] = useQueryLoader<VendorOverviewPageQueryType>(
+    vendorOverviewPageQuery
   );
   const { toast } = useToast();
 
@@ -174,13 +174,10 @@ function VendorOverviewPageContent({
           });
         }
       },
-      updater: (store) => {
-        // Clear any error states if needed
-      },
     });
   }, [commit, data.node.id, data.node.version, formData, loadQuery, toast]);
 
-  const handleFieldChange = (field: keyof typeof formData, value: any) => {
+  const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -262,7 +259,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.serviceCriticality === "LOW"
                           ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                       )}
                     >
                       Low
@@ -275,7 +272,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.serviceCriticality === "MEDIUM"
                           ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                       )}
                     >
                       Medium
@@ -288,7 +285,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.serviceCriticality === "HIGH"
                           ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                       )}
                     >
                       High
@@ -316,7 +313,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.riskTier === "CRITICAL"
                           ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                       )}
                     >
                       Critical
@@ -329,7 +326,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.riskTier === "SIGNIFICANT"
                           ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                       )}
                     >
                       Significant
@@ -340,7 +337,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.riskTier === "GENERAL"
                           ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                       )}
                     >
                       General
@@ -421,7 +418,7 @@ function VendorOverviewPageFallback() {
 export default function VendorOverviewPage() {
   const { vendorId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<VendorOverviewPageQueryType>(
-    vendorOverviewPageQuery,
+    vendorOverviewPageQuery
   );
 
   useEffect(() => {

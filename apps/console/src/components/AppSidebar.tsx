@@ -5,7 +5,6 @@ import {
   BookOpen,
   Users,
   ToyBrick,
-  Command,
   LifeBuoy,
   Send,
   Settings,

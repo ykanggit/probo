@@ -8,7 +8,7 @@ import {
   usePaginationFragment,
 } from "react-relay";
 import { useSearchParams, useParams } from "react-router";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Store, ChevronRight, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -190,8 +190,8 @@ function VendorListContent({
     vendorListPageQuery,
     queryRef
   );
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+  const [, setSearchParams] = useSearchParams();
+  const [, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredVendors, setFilteredVendors] = useState<VendorItem[]>([]);
   const [createVendor] =

@@ -143,12 +143,12 @@ export default function CreateOrganizationPage() {
         <title>Create Organization - Probo</title>
       </Helmet>
 
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="space-y-6">
         <div>
-          <h1 className="text-4xl font-medium tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-tight">
             Create Organization
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-muted-foreground">
             Create a new organization to manage your compliance and security
             needs.
           </p>

@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         response.ok && !response.headers.get("WWW-Authenticate");
       setIsAuthenticated(authenticated);
       return authenticated;
-    } catch (error) {
+    } catch {
       setIsAuthenticated(false);
       return false;
     } finally {

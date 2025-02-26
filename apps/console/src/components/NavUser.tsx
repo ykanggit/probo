@@ -11,7 +11,7 @@ import {
 import { graphql, useFragment } from "react-relay";
 import { useNavigate } from "react-router";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,10 +28,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  NavUser_viewer$key,
-  NavUser_viewer$data,
-} from "./__generated__/NavUser_viewer.graphql";
+import { NavUser_viewer$key } from "./__generated__/NavUser_viewer.graphql";
 
 export const navUserFragment = graphql`
   fragment NavUser_viewer on User {

@@ -8,7 +8,7 @@ import {
   usePaginationFragment,
 } from "react-relay";
 import { useSearchParams, useParams } from "react-router";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -136,8 +136,8 @@ function PeopleListContent({
     peopleListPageQuery,
     queryRef
   );
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+  const [, setSearchParams] = useSearchParams();
+  const [, startTransition] = useTransition();
   const [deletePeople] =
     useMutation<PeopleListPageDeletePeopleMutation>(deletePeopleMutation);
   const { organizationId } = useParams();

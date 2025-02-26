@@ -1,14 +1,6 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import {
-  graphql,
-  PreloadedQuery,
-  usePreloadedQuery,
-  useQueryLoader,
-  useMutation,
-  useRelayEnvironment,
-  ConnectionHandler,
-} from "react-relay";
+import { graphql, useMutation, ConnectionHandler } from "react-relay";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -86,7 +78,7 @@ function CreatePeoplePageContent() {
     kind: "EMPLOYEE" as "EMPLOYEE" | "CONTRACTOR",
   });
 
-  const handleFieldChange = (field: keyof typeof formData, value: any) => {
+  const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
