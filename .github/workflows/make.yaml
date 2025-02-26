@@ -46,6 +46,7 @@ jobs:
         with:
           node-version: 22
       - run: "npm ci"
+      - run: "npm run lint"
       - run: "make @probo/console"
   fmt-check:
     name: "fmt-check"
