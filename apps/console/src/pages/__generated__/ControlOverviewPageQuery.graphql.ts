@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3e556c8d6b7896963c5433de8acca792>>
+ * @generated SignedSource<<91fa70daabd409bc43d5e25a2fa98a13>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -22,6 +22,7 @@ export type ControlOverviewPageQuery$data = {
     readonly name?: string;
     readonly state?: ControlState;
     readonly tasks?: {
+      readonly __id: string;
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly description: string;
@@ -82,59 +83,99 @@ v5 = {
   "storageKey": null
 },
 v6 = {
-  "kind": "InlineFragment",
-  "selections": [
-    (v3/*: any*/),
-    (v4/*: any*/),
-    (v5/*: any*/),
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "category",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "concreteType": "TaskConnection",
-      "kind": "LinkedField",
-      "name": "tasks",
-      "plural": false,
-      "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "TaskEdge",
-          "kind": "LinkedField",
-          "name": "edges",
-          "plural": true,
-          "selections": [
-            {
-              "alias": null,
-              "args": null,
-              "concreteType": "Task",
-              "kind": "LinkedField",
-              "name": "node",
-              "plural": false,
-              "selections": [
-                (v2/*: any*/),
-                (v3/*: any*/),
-                (v4/*: any*/),
-                (v5/*: any*/)
-              ],
-              "storageKey": null
-            }
-          ],
-          "storageKey": null
-        }
-      ],
-      "storageKey": null
-    }
-  ],
-  "type": "Control",
-  "abstractKey": null
-};
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "category",
+  "storageKey": null
+},
+v7 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v8 = [
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "TaskEdge",
+    "kind": "LinkedField",
+    "name": "edges",
+    "plural": true,
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": "Task",
+        "kind": "LinkedField",
+        "name": "node",
+        "plural": false,
+        "selections": [
+          (v2/*: any*/),
+          (v3/*: any*/),
+          (v4/*: any*/),
+          (v5/*: any*/),
+          (v7/*: any*/)
+        ],
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "cursor",
+        "storageKey": null
+      }
+    ],
+    "storageKey": null
+  },
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "PageInfo",
+    "kind": "LinkedField",
+    "name": "pageInfo",
+    "plural": false,
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "endCursor",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "hasNextPage",
+        "storageKey": null
+      }
+    ],
+    "storageKey": null
+  },
+  {
+    "kind": "ClientExtension",
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "__id",
+        "storageKey": null
+      }
+    ]
+  }
+],
+v9 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 100
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": (v0/*: any*/),
@@ -151,7 +192,27 @@ return {
         "plural": false,
         "selections": [
           (v2/*: any*/),
-          (v6/*: any*/)
+          {
+            "kind": "InlineFragment",
+            "selections": [
+              (v3/*: any*/),
+              (v4/*: any*/),
+              (v5/*: any*/),
+              (v6/*: any*/),
+              {
+                "alias": "tasks",
+                "args": null,
+                "concreteType": "TaskConnection",
+                "kind": "LinkedField",
+                "name": "__ControlOverviewPage_tasks_connection",
+                "plural": false,
+                "selections": (v8/*: any*/),
+                "storageKey": null
+              }
+            ],
+            "type": "Control",
+            "abstractKey": null
+          }
         ],
         "storageKey": null
       }
@@ -173,31 +234,66 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "__typename",
-            "storageKey": null
-          },
+          (v7/*: any*/),
           (v2/*: any*/),
-          (v6/*: any*/)
+          {
+            "kind": "InlineFragment",
+            "selections": [
+              (v3/*: any*/),
+              (v4/*: any*/),
+              (v5/*: any*/),
+              (v6/*: any*/),
+              {
+                "alias": null,
+                "args": (v9/*: any*/),
+                "concreteType": "TaskConnection",
+                "kind": "LinkedField",
+                "name": "tasks",
+                "plural": false,
+                "selections": (v8/*: any*/),
+                "storageKey": "tasks(first:100)"
+              },
+              {
+                "alias": null,
+                "args": (v9/*: any*/),
+                "filters": null,
+                "handle": "connection",
+                "key": "ControlOverviewPage_tasks",
+                "kind": "LinkedHandle",
+                "name": "tasks"
+              }
+            ],
+            "type": "Control",
+            "abstractKey": null
+          }
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "130c195db0e9055a63b88ea5eee8b3aa",
+    "cacheID": "a13eb28fcbe162deaff92653c19cc22a",
     "id": null,
-    "metadata": {},
+    "metadata": {
+      "connection": [
+        {
+          "count": null,
+          "cursor": null,
+          "direction": "forward",
+          "path": [
+            "control",
+            "tasks"
+          ]
+        }
+      ]
+    },
     "name": "ControlOverviewPageQuery",
     "operationKind": "query",
-    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "1feb1b6d25907ac45205183c39092d35";
+(node as any).hash = "dfdddd9d98741d1e2bfabf4d4430756f";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<191b5c89c10a7d949997216a79f49598>>
+ * @generated SignedSource<<168d543d518d84054b1f194ee13feeaa>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -19,11 +19,9 @@ export type ControlOverviewPageUpdateTaskStateMutation$variables = {
 };
 export type ControlOverviewPageUpdateTaskStateMutation$data = {
   readonly updateTaskState: {
-    readonly taskEdge: {
-      readonly node: {
-        readonly id: string;
-        readonly state: TaskState;
-      };
+    readonly task: {
+      readonly id: string;
+      readonly state: TaskState;
     };
   };
 };
@@ -58,34 +56,23 @@ v1 = [
       {
         "alias": null,
         "args": null,
-        "concreteType": "TaskEdge",
+        "concreteType": "Task",
         "kind": "LinkedField",
-        "name": "taskEdge",
+        "name": "task",
         "plural": false,
         "selections": [
           {
             "alias": null,
             "args": null,
-            "concreteType": "Task",
-            "kind": "LinkedField",
-            "name": "node",
-            "plural": false,
-            "selections": [
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
-                "name": "id",
-                "storageKey": null
-              },
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
-                "name": "state",
-                "storageKey": null
-              }
-            ],
+            "kind": "ScalarField",
+            "name": "id",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "state",
             "storageKey": null
           }
         ],
@@ -113,16 +100,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "ea56b9c3f41a4b69a3643884f8f2306d",
+    "cacheID": "7099089b96d6ca450d88f0a3597b2203",
     "id": null,
     "metadata": {},
     "name": "ControlOverviewPageUpdateTaskStateMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlOverviewPageUpdateTaskStateMutation(\n  $input: UpdateTaskStateInput!\n) {\n  updateTaskState(input: $input) {\n    taskEdge {\n      node {\n        id\n        state\n      }\n    }\n  }\n}\n"
+    "text": "mutation ControlOverviewPageUpdateTaskStateMutation(\n  $input: UpdateTaskStateInput!\n) {\n  updateTaskState(input: $input) {\n    task {\n      id\n      state\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3113753b83cf06bd8aca41610c1e89fd";
+(node as any).hash = "a81e1f58fa9931a70b85633b6ad0bd7a";
 
 export default node;

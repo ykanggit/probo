@@ -171,13 +171,13 @@ VALUES (
 `
 
 	args := pgx.NamedArgs{
-		"control_id":   t.ID,
-		"framework_id": t.ControlID,
-		"name":         t.Name,
-		"description":  t.Description,
-		"content_ref":  t.ContentRef,
-		"created_at":   t.CreatedAt,
-		"updated_at":   t.UpdatedAt,
+		"task_id":     t.ID,
+		"control_id":  t.ControlID,
+		"name":        t.Name,
+		"description": t.Description,
+		"content_ref": t.ContentRef,
+		"created_at":  t.CreatedAt,
+		"updated_at":  t.UpdatedAt,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err

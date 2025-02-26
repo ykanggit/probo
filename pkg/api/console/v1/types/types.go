@@ -79,6 +79,16 @@ type CreatePeoplePayload struct {
 	PeopleEdge *PeopleEdge `json:"peopleEdge"`
 }
 
+type CreateTaskInput struct {
+	ControlID   gid.GID `json:"controlId"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+}
+
+type CreateTaskPayload struct {
+	TaskEdge *TaskEdge `json:"taskEdge"`
+}
+
 type CreateVendorInput struct {
 	OrganizationID       gid.GID                     `json:"organizationId"`
 	Name                 string                      `json:"name"`
@@ -309,7 +319,7 @@ type UpdateTaskStateInput struct {
 }
 
 type UpdateTaskStatePayload struct {
-	TaskEdge *TaskEdge `json:"taskEdge"`
+	Task *Task `json:"task"`
 }
 
 type UpdateVendorInput struct {

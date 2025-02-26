@@ -27,9 +27,10 @@ import (
 
 type (
 	CreateTaskRequest struct {
-		ControlID  gid.GID
-		Name       string
-		ContentRef string
+		ControlID   gid.GID
+		Name        string
+		ContentRef  string
+		Description string
 	}
 )
 
@@ -49,13 +50,14 @@ func (s Service) CreateTask(
 
 	control := &coredata.Control{}
 	task := &coredata.Task{
-		ID:         taskID,
-		ControlID:  req.ControlID,
-		Name:       req.Name,
-		ContentRef: req.ContentRef,
-		State:      coredata.TaskStateTodo,
-		CreatedAt:  now,
-		UpdatedAt:  now,
+		ID:          taskID,
+		ControlID:   req.ControlID,
+		Name:        req.Name,
+		ContentRef:  req.ContentRef,
+		Description: req.Description,
+		State:       coredata.TaskStateTodo,
+		CreatedAt:   now,
+		UpdatedAt:   now,
 	}
 
 	taskStateTransition := coredata.TaskStateTransition{

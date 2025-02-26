@@ -105,6 +105,10 @@ type ComplexityRoot struct {
 		PeopleEdge func(childComplexity int) int
 	}
 
+	CreateTaskPayload struct {
+		TaskEdge func(childComplexity int) int
+	}
+
 	CreateVendorPayload struct {
 		VendorEdge func(childComplexity int) int
 	}
@@ -183,6 +187,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateOrganization func(childComplexity int, input types.CreateOrganizationInput) int
 		CreatePeople       func(childComplexity int, input types.CreatePeopleInput) int
+		CreateTask         func(childComplexity int, input types.CreateTaskInput) int
 		CreateVendor       func(childComplexity int, input types.CreateVendorInput) int
 		DeleteOrganization func(childComplexity int, input types.DeleteOrganizationInput) int
 		DeletePeople       func(childComplexity int, input types.DeletePeopleInput) int
@@ -292,7 +297,7 @@ type ComplexityRoot struct {
 	}
 
 	UpdateTaskStatePayload struct {
-		TaskEdge func(childComplexity int) int
+		Task func(childComplexity int) int
 	}
 
 	User struct {
@@ -351,6 +356,7 @@ type MutationResolver interface {
 	CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error)
 	DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error)
 	UpdateTaskState(ctx context.Context, input types.UpdateTaskStateInput) (*types.UpdateTaskStatePayload, error)
+	CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error)
 }
 type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
@@ -572,6 +578,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreatePeoplePayload.PeopleEdge(childComplexity), true
+
+	case "CreateTaskPayload.taskEdge":
+		if e.complexity.CreateTaskPayload.TaskEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateTaskPayload.TaskEdge(childComplexity), true
 
 	case "CreateVendorPayload.vendorEdge":
 		if e.complexity.CreateVendorPayload.VendorEdge == nil {
@@ -858,6 +871,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreatePeople(childComplexity, args["input"].(types.CreatePeopleInput)), true
+
+	case "Mutation.createTask":
+		if e.complexity.Mutation.CreateTask == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTask_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateTask(childComplexity, args["input"].(types.CreateTaskInput)), true
 
 	case "Mutation.createVendor":
 		if e.complexity.Mutation.CreateVendor == nil {
@@ -1351,12 +1376,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TaskStateTransitionEdge.Node(childComplexity), true
 
-	case "UpdateTaskStatePayload.taskEdge":
-		if e.complexity.UpdateTaskStatePayload.TaskEdge == nil {
+	case "UpdateTaskStatePayload.task":
+		if e.complexity.UpdateTaskStatePayload.Task == nil {
 			break
 		}
 
-		return e.complexity.UpdateTaskStatePayload.TaskEdge(childComplexity), true
+		return e.complexity.UpdateTaskStatePayload.Task(childComplexity), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -1534,6 +1559,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateOrganizationInput,
 		ec.unmarshalInputCreatePeopleInput,
+		ec.unmarshalInputCreateTaskInput,
 		ec.unmarshalInputCreateVendorInput,
 		ec.unmarshalInputDeleteOrganizationInput,
 		ec.unmarshalInputDeletePeopleInput,
@@ -2032,6 +2058,7 @@ type Mutation {
     input: DeleteOrganizationInput!
   ): DeleteOrganizationPayload!
   updateTaskState(input: UpdateTaskStateInput!): UpdateTaskStatePayload!
+  createTask(input: CreateTaskInput!): CreateTaskPayload!
 }
 
 input CreateVendorInput {
@@ -2158,6 +2185,16 @@ input UpdateTaskStateInput {
 }
 
 type UpdateTaskStatePayload {
+  task: Task!
+}
+
+input CreateTaskInput {
+  controlId: ID!
+  name: String!
+  description: String!
+}
+
+type CreateTaskPayload {
   taskEdge: TaskEdge!
 }
 `, BuiltIn: false},
@@ -2519,6 +2556,29 @@ func (ec *executionContext) field_Mutation_createPeople_argsInput(
 	}
 
 	var zeroVal types.CreatePeopleInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createTask_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createTask_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createTask_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateTaskInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateTaskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTaskInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateTaskInput
 	return zeroVal, nil
 }
 
@@ -4284,6 +4344,50 @@ func (ec *executionContext) fieldContext_CreatePeoplePayload_peopleEdge(_ contex
 				return ec.fieldContext_PeopleEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PeopleEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateTaskPayload_taskEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateTaskPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateTaskPayload_taskEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TaskEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TaskEdge)
+	fc.Result = res
+	return ec.marshalNTaskEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateTaskPayload_taskEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateTaskPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_TaskEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_TaskEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TaskEdge", field.Name)
 		},
 	}
 	return fc, nil
@@ -6220,14 +6324,61 @@ func (ec *executionContext) fieldContext_Mutation_updateTaskState(ctx context.Co
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "taskEdge":
-				return ec.fieldContext_UpdateTaskStatePayload_taskEdge(ctx, field)
+			case "task":
+				return ec.fieldContext_UpdateTaskStatePayload_task(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UpdateTaskStatePayload", field.Name)
 		},
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateTaskState_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createTask(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTask(rctx, fc.Args["input"].(types.CreateTaskInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateTaskPayload)
+	fc.Result = res
+	return ec.marshalNCreateTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTaskPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "taskEdge":
+				return ec.fieldContext_CreateTaskPayload_taskEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateTaskPayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8591,15 +8742,15 @@ func (ec *executionContext) fieldContext_TaskStateTransitionEdge_node(_ context.
 	return fc, nil
 }
 
-func (ec *executionContext) _UpdateTaskStatePayload_taskEdge(ctx context.Context, field graphql.CollectedField, obj *types.UpdateTaskStatePayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UpdateTaskStatePayload_taskEdge(ctx, field)
+func (ec *executionContext) _UpdateTaskStatePayload_task(ctx context.Context, field graphql.CollectedField, obj *types.UpdateTaskStatePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateTaskStatePayload_task(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TaskEdge, nil
+		return obj.Task, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8611,12 +8762,12 @@ func (ec *executionContext) _UpdateTaskStatePayload_taskEdge(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.TaskEdge)
+	res := resTmp.(*types.Task)
 	fc.Result = res
-	return ec.marshalNTaskEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskEdge(ctx, field.Selections, res)
+	return ec.marshalNTask2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐTask(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_UpdateTaskStatePayload_taskEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_UpdateTaskStatePayload_task(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UpdateTaskStatePayload",
 		Field:      field,
@@ -8624,12 +8775,24 @@ func (ec *executionContext) fieldContext_UpdateTaskStatePayload_taskEdge(_ conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "cursor":
-				return ec.fieldContext_TaskEdge_cursor(ctx, field)
-			case "node":
-				return ec.fieldContext_TaskEdge_node(ctx, field)
+			case "id":
+				return ec.fieldContext_Task_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Task_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Task_description(ctx, field)
+			case "state":
+				return ec.fieldContext_Task_state(ctx, field)
+			case "stateTransisions":
+				return ec.fieldContext_Task_stateTransisions(ctx, field)
+			case "evidences":
+				return ec.fieldContext_Task_evidences(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type TaskEdge", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
 		},
 	}
 	return fc, nil
@@ -11185,6 +11348,47 @@ func (ec *executionContext) unmarshalInputCreatePeopleInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, obj any) (types.CreateTaskInput, error) {
+	var it types.CreateTaskInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"controlId", "name", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "controlId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("controlId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ControlID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context, obj any) (types.CreateVendorInput, error) {
 	var it types.CreateVendorInput
 	asMap := map[string]any{}
@@ -12065,6 +12269,45 @@ func (ec *executionContext) _CreatePeoplePayload(ctx context.Context, sel ast.Se
 	return out
 }
 
+var createTaskPayloadImplementors = []string{"CreateTaskPayload"}
+
+func (ec *executionContext) _CreateTaskPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateTaskPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createTaskPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateTaskPayload")
+		case "taskEdge":
+			out.Values[i] = ec._CreateTaskPayload_taskEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createVendorPayloadImplementors = []string{"CreateVendorPayload"}
 
 func (ec *executionContext) _CreateVendorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateVendorPayload) graphql.Marshaler {
@@ -12811,6 +13054,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "updateTaskState":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateTaskState(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createTask":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createTask(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -13787,8 +14037,8 @@ func (ec *executionContext) _UpdateTaskStatePayload(ctx context.Context, sel ast
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateTaskStatePayload")
-		case "taskEdge":
-			out.Values[i] = ec._UpdateTaskStatePayload_taskEdge(ctx, field, obj)
+		case "task":
+			out.Values[i] = ec._UpdateTaskStatePayload_task(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -14632,6 +14882,25 @@ func (ec *executionContext) marshalNCreatePeoplePayload2ᚖgithubᚗcomᚋgetpro
 		return graphql.Null
 	}
 	return ec._CreatePeoplePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCreateTaskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTaskInput(ctx context.Context, v any) (types.CreateTaskInput, error) {
+	res, err := ec.unmarshalInputCreateTaskInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateTaskPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTaskPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateTaskPayload) graphql.Marshaler {
+	return ec._CreateTaskPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTaskPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateTaskPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateTaskPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNCreateVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorInput(ctx context.Context, v any) (types.CreateVendorInput, error) {

@@ -205,6 +205,22 @@ func (r *mutationResolver) UpdateTaskState(ctx context.Context, input types.Upda
 	}
 
 	return &types.UpdateTaskStatePayload{
+		Task: types.NewTask(task),
+	}, nil
+}
+
+// CreateTask is the resolver for the createTask field.
+func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error) {
+	task, err := r.proboSvc.CreateTask(ctx, probo.CreateTaskRequest{
+		ControlID:   input.ControlID,
+		Name:        input.Name,
+		Description: input.Description,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create task: %w", err)
+	}
+
+	return &types.CreateTaskPayload{
 		TaskEdge: types.NewTaskEdge(task),
 	}, nil
 }

@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import {
   graphql,
@@ -7,13 +7,25 @@ import {
   useQueryLoader,
   useMutation,
 } from "react-relay";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import { Helmet } from "react-helmet-async";
 import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from "./__generated__/ControlOverviewPageQuery.graphql";
 import type { ControlOverviewPageUpdateTaskStateMutation as ControlOverviewPageUpdateTaskStateMutationType } from "./__generated__/ControlOverviewPageUpdateTaskStateMutation.graphql";
+import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreateTaskMutationType } from "./__generated__/ControlOverviewPageCreateTaskMutation.graphql";
 
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
@@ -24,7 +36,8 @@ const controlOverviewPageQuery = graphql`
         description
         state
         category
-        tasks {
+        tasks(first: 100) @connection(key: "ControlOverviewPage_tasks") {
+          __id
           edges {
             node {
               id
@@ -44,9 +57,25 @@ const updateTaskStateMutation = graphql`
     $input: UpdateTaskStateInput!
   ) {
     updateTaskState(input: $input) {
-      taskEdge {
+      task {
+        id
+        state
+      }
+    }
+  }
+`;
+
+const createTaskMutation = graphql`
+  mutation ControlOverviewPageCreateTaskMutation(
+    $input: CreateTaskInput!
+    $connections: [ID!]!
+  ) {
+    createTask(input: $input) {
+      taskEdge @prependEdge(connections: $connections) {
         node {
           id
+          name
+          description
           state
         }
       }
@@ -68,8 +97,15 @@ function ControlOverviewPageContent({
     useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
       updateTaskStateMutation
     );
+  const [createTask] =
+    useMutation<ControlOverviewPageCreateTaskMutationType>(createTaskMutation);
   const control = data.control;
   const tasks = control?.tasks?.edges.map((edge) => edge?.node) ?? [];
+
+  // State for the create task dialog
+  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  const [newTaskName, setNewTaskName] = useState("");
+  const [newTaskDescription, setNewTaskDescription] = useState("");
 
   const handleTaskClick = (taskId: string, currentState: string) => {
     const newState = currentState === "DONE" ? "TODO" : "DONE";
@@ -83,9 +119,11 @@ function ControlOverviewPageContent({
       },
       optimisticResponse: {
         updateTaskState: {
-          task: {
-            id: taskId,
-            state: newState,
+          taskEdge: {
+            node: {
+              id: taskId,
+              state: newState,
+            },
           },
         },
       },
@@ -100,6 +138,53 @@ function ControlOverviewPageContent({
       onError: (error) => {
         toast({
           title: "Error updating task",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const handleCreateTask = () => {
+    if (!newTaskName.trim()) {
+      toast({
+        title: "Error creating task",
+        description: "Task name is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!control?.id) {
+      toast({
+        title: "Error creating task",
+        description: "Control ID is missing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createTask({
+      variables: {
+        connections: [`${data.control?.tasks?.__id}`],
+        input: {
+          controlId: control.id,
+          name: newTaskName,
+          description: newTaskDescription,
+        },
+      },
+      onCompleted: () => {
+        toast({
+          title: "Task created",
+          description: "New task has been created successfully.",
+        });
+        setNewTaskName("");
+        setNewTaskDescription("");
+        setIsCreateTaskOpen(false);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error creating task",
           description: error.message,
           variant: "destructive",
         });
@@ -147,7 +232,59 @@ function ControlOverviewPageContent({
       </Card>
 
       <div>
-        <h2 className="text-xl font-semibold mb-6">Tasks</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold">Tasks</h2>
+          <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="flex items-center gap-1">
+                <Plus className="w-4 h-4" />
+                <span>Add Task</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Task</DialogTitle>
+                <DialogDescription>
+                  Add a new task to this control. Click save when you&apos;re
+                  done.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-medium">
+                    Task Name
+                  </label>
+                  <Input
+                    id="name"
+                    value={newTaskName}
+                    onChange={(e) => setNewTaskName(e.target.value)}
+                    placeholder="Enter task name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="description" className="text-sm font-medium">
+                    Description (optional)
+                  </label>
+                  <Input
+                    id="description"
+                    value={newTaskDescription}
+                    onChange={(e) => setNewTaskDescription(e.target.value)}
+                    placeholder="Enter task description"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCreateTaskOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleCreateTask}>Create Task</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
         <div className="space-y-2">
           {tasks.map((task) => (
             <div
@@ -188,6 +325,17 @@ function ControlOverviewPageContent({
                   >
                     {task?.name}
                   </h3>
+                  {task?.description && (
+                    <p
+                      className={`text-xs mt-1 ${
+                        task?.state === "DONE"
+                          ? "text-gray-400 line-through"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      {task.description}
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="text-gray-400 text-sm">06.00 - 07.30</div>
@@ -206,6 +354,12 @@ function ControlOverviewPageContent({
               </div>
             </div>
           ))}
+
+          {tasks.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <p>No tasks yet. Click &quot;Add Task&quot; to create one.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
