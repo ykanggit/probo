@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 import type { AppSidebarQuery as AppSidebarQueryType } from "./__generated__/AppSidebarQuery.graphql";
 import { TeamSwitcher } from "@/components/TeamSwitcher";
+import { url } from "inspector";
 const staticData = {
   user: {
     name: "shadcn",
@@ -46,7 +47,7 @@ const staticData = {
     {
       title: "Organizations",
       icon: Building,
-      isActive: true,
+      url: "/peoples",
       items: [
         {
           title: "Peoples",
