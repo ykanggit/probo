@@ -164,7 +164,7 @@ function PeopleListContent({
       <div>
         <h2 className="text-2xl font-semibold mb-1">Employees</h2>
         <p className="text-muted-foreground">
-          Keep track of your company's workforce and their progress towards
+          Keep track of your company{"'"}s workforce and their progress towards
           completing tasks assigned to them.
         </p>
       </div>

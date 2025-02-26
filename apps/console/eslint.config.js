@@ -27,8 +27,6 @@ export default [
     rules: {
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
-      "@typescript-eslint/no-explicit-any": "warn",
-      "react/no-unescaped-entities": "off"
     }
   }
 ];

@@ -8,10 +8,8 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { Plus } from "lucide-react";
 import { OrganizationSelectionPageQuery } from "./__generated__/OrganizationSelectionPageQuery.graphql";
 
@@ -34,7 +32,6 @@ const organizationSelectionQuery = graphql`
 
 export default function OrganizationSelectionPage() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const data = useLazyLoadQuery<OrganizationSelectionPageQuery>(
     organizationSelectionQuery,
     {}
@@ -45,13 +42,11 @@ export default function OrganizationSelectionPage() {
   );
 
   useEffect(() => {
-    // If there's only one organization, redirect to it automatically
     if (organizations.length === 1) {
       navigate(`/organizations/${organizations[0].id}`);
     }
   }, [organizations, navigate]);
 
-  // If no organizations, show a message to create one
   if (organizations.length === 0) {
     return (
       <div className="container mx-auto py-10">
@@ -63,8 +58,8 @@ export default function OrganizationSelectionPage() {
             <CardHeader>
               <CardTitle>Welcome to Probo</CardTitle>
               <CardDescription>
-                You don't have any organizations yet. Create your first one to
-                get started.
+                You don{"'"}t have any organizations yet. Create your first one
+                to get started.
               </CardDescription>
             </CardHeader>
             <CardFooter>
@@ -81,7 +76,6 @@ export default function OrganizationSelectionPage() {
     );
   }
 
-  // If multiple organizations, show a selection screen
   return (
     <div className="container mx-auto py-10">
       <Helmet>
