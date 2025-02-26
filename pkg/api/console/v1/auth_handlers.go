@@ -77,13 +77,6 @@ func RegisterHandler(usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.Handler
 			return
 		}
 
-		organizationID, _ := gid.ParseGID("AZSfP_xAcAC5IAAAAAAltA")
-		err = usrmgrSvc.AddUserToOrganization(r.Context(), user.ID, organizationID)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to add user to organization: %v", err), http.StatusInternalServerError)
-			return
-		}
-
 		// Log the user in
 		session, err := usrmgrSvc.Login(r.Context(), req.Email, req.Password)
 		if err != nil {

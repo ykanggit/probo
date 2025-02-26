@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useParams } from "react-router";
 
 import {
   Collapsible,
@@ -35,15 +35,62 @@ export function NavMain({
   }[];
 }) {
   const location = useLocation();
+  const { organizationId } = useParams();
 
-  // Determine if an item is active based on the current route
+  const noOrganizationSelected = organizationId === undefined;
+
+  if (noOrganizationSelected) {
+    return (
+      <SidebarGroup>
+        <SidebarGroupLabel>
+          <div className="h-4 w-28 rounded-md bg-gray-200 animate-pulse" />
+        </SidebarGroupLabel>
+        <SidebarMenu className="space-y-1.5">
+          {/* First item - simple item */}
+          <SidebarMenuItem>
+            <SidebarMenuButton className="animate-pulse">
+              <div className="h-4 w-4 rounded-md bg-gray-200" />
+              <div className="h-4 w-32 rounded-md bg-gray-200 ml-2" />
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* Second item - with dropdown */}
+          <SidebarMenuItem>
+            <SidebarMenuButton className="animate-pulse">
+              <div className="h-4 w-4 rounded-md bg-gray-200" />
+              <div className="h-4 w-28 rounded-md bg-gray-200 ml-2" />
+              <div className="ml-auto">
+                <div className="h-4 w-4 rounded-md bg-gray-200" />
+              </div>
+            </SidebarMenuButton>
+            <SidebarMenuSub>
+              {[1, 2].map((i) => (
+                <SidebarMenuSubItem key={i}>
+                  <SidebarMenuSubButton className="animate-pulse pl-8">
+                    <div className="h-3 w-20 rounded-md bg-gray-200" />
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              ))}
+            </SidebarMenuSub>
+          </SidebarMenuItem>
+
+          {/* Third item - simple item */}
+          <SidebarMenuItem>
+            <SidebarMenuButton className="animate-pulse">
+              <div className="h-4 w-4 rounded-md bg-gray-200" />
+              <div className="h-4 w-24 rounded-md bg-gray-200 ml-2" />
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroup>
+    );
+  }
+
   const isItemActive = (item: { url?: string; items?: { url: string }[] }) => {
-    // If the item has a URL and it matches the current path
     if (item.url && location.pathname.startsWith(item.url)) {
       return true;
     }
 
-    // If the item has sub-items, check if any of them match the current path
     if (item.items?.length) {
       return item.items.some((subItem) =>
         location.pathname.startsWith(subItem.url),

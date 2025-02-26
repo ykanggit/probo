@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronsUpDown, Plus } from "lucide-react";
+import { ChevronsUpDown, Plus, Building } from "lucide-react";
 import { graphql, useFragment } from "react-relay";
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -67,25 +67,40 @@ export function TeamSwitcher({
   const { organizationId } = useParams();
   const [currentOrganization, setCurrentOrganization] =
     useState<Organization | null>(null);
+  const hasOrganizations =
+    data.organizations && data.organizations.edges.length > 0;
 
   useEffect(() => {
-    if (data.organizations && data.organizations.edges.length > 0) {
+    if (hasOrganizations) {
       const org = data.organizations.edges.find(
-        (edge) => edge.node.id === organizationId
+        (edge) => edge.node.id === organizationId,
       );
       if (org) {
         setCurrentOrganization(org.node);
       }
     }
-  }, [data.organizations, organizationId]);
-
-  if (!currentOrganization) {
-    return null;
-  }
+  }, [data.organizations, organizationId, hasOrganizations]);
 
   const handleOrganizationSwitch = (org: Organization) => {
     navigate(`/organizations/${org.id}`);
   };
+
+  if (!hasOrganizations) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg" className="animate-pulse">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gray-200" />
+            <div className="flex-1 space-y-1">
+              <div className="h-4 w-3/4 rounded-lg bg-gray-200" />
+              <div className="h-3 w-1/2 rounded-lg bg-gray-200" />
+            </div>
+            <div className="ml-auto h-4 w-4 rounded-lg bg-gray-200" />
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
   return (
     <SidebarMenu>
@@ -94,18 +109,42 @@ export function TeamSwitcher({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className={`data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ${
+                !currentOrganization
+                  ? "border border-dashed border-gray-400"
+                  : ""
+              }`}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <LogoComponent org={currentOrganization} className="size-4" />
+                {currentOrganization ? (
+                  <LogoComponent org={currentOrganization} className="size-4" />
+                ) : (
+                  <Building className="size-4 text-gray-400" />
+                )}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  {currentOrganization.name}
+                <span
+                  className={`truncate font-semibold ${
+                    !currentOrganization ? "text-gray-500" : ""
+                  }`}
+                >
+                  {currentOrganization
+                    ? currentOrganization.name
+                    : "Select Organization"}
                 </span>
-                <span className="truncate text-xs">Free</span>
+                <span
+                  className={`truncate text-xs ${
+                    !currentOrganization ? "text-gray-400" : ""
+                  }`}
+                >
+                  {currentOrganization ? "Free" : "No organization selected"}
+                </span>
               </div>
-              <ChevronsUpDown className="ml-auto" />
+              <ChevronsUpDown
+                className={`ml-auto ${
+                  !currentOrganization ? "text-gray-400" : ""
+                }`}
+              />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -117,19 +156,25 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-xs text-muted-foreground">
               Organizations
             </DropdownMenuLabel>
-            {data.organizations.edges.map((edge, index) => (
-              <DropdownMenuItem
-                key={edge.node.id}
-                onClick={() => handleOrganizationSwitch(edge.node)}
-                className="gap-2 p-2"
-              >
-                <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <LogoComponent org={edge.node} className="size-4 shrink-0" />
-                </div>
-                {edge.node.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            ))}
+            {hasOrganizations &&
+              data.organizations.edges.map((edge, index) => (
+                <DropdownMenuItem
+                  key={edge.node.id}
+                  onClick={() => handleOrganizationSwitch(edge.node)}
+                  className={`gap-2 p-2 ${
+                    edge.node.id === organizationId ? "bg-muted" : ""
+                  }`}
+                >
+                  <div className="flex size-6 items-center justify-center rounded-sm border">
+                    <LogoComponent
+                      org={edge.node}
+                      className="size-4 shrink-0"
+                    />
+                  </div>
+                  {edge.node.name}
+                  <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              ))}
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link

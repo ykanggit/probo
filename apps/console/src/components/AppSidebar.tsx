@@ -32,34 +32,43 @@ import {
 import type { AppSidebarQuery as AppSidebarQueryType } from "./__generated__/AppSidebarQuery.graphql";
 import { TeamSwitcher } from "@/components/TeamSwitcher";
 
-function getNavItems(organizationId: string) {
+function getNavItems(organizationId?: string) {
+  // Always return the same structure, but with or without URLs depending on whether an organization is selected
   return {
     navMain: [
       {
         title: "Frameworks",
-        url: `/organizations/${organizationId}/frameworks`,
+        url: organizationId
+          ? `/organizations/${organizationId}/frameworks`
+          : undefined,
         icon: BookOpen,
       },
       {
         title: "Organizations",
         icon: Building,
-        url: `/organizations/${organizationId}/peoples`,
-        items: [
-          {
-            title: "Peoples",
-            url: `/organizations/${organizationId}/peoples`,
-            icon: Users,
-          },
-          {
-            title: "Vendors",
-            url: `/organizations/${organizationId}/vendors`,
-            icon: ToyBrick,
-          },
-        ],
+        url: organizationId
+          ? `/organizations/${organizationId}/peoples`
+          : undefined,
+        items: organizationId
+          ? [
+              {
+                title: "Peoples",
+                url: `/organizations/${organizationId}/peoples`,
+                icon: Users,
+              },
+              {
+                title: "Vendors",
+                url: `/organizations/${organizationId}/vendors`,
+                icon: ToyBrick,
+              },
+            ]
+          : [],
       },
       {
         title: "Settings",
-        url: `/organizations/${organizationId}/settings`,
+        url: organizationId
+          ? `/organizations/${organizationId}/settings`
+          : undefined,
         icon: Settings,
       },
     ],
@@ -96,7 +105,7 @@ function AppSidebarContent({
 }) {
   const { organizationId } = useParams();
   const data = usePreloadedQuery(AppSidebarQuery, queryRef);
-  const navItems = getNavItems(organizationId!);
+  const navItems = getNavItems(organizationId);
 
   return (
     <Sidebar variant="inset" {...props}>
