@@ -43,6 +43,19 @@ export const teamSwitcherFragment = graphql`
 type Organization =
   TeamSwitcher_organizations$data["organizations"]["edges"][0]["node"];
 
+const LogoComponent = ({
+  org,
+  className,
+}: {
+  org: Organization;
+  className?: string;
+}) => {
+  if (org.logoUrl) {
+    return <img src={org.logoUrl} alt={org.name} className={className} />;
+  }
+  return null;
+};
+
 export function TeamSwitcher({
   organizations,
 }: {
@@ -58,7 +71,7 @@ export function TeamSwitcher({
   useEffect(() => {
     if (data.organizations && data.organizations.edges.length > 0) {
       const org = data.organizations.edges.find(
-        (edge) => edge.node.id === organizationId,
+        (edge) => edge.node.id === organizationId
       );
       if (org) {
         setCurrentOrganization(org.node);
@@ -69,19 +82,6 @@ export function TeamSwitcher({
   if (!currentOrganization) {
     return null;
   }
-
-  const LogoComponent = ({
-    org,
-    className,
-  }: {
-    org: Organization;
-    className?: string;
-  }) => {
-    if (org.logoUrl) {
-      return <img src={org.logoUrl} alt={org.name} className={className} />;
-    }
-    return null;
-  };
 
   const handleOrganizationSwitch = (org: Organization) => {
     navigate(`/organizations/${org.id}`);
