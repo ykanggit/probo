@@ -117,36 +117,6 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        <Button variant="outline" className="w-full" disabled={isLoading}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-4 w-4"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <path d="M17.13 17.13v-4.26l-3.2 3.2a4.33 4.33 0 0 1-6.13-6.13l3.2-3.2h-4.26" />
-          </svg>
-          Log in with Google
-        </Button>
       </div>
     </>
   );
