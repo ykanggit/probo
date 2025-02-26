@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a4a57a018956ccc09931f2b2ce87c933>>
+ * @generated SignedSource<<e71f99685baea9efcb9f603d577f7412>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,7 +10,7 @@
 
 import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type TeamSwitcher_organizations$data = {
+export type OrganizationSwitcher_organizations$data = {
   readonly organizations: {
     readonly __id: string;
     readonly edges: ReadonlyArray<{
@@ -21,11 +21,11 @@ export type TeamSwitcher_organizations$data = {
       };
     }>;
   };
-  readonly " $fragmentType": "TeamSwitcher_organizations";
+  readonly " $fragmentType": "OrganizationSwitcher_organizations";
 };
-export type TeamSwitcher_organizations$key = {
-  readonly " $data"?: TeamSwitcher_organizations$data;
-  readonly " $fragmentSpreads": FragmentRefs<"TeamSwitcher_organizations">;
+export type OrganizationSwitcher_organizations$key = {
+  readonly " $data"?: OrganizationSwitcher_organizations$data;
+  readonly " $fragmentSpreads": FragmentRefs<"OrganizationSwitcher_organizations">;
 };
 
 const node: ReaderFragment = {
@@ -43,14 +43,14 @@ const node: ReaderFragment = {
       }
     ]
   },
-  "name": "TeamSwitcher_organizations",
+  "name": "OrganizationSwitcher_organizations",
   "selections": [
     {
       "alias": "organizations",
       "args": null,
       "concreteType": "OrganizationConnection",
       "kind": "LinkedField",
-      "name": "__TeamSwitcher_organizations_connection",
+      "name": "__OrganizationSwitcher_organizations_connection",
       "plural": false,
       "selections": [
         {
@@ -155,6 +155,6 @@ const node: ReaderFragment = {
   "abstractKey": null
 };
 
-(node as any).hash = "22731866cafda226a19f8c64fda51ba5";
+(node as any).hash = "8150704a009e88c096c6f6aa13cada52";
 
 export default node;

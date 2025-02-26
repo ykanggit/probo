@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a1cc304a7eb154a19a1ec9a68c2cda98>>
+ * @generated SignedSource<<d4b79299641fcf7b2547eec4064af57a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,7 +14,7 @@ export type AppSidebarQuery$variables = Record<PropertyKey, never>;
 export type AppSidebarQuery$data = {
   readonly viewer: {
     readonly id: string;
-    readonly " $fragmentSpreads": FragmentRefs<"NavUser_viewer" | "TeamSwitcher_organizations">;
+    readonly " $fragmentSpreads": FragmentRefs<"NavUser_viewer" | "OrganizationSwitcher_organizations">;
   };
 };
 export type AppSidebarQuery = {
@@ -56,7 +56,7 @@ return {
           {
             "args": null,
             "kind": "FragmentSpread",
-            "name": "TeamSwitcher_organizations"
+            "name": "OrganizationSwitcher_organizations"
           },
           {
             "args": null,
@@ -189,7 +189,7 @@ return {
             "args": (v1/*: any*/),
             "filters": null,
             "handle": "connection",
-            "key": "TeamSwitcher_organizations",
+            "key": "OrganizationSwitcher_organizations",
             "kind": "LinkedHandle",
             "name": "organizations"
           },
@@ -213,16 +213,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "52b7d912665a4da10a79b82987a7e58a",
+    "cacheID": "d92e5e742128d82b461ab1b6d52cd2a6",
     "id": null,
     "metadata": {},
     "name": "AppSidebarQuery",
     "operationKind": "query",
-    "text": "query AppSidebarQuery {\n  viewer {\n    id\n    ...TeamSwitcher_organizations\n    ...NavUser_viewer\n  }\n}\n\nfragment NavUser_viewer on User {\n  id\n  fullName\n  email\n}\n\nfragment TeamSwitcher_organizations on User {\n  organizations(first: 25) {\n    edges {\n      node {\n        id\n        name\n        logoUrl\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query AppSidebarQuery {\n  viewer {\n    id\n    ...OrganizationSwitcher_organizations\n    ...NavUser_viewer\n  }\n}\n\nfragment NavUser_viewer on User {\n  id\n  fullName\n  email\n}\n\nfragment OrganizationSwitcher_organizations on User {\n  organizations(first: 25) {\n    edges {\n      node {\n        id\n        name\n        logoUrl\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d5e28d934b5913169dd822042f4eca07";
+(node as any).hash = "ebe1f481a1454380e017fb976b8bb8a5";
 
 export default node;

@@ -21,13 +21,14 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import {
-  TeamSwitcher_organizations$key,
-  TeamSwitcher_organizations$data,
-} from "./__generated__/TeamSwitcher_organizations.graphql";
+  OrganizationSwitcher_organizations$key,
+  OrganizationSwitcher_organizations$data,
+} from "./__generated__/OrganizationSwitcher_organizations.graphql";
 
-export const teamSwitcherFragment = graphql`
-  fragment TeamSwitcher_organizations on User {
-    organizations(first: 25) @connection(key: "TeamSwitcher_organizations") {
+export const organizationSwitcherFragment = graphql`
+  fragment OrganizationSwitcher_organizations on User {
+    organizations(first: 25)
+      @connection(key: "OrganizationSwitcher_organizations") {
       __id
       edges {
         node {
@@ -41,7 +42,7 @@ export const teamSwitcherFragment = graphql`
 `;
 
 type Organization =
-  TeamSwitcher_organizations$data["organizations"]["edges"][0]["node"];
+  OrganizationSwitcher_organizations$data["organizations"]["edges"][0]["node"];
 
 const LogoComponent = ({
   org,
@@ -56,13 +57,13 @@ const LogoComponent = ({
   return null;
 };
 
-export function TeamSwitcher({
+export function OrganizationSwitcher({
   organizations,
 }: {
-  organizations: TeamSwitcher_organizations$key;
+  organizations: OrganizationSwitcher_organizations$key;
 }) {
   const { isMobile } = useSidebar();
-  const data = useFragment(teamSwitcherFragment, organizations);
+  const data = useFragment(organizationSwitcherFragment, organizations);
   const navigate = useNavigate();
   const { organizationId } = useParams();
   const [currentOrganization, setCurrentOrganization] =
@@ -73,7 +74,7 @@ export function TeamSwitcher({
   useEffect(() => {
     if (hasOrganizations) {
       const org = data.organizations.edges.find(
-        (edge) => edge.node.id === organizationId,
+        (edge) => edge.node.id === organizationId
       );
       if (org) {
         setCurrentOrganization(org.node);

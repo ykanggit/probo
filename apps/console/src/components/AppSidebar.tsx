@@ -30,7 +30,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import type { AppSidebarQuery as AppSidebarQueryType } from "./__generated__/AppSidebarQuery.graphql";
-import { TeamSwitcher } from "@/components/TeamSwitcher";
+import { OrganizationSwitcher } from "@/components/OrganizationSwitcher";
 
 function getNavItems(organizationId?: string) {
   // Always return the same structure, but with or without URLs depending on whether an organization is selected
@@ -91,7 +91,7 @@ const AppSidebarQuery = graphql`
   query AppSidebarQuery {
     viewer {
       id
-      ...TeamSwitcher_organizations
+      ...OrganizationSwitcher_organizations
       ...NavUser_viewer
     }
   }
@@ -110,7 +110,7 @@ function AppSidebarContent({
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
-        <TeamSwitcher organizations={data.viewer} />
+        <OrganizationSwitcher organizations={data.viewer} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navItems.navMain} />
