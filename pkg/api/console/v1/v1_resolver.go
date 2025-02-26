@@ -225,6 +225,18 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 	}, nil
 }
 
+// DeleteTask is the resolver for the deleteTask field.
+func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error) {
+	err := r.proboSvc.DeleteTask(ctx, input.TaskID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete task: %w", err)
+	}
+
+	return &types.DeleteTaskPayload{
+		DeletedTaskID: input.TaskID,
+	}, nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

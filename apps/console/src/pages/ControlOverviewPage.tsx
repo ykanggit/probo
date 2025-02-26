@@ -7,7 +7,7 @@ import {
   useQueryLoader,
   useMutation,
 } from "react-relay";
-import { CheckCircle2, Plus } from "lucide-react";
+import { CheckCircle2, Plus, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,8 @@ import { Helmet } from "react-helmet-async";
 import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from "./__generated__/ControlOverviewPageQuery.graphql";
 import type { ControlOverviewPageUpdateTaskStateMutation as ControlOverviewPageUpdateTaskStateMutationType } from "./__generated__/ControlOverviewPageUpdateTaskStateMutation.graphql";
 import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreateTaskMutationType } from "./__generated__/ControlOverviewPageCreateTaskMutation.graphql";
+// The import below will be generated after the first run
+// import type { ControlOverviewPageDeleteTaskMutation as ControlOverviewPageDeleteTaskMutationType } from "./__generated__/ControlOverviewPageDeleteTaskMutation.graphql";
 
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
@@ -83,6 +85,17 @@ const createTaskMutation = graphql`
   }
 `;
 
+const deleteTaskMutation = graphql`
+  mutation ControlOverviewPageDeleteTaskMutation(
+    $input: DeleteTaskInput!
+    $connections: [ID!]!
+  ) {
+    deleteTask(input: $input) {
+      deletedTaskId @deleteEdge(connections: $connections)
+    }
+  }
+`;
+
 function ControlOverviewPageContent({
   queryRef,
 }: {
@@ -99,6 +112,8 @@ function ControlOverviewPageContent({
     );
   const [createTask] =
     useMutation<ControlOverviewPageCreateTaskMutationType>(createTaskMutation);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [deleteTask] = useMutation<any>(deleteTaskMutation);
   const control = data.control;
   const tasks = control?.tasks?.edges.map((edge) => edge?.node) ?? [];
 
@@ -106,6 +121,13 @@ function ControlOverviewPageContent({
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
+
+  // State for the delete task dialog
+  const [isDeleteTaskOpen, setIsDeleteTaskOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const handleTaskClick = (taskId: string, currentState: string) => {
     const newState = currentState === "DONE" ? "TODO" : "DONE";
@@ -185,6 +207,39 @@ function ControlOverviewPageContent({
       onError: (error) => {
         toast({
           title: "Error creating task",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const handleDeleteTask = (taskId: string, taskName: string) => {
+    setTaskToDelete({ id: taskId, name: taskName });
+    setIsDeleteTaskOpen(true);
+  };
+
+  const confirmDeleteTask = () => {
+    if (!taskToDelete) return;
+
+    deleteTask({
+      variables: {
+        connections: [`${data.control?.tasks?.__id}`],
+        input: {
+          taskId: taskToDelete.id,
+        },
+      },
+      onCompleted: () => {
+        toast({
+          title: "Task deleted",
+          description: "Task has been deleted successfully.",
+        });
+        setIsDeleteTaskOpen(false);
+        setTaskToDelete(null);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error deleting task",
           description: error.message,
           variant: "destructive",
         });
@@ -339,16 +394,16 @@ function ControlOverviewPageContent({
                 </div>
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="text-gray-400 text-sm">06.00 - 07.30</div>
-                  <button className="text-gray-400 hover:text-gray-600">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24">
-                      <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 12h.01M12 6h.01M12 18h.01"
-                      />
-                    </svg>
+                  <button
+                    className="text-gray-400 hover:text-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (task?.id && task?.name) {
+                        handleDeleteTask(task.id, task.name);
+                      }
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -362,6 +417,30 @@ function ControlOverviewPageContent({
           )}
         </div>
       </div>
+
+      {/* Delete Task Confirmation Dialog */}
+      <Dialog open={isDeleteTaskOpen} onOpenChange={setIsDeleteTaskOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Task</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the task &quot;
+              {taskToDelete?.name}&quot;? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteTaskOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteTask}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

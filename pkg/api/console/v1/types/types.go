@@ -122,6 +122,14 @@ type DeletePeoplePayload struct {
 	DeletedPeopleID gid.GID `json:"deletedPeopleId"`
 }
 
+type DeleteTaskInput struct {
+	TaskID gid.GID `json:"taskId"`
+}
+
+type DeleteTaskPayload struct {
+	DeletedTaskID gid.GID `json:"deletedTaskId"`
+}
+
 type DeleteVendorInput struct {
 	VendorID gid.GID `json:"vendorId"`
 }
