@@ -106,7 +106,6 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot create pg client: %w", err)
 	}
 
-	// Get the pepper bytes for password hashing
 	pepper, err := impl.cfg.Auth.GetPepperBytes()
 	if err != nil {
 		return fmt.Errorf("cannot get pepper bytes: %w", err)

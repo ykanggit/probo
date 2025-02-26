@@ -59,8 +59,8 @@ func (tst TaskStateTransition) Insert(
 INSERT INTO
     task_state_transitions (
         id,
-        control_id,
-        from_state
+        task_id,
+        from_state,
         to_state,
         reason,
         created_at,

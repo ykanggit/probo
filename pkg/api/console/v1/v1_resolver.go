@@ -193,6 +193,22 @@ func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.D
 	panic(fmt.Errorf("not implemented: DeleteOrganization - deleteOrganization"))
 }
 
+// UpdateTaskState is the resolver for the updateTaskState field.
+func (r *mutationResolver) UpdateTaskState(ctx context.Context, input types.UpdateTaskStateInput) (*types.UpdateTaskStatePayload, error) {
+	task, err := r.proboSvc.UpdateTaskState(ctx, probo.UpdateTaskStateRequest{
+		TaskID: input.TaskID,
+		State:  input.State,
+		Reason: nil,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update task state: %w", err)
+	}
+
+	return &types.UpdateTaskStatePayload{
+		TaskEdge: types.NewTaskEdge(task),
+	}, nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

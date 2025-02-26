@@ -5,12 +5,15 @@ import {
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
+  useMutation,
 } from "react-relay";
 import { CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 
 import { Helmet } from "react-helmet-async";
 import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from "./__generated__/ControlOverviewPageQuery.graphql";
+import type { ControlOverviewPageUpdateTaskStateMutation as ControlOverviewPageUpdateTaskStateMutationType } from "./__generated__/ControlOverviewPageUpdateTaskStateMutation.graphql";
 
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
@@ -36,6 +39,21 @@ const controlOverviewPageQuery = graphql`
   }
 `;
 
+const updateTaskStateMutation = graphql`
+  mutation ControlOverviewPageUpdateTaskStateMutation(
+    $input: UpdateTaskStateInput!
+  ) {
+    updateTaskState(input: $input) {
+      taskEdge {
+        node {
+          id
+          state
+        }
+      }
+    }
+  }
+`;
+
 function ControlOverviewPageContent({
   queryRef,
 }: {
@@ -43,10 +61,51 @@ function ControlOverviewPageContent({
 }) {
   const data = usePreloadedQuery<ControlOverviewPageQueryType>(
     controlOverviewPageQuery,
-    queryRef,
+    queryRef
   );
+  const { toast } = useToast();
+  const [updateTaskState] =
+    useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
+      updateTaskStateMutation
+    );
   const control = data.control;
   const tasks = control?.tasks?.edges.map((edge) => edge?.node) ?? [];
+
+  const handleTaskClick = (taskId: string, currentState: string) => {
+    const newState = currentState === "DONE" ? "TODO" : "DONE";
+
+    updateTaskState({
+      variables: {
+        input: {
+          taskId,
+          state: newState,
+        },
+      },
+      optimisticResponse: {
+        updateTaskState: {
+          task: {
+            id: taskId,
+            state: newState,
+          },
+        },
+      },
+      onCompleted: () => {
+        toast({
+          title: "Task updated",
+          description: `Task has been ${
+            newState === "DONE" ? "completed" : "reopened"
+          }.`,
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Error updating task",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
 
   return (
     <div className="min-h-screen bg-white p-6 space-y-6">
@@ -101,12 +160,24 @@ function ControlOverviewPageContent({
                     ? "border-gray-400 bg-gray-100"
                     : "border-gray-300"
                 }`}
+                onClick={() =>
+                  task?.id &&
+                  task?.state &&
+                  handleTaskClick(task.id, task.state)
+                }
               >
                 {task?.state === "DONE" && (
                   <CheckCircle2 className="w-4 h-4 text-gray-500" />
                 )}
               </div>
-              <div className="flex-1 flex items-center justify-between">
+              <div
+                className="flex-1 flex items-center justify-between cursor-pointer"
+                onClick={() =>
+                  task?.id &&
+                  task?.state &&
+                  handleTaskClick(task.id, task.state)
+                }
+              >
                 <div>
                   <h3
                     className={`text-sm ${
@@ -165,7 +236,7 @@ function ControlOverviewPageFallback() {
 export default function ControlOverviewPage() {
   const { controlId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<ControlOverviewPageQueryType>(
-    controlOverviewPageQuery,
+    controlOverviewPageQuery
   );
 
   useEffect(() => {

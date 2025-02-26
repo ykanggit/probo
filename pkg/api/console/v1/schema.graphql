@@ -391,6 +391,7 @@ type Mutation {
   deleteOrganization(
     input: DeleteOrganizationInput!
   ): DeleteOrganizationPayload!
+  updateTaskState(input: UpdateTaskStateInput!): UpdateTaskStatePayload!
 }
 
 input CreateVendorInput {
@@ -509,4 +510,13 @@ type CreateOrganizationPayload {
 
 type DeleteOrganizationPayload {
   deletedOrganizationId: ID!
+}
+
+input UpdateTaskStateInput {
+  taskId: ID!
+  state: TaskState!
+}
+
+type UpdateTaskStatePayload {
+  taskEdge: TaskEdge!
 }

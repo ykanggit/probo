@@ -303,6 +303,15 @@ type UpdatePeopleInput struct {
 	Kind                     *coredata.PeopleKind `json:"kind,omitempty"`
 }
 
+type UpdateTaskStateInput struct {
+	TaskID gid.GID            `json:"taskId"`
+	State  coredata.TaskState `json:"state"`
+}
+
+type UpdateTaskStatePayload struct {
+	TaskEdge *TaskEdge `json:"taskEdge"`
+}
+
 type UpdateVendorInput struct {
 	ID                   gid.GID                      `json:"id"`
 	ExpectedVersion      int                          `json:"expectedVersion"`
