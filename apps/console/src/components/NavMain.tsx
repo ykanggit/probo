@@ -46,7 +46,7 @@ export function NavMain({
     // If the item has sub-items, check if any of them match the current path
     if (item.items?.length) {
       return item.items.some((subItem) =>
-        location.pathname.startsWith(subItem.url)
+        location.pathname.startsWith(subItem.url),
       );
     }
 
@@ -86,7 +86,7 @@ export function NavMain({
                       <SidebarMenuSub>
                         {item.items?.map((subItem) => {
                           const subItemActive = location.pathname.startsWith(
-                            subItem.url
+                            subItem.url,
                           );
 
                           return (

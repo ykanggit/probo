@@ -40,11 +40,8 @@ export const teamSwitcherFragment = graphql`
   }
 `;
 
-// Extended type to include plan field until Relay compiler generates the types
 type Organization =
-  TeamSwitcher_organizations$data["organizations"]["edges"][0]["node"] & {
-    plan?: string;
-  };
+  TeamSwitcher_organizations$data["organizations"]["edges"][0]["node"];
 
 export function TeamSwitcher({
   organizations,
@@ -60,9 +57,8 @@ export function TeamSwitcher({
 
   useEffect(() => {
     if (data.organizations && data.organizations.edges.length > 0) {
-      // Find the current organization based on the URL parameter
       const org = data.organizations.edges.find(
-        (edge) => edge.node.id === organizationId
+        (edge) => edge.node.id === organizationId,
       );
       if (org) {
         setCurrentOrganization(org.node);
@@ -70,12 +66,10 @@ export function TeamSwitcher({
     }
   }, [data.organizations, organizationId]);
 
-  // If no organizations or data is still loading
   if (!currentOrganization) {
     return null;
   }
 
-  // Convert logoUrl to a React component
   const LogoComponent = ({
     org,
     className,
@@ -90,7 +84,6 @@ export function TeamSwitcher({
   };
 
   const handleOrganizationSwitch = (org: Organization) => {
-    // Navigate to the selected organization
     navigate(`/organizations/${org.id}`);
   };
 

@@ -56,14 +56,17 @@ function FrameworkOverviewPageContent({
   const { organizationId } = useParams();
 
   // Group controls by their category
-  const controlsByCategory = controls.reduce((acc, control) => {
-    if (!control?.category) return acc;
-    if (!acc[control.category]) {
-      acc[control.category] = [];
-    }
-    acc[control.category].push(control);
-    return acc;
-  }, {} as Record<string, typeof controls>);
+  const controlsByCategory = controls.reduce(
+    (acc, control) => {
+      if (!control?.category) return acc;
+      if (!acc[control.category]) {
+        acc[control.category] = [];
+      }
+      acc[control.category].push(control);
+      return acc;
+    },
+    {} as Record<string, typeof controls>,
+  );
 
   const controlCards = Object.entries(controlsByCategory).map(
     ([category, controls]) => ({
@@ -71,11 +74,11 @@ function FrameworkOverviewPageContent({
       controls,
       completed: controls.filter((c) => c?.state === "IMPLEMENTED").length,
       total: controls.length,
-    })
+    }),
   );
 
   const totalImplemented = controls.filter(
-    (c) => c?.state === "IMPLEMENTED"
+    (c) => c?.state === "IMPLEMENTED",
   ).length;
 
   return (
@@ -187,7 +190,7 @@ function FrameworkOverviewPageContent({
                           onClick={() => {
                             if (control?.id) {
                               navigate(
-                                `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
+                                `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`,
                               );
                             }
                           }}
@@ -271,7 +274,7 @@ function FrameworkOverviewPageContent({
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );
@@ -305,7 +308,7 @@ function FrameworkOverviewPageFallback() {
 export default function FrameworkOverviewPage() {
   const { frameworkId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<FrameworkOverviewPageQueryType>(
-    FrameworkOverviewPageQuery
+    FrameworkOverviewPageQuery,
   );
 
   useEffect(() => {

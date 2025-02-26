@@ -89,7 +89,7 @@ function CreatePeoplePageContent() {
     e.preventDefault();
     const peopleConnectionId = ConnectionHandler.getConnectionID(
       organizationId!,
-      "PeopleListPage_peoples"
+      "PeopleListPage_peoples",
     );
 
     createPeople({
@@ -165,7 +165,7 @@ function CreatePeoplePageContent() {
                         newEmails[index] = e.target.value;
                         handleFieldChange(
                           "additionalEmailAddresses",
-                          newEmails
+                          newEmails,
                         );
                       }}
                     />
@@ -175,11 +175,11 @@ function CreatePeoplePageContent() {
                       onClick={() => {
                         const newEmails =
                           formData.additionalEmailAddresses.filter(
-                            (_, i) => i !== index
+                            (_, i) => i !== index,
                           );
                         handleFieldChange(
                           "additionalEmailAddresses",
-                          newEmails
+                          newEmails,
                         );
                       }}
                     >
@@ -227,7 +227,7 @@ function CreatePeoplePageContent() {
                           "rounded-full px-4 py-1 text-sm transition-colors",
                           formData.kind === "EMPLOYEE"
                             ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                         )}
                       >
                         Employee
@@ -239,7 +239,7 @@ function CreatePeoplePageContent() {
                           "rounded-full px-4 py-1 text-sm transition-colors",
                           formData.kind === "CONTRACTOR"
                             ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                         )}
                       >
                         Contractor

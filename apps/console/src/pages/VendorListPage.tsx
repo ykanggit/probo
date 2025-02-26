@@ -188,7 +188,7 @@ function VendorListContent({
   const { toast } = useToast();
   const data = usePreloadedQuery<VendorListPageQueryType>(
     vendorListPageQuery,
-    queryRef
+    queryRef,
   );
   const [, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
@@ -335,7 +335,7 @@ function VendorListContent({
                     e.preventDefault(); // Prevent navigation
                     if (
                       window.confirm(
-                        "Are you sure you want to delete this vendor?"
+                        "Are you sure you want to delete this vendor?",
                       )
                     ) {
                       deleteVendor({
