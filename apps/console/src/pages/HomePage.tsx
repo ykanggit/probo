@@ -5,116 +5,112 @@ import {
   usePreloadedQuery,
   useQueryLoader,
 } from "react-relay";
-import { Link } from "react-router";
+import { Link, useParams } from "react-router";
 import type { HomePageQuery as HomePageQueryType } from "./__generated__/HomePageQuery.graphql";
 
 export const HomePageQuery = graphql`
-  query HomePageQuery {
-    viewer {
-      id
-      organizations {
-        edges {
-          node {
-            name
-            createdAt
-            updatedAt
-            vendors {
-              edges {
-                node {
-                  id
-                  name
-                  createdAt
-                  updatedAt
-                }
-              }
+  query HomePageQuery($organizationId: ID!) {
+    organization: node(id: $organizationId) {
+      ... on Organization {
+        id
+        name
+        createdAt
+        updatedAt
+        vendors {
+          edges {
+            node {
+              id
+              name
+              createdAt
+              updatedAt
             }
-            peoples {
-              edges {
-                node {
-                  id
-                  fullName
-                  primaryEmailAddress
-                  additionalEmailAddresses
-                  createdAt
-                  updatedAt
-                }
-              }
+          }
+        }
+        peoples {
+          edges {
+            node {
+              id
+              fullName
+              primaryEmailAddress
+              additionalEmailAddresses
+              createdAt
+              updatedAt
             }
-            frameworks {
-              pageInfo {
-                hasNextPage
-                hasPreviousPage
-                startCursor
-                endCursor
-              }
-              edges {
-                cursor
-                node {
-                  id
-                  name
-                  description
-                  controls {
-                    edges {
-                      node {
-                        id
-                        name
-                        state
-                        stateTransisions {
-                          edges {
-                            node {
-                              id
-                              toState
-                              fromState
-                              createdAt
-                              updatedAt
-                            }
-                          }
+          }
+        }
+        frameworks {
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+          }
+          edges {
+            cursor
+            node {
+              id
+              name
+              description
+              controls {
+                edges {
+                  node {
+                    id
+                    name
+                    state
+                    stateTransisions {
+                      edges {
+                        node {
+                          id
+                          toState
+                          fromState
+                          createdAt
+                          updatedAt
                         }
-                        tasks {
-                          edges {
-                            node {
-                              id
-                              name
-                              state
-                              evidences {
-                                edges {
-                                  node {
-                                    id
-                                    state
-                                    fileUrl
-                                    stateTransisions {
-                                      edges {
-                                        node {
-                                          id
-                                          fromState
-                                          toState
-                                          reason
-                                          createdAt
-                                          updatedAt
-                                        }
-                                      }
+                      }
+                    }
+                    tasks {
+                      edges {
+                        node {
+                          id
+                          name
+                          state
+                          evidences {
+                            edges {
+                              node {
+                                id
+                                state
+                                fileUrl
+                                stateTransisions {
+                                  edges {
+                                    node {
+                                      id
+                                      fromState
+                                      toState
+                                      reason
+                                      createdAt
+                                      updatedAt
                                     }
-                                    createdAt
-                                    updatedAt
                                   }
                                 }
+                                createdAt
+                                updatedAt
                               }
-                              stateTransisions {
-                                edges {
-                                  node {
-                                    id
-                                    toState
-                                    fromState
-                                    reason
-                                    createdAt
-                                    updatedAt
-                                  }
-                                }
-                              }
-                              createdAt
-                              updatedAt
                             }
                           }
+                          stateTransisions {
+                            edges {
+                              node {
+                                id
+                                toState
+                                fromState
+                                reason
+                                createdAt
+                                updatedAt
+                              }
+                            }
+                          }
+                          createdAt
+                          updatedAt
                         }
                       }
                     }
@@ -130,10 +126,15 @@ export const HomePageQuery = graphql`
 `;
 
 export default function HomePage() {
+  const { organizationId } = useParams();
   const [queryRef, loadQuery] =
     useQueryLoader<HomePageQueryType>(HomePageQuery);
 
-  useEffect(() => loadQuery({}), [loadQuery]);
+  useEffect(() => {
+    if (organizationId) {
+      loadQuery({ organizationId });
+    }
+  }, [organizationId, loadQuery]);
 
   if (!queryRef) {
     return <HomePageFallback />;
@@ -155,6 +156,7 @@ function HomePageContent({
 }: {
   queryRef: PreloadedQuery<HomePageQueryType>;
 }) {
+  const { organizationId } = useParams();
   const data = usePreloadedQuery(HomePageQuery, queryRef);
 
   return (
@@ -166,7 +168,9 @@ function HomePageContent({
       </div>
       <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
         <pre>{JSON.stringify(data, null, 2)}</pre>
-        <Link to="/foobar">Go to FooPage</Link>
+        <Link to={`/organizations/${organizationId}/frameworks`}>
+          Go to Frameworks
+        </Link>
       </div>
     </div>
   );

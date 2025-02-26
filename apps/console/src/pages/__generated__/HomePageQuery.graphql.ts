@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f40d67f614a103849ba940fbd14f71af>>
+ * @generated SignedSource<<72fcf5e9542bdba3b547fa523e55378d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,73 +12,52 @@ import { ConcreteRequest } from 'relay-runtime';
 export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type EvidenceState = "EXPIRED" | "INVALID" | "VALID";
 export type TaskState = "DONE" | "TODO";
-export type HomePageQuery$variables = Record<PropertyKey, never>;
+export type HomePageQuery$variables = {
+  organizationId: string;
+};
 export type HomePageQuery$data = {
-  readonly viewer: {
-    readonly id: string;
-    readonly organizations: {
+  readonly organization: {
+    readonly createdAt?: any;
+    readonly frameworks?: {
       readonly edges: ReadonlyArray<{
+        readonly cursor: any;
         readonly node: {
-          readonly createdAt: any;
-          readonly frameworks: {
+          readonly controls: {
             readonly edges: ReadonlyArray<{
-              readonly cursor: any;
               readonly node: {
-                readonly controls: {
+                readonly id: string;
+                readonly name: string;
+                readonly state: ControlState;
+                readonly stateTransisions: {
                   readonly edges: ReadonlyArray<{
                     readonly node: {
+                      readonly createdAt: any;
+                      readonly fromState: ControlState | null | undefined;
                       readonly id: string;
-                      readonly name: string;
-                      readonly state: ControlState;
-                      readonly stateTransisions: {
+                      readonly toState: ControlState;
+                      readonly updatedAt: any;
+                    };
+                  }>;
+                };
+                readonly tasks: {
+                  readonly edges: ReadonlyArray<{
+                    readonly node: {
+                      readonly createdAt: any;
+                      readonly evidences: {
                         readonly edges: ReadonlyArray<{
                           readonly node: {
                             readonly createdAt: any;
-                            readonly fromState: ControlState | null | undefined;
+                            readonly fileUrl: string;
                             readonly id: string;
-                            readonly toState: ControlState;
-                            readonly updatedAt: any;
-                          };
-                        }>;
-                      };
-                      readonly tasks: {
-                        readonly edges: ReadonlyArray<{
-                          readonly node: {
-                            readonly createdAt: any;
-                            readonly evidences: {
-                              readonly edges: ReadonlyArray<{
-                                readonly node: {
-                                  readonly createdAt: any;
-                                  readonly fileUrl: string;
-                                  readonly id: string;
-                                  readonly state: EvidenceState;
-                                  readonly stateTransisions: {
-                                    readonly edges: ReadonlyArray<{
-                                      readonly node: {
-                                        readonly createdAt: any;
-                                        readonly fromState: EvidenceState | null | undefined;
-                                        readonly id: string;
-                                        readonly reason: string | null | undefined;
-                                        readonly toState: EvidenceState;
-                                        readonly updatedAt: any;
-                                      };
-                                    }>;
-                                  };
-                                  readonly updatedAt: any;
-                                };
-                              }>;
-                            };
-                            readonly id: string;
-                            readonly name: string;
-                            readonly state: TaskState;
+                            readonly state: EvidenceState;
                             readonly stateTransisions: {
                               readonly edges: ReadonlyArray<{
                                 readonly node: {
                                   readonly createdAt: any;
-                                  readonly fromState: TaskState | null | undefined;
+                                  readonly fromState: EvidenceState | null | undefined;
                                   readonly id: string;
                                   readonly reason: string | null | undefined;
-                                  readonly toState: TaskState;
+                                  readonly toState: EvidenceState;
                                   readonly updatedAt: any;
                                 };
                               }>;
@@ -87,45 +66,62 @@ export type HomePageQuery$data = {
                           };
                         }>;
                       };
+                      readonly id: string;
+                      readonly name: string;
+                      readonly state: TaskState;
+                      readonly stateTransisions: {
+                        readonly edges: ReadonlyArray<{
+                          readonly node: {
+                            readonly createdAt: any;
+                            readonly fromState: TaskState | null | undefined;
+                            readonly id: string;
+                            readonly reason: string | null | undefined;
+                            readonly toState: TaskState;
+                            readonly updatedAt: any;
+                          };
+                        }>;
+                      };
+                      readonly updatedAt: any;
                     };
                   }>;
                 };
-                readonly description: string;
-                readonly id: string;
-                readonly name: string;
               };
             }>;
-            readonly pageInfo: {
-              readonly endCursor: any | null | undefined;
-              readonly hasNextPage: boolean;
-              readonly hasPreviousPage: boolean;
-              readonly startCursor: any | null | undefined;
-            };
           };
+          readonly description: string;
+          readonly id: string;
           readonly name: string;
-          readonly peoples: {
-            readonly edges: ReadonlyArray<{
-              readonly node: {
-                readonly additionalEmailAddresses: ReadonlyArray<string>;
-                readonly createdAt: any;
-                readonly fullName: string;
-                readonly id: string;
-                readonly primaryEmailAddress: string;
-                readonly updatedAt: any;
-              };
-            }>;
-          };
+        };
+      }>;
+      readonly pageInfo: {
+        readonly endCursor: any | null | undefined;
+        readonly hasNextPage: boolean;
+        readonly hasPreviousPage: boolean;
+        readonly startCursor: any | null | undefined;
+      };
+    };
+    readonly id?: string;
+    readonly name?: string;
+    readonly peoples?: {
+      readonly edges: ReadonlyArray<{
+        readonly node: {
+          readonly additionalEmailAddresses: ReadonlyArray<string>;
+          readonly createdAt: any;
+          readonly fullName: string;
+          readonly id: string;
+          readonly primaryEmailAddress: string;
           readonly updatedAt: any;
-          readonly vendors: {
-            readonly edges: ReadonlyArray<{
-              readonly node: {
-                readonly createdAt: any;
-                readonly id: string;
-                readonly name: string;
-                readonly updatedAt: any;
-              };
-            }>;
-          };
+        };
+      }>;
+    };
+    readonly updatedAt?: any;
+    readonly vendors?: {
+      readonly edges: ReadonlyArray<{
+        readonly node: {
+          readonly createdAt: any;
+          readonly id: string;
+          readonly name: string;
+          readonly updatedAt: any;
         };
       }>;
     };
@@ -137,35 +133,49 @@ export type HomePageQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = {
+var v0 = [
+  {
+    "defaultValue": null,
+    "kind": "LocalArgument",
+    "name": "organizationId"
+  }
+],
+v1 = [
+  {
+    "kind": "Variable",
+    "name": "id",
+    "variableName": "organizationId"
+  }
+],
+v2 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v1 = {
+v3 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "name",
   "storageKey": null
 },
-v2 = {
+v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "createdAt",
   "storageKey": null
 },
-v3 = {
+v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "updatedAt",
   "storageKey": null
 },
-v4 = {
+v6 = {
   "alias": null,
   "args": null,
   "concreteType": "VendorConnection",
@@ -189,10 +199,10 @@ v4 = {
           "name": "node",
           "plural": false,
           "selections": [
-            (v0/*: any*/),
-            (v1/*: any*/),
             (v2/*: any*/),
-            (v3/*: any*/)
+            (v3/*: any*/),
+            (v4/*: any*/),
+            (v5/*: any*/)
           ],
           "storageKey": null
         }
@@ -202,7 +212,7 @@ v4 = {
   ],
   "storageKey": null
 },
-v5 = {
+v7 = {
   "alias": null,
   "args": null,
   "concreteType": "PeopleConnection",
@@ -226,7 +236,7 @@ v5 = {
           "name": "node",
           "plural": false,
           "selections": [
-            (v0/*: any*/),
+            (v2/*: any*/),
             {
               "alias": null,
               "args": null,
@@ -248,8 +258,8 @@ v5 = {
               "name": "additionalEmailAddresses",
               "storageKey": null
             },
-            (v2/*: any*/),
-            (v3/*: any*/)
+            (v4/*: any*/),
+            (v5/*: any*/)
           ],
           "storageKey": null
         }
@@ -259,35 +269,35 @@ v5 = {
   ],
   "storageKey": null
 },
-v6 = {
+v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "state",
   "storageKey": null
 },
-v7 = {
+v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "toState",
   "storageKey": null
 },
-v8 = {
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "fromState",
   "storageKey": null
 },
-v9 = {
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "reason",
   "storageKey": null
 },
-v10 = {
+v12 = {
   "alias": null,
   "args": null,
   "concreteType": "FrameworkConnection",
@@ -357,8 +367,8 @@ v10 = {
           "name": "node",
           "plural": false,
           "selections": [
-            (v0/*: any*/),
-            (v1/*: any*/),
+            (v2/*: any*/),
+            (v3/*: any*/),
             {
               "alias": null,
               "args": null,
@@ -390,9 +400,9 @@ v10 = {
                       "name": "node",
                       "plural": false,
                       "selections": [
-                        (v0/*: any*/),
-                        (v1/*: any*/),
-                        (v6/*: any*/),
+                        (v2/*: any*/),
+                        (v3/*: any*/),
+                        (v8/*: any*/),
                         {
                           "alias": null,
                           "args": null,
@@ -417,11 +427,11 @@ v10 = {
                                   "name": "node",
                                   "plural": false,
                                   "selections": [
-                                    (v0/*: any*/),
-                                    (v7/*: any*/),
-                                    (v8/*: any*/),
                                     (v2/*: any*/),
-                                    (v3/*: any*/)
+                                    (v9/*: any*/),
+                                    (v10/*: any*/),
+                                    (v4/*: any*/),
+                                    (v5/*: any*/)
                                   ],
                                   "storageKey": null
                                 }
@@ -455,9 +465,9 @@ v10 = {
                                   "name": "node",
                                   "plural": false,
                                   "selections": [
-                                    (v0/*: any*/),
-                                    (v1/*: any*/),
-                                    (v6/*: any*/),
+                                    (v2/*: any*/),
+                                    (v3/*: any*/),
+                                    (v8/*: any*/),
                                     {
                                       "alias": null,
                                       "args": null,
@@ -482,8 +492,8 @@ v10 = {
                                               "name": "node",
                                               "plural": false,
                                               "selections": [
-                                                (v0/*: any*/),
-                                                (v6/*: any*/),
+                                                (v2/*: any*/),
+                                                (v8/*: any*/),
                                                 {
                                                   "alias": null,
                                                   "args": null,
@@ -515,12 +525,12 @@ v10 = {
                                                           "name": "node",
                                                           "plural": false,
                                                           "selections": [
-                                                            (v0/*: any*/),
-                                                            (v8/*: any*/),
-                                                            (v7/*: any*/),
-                                                            (v9/*: any*/),
                                                             (v2/*: any*/),
-                                                            (v3/*: any*/)
+                                                            (v10/*: any*/),
+                                                            (v9/*: any*/),
+                                                            (v11/*: any*/),
+                                                            (v4/*: any*/),
+                                                            (v5/*: any*/)
                                                           ],
                                                           "storageKey": null
                                                         }
@@ -530,8 +540,8 @@ v10 = {
                                                   ],
                                                   "storageKey": null
                                                 },
-                                                (v2/*: any*/),
-                                                (v3/*: any*/)
+                                                (v4/*: any*/),
+                                                (v5/*: any*/)
                                               ],
                                               "storageKey": null
                                             }
@@ -565,12 +575,12 @@ v10 = {
                                               "name": "node",
                                               "plural": false,
                                               "selections": [
-                                                (v0/*: any*/),
-                                                (v7/*: any*/),
-                                                (v8/*: any*/),
-                                                (v9/*: any*/),
                                                 (v2/*: any*/),
-                                                (v3/*: any*/)
+                                                (v9/*: any*/),
+                                                (v10/*: any*/),
+                                                (v11/*: any*/),
+                                                (v4/*: any*/),
+                                                (v5/*: any*/)
                                               ],
                                               "storageKey": null
                                             }
@@ -580,8 +590,8 @@ v10 = {
                                       ],
                                       "storageKey": null
                                     },
-                                    (v2/*: any*/),
-                                    (v3/*: any*/)
+                                    (v4/*: any*/),
+                                    (v5/*: any*/)
                                   ],
                                   "storageKey": null
                                 }
@@ -611,58 +621,32 @@ v10 = {
 };
 return {
   "fragment": {
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
     "name": "HomePageQuery",
     "selections": [
       {
-        "alias": null,
-        "args": null,
-        "concreteType": "User",
+        "alias": "organization",
+        "args": (v1/*: any*/),
+        "concreteType": null,
         "kind": "LinkedField",
-        "name": "viewer",
+        "name": "node",
         "plural": false,
         "selections": [
-          (v0/*: any*/),
           {
-            "alias": null,
-            "args": null,
-            "concreteType": "OrganizationConnection",
-            "kind": "LinkedField",
-            "name": "organizations",
-            "plural": false,
+            "kind": "InlineFragment",
             "selections": [
-              {
-                "alias": null,
-                "args": null,
-                "concreteType": "OrganizationEdge",
-                "kind": "LinkedField",
-                "name": "edges",
-                "plural": true,
-                "selections": [
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "Organization",
-                    "kind": "LinkedField",
-                    "name": "node",
-                    "plural": false,
-                    "selections": [
-                      (v1/*: any*/),
-                      (v2/*: any*/),
-                      (v3/*: any*/),
-                      (v4/*: any*/),
-                      (v5/*: any*/),
-                      (v10/*: any*/)
-                    ],
-                    "storageKey": null
-                  }
-                ],
-                "storageKey": null
-              }
+              (v2/*: any*/),
+              (v3/*: any*/),
+              (v4/*: any*/),
+              (v5/*: any*/),
+              (v6/*: any*/),
+              (v7/*: any*/),
+              (v12/*: any*/)
             ],
-            "storageKey": null
+            "type": "Organization",
+            "abstractKey": null
           }
         ],
         "storageKey": null
@@ -673,58 +657,38 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
     "name": "HomePageQuery",
     "selections": [
       {
-        "alias": null,
-        "args": null,
-        "concreteType": "User",
+        "alias": "organization",
+        "args": (v1/*: any*/),
+        "concreteType": null,
         "kind": "LinkedField",
-        "name": "viewer",
+        "name": "node",
         "plural": false,
         "selections": [
-          (v0/*: any*/),
           {
             "alias": null,
             "args": null,
-            "concreteType": "OrganizationConnection",
-            "kind": "LinkedField",
-            "name": "organizations",
-            "plural": false,
-            "selections": [
-              {
-                "alias": null,
-                "args": null,
-                "concreteType": "OrganizationEdge",
-                "kind": "LinkedField",
-                "name": "edges",
-                "plural": true,
-                "selections": [
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "Organization",
-                    "kind": "LinkedField",
-                    "name": "node",
-                    "plural": false,
-                    "selections": [
-                      (v1/*: any*/),
-                      (v2/*: any*/),
-                      (v3/*: any*/),
-                      (v4/*: any*/),
-                      (v5/*: any*/),
-                      (v10/*: any*/),
-                      (v0/*: any*/)
-                    ],
-                    "storageKey": null
-                  }
-                ],
-                "storageKey": null
-              }
-            ],
+            "kind": "ScalarField",
+            "name": "__typename",
             "storageKey": null
+          },
+          (v2/*: any*/),
+          {
+            "kind": "InlineFragment",
+            "selections": [
+              (v3/*: any*/),
+              (v4/*: any*/),
+              (v5/*: any*/),
+              (v6/*: any*/),
+              (v7/*: any*/),
+              (v12/*: any*/)
+            ],
+            "type": "Organization",
+            "abstractKey": null
           }
         ],
         "storageKey": null
@@ -732,16 +696,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "5a56fefd066703ca0ebac1ef3e9a7e1f",
+    "cacheID": "29440183dcc30ec5e0bcce9c1910b92f",
     "id": null,
     "metadata": {},
     "name": "HomePageQuery",
     "operationKind": "query",
-    "text": "query HomePageQuery {\n  viewer {\n    id\n    organizations {\n      edges {\n        node {\n          name\n          createdAt\n          updatedAt\n          vendors {\n            edges {\n              node {\n                id\n                name\n                createdAt\n                updatedAt\n              }\n            }\n          }\n          peoples {\n            edges {\n              node {\n                id\n                fullName\n                primaryEmailAddress\n                additionalEmailAddresses\n                createdAt\n                updatedAt\n              }\n            }\n          }\n          frameworks {\n            pageInfo {\n              hasNextPage\n              hasPreviousPage\n              startCursor\n              endCursor\n            }\n            edges {\n              cursor\n              node {\n                id\n                name\n                description\n                controls {\n                  edges {\n                    node {\n                      id\n                      name\n                      state\n                      stateTransisions {\n                        edges {\n                          node {\n                            id\n                            toState\n                            fromState\n                            createdAt\n                            updatedAt\n                          }\n                        }\n                      }\n                      tasks {\n                        edges {\n                          node {\n                            id\n                            name\n                            state\n                            evidences {\n                              edges {\n                                node {\n                                  id\n                                  state\n                                  fileUrl\n                                  stateTransisions {\n                                    edges {\n                                      node {\n                                        id\n                                        fromState\n                                        toState\n                                        reason\n                                        createdAt\n                                        updatedAt\n                                      }\n                                    }\n                                  }\n                                  createdAt\n                                  updatedAt\n                                }\n                              }\n                            }\n                            stateTransisions {\n                              edges {\n                                node {\n                                  id\n                                  toState\n                                  fromState\n                                  reason\n                                  createdAt\n                                  updatedAt\n                                }\n                              }\n                            }\n                            createdAt\n                            updatedAt\n                          }\n                        }\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n          id\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query HomePageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      name\n      createdAt\n      updatedAt\n      vendors {\n        edges {\n          node {\n            id\n            name\n            createdAt\n            updatedAt\n          }\n        }\n      }\n      peoples {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            additionalEmailAddresses\n            createdAt\n            updatedAt\n          }\n        }\n      }\n      frameworks {\n        pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n        }\n        edges {\n          cursor\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  name\n                  state\n                  stateTransisions {\n                    edges {\n                      node {\n                        id\n                        toState\n                        fromState\n                        createdAt\n                        updatedAt\n                      }\n                    }\n                  }\n                  tasks {\n                    edges {\n                      node {\n                        id\n                        name\n                        state\n                        evidences {\n                          edges {\n                            node {\n                              id\n                              state\n                              fileUrl\n                              stateTransisions {\n                                edges {\n                                  node {\n                                    id\n                                    fromState\n                                    toState\n                                    reason\n                                    createdAt\n                                    updatedAt\n                                  }\n                                }\n                              }\n                              createdAt\n                              updatedAt\n                            }\n                          }\n                        }\n                        stateTransisions {\n                          edges {\n                            node {\n                              id\n                              toState\n                              fromState\n                              reason\n                              createdAt\n                              updatedAt\n                            }\n                          }\n                        }\n                        createdAt\n                        updatedAt\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "7a1699535af738f939d954a88c6daa9e";
+(node as any).hash = "d4f516b436d096fe9c91ce532a75b022";
 
 export default node;

@@ -8,7 +8,6 @@ import {
 } from "react-relay";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
-import { useOrganization } from "@/contexts/OrganizationContext";
 import {
   Card,
   CardHeader,
@@ -84,7 +83,7 @@ function EditableField({
 
 export default function CreateOrganizationPage() {
   const navigate = useNavigate();
-  const { setCurrentOrganization } = useOrganization();
+  const { toast } = useToast();
   const data = useLazyLoadQuery<CreateOrganizationPageViewerQuery>(
     viewerQuery,
     {}
@@ -93,7 +92,6 @@ export default function CreateOrganizationPage() {
     useMutation<CreateOrganizationPageCreateOrganizationMutation>(
       createOrganizationMutation
     );
-  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
   });
@@ -122,13 +120,12 @@ export default function CreateOrganizationPage() {
       },
       onCompleted: (response) => {
         const newOrg = response.createOrganization.organizationEdge.node;
-        setCurrentOrganization(newOrg);
         toast({
           title: "Success",
           description: "Organization created successfully",
           variant: "default",
         });
-        navigate("/");
+        navigate(`/organizations/${newOrg.id}`);
       },
       onError: (error) => {
         toast({

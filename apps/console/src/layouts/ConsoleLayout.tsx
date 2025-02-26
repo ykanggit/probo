@@ -29,14 +29,32 @@ import { ConsoleLayoutBreadcrumbFrameworkOverviewQuery } from "./__generated__/C
 import { ConsoleLayoutBreadcrumbPeopleOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbPeopleOverviewQuery.graphql";
 import { ConsoleLayoutBreadcrumbVendorOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbVendorOverviewQuery.graphql";
 import { ConsoleLayoutBreadcrumbControlOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbControlOverviewQuery.graphql";
+import { ConsoleLayoutOrganizationQuery } from "./__generated__/ConsoleLayoutOrganizationQuery.graphql";
 
 function BreadcrumbHome({ children }: { children: React.ReactNode }) {
+  const { organizationId } = useParams();
+  const data = useLazyLoadQuery<ConsoleLayoutOrganizationQuery>(
+    graphql`
+      query ConsoleLayoutOrganizationQuery($organizationId: ID!) {
+        organization: node(id: $organizationId) {
+          ... on Organization {
+            name
+          }
+        }
+      }
+    `,
+    { organizationId: organizationId! },
+    { fetchPolicy: "store-or-network" }
+  );
+
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link to="/">Home</Link>
+            <Link to={`/organizations/${organizationId}`}>
+              {data.organization?.name || "Home"}
+            </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         {children}
@@ -46,12 +64,15 @@ function BreadcrumbHome({ children }: { children: React.ReactNode }) {
 }
 
 function BreadcrumbFrameworkList() {
+  const { organizationId } = useParams();
   return (
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
-          <Link to="/frameworks">Frameworks</Link>
+          <Link to={`/organizations/${organizationId}/frameworks`}>
+            Frameworks
+          </Link>
         </BreadcrumbLink>
       </BreadcrumbItem>
       <Outlet />
@@ -60,7 +81,7 @@ function BreadcrumbFrameworkList() {
 }
 
 function BreadcrumbFrameworkOverview() {
-  const { frameworkId } = useParams();
+  const { organizationId, frameworkId } = useParams();
   const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbFrameworkOverviewQuery>(
     graphql`
       query ConsoleLayoutBreadcrumbFrameworkOverviewQuery($frameworkId: ID!) {
@@ -81,7 +102,9 @@ function BreadcrumbFrameworkOverview() {
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
-          <Link to={`/frameworks/${data.framework.id}`}>
+          <Link
+            to={`/organizations/${organizationId}/frameworks/${data.framework.id}`}
+          >
             {data.framework.name}
           </Link>
         </BreadcrumbLink>
@@ -91,71 +114,14 @@ function BreadcrumbFrameworkOverview() {
   );
 }
 
-function BreadcrumbPeopleList() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link to="/peoples">People</Link>
-        </BreadcrumbLink>
-      </BreadcrumbItem>
-      <Outlet />
-    </>
-  );
-}
-
-function BreadcrumbCreatePeople() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link to="/peoples/create">Create People</Link>
-        </BreadcrumbLink>
-      </BreadcrumbItem>
-      <Outlet />
-    </>
-  );
-}
-
-function BreadcrumbPeopleOverview() {
-  const { peopleId } = useParams();
-  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbPeopleOverviewQuery>(
-    graphql`
-      query ConsoleLayoutBreadcrumbPeopleOverviewQuery($peopleId: ID!) {
-        people: node(id: $peopleId) {
-          id
-          ... on People {
-            fullName
-          }
-        }
-      }
-    `,
-    { peopleId: peopleId! },
-    { fetchPolicy: "store-or-network" }
-  );
-
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link to={`/peoples/${data.people.id}`}>{data.people.fullName}</Link>
-        </BreadcrumbLink>
-      </BreadcrumbItem>
-      <Outlet />
-    </>
-  );
-}
-
 function BreadcrumbVendorList() {
+  const { organizationId } = useParams();
   return (
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
-          <Link to="/vendors">Vendors</Link>
+          <Link to={`/organizations/${organizationId}/vendors`}>Vendors</Link>
         </BreadcrumbLink>
       </BreadcrumbItem>
       <Outlet />
@@ -164,7 +130,7 @@ function BreadcrumbVendorList() {
 }
 
 function BreadcrumbVendorOverview() {
-  const { vendorId } = useParams();
+  const { organizationId, vendorId } = useParams();
   const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbVendorOverviewQuery>(
     graphql`
       query ConsoleLayoutBreadcrumbVendorOverviewQuery($vendorId: ID!) {
@@ -185,15 +151,91 @@ function BreadcrumbVendorOverview() {
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
-          <Link to={`/vendors/${data.vendor.id}`}>{data.vendor.name}</Link>
+          <Link
+            to={`/organizations/${organizationId}/vendors/${data.vendor.id}`}
+          >
+            {data.vendor.name}
+          </Link>
         </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbPeopleList() {
+  const { organizationId } = useParams();
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to={`/organizations/${organizationId}/peoples`}>People</Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbCreatePeople() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Create</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbPeopleOverview() {
+  const { organizationId, peopleId } = useParams();
+  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbPeopleOverviewQuery>(
+    graphql`
+      query ConsoleLayoutBreadcrumbPeopleOverviewQuery($peopleId: ID!) {
+        people: node(id: $peopleId) {
+          id
+          ... on People {
+            fullName
+          }
+        }
+      }
+    `,
+    { peopleId: peopleId! },
+    { fetchPolicy: "store-or-network" }
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link
+            to={`/organizations/${organizationId}/peoples/${data.people.id}`}
+          >
+            {data.people.fullName}
+          </Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbCreateOrganization() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Create Organization</BreadcrumbPage>
       </BreadcrumbItem>
     </>
   );
 }
 
 function BreadcrumbControlOverview() {
-  const { frameworkId, controlId } = useParams();
+  const { organizationId, frameworkId, controlId } = useParams();
   const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbControlOverviewQuery>(
     graphql`
       query ConsoleLayoutBreadcrumbControlOverviewQuery(
@@ -223,7 +265,9 @@ function BreadcrumbControlOverview() {
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
-          <Link to={`/frameworks/${data.framework.id}`}>
+          <Link
+            to={`/organizations/${organizationId}/frameworks/${data.framework.id}`}
+          >
             {data.framework.name}
           </Link>
         </BreadcrumbLink>
@@ -232,7 +276,7 @@ function BreadcrumbControlOverview() {
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
           <Link
-            to={`/frameworks/${data.framework.id}/controls/${data.control.id}`}
+            to={`/organizations/${organizationId}/frameworks/${data.framework.id}/controls/${data.control.id}`}
           >
             {data.control.name}
           </Link>
@@ -243,21 +287,9 @@ function BreadcrumbControlOverview() {
   );
 }
 
-function BreadcrumbCreateOrganization() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link to="/organizations/create">Create Organization</Link>
-        </BreadcrumbLink>
-      </BreadcrumbItem>
-      <Outlet />
-    </>
-  );
-}
-
 export default function ConsoleLayout() {
+  const { organizationId } = useParams();
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -268,36 +300,29 @@ export default function ConsoleLayout() {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <BreadcrumbHome>
               <Routes>
-                <Route path="/frameworks" element={<BreadcrumbFrameworkList />}>
+                <Route path="frameworks" element={<BreadcrumbFrameworkList />}>
                   <Route
-                    path="/frameworks/:frameworkId"
+                    path=":frameworkId"
                     element={<BreadcrumbFrameworkOverview />}
                   />
                   <Route
-                    path="/frameworks/:frameworkId/controls/:controlId"
+                    path=":frameworkId/controls/:controlId"
                     element={<BreadcrumbControlOverview />}
                   />
                 </Route>
-                <Route path="/peoples" element={<BreadcrumbPeopleList />}>
+                <Route path="peoples" element={<BreadcrumbPeopleList />}>
                   <Route
-                    path="/peoples/:peopleId"
+                    path=":peopleId"
                     element={<BreadcrumbPeopleOverview />}
                   />
-                  <Route
-                    path="/peoples/create"
-                    element={<BreadcrumbCreatePeople />}
-                  />
+                  <Route path="create" element={<BreadcrumbCreatePeople />} />
                 </Route>
-                <Route path="/vendors" element={<BreadcrumbVendorList />}>
+                <Route path="vendors" element={<BreadcrumbVendorList />}>
                   <Route
-                    path="/vendors/:vendorId"
+                    path=":vendorId"
                     element={<BreadcrumbVendorOverview />}
                   />
                 </Route>
-                <Route
-                  path="/organizations/create"
-                  element={<BreadcrumbCreateOrganization />}
-                />
               </Routes>
             </BreadcrumbHome>
           </div>

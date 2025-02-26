@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Suspense, useEffect } from "react";
+import { useParams } from "react-router";
 import {
   BookOpen,
   Users,
@@ -31,55 +32,52 @@ import {
 } from "@/components/ui/sidebar";
 import type { AppSidebarQuery as AppSidebarQueryType } from "./__generated__/AppSidebarQuery.graphql";
 import { TeamSwitcher } from "@/components/TeamSwitcher";
-import { url } from "inspector";
-const staticData = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Frameworks",
-      url: "/frameworks",
-      icon: BookOpen,
-    },
-    {
-      title: "Organizations",
-      icon: Building,
-      url: "/peoples",
-      items: [
-        {
-          title: "Peoples",
-          url: "/peoples",
-          icon: Users,
-        },
-        {
-          title: "Vendors",
-          url: "/vendors",
-          icon: ToyBrick,
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings,
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-};
+
+function getNavItems(organizationId: string) {
+  return {
+    navMain: [
+      {
+        title: "Frameworks",
+        url: `/organizations/${organizationId}/frameworks`,
+        icon: BookOpen,
+      },
+      {
+        title: "Organizations",
+        icon: Building,
+        url: `/organizations/${organizationId}/peoples`,
+        items: [
+          {
+            title: "Peoples",
+            url: `/organizations/${organizationId}/peoples`,
+            icon: Users,
+          },
+          {
+            title: "Vendors",
+            url: `/organizations/${organizationId}/vendors`,
+            icon: ToyBrick,
+          },
+        ],
+      },
+      {
+        title: "Settings",
+        url: `/organizations/${organizationId}/settings`,
+        icon: Settings,
+      },
+    ],
+    navSecondary: [
+      {
+        title: "Support",
+        url: "#",
+        icon: LifeBuoy,
+      },
+      {
+        title: "Feedback",
+        url: "#",
+        icon: Send,
+      },
+    ],
+  };
+}
 
 const AppSidebarQuery = graphql`
   query AppSidebarQuery {
@@ -97,7 +95,9 @@ function AppSidebarContent({
 }: React.ComponentProps<typeof Sidebar> & {
   queryRef: PreloadedQuery<AppSidebarQueryType>;
 }) {
+  const { organizationId } = useParams();
   const data = usePreloadedQuery(AppSidebarQuery, queryRef);
+  const navItems = getNavItems(organizationId!);
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -105,8 +105,8 @@ function AppSidebarContent({
         <TeamSwitcher organizations={data.viewer} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={staticData.navMain} />
-        <NavSecondary items={staticData.navSecondary} className="mt-auto" />
+        <NavMain items={navItems.navMain} />
+        <NavSecondary items={navItems.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser viewer={data.viewer} />
@@ -121,39 +121,37 @@ function AppSidebarFallback(props: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="size-8 rounded-lg bg-muted animate-pulse" />
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-                  </span>
-                  <span className="truncate text-xs">Enterprise</span>
-                </div>
-              </a>
+            <SidebarMenuButton size="lg">
+              <div className="h-8 w-8 rounded-lg bg-sidebar-muted" />
+              <div className="flex-1 space-y-1">
+                <div className="h-4 w-3/4 rounded-lg bg-sidebar-muted" />
+                <div className="h-3 w-1/2 rounded-lg bg-sidebar-muted" />
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={staticData.navMain} />
-        <NavSecondary items={staticData.navSecondary} className="mt-auto" />
+        <SidebarMenu>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <SidebarMenuItem key={i}>
+              <SidebarMenuButton>
+                <div className="h-4 w-4 rounded-lg bg-sidebar-muted" />
+                <div className="h-4 w-24 rounded-lg bg-sidebar-muted" />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-                  </span>
-                  <span className="truncate text-xs">
-                    <div className="h-3 w-32 animate-pulse rounded bg-muted" />
-                  </span>
-                </div>
-              </a>
+            <SidebarMenuButton size="lg">
+              <div className="h-8 w-8 rounded-lg bg-sidebar-muted" />
+              <div className="flex-1 space-y-1">
+                <div className="h-4 w-3/4 rounded-lg bg-sidebar-muted" />
+                <div className="h-3 w-1/2 rounded-lg bg-sidebar-muted" />
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { ChevronsUpDown, Plus } from "lucide-react";
 import { graphql, useFragment } from "react-relay";
-import { useOrganization } from "@/contexts/OrganizationContext";
-import { Link } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 
 import {
   DropdownMenu,
@@ -54,20 +53,22 @@ export function TeamSwitcher({
 }) {
   const { isMobile } = useSidebar();
   const data = useFragment(teamSwitcherFragment, organizations);
-  const { currentOrganization, setCurrentOrganization } = useOrganization();
+  const navigate = useNavigate();
+  const { organizationId } = useParams();
+  const [currentOrganization, setCurrentOrganization] =
+    useState<Organization | null>(null);
 
   useEffect(() => {
-    console.log(data.organizations);
-
-    if (
-      data.organizations &&
-      data.organizations.edges.length > 0 &&
-      !currentOrganization
-    ) {
-      // Type assertion to include plan field
-      setCurrentOrganization(data.organizations.edges[0].node);
+    if (data.organizations && data.organizations.edges.length > 0) {
+      // Find the current organization based on the URL parameter
+      const org = data.organizations.edges.find(
+        (edge) => edge.node.id === organizationId
+      );
+      if (org) {
+        setCurrentOrganization(org.node);
+      }
     }
-  }, [data.organizations, currentOrganization, setCurrentOrganization]);
+  }, [data.organizations, organizationId]);
 
   // If no organizations or data is still loading
   if (!currentOrganization) {
@@ -86,6 +87,11 @@ export function TeamSwitcher({
       return <img src={org.logoUrl} alt={org.name} className={className} />;
     }
     return null;
+  };
+
+  const handleOrganizationSwitch = (org: Organization) => {
+    // Navigate to the selected organization
+    navigate(`/organizations/${org.id}`);
   };
 
   return (
@@ -121,7 +127,7 @@ export function TeamSwitcher({
             {data.organizations.edges.map((edge, index) => (
               <DropdownMenuItem
                 key={edge.node.id}
-                onClick={() => setCurrentOrganization(edge.node)}
+                onClick={() => handleOrganizationSwitch(edge.node)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">

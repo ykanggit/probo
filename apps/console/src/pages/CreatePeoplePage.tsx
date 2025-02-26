@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   graphql,
   PreloadedQuery,
@@ -18,7 +18,6 @@ import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CreatePeoplePageCreatePeopleMutation } from "./__generated__/CreatePeoplePageCreatePeopleMutation.graphql";
-import { useOrganization } from "@/contexts/OrganizationContext";
 
 const createPeopleMutation = graphql`
   mutation CreatePeoplePageCreatePeopleMutation(
@@ -75,7 +74,7 @@ function EditableField({
 
 function CreatePeoplePageContent() {
   const navigate = useNavigate();
-  const { currentOrganization } = useOrganization();
+  const { organizationId } = useParams();
 
   const [createPeople] =
     useMutation<CreatePeoplePageCreatePeopleMutation>(createPeopleMutation);
@@ -97,7 +96,7 @@ function CreatePeoplePageContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const peopleConnectionId = ConnectionHandler.getConnectionID(
-      currentOrganization!.id,
+      organizationId!,
       "PeopleListPage_peoples"
     );
 
@@ -105,7 +104,7 @@ function CreatePeoplePageContent() {
       variables: {
         connections: [peopleConnectionId],
         input: {
-          organizationId: currentOrganization!.id,
+          organizationId: organizationId!,
           fullName: formData.fullName,
           primaryEmailAddress: formData.primaryEmailAddress,
           additionalEmailAddresses: formData.additionalEmailAddresses,

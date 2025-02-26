@@ -7,7 +7,7 @@ import {
   useMutation,
   usePaginationFragment,
 } from "react-relay";
-import { useSearchParams } from "react-router";
+import { useSearchParams, useParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Trash2, ChevronRight } from "lucide-react";
@@ -18,7 +18,6 @@ import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generat
 import type { PeopleListPageDeletePeopleMutation } from "./__generated__/PeopleListPageDeletePeopleMutation.graphql";
 import { PeopleListPagePaginationQuery } from "./__generated__/PeopleListPagePaginationQuery.graphql";
 import { PeopleListPage_peoples$key } from "./__generated__/PeopleListPage_peoples.graphql";
-import { useOrganization } from "@/contexts/OrganizationContext";
 
 const ITEMS_PER_PAGE = 25;
 
@@ -141,6 +140,7 @@ function PeopleListContent({
   const [isPending, startTransition] = useTransition();
   const [deletePeople] =
     useMutation<PeopleListPageDeletePeopleMutation>(deletePeopleMutation);
+  const { organizationId } = useParams();
 
   const {
     data: peoplesConnection,
@@ -177,7 +177,7 @@ function PeopleListContent({
           style={{ borderRadius: "0.5rem" }}
           className="gap-2"
         >
-          <Link to="/peoples/create">
+          <Link to={`/organizations/${organizationId}/peoples/create`}>
             <UserPlus className="h-4 w-4" />
             Add a people
           </Link>
@@ -188,7 +188,7 @@ function PeopleListContent({
         {peoples.map((person) => (
           <Link
             key={person?.id}
-            to={`/peoples/${person?.id}`}
+            to={`/organizations/${organizationId}/peoples/${person?.id}`}
             className="block"
           >
             <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">
@@ -307,20 +307,20 @@ export default function PeopleListPage() {
   const [queryRef, loadQuery] =
     useQueryLoader<PeopleListPageQueryType>(peopleListPageQuery);
 
-  const { currentOrganization } = useOrganization();
+  const { organizationId } = useParams();
 
   useEffect(() => {
     const after = searchParams.get("after");
     const before = searchParams.get("before");
 
     loadQuery({
-      organizationId: currentOrganization!.id,
+      organizationId: organizationId!,
       first: before ? undefined : ITEMS_PER_PAGE,
       after: after || undefined,
       last: before ? ITEMS_PER_PAGE : undefined,
       before: before || undefined,
     });
-  }, [loadQuery, currentOrganization]);
+  }, [loadQuery, organizationId, searchParams]);
 
   if (!queryRef) {
     return <PeopleListPageFallback />;

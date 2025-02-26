@@ -22,8 +22,8 @@ import {
   usePreloadedQuery,
   useQueryLoader,
 } from "react-relay";
+import { useParams } from "react-router";
 import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__/SettingsPageQuery.graphql";
-import { useOrganization } from "@/contexts/OrganizationContext";
 
 const settingsPageQuery = graphql`
   query SettingsPageQuery($organizationID: ID!) {
@@ -217,11 +217,11 @@ export default function SettingsPage() {
   const [queryRef, loadQuery] =
     useQueryLoader<SettingsPageQueryType>(settingsPageQuery);
 
-  const { currentOrganization } = useOrganization();
+  const { organizationId } = useParams();
 
   useEffect(() => {
-    loadQuery({ organizationID: currentOrganization!.id });
-  }, [loadQuery, currentOrganization]);
+    loadQuery({ organizationID: organizationId! });
+  }, [loadQuery, organizationId]);
 
   if (!queryRef) {
     return <SettingsPageFallback />;

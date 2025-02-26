@@ -9,6 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { graphql, useFragment } from "react-relay";
+import { useNavigate } from "react-router";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -26,6 +27,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   NavUser_viewer$key,
   NavUser_viewer$data,
@@ -42,6 +44,13 @@ export const navUserFragment = graphql`
 export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
   const { isMobile } = useSidebar();
   const currentUser = useFragment(navUserFragment, viewer);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   return (
     <SidebarMenu>
@@ -116,7 +125,7 @@ export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

@@ -7,7 +7,7 @@ import {
   useMutation,
   usePaginationFragment,
 } from "react-relay";
-import { useSearchParams } from "react-router";
+import { useSearchParams, useParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Store, ChevronRight, Trash2 } from "lucide-react";
@@ -22,7 +22,6 @@ import { VendorListPageDeleteVendorMutation } from "./__generated__/VendorListPa
 import { VendorListPagePaginationQuery } from "./__generated__/VendorListPagePaginationQuery.graphql";
 import { VendorListPage_vendors$key } from "./__generated__/VendorListPage_vendors.graphql";
 import { useToast } from "@/hooks/use-toast";
-import { useOrganization } from "@/contexts/OrganizationContext";
 
 const ITEMS_PER_PAGE = 25;
 
@@ -199,6 +198,7 @@ function VendorListContent({
     useMutation<VendorListPageCreateVendorMutation>(createVendorMutation);
   const [deleteVendor] =
     useMutation<VendorListPageDeleteVendorMutation>(deleteVendorMutation);
+  const { organizationId } = useParams();
 
   const {
     data: vendorsConnection,
@@ -300,7 +300,7 @@ function VendorListContent({
         {vendors.map((vendor) => (
           <Link
             key={vendor?.id}
-            to={`/vendors/${vendor?.id}`}
+            to={`/organizations/${organizationId}/vendors/${vendor?.id}`}
             className="block"
           >
             <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">
@@ -425,20 +425,20 @@ export default function VendorListPage() {
   const [queryRef, loadQuery] =
     useQueryLoader<VendorListPageQueryType>(vendorListPageQuery);
 
-  const { currentOrganization } = useOrganization();
+  const { organizationId } = useParams();
 
   useEffect(() => {
     const after = searchParams.get("after");
     const before = searchParams.get("before");
 
     loadQuery({
-      organizationId: currentOrganization!.id,
+      organizationId: organizationId!,
       first: before ? undefined : ITEMS_PER_PAGE,
       after: after || undefined,
       last: before ? ITEMS_PER_PAGE : undefined,
       before: before || undefined,
     });
-  }, [loadQuery, currentOrganization]);
+  }, [loadQuery, organizationId, searchParams]);
 
   if (!queryRef) {
     return <VendorListFallback />;

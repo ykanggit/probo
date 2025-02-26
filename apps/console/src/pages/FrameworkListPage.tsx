@@ -6,10 +6,9 @@ import {
   useQueryLoader,
 } from "react-relay";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "react-router";
+import { Link, useParams } from "react-router";
 import type { FrameworkListPageQuery as FrameworkListPageQueryType } from "./__generated__/FrameworkListPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
-import { useOrganization } from "@/contexts/OrganizationContext";
 
 const FrameworkListPageQuery = graphql`
   query FrameworkListPageQuery($organizationId: ID!) {
@@ -86,6 +85,7 @@ function FrameworkListPageContent({
   queryRef: PreloadedQuery<FrameworkListPageQueryType>;
 }) {
   const data = usePreloadedQuery(FrameworkListPageQuery, queryRef);
+  const { organizationId } = useParams();
   const frameworks =
     data.organization.frameworks?.edges.map((edge) => edge?.node) ?? [];
 
@@ -101,12 +101,15 @@ function FrameworkListPageContent({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
         {frameworks.map((framework) => {
           const validatedControls = framework.controls.edges.filter(
-            (edge) => edge?.node?.state === "IMPLEMENTED",
+            (edge) => edge?.node?.state === "IMPLEMENTED"
           ).length;
           const totalControls = framework.controls.edges.length;
 
           return (
-            <Link key={framework.id} to={`/frameworks/${framework.id}`}>
+            <Link
+              key={framework.id}
+              to={`/organizations/${organizationId}/frameworks/${framework.id}`}
+            >
               <FrameworkCard
                 title={framework.name}
                 description={framework.description}
@@ -161,14 +164,14 @@ function FrameworkListPageFallback() {
 
 export default function FrameworkListPage() {
   const [queryRef, loadQuery] = useQueryLoader<FrameworkListPageQueryType>(
-    FrameworkListPageQuery,
+    FrameworkListPageQuery
   );
 
-  const { currentOrganization } = useOrganization();
+  const { organizationId } = useParams();
 
   useEffect(() => {
-    loadQuery({ organizationId: currentOrganization!.id });
-  }, [loadQuery, currentOrganization]);
+    loadQuery({ organizationId: organizationId! });
+  }, [loadQuery, organizationId]);
 
   return (
     <>
