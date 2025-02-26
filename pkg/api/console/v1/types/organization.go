@@ -27,3 +27,9 @@ func NewOrganization(o *coredata.Organization) *Organization {
 		UpdatedAt: o.UpdatedAt,
 	}
 }
+
+func NewOrganizationEdge(o *coredata.Organization) *OrganizationEdge {
+	return &OrganizationEdge{
+		Node: NewOrganization(o),
+	}
+}

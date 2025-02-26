@@ -73,7 +73,7 @@ function BreadcrumbFrameworkOverview() {
       }
     `,
     { frameworkId: frameworkId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -133,7 +133,7 @@ function BreadcrumbPeopleOverview() {
       }
     `,
     { peopleId: peopleId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -177,7 +177,7 @@ function BreadcrumbVendorOverview() {
       }
     `,
     { vendorId: vendorId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -215,7 +215,7 @@ function BreadcrumbControlOverview() {
       }
     `,
     { frameworkId: frameworkId!, controlId: controlId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -236,6 +236,20 @@ function BreadcrumbControlOverview() {
           >
             {data.control.name}
           </Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbCreateOrganization() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to="/organizations/create">Create Organization</Link>
         </BreadcrumbLink>
       </BreadcrumbItem>
       <Outlet />
@@ -280,6 +294,10 @@ export default function ConsoleLayout() {
                     element={<BreadcrumbVendorOverview />}
                   />
                 </Route>
+                <Route
+                  path="/organizations/create"
+                  element={<BreadcrumbCreateOrganization />}
+                />
               </Routes>
             </BreadcrumbHome>
           </div>

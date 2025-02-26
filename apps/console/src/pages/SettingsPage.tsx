@@ -23,12 +23,13 @@ import {
   useQueryLoader,
 } from "react-relay";
 import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__/SettingsPageQuery.graphql";
+import { useOrganization } from "@/contexts/OrganizationContext";
 
 const settingsPageQuery = graphql`
-  query SettingsPageQuery {
-    viewer {
+  query SettingsPageQuery($organizationID: ID!) {
+    organization: node(id: $organizationID) {
       id
-      organizations {
+      ... on Organization {
         name
         logoUrl
       }
@@ -49,7 +50,7 @@ function SettingsPageContent({
   queryRef: PreloadedQuery<SettingsPageQueryType>;
 }) {
   const data = usePreloadedQuery(settingsPageQuery, queryRef);
-  const organization = data.viewer.organizations[0];
+  const organization = data.organization;
   const members: Member[] = [];
 
   return (
@@ -216,9 +217,11 @@ export default function SettingsPage() {
   const [queryRef, loadQuery] =
     useQueryLoader<SettingsPageQueryType>(settingsPageQuery);
 
+  const { currentOrganization } = useOrganization();
+
   useEffect(() => {
-    loadQuery({});
-  }, [loadQuery]);
+    loadQuery({ organizationID: currentOrganization!.id });
+  }, [loadQuery, currentOrganization]);
 
   if (!queryRef) {
     return <SettingsPageFallback />;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f2e46ea14241587a319e9a6af9072bb9>>
+ * @generated SignedSource<<9a5ce377f093c4bbbb2375aacc373fb0>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,14 +9,14 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type SettingsPageQuery$variables = Record<PropertyKey, never>;
+export type SettingsPageQuery$variables = {
+  organizationID: string;
+};
 export type SettingsPageQuery$data = {
-  readonly viewer: {
+  readonly organization: {
     readonly id: string;
-    readonly organizations: ReadonlyArray<{
-      readonly logoUrl: string;
-      readonly name: string;
-    }>;
+    readonly logoUrl?: string;
+    readonly name?: string;
   };
 };
 export type SettingsPageQuery = {
@@ -25,56 +25,65 @@ export type SettingsPageQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = {
+var v0 = [
+  {
+    "defaultValue": null,
+    "kind": "LocalArgument",
+    "name": "organizationID"
+  }
+],
+v1 = [
+  {
+    "kind": "Variable",
+    "name": "id",
+    "variableName": "organizationID"
+  }
+],
+v2 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v1 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "name",
-  "storageKey": null
-},
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "logoUrl",
-  "storageKey": null
+v3 = {
+  "kind": "InlineFragment",
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "name",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "logoUrl",
+      "storageKey": null
+    }
+  ],
+  "type": "Organization",
+  "abstractKey": null
 };
 return {
   "fragment": {
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
     "name": "SettingsPageQuery",
     "selections": [
       {
-        "alias": null,
-        "args": null,
-        "concreteType": "User",
+        "alias": "organization",
+        "args": (v1/*: any*/),
+        "concreteType": null,
         "kind": "LinkedField",
-        "name": "viewer",
+        "name": "node",
         "plural": false,
         "selections": [
-          (v0/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Organization",
-            "kind": "LinkedField",
-            "name": "organizations",
-            "plural": true,
-            "selections": [
-              (v1/*: any*/),
-              (v2/*: any*/)
-            ],
-            "storageKey": null
-          }
+          (v2/*: any*/),
+          (v3/*: any*/)
         ],
         "storageKey": null
       }
@@ -84,49 +93,43 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
     "name": "SettingsPageQuery",
     "selections": [
       {
-        "alias": null,
-        "args": null,
-        "concreteType": "User",
+        "alias": "organization",
+        "args": (v1/*: any*/),
+        "concreteType": null,
         "kind": "LinkedField",
-        "name": "viewer",
+        "name": "node",
         "plural": false,
         "selections": [
-          (v0/*: any*/),
           {
             "alias": null,
             "args": null,
-            "concreteType": "Organization",
-            "kind": "LinkedField",
-            "name": "organizations",
-            "plural": true,
-            "selections": [
-              (v1/*: any*/),
-              (v2/*: any*/),
-              (v0/*: any*/)
-            ],
+            "kind": "ScalarField",
+            "name": "__typename",
             "storageKey": null
-          }
+          },
+          (v2/*: any*/),
+          (v3/*: any*/)
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "5a3f5c431e1f886a330d220fd33a33f3",
+    "cacheID": "1ff42392cdd403c92101dc9c5fb7ceda",
     "id": null,
     "metadata": {},
     "name": "SettingsPageQuery",
     "operationKind": "query",
-    "text": "query SettingsPageQuery {\n  viewer {\n    id\n    organizations {\n      name\n      logoUrl\n      id\n    }\n  }\n}\n"
+    "text": "query SettingsPageQuery(\n  $organizationID: ID!\n) {\n  organization: node(id: $organizationID) {\n    __typename\n    id\n    ... on Organization {\n      name\n      logoUrl\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "cef332dd829051516fa47315c3a60d1f";
+(node as any).hash = "60cdb8a35f7e5f58536101243b57e57c";
 
 export default node;

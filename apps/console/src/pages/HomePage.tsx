@@ -13,104 +13,108 @@ export const HomePageQuery = graphql`
     viewer {
       id
       organizations {
-        name
-        createdAt
-        updatedAt
-        vendors {
-          edges {
-            node {
-              id
-              name
-              createdAt
-              updatedAt
+        edges {
+          node {
+            name
+            createdAt
+            updatedAt
+            vendors {
+              edges {
+                node {
+                  id
+                  name
+                  createdAt
+                  updatedAt
+                }
+              }
             }
-          }
-        }
-        peoples {
-          edges {
-            node {
-              id
-              fullName
-              primaryEmailAddress
-              additionalEmailAddresses
-              createdAt
-              updatedAt
+            peoples {
+              edges {
+                node {
+                  id
+                  fullName
+                  primaryEmailAddress
+                  additionalEmailAddresses
+                  createdAt
+                  updatedAt
+                }
+              }
             }
-          }
-        }
-        frameworks {
-          pageInfo {
-            hasNextPage
-            hasPreviousPage
-            startCursor
-            endCursor
-          }
-          edges {
-            cursor
-            node {
-              id
-              name
-              description
-              controls {
-                edges {
-                  node {
-                    id
-                    name
-                    state
-                    stateTransisions {
-                      edges {
-                        node {
-                          id
-                          toState
-                          fromState
-                          createdAt
-                          updatedAt
+            frameworks {
+              pageInfo {
+                hasNextPage
+                hasPreviousPage
+                startCursor
+                endCursor
+              }
+              edges {
+                cursor
+                node {
+                  id
+                  name
+                  description
+                  controls {
+                    edges {
+                      node {
+                        id
+                        name
+                        state
+                        stateTransisions {
+                          edges {
+                            node {
+                              id
+                              toState
+                              fromState
+                              createdAt
+                              updatedAt
+                            }
+                          }
                         }
-                      }
-                    }
-                    tasks {
-                      edges {
-                        node {
-                          id
-                          name
-                          state
-                          evidences {
-                            edges {
-                              node {
-                                id
-                                state
-                                fileUrl
-                                stateTransisions {
-                                  edges {
-                                    node {
-                                      id
-                                      fromState
-                                      toState
-                                      reason
-                                      createdAt
-                                      updatedAt
+                        tasks {
+                          edges {
+                            node {
+                              id
+                              name
+                              state
+                              evidences {
+                                edges {
+                                  node {
+                                    id
+                                    state
+                                    fileUrl
+                                    stateTransisions {
+                                      edges {
+                                        node {
+                                          id
+                                          fromState
+                                          toState
+                                          reason
+                                          createdAt
+                                          updatedAt
+                                        }
+                                      }
                                     }
+                                    createdAt
+                                    updatedAt
                                   }
                                 }
-                                createdAt
-                                updatedAt
                               }
+                              stateTransisions {
+                                edges {
+                                  node {
+                                    id
+                                    toState
+                                    fromState
+                                    reason
+                                    createdAt
+                                    updatedAt
+                                  }
+                                }
+                              }
+                              createdAt
+                              updatedAt
                             }
                           }
-                          stateTransisions {
-                            edges {
-                              node {
-                                id
-                                toState
-                                fromState
-                                reason
-                                createdAt
-                                updatedAt
-                              }
-                            }
-                          }
-                          createdAt
-                          updatedAt
                         }
                       }
                     }

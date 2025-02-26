@@ -169,6 +169,30 @@ func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeleteP
 	}, nil
 }
 
+// CreateOrganization is the resolver for the createOrganization field.
+func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error) {
+	organization, err := r.proboSvc.CreateOrganization(ctx, probo.CreateOrganizationRequest{
+		Name: input.Name,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create organization: %w", err)
+	}
+
+	err = r.usrmgrSvc.AddUserToOrganization(ctx, UserFromContext(ctx).ID, organization.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot add user to organization: %w", err)
+	}
+
+	return &types.CreateOrganizationPayload{
+		OrganizationEdge: types.NewOrganizationEdge(organization),
+	}, nil
+}
+
+// DeleteOrganization is the resolver for the deleteOrganization field.
+func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteOrganization - deleteOrganization"))
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
@@ -300,29 +324,35 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 }
 
 // Organizations is the resolver for the organizations field.
-func (r *userResolver) Organizations(ctx context.Context, obj *types.User) ([]*types.Organization, error) {
+func (r *userResolver) Organizations(ctx context.Context, obj *types.User, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.OrganizationConnection, error) {
 	// Get the user's organization IDs
 	organizationIDs, err := r.usrmgrSvc.GetUserOrganizations(ctx, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user organizations: %w", err)
 	}
 
-	// If the user doesn't have any organizations, return an empty slice
+	// If the user doesn't have any organizations, return an empty connection
 	if len(organizationIDs) == 0 {
-		return []*types.Organization{}, nil
+		return &types.OrganizationConnection{
+			Edges:    []*types.OrganizationEdge{},
+			PageInfo: &types.PageInfo{},
+		}, nil
 	}
 
 	// Get the organization details for each organization ID
-	var organizations []*types.Organization
+	var edges []*types.OrganizationEdge
 	for _, organizationID := range organizationIDs {
 		organization, err := r.proboSvc.GetOrganization(ctx, organizationID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get organization details: %w", err)
 		}
-		organizations = append(organizations, types.NewOrganization(organization))
+		edges = append(edges, types.NewOrganizationEdge(organization))
 	}
 
-	return organizations, nil
+	return &types.OrganizationConnection{
+		Edges:    edges,
+		PageInfo: &types.PageInfo{},
+	}, nil
 }
 
 // Control returns schema.ControlResolver implementation.

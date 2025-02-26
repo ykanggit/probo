@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ChevronsUpDown, Plus } from "lucide-react";
 import { graphql, useFragment } from "react-relay";
 import { useOrganization } from "@/contexts/OrganizationContext";
+import { Link } from "react-router";
 
 import {
   DropdownMenu,
@@ -27,18 +28,24 @@ import {
 
 export const teamSwitcherFragment = graphql`
   fragment TeamSwitcher_organizations on User {
-    organizations {
-      id
-      name
-      logoUrl
+    organizations(first: 25) @connection(key: "TeamSwitcher_organizations") {
+      __id
+      edges {
+        node {
+          id
+          name
+          logoUrl
+        }
+      }
     }
   }
 `;
 
 // Extended type to include plan field until Relay compiler generates the types
-type Organization = TeamSwitcher_organizations$data["organizations"][0] & {
-  plan?: string;
-};
+type Organization =
+  TeamSwitcher_organizations$data["organizations"]["edges"][0]["node"] & {
+    plan?: string;
+  };
 
 export function TeamSwitcher({
   organizations,
@@ -50,13 +57,15 @@ export function TeamSwitcher({
   const { currentOrganization, setCurrentOrganization } = useOrganization();
 
   useEffect(() => {
+    console.log(data.organizations);
+
     if (
       data.organizations &&
-      data.organizations.length > 0 &&
+      data.organizations.edges.length > 0 &&
       !currentOrganization
     ) {
       // Type assertion to include plan field
-      setCurrentOrganization(data.organizations[0] as Organization);
+      setCurrentOrganization(data.organizations.edges[0].node);
     }
   }, [data.organizations, currentOrganization, setCurrentOrganization]);
 
@@ -109,27 +118,32 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-xs text-muted-foreground">
               Organizations
             </DropdownMenuLabel>
-            {data.organizations.map((org: Organization, index: number) => (
+            {data.organizations.edges.map((edge, index) => (
               <DropdownMenuItem
-                key={org.id}
-                onClick={() => setCurrentOrganization(org)}
+                key={edge.node.id}
+                onClick={() => setCurrentOrganization(edge.node)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <LogoComponent org={org} className="size-4 shrink-0" />
+                  <LogoComponent org={edge.node} className="size-4 shrink-0" />
                 </div>
-                {org.name}
+                {edge.node.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                <Plus className="size-4" />
-              </div>
-              <div className="font-medium text-muted-foreground">
-                Add organization
-              </div>
+            <DropdownMenuItem asChild>
+              <Link
+                to="/organizations/create"
+                className="gap-2 p-2 cursor-pointer"
+              >
+                <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                  <Plus className="size-4" />
+                </div>
+                <div className="font-medium text-muted-foreground">
+                  Add organization
+                </div>
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

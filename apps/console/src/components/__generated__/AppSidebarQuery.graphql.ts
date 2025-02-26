@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d060c85c907876f442133c643b917eee>>
+ * @generated SignedSource<<a1cc304a7eb154a19a1ec9a68c2cda98>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -29,7 +29,14 @@ var v0 = {
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
-};
+},
+v1 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 25
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": [],
@@ -80,29 +87,111 @@ return {
           (v0/*: any*/),
           {
             "alias": null,
-            "args": null,
-            "concreteType": "Organization",
+            "args": (v1/*: any*/),
+            "concreteType": "OrganizationConnection",
             "kind": "LinkedField",
             "name": "organizations",
-            "plural": true,
+            "plural": false,
             "selections": [
-              (v0/*: any*/),
               {
                 "alias": null,
                 "args": null,
-                "kind": "ScalarField",
-                "name": "name",
+                "concreteType": "OrganizationEdge",
+                "kind": "LinkedField",
+                "name": "edges",
+                "plural": true,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "Organization",
+                    "kind": "LinkedField",
+                    "name": "node",
+                    "plural": false,
+                    "selections": [
+                      (v0/*: any*/),
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "name",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "logoUrl",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "__typename",
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "cursor",
+                    "storageKey": null
+                  }
+                ],
                 "storageKey": null
               },
               {
                 "alias": null,
                 "args": null,
-                "kind": "ScalarField",
-                "name": "logoUrl",
+                "concreteType": "PageInfo",
+                "kind": "LinkedField",
+                "name": "pageInfo",
+                "plural": false,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "endCursor",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "hasNextPage",
+                    "storageKey": null
+                  }
+                ],
                 "storageKey": null
+              },
+              {
+                "kind": "ClientExtension",
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "__id",
+                    "storageKey": null
+                  }
+                ]
               }
             ],
-            "storageKey": null
+            "storageKey": "organizations(first:25)"
+          },
+          {
+            "alias": null,
+            "args": (v1/*: any*/),
+            "filters": null,
+            "handle": "connection",
+            "key": "TeamSwitcher_organizations",
+            "kind": "LinkedHandle",
+            "name": "organizations"
           },
           {
             "alias": null,
@@ -124,12 +213,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "48137f101a20a5ce116cbf46c2a8cd63",
+    "cacheID": "52b7d912665a4da10a79b82987a7e58a",
     "id": null,
     "metadata": {},
     "name": "AppSidebarQuery",
     "operationKind": "query",
-    "text": "query AppSidebarQuery {\n  viewer {\n    id\n    ...TeamSwitcher_organizations\n    ...NavUser_viewer\n  }\n}\n\nfragment NavUser_viewer on User {\n  id\n  fullName\n  email\n}\n\nfragment TeamSwitcher_organizations on User {\n  organizations {\n    id\n    name\n    logoUrl\n  }\n}\n"
+    "text": "query AppSidebarQuery {\n  viewer {\n    id\n    ...TeamSwitcher_organizations\n    ...NavUser_viewer\n  }\n}\n\nfragment NavUser_viewer on User {\n  id\n  fullName\n  email\n}\n\nfragment TeamSwitcher_organizations on User {\n  organizations(first: 25) {\n    edges {\n      node {\n        id\n        name\n        logoUrl\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();

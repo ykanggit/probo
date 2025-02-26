@@ -97,12 +97,20 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	CreateOrganizationPayload struct {
+		OrganizationEdge func(childComplexity int) int
+	}
+
 	CreatePeoplePayload struct {
 		PeopleEdge func(childComplexity int) int
 	}
 
 	CreateVendorPayload struct {
 		VendorEdge func(childComplexity int) int
+	}
+
+	DeleteOrganizationPayload struct {
+		DeletedOrganizationID func(childComplexity int) int
 	}
 
 	DeletePeoplePayload struct {
@@ -173,12 +181,14 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreatePeople func(childComplexity int, input types.CreatePeopleInput) int
-		CreateVendor func(childComplexity int, input types.CreateVendorInput) int
-		DeletePeople func(childComplexity int, input types.DeletePeopleInput) int
-		DeleteVendor func(childComplexity int, input types.DeleteVendorInput) int
-		UpdatePeople func(childComplexity int, input types.UpdatePeopleInput) int
-		UpdateVendor func(childComplexity int, input types.UpdateVendorInput) int
+		CreateOrganization func(childComplexity int, input types.CreateOrganizationInput) int
+		CreatePeople       func(childComplexity int, input types.CreatePeopleInput) int
+		CreateVendor       func(childComplexity int, input types.CreateVendorInput) int
+		DeleteOrganization func(childComplexity int, input types.DeleteOrganizationInput) int
+		DeletePeople       func(childComplexity int, input types.DeletePeopleInput) int
+		DeleteVendor       func(childComplexity int, input types.DeleteVendorInput) int
+		UpdatePeople       func(childComplexity int, input types.UpdatePeopleInput) int
+		UpdateVendor       func(childComplexity int, input types.UpdateVendorInput) int
 	}
 
 	Organization struct {
@@ -190,6 +200,16 @@ type ComplexityRoot struct {
 		Peoples    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 		UpdatedAt  func(childComplexity int) int
 		Vendors    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+	}
+
+	OrganizationConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	OrganizationEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	PageInfo struct {
@@ -275,7 +295,7 @@ type ComplexityRoot struct {
 		Email         func(childComplexity int) int
 		FullName      func(childComplexity int) int
 		ID            func(childComplexity int) int
-		Organizations func(childComplexity int) int
+		Organizations func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 		UpdatedAt     func(childComplexity int) int
 	}
 
@@ -323,6 +343,8 @@ type MutationResolver interface {
 	CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error)
 	UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.People, error)
 	DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error)
+	CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error)
+	DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error)
 }
 type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
@@ -338,7 +360,7 @@ type TaskResolver interface {
 	Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceConnection, error)
 }
 type UserResolver interface {
-	Organizations(ctx context.Context, obj *types.User) ([]*types.Organization, error)
+	Organizations(ctx context.Context, obj *types.User, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.OrganizationConnection, error)
 }
 
 type executableSchema struct {
@@ -531,6 +553,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ControlStateTransitionEdge.Node(childComplexity), true
 
+	case "CreateOrganizationPayload.organizationEdge":
+		if e.complexity.CreateOrganizationPayload.OrganizationEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateOrganizationPayload.OrganizationEdge(childComplexity), true
+
 	case "CreatePeoplePayload.peopleEdge":
 		if e.complexity.CreatePeoplePayload.PeopleEdge == nil {
 			break
@@ -544,6 +573,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreateVendorPayload.VendorEdge(childComplexity), true
+
+	case "DeleteOrganizationPayload.deletedOrganizationId":
+		if e.complexity.DeleteOrganizationPayload.DeletedOrganizationID == nil {
+			break
+		}
+
+		return e.complexity.DeleteOrganizationPayload.DeletedOrganizationID(childComplexity), true
 
 	case "DeletePeoplePayload.deletedPeopleId":
 		if e.complexity.DeletePeoplePayload.DeletedPeopleID == nil {
@@ -793,6 +829,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.FrameworkEdge.Node(childComplexity), true
 
+	case "Mutation.createOrganization":
+		if e.complexity.Mutation.CreateOrganization == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createOrganization_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateOrganization(childComplexity, args["input"].(types.CreateOrganizationInput)), true
+
 	case "Mutation.createPeople":
 		if e.complexity.Mutation.CreatePeople == nil {
 			break
@@ -816,6 +864,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateVendor(childComplexity, args["input"].(types.CreateVendorInput)), true
+
+	case "Mutation.deleteOrganization":
+		if e.complexity.Mutation.DeleteOrganization == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteOrganization_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteOrganization(childComplexity, args["input"].(types.DeleteOrganizationInput)), true
 
 	case "Mutation.deletePeople":
 		if e.complexity.Mutation.DeletePeople == nil {
@@ -935,6 +995,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Organization.Vendors(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+
+	case "OrganizationConnection.edges":
+		if e.complexity.OrganizationConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.OrganizationConnection.Edges(childComplexity), true
+
+	case "OrganizationConnection.pageInfo":
+		if e.complexity.OrganizationConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.OrganizationConnection.PageInfo(childComplexity), true
+
+	case "OrganizationEdge.cursor":
+		if e.complexity.OrganizationEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.OrganizationEdge.Cursor(childComplexity), true
+
+	case "OrganizationEdge.node":
+		if e.complexity.OrganizationEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.OrganizationEdge.Node(childComplexity), true
 
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
@@ -1278,7 +1366,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.User.Organizations(childComplexity), true
+		args, err := ec.field_User_organizations_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Organizations(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
 
 	case "User.updatedAt":
 		if e.complexity.User.UpdatedAt == nil {
@@ -1414,8 +1507,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputCreateOrganizationInput,
 		ec.unmarshalInputCreatePeopleInput,
 		ec.unmarshalInputCreateVendorInput,
+		ec.unmarshalInputDeleteOrganizationInput,
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeleteVendorInput,
 		ec.unmarshalInputUpdatePeopleInput,
@@ -1602,6 +1697,16 @@ type PageInfo {
   hasPreviousPage: Boolean!
   startCursor: CursorKey
   endCursor: CursorKey
+}
+
+type OrganizationConnection {
+  edges: [OrganizationEdge!]!
+  pageInfo: PageInfo!
+}
+
+type OrganizationEdge {
+  cursor: CursorKey!
+  node: Organization!
 }
 
 type Organization implements Node {
@@ -1861,13 +1966,17 @@ type EvidenceStateTransition {
   updatedAt: Datetime!
 }
 
-# Authentication types
-type User {
+type User implements Node {
   id: ID!
   fullName: String!
   email: String!
 
-  organizations: [Organization!]! @goField(forceResolver: true)
+  organizations(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): OrganizationConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -1890,6 +1999,12 @@ type Mutation {
   createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
   updatePeople(input: UpdatePeopleInput!): People!
   deletePeople(input: DeletePeopleInput!): DeletePeoplePayload!
+  createOrganization(
+    input: CreateOrganizationInput!
+  ): CreateOrganizationPayload!
+  deleteOrganization(
+    input: DeleteOrganizationInput!
+  ): DeleteOrganizationPayload!
 }
 
 input CreateVendorInput {
@@ -1992,6 +2107,22 @@ type DeleteVendorPayload {
 
 type DeletePeoplePayload {
   deletedPeopleId: ID!
+}
+
+input CreateOrganizationInput {
+  name: String!
+}
+
+input DeleteOrganizationInput {
+  organizationId: ID!
+}
+
+type CreateOrganizationPayload {
+  organizationEdge: OrganizationEdge!
+}
+
+type DeleteOrganizationPayload {
+  deletedOrganizationId: ID!
 }
 `, BuiltIn: false},
 }
@@ -2309,6 +2440,29 @@ func (ec *executionContext) field_Framework_controls_argsBefore(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_createOrganization_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createOrganization_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createOrganization_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateOrganizationInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateOrganizationInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateOrganizationInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_createPeople_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -2352,6 +2506,29 @@ func (ec *executionContext) field_Mutation_createVendor_argsInput(
 	}
 
 	var zeroVal types.CreateVendorInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteOrganization_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteOrganization_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteOrganization_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteOrganizationInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteOrganizationInput
 	return zeroVal, nil
 }
 
@@ -2866,6 +3043,83 @@ func (ec *executionContext) field_Task_stateTransisions_argsLast(
 }
 
 func (ec *executionContext) field_Task_stateTransisions_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_User_organizations_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_User_organizations_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_User_organizations_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_User_organizations_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_User_organizations_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	return args, nil
+}
+func (ec *executionContext) field_User_organizations_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_User_organizations_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_User_organizations_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_User_organizations_argsBefore(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*page.CursorKey, error) {
@@ -3888,6 +4142,50 @@ func (ec *executionContext) fieldContext_ControlStateTransitionEdge_node(_ conte
 	return fc, nil
 }
 
+func (ec *executionContext) _CreateOrganizationPayload_organizationEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateOrganizationPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateOrganizationPayload_organizationEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OrganizationEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.OrganizationEdge)
+	fc.Result = res
+	return ec.marshalNOrganizationEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateOrganizationPayload_organizationEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateOrganizationPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_OrganizationEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_OrganizationEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type OrganizationEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CreatePeoplePayload_peopleEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreatePeoplePayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CreatePeoplePayload_peopleEdge(ctx, field)
 	if err != nil {
@@ -3971,6 +4269,44 @@ func (ec *executionContext) fieldContext_CreateVendorPayload_vendorEdge(_ contex
 				return ec.fieldContext_VendorEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type VendorEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteOrganizationPayload_deletedOrganizationId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteOrganizationPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedOrganizationID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteOrganizationPayload_deletedOrganizationId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteOrganizationPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5698,6 +6034,100 @@ func (ec *executionContext) fieldContext_Mutation_deletePeople(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createOrganization(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createOrganization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateOrganization(rctx, fc.Args["input"].(types.CreateOrganizationInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateOrganizationPayload)
+	fc.Result = res
+	return ec.marshalNCreateOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateOrganizationPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createOrganization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "organizationEdge":
+				return ec.fieldContext_CreateOrganizationPayload_organizationEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateOrganizationPayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteOrganization(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteOrganization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteOrganization(rctx, fc.Args["input"].(types.DeleteOrganizationInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteOrganizationPayload)
+	fc.Result = res
+	return ec.marshalNDeleteOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteOrganization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedOrganizationId":
+				return ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteOrganizationPayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Organization_id(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Organization_id(ctx, field)
 	if err != nil {
@@ -6030,6 +6460,192 @@ func (ec *executionContext) fieldContext_Organization_updatedAt(_ context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OrganizationConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.OrganizationConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OrganizationConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.OrganizationEdge)
+	fc.Result = res
+	return ec.marshalNOrganizationEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OrganizationConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OrganizationConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_OrganizationEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_OrganizationEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type OrganizationEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OrganizationConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.OrganizationConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OrganizationConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OrganizationConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OrganizationConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OrganizationEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.OrganizationEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OrganizationEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OrganizationEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OrganizationEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OrganizationEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.OrganizationEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OrganizationEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Organization)
+	fc.Result = res
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OrganizationEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OrganizationEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Organization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Organization_name(ctx, field)
+			case "logoUrl":
+				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "frameworks":
+				return ec.fieldContext_Organization_frameworks(ctx, field)
+			case "vendors":
+				return ec.fieldContext_Organization_vendors(ctx, field)
+			case "peoples":
+				return ec.fieldContext_Organization_peoples(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Organization_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Organization_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -7991,7 +8607,7 @@ func (ec *executionContext) _User_organizations(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Organizations(rctx, obj)
+		return ec.resolvers.User().Organizations(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8003,12 +8619,12 @@ func (ec *executionContext) _User_organizations(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*types.Organization)
+	res := resTmp.(*types.OrganizationConnection)
 	fc.Result = res
-	return ec.marshalNOrganization2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationᚄ(ctx, field.Selections, res)
+	return ec.marshalNOrganizationConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_organizations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_organizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -8016,25 +8632,18 @@ func (ec *executionContext) fieldContext_User_organizations(_ context.Context, f
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Organization_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Organization_name(ctx, field)
-			case "logoUrl":
-				return ec.fieldContext_Organization_logoUrl(ctx, field)
-			case "frameworks":
-				return ec.fieldContext_Organization_frameworks(ctx, field)
-			case "vendors":
-				return ec.fieldContext_Organization_vendors(ctx, field)
-			case "peoples":
-				return ec.fieldContext_Organization_peoples(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Organization_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Organization_updatedAt(ctx, field)
+			case "edges":
+				return ec.fieldContext_OrganizationConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_OrganizationConnection_pageInfo(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type OrganizationConnection", field.Name)
 		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_organizations_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -10344,6 +10953,33 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCreateOrganizationInput(ctx context.Context, obj any) (types.CreateOrganizationInput, error) {
+	var it types.CreateOrganizationInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreatePeopleInput(ctx context.Context, obj any) (types.CreatePeopleInput, error) {
 	var it types.CreatePeopleInput
 	asMap := map[string]any{}
@@ -10483,6 +11119,33 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.PrivacyPolicyURL = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDeleteOrganizationInput(ctx context.Context, obj any) (types.DeleteOrganizationInput, error) {
+	var it types.DeleteOrganizationInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"organizationId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
 		}
 	}
 
@@ -10759,6 +11422,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Evidence(ctx, sel, obj)
+	case types.User:
+		return ec._User(ctx, sel, &obj)
+	case *types.User:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._User(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -11133,6 +11803,45 @@ func (ec *executionContext) _ControlStateTransitionEdge(ctx context.Context, sel
 	return out
 }
 
+var createOrganizationPayloadImplementors = []string{"CreateOrganizationPayload"}
+
+func (ec *executionContext) _CreateOrganizationPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateOrganizationPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createOrganizationPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateOrganizationPayload")
+		case "organizationEdge":
+			out.Values[i] = ec._CreateOrganizationPayload_organizationEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createPeoplePayloadImplementors = []string{"CreatePeoplePayload"}
 
 func (ec *executionContext) _CreatePeoplePayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreatePeoplePayload) graphql.Marshaler {
@@ -11185,6 +11894,45 @@ func (ec *executionContext) _CreateVendorPayload(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("CreateVendorPayload")
 		case "vendorEdge":
 			out.Values[i] = ec._CreateVendorPayload_vendorEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteOrganizationPayloadImplementors = []string{"DeleteOrganizationPayload"}
+
+func (ec *executionContext) _DeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteOrganizationPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteOrganizationPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteOrganizationPayload")
+		case "deletedOrganizationId":
+			out.Values[i] = ec._DeleteOrganizationPayload_deletedOrganizationId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -11862,6 +12610,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createOrganization":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createOrganization(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteOrganization":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteOrganization(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12013,6 +12775,94 @@ func (ec *executionContext) _Organization(ctx context.Context, sel ast.Selection
 			out.Values[i] = ec._Organization_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var organizationConnectionImplementors = []string{"OrganizationConnection"}
+
+func (ec *executionContext) _OrganizationConnection(ctx context.Context, sel ast.SelectionSet, obj *types.OrganizationConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, organizationConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OrganizationConnection")
+		case "edges":
+			out.Values[i] = ec._OrganizationConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._OrganizationConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var organizationEdgeImplementors = []string{"OrganizationEdge"}
+
+func (ec *executionContext) _OrganizationEdge(ctx context.Context, sel ast.SelectionSet, obj *types.OrganizationEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, organizationEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OrganizationEdge")
+		case "cursor":
+			out.Values[i] = ec._OrganizationEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._OrganizationEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -12735,7 +13585,7 @@ func (ec *executionContext) _TaskStateTransitionEdge(ctx context.Context, sel as
 	return out
 }
 
-var userImplementors = []string{"User"}
+var userImplementors = []string{"User", "Node"}
 
 func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *types.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
@@ -13516,6 +14366,25 @@ func (ec *executionContext) marshalNControlStateTransitionEdge2ᚖgithubᚗcom�
 	return ec._ControlStateTransitionEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateOrganizationInput(ctx context.Context, v any) (types.CreateOrganizationInput, error) {
+	res, err := ec.unmarshalInputCreateOrganizationInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateOrganizationPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateOrganizationPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateOrganizationPayload) graphql.Marshaler {
+	return ec._CreateOrganizationPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateOrganizationPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateOrganizationPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateOrganizationPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreatePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePeopleInput(ctx context.Context, v any) (types.CreatePeopleInput, error) {
 	res, err := ec.unmarshalInputCreatePeopleInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -13582,6 +14451,25 @@ func (ec *executionContext) marshalNDatetime2timeᚐTime(ctx context.Context, se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNDeleteOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationInput(ctx context.Context, v any) (types.DeleteOrganizationInput, error) {
+	res, err := ec.unmarshalInputDeleteOrganizationInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteOrganizationPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteOrganizationPayload) graphql.Marshaler {
+	return ec._DeleteOrganizationPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteOrganizationPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteOrganizationPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeletePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeletePeopleInput(ctx context.Context, v any) (types.DeletePeopleInput, error) {
@@ -13907,7 +14795,31 @@ func (ec *executionContext) marshalNNode2githubᚗcomᚋgetproboᚋproboᚋpkg�
 	return ec._Node(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNOrganization2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.Organization) graphql.Marshaler {
+func (ec *executionContext) marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx context.Context, sel ast.SelectionSet, v *types.Organization) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Organization(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNOrganizationConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationConnection(ctx context.Context, sel ast.SelectionSet, v types.OrganizationConnection) graphql.Marshaler {
+	return ec._OrganizationConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNOrganizationConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationConnection(ctx context.Context, sel ast.SelectionSet, v *types.OrganizationConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._OrganizationConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNOrganizationEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.OrganizationEdge) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -13925,7 +14837,7 @@ func (ec *executionContext) marshalNOrganization2ᚕᚖgithubᚗcomᚋgetprobo�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx, sel, v[i])
+			ret[i] = ec.marshalNOrganizationEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -13945,14 +14857,14 @@ func (ec *executionContext) marshalNOrganization2ᚕᚖgithubᚗcomᚋgetprobo�
 	return ret
 }
 
-func (ec *executionContext) marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx context.Context, sel ast.SelectionSet, v *types.Organization) graphql.Marshaler {
+func (ec *executionContext) marshalNOrganizationEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationEdge(ctx context.Context, sel ast.SelectionSet, v *types.OrganizationEdge) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._Organization(ctx, sel, v)
+	return ec._OrganizationEdge(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *types.PageInfo) graphql.Marshaler {

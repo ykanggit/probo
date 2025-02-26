@@ -59,6 +59,14 @@ type ControlStateTransitionEdge struct {
 	Node   *ControlStateTransition `json:"node"`
 }
 
+type CreateOrganizationInput struct {
+	Name string `json:"name"`
+}
+
+type CreateOrganizationPayload struct {
+	OrganizationEdge *OrganizationEdge `json:"organizationEdge"`
+}
+
 type CreatePeopleInput struct {
 	OrganizationID           gid.GID             `json:"organizationId"`
 	FullName                 string              `json:"fullName"`
@@ -86,6 +94,14 @@ type CreateVendorInput struct {
 
 type CreateVendorPayload struct {
 	VendorEdge *VendorEdge `json:"vendorEdge"`
+}
+
+type DeleteOrganizationInput struct {
+	OrganizationID gid.GID `json:"organizationId"`
+}
+
+type DeleteOrganizationPayload struct {
+	DeletedOrganizationID gid.GID `json:"deletedOrganizationId"`
 }
 
 type DeletePeopleInput struct {
@@ -185,6 +201,16 @@ type Organization struct {
 
 func (Organization) IsNode()             {}
 func (this Organization) GetID() gid.GID { return this.ID }
+
+type OrganizationConnection struct {
+	Edges    []*OrganizationEdge `json:"edges"`
+	PageInfo *PageInfo           `json:"pageInfo"`
+}
+
+type OrganizationEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Organization  `json:"node"`
+}
 
 type PageInfo struct {
 	HasNextPage     bool            `json:"hasNextPage"`
@@ -292,13 +318,16 @@ type UpdateVendorInput struct {
 }
 
 type User struct {
-	ID            gid.GID         `json:"id"`
-	FullName      string          `json:"fullName"`
-	Email         string          `json:"email"`
-	Organizations []*Organization `json:"organizations"`
-	CreatedAt     time.Time       `json:"createdAt"`
-	UpdatedAt     time.Time       `json:"updatedAt"`
+	ID            gid.GID                 `json:"id"`
+	FullName      string                  `json:"fullName"`
+	Email         string                  `json:"email"`
+	Organizations *OrganizationConnection `json:"organizations"`
+	CreatedAt     time.Time               `json:"createdAt"`
+	UpdatedAt     time.Time               `json:"updatedAt"`
 }
+
+func (User) IsNode()             {}
+func (this User) GetID() gid.GID { return this.ID }
 
 type Vendor struct {
 	ID                   gid.GID                     `json:"id"`

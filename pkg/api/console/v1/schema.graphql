@@ -85,6 +85,16 @@ type PageInfo {
   endCursor: CursorKey
 }
 
+type OrganizationConnection {
+  edges: [OrganizationEdge!]!
+  pageInfo: PageInfo!
+}
+
+type OrganizationEdge {
+  cursor: CursorKey!
+  node: Organization!
+}
+
 type Organization implements Node {
   id: ID!
   name: String!
@@ -342,13 +352,17 @@ type EvidenceStateTransition {
   updatedAt: Datetime!
 }
 
-# Authentication types
-type User {
+type User implements Node {
   id: ID!
   fullName: String!
   email: String!
 
-  organizations: [Organization!]! @goField(forceResolver: true)
+  organizations(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): OrganizationConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -371,6 +385,12 @@ type Mutation {
   createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
   updatePeople(input: UpdatePeopleInput!): People!
   deletePeople(input: DeletePeopleInput!): DeletePeoplePayload!
+  createOrganization(
+    input: CreateOrganizationInput!
+  ): CreateOrganizationPayload!
+  deleteOrganization(
+    input: DeleteOrganizationInput!
+  ): DeleteOrganizationPayload!
 }
 
 input CreateVendorInput {
@@ -473,4 +493,20 @@ type DeleteVendorPayload {
 
 type DeletePeoplePayload {
   deletedPeopleId: ID!
+}
+
+input CreateOrganizationInput {
+  name: String!
+}
+
+input DeleteOrganizationInput {
+  organizationId: ID!
+}
+
+type CreateOrganizationPayload {
+  organizationEdge: OrganizationEdge!
+}
+
+type DeleteOrganizationPayload {
+  deletedOrganizationId: ID!
 }

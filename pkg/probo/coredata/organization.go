@@ -29,7 +29,7 @@ type (
 	Organization struct {
 		ID        gid.GID
 		Name      string
-		LogoURL string
+		LogoURL   string
 		CreatedAt time.Time
 		UpdatedAt time.Time
 	}
@@ -79,6 +79,36 @@ LIMIT 1;
 	}
 
 	*o = o2
+
+	return nil
+}
+
+func (o *Organization) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+) error {
+	q := `
+INSERT INTO organizations (
+    id,
+    name,
+    logo_url,
+    created_at,
+    updated_at
+) VALUES (@id, @name, @logo_url, @created_at, @updated_at)
+`
+
+	args := pgx.NamedArgs{
+		"id":         o.ID,
+		"name":       o.Name,
+		"logo_url":   o.LogoURL,
+		"created_at": o.CreatedAt,
+		"updated_at": o.UpdatedAt,
+	}
+
+	_, err := conn.Exec(ctx, q, args)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

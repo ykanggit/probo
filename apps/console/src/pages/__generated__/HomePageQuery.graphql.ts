@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<17467071cb25b3e291532a4fb9074d67>>
+ * @generated SignedSource<<f40d67f614a103849ba940fbd14f71af>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,115 +16,119 @@ export type HomePageQuery$variables = Record<PropertyKey, never>;
 export type HomePageQuery$data = {
   readonly viewer: {
     readonly id: string;
-    readonly organizations: ReadonlyArray<{
-      readonly createdAt: any;
-      readonly frameworks: {
-        readonly edges: ReadonlyArray<{
-          readonly cursor: any;
-          readonly node: {
-            readonly controls: {
-              readonly edges: ReadonlyArray<{
-                readonly node: {
-                  readonly id: string;
-                  readonly name: string;
-                  readonly state: ControlState;
-                  readonly stateTransisions: {
-                    readonly edges: ReadonlyArray<{
-                      readonly node: {
-                        readonly createdAt: any;
-                        readonly fromState: ControlState | null | undefined;
-                        readonly id: string;
-                        readonly toState: ControlState;
-                        readonly updatedAt: any;
+    readonly organizations: {
+      readonly edges: ReadonlyArray<{
+        readonly node: {
+          readonly createdAt: any;
+          readonly frameworks: {
+            readonly edges: ReadonlyArray<{
+              readonly cursor: any;
+              readonly node: {
+                readonly controls: {
+                  readonly edges: ReadonlyArray<{
+                    readonly node: {
+                      readonly id: string;
+                      readonly name: string;
+                      readonly state: ControlState;
+                      readonly stateTransisions: {
+                        readonly edges: ReadonlyArray<{
+                          readonly node: {
+                            readonly createdAt: any;
+                            readonly fromState: ControlState | null | undefined;
+                            readonly id: string;
+                            readonly toState: ControlState;
+                            readonly updatedAt: any;
+                          };
+                        }>;
                       };
-                    }>;
-                  };
-                  readonly tasks: {
-                    readonly edges: ReadonlyArray<{
-                      readonly node: {
-                        readonly createdAt: any;
-                        readonly evidences: {
-                          readonly edges: ReadonlyArray<{
-                            readonly node: {
-                              readonly createdAt: any;
-                              readonly fileUrl: string;
-                              readonly id: string;
-                              readonly state: EvidenceState;
-                              readonly stateTransisions: {
-                                readonly edges: ReadonlyArray<{
-                                  readonly node: {
-                                    readonly createdAt: any;
-                                    readonly fromState: EvidenceState | null | undefined;
-                                    readonly id: string;
-                                    readonly reason: string | null | undefined;
-                                    readonly toState: EvidenceState;
-                                    readonly updatedAt: any;
+                      readonly tasks: {
+                        readonly edges: ReadonlyArray<{
+                          readonly node: {
+                            readonly createdAt: any;
+                            readonly evidences: {
+                              readonly edges: ReadonlyArray<{
+                                readonly node: {
+                                  readonly createdAt: any;
+                                  readonly fileUrl: string;
+                                  readonly id: string;
+                                  readonly state: EvidenceState;
+                                  readonly stateTransisions: {
+                                    readonly edges: ReadonlyArray<{
+                                      readonly node: {
+                                        readonly createdAt: any;
+                                        readonly fromState: EvidenceState | null | undefined;
+                                        readonly id: string;
+                                        readonly reason: string | null | undefined;
+                                        readonly toState: EvidenceState;
+                                        readonly updatedAt: any;
+                                      };
+                                    }>;
                                   };
-                                }>;
-                              };
-                              readonly updatedAt: any;
+                                  readonly updatedAt: any;
+                                };
+                              }>;
                             };
-                          }>;
-                        };
-                        readonly id: string;
-                        readonly name: string;
-                        readonly state: TaskState;
-                        readonly stateTransisions: {
-                          readonly edges: ReadonlyArray<{
-                            readonly node: {
-                              readonly createdAt: any;
-                              readonly fromState: TaskState | null | undefined;
-                              readonly id: string;
-                              readonly reason: string | null | undefined;
-                              readonly toState: TaskState;
-                              readonly updatedAt: any;
+                            readonly id: string;
+                            readonly name: string;
+                            readonly state: TaskState;
+                            readonly stateTransisions: {
+                              readonly edges: ReadonlyArray<{
+                                readonly node: {
+                                  readonly createdAt: any;
+                                  readonly fromState: TaskState | null | undefined;
+                                  readonly id: string;
+                                  readonly reason: string | null | undefined;
+                                  readonly toState: TaskState;
+                                  readonly updatedAt: any;
+                                };
+                              }>;
                             };
-                          }>;
-                        };
-                        readonly updatedAt: any;
+                            readonly updatedAt: any;
+                          };
+                        }>;
                       };
-                    }>;
-                  };
+                    };
+                  }>;
                 };
-              }>;
+                readonly description: string;
+                readonly id: string;
+                readonly name: string;
+              };
+            }>;
+            readonly pageInfo: {
+              readonly endCursor: any | null | undefined;
+              readonly hasNextPage: boolean;
+              readonly hasPreviousPage: boolean;
+              readonly startCursor: any | null | undefined;
             };
-            readonly description: string;
-            readonly id: string;
-            readonly name: string;
           };
-        }>;
-        readonly pageInfo: {
-          readonly endCursor: any | null | undefined;
-          readonly hasNextPage: boolean;
-          readonly hasPreviousPage: boolean;
-          readonly startCursor: any | null | undefined;
+          readonly name: string;
+          readonly peoples: {
+            readonly edges: ReadonlyArray<{
+              readonly node: {
+                readonly additionalEmailAddresses: ReadonlyArray<string>;
+                readonly createdAt: any;
+                readonly fullName: string;
+                readonly id: string;
+                readonly primaryEmailAddress: string;
+                readonly updatedAt: any;
+              };
+            }>;
+          };
+          readonly updatedAt: any;
+          readonly vendors: {
+            readonly edges: ReadonlyArray<{
+              readonly node: {
+                readonly createdAt: any;
+                readonly id: string;
+                readonly name: string;
+                readonly updatedAt: any;
+              };
+            }>;
+          };
         };
-      };
-      readonly name: string;
-      readonly peoples: {
-        readonly edges: ReadonlyArray<{
-          readonly node: {
-            readonly additionalEmailAddresses: ReadonlyArray<string>;
-            readonly createdAt: any;
-            readonly fullName: string;
-            readonly id: string;
-            readonly primaryEmailAddress: string;
-            readonly updatedAt: any;
-          };
-        }>;
-      };
-      readonly updatedAt: any;
-      readonly vendors: {
-        readonly edges: ReadonlyArray<{
-          readonly node: {
-            readonly createdAt: any;
-            readonly id: string;
-            readonly name: string;
-            readonly updatedAt: any;
-          };
-        }>;
-      };
-    }>;
+      }>;
+    };
   };
 };
 export type HomePageQuery = {
@@ -624,17 +628,39 @@ return {
           {
             "alias": null,
             "args": null,
-            "concreteType": "Organization",
+            "concreteType": "OrganizationConnection",
             "kind": "LinkedField",
             "name": "organizations",
-            "plural": true,
+            "plural": false,
             "selections": [
-              (v1/*: any*/),
-              (v2/*: any*/),
-              (v3/*: any*/),
-              (v4/*: any*/),
-              (v5/*: any*/),
-              (v10/*: any*/)
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "OrganizationEdge",
+                "kind": "LinkedField",
+                "name": "edges",
+                "plural": true,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "Organization",
+                    "kind": "LinkedField",
+                    "name": "node",
+                    "plural": false,
+                    "selections": [
+                      (v1/*: any*/),
+                      (v2/*: any*/),
+                      (v3/*: any*/),
+                      (v4/*: any*/),
+                      (v5/*: any*/),
+                      (v10/*: any*/)
+                    ],
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": null
+              }
             ],
             "storageKey": null
           }
@@ -663,18 +689,40 @@ return {
           {
             "alias": null,
             "args": null,
-            "concreteType": "Organization",
+            "concreteType": "OrganizationConnection",
             "kind": "LinkedField",
             "name": "organizations",
-            "plural": true,
+            "plural": false,
             "selections": [
-              (v1/*: any*/),
-              (v2/*: any*/),
-              (v3/*: any*/),
-              (v4/*: any*/),
-              (v5/*: any*/),
-              (v10/*: any*/),
-              (v0/*: any*/)
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "OrganizationEdge",
+                "kind": "LinkedField",
+                "name": "edges",
+                "plural": true,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "Organization",
+                    "kind": "LinkedField",
+                    "name": "node",
+                    "plural": false,
+                    "selections": [
+                      (v1/*: any*/),
+                      (v2/*: any*/),
+                      (v3/*: any*/),
+                      (v4/*: any*/),
+                      (v5/*: any*/),
+                      (v10/*: any*/),
+                      (v0/*: any*/)
+                    ],
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": null
+              }
             ],
             "storageKey": null
           }
@@ -684,16 +732,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d40cf8a4787ed129284c566abd99fdaf",
+    "cacheID": "5a56fefd066703ca0ebac1ef3e9a7e1f",
     "id": null,
     "metadata": {},
     "name": "HomePageQuery",
     "operationKind": "query",
-    "text": "query HomePageQuery {\n  viewer {\n    id\n    organizations {\n      name\n      createdAt\n      updatedAt\n      vendors {\n        edges {\n          node {\n            id\n            name\n            createdAt\n            updatedAt\n          }\n        }\n      }\n      peoples {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            additionalEmailAddresses\n            createdAt\n            updatedAt\n          }\n        }\n      }\n      frameworks {\n        pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n        }\n        edges {\n          cursor\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  name\n                  state\n                  stateTransisions {\n                    edges {\n                      node {\n                        id\n                        toState\n                        fromState\n                        createdAt\n                        updatedAt\n                      }\n                    }\n                  }\n                  tasks {\n                    edges {\n                      node {\n                        id\n                        name\n                        state\n                        evidences {\n                          edges {\n                            node {\n                              id\n                              state\n                              fileUrl\n                              stateTransisions {\n                                edges {\n                                  node {\n                                    id\n                                    fromState\n                                    toState\n                                    reason\n                                    createdAt\n                                    updatedAt\n                                  }\n                                }\n                              }\n                              createdAt\n                              updatedAt\n                            }\n                          }\n                        }\n                        stateTransisions {\n                          edges {\n                            node {\n                              id\n                              toState\n                              fromState\n                              reason\n                              createdAt\n                              updatedAt\n                            }\n                          }\n                        }\n                        createdAt\n                        updatedAt\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n      id\n    }\n  }\n}\n"
+    "text": "query HomePageQuery {\n  viewer {\n    id\n    organizations {\n      edges {\n        node {\n          name\n          createdAt\n          updatedAt\n          vendors {\n            edges {\n              node {\n                id\n                name\n                createdAt\n                updatedAt\n              }\n            }\n          }\n          peoples {\n            edges {\n              node {\n                id\n                fullName\n                primaryEmailAddress\n                additionalEmailAddresses\n                createdAt\n                updatedAt\n              }\n            }\n          }\n          frameworks {\n            pageInfo {\n              hasNextPage\n              hasPreviousPage\n              startCursor\n              endCursor\n            }\n            edges {\n              cursor\n              node {\n                id\n                name\n                description\n                controls {\n                  edges {\n                    node {\n                      id\n                      name\n                      state\n                      stateTransisions {\n                        edges {\n                          node {\n                            id\n                            toState\n                            fromState\n                            createdAt\n                            updatedAt\n                          }\n                        }\n                      }\n                      tasks {\n                        edges {\n                          node {\n                            id\n                            name\n                            state\n                            evidences {\n                              edges {\n                                node {\n                                  id\n                                  state\n                                  fileUrl\n                                  stateTransisions {\n                                    edges {\n                                      node {\n                                        id\n                                        fromState\n                                        toState\n                                        reason\n                                        createdAt\n                                        updatedAt\n                                      }\n                                    }\n                                  }\n                                  createdAt\n                                  updatedAt\n                                }\n                              }\n                            }\n                            stateTransisions {\n                              edges {\n                                node {\n                                  id\n                                  toState\n                                  fromState\n                                  reason\n                                  createdAt\n                                  updatedAt\n                                }\n                              }\n                            }\n                            createdAt\n                            updatedAt\n                          }\n                        }\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n          id\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "e9da69d4e7095f003eb28bf51e7c399d";
+(node as any).hash = "7a1699535af738f939d954a88c6daa9e";
 
 export default node;
