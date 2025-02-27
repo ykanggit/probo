@@ -87,7 +87,7 @@ function EditableField({
           }
           className={cn(
             "w-full resize-none",
-            required && !value && "border-red-500",
+            required && !value && "border-red-500"
           )}
           placeholder={`Enter ${label.toLowerCase()}`}
           rows={4}
@@ -117,7 +117,7 @@ function UpdateFrameworkPageContent({
   const navigate = useNavigate();
   const { toast } = useToast();
   const data = usePreloadedQuery(updateFrameworkQuery, queryRef);
-  const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
+  const [, setEditedFields] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -134,7 +134,7 @@ function UpdateFrameworkPageContent({
 
   const [commit, isInFlight] =
     useMutation<UpdateFrameworkPageUpdateFrameworkMutation>(
-      updateFrameworkMutation,
+      updateFrameworkMutation
     );
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
@@ -148,8 +148,6 @@ function UpdateFrameworkPageContent({
   const handleCancel = () => {
     navigate(`/organizations/${organizationId}/frameworks/${frameworkId}`);
   };
-
-  const hasChanges = editedFields.size > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

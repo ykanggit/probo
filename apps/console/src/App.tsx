@@ -24,7 +24,7 @@ posthog.init(process.env.POSTHOG_KEY!, {
 });
 
 const OrganizationSelectionPage = lazy(
-  () => import("./pages/OrganizationSelectionPage")
+  () => import("./pages/OrganizationSelectionPage"),
 );
 const HomePage = lazy(() => import("./pages/HomePage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
@@ -35,14 +35,14 @@ const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const CreatePeoplePage = lazy(() => import("./pages/CreatePeoplePage"));
 const FrameworkOverviewPage = lazy(
-  () => import("./pages/FrameworkOverviewPage")
+  () => import("./pages/FrameworkOverviewPage"),
 );
 const ControlOverviewPage = lazy(() => import("./pages/ControlOverviewPage"));
 const PeopleOverviewPage = lazy(() => import("./pages/PeopleOverviewPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const CreateOrganizationPage = lazy(
-  () => import("./pages/CreateOrganizationPage")
+  () => import("./pages/CreateOrganizationPage"),
 );
 const CreateFrameworkPage = lazy(() => import("./pages/CreateFrameworkPage"));
 const CreateControlPage = lazy(() => import("./pages/CreateControlPage"));
