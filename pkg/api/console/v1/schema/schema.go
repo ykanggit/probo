@@ -313,8 +313,20 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	UpdateFrameworkPayload struct {
+		Framework func(childComplexity int) int
+	}
+
+	UpdatePeoplePayload struct {
+		People func(childComplexity int) int
+	}
+
 	UpdateTaskStatePayload struct {
 		Task func(childComplexity int) int
+	}
+
+	UpdateVendorPayload struct {
+		Vendor func(childComplexity int) int
 	}
 
 	User struct {
@@ -365,10 +377,10 @@ type FrameworkResolver interface {
 }
 type MutationResolver interface {
 	CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error)
-	UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.Vendor, error)
+	UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.UpdateVendorPayload, error)
 	DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error)
 	CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error)
-	UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.People, error)
+	UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.UpdatePeoplePayload, error)
 	DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error)
 	CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error)
 	DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error)
@@ -377,7 +389,7 @@ type MutationResolver interface {
 	DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error)
 	CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error)
 	CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error)
-	UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.Framework, error)
+	UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error)
 }
 type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
@@ -1473,12 +1485,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TaskStateTransitionEdge.Node(childComplexity), true
 
+	case "UpdateFrameworkPayload.framework":
+		if e.complexity.UpdateFrameworkPayload.Framework == nil {
+			break
+		}
+
+		return e.complexity.UpdateFrameworkPayload.Framework(childComplexity), true
+
+	case "UpdatePeoplePayload.people":
+		if e.complexity.UpdatePeoplePayload.People == nil {
+			break
+		}
+
+		return e.complexity.UpdatePeoplePayload.People(childComplexity), true
+
 	case "UpdateTaskStatePayload.task":
 		if e.complexity.UpdateTaskStatePayload.Task == nil {
 			break
 		}
 
 		return e.complexity.UpdateTaskStatePayload.Task(childComplexity), true
+
+	case "UpdateVendorPayload.vendor":
+		if e.complexity.UpdateVendorPayload.Vendor == nil {
+			break
+		}
+
+		return e.complexity.UpdateVendorPayload.Vendor(childComplexity), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -2149,10 +2182,10 @@ type Query {
 
 type Mutation {
   createVendor(input: CreateVendorInput!): CreateVendorPayload!
-  updateVendor(input: UpdateVendorInput!): Vendor!
+  updateVendor(input: UpdateVendorInput!): UpdateVendorPayload!
   deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
   createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
-  updatePeople(input: UpdatePeopleInput!): People!
+  updatePeople(input: UpdatePeopleInput!): UpdatePeoplePayload!
   deletePeople(input: DeletePeopleInput!): DeletePeoplePayload!
   createOrganization(
     input: CreateOrganizationInput!
@@ -2165,7 +2198,7 @@ type Mutation {
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   createControl(input: CreateControlInput!): CreateControlPayload!
-  updateFramework(input: UpdateFrameworkInput!): Framework!
+  updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
 }
 
 input CreateVendorInput {
@@ -2339,6 +2372,18 @@ input CreateControlInput {
 
 type CreateControlPayload {
   controlEdge: ControlEdge!
+}
+
+type UpdateFrameworkPayload {
+  framework: Framework!
+}
+
+type UpdateVendorPayload {
+  vendor: Vendor!
+}
+
+type UpdatePeoplePayload {
+  people: People!
 }
 `, BuiltIn: false},
 }
@@ -6345,9 +6390,9 @@ func (ec *executionContext) _Mutation_updateVendor(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.Vendor)
+	res := resTmp.(*types.UpdateVendorPayload)
 	fc.Result = res
-	return ec.marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx, field.Selections, res)
+	return ec.marshalNUpdateVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6358,34 +6403,10 @@ func (ec *executionContext) fieldContext_Mutation_updateVendor(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Vendor_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Vendor_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Vendor_description(ctx, field)
-			case "serviceStartAt":
-				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
-			case "serviceTerminationAt":
-				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
-			case "serviceCriticality":
-				return ec.fieldContext_Vendor_serviceCriticality(ctx, field)
-			case "riskTier":
-				return ec.fieldContext_Vendor_riskTier(ctx, field)
-			case "statusPageUrl":
-				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
-			case "termsOfServiceUrl":
-				return ec.fieldContext_Vendor_termsOfServiceUrl(ctx, field)
-			case "privacyPolicyUrl":
-				return ec.fieldContext_Vendor_privacyPolicyUrl(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Vendor_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Vendor_updatedAt(ctx, field)
-			case "version":
-				return ec.fieldContext_Vendor_version(ctx, field)
+			case "vendor":
+				return ec.fieldContext_UpdateVendorPayload_vendor(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type UpdateVendorPayload", field.Name)
 		},
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
@@ -6510,9 +6531,9 @@ func (ec *executionContext) _Mutation_updatePeople(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.People)
+	res := resTmp.(*types.UpdatePeoplePayload)
 	fc.Result = res
-	return ec.marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+	return ec.marshalNUpdatePeoplePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePeoplePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updatePeople(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6523,24 +6544,10 @@ func (ec *executionContext) fieldContext_Mutation_updatePeople(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_People_id(ctx, field)
-			case "fullName":
-				return ec.fieldContext_People_fullName(ctx, field)
-			case "primaryEmailAddress":
-				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
-			case "additionalEmailAddresses":
-				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
-			case "kind":
-				return ec.fieldContext_People_kind(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_People_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_People_updatedAt(ctx, field)
-			case "version":
-				return ec.fieldContext_People_version(ctx, field)
+			case "people":
+				return ec.fieldContext_UpdatePeoplePayload_people(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type UpdatePeoplePayload", field.Name)
 		},
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
@@ -6947,9 +6954,9 @@ func (ec *executionContext) _Mutation_updateFramework(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.Framework)
+	res := resTmp.(*types.UpdateFrameworkPayload)
 	fc.Result = res
-	return ec.marshalNFramework2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx, field.Selections, res)
+	return ec.marshalNUpdateFrameworkPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateFrameworkPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateFramework(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6960,22 +6967,10 @@ func (ec *executionContext) fieldContext_Mutation_updateFramework(ctx context.Co
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Framework_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Framework_version(ctx, field)
-			case "name":
-				return ec.fieldContext_Framework_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Framework_description(ctx, field)
-			case "controls":
-				return ec.fieldContext_Framework_controls(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Framework_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Framework_updatedAt(ctx, field)
+			case "framework":
+				return ec.fieldContext_UpdateFrameworkPayload_framework(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Framework", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type UpdateFrameworkPayload", field.Name)
 		},
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
@@ -9343,6 +9338,116 @@ func (ec *executionContext) fieldContext_TaskStateTransitionEdge_node(_ context.
 	return fc, nil
 }
 
+func (ec *executionContext) _UpdateFrameworkPayload_framework(ctx context.Context, field graphql.CollectedField, obj *types.UpdateFrameworkPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateFrameworkPayload_framework(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Framework, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Framework)
+	fc.Result = res
+	return ec.marshalNFramework2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateFrameworkPayload_framework(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateFrameworkPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Framework_id(ctx, field)
+			case "version":
+				return ec.fieldContext_Framework_version(ctx, field)
+			case "name":
+				return ec.fieldContext_Framework_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Framework_description(ctx, field)
+			case "controls":
+				return ec.fieldContext_Framework_controls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Framework_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Framework_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Framework", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdatePeoplePayload_people(ctx context.Context, field graphql.CollectedField, obj *types.UpdatePeoplePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdatePeoplePayload_people(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.People, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdatePeoplePayload_people(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdatePeoplePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			case "version":
+				return ec.fieldContext_People_version(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateTaskStatePayload_task(ctx context.Context, field graphql.CollectedField, obj *types.UpdateTaskStatePayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateTaskStatePayload_task(ctx, field)
 	if err != nil {
@@ -9394,6 +9499,72 @@ func (ec *executionContext) fieldContext_UpdateTaskStatePayload_task(_ context.C
 				return ec.fieldContext_Task_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateVendorPayload_vendor(ctx context.Context, field graphql.CollectedField, obj *types.UpdateVendorPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateVendorPayload_vendor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Vendor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Vendor)
+	fc.Result = res
+	return ec.marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateVendorPayload_vendor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateVendorPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Vendor_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Vendor_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Vendor_description(ctx, field)
+			case "serviceStartAt":
+				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
+			case "serviceTerminationAt":
+				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
+			case "serviceCriticality":
+				return ec.fieldContext_Vendor_serviceCriticality(ctx, field)
+			case "riskTier":
+				return ec.fieldContext_Vendor_riskTier(ctx, field)
+			case "statusPageUrl":
+				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
+			case "termsOfServiceUrl":
+				return ec.fieldContext_Vendor_termsOfServiceUrl(ctx, field)
+			case "privacyPolicyUrl":
+				return ec.fieldContext_Vendor_privacyPolicyUrl(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Vendor_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Vendor_updatedAt(ctx, field)
+			case "version":
+				return ec.fieldContext_Vendor_version(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
 		},
 	}
 	return fc, nil
@@ -14941,6 +15112,84 @@ func (ec *executionContext) _TaskStateTransitionEdge(ctx context.Context, sel as
 	return out
 }
 
+var updateFrameworkPayloadImplementors = []string{"UpdateFrameworkPayload"}
+
+func (ec *executionContext) _UpdateFrameworkPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdateFrameworkPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateFrameworkPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateFrameworkPayload")
+		case "framework":
+			out.Values[i] = ec._UpdateFrameworkPayload_framework(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updatePeoplePayloadImplementors = []string{"UpdatePeoplePayload"}
+
+func (ec *executionContext) _UpdatePeoplePayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdatePeoplePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updatePeoplePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdatePeoplePayload")
+		case "people":
+			out.Values[i] = ec._UpdatePeoplePayload_people(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var updateTaskStatePayloadImplementors = []string{"UpdateTaskStatePayload"}
 
 func (ec *executionContext) _UpdateTaskStatePayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdateTaskStatePayload) graphql.Marshaler {
@@ -14954,6 +15203,45 @@ func (ec *executionContext) _UpdateTaskStatePayload(ctx context.Context, sel ast
 			out.Values[i] = graphql.MarshalString("UpdateTaskStatePayload")
 		case "task":
 			out.Values[i] = ec._UpdateTaskStatePayload_task(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateVendorPayloadImplementors = []string{"UpdateVendorPayload"}
+
+func (ec *executionContext) _UpdateVendorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdateVendorPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateVendorPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateVendorPayload")
+		case "vendor":
+			out.Values[i] = ec._UpdateVendorPayload_vendor(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -16154,10 +16442,6 @@ func (ec *executionContext) marshalNEvidenceStateTransitionEdge2ᚖgithubᚗcom�
 	return ec._EvidenceStateTransitionEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNFramework2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v types.Framework) graphql.Marshaler {
-	return ec._Framework(ctx, sel, &v)
-}
-
 func (ec *executionContext) marshalNFramework2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v *types.Framework) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -16350,10 +16634,6 @@ func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋprobo�
 		return graphql.Null
 	}
 	return ec._PageInfo(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNPeople2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx context.Context, sel ast.SelectionSet, v types.People) graphql.Marshaler {
-	return ec._People(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx context.Context, sel ast.SelectionSet, v *types.People) graphql.Marshaler {
@@ -16736,9 +17016,37 @@ func (ec *executionContext) unmarshalNUpdateFrameworkInput2githubᚗcomᚋgetpro
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNUpdateFrameworkPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateFrameworkPayload(ctx context.Context, sel ast.SelectionSet, v types.UpdateFrameworkPayload) graphql.Marshaler {
+	return ec._UpdateFrameworkPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateFrameworkPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateFrameworkPayload(ctx context.Context, sel ast.SelectionSet, v *types.UpdateFrameworkPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateFrameworkPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNUpdatePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePeopleInput(ctx context.Context, v any) (types.UpdatePeopleInput, error) {
 	res, err := ec.unmarshalInputUpdatePeopleInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdatePeoplePayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePeoplePayload(ctx context.Context, sel ast.SelectionSet, v types.UpdatePeoplePayload) graphql.Marshaler {
+	return ec._UpdatePeoplePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdatePeoplePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePeoplePayload(ctx context.Context, sel ast.SelectionSet, v *types.UpdatePeoplePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdatePeoplePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateTaskStateInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateTaskStateInput(ctx context.Context, v any) (types.UpdateTaskStateInput, error) {
@@ -16765,6 +17073,20 @@ func (ec *executionContext) unmarshalNUpdateVendorInput2githubᚗcomᚋgetprobo�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNUpdateVendorPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorPayload(ctx context.Context, sel ast.SelectionSet, v types.UpdateVendorPayload) graphql.Marshaler {
+	return ec._UpdateVendorPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorPayload(ctx context.Context, sel ast.SelectionSet, v *types.UpdateVendorPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateVendorPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNUser2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUser(ctx context.Context, sel ast.SelectionSet, v types.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
@@ -16777,10 +17099,6 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋgetproboᚋproboᚋpk
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNVendor2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx context.Context, sel ast.SelectionSet, v types.Vendor) graphql.Marshaler {
-	return ec._Vendor(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx context.Context, sel ast.SelectionSet, v *types.Vendor) graphql.Marshaler {

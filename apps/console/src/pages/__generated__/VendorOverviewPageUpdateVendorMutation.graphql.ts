@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0c1d84470c9beda41d05161fad1608f2>>
+ * @generated SignedSource<<6453606aec7f5a8548c5cc76e9d775f0>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -29,18 +29,20 @@ export type VendorOverviewPageUpdateVendorMutation$variables = {
 };
 export type VendorOverviewPageUpdateVendorMutation$data = {
   readonly updateVendor: {
-    readonly description: string;
-    readonly id: string;
-    readonly name: string;
-    readonly privacyPolicyUrl: string | null | undefined;
-    readonly riskTier: RiskTier;
-    readonly serviceCriticality: ServiceCriticality;
-    readonly serviceStartAt: any;
-    readonly serviceTerminationAt: any | null | undefined;
-    readonly statusPageUrl: string | null | undefined;
-    readonly termsOfServiceUrl: string | null | undefined;
-    readonly updatedAt: any;
-    readonly version: number;
+    readonly vendor: {
+      readonly description: string;
+      readonly id: string;
+      readonly name: string;
+      readonly privacyPolicyUrl: string | null | undefined;
+      readonly riskTier: RiskTier;
+      readonly serviceCriticality: ServiceCriticality;
+      readonly serviceStartAt: any;
+      readonly serviceTerminationAt: any | null | undefined;
+      readonly statusPageUrl: string | null | undefined;
+      readonly termsOfServiceUrl: string | null | undefined;
+      readonly updatedAt: any;
+      readonly version: number;
+    };
   };
 };
 export type VendorOverviewPageUpdateVendorMutation = {
@@ -66,7 +68,7 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "Vendor",
+    "concreteType": "UpdateVendorPayload",
     "kind": "LinkedField",
     "name": "updateVendor",
     "plural": false,
@@ -74,85 +76,96 @@ v1 = [
       {
         "alias": null,
         "args": null,
-        "kind": "ScalarField",
-        "name": "id",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "name",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "description",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "serviceStartAt",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "serviceTerminationAt",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "serviceCriticality",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "riskTier",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "statusPageUrl",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "termsOfServiceUrl",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "privacyPolicyUrl",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "updatedAt",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "version",
+        "concreteType": "Vendor",
+        "kind": "LinkedField",
+        "name": "vendor",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "id",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "name",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "description",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "serviceStartAt",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "serviceTerminationAt",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "serviceCriticality",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "riskTier",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "statusPageUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "termsOfServiceUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "privacyPolicyUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "updatedAt",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "version",
+            "storageKey": null
+          }
+        ],
         "storageKey": null
       }
     ],
@@ -177,16 +190,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "d0dd4f7b7219b20cc57a57e25b2b1197",
+    "cacheID": "30449b25e96907e852ae1638ab425111",
     "id": null,
     "metadata": {},
     "name": "VendorOverviewPageUpdateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorOverviewPageUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    id\n    name\n    description\n    serviceStartAt\n    serviceTerminationAt\n    serviceCriticality\n    riskTier\n    statusPageUrl\n    termsOfServiceUrl\n    privacyPolicyUrl\n    updatedAt\n    version\n  }\n}\n"
+    "text": "mutation VendorOverviewPageUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      updatedAt\n      version\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "be093542424cdd4a329ec389312d0f83";
+(node as any).hash = "e07426684611544b6f4c8d1668a19794";
 
 export default node;

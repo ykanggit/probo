@@ -24,10 +24,12 @@ const updateFrameworkMutation = graphql`
     $input: UpdateFrameworkInput!
   ) {
     updateFramework(input: $input) {
-      id
-      name
-      description
-      version
+      framework {
+        id
+        name
+        description
+        version
+      }
     }
   }
 `;

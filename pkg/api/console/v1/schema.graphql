@@ -382,10 +382,10 @@ type Query {
 
 type Mutation {
   createVendor(input: CreateVendorInput!): CreateVendorPayload!
-  updateVendor(input: UpdateVendorInput!): Vendor!
+  updateVendor(input: UpdateVendorInput!): UpdateVendorPayload!
   deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
   createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
-  updatePeople(input: UpdatePeopleInput!): People!
+  updatePeople(input: UpdatePeopleInput!): UpdatePeoplePayload!
   deletePeople(input: DeletePeopleInput!): DeletePeoplePayload!
   createOrganization(
     input: CreateOrganizationInput!
@@ -398,7 +398,7 @@ type Mutation {
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   createControl(input: CreateControlInput!): CreateControlPayload!
-  updateFramework(input: UpdateFrameworkInput!): Framework!
+  updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
 }
 
 input CreateVendorInput {
@@ -572,4 +572,16 @@ input CreateControlInput {
 
 type CreateControlPayload {
   controlEdge: ControlEdge!
+}
+
+type UpdateFrameworkPayload {
+  framework: Framework!
+}
+
+type UpdateVendorPayload {
+  vendor: Vendor!
+}
+
+type UpdatePeoplePayload {
+  people: People!
 }

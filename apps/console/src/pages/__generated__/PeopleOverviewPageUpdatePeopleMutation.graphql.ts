@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b950e6a3b56e0545050b3bbe076c2f65>>
+ * @generated SignedSource<<aa7d9efd2aaaa6af57bfc956754c69dd>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -23,13 +23,15 @@ export type PeopleOverviewPageUpdatePeopleMutation$variables = {
 };
 export type PeopleOverviewPageUpdatePeopleMutation$data = {
   readonly updatePeople: {
-    readonly additionalEmailAddresses: ReadonlyArray<string>;
-    readonly fullName: string;
-    readonly id: string;
-    readonly kind: PeopleKind;
-    readonly primaryEmailAddress: string;
-    readonly updatedAt: any;
-    readonly version: number;
+    readonly people: {
+      readonly additionalEmailAddresses: ReadonlyArray<string>;
+      readonly fullName: string;
+      readonly id: string;
+      readonly kind: PeopleKind;
+      readonly primaryEmailAddress: string;
+      readonly updatedAt: any;
+      readonly version: number;
+    };
   };
 };
 export type PeopleOverviewPageUpdatePeopleMutation = {
@@ -55,7 +57,7 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "People",
+    "concreteType": "UpdatePeoplePayload",
     "kind": "LinkedField",
     "name": "updatePeople",
     "plural": false,
@@ -63,50 +65,61 @@ v1 = [
       {
         "alias": null,
         "args": null,
-        "kind": "ScalarField",
-        "name": "id",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "fullName",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "primaryEmailAddress",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "additionalEmailAddresses",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "kind",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "updatedAt",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "version",
+        "concreteType": "People",
+        "kind": "LinkedField",
+        "name": "people",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "id",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "fullName",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "primaryEmailAddress",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "additionalEmailAddresses",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "kind",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "updatedAt",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "version",
+            "storageKey": null
+          }
+        ],
         "storageKey": null
       }
     ],
@@ -131,16 +144,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "85b62bd3c79a01fc437649a9c8a217b3",
+    "cacheID": "6961fac292b72111b2d0a46f078e3efc",
     "id": null,
     "metadata": {},
     "name": "PeopleOverviewPageUpdatePeopleMutation",
     "operationKind": "mutation",
-    "text": "mutation PeopleOverviewPageUpdatePeopleMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    id\n    fullName\n    primaryEmailAddress\n    additionalEmailAddresses\n    kind\n    updatedAt\n    version\n  }\n}\n"
+    "text": "mutation PeopleOverviewPageUpdatePeopleMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      updatedAt\n      version\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3fba4023eb9fa1520ed88bb9b4501dc7";
+(node as any).hash = "01a8fefe43cdc344f9a4dd62a60edc6c";
 
 export default node;

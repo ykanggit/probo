@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<190ec3d14b98c4685fcc363fc41cee96>>
+ * @generated SignedSource<<822ef9b3867da7de4bca37e5be0e077e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -20,10 +20,12 @@ export type UpdateFrameworkPageUpdateFrameworkMutation$variables = {
 };
 export type UpdateFrameworkPageUpdateFrameworkMutation$data = {
   readonly updateFramework: {
-    readonly description: string;
-    readonly id: string;
-    readonly name: string;
-    readonly version: number;
+    readonly framework: {
+      readonly description: string;
+      readonly id: string;
+      readonly name: string;
+      readonly version: number;
+    };
   };
 };
 export type UpdateFrameworkPageUpdateFrameworkMutation = {
@@ -49,7 +51,7 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "Framework",
+    "concreteType": "UpdateFrameworkPayload",
     "kind": "LinkedField",
     "name": "updateFramework",
     "plural": false,
@@ -57,29 +59,40 @@ v1 = [
       {
         "alias": null,
         "args": null,
-        "kind": "ScalarField",
-        "name": "id",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "name",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "description",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "version",
+        "concreteType": "Framework",
+        "kind": "LinkedField",
+        "name": "framework",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "id",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "name",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "description",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "version",
+            "storageKey": null
+          }
+        ],
         "storageKey": null
       }
     ],
@@ -104,16 +117,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "f0f708c6034a6f3c27fbad0193535e51",
+    "cacheID": "d85d38851d3d94709a5b6c4090678ea4",
     "id": null,
     "metadata": {},
     "name": "UpdateFrameworkPageUpdateFrameworkMutation",
     "operationKind": "mutation",
-    "text": "mutation UpdateFrameworkPageUpdateFrameworkMutation(\n  $input: UpdateFrameworkInput!\n) {\n  updateFramework(input: $input) {\n    id\n    name\n    description\n    version\n  }\n}\n"
+    "text": "mutation UpdateFrameworkPageUpdateFrameworkMutation(\n  $input: UpdateFrameworkInput!\n) {\n  updateFramework(input: $input) {\n    framework {\n      id\n      name\n      description\n      version\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "b8a8cebfad0ef454a5d5436b61cc595c";
+(node as any).hash = "c363b35a095da9142d61907ca7ba3c62";
 
 export default node;

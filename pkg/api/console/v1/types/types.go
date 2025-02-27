@@ -341,6 +341,10 @@ type UpdateFrameworkInput struct {
 	Description     *string `json:"description,omitempty"`
 }
 
+type UpdateFrameworkPayload struct {
+	Framework *Framework `json:"framework"`
+}
+
 type UpdatePeopleInput struct {
 	ID                       gid.GID              `json:"id"`
 	ExpectedVersion          int                  `json:"expectedVersion"`
@@ -348,6 +352,10 @@ type UpdatePeopleInput struct {
 	PrimaryEmailAddress      *string              `json:"primaryEmailAddress,omitempty"`
 	AdditionalEmailAddresses []string             `json:"additionalEmailAddresses,omitempty"`
 	Kind                     *coredata.PeopleKind `json:"kind,omitempty"`
+}
+
+type UpdatePeoplePayload struct {
+	People *People `json:"people"`
 }
 
 type UpdateTaskStateInput struct {
@@ -371,6 +379,10 @@ type UpdateVendorInput struct {
 	StatusPageURL        *string                      `json:"statusPageUrl,omitempty"`
 	TermsOfServiceURL    *string                      `json:"termsOfServiceUrl,omitempty"`
 	PrivacyPolicyURL     *string                      `json:"privacyPolicyUrl,omitempty"`
+}
+
+type UpdateVendorPayload struct {
+	Vendor *Vendor `json:"vendor"`
 }
 
 type User struct {

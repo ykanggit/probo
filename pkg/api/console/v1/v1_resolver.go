@@ -88,7 +88,7 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 }
 
 // UpdateVendor is the resolver for the updateVendor field.
-func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.Vendor, error) {
+func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.UpdateVendorPayload, error) {
 	vendor, err := r.proboSvc.UpdateVendor(ctx, probo.UpdateVendorRequest{
 		ID:                   input.ID,
 		ExpectedVersion:      input.ExpectedVersion,
@@ -106,7 +106,9 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 		return nil, fmt.Errorf("cannot update vendor: %w", err)
 	}
 
-	return types.NewVendor(vendor), nil
+	return &types.UpdateVendorPayload{
+		Vendor: types.NewVendor(vendor),
+	}, nil
 }
 
 // DeleteVendor is the resolver for the deleteVendor field.
@@ -141,7 +143,7 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 }
 
 // UpdatePeople is the resolver for the updatePeople field.
-func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.People, error) {
+func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.UpdatePeoplePayload, error) {
 	people, err := r.proboSvc.UpdatePeople(ctx, probo.UpdatePeopleRequest{
 		ID:                       input.ID,
 		ExpectedVersion:          input.ExpectedVersion,
@@ -154,7 +156,9 @@ func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdateP
 		return nil, fmt.Errorf("cannot update people: %w", err)
 	}
 
-	return types.NewPeople(people), nil
+	return &types.UpdatePeoplePayload{
+		People: types.NewPeople(people),
+	}, nil
 }
 
 // DeletePeople is the resolver for the deletePeople field.
@@ -271,7 +275,7 @@ func (r *mutationResolver) CreateControl(ctx context.Context, input types.Create
 }
 
 // UpdateFramework is the resolver for the updateFramework field.
-func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.Framework, error) {
+func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error) {
 	framework, err := r.proboSvc.UpdateFramework(ctx, probo.UpdateFrameworkRequest{
 		ID:              input.ID,
 		ExpectedVersion: input.ExpectedVersion,
@@ -282,7 +286,9 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 		return nil, fmt.Errorf("cannot update framework: %w", err)
 	}
 
-	return types.NewFramework(framework), nil
+	return &types.UpdateFrameworkPayload{
+		Framework: types.NewFramework(framework),
+	}, nil
 }
 
 // Frameworks is the resolver for the frameworks field.
