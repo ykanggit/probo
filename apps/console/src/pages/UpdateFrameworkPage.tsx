@@ -165,7 +165,7 @@ function UpdateFrameworkPageContent({
       variables: {
         input: {
           id: frameworkId!,
-          expectedVersion: data.node.version,
+          expectedVersion: data.node.version!,
           name: formData.name,
           description: formData.description,
         },
