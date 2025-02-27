@@ -26,8 +26,7 @@ import { Helmet } from "react-helmet-async";
 import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from "./__generated__/ControlOverviewPageQuery.graphql";
 import type { ControlOverviewPageUpdateTaskStateMutation as ControlOverviewPageUpdateTaskStateMutationType } from "./__generated__/ControlOverviewPageUpdateTaskStateMutation.graphql";
 import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreateTaskMutationType } from "./__generated__/ControlOverviewPageCreateTaskMutation.graphql";
-// The import below will be generated after the first run
-// import type { ControlOverviewPageDeleteTaskMutation as ControlOverviewPageDeleteTaskMutationType } from "./__generated__/ControlOverviewPageDeleteTaskMutation.graphql";
+import type { ControlOverviewPageDeleteTaskMutation as ControlOverviewPageDeleteTaskMutationType } from "./__generated__/ControlOverviewPageDeleteTaskMutation.graphql";
 
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
@@ -112,17 +111,15 @@ function ControlOverviewPageContent({
     );
   const [createTask] =
     useMutation<ControlOverviewPageCreateTaskMutationType>(createTaskMutation);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [deleteTask] = useMutation<any>(deleteTaskMutation);
+  const [deleteTask] =
+    useMutation<ControlOverviewPageDeleteTaskMutationType>(deleteTaskMutation);
   const control = data.control;
   const tasks = control?.tasks?.edges.map((edge) => edge?.node) ?? [];
 
-  // State for the create task dialog
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
 
-  // State for the delete task dialog
   const [isDeleteTaskOpen, setIsDeleteTaskOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<{
     id: string;
