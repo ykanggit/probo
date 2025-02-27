@@ -102,14 +102,14 @@ function ControlOverviewPageContent({
 }) {
   const data = usePreloadedQuery<ControlOverviewPageQueryType>(
     controlOverviewPageQuery,
-    queryRef
+    queryRef,
   );
   const { toast } = useToast();
   const { organizationId, frameworkId, controlId } = useParams();
   const navigate = useNavigate();
   const [updateTaskState] =
     useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
-      updateTaskStateMutation
+      updateTaskStateMutation,
     );
   const [createTask] =
     useMutation<ControlOverviewPageCreateTaskMutationType>(createTaskMutation);
@@ -248,7 +248,7 @@ function ControlOverviewPageContent({
 
   const handleEditControl = () => {
     navigate(
-      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}/update`
+      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}/update`,
     );
   };
 
@@ -489,7 +489,7 @@ function ControlOverviewPageFallback() {
 export default function ControlOverviewPage() {
   const { controlId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<ControlOverviewPageQueryType>(
-    controlOverviewPageQuery
+    controlOverviewPageQuery,
   );
 
   useEffect(() => {

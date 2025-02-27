@@ -98,7 +98,7 @@ function EditableField({
           }
           className={cn(
             "w-full resize-none",
-            required && !value && "border-red-500"
+            required && !value && "border-red-500",
           )}
           placeholder={`Enter ${label.toLowerCase()}`}
           rows={4}
@@ -161,7 +161,7 @@ function UpdateControlPageContent({
 
   const handleCancel = () => {
     navigate(
-      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`
+      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`,
     );
   };
 
@@ -224,7 +224,7 @@ function UpdateControlPageContent({
         });
 
         navigate(
-          `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`
+          `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`,
         );
       },
       onError(error) {
