@@ -16,6 +16,7 @@ package coredata
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"maps"
 	"time"
@@ -38,9 +39,18 @@ type (
 		ContentRef  string
 		CreatedAt   time.Time
 		UpdatedAt   time.Time
+		Version     int
 	}
 
 	Controls []*Control
+
+	UpdateControlParams struct {
+		ExpectedVersion int
+		Name            *string
+		Description     *string
+		Category        *string
+		State           *ControlState
+	}
 )
 
 func (c Control) CursorKey() page.CursorKey {
@@ -58,6 +68,7 @@ func (c *Control) scan(r pgx.Row) error {
 		&c.ContentRef,
 		&c.CreatedAt,
 		&c.UpdatedAt,
+		&c.Version,
 	)
 }
 
@@ -90,7 +101,8 @@ SELECT
     cs.to_state AS state,
     content_ref,
     created_at,
-    updated_at
+    updated_at,
+	version
 FROM
     controls
 INNER JOIN
@@ -133,7 +145,8 @@ INSERT INTO
         description,
         content_ref,
         created_at,
-        updated_at
+        updated_at,
+		version
     )
 VALUES (
     @control_id,
@@ -152,6 +165,7 @@ VALUES (
 		"framework_id": c.FrameworkID,
 		"category":     c.Category,
 		"name":         c.Name,
+		"version":      0,
 		"description":  c.Description,
 		"content_ref":  c.ContentRef,
 		"created_at":   c.CreatedAt,
@@ -189,7 +203,8 @@ SELECT
     cs.to_state AS state,
     content_ref,
     created_at,
-    updated_at
+    updated_at,
+	version
 FROM
     controls
 INNER JOIN
@@ -228,5 +243,78 @@ WHERE
 
 	*c = controls
 
+	return nil
+}
+
+func (c *Control) Update(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+	params UpdateControlParams,
+) error {
+	q := `
+WITH control_states AS (
+    SELECT
+        control_id,
+        to_state,
+        reason,
+        RANK() OVER w
+    FROM
+        control_state_transitions
+    WINDOW
+        w AS (PARTITION BY control_id ORDER BY created_at DESC)
+)
+UPDATE controls SET
+    name = COALESCE(@name, name),
+    description = COALESCE(@description, description),
+    category = COALESCE(@category, category),
+    updated_at = @updated_at,
+    version = version + 1
+WHERE %s
+    AND id = @control_id
+    AND version = @expected_version
+RETURNING 
+    id,
+    framework_id,
+    category,
+    name,
+    description,
+	(SELECT to_state FROM control_states WHERE control_id = controls.id AND rank = 1) AS state,
+    content_ref,
+    created_at,
+    updated_at,
+    version
+`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{
+		"control_id":       c.ID,
+		"expected_version": params.ExpectedVersion,
+		"updated_at":       time.Now(),
+	}
+
+	if params.Name != nil {
+		args["name"] = *params.Name
+	}
+	if params.Description != nil {
+		args["description"] = *params.Description
+	}
+	if params.Category != nil {
+		args["category"] = *params.Category
+	}
+
+	maps.Copy(args, scope.SQLArguments())
+
+	r := conn.QueryRow(ctx, q, args)
+
+	c2 := Control{}
+	if err := c2.scan(r); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrConcurrentModification
+		}
+		return err
+	}
+
+	*c = c2
 	return nil
 }

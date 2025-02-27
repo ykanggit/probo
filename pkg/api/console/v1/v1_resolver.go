@@ -276,11 +276,19 @@ func (r *mutationResolver) CreateControl(ctx context.Context, input types.Create
 
 // UpdateFramework is the resolver for the updateFramework field.
 func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error) {
+	var name, description *string
+	if input.Name != nil {
+		name = input.Name
+	}
+	if input.Description != nil {
+		description = input.Description
+	}
+
 	framework, err := r.proboSvc.UpdateFramework(ctx, probo.UpdateFrameworkRequest{
 		ID:              input.ID,
 		ExpectedVersion: input.ExpectedVersion,
-		Name:            input.Name,
-		Description:     input.Description,
+		Name:            name,
+		Description:     description,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update framework: %w", err)
@@ -288,6 +296,41 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 
 	return &types.UpdateFrameworkPayload{
 		Framework: types.NewFramework(framework),
+	}, nil
+}
+
+// UpdateControl is the resolver for the updateControl field.
+func (r *mutationResolver) UpdateControl(ctx context.Context, input types.UpdateControlInput) (*types.UpdateControlPayload, error) {
+	var name, description, category *string
+	var state *coredata.ControlState
+
+	if input.Name != nil {
+		name = input.Name
+	}
+	if input.Description != nil {
+		description = input.Description
+	}
+	if input.Category != nil {
+		category = input.Category
+	}
+	if input.State != nil {
+		state = input.State
+	}
+
+	control, err := r.proboSvc.UpdateControl(ctx, probo.UpdateControlRequest{
+		ID:              input.ID,
+		ExpectedVersion: input.ExpectedVersion,
+		Name:            name,
+		Description:     description,
+		Category:        category,
+		State:           state,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update control: %w", err)
+	}
+
+	return &types.UpdateControlPayload{
+		Control: types.NewControl(control),
 	}, nil
 }
 

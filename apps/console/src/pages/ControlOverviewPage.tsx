@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import {
   graphql,
   PreloadedQuery,
@@ -102,12 +102,14 @@ function ControlOverviewPageContent({
 }) {
   const data = usePreloadedQuery<ControlOverviewPageQueryType>(
     controlOverviewPageQuery,
-    queryRef,
+    queryRef
   );
   const { toast } = useToast();
+  const { organizationId, frameworkId, controlId } = useParams();
+  const navigate = useNavigate();
   const [updateTaskState] =
     useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
-      updateTaskStateMutation,
+      updateTaskStateMutation
     );
   const [createTask] =
     useMutation<ControlOverviewPageCreateTaskMutationType>(createTaskMutation);
@@ -244,201 +246,222 @@ function ControlOverviewPageContent({
     });
   };
 
+  const handleEditControl = () => {
+    navigate(
+      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}/update`
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-white p-6 space-y-6">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">{control?.name}</h1>
-          <div className="flex items-center gap-2">
-            <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-              30 min
-            </div>
-            <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-              Mandatory
-            </div>
-            <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-              Assigned to you
-            </div>
-          </div>
-        </div>
-        <p className="text-gray-600 max-w-3xl">{control?.description}</p>
-      </div>
-
-      <Card className="bg-gray-50 border border-gray-200">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center border border-gray-200">
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  control?.state === "IMPLEMENTED"
-                    ? "bg-green-500"
-                    : "bg-gray-300"
-                }`}
-              />
-            </div>
-            <span className="text-sm text-gray-700">
-              {control?.state === "IMPLEMENTED" ? "Validated" : "Not validated"}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Tasks</h2>
-          <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="flex items-center gap-1">
-                <Plus className="w-4 h-4" />
-                <span>Add Task</span>
+    <>
+      <Helmet>
+        <title>{control?.name || "Control"} - Probo</title>
+      </Helmet>
+      <div className="min-h-screen bg-white p-6 space-y-6">
+        <div className="space-y-4 mb-8">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold">{control?.name}</h1>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleEditControl}>
+                Edit Control
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Task</DialogTitle>
-                <DialogDescription>
-                  Add a new task to this control. Click save when you&apos;re
-                  done.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium">
-                    Task Name
-                  </label>
-                  <Input
-                    id="name"
-                    value={newTaskName}
-                    onChange={(e) => setNewTaskName(e.target.value)}
-                    placeholder="Enter task name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="description" className="text-sm font-medium">
-                    Description (optional)
-                  </label>
-                  <Input
-                    id="description"
-                    value={newTaskDescription}
-                    onChange={(e) => setNewTaskDescription(e.target.value)}
-                    placeholder="Enter task description"
-                  />
-                </div>
+              <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                30 min
               </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsCreateTaskOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleCreateTask}>Create Task</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                Mandatory
+              </div>
+              <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                Assigned to you
+              </div>
+            </div>
+          </div>
+          <p className="text-gray-600 max-w-3xl">{control?.description}</p>
         </div>
-        <div className="space-y-2">
-          {tasks.map((task) => (
-            <div
-              key={task?.id}
-              className="flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group"
-            >
+
+        <Card className="bg-gray-50 border border-gray-200">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
               <div
-                className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer ${
-                  task?.state === "DONE"
-                    ? "border-gray-400 bg-gray-100"
-                    : "border-gray-300"
-                }`}
-                onClick={() =>
-                  task?.id &&
-                  task?.state &&
-                  handleTaskClick(task.id, task.state)
-                }
+                className={`w-4 h-4 rounded-full bg-white flex items-center justify-center border border-gray-200`}
               >
-                {task?.state === "DONE" && (
-                  <CheckCircle2 className="w-4 h-4 text-gray-500" />
-                )}
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    control?.state === "IMPLEMENTED"
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                  }`}
+                />
               </div>
-              <div
-                className="flex-1 flex items-center justify-between cursor-pointer"
-                onClick={() =>
-                  task?.id &&
-                  task?.state &&
-                  handleTaskClick(task.id, task.state)
-                }
-              >
-                <div>
-                  <h3
-                    className={`text-sm ${
-                      task?.state === "DONE"
-                        ? "text-gray-500 line-through"
-                        : "text-gray-900"
-                    }`}
-                  >
-                    {task?.name}
-                  </h3>
-                  {task?.description && (
-                    <p
-                      className={`text-xs mt-1 ${
-                        task?.state === "DONE"
-                          ? "text-gray-400 line-through"
-                          : "text-gray-500"
-                      }`}
+              <span className="text-sm text-gray-700">
+                {control?.state === "IMPLEMENTED"
+                  ? "Validated"
+                  : "Not validated"}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold">Tasks</h2>
+            <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="flex items-center gap-1">
+                  <Plus className="w-4 h-4" />
+                  <span>Add Task</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Task</DialogTitle>
+                  <DialogDescription>
+                    Add a new task to this control. Click save when you&apos;re
+                    done.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="text-sm font-medium">
+                      Task Name
+                    </label>
+                    <Input
+                      id="name"
+                      value={newTaskName}
+                      onChange={(e) => setNewTaskName(e.target.value)}
+                      placeholder="Enter task name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="description"
+                      className="text-sm font-medium"
                     >
-                      {task.description}
-                    </p>
+                      Description (optional)
+                    </label>
+                    <Input
+                      id="description"
+                      value={newTaskDescription}
+                      onChange={(e) => setNewTaskDescription(e.target.value)}
+                      placeholder="Enter task description"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsCreateTaskOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleCreateTask}>Create Task</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="space-y-2">
+            {tasks.map((task) => (
+              <div
+                key={task?.id}
+                className="flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group"
+              >
+                <div
+                  className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer ${
+                    task?.state === "DONE"
+                      ? "border-gray-400 bg-gray-100"
+                      : "border-gray-300"
+                  }`}
+                  onClick={() =>
+                    task?.id &&
+                    task?.state &&
+                    handleTaskClick(task.id, task.state)
+                  }
+                >
+                  {task?.state === "DONE" && (
+                    <CheckCircle2 className="w-4 h-4 text-gray-500" />
                   )}
                 </div>
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="text-gray-400 text-sm">06.00 - 07.30</div>
-                  <button
-                    className="text-gray-400 hover:text-red-600"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (task?.id && task?.name) {
-                        handleDeleteTask(task.id, task.name);
-                      }
-                    }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                <div
+                  className="flex-1 flex items-center justify-between cursor-pointer"
+                  onClick={() =>
+                    task?.id &&
+                    task?.state &&
+                    handleTaskClick(task.id, task.state)
+                  }
+                >
+                  <div>
+                    <h3
+                      className={`text-sm ${
+                        task?.state === "DONE"
+                          ? "text-gray-500 line-through"
+                          : "text-gray-900"
+                      }`}
+                    >
+                      {task?.name}
+                    </h3>
+                    {task?.description && (
+                      <p
+                        className={`text-xs mt-1 ${
+                          task?.state === "DONE"
+                            ? "text-gray-400 line-through"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {task.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="text-gray-400 text-sm">06.00 - 07.30</div>
+                    <button
+                      className="text-gray-400 hover:text-red-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (task?.id && task?.name) {
+                          handleDeleteTask(task.id, task.name);
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
 
-          {tasks.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <p>No tasks yet. Click &quot;Add Task&quot; to create one.</p>
-            </div>
-          )}
+            {tasks.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <p>No tasks yet. Click &quot;Add Task&quot; to create one.</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Delete Task Confirmation Dialog */}
-      <Dialog open={isDeleteTaskOpen} onOpenChange={setIsDeleteTaskOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Task</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete the task &quot;
-              {taskToDelete?.name}&quot;? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteTaskOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDeleteTask}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+        {/* Delete Task Confirmation Dialog */}
+        <Dialog open={isDeleteTaskOpen} onOpenChange={setIsDeleteTaskOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Task</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete the task &quot;
+                {taskToDelete?.name}&quot;? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteTaskOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={confirmDeleteTask}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </>
   );
 }
 
@@ -466,21 +489,22 @@ function ControlOverviewPageFallback() {
 export default function ControlOverviewPage() {
   const { controlId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<ControlOverviewPageQueryType>(
-    controlOverviewPageQuery,
+    controlOverviewPageQuery
   );
 
   useEffect(() => {
-    loadQuery({ controlId: controlId! });
-  }, [loadQuery, controlId]);
+    if (controlId) {
+      loadQuery({ controlId });
+    }
+  }, [controlId, loadQuery]);
+
+  if (!queryRef) {
+    return <ControlOverviewPageFallback />;
+  }
 
   return (
-    <>
-      <Helmet>
-        <title>Control Overview - Probo Console</title>
-      </Helmet>
-      <Suspense fallback={<ControlOverviewPageFallback />}>
-        {queryRef && <ControlOverviewPageContent queryRef={queryRef} />}
-      </Suspense>
-    </>
+    <Suspense fallback={<ControlOverviewPageFallback />}>
+      <ControlOverviewPageContent queryRef={queryRef} />
+    </Suspense>
   );
 }

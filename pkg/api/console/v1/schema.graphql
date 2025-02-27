@@ -212,6 +212,7 @@ type ControlEdge {
 
 type Control implements Node {
   id: ID!
+  version: Int!
   category: String!
   name: String!
   description: String!
@@ -399,6 +400,7 @@ type Mutation {
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   createControl(input: CreateControlInput!): CreateControlPayload!
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
+  updateControl(input: UpdateControlInput!): UpdateControlPayload!
 }
 
 input CreateVendorInput {
@@ -584,4 +586,17 @@ type UpdateVendorPayload {
 
 type UpdatePeoplePayload {
   people: People!
+}
+
+input UpdateControlInput {
+  id: ID!
+  expectedVersion: Int!
+  name: String
+  description: String
+  category: String
+  state: ControlState
+}
+
+type UpdateControlPayload {
+  control: Control!
 }

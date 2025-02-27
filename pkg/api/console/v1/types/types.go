@@ -17,6 +17,7 @@ type Node interface {
 
 type Control struct {
 	ID               gid.GID                           `json:"id"`
+	Version          int                               `json:"version"`
 	Category         string                            `json:"category"`
 	Name             string                            `json:"name"`
 	Description      string                            `json:"description"`
@@ -332,6 +333,19 @@ type TaskStateTransitionConnection struct {
 type TaskStateTransitionEdge struct {
 	Cursor page.CursorKey       `json:"cursor"`
 	Node   *TaskStateTransition `json:"node"`
+}
+
+type UpdateControlInput struct {
+	ID              gid.GID                `json:"id"`
+	ExpectedVersion int                    `json:"expectedVersion"`
+	Name            *string                `json:"name,omitempty"`
+	Description     *string                `json:"description,omitempty"`
+	Category        *string                `json:"category,omitempty"`
+	State           *coredata.ControlState `json:"state,omitempty"`
+}
+
+type UpdateControlPayload struct {
+	Control *Control `json:"control"`
 }
 
 type UpdateFrameworkInput struct {
