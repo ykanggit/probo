@@ -26,9 +26,10 @@ import (
 
 type (
 	CreateFrameworkRequest struct {
-		Name        string
-		Description string
-		ContentRef  string
+		OrganizationID gid.GID
+		Name           string
+		Description    string
+		ContentRef     string
 	}
 )
 
@@ -44,7 +45,7 @@ func (s Service) CreateFramework(
 
 	framework := &coredata.Framework{
 		ID:             frameworkID,
-		OrganizationID: gid.Nil,
+		OrganizationID: req.OrganizationID,
 		Name:           req.Name,
 		Description:    req.Description,
 		ContentRef:     req.ContentRef,

@@ -165,7 +165,7 @@ INSERT INTO
         updated_at
     )
 VALUES (
-    @frameworkd_id,
+    @framework_id,
     @organization_id,
     @name,
     @description,

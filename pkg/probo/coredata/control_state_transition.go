@@ -60,7 +60,7 @@ INSERT INTO
     control_state_transitions (
         id,
         control_id,
-        from_state
+        from_state,
         to_state,
         reason,
         created_at,

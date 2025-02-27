@@ -394,6 +394,8 @@ type Mutation {
   updateTaskState(input: UpdateTaskStateInput!): UpdateTaskStatePayload!
   createTask(input: CreateTaskInput!): CreateTaskPayload!
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
+  createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
+  createControl(input: CreateControlInput!): CreateControlPayload!
 }
 
 input CreateVendorInput {
@@ -539,4 +541,25 @@ input DeleteTaskInput {
 
 type DeleteTaskPayload {
   deletedTaskId: ID!
+}
+
+input CreateFrameworkInput {
+  organizationId: ID!
+  name: String!
+  description: String!
+}
+
+type CreateFrameworkPayload {
+  frameworkEdge: FrameworkEdge!
+}
+
+input CreateControlInput {
+  frameworkId: ID!
+  name: String!
+  description: String!
+  category: String!
+}
+
+type CreateControlPayload {
+  controlEdge: ControlEdge!
 }

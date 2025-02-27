@@ -59,6 +59,27 @@ type ControlStateTransitionEdge struct {
 	Node   *ControlStateTransition `json:"node"`
 }
 
+type CreateControlInput struct {
+	FrameworkID gid.GID `json:"frameworkId"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Category    string  `json:"category"`
+}
+
+type CreateControlPayload struct {
+	ControlEdge *ControlEdge `json:"controlEdge"`
+}
+
+type CreateFrameworkInput struct {
+	OrganizationID gid.GID `json:"organizationId"`
+	Name           string  `json:"name"`
+	Description    string  `json:"description"`
+}
+
+type CreateFrameworkPayload struct {
+	FrameworkEdge *FrameworkEdge `json:"frameworkEdge"`
+}
+
 type CreateOrganizationInput struct {
 	Name string `json:"name"`
 }

@@ -127,22 +127,21 @@ func (c Control) Insert(
 INSERT INTO
     controls (
         id,
-        control_id,
+        framework_id,
 		category,
         name,
         description,
         content_ref,
-        state,
         created_at,
         updated_at
     )
 VALUES (
     @control_id,
     @framework_id,
+	@category,
     @name,
     @description,
     @content_ref,
-    @state,
     @created_at,
     @updated_at
 );
@@ -151,6 +150,7 @@ VALUES (
 	args := pgx.NamedArgs{
 		"control_id":   c.ID,
 		"framework_id": c.FrameworkID,
+		"category":     c.Category,
 		"name":         c.Name,
 		"description":  c.Description,
 		"content_ref":  c.ContentRef,

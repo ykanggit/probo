@@ -9,12 +9,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link, useParams } from "react-router";
 import type { FrameworkListPageQuery as FrameworkListPageQueryType } from "./__generated__/FrameworkListPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 const FrameworkListPageQuery = graphql`
   query FrameworkListPageQuery($organizationId: ID!) {
     organization: node(id: $organizationId) {
       ... on Organization {
-        frameworks {
+        frameworks(first: 25) @connection(key: "FrameworkListPage_frameworks") {
           edges {
             node {
               id
@@ -84,56 +86,75 @@ function FrameworkListPageContent({
 }: {
   queryRef: PreloadedQuery<FrameworkListPageQueryType>;
 }) {
-  const data = usePreloadedQuery(FrameworkListPageQuery, queryRef);
+  const data = usePreloadedQuery<FrameworkListPageQueryType>(
+    FrameworkListPageQuery,
+    queryRef
+  );
   const { organizationId } = useParams();
   const frameworks =
     data.organization.frameworks?.edges.map((edge) => edge?.node) ?? [];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold mb-1">Framework</h2>
-        <p className="text-muted-foreground">
-          Track and manage your compliance frameworks and their controls.
-        </p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-        {frameworks.map((framework) => {
-          const validatedControls = framework.controls.edges.filter(
-            (edge) => edge?.node?.state === "IMPLEMENTED",
-          ).length;
-          const totalControls = framework.controls.edges.length;
-
-          return (
-            <Link
-              key={framework.id}
-              to={`/organizations/${organizationId}/frameworks/${framework.id}`}
-            >
-              <FrameworkCard
-                title={framework.name}
-                description={framework.description}
-                icon={
-                  <div className="flex size-full items-center justify-center rounded-full bg-blue-100">
-                    <span className="text-lg font-semibold text-blue-900">
-                      {framework.name.split(" ")[0]}
-                    </span>
-                  </div>
-                }
-                status={
-                  validatedControls === totalControls ? "Compliant" : undefined
-                }
-                progress={
-                  validatedControls === totalControls
-                    ? "All controls validated"
-                    : `${validatedControls}/${totalControls} Controls validated`
-                }
-              />
+    <>
+      <Helmet>
+        <title>Frameworks - Probo</title>
+      </Helmet>
+      <div className="container mx-auto py-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold">Frameworks</h1>
+            <p className="text-muted-foreground">
+              Manage your compliance frameworks
+            </p>
+          </div>
+          <Button asChild>
+            <Link to={`/organizations/${organizationId}/frameworks/create`}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Framework
             </Link>
-          );
-        })}
+          </Button>
+        </div>
+        <div className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+            {frameworks.map((framework) => {
+              const validatedControls = framework.controls.edges.filter(
+                (edge) => edge?.node?.state === "IMPLEMENTED"
+              ).length;
+              const totalControls = framework.controls.edges.length;
+
+              return (
+                <Link
+                  key={framework.id}
+                  to={`/organizations/${organizationId}/frameworks/${framework.id}`}
+                >
+                  <FrameworkCard
+                    title={framework.name}
+                    description={framework.description}
+                    icon={
+                      <div className="flex size-full items-center justify-center rounded-full bg-blue-100">
+                        <span className="text-lg font-semibold text-blue-900">
+                          {framework.name.split(" ")[0]}
+                        </span>
+                      </div>
+                    }
+                    status={
+                      validatedControls === totalControls
+                        ? "Compliant"
+                        : undefined
+                    }
+                    progress={
+                      validatedControls === totalControls
+                        ? "All controls validated"
+                        : `${validatedControls}/${totalControls} Controls validated`
+                    }
+                  />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -164,7 +185,7 @@ function FrameworkListPageFallback() {
 
 export default function FrameworkListPage() {
   const [queryRef, loadQuery] = useQueryLoader<FrameworkListPageQueryType>(
-    FrameworkListPageQuery,
+    FrameworkListPageQuery
   );
 
   const { organizationId } = useParams();

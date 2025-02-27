@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ea02ef2ebc2c52a72d443c130a44087c>>
+ * @generated SignedSource<<fd058cd12c357b25b11a3806c359e33b>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -64,115 +64,146 @@ v2 = {
   "storageKey": null
 },
 v3 = {
-  "kind": "InlineFragment",
-  "selections": [
-    {
-      "alias": null,
-      "args": null,
-      "concreteType": "FrameworkConnection",
-      "kind": "LinkedField",
-      "name": "frameworks",
-      "plural": false,
-      "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "FrameworkEdge",
-          "kind": "LinkedField",
-          "name": "edges",
-          "plural": true,
-          "selections": [
-            {
-              "alias": null,
-              "args": null,
-              "concreteType": "Framework",
-              "kind": "LinkedField",
-              "name": "node",
-              "plural": false,
-              "selections": [
-                (v2/*: any*/),
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "name",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "description",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "concreteType": "ControlConnection",
-                  "kind": "LinkedField",
-                  "name": "controls",
-                  "plural": false,
-                  "selections": [
-                    {
-                      "alias": null,
-                      "args": null,
-                      "concreteType": "ControlEdge",
-                      "kind": "LinkedField",
-                      "name": "edges",
-                      "plural": true,
-                      "selections": [
-                        {
-                          "alias": null,
-                          "args": null,
-                          "concreteType": "Control",
-                          "kind": "LinkedField",
-                          "name": "node",
-                          "plural": false,
-                          "selections": [
-                            (v2/*: any*/),
-                            {
-                              "alias": null,
-                              "args": null,
-                              "kind": "ScalarField",
-                              "name": "state",
-                              "storageKey": null
-                            }
-                          ],
-                          "storageKey": null
-                        }
-                      ],
-                      "storageKey": null
-                    }
-                  ],
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "createdAt",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "updatedAt",
-                  "storageKey": null
-                }
-              ],
-              "storageKey": null
-            }
-          ],
-          "storageKey": null
-        }
-      ],
-      "storageKey": null
-    }
-  ],
-  "type": "Organization",
-  "abstractKey": null
-};
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v4 = [
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "FrameworkEdge",
+    "kind": "LinkedField",
+    "name": "edges",
+    "plural": true,
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": "Framework",
+        "kind": "LinkedField",
+        "name": "node",
+        "plural": false,
+        "selections": [
+          (v2/*: any*/),
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "name",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "description",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "ControlConnection",
+            "kind": "LinkedField",
+            "name": "controls",
+            "plural": false,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "ControlEdge",
+                "kind": "LinkedField",
+                "name": "edges",
+                "plural": true,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "Control",
+                    "kind": "LinkedField",
+                    "name": "node",
+                    "plural": false,
+                    "selections": [
+                      (v2/*: any*/),
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "state",
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "createdAt",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "updatedAt",
+            "storageKey": null
+          },
+          (v3/*: any*/)
+        ],
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "cursor",
+        "storageKey": null
+      }
+    ],
+    "storageKey": null
+  },
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "PageInfo",
+    "kind": "LinkedField",
+    "name": "pageInfo",
+    "plural": false,
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "endCursor",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "hasNextPage",
+        "storageKey": null
+      }
+    ],
+    "storageKey": null
+  }
+],
+v5 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 25
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": (v0/*: any*/),
@@ -188,7 +219,23 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v3/*: any*/)
+          {
+            "kind": "InlineFragment",
+            "selections": [
+              {
+                "alias": "frameworks",
+                "args": null,
+                "concreteType": "FrameworkConnection",
+                "kind": "LinkedField",
+                "name": "__FrameworkListPage_frameworks_connection",
+                "plural": false,
+                "selections": (v4/*: any*/),
+                "storageKey": null
+              }
+            ],
+            "type": "Organization",
+            "abstractKey": null
+          }
         ],
         "storageKey": null
       }
@@ -210,14 +257,33 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "__typename",
-            "storageKey": null
-          },
           (v3/*: any*/),
+          {
+            "kind": "InlineFragment",
+            "selections": [
+              {
+                "alias": null,
+                "args": (v5/*: any*/),
+                "concreteType": "FrameworkConnection",
+                "kind": "LinkedField",
+                "name": "frameworks",
+                "plural": false,
+                "selections": (v4/*: any*/),
+                "storageKey": "frameworks(first:25)"
+              },
+              {
+                "alias": null,
+                "args": (v5/*: any*/),
+                "filters": null,
+                "handle": "connection",
+                "key": "FrameworkListPage_frameworks",
+                "kind": "LinkedHandle",
+                "name": "frameworks"
+              }
+            ],
+            "type": "Organization",
+            "abstractKey": null
+          },
           (v2/*: any*/)
         ],
         "storageKey": null
@@ -225,16 +291,28 @@ return {
     ]
   },
   "params": {
-    "cacheID": "e45d4e64a00b3e27cd6dc52179f47d52",
+    "cacheID": "0922c219bcd69d7b2fd6b85399de7029",
     "id": null,
-    "metadata": {},
+    "metadata": {
+      "connection": [
+        {
+          "count": null,
+          "cursor": null,
+          "direction": "forward",
+          "path": [
+            "organization",
+            "frameworks"
+          ]
+        }
+      ]
+    },
     "name": "FrameworkListPageQuery",
     "operationKind": "query",
-    "text": "query FrameworkListPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks {\n        edges {\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query FrameworkListPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 25) {\n        edges {\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5cd314faffe31e716de2336e70cca4ee";
+(node as any).hash = "11e5b067132c7a20da3f6d0d7b6ff450";
 
 export default node;

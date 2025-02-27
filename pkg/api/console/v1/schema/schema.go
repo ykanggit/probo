@@ -97,6 +97,14 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	CreateControlPayload struct {
+		ControlEdge func(childComplexity int) int
+	}
+
+	CreateFrameworkPayload struct {
+		FrameworkEdge func(childComplexity int) int
+	}
+
 	CreateOrganizationPayload struct {
 		OrganizationEdge func(childComplexity int) int
 	}
@@ -189,6 +197,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		CreateControl      func(childComplexity int, input types.CreateControlInput) int
+		CreateFramework    func(childComplexity int, input types.CreateFrameworkInput) int
 		CreateOrganization func(childComplexity int, input types.CreateOrganizationInput) int
 		CreatePeople       func(childComplexity int, input types.CreatePeopleInput) int
 		CreateTask         func(childComplexity int, input types.CreateTaskInput) int
@@ -363,6 +373,8 @@ type MutationResolver interface {
 	UpdateTaskState(ctx context.Context, input types.UpdateTaskStateInput) (*types.UpdateTaskStatePayload, error)
 	CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error)
 	DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error)
+	CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error)
+	CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error)
 }
 type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
@@ -570,6 +582,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ControlStateTransitionEdge.Node(childComplexity), true
+
+	case "CreateControlPayload.controlEdge":
+		if e.complexity.CreateControlPayload.ControlEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateControlPayload.ControlEdge(childComplexity), true
+
+	case "CreateFrameworkPayload.frameworkEdge":
+		if e.complexity.CreateFrameworkPayload.FrameworkEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateFrameworkPayload.FrameworkEdge(childComplexity), true
 
 	case "CreateOrganizationPayload.organizationEdge":
 		if e.complexity.CreateOrganizationPayload.OrganizationEdge == nil {
@@ -860,6 +886,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.FrameworkEdge.Node(childComplexity), true
+
+	case "Mutation.createControl":
+		if e.complexity.Mutation.CreateControl == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createControl_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateControl(childComplexity, args["input"].(types.CreateControlInput)), true
+
+	case "Mutation.createFramework":
+		if e.complexity.Mutation.CreateFramework == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createFramework_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateFramework(childComplexity, args["input"].(types.CreateFrameworkInput)), true
 
 	case "Mutation.createOrganization":
 		if e.complexity.Mutation.CreateOrganization == nil {
@@ -1582,6 +1632,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputCreateControlInput,
+		ec.unmarshalInputCreateFrameworkInput,
 		ec.unmarshalInputCreateOrganizationInput,
 		ec.unmarshalInputCreatePeopleInput,
 		ec.unmarshalInputCreateTaskInput,
@@ -2086,6 +2138,8 @@ type Mutation {
   updateTaskState(input: UpdateTaskStateInput!): UpdateTaskStatePayload!
   createTask(input: CreateTaskInput!): CreateTaskPayload!
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
+  createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
+  createControl(input: CreateControlInput!): CreateControlPayload!
 }
 
 input CreateVendorInput {
@@ -2231,6 +2285,27 @@ input DeleteTaskInput {
 
 type DeleteTaskPayload {
   deletedTaskId: ID!
+}
+
+input CreateFrameworkInput {
+  organizationId: ID!
+  name: String!
+  description: String!
+}
+
+type CreateFrameworkPayload {
+  frameworkEdge: FrameworkEdge!
+}
+
+input CreateControlInput {
+  frameworkId: ID!
+  name: String!
+  description: String!
+  category: String!
+}
+
+type CreateControlPayload {
+  controlEdge: ControlEdge!
 }
 `, BuiltIn: false},
 }
@@ -2545,6 +2620,52 @@ func (ec *executionContext) field_Framework_controls_argsBefore(
 	}
 
 	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createControl_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createControl_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createControl_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateControlInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateControlInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateControlInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createFramework_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createFramework_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createFramework_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateFrameworkInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateFrameworkInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateFrameworkInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateFrameworkInput
 	return zeroVal, nil
 }
 
@@ -4314,6 +4435,94 @@ func (ec *executionContext) fieldContext_ControlStateTransitionEdge_node(_ conte
 				return ec.fieldContext_ControlStateTransition_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ControlStateTransition", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateControlPayload_controlEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateControlPayload_controlEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ControlEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ControlEdge)
+	fc.Result = res
+	return ec.marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐControlEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateControlPayload_controlEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateControlPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_ControlEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_ControlEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateFrameworkPayload_frameworkEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateFrameworkPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateFrameworkPayload_frameworkEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FrameworkEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.FrameworkEdge)
+	fc.Result = res
+	return ec.marshalNFrameworkEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐFrameworkEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateFrameworkPayload_frameworkEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateFrameworkPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_FrameworkEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_FrameworkEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type FrameworkEdge", field.Name)
 		},
 	}
 	return fc, nil
@@ -6522,6 +6731,100 @@ func (ec *executionContext) fieldContext_Mutation_deleteTask(ctx context.Context
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createFramework(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createFramework(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateFramework(rctx, fc.Args["input"].(types.CreateFrameworkInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateFrameworkPayload)
+	fc.Result = res
+	return ec.marshalNCreateFrameworkPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateFrameworkPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createFramework(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "frameworkEdge":
+				return ec.fieldContext_CreateFrameworkPayload_frameworkEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateFrameworkPayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createFramework_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createControl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createControl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateControl(rctx, fc.Args["input"].(types.CreateControlInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateControlPayload)
+	fc.Result = res
+	return ec.marshalNCreateControlPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createControl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "controlEdge":
+				return ec.fieldContext_CreateControlPayload_controlEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateControlPayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createControl_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -11409,6 +11712,95 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCreateControlInput(ctx context.Context, obj any) (types.CreateControlInput, error) {
+	var it types.CreateControlInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"frameworkId", "name", "description", "category"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "frameworkId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("frameworkId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FrameworkID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "category":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Category = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateFrameworkInput(ctx context.Context, obj any) (types.CreateFrameworkInput, error) {
+	var it types.CreateFrameworkInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"organizationId", "name", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateOrganizationInput(ctx context.Context, obj any) (types.CreateOrganizationInput, error) {
 	var it types.CreateOrganizationInput
 	asMap := map[string]any{}
@@ -12361,6 +12753,84 @@ func (ec *executionContext) _ControlStateTransitionEdge(ctx context.Context, sel
 	return out
 }
 
+var createControlPayloadImplementors = []string{"CreateControlPayload"}
+
+func (ec *executionContext) _CreateControlPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateControlPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createControlPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateControlPayload")
+		case "controlEdge":
+			out.Values[i] = ec._CreateControlPayload_controlEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var createFrameworkPayloadImplementors = []string{"CreateFrameworkPayload"}
+
+func (ec *executionContext) _CreateFrameworkPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateFrameworkPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createFrameworkPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateFrameworkPayload")
+		case "frameworkEdge":
+			out.Values[i] = ec._CreateFrameworkPayload_frameworkEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createOrganizationPayloadImplementors = []string{"CreateOrganizationPayload"}
 
 func (ec *executionContext) _CreateOrganizationPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateOrganizationPayload) graphql.Marshaler {
@@ -13277,6 +13747,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteTask":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteTask(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createFramework":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createFramework(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createControl":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createControl(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -15060,6 +15544,44 @@ func (ec *executionContext) marshalNControlStateTransitionEdge2ᚖgithubᚗcom�
 		return graphql.Null
 	}
 	return ec._ControlStateTransitionEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCreateControlInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlInput(ctx context.Context, v any) (types.CreateControlInput, error) {
+	res, err := ec.unmarshalInputCreateControlInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateControlPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateControlPayload) graphql.Marshaler {
+	return ec._CreateControlPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateControlPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateControlPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateControlPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCreateFrameworkInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateFrameworkInput(ctx context.Context, v any) (types.CreateFrameworkInput, error) {
+	res, err := ec.unmarshalInputCreateFrameworkInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateFrameworkPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateFrameworkPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateFrameworkPayload) graphql.Marshaler {
+	return ec._CreateFrameworkPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateFrameworkPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateFrameworkPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateFrameworkPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateFrameworkPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNCreateOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateOrganizationInput(ctx context.Context, v any) (types.CreateOrganizationInput, error) {

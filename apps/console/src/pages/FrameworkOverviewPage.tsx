@@ -1,14 +1,15 @@
 import { Suspense, useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import {
   graphql,
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
 } from "react-relay";
-import { Shield, MoveUpRight, Clock } from "lucide-react";
+import { Shield, MoveUpRight, Clock, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
 import { createPortal } from "react-dom";
@@ -20,7 +21,7 @@ const FrameworkOverviewPageQuery = graphql`
       ... on Framework {
         name
         description
-        controls {
+        controls(first: 90) @connection(key: "FrameworkOverviewPage_controls") {
           edges {
             node {
               id
@@ -56,17 +57,14 @@ function FrameworkOverviewPageContent({
   const { organizationId } = useParams();
 
   // Group controls by their category
-  const controlsByCategory = controls.reduce(
-    (acc, control) => {
-      if (!control?.category) return acc;
-      if (!acc[control.category]) {
-        acc[control.category] = [];
-      }
-      acc[control.category].push(control);
-      return acc;
-    },
-    {} as Record<string, typeof controls>,
-  );
+  const controlsByCategory = controls.reduce((acc, control) => {
+    if (!control?.category) return acc;
+    if (!acc[control.category]) {
+      acc[control.category] = [];
+    }
+    acc[control.category].push(control);
+    return acc;
+  }, {} as Record<string, typeof controls>);
 
   const controlCards = Object.entries(controlsByCategory).map(
     ([category, controls]) => ({
@@ -74,20 +72,30 @@ function FrameworkOverviewPageContent({
       controls,
       completed: controls.filter((c) => c?.state === "IMPLEMENTED").length,
       total: controls.length,
-    }),
+    })
   );
 
   const totalImplemented = controls.filter(
-    (c) => c?.state === "IMPLEMENTED",
+    (c) => c?.state === "IMPLEMENTED"
   ).length;
 
   return (
     <div className="min-h-screen bg-background p-6 space-y-6">
       <div className="space-y-4 mb-8">
-        <h1 className="text-2xl font-semibold">{framework.name}</h1>
-        <p className="text-muted-foreground max-w-3xl">
-          {framework.description}
-        </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-semibold mb-1">{framework.name}</h2>
+            <p className="text-muted-foreground">{framework.description}</p>
+          </div>
+          <Button asChild>
+            <Link
+              to={`/organizations/${organizationId}/frameworks/${framework.id}/controls/create`}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Create Control
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div>
@@ -190,7 +198,7 @@ function FrameworkOverviewPageContent({
                           onClick={() => {
                             if (control?.id) {
                               navigate(
-                                `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`,
+                                `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
                               );
                             }
                           }}
@@ -274,7 +282,7 @@ function FrameworkOverviewPageContent({
               </div>
             </div>
           </div>,
-          document.body,
+          document.body
         )}
     </div>
   );
@@ -308,7 +316,7 @@ function FrameworkOverviewPageFallback() {
 export default function FrameworkOverviewPage() {
   const { frameworkId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<FrameworkOverviewPageQueryType>(
-    FrameworkOverviewPageQuery,
+    FrameworkOverviewPageQuery
   );
 
   useEffect(() => {

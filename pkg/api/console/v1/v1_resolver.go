@@ -237,6 +237,39 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTas
 	}, nil
 }
 
+// CreateFramework is the resolver for the createFramework field.
+func (r *mutationResolver) CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error) {
+	framework, err := r.proboSvc.CreateFramework(ctx, probo.CreateFrameworkRequest{
+		OrganizationID: input.OrganizationID,
+		Name:           input.Name,
+		Description:    input.Description,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create framework: %w", err)
+	}
+
+	return &types.CreateFrameworkPayload{
+		FrameworkEdge: types.NewFrameworkEdge(framework),
+	}, nil
+}
+
+// CreateControl is the resolver for the createControl field.
+func (r *mutationResolver) CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error) {
+	control, err := r.proboSvc.CreateControl(ctx, probo.CreateControlRequest{
+		FrameworkID: input.FrameworkID,
+		Name:        input.Name,
+		Description: input.Description,
+		Category:    input.Category,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create control: %w", err)
+	}
+
+	return &types.CreateControlPayload{
+		ControlEdge: types.NewControlEdge(control),
+	}, nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

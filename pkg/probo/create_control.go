@@ -31,6 +31,7 @@ type (
 		Name        string
 		Description string
 		ContentRef  string
+		Category    string
 	}
 )
 
@@ -54,6 +55,7 @@ func (s Service) CreateControl(
 		FrameworkID: req.FrameworkID,
 		Name:        req.Name,
 		Description: req.Description,
+		Category:    req.Category,
 		State:       coredata.ControlStateNotStarted,
 		ContentRef:  req.ContentRef,
 		CreatedAt:   now,

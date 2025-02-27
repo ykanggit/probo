@@ -16,13 +16,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
-import { graphql } from "react-relay";
-import { useLazyLoadQuery } from "react-relay";
+import { graphql, useLazyLoadQuery } from "react-relay";
 import { ConsoleLayoutBreadcrumbFrameworkOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbFrameworkOverviewQuery.graphql";
 import { ConsoleLayoutBreadcrumbPeopleOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbPeopleOverviewQuery.graphql";
 import { ConsoleLayoutBreadcrumbVendorOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbVendorOverviewQuery.graphql";
 import { ConsoleLayoutBreadcrumbControlOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbControlOverviewQuery.graphql";
 import { ConsoleLayoutOrganizationQuery } from "./__generated__/ConsoleLayoutOrganizationQuery.graphql";
+import { ConsoleLayoutBreadcrumbCreateControlQuery } from "./__generated__/ConsoleLayoutBreadcrumbCreateControlQuery.graphql";
 
 function BreadcrumbHome({ children }: { children: React.ReactNode }) {
   const { organizationId } = useParams();
@@ -57,7 +57,7 @@ function BreadcrumbHome({ children }: { children: React.ReactNode }) {
       }
     `,
     { organizationId: organizationId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -93,6 +93,17 @@ function BreadcrumbFrameworkList() {
   );
 }
 
+function BreadcrumbCreateFramework() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Create</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
 function BreadcrumbFrameworkOverview() {
   const { organizationId, frameworkId } = useParams();
   const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbFrameworkOverviewQuery>(
@@ -106,8 +117,7 @@ function BreadcrumbFrameworkOverview() {
         }
       }
     `,
-    { frameworkId: frameworkId! },
-    { fetchPolicy: "store-or-network" },
+    { frameworkId: frameworkId! }
   );
 
   return (
@@ -116,9 +126,9 @@ function BreadcrumbFrameworkOverview() {
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
           <Link
-            to={`/organizations/${organizationId}/frameworks/${data.framework.id}`}
+            to={`/organizations/${organizationId}/frameworks/${frameworkId}`}
           >
-            {data.framework.name}
+            {data.framework?.name}
           </Link>
         </BreadcrumbLink>
       </BreadcrumbItem>
@@ -156,7 +166,7 @@ function BreadcrumbVendorOverview() {
       }
     `,
     { vendorId: vendorId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -216,7 +226,7 @@ function BreadcrumbPeopleOverview() {
       }
     `,
     { peopleId: peopleId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -258,8 +268,7 @@ function BreadcrumbControlOverview() {
         }
       }
     `,
-    { frameworkId: frameworkId!, controlId: controlId! },
-    { fetchPolicy: "store-or-network" },
+    { frameworkId: frameworkId!, controlId: controlId! }
   );
 
   return (
@@ -268,9 +277,9 @@ function BreadcrumbControlOverview() {
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
           <Link
-            to={`/organizations/${organizationId}/frameworks/${data.framework.id}`}
+            to={`/organizations/${organizationId}/frameworks/${frameworkId}`}
           >
-            {data.framework.name}
+            {data.framework?.name}
           </Link>
         </BreadcrumbLink>
       </BreadcrumbItem>
@@ -278,13 +287,48 @@ function BreadcrumbControlOverview() {
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
           <Link
-            to={`/organizations/${organizationId}/frameworks/${data.framework.id}/controls/${data.control.id}`}
+            to={`/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`}
           >
-            {data.control.name}
+            {data.control?.name}
           </Link>
         </BreadcrumbLink>
       </BreadcrumbItem>
-      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbCreateControl() {
+  const { organizationId, frameworkId } = useParams();
+  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbCreateControlQuery>(
+    graphql`
+      query ConsoleLayoutBreadcrumbCreateControlQuery($frameworkId: ID!) {
+        framework: node(id: $frameworkId) {
+          id
+          ... on Framework {
+            name
+          }
+        }
+      }
+    `,
+    { frameworkId: frameworkId! }
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link
+            to={`/organizations/${organizationId}/frameworks/${frameworkId}`}
+          >
+            {data.framework?.name}
+          </Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Create Control</BreadcrumbPage>
+      </BreadcrumbItem>
     </>
   );
 }
@@ -311,10 +355,19 @@ export default function ConsoleLayout() {
                     <Route
                       path=":frameworkId"
                       element={<BreadcrumbFrameworkOverview />}
-                    />
+                    >
+                      <Route
+                        path="controls/create"
+                        element={<BreadcrumbCreateControl />}
+                      />
+                      <Route
+                        path="controls/:controlId"
+                        element={<BreadcrumbControlOverview />}
+                      />
+                    </Route>
                     <Route
-                      path=":frameworkId/controls/:controlId"
-                      element={<BreadcrumbControlOverview />}
+                      path="create"
+                      element={<BreadcrumbCreateFramework />}
                     />
                   </Route>
                   <Route path="peoples" element={<BreadcrumbPeopleList />}>

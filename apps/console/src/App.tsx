@@ -44,6 +44,8 @@ const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const CreateOrganizationPage = lazy(
   () => import("./pages/CreateOrganizationPage")
 );
+const CreateFrameworkPage = lazy(() => import("./pages/CreateFrameworkPage"));
+const CreateControlPage = lazy(() => import("./pages/CreateControlPage"));
 
 function App() {
   return (
@@ -209,11 +211,31 @@ function App() {
                           }
                         />
                         <Route
+                          path="frameworks/create"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <CreateFrameworkPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
                           path="frameworks/:frameworkId"
                           element={
                             <Suspense>
                               <ErrorBoundaryWithLocation>
                                 <FrameworkOverviewPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="frameworks/:frameworkId/controls/create"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <CreateControlPage />
                               </ErrorBoundaryWithLocation>
                             </Suspense>
                           }
