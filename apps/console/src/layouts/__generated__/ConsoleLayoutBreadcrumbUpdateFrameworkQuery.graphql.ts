@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<051137c0676ed5fd6b8807a44b9cb2a4>>
+ * @generated SignedSource<<d4b3974723a445d3d352518d6244afd2>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,17 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ConsoleLayoutBreadcrumbCreateControlQuery$variables = {
+export type ConsoleLayoutBreadcrumbUpdateFrameworkQuery$variables = {
   frameworkId: string;
 };
-export type ConsoleLayoutBreadcrumbCreateControlQuery$data = {
+export type ConsoleLayoutBreadcrumbUpdateFrameworkQuery$data = {
   readonly framework: {
+    readonly id: string;
     readonly name?: string;
   };
 };
-export type ConsoleLayoutBreadcrumbCreateControlQuery = {
-  response: ConsoleLayoutBreadcrumbCreateControlQuery$data;
-  variables: ConsoleLayoutBreadcrumbCreateControlQuery$variables;
+export type ConsoleLayoutBreadcrumbUpdateFrameworkQuery = {
+  response: ConsoleLayoutBreadcrumbUpdateFrameworkQuery$data;
+  variables: ConsoleLayoutBreadcrumbUpdateFrameworkQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -38,6 +39,13 @@ v1 = [
   }
 ],
 v2 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v3 = {
   "kind": "InlineFragment",
   "selections": [
     {
@@ -56,7 +64,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ConsoleLayoutBreadcrumbCreateControlQuery",
+    "name": "ConsoleLayoutBreadcrumbUpdateFrameworkQuery",
     "selections": [
       {
         "alias": "framework",
@@ -66,7 +74,8 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/)
+          (v2/*: any*/),
+          (v3/*: any*/)
         ],
         "storageKey": null
       }
@@ -78,7 +87,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ConsoleLayoutBreadcrumbCreateControlQuery",
+    "name": "ConsoleLayoutBreadcrumbUpdateFrameworkQuery",
     "selections": [
       {
         "alias": "framework",
@@ -96,29 +105,23 @@ return {
             "storageKey": null
           },
           (v2/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "id",
-            "storageKey": null
-          }
+          (v3/*: any*/)
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "a86ec305f24f6a83d549a31e1469a89c",
+    "cacheID": "194d6a240ee1e2f0ef799e08bc0e44f5",
     "id": null,
     "metadata": {},
-    "name": "ConsoleLayoutBreadcrumbCreateControlQuery",
+    "name": "ConsoleLayoutBreadcrumbUpdateFrameworkQuery",
     "operationKind": "query",
-    "text": "query ConsoleLayoutBreadcrumbCreateControlQuery(\n  $frameworkId: ID!\n) {\n  framework: node(id: $frameworkId) {\n    __typename\n    ... on Framework {\n      name\n    }\n    id\n  }\n}\n"
+    "text": "query ConsoleLayoutBreadcrumbUpdateFrameworkQuery(\n  $frameworkId: ID!\n) {\n  framework: node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5033069853aec310ad544974f7e64b5b";
+(node as any).hash = "c6381fa068566e0ec00356b3e6835700";
 
 export default node;

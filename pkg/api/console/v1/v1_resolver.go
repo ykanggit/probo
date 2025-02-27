@@ -270,6 +270,21 @@ func (r *mutationResolver) CreateControl(ctx context.Context, input types.Create
 	}, nil
 }
 
+// UpdateFramework is the resolver for the updateFramework field.
+func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.Framework, error) {
+	framework, err := r.proboSvc.UpdateFramework(ctx, probo.UpdateFrameworkRequest{
+		ID:              input.ID,
+		ExpectedVersion: input.ExpectedVersion,
+		Name:            input.Name,
+		Description:     input.Description,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update framework: %w", err)
+	}
+
+	return types.NewFramework(framework), nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

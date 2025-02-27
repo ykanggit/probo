@@ -87,14 +87,23 @@ function FrameworkOverviewPageContent({
             <h2 className="text-2xl font-semibold mb-1">{framework.name}</h2>
             <p className="text-muted-foreground">{framework.description}</p>
           </div>
-          <Button asChild>
-            <Link
-              to={`/organizations/${organizationId}/frameworks/${framework.id}/controls/create`}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create Control
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link
+                to={`/organizations/${organizationId}/frameworks/${framework.id}/update`}
+              >
+                Edit Framework
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link
+                to={`/organizations/${organizationId}/frameworks/${framework.id}/controls/create`}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create Control
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
 

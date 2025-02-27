@@ -184,6 +184,7 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
+		Version     func(childComplexity int) int
 	}
 
 	FrameworkConnection struct {
@@ -207,6 +208,7 @@ type ComplexityRoot struct {
 		DeletePeople       func(childComplexity int, input types.DeletePeopleInput) int
 		DeleteTask         func(childComplexity int, input types.DeleteTaskInput) int
 		DeleteVendor       func(childComplexity int, input types.DeleteVendorInput) int
+		UpdateFramework    func(childComplexity int, input types.UpdateFrameworkInput) int
 		UpdatePeople       func(childComplexity int, input types.UpdatePeopleInput) int
 		UpdateTaskState    func(childComplexity int, input types.UpdateTaskStateInput) int
 		UpdateVendor       func(childComplexity int, input types.UpdateVendorInput) int
@@ -375,6 +377,7 @@ type MutationResolver interface {
 	DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error)
 	CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error)
 	CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error)
+	UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.Framework, error)
 }
 type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
@@ -859,6 +862,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Framework.UpdatedAt(childComplexity), true
 
+	case "Framework.version":
+		if e.complexity.Framework.Version == nil {
+			break
+		}
+
+		return e.complexity.Framework.Version(childComplexity), true
+
 	case "FrameworkConnection.edges":
 		if e.complexity.FrameworkConnection.Edges == nil {
 			break
@@ -1006,6 +1016,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteVendor(childComplexity, args["input"].(types.DeleteVendorInput)), true
+
+	case "Mutation.updateFramework":
+		if e.complexity.Mutation.UpdateFramework == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateFramework_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateFramework(childComplexity, args["input"].(types.UpdateFrameworkInput)), true
 
 	case "Mutation.updatePeople":
 		if e.complexity.Mutation.UpdatePeople == nil {
@@ -1642,6 +1664,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeleteTaskInput,
 		ec.unmarshalInputDeleteVendorInput,
+		ec.unmarshalInputUpdateFrameworkInput,
 		ec.unmarshalInputUpdatePeopleInput,
 		ec.unmarshalInputUpdateTaskStateInput,
 		ec.unmarshalInputUpdateVendorInput,
@@ -1928,6 +1951,8 @@ type FrameworkEdge {
 
 type Framework implements Node {
   id: ID!
+  version: Int!
+
   name: String!
   description: String!
 
@@ -2140,6 +2165,7 @@ type Mutation {
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   createControl(input: CreateControlInput!): CreateControlPayload!
+  updateFramework(input: UpdateFrameworkInput!): Framework!
 }
 
 input CreateVendorInput {
@@ -2291,6 +2317,13 @@ input CreateFrameworkInput {
   organizationId: ID!
   name: String!
   description: String!
+}
+
+input UpdateFrameworkInput {
+  id: ID!
+  expectedVersion: Int!
+  name: String
+  description: String
 }
 
 type CreateFrameworkPayload {
@@ -2850,6 +2883,29 @@ func (ec *executionContext) field_Mutation_deleteVendor_argsInput(
 	}
 
 	var zeroVal types.DeleteVendorInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateFramework_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateFramework_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateFramework_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UpdateFrameworkInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdateFrameworkInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateFrameworkInput(ctx, tmp)
+	}
+
+	var zeroVal types.UpdateFrameworkInput
 	return zeroVal, nil
 }
 
@@ -5799,6 +5855,44 @@ func (ec *executionContext) fieldContext_Framework_id(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Framework_version(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Framework_version(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Version, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Framework_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Framework",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Framework_name(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Framework_name(ctx, field)
 	if err != nil {
@@ -6165,6 +6259,8 @@ func (ec *executionContext) fieldContext_FrameworkEdge_node(_ context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Framework_id(ctx, field)
+			case "version":
+				return ec.fieldContext_Framework_version(ctx, field)
 			case "name":
 				return ec.fieldContext_Framework_name(ctx, field)
 			case "description":
@@ -6825,6 +6921,65 @@ func (ec *executionContext) fieldContext_Mutation_createControl(ctx context.Cont
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createControl_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateFramework(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateFramework(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateFramework(rctx, fc.Args["input"].(types.UpdateFrameworkInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Framework)
+	fc.Result = res
+	return ec.marshalNFramework2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateFramework(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Framework_id(ctx, field)
+			case "version":
+				return ec.fieldContext_Framework_version(ctx, field)
+			case "name":
+				return ec.fieldContext_Framework_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Framework_description(ctx, field)
+			case "controls":
+				return ec.fieldContext_Framework_controls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Framework_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Framework_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Framework", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateFramework_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -12122,6 +12277,54 @@ func (ec *executionContext) unmarshalInputDeleteVendorInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateFrameworkInput(ctx context.Context, obj any) (types.UpdateFrameworkInput, error) {
+	var it types.UpdateFrameworkInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "expectedVersion", "name", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "expectedVersion":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expectedVersion"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExpectedVersion = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdatePeopleInput(ctx context.Context, obj any) (types.UpdatePeopleInput, error) {
 	var it types.UpdatePeopleInput
 	asMap := map[string]any{}
@@ -13493,6 +13696,11 @@ func (ec *executionContext) _Framework(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "version":
+			out.Values[i] = ec._Framework_version(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "name":
 			out.Values[i] = ec._Framework_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -13761,6 +13969,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createControl":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createControl(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateFramework":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateFramework(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -15939,6 +16154,10 @@ func (ec *executionContext) marshalNEvidenceStateTransitionEdge2ᚖgithubᚗcom�
 	return ec._EvidenceStateTransitionEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNFramework2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v types.Framework) graphql.Marshaler {
+	return ec._Framework(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNFramework2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v *types.Framework) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -16510,6 +16729,11 @@ func (ec *executionContext) marshalNTaskStateTransitionEdge2ᚖgithubᚗcomᚋge
 		return graphql.Null
 	}
 	return ec._TaskStateTransitionEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateFrameworkInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateFrameworkInput(ctx context.Context, v any) (types.UpdateFrameworkInput, error) {
+	res, err := ec.unmarshalInputUpdateFrameworkInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNUpdatePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePeopleInput(ctx context.Context, v any) (types.UpdatePeopleInput, error) {

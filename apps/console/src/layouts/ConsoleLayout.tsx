@@ -137,6 +137,48 @@ function BreadcrumbFrameworkOverview() {
   );
 }
 
+function BreadcrumbUpdateFramework() {
+  const { organizationId, frameworkId } = useParams();
+  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbUpdateFrameworkQuery>(
+    graphql`
+      query ConsoleLayoutBreadcrumbUpdateFrameworkQuery($frameworkId: ID!) {
+        framework: node(id: $frameworkId) {
+          id
+          ... on Framework {
+            name
+          }
+        }
+      }
+    `,
+    { frameworkId: frameworkId! },
+    { fetchPolicy: "store-or-network" }
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink
+          asChild
+          className="max-w-[160px] truncate"
+          aria-label={data.framework?.name}
+        >
+          <Link
+            to={`/organizations/${organizationId}/frameworks/${frameworkId}`}
+          >
+            {data.framework?.name}
+          </Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Update</BreadcrumbPage>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
 function BreadcrumbVendorList() {
   const { organizationId } = useParams();
   return (
@@ -303,7 +345,6 @@ function BreadcrumbCreateControl() {
     graphql`
       query ConsoleLayoutBreadcrumbCreateControlQuery($frameworkId: ID!) {
         framework: node(id: $frameworkId) {
-          id
           ... on Framework {
             name
           }
@@ -365,6 +406,10 @@ export default function ConsoleLayout() {
                         element={<BreadcrumbControlOverview />}
                       />
                     </Route>
+                    <Route
+                      path=":frameworkId/update"
+                      element={<BreadcrumbUpdateFramework />}
+                    />
                     <Route
                       path="create"
                       element={<BreadcrumbCreateFramework />}

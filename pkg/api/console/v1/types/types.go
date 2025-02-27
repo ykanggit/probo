@@ -204,6 +204,7 @@ type EvidenceStateTransitionEdge struct {
 
 type Framework struct {
 	ID          gid.GID            `json:"id"`
+	Version     int                `json:"version"`
 	Name        string             `json:"name"`
 	Description string             `json:"description"`
 	Controls    *ControlConnection `json:"controls"`
@@ -331,6 +332,13 @@ type TaskStateTransitionConnection struct {
 type TaskStateTransitionEdge struct {
 	Cursor page.CursorKey       `json:"cursor"`
 	Node   *TaskStateTransition `json:"node"`
+}
+
+type UpdateFrameworkInput struct {
+	ID              gid.GID `json:"id"`
+	ExpectedVersion int     `json:"expectedVersion"`
+	Name            *string `json:"name,omitempty"`
+	Description     *string `json:"description,omitempty"`
 }
 
 type UpdatePeopleInput struct {

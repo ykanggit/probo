@@ -16,6 +16,7 @@ package coredata
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"maps"
 	"time"
@@ -35,9 +36,16 @@ type (
 		ContentRef     string
 		CreatedAt      time.Time
 		UpdatedAt      time.Time
+		Version        int
 	}
 
 	Frameworks []*Framework
+
+	UpdateFrameworkParams struct {
+		ExpectedVersion int
+		Name            *string
+		Description     *string
+	}
 )
 
 func (f Framework) CursorKey() page.CursorKey {
@@ -53,8 +61,10 @@ func (f *Framework) scan(r pgx.Row) error {
 		&f.ContentRef,
 		&f.CreatedAt,
 		&f.UpdatedAt,
+		&f.Version,
 	)
 }
+
 func (f *Frameworks) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -70,7 +80,8 @@ SELECT
     description,
     content_ref,
     created_at,
-    updated_at
+    updated_at,
+    version
 FROM
     frameworks
 WHERE
@@ -124,7 +135,8 @@ SELECT
     description,
     content_ref,
     created_at,
-    updated_at
+    updated_at,
+    version
 FROM
     frameworks
 WHERE
@@ -162,7 +174,8 @@ INSERT INTO
         description,
         content_ref,
         created_at,
-        updated_at
+        updated_at,
+        version
     )
 VALUES (
     @framework_id,
@@ -171,7 +184,8 @@ VALUES (
     @description,
     @content_ref,
     @created_at,
-    @updated_at
+    @updated_at,
+    @version
 );
 `
 
@@ -183,6 +197,7 @@ VALUES (
 		"content_ref":     f.ContentRef,
 		"created_at":      f.CreatedAt,
 		"updated_at":      f.UpdatedAt,
+		"version":         f.Version,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -208,4 +223,60 @@ WHERE
 
 	_, err := conn.Exec(ctx, q, args)
 	return err
+}
+
+func (f *Framework) Update(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+	params UpdateFrameworkParams,
+) error {
+	q := `
+UPDATE frameworks SET
+    name = COALESCE(@name, name),
+    description = COALESCE(@description, description),
+    updated_at = @updated_at,
+    version = version + 1
+WHERE %s
+    AND id = @framework_id
+    AND version = @expected_version
+RETURNING 
+    id,
+    organization_id,
+    name,
+    description,
+    content_ref,
+    created_at,
+    updated_at,
+    version
+`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{
+		"framework_id":     f.ID,
+		"expected_version": params.ExpectedVersion,
+		"updated_at":       time.Now(),
+	}
+
+	if params.Name != nil {
+		args["name"] = *params.Name
+	}
+	if params.Description != nil {
+		args["description"] = *params.Description
+	}
+
+	maps.Copy(args, scope.SQLArguments())
+
+	r := conn.QueryRow(ctx, q, args)
+
+	f2 := Framework{}
+	if err := f2.scan(r); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrConcurrentModification
+		}
+		return err
+	}
+
+	*f = f2
+	return nil
 }

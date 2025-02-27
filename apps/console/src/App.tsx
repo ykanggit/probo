@@ -46,6 +46,7 @@ const CreateOrganizationPage = lazy(
 );
 const CreateFrameworkPage = lazy(() => import("./pages/CreateFrameworkPage"));
 const CreateControlPage = lazy(() => import("./pages/CreateControlPage"));
+const UpdateFrameworkPage = lazy(() => import("./pages/UpdateFrameworkPage"));
 
 function App() {
   return (
@@ -226,6 +227,16 @@ function App() {
                             <Suspense>
                               <ErrorBoundaryWithLocation>
                                 <FrameworkOverviewPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="frameworks/:frameworkId/update"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <UpdateFrameworkPage />
                               </ErrorBoundaryWithLocation>
                             </Suspense>
                           }

@@ -184,6 +184,8 @@ type FrameworkEdge {
 
 type Framework implements Node {
   id: ID!
+  version: Int!
+
   name: String!
   description: String!
 
@@ -396,6 +398,7 @@ type Mutation {
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   createControl(input: CreateControlInput!): CreateControlPayload!
+  updateFramework(input: UpdateFrameworkInput!): Framework!
 }
 
 input CreateVendorInput {
@@ -547,6 +550,13 @@ input CreateFrameworkInput {
   organizationId: ID!
   name: String!
   description: String!
+}
+
+input UpdateFrameworkInput {
+  id: ID!
+  expectedVersion: Int!
+  name: String
+  description: String
 }
 
 type CreateFrameworkPayload {
