@@ -71,7 +71,7 @@ function EditableField({
           }
           className={cn(
             "w-full resize-none",
-            required && !value && "border-red-500"
+            required && !value && "border-red-500",
           )}
           placeholder={`Enter ${label.toLowerCase()}`}
           rows={4}
@@ -126,7 +126,7 @@ function CreateControlPageContent() {
 
     const connectionId = ConnectionHandler.getConnectionID(
       frameworkId!,
-      "FrameworkOverviewPage_controls"
+      "FrameworkOverviewPage_controls",
     );
 
     commit({
@@ -155,7 +155,7 @@ function CreateControlPageContent() {
         });
 
         navigate(
-          `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${data.createControl.controlEdge.node.id}`
+          `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${data.createControl.controlEdge.node.id}`,
         );
       },
       onError(error) {
@@ -215,7 +215,7 @@ function CreateControlPageContent() {
                   navigate(
                     `/organizations/${
                       frameworkId?.split(":")[1]
-                    }/frameworks/${frameworkId}`
+                    }/frameworks/${frameworkId}`,
                   )
                 }
               >

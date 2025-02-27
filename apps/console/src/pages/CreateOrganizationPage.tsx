@@ -86,11 +86,11 @@ export default function CreateOrganizationPage() {
   const { toast } = useToast();
   const data = useLazyLoadQuery<CreateOrganizationPageViewerQuery>(
     viewerQuery,
-    {}
+    {},
   );
   const [createOrganization] =
     useMutation<CreateOrganizationPageCreateOrganizationMutation>(
-      createOrganizationMutation
+      createOrganizationMutation,
     );
   const [formData, setFormData] = useState({
     name: "",
@@ -114,7 +114,7 @@ export default function CreateOrganizationPage() {
         connections: [
           ConnectionHandler.getConnectionID(
             data.viewer.id,
-            "OrganizationSwitcher_organizations"
+            "OrganizationSwitcher_organizations",
           ),
         ],
       },

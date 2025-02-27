@@ -102,12 +102,12 @@ function ControlOverviewPageContent({
 }) {
   const data = usePreloadedQuery<ControlOverviewPageQueryType>(
     controlOverviewPageQuery,
-    queryRef
+    queryRef,
   );
   const { toast } = useToast();
   const [updateTaskState] =
     useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
-      updateTaskStateMutation
+      updateTaskStateMutation,
     );
   const [createTask] =
     useMutation<ControlOverviewPageCreateTaskMutationType>(createTaskMutation);
@@ -466,7 +466,7 @@ function ControlOverviewPageFallback() {
 export default function ControlOverviewPage() {
   const { controlId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<ControlOverviewPageQueryType>(
-    controlOverviewPageQuery
+    controlOverviewPageQuery,
   );
 
   useEffect(() => {

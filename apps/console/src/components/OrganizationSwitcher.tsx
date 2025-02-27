@@ -74,7 +74,7 @@ export function OrganizationSwitcher({
   useEffect(() => {
     if (hasOrganizations) {
       const org = data.organizations.edges.find(
-        (edge) => edge.node.id === organizationId
+        (edge) => edge.node.id === organizationId,
       );
       if (org) {
         setCurrentOrganization(org.node);

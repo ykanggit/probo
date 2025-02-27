@@ -127,7 +127,7 @@ function VendorOverviewPageContent({
   });
   const [commit] = useMutation(updateVendorMutation);
   const [, loadQuery] = useQueryLoader<VendorOverviewPageQueryType>(
-    vendorOverviewPageQuery
+    vendorOverviewPageQuery,
   );
   const { toast } = useToast();
 
@@ -261,7 +261,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.serviceCriticality === "LOW"
                           ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Low
@@ -274,7 +274,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.serviceCriticality === "MEDIUM"
                           ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Medium
@@ -287,7 +287,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.serviceCriticality === "HIGH"
                           ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       High
@@ -315,7 +315,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.riskTier === "CRITICAL"
                           ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Critical
@@ -328,7 +328,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.riskTier === "SIGNIFICANT"
                           ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Significant
@@ -339,7 +339,7 @@ function VendorOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.riskTier === "GENERAL"
                           ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       General
@@ -420,7 +420,7 @@ function VendorOverviewPageFallback() {
 export default function VendorOverviewPage() {
   const { vendorId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<VendorOverviewPageQueryType>(
-    vendorOverviewPageQuery
+    vendorOverviewPageQuery,
   );
 
   useEffect(() => {

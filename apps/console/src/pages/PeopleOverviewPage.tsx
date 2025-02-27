@@ -98,7 +98,7 @@ function PeopleOverviewPageContent({
   });
   const [commit] = useMutation(updatePeopleMutation);
   const [, loadQuery] = useQueryLoader<PeopleOverviewPageQueryType>(
-    peopleOverviewPageQuery
+    peopleOverviewPageQuery,
   );
   const { toast } = useToast();
 
@@ -200,7 +200,7 @@ function PeopleOverviewPageContent({
                     onClick={() => {
                       const newEmails =
                         formData.additionalEmailAddresses.filter(
-                          (_, i) => i !== index
+                          (_, i) => i !== index,
                         );
                       handleFieldChange("additionalEmailAddresses", newEmails);
                     }}
@@ -245,7 +245,7 @@ function PeopleOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.kind === "EMPLOYEE"
                           ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Employee
@@ -256,7 +256,7 @@ function PeopleOverviewPageContent({
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.kind === "CONTRACTOR"
                           ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200",
                       )}
                     >
                       Contractor
@@ -305,7 +305,7 @@ function PeopleOverviewPageFallback() {
 export default function PeopleOverviewPage() {
   const { peopleId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<PeopleOverviewPageQueryType>(
-    peopleOverviewPageQuery
+    peopleOverviewPageQuery,
   );
 
   useEffect(() => {

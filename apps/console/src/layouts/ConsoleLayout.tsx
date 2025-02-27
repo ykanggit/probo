@@ -57,7 +57,7 @@ function BreadcrumbHome({ children }: { children: React.ReactNode }) {
       }
     `,
     { organizationId: organizationId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (
@@ -117,7 +117,7 @@ function BreadcrumbFrameworkOverview() {
         }
       }
     `,
-    { frameworkId: frameworkId! }
+    { frameworkId: frameworkId! },
   );
 
   return (
@@ -151,7 +151,7 @@ function BreadcrumbUpdateFramework() {
       }
     `,
     { frameworkId: frameworkId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (
@@ -208,7 +208,7 @@ function BreadcrumbVendorOverview() {
       }
     `,
     { vendorId: vendorId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (
@@ -268,7 +268,7 @@ function BreadcrumbPeopleOverview() {
       }
     `,
     { peopleId: peopleId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (
@@ -310,7 +310,7 @@ function BreadcrumbControlOverview() {
         }
       }
     `,
-    { frameworkId: frameworkId!, controlId: controlId! }
+    { frameworkId: frameworkId!, controlId: controlId! },
   );
 
   return (
@@ -351,7 +351,7 @@ function BreadcrumbCreateControl() {
         }
       }
     `,
-    { frameworkId: frameworkId! }
+    { frameworkId: frameworkId! },
   );
 
   return (
