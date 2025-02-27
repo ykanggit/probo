@@ -15,35 +15,15 @@
 package types
 
 import (
-	"time"
-
 	"github.com/getprobo/probo/pkg/usrmgr/coredata"
 )
 
-type UserType struct {
-	ID        string
-	Email     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
-
-// NewUser creates a new UserType from a coredata.User
-func NewUser(u *coredata.User) *UserType {
-	return &UserType{
-		ID:        u.ID.String(),
+func NewUser(u *coredata.User) *User {
+	return &User{
+		ID:        u.ID,
 		Email:     u.EmailAddress,
+		FullName:  u.FullName,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 	}
-}
-
-// AddUserToOrganizationInput is the input for adding a user to an organization
-type AddUserToOrganizationInput struct {
-	UserID         string
-	OrganizationID string
-}
-
-// AddUserToOrganizationPayload is the payload for adding a user to an organization
-type AddUserToOrganizationPayload struct {
-	User *UserType
 }

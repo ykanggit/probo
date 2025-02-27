@@ -334,13 +334,7 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 // Viewer is the resolver for the viewer field.
 func (r *queryResolver) Viewer(ctx context.Context) (*types.User, error) {
 	user := UserFromContext(ctx)
-	return &types.User{
-		ID:        user.ID,
-		Email:     user.EmailAddress,
-		FullName:  user.FullName,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-	}, nil
+	return types.NewUser(user), nil
 }
 
 // StateTransisions is the resolver for the stateTransisions field.
