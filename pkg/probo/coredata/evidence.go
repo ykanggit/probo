@@ -34,6 +34,7 @@ type (
 		ObjectKey string
 		MimeType  string
 		Size      uint64
+		Filename  string
 		CreatedAt time.Time
 		UpdatedAt time.Time
 	}
@@ -53,6 +54,7 @@ func (e *Evidence) scan(r pgx.Row) error {
 		&e.ObjectKey,
 		&e.MimeType,
 		&e.Size,
+		&e.Filename,
 		&e.CreatedAt,
 		&e.UpdatedAt,
 	)
@@ -70,6 +72,7 @@ INSERT INTO
         object_key,
         mime_type,
         size,
+        filename,
         created_at,
         updated_at
     )
@@ -79,6 +82,7 @@ VALUES (
     @object_key,
     @mime_type,
     @size,
+    @filename,
     @created_at,
     @updated_at
 )
@@ -90,6 +94,7 @@ VALUES (
 		"object_key":  e.ObjectKey,
 		"mime_type":   e.MimeType,
 		"size":        e.Size,
+		"filename":    e.Filename,
 		"created_at":  e.CreatedAt,
 		"updated_at":  e.UpdatedAt,
 	}
@@ -125,6 +130,7 @@ SELECT
     object_key,
     mime_type,
     size,
+    filename,
     created_at,
     updated_at
 FROM
@@ -182,6 +188,7 @@ SELECT
     object_key,
     mime_type,
     size,
+    filename,
     created_at,
     updated_at
 FROM
