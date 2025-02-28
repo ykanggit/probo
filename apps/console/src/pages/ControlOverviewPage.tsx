@@ -28,7 +28,7 @@ import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from ".
 import type { ControlOverviewPageUpdateTaskStateMutation as ControlOverviewPageUpdateTaskStateMutationType } from "./__generated__/ControlOverviewPageUpdateTaskStateMutation.graphql";
 import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreateTaskMutationType } from "./__generated__/ControlOverviewPageCreateTaskMutation.graphql";
 import type { ControlOverviewPageDeleteTaskMutation as ControlOverviewPageDeleteTaskMutationType } from "./__generated__/ControlOverviewPageDeleteTaskMutation.graphql";
-
+import type { ControlOverviewPageUploadEvidenceMutation as ControlOverviewPageUploadEvidenceMutationType } from "./__generated__/ControlOverviewPageUploadEvidenceMutation.graphql";
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
     control: node(id: $controlId) {
