@@ -7,25 +7,28 @@ import {
 } from "relay-runtime";
 import { buildEndpoint } from "./utils";
 
-const fetchRelay: FetchFunction = async (request, variables, _, uploadables) => {
+const fetchRelay: FetchFunction = async (
+  request,
+  variables,
+  _,
+  uploadables,
+) => {
   const requestInit: RequestInit = {
-    method: 'POST',
-    credentials: 'include',
+    method: "POST",
+    credentials: "include",
     headers: {},
   };
-
 
   if (uploadables) {
     const formData = new FormData();
     formData.append(
-      'operations',
+      "operations",
       JSON.stringify({
         operationName: request.name,
         query: request.text,
         variables: variables,
-      })
+      }),
     );
-
 
     const uploadableMap: {
       [key: string]: string[];
@@ -35,19 +38,19 @@ const fetchRelay: FetchFunction = async (request, variables, _, uploadables) => 
       uploadableMap[index] = [`variables.${key}`];
     });
 
-    formData.append('map', JSON.stringify(uploadableMap));
+    formData.append("map", JSON.stringify(uploadableMap));
 
     Object.keys(uploadables).forEach((key, index) => {
       formData.append(index.toString(), uploadables[key]);
     });
 
     requestInit.body = formData;
-
   } else {
     requestInit.headers = {
-      "Accept": "application/graphql-response+json; charset=utf-8, application/json; charset=utf-8",
-      "Content-Type": "application/json"
-    }
+      Accept:
+        "application/graphql-response+json; charset=utf-8, application/json; charset=utf-8",
+      "Content-Type": "application/json",
+    };
 
     requestInit.body = JSON.stringify({
       operationName: request.name,
