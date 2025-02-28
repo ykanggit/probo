@@ -59,8 +59,8 @@ func (est EvidenceStateTransition) Insert(
 INSERT INTO
     evidence_state_transitions (
         id,
-        control_id,
-        from_state
+        evidence_id,
+        from_state,
         to_state,
         reason,
         created_at,
