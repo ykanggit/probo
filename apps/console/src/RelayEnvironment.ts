@@ -32,17 +32,13 @@ const fetchRelay: FetchFunction = async (request, variables, _, uploadables) => 
     } = {};
 
     Object.keys(uploadables).forEach((key, index) => {
-      if (Object.prototype.hasOwnProperty.call(uploadables, key)) {
-        uploadableMap[index] = [`variables.${key}`];
-      }
+      uploadableMap[index] = [`variables.${key}`];
     });
 
     formData.append('map', JSON.stringify(uploadableMap));
 
     Object.keys(uploadables).forEach((key, index) => {
-      if (Object.prototype.hasOwnProperty.call(uploadables, key)) {
-        formData.append(index.toString(), uploadables[key]);
-      }
+      formData.append(index.toString(), uploadables[key]);
     });
 
     requestInit.body = formData;
