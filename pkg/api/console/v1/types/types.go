@@ -5,6 +5,7 @@ package types
 import (
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/probo/coredata"
@@ -397,6 +398,16 @@ type UpdateVendorInput struct {
 
 type UpdateVendorPayload struct {
 	Vendor *Vendor `json:"vendor"`
+}
+
+type UploadEvidenceInput struct {
+	TaskID gid.GID        `json:"taskId"`
+	Name   string         `json:"name"`
+	File   graphql.Upload `json:"file"`
+}
+
+type UploadEvidencePayload struct {
+	EvidenceEdge *EvidenceEdge `json:"evidenceEdge"`
 }
 
 type User struct {

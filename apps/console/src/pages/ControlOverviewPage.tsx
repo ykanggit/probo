@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router";
 import {
   graphql,
@@ -7,7 +7,7 @@ import {
   useQueryLoader,
   useMutation,
 } from "react-relay";
-import { CheckCircle2, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2, Plus, Trash2, Upload } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 import { Helmet } from "react-helmet-async";
 import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from "./__generated__/ControlOverviewPageQuery.graphql";
@@ -95,6 +96,26 @@ const deleteTaskMutation = graphql`
   }
 `;
 
+const uploadEvidenceMutation = graphql`
+  mutation ControlOverviewPageUploadEvidenceMutation(
+    $input: UploadEvidenceInput!
+    $connections: [ID!]!
+  ) {
+    uploadEvidence(input: $input) {
+      evidenceEdge @appendEdge(connections: $connections) {
+        node {
+          id
+          fileUrl
+          mimeType
+          size
+          state
+          createdAt
+        }
+      }
+    }
+  }
+`;
+
 function ControlOverviewPageContent({
   queryRef,
 }: {
@@ -102,19 +123,23 @@ function ControlOverviewPageContent({
 }) {
   const data = usePreloadedQuery<ControlOverviewPageQueryType>(
     controlOverviewPageQuery,
-    queryRef,
+    queryRef
   );
   const { toast } = useToast();
   const { organizationId, frameworkId, controlId } = useParams();
   const navigate = useNavigate();
   const [updateTaskState] =
     useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
-      updateTaskStateMutation,
+      updateTaskStateMutation
     );
   const [createTask] =
     useMutation<ControlOverviewPageCreateTaskMutationType>(createTaskMutation);
   const [deleteTask] =
     useMutation<ControlOverviewPageDeleteTaskMutationType>(deleteTaskMutation);
+  const [uploadEvidence] =
+    useMutation<ControlOverviewPageUploadEvidenceMutationType>(
+      uploadEvidenceMutation
+    );
   const control = data.control;
   const tasks = control?.tasks?.edges.map((edge) => edge?.node) ?? [];
 
@@ -127,6 +152,14 @@ function ControlOverviewPageContent({
     id: string;
     name: string;
   } | null>(null);
+
+  const [isUploadEvidenceOpen, setIsUploadEvidenceOpen] = useState(false);
+  const [taskForEvidence, setTaskForEvidence] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [evidenceName, setEvidenceName] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleTaskClick = (taskId: string, currentState: string) => {
     const newState = currentState === "DONE" ? "TODO" : "DONE";
@@ -248,8 +281,54 @@ function ControlOverviewPageContent({
 
   const handleEditControl = () => {
     navigate(
-      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}/update`,
+      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}/update`
     );
+  };
+
+  const handleUploadEvidence = (taskId: string, taskName: string) => {
+    setTaskForEvidence({ id: taskId, name: taskName });
+    setIsUploadEvidenceOpen(true);
+  };
+
+  const confirmUploadEvidence = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!taskForEvidence || !fileInputRef.current?.files?.[0]) return;
+
+    const file = fileInputRef.current.files[0];
+
+    uploadEvidence({
+      variables: {
+        input: {
+          taskId: taskForEvidence.id,
+          name: evidenceName || file.name,
+          file: null,
+        },
+        connections: [`client:${taskForEvidence.id}`],
+      },
+      uploadables: {
+        "input.file": file,
+      },
+      onCompleted: () => {
+        toast({
+          title: "Evidence uploaded",
+          description: "Evidence has been uploaded successfully.",
+        });
+        setIsUploadEvidenceOpen(false);
+        setTaskForEvidence(null);
+        setEvidenceName("");
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      },
+      onError: (error) => {
+        toast({
+          title: "Error uploading evidence",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   return (
@@ -414,6 +493,17 @@ function ControlOverviewPageContent({
                   <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="text-gray-400 text-sm">06.00 - 07.30</div>
                     <button
+                      className="text-gray-400 hover:text-blue-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (task?.id && task?.name) {
+                          handleUploadEvidence(task.id, task.name);
+                        }
+                      }}
+                    >
+                      <Upload className="w-4 h-4" />
+                    </button>
+                    <button
                       className="text-gray-400 hover:text-red-600"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -460,6 +550,56 @@ function ControlOverviewPageContent({
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Upload Evidence Dialog */}
+        <Dialog
+          open={isUploadEvidenceOpen}
+          onOpenChange={setIsUploadEvidenceOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Upload Evidence</DialogTitle>
+              <DialogDescription>
+                Upload evidence for the task &quot;{taskForEvidence?.name}
+                &quot;.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={confirmUploadEvidence}>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="evidence-name">
+                    Evidence Name (Optional)
+                  </Label>
+                  <Input
+                    id="evidence-name"
+                    placeholder="Enter a name for this evidence"
+                    value={evidenceName}
+                    onChange={(e) => setEvidenceName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="evidence-file">File</Label>
+                  <Input
+                    id="evidence-file"
+                    type="file"
+                    ref={fileInputRef}
+                    required
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setIsUploadEvidenceOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">Upload</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );
@@ -489,7 +629,7 @@ function ControlOverviewPageFallback() {
 export default function ControlOverviewPage() {
   const { controlId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<ControlOverviewPageQueryType>(
-    controlOverviewPageQuery,
+    controlOverviewPageQuery
   );
 
   useEffect(() => {

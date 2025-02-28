@@ -334,6 +334,24 @@ func (r *mutationResolver) UpdateControl(ctx context.Context, input types.Update
 	}, nil
 }
 
+// UploadEvidence is the resolver for the uploadEvidence field.
+func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error) {
+	req := probo.CreateEvidenceRequest{
+		TaskID: input.TaskID,
+		Name:   input.Name,
+		File:   input.File.File,
+	}
+
+	evidence, err := r.proboSvc.CreateEvidence(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create evidence: %w", err)
+	}
+
+	return &types.UploadEvidencePayload{
+		EvidenceEdge: types.NewEvidenceEdge(evidence),
+	}, nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

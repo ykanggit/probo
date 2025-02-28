@@ -401,6 +401,7 @@ type Mutation {
   createControl(input: CreateControlInput!): CreateControlPayload!
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
   updateControl(input: UpdateControlInput!): UpdateControlPayload!
+  uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
 }
 
 input CreateVendorInput {
@@ -599,4 +600,14 @@ input UpdateControlInput {
 
 type UpdateControlPayload {
   control: Control!
+}
+
+input UploadEvidenceInput {
+  taskId: ID!
+  name: String!
+  file: Upload!
+}
+
+type UploadEvidencePayload {
+  evidenceEdge: EvidenceEdge!
 }
