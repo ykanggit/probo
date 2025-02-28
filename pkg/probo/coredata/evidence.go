@@ -71,7 +71,7 @@ INSERT INTO
         mime_type,
         size,
         created_at,
-        updated_at,
+        updated_at
     )
 VALUES (
     @evidence_id,
