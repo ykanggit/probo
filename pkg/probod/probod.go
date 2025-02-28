@@ -23,11 +23,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/api"
 	console_v1 "github.com/getprobo/probo/pkg/api/console/v1"
+	"github.com/getprobo/probo/pkg/awsconfig"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.gearno.de/kit/httpclient"
 	"go.gearno.de/kit/httpserver"
 	"go.gearno.de/kit/log"
 	"go.gearno.de/kit/pg"
@@ -44,6 +47,7 @@ type (
 		Pg   pgConfig   `json:"pg"`
 		Api  apiConfig  `json:"api"`
 		Auth authConfig `json:"auth"`
+		AWS  awsConfig  `json:"aws"`
 	}
 )
 
@@ -76,6 +80,13 @@ func New() *Implm {
 				CookieHTTPOnly:  true,
 				CookieDomain:    "localhost",
 				CookiePath:      "/",
+			},
+			AWS: awsConfig{
+				Region:          "us-east-1",
+				Bucket:          "probod",
+				AccessKeyID:     "probod",
+				SecretAccessKey: "thisisnotasecret",
+				Endpoint:        "http://127.0.0.1:9000",
 			},
 		},
 	}
@@ -111,13 +122,30 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot get pepper bytes: %w", err)
 	}
 
-	// Initialize the user management service with the pepper
+	awsConfig := awsconfig.NewConfig(
+		l,
+		httpclient.DefaultPooledClient(
+			httpclient.WithLogger(l),
+			httpclient.WithTracerProvider(tp),
+			httpclient.WithRegisterer(r),
+		),
+		awsconfig.Options{
+			Region:          impl.cfg.AWS.Region,
+			AccessKeyID:     impl.cfg.AWS.AccessKeyID,
+			SecretAccessKey: impl.cfg.AWS.SecretAccessKey,
+			Endpoint:        impl.cfg.AWS.Endpoint,
+		},
+	)
+
+	s3Client := s3.NewFromConfig(awsConfig)
+
+	// TODO: merge usrmgr and probo service
 	usrmgrService, err := usrmgr.NewService(ctx, pgClient, pepper)
 	if err != nil {
 		return fmt.Errorf("cannot create usrmgr service: %w", err)
 	}
 
-	proboService, err := probo.NewService(ctx, pgClient)
+	proboService, err := probo.NewService(ctx, pgClient, s3Client, impl.cfg.AWS.Bucket)
 	if err != nil {
 		return fmt.Errorf("cannot create probo service: %w", err)
 	}

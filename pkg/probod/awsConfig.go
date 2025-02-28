@@ -12,41 +12,14 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package probo
-
-import (
-	"context"
-	"fmt"
-
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/getprobo/probo/pkg/probo/coredata"
-	"go.gearno.de/kit/migrator"
-	"go.gearno.de/kit/pg"
-)
+package probod
 
 type (
-	Service struct {
-		pg     *pg.Client
-		scope  *coredata.Scope
-		s3     *s3.Client
-		bucket string
+	awsConfig struct {
+		Region          string `json:"region"`
+		Bucket          string `json:"bucket"`
+		AccessKeyID     string `json:"access-key-id"`
+		SecretAccessKey string `json:"secret-access-key"`
+		Endpoint        string `json:"endpoint"`
 	}
 )
-
-func NewService(ctx context.Context, pgClient *pg.Client, s3Client *s3.Client, bucket string) (*Service, error) {
-	err := migrator.NewMigrator(pgClient, coredata.Migrations).Run(ctx, "migrations")
-	if err != nil {
-		return nil, fmt.Errorf("cannot migrate database schema: %w", err)
-	}
-
-	if bucket == "" {
-		return nil, fmt.Errorf("bucket is required")
-	}
-
-	return &Service{
-		pg:     pgClient,
-		s3:     s3Client,
-		scope:  coredata.NewScope(), // must be created from auth
-		bucket: bucket,
-	}, nil
-}
