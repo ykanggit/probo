@@ -48,7 +48,7 @@ func (s Service) CreateEvidence(
 		return nil, fmt.Errorf("cannot create evidence state transition: %w", err)
 	}
 
-	task := &coredata.Organization{}
+	task := &coredata.Task{}
 	evidence := &coredata.Evidence{
 		ID:        evidenceID,
 		TaskID:    req.TaskID,
