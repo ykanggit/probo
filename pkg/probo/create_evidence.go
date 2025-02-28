@@ -18,11 +18,16 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"mime"
+	"path/filepath"
 	"time"
 
 	"gearno.de/ref"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata"
+	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
 
@@ -41,21 +46,54 @@ func (s Service) CreateEvidence(
 	now := time.Now()
 	evidenceID, err := gid.NewGID(coredata.EvidenceEntityType)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create vendor global id: %w", err)
+		return nil, fmt.Errorf("cannot create evidence global id: %w", err)
 	}
 	evidenceStateTransitionID, err := gid.NewGID(coredata.EvidenceStateTransitionEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create evidence state transition: %w", err)
 	}
 
+	contentType := "application/octet-stream"
+	if req.Name != "" {
+		if detectedType := mime.TypeByExtension(filepath.Ext(req.Name)); detectedType != "" {
+			contentType = detectedType
+		}
+	}
+
+	objectKey, err := uuid.NewV7()
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate object key: %w", err)
+	}
+
+	putObjectOutput, err := s.s3.PutObject(ctx, &s3.PutObjectInput{
+		Bucket:      aws.String(s.bucket),
+		Key:         aws.String(objectKey.String()),
+		Body:        req.File,
+		ContentType: aws.String(contentType),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot upload file to S3: %w", err)
+	}
+
+	headOutput, err := s.s3.HeadObject(ctx, &s3.HeadObjectInput{
+		Bucket: aws.String(s.bucket),
+		Key:    aws.String(objectKey.String()),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot get object metadata: %w", err)
+	}
+
+	fmt.Println("putObjectOutput", putObjectOutput)
+
 	task := &coredata.Task{}
 	evidence := &coredata.Evidence{
 		ID:        evidenceID,
 		TaskID:    req.TaskID,
 		State:     coredata.EvidenceStateValid,
-		ObjectKey: "", // TODO upload file
-		MimeType:  "",
-		Size:      0,
+		ObjectKey: objectKey.String(),
+		MimeType:  contentType,
+		Size:      uint64(*headOutput.ContentLength),
+		Filename:  req.Name,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -80,7 +118,7 @@ func (s Service) CreateEvidence(
 			}
 
 			if err := evidence.Insert(ctx, conn); err != nil {
-				return fmt.Errorf("cannot insert vendor: %w", err)
+				return fmt.Errorf("cannot insert evidence: %w", err)
 			}
 
 			if err := evidenceStateTransition.Insert(ctx, conn); err != nil {
@@ -92,6 +130,7 @@ func (s Service) CreateEvidence(
 	)
 
 	if err != nil {
+		// TODO try do delete file from s3
 		return nil, err
 	}
 
