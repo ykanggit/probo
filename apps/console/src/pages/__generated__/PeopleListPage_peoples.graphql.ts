@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4291ff1f33eb226774e68544740b4331>>
+ * @generated SignedSource<<f4f654235ec0210a616d4e317c3273bc>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,19 +18,19 @@ export type PeopleListPage_peoples$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly additionalEmailAddresses: ReadonlyArray<string>;
-        readonly createdAt: any;
+        readonly createdAt: string;
         readonly fullName: string;
         readonly id: string;
         readonly kind: PeopleKind;
         readonly primaryEmailAddress: string;
-        readonly updatedAt: any;
+        readonly updatedAt: string;
       };
     }>;
     readonly pageInfo: {
-      readonly endCursor: any | null | undefined;
+      readonly endCursor: string | null | undefined;
       readonly hasNextPage: boolean;
       readonly hasPreviousPage: boolean;
-      readonly startCursor: any | null | undefined;
+      readonly startCursor: string | null | undefined;
     };
   };
   readonly " $fragmentType": "PeopleListPage_peoples";

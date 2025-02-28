@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<193d632d808f2238377dab9c47d89f49>>
+ * @generated SignedSource<<a49f471e0d974928edd4bbc25dc8c762>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,18 +16,18 @@ export type VendorListPage_vendors$data = {
     readonly __id: string;
     readonly edges: ReadonlyArray<{
       readonly node: {
-        readonly createdAt: any;
+        readonly createdAt: string;
         readonly description: string;
         readonly id: string;
         readonly name: string;
-        readonly updatedAt: any;
+        readonly updatedAt: string;
       };
     }>;
     readonly pageInfo: {
-      readonly endCursor: any | null | undefined;
+      readonly endCursor: string | null | undefined;
       readonly hasNextPage: boolean;
       readonly hasPreviousPage: boolean;
-      readonly startCursor: any | null | undefined;
+      readonly startCursor: string | null | undefined;
     };
   };
   readonly " $fragmentType": "VendorListPage_vendors";

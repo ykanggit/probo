@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<fd058cd12c357b25b11a3806c359e33b>>
+ * @generated SignedSource<<8273f7b4bac530c828f54969eb877edb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -26,11 +26,11 @@ export type FrameworkListPageQuery$data = {
               };
             }>;
           };
-          readonly createdAt: any;
+          readonly createdAt: string;
           readonly description: string;
           readonly id: string;
           readonly name: string;
-          readonly updatedAt: any;
+          readonly updatedAt: string;
         };
       }>;
     };

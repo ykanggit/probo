@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<aa7d9efd2aaaa6af57bfc956754c69dd>>
+ * @generated SignedSource<<6ab9b7473f7ac19f7ed988d416de4ccd>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -29,7 +29,7 @@ export type PeopleOverviewPageUpdatePeopleMutation$data = {
       readonly id: string;
       readonly kind: PeopleKind;
       readonly primaryEmailAddress: string;
-      readonly updatedAt: any;
+      readonly updatedAt: string;
       readonly version: number;
     };
   };

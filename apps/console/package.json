@@ -67,6 +67,10 @@
     "language": "typescript",
     "schema": "../../pkg/api/console/v1/schema.graphql",
     "noFutureProofEnums": true,
+    "customScalarTypes": {
+      "Datetime": "string",
+      "CursorKey": "string"
+    },
     "excludes": [
       "**/node_modules/**",
       "**/__mocks__/**",

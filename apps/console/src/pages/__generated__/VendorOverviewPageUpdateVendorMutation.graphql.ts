@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6453606aec7f5a8548c5cc76e9d775f0>>
+ * @generated SignedSource<<918d7356c117ff6830c2c41b7db72ddd>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -19,8 +19,8 @@ export type UpdateVendorInput = {
   privacyPolicyUrl?: string | null | undefined;
   riskTier?: RiskTier | null | undefined;
   serviceCriticality?: ServiceCriticality | null | undefined;
-  serviceStartAt?: any | null | undefined;
-  serviceTerminationAt?: any | null | undefined;
+  serviceStartAt?: string | null | undefined;
+  serviceTerminationAt?: string | null | undefined;
   statusPageUrl?: string | null | undefined;
   termsOfServiceUrl?: string | null | undefined;
 };
@@ -36,11 +36,11 @@ export type VendorOverviewPageUpdateVendorMutation$data = {
       readonly privacyPolicyUrl: string | null | undefined;
       readonly riskTier: RiskTier;
       readonly serviceCriticality: ServiceCriticality;
-      readonly serviceStartAt: any;
-      readonly serviceTerminationAt: any | null | undefined;
+      readonly serviceStartAt: string;
+      readonly serviceTerminationAt: string | null | undefined;
       readonly statusPageUrl: string | null | undefined;
       readonly termsOfServiceUrl: string | null | undefined;
-      readonly updatedAt: any;
+      readonly updatedAt: string;
       readonly version: number;
     };
   };

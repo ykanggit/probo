@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<528ad6b0a104964c9d947ef1e9c41b46>>
+ * @generated SignedSource<<12b9bffcb7d1b32602592f77810dd9cb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,12 +16,12 @@ export type PeopleOverviewPageQuery$variables = {
 export type PeopleOverviewPageQuery$data = {
   readonly node: {
     readonly additionalEmailAddresses?: ReadonlyArray<string>;
-    readonly createdAt?: any;
+    readonly createdAt?: string;
     readonly fullName?: string;
     readonly id?: string;
     readonly kind?: PeopleKind;
     readonly primaryEmailAddress?: string;
-    readonly updatedAt?: any;
+    readonly updatedAt?: string;
     readonly version?: number;
   };
 };

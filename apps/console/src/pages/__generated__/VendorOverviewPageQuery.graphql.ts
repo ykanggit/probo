@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2d865a3f5deae54eed7c54b08df7bf0a>>
+ * @generated SignedSource<<e6f91ab15045c3a5139af514ed4fe3c1>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,18 +16,18 @@ export type VendorOverviewPageQuery$variables = {
 };
 export type VendorOverviewPageQuery$data = {
   readonly node: {
-    readonly createdAt?: any;
+    readonly createdAt?: string;
     readonly description?: string;
     readonly id?: string;
     readonly name?: string;
     readonly privacyPolicyUrl?: string | null | undefined;
     readonly riskTier?: RiskTier;
     readonly serviceCriticality?: ServiceCriticality;
-    readonly serviceStartAt?: any;
-    readonly serviceTerminationAt?: any | null | undefined;
+    readonly serviceStartAt?: string;
+    readonly serviceTerminationAt?: string | null | undefined;
     readonly statusPageUrl?: string | null | undefined;
     readonly termsOfServiceUrl?: string | null | undefined;
-    readonly updatedAt?: any;
+    readonly updatedAt?: string;
     readonly version?: number;
   };
 };

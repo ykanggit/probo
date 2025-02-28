@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<03e542b8e2ecf3c17be86da4526541d2>>
+ * @generated SignedSource<<03490b3e2c1e510c108108be2aabdb60>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,8 +18,8 @@ export type CreateVendorInput = {
   privacyPolicyUrl?: string | null | undefined;
   riskTier: RiskTier;
   serviceCriticality: ServiceCriticality;
-  serviceStartAt: any;
-  serviceTerminationAt?: any | null | undefined;
+  serviceStartAt: string;
+  serviceTerminationAt?: string | null | undefined;
   statusPageUrl?: string | null | undefined;
   termsOfServiceUrl?: string | null | undefined;
 };
@@ -31,10 +31,10 @@ export type VendorListPageCreateVendorMutation$data = {
   readonly createVendor: {
     readonly vendorEdge: {
       readonly node: {
-        readonly createdAt: any;
+        readonly createdAt: string;
         readonly id: string;
         readonly name: string;
-        readonly updatedAt: any;
+        readonly updatedAt: string;
       };
     };
   };

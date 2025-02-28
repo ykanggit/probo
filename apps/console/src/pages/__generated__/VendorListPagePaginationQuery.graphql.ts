@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4088732e27ad0219fc1d7a47b156bc6e>>
+ * @generated SignedSource<<36b79f3dc10a438f4bebae5387130337>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,8 +11,8 @@
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type VendorListPagePaginationQuery$variables = {
-  after?: any | null | undefined;
-  before?: any | null | undefined;
+  after?: string | null | undefined;
+  before?: string | null | undefined;
   first?: number | null | undefined;
   id: string;
   last?: number | null | undefined;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<48cb6bd6a591f9b4a0c44d3ac0b54ee4>>
+ * @generated SignedSource<<ef6ba4dba570cb33d84ec05b27ea18c7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,8 +11,8 @@
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type PeopleListPagePaginationQuery$variables = {
-  after?: any | null | undefined;
-  before?: any | null | undefined;
+  after?: string | null | undefined;
+  before?: string | null | undefined;
   first?: number | null | undefined;
   id: string;
   last?: number | null | undefined;
