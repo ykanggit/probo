@@ -293,16 +293,7 @@ function BreadcrumbControlOverview() {
   const { organizationId, frameworkId, controlId } = useParams();
   const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbControlOverviewQuery>(
     graphql`
-      query ConsoleLayoutBreadcrumbControlOverviewQuery(
-        $frameworkId: ID!
-        $controlId: ID!
-      ) {
-        framework: node(id: $frameworkId) {
-          id
-          ... on Framework {
-            name
-          }
-        }
+      query ConsoleLayoutBreadcrumbControlOverviewQuery($controlId: ID!) {
         control: node(id: $controlId) {
           id
           ... on Control {
@@ -311,21 +302,11 @@ function BreadcrumbControlOverview() {
         }
       }
     `,
-    { frameworkId: frameworkId!, controlId: controlId! }
+    { controlId: controlId! }
   );
 
   return (
     <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link
-            to={`/organizations/${organizationId}/frameworks/${frameworkId}`}
-          >
-            {data.framework?.name}
-          </Link>
-        </BreadcrumbLink>
-      </BreadcrumbItem>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
