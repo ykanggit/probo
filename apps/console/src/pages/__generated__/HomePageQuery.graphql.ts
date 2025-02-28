@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<72fcf5e9542bdba3b547fa523e55378d>>
+ * @generated SignedSource<<85432509e7341bbc8ee402e20d16c73f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,10 +17,10 @@ export type HomePageQuery$variables = {
 };
 export type HomePageQuery$data = {
   readonly organization: {
-    readonly createdAt?: any;
+    readonly createdAt?: string;
     readonly frameworks?: {
       readonly edges: ReadonlyArray<{
-        readonly cursor: any;
+        readonly cursor: string;
         readonly node: {
           readonly controls: {
             readonly edges: ReadonlyArray<{
@@ -31,38 +31,38 @@ export type HomePageQuery$data = {
                 readonly stateTransisions: {
                   readonly edges: ReadonlyArray<{
                     readonly node: {
-                      readonly createdAt: any;
+                      readonly createdAt: string;
                       readonly fromState: ControlState | null | undefined;
                       readonly id: string;
                       readonly toState: ControlState;
-                      readonly updatedAt: any;
+                      readonly updatedAt: string;
                     };
                   }>;
                 };
                 readonly tasks: {
                   readonly edges: ReadonlyArray<{
                     readonly node: {
-                      readonly createdAt: any;
+                      readonly createdAt: string;
                       readonly evidences: {
                         readonly edges: ReadonlyArray<{
                           readonly node: {
-                            readonly createdAt: any;
+                            readonly createdAt: string;
                             readonly fileUrl: string;
                             readonly id: string;
                             readonly state: EvidenceState;
                             readonly stateTransisions: {
                               readonly edges: ReadonlyArray<{
                                 readonly node: {
-                                  readonly createdAt: any;
+                                  readonly createdAt: string;
                                   readonly fromState: EvidenceState | null | undefined;
                                   readonly id: string;
                                   readonly reason: string | null | undefined;
                                   readonly toState: EvidenceState;
-                                  readonly updatedAt: any;
+                                  readonly updatedAt: string;
                                 };
                               }>;
                             };
-                            readonly updatedAt: any;
+                            readonly updatedAt: string;
                           };
                         }>;
                       };
@@ -72,16 +72,16 @@ export type HomePageQuery$data = {
                       readonly stateTransisions: {
                         readonly edges: ReadonlyArray<{
                           readonly node: {
-                            readonly createdAt: any;
+                            readonly createdAt: string;
                             readonly fromState: TaskState | null | undefined;
                             readonly id: string;
                             readonly reason: string | null | undefined;
                             readonly toState: TaskState;
-                            readonly updatedAt: any;
+                            readonly updatedAt: string;
                           };
                         }>;
                       };
-                      readonly updatedAt: any;
+                      readonly updatedAt: string;
                     };
                   }>;
                 };
@@ -94,10 +94,10 @@ export type HomePageQuery$data = {
         };
       }>;
       readonly pageInfo: {
-        readonly endCursor: any | null | undefined;
+        readonly endCursor: string | null | undefined;
         readonly hasNextPage: boolean;
         readonly hasPreviousPage: boolean;
-        readonly startCursor: any | null | undefined;
+        readonly startCursor: string | null | undefined;
       };
     };
     readonly id?: string;
@@ -106,22 +106,22 @@ export type HomePageQuery$data = {
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly additionalEmailAddresses: ReadonlyArray<string>;
-          readonly createdAt: any;
+          readonly createdAt: string;
           readonly fullName: string;
           readonly id: string;
           readonly primaryEmailAddress: string;
-          readonly updatedAt: any;
+          readonly updatedAt: string;
         };
       }>;
     };
-    readonly updatedAt?: any;
+    readonly updatedAt?: string;
     readonly vendors?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
-          readonly createdAt: any;
+          readonly createdAt: string;
           readonly id: string;
           readonly name: string;
-          readonly updatedAt: any;
+          readonly updatedAt: string;
         };
       }>;
     };
