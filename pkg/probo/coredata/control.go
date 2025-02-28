@@ -156,7 +156,8 @@ VALUES (
     @description,
     @content_ref,
     @created_at,
-    @updated_at
+    @updated_at,
+    @version
 );
 `
 
