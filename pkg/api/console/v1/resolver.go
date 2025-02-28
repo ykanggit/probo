@@ -91,6 +91,8 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 }
 
 func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.HandlerFunc {
+	var mb int64 = 1 << 20
+
 	es := schema.NewExecutableSchema(
 		schema.Config{
 			Resolvers: &Resolver{
@@ -102,6 +104,10 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 	)
 	srv := handler.New(es)
 	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{
+		MaxMemory:     32 * mb,
+		MaxUploadSize: 50 * mb,
+	})
 	srv.Use(extension.Introspection{})
 
 	// Add operation middleware for authentication
