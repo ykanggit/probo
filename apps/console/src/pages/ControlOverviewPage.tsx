@@ -1040,6 +1040,10 @@ function ControlOverviewPageContent({
                   <X className="w-5 h-5" />
                 </button>
               </DialogTitle>
+              <DialogDescription>
+                Preview of the evidence file. You can view or download the file
+                from here.
+              </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col items-center justify-center min-h-[300px] bg-gray-50 rounded-md p-4">
               {isLoadingFileUrl ? (
