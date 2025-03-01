@@ -122,6 +122,10 @@ type ComplexityRoot struct {
 		VendorEdge func(childComplexity int) int
 	}
 
+	DeleteEvidencePayload struct {
+		DeletedEvidenceID func(childComplexity int) int
+	}
+
 	DeleteOrganizationPayload struct {
 		DeletedOrganizationID func(childComplexity int) int
 	}
@@ -206,6 +210,7 @@ type ComplexityRoot struct {
 		CreatePeople       func(childComplexity int, input types.CreatePeopleInput) int
 		CreateTask         func(childComplexity int, input types.CreateTaskInput) int
 		CreateVendor       func(childComplexity int, input types.CreateVendorInput) int
+		DeleteEvidence     func(childComplexity int, input types.DeleteEvidenceInput) int
 		DeleteOrganization func(childComplexity int, input types.DeleteOrganizationInput) int
 		DeletePeople       func(childComplexity int, input types.DeletePeopleInput) int
 		DeleteTask         func(childComplexity int, input types.DeleteTaskInput) int
@@ -406,6 +411,7 @@ type MutationResolver interface {
 	UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error)
 	UpdateControl(ctx context.Context, input types.UpdateControlInput) (*types.UpdateControlPayload, error)
 	UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error)
+	DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error)
 }
 type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
@@ -662,6 +668,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreateVendorPayload.VendorEdge(childComplexity), true
+
+	case "DeleteEvidencePayload.deletedEvidenceId":
+		if e.complexity.DeleteEvidencePayload.DeletedEvidenceID == nil {
+			break
+		}
+
+		return e.complexity.DeleteEvidencePayload.DeletedEvidenceID(childComplexity), true
 
 	case "DeleteOrganizationPayload.deletedOrganizationId":
 		if e.complexity.DeleteOrganizationPayload.DeletedOrganizationID == nil {
@@ -1010,6 +1023,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateVendor(childComplexity, args["input"].(types.CreateVendorInput)), true
+
+	case "Mutation.deleteEvidence":
+		if e.complexity.Mutation.DeleteEvidence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteEvidence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteEvidence(childComplexity, args["input"].(types.DeleteEvidenceInput)), true
 
 	case "Mutation.deleteOrganization":
 		if e.complexity.Mutation.DeleteOrganization == nil {
@@ -1761,6 +1786,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreatePeopleInput,
 		ec.unmarshalInputCreateTaskInput,
 		ec.unmarshalInputCreateVendorInput,
+		ec.unmarshalInputDeleteEvidenceInput,
 		ec.unmarshalInputDeleteOrganizationInput,
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeleteTaskInput,
@@ -2273,6 +2299,7 @@ type Mutation {
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
   updateControl(input: UpdateControlInput!): UpdateControlPayload!
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
+  deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
 }
 
 input CreateVendorInput {
@@ -2481,6 +2508,14 @@ input UploadEvidenceInput {
 
 type UploadEvidencePayload {
   evidenceEdge: EvidenceEdge!
+}
+
+input DeleteEvidenceInput {
+  evidenceId: ID!
+}
+
+type DeleteEvidencePayload {
+  deletedEvidenceId: ID!
 }
 `, BuiltIn: false},
 }
@@ -2933,6 +2968,29 @@ func (ec *executionContext) field_Mutation_createVendor_argsInput(
 	}
 
 	var zeroVal types.CreateVendorInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteEvidence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteEvidence_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteEvidence_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteEvidenceInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteEvidenceInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteEvidenceInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteEvidenceInput
 	return zeroVal, nil
 }
 
@@ -4983,6 +5041,44 @@ func (ec *executionContext) fieldContext_CreateVendorPayload_vendorEdge(_ contex
 				return ec.fieldContext_VendorEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type VendorEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteEvidencePayload_deletedEvidenceId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteEvidencePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteEvidencePayload_deletedEvidenceId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedEvidenceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteEvidencePayload_deletedEvidenceId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteEvidencePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7292,6 +7388,53 @@ func (ec *executionContext) fieldContext_Mutation_uploadEvidence(ctx context.Con
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_uploadEvidence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteEvidence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteEvidence(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteEvidence(rctx, fc.Args["input"].(types.DeleteEvidenceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteEvidencePayload)
+	fc.Result = res
+	return ec.marshalNDeleteEvidencePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteEvidencePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteEvidence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedEvidenceId":
+				return ec.fieldContext_DeleteEvidencePayload_deletedEvidenceId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteEvidencePayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteEvidence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -12761,6 +12904,33 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteEvidenceInput(ctx context.Context, obj any) (types.DeleteEvidenceInput, error) {
+	var it types.DeleteEvidenceInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"evidenceId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "evidenceId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("evidenceId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EvidenceID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDeleteOrganizationInput(ctx context.Context, obj any) (types.DeleteOrganizationInput, error) {
 	var it types.DeleteOrganizationInput
 	asMap := map[string]any{}
@@ -13890,6 +14060,45 @@ func (ec *executionContext) _CreateVendorPayload(ctx context.Context, sel ast.Se
 	return out
 }
 
+var deleteEvidencePayloadImplementors = []string{"DeleteEvidencePayload"}
+
+func (ec *executionContext) _DeleteEvidencePayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteEvidencePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteEvidencePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteEvidencePayload")
+		case "deletedEvidenceId":
+			out.Values[i] = ec._DeleteEvidencePayload_deletedEvidenceId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deleteOrganizationPayloadImplementors = []string{"DeleteOrganizationPayload"}
 
 func (ec *executionContext) _DeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteOrganizationPayload) graphql.Marshaler {
@@ -14721,6 +14930,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "uploadEvidence":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_uploadEvidence(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteEvidence":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteEvidence(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -16843,6 +17059,25 @@ func (ec *executionContext) marshalNDatetime2timeᚐTime(ctx context.Context, se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNDeleteEvidenceInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteEvidenceInput(ctx context.Context, v any) (types.DeleteEvidenceInput, error) {
+	res, err := ec.unmarshalInputDeleteEvidenceInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteEvidencePayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteEvidencePayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteEvidencePayload) graphql.Marshaler {
+	return ec._DeleteEvidencePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteEvidencePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteEvidencePayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteEvidencePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteEvidencePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeleteOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationInput(ctx context.Context, v any) (types.DeleteOrganizationInput, error) {

@@ -53,6 +53,7 @@ import type { ControlOverviewPageUpdateTaskStateMutation as ControlOverviewPageU
 import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreateTaskMutationType } from "./__generated__/ControlOverviewPageCreateTaskMutation.graphql";
 import type { ControlOverviewPageDeleteTaskMutation as ControlOverviewPageDeleteTaskMutationType } from "./__generated__/ControlOverviewPageDeleteTaskMutation.graphql";
 import type { ControlOverviewPageUploadEvidenceMutation as ControlOverviewPageUploadEvidenceMutationType } from "./__generated__/ControlOverviewPageUploadEvidenceMutation.graphql";
+import type { ControlOverviewPageDeleteEvidenceMutation as ControlOverviewPageDeleteEvidenceMutationType } from "./__generated__/ControlOverviewPageDeleteEvidenceMutation.graphql";
 
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
@@ -155,6 +156,17 @@ const uploadEvidenceMutation = graphql`
   }
 `;
 
+const deleteEvidenceMutation = graphql`
+  mutation ControlOverviewPageDeleteEvidenceMutation(
+    $input: DeleteEvidenceInput!
+    $connections: [ID!]!
+  ) {
+    deleteEvidence(input: $input) {
+      deletedEvidenceId @deleteEdge(connections: $connections)
+    }
+  }
+`;
+
 // Add a GraphQL query to fetch the fileUrl for an evidence item
 const getEvidenceFileUrlQuery = graphql`
   query ControlOverviewPageGetEvidenceFileUrlQuery($evidenceId: ID!) {
@@ -191,6 +203,10 @@ function ControlOverviewPageContent({
   const [uploadEvidence] =
     useMutation<ControlOverviewPageUploadEvidenceMutationType>(
       uploadEvidenceMutation
+    );
+  const [deleteEvidence] =
+    useMutation<ControlOverviewPageDeleteEvidenceMutationType>(
+      deleteEvidenceMutation
     );
 
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
@@ -231,6 +247,13 @@ function ControlOverviewPageContent({
     fileUrl?: string;
   } | null>(null);
   const [isLoadingFileUrl, setIsLoadingFileUrl] = useState(false);
+
+  const [isDeleteEvidenceOpen, setIsDeleteEvidenceOpen] = useState(false);
+  const [evidenceToDelete, setEvidenceToDelete] = useState<{
+    id: string;
+    filename: string;
+    taskId: string;
+  } | null>(null);
 
   const tasks = data.control.tasks?.edges.map((edge) => edge.node) || [];
 
@@ -604,6 +627,47 @@ function ControlOverviewPageContent({
       });
   };
 
+  const handleDeleteEvidence = (
+    evidenceId: string,
+    filename: string,
+    taskId: string
+  ) => {
+    setEvidenceToDelete({ id: evidenceId, filename, taskId });
+    setIsDeleteEvidenceOpen(true);
+  };
+
+  const confirmDeleteEvidence = () => {
+    if (!evidenceToDelete) return;
+
+    const evidenceConnectionId = getEvidenceConnectionId(
+      evidenceToDelete.taskId
+    );
+
+    deleteEvidence({
+      variables: {
+        input: {
+          evidenceId: evidenceToDelete.id,
+        },
+        connections: evidenceConnectionId ? [evidenceConnectionId] : [],
+      },
+      onCompleted: () => {
+        toast({
+          title: "Evidence deleted",
+          description: "Evidence has been deleted successfully.",
+        });
+        setIsDeleteEvidenceOpen(false);
+        setEvidenceToDelete(null);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error deleting evidence",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
   return (
     <>
       <Helmet>
@@ -928,6 +992,20 @@ function ControlOverviewPageContent({
                                 >
                                   <Download className="w-4 h-4 text-gray-600" />
                                 </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleDeleteEvidence(
+                                      evidence.id,
+                                      evidence.filename,
+                                      task.id
+                                    );
+                                  }}
+                                  className="p-1 rounded-full hover:bg-gray-100 hover:bg-red-50 hover:text-red-600"
+                                  title="Delete Evidence"
+                                >
+                                  <Trash2 className="w-4 h-4 text-gray-600 hover:text-red-600" />
+                                </button>
                               </div>
                             </div>
                           );
@@ -1100,6 +1178,34 @@ function ControlOverviewPageContent({
                   Download
                 </Button>
               )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Delete Evidence Confirmation Dialog */}
+        <Dialog
+          open={isDeleteEvidenceOpen}
+          onOpenChange={setIsDeleteEvidenceOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Evidence</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete the evidence &quot;
+                {evidenceToDelete?.filename}&quot;? This action cannot be
+                undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteEvidenceOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={confirmDeleteEvidence}>
+                Delete
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

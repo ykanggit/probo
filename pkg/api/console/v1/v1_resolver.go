@@ -363,6 +363,18 @@ func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.Uploa
 	}, nil
 }
 
+// DeleteEvidence is the resolver for the deleteEvidence field.
+func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error) {
+	err := r.proboSvc.DeleteEvidence(ctx, input.EvidenceID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete evidence: %w", err)
+	}
+
+	return &types.DeleteEvidencePayload{
+		DeletedEvidenceID: input.EvidenceID,
+	}, nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)

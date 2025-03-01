@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3c761f476fc4dcbc2f175eefa625bb28>>
+ * @generated SignedSource<<e1f21afb2bf00563c8343f3700c08c6e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -31,7 +31,7 @@ export type ControlOverviewPageQuery$data = {
             readonly __id: string;
             readonly edges: ReadonlyArray<{
               readonly node: {
-                readonly createdAt: any;
+                readonly createdAt: string;
                 readonly filename: string;
                 readonly id: string;
                 readonly mimeType: string;

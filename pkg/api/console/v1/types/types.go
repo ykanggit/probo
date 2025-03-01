@@ -129,6 +129,14 @@ type CreateVendorPayload struct {
 	VendorEdge *VendorEdge `json:"vendorEdge"`
 }
 
+type DeleteEvidenceInput struct {
+	EvidenceID gid.GID `json:"evidenceId"`
+}
+
+type DeleteEvidencePayload struct {
+	DeletedEvidenceID gid.GID `json:"deletedEvidenceId"`
+}
+
 type DeleteOrganizationInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 }

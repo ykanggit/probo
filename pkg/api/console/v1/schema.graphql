@@ -403,6 +403,7 @@ type Mutation {
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
   updateControl(input: UpdateControlInput!): UpdateControlPayload!
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
+  deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
 }
 
 input CreateVendorInput {
@@ -611,4 +612,12 @@ input UploadEvidenceInput {
 
 type UploadEvidencePayload {
   evidenceEdge: EvidenceEdge!
+}
+
+input DeleteEvidenceInput {
+  evidenceId: ID!
+}
+
+type DeleteEvidencePayload {
+  deletedEvidenceId: ID!
 }

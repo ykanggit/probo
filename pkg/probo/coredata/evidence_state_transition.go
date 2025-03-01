@@ -143,3 +143,26 @@ WHERE
 
 	return nil
 }
+
+func (cst *EvidenceStateTransitions) DeleteForEvidenceID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+	evidenceID gid.GID,
+) error {
+	q := `
+DELETE FROM
+    evidence_state_transitions
+WHERE
+    %s
+    AND evidence_id = @evidence_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{"evidence_id": evidenceID}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}

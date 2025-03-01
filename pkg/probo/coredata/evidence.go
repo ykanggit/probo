@@ -232,3 +232,25 @@ WHERE
 
 	return nil
 }
+
+func (e Evidence) Delete(
+	ctx context.Context,
+	conn pg.Conn,
+	scope *Scope,
+) error {
+	q := `
+DELETE FROM
+    evidences
+WHERE
+	%s
+    AND id = @evidence_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.NamedArgs{"evidence_id": e.ID}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
