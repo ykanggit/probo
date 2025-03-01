@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f1cdd20d14ca9fefe868019e5aa43741>>
+ * @generated SignedSource<<09af19b5a7657e04606a42962db9db2c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -23,7 +23,7 @@ export type ControlOverviewPageUploadEvidenceMutation$data = {
   readonly uploadEvidence: {
     readonly evidenceEdge: {
       readonly node: {
-        readonly createdAt: string;
+        readonly createdAt: any;
         readonly fileUrl: string;
         readonly id: string;
         readonly mimeType: string;

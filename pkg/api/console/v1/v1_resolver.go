@@ -7,6 +7,7 @@ package console_v1
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/getprobo/probo/pkg/api/console/v1/schema"
 	"github.com/getprobo/probo/pkg/api/console/v1/types"
@@ -39,6 +40,16 @@ func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *
 	}
 
 	return types.NewTaskConnection(page), nil
+}
+
+// FileURL is the resolver for the fileUrl field.
+func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (string, error) {
+	fileURL, err := r.proboSvc.GetEvidenceFileURL(ctx, obj.ID, 15*time.Minute)
+	if err != nil {
+		return "", fmt.Errorf("cannot generate file URL: %w", err)
+	}
+
+	return *fileURL, nil
 }
 
 // StateTransisions is the resolver for the stateTransisions field.

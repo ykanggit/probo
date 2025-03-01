@@ -320,7 +320,7 @@ type EvidenceEdge {
 
 type Evidence implements Node {
   id: ID!
-  fileUrl: String!
+  fileUrl: String! @goField(forceResolver: true)
   mimeType: String!
   size: Int!
   state: EvidenceState!

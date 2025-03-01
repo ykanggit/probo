@@ -13,6 +13,8 @@ import {
   usePreloadedQuery,
   useQueryLoader,
   useMutation,
+  fetchQuery,
+  useRelayEnvironment,
 } from "react-relay";
 import {
   CheckCircle2,
@@ -28,6 +30,7 @@ import {
   File as FileGeneric,
   FileText,
   Image,
+  X,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -74,7 +77,6 @@ const controlOverviewPageQuery = graphql`
                 edges {
                   node {
                     id
-                    fileUrl
                     mimeType
                     filename
                     size
@@ -153,6 +155,18 @@ const uploadEvidenceMutation = graphql`
   }
 `;
 
+// Add a GraphQL query to fetch the fileUrl for an evidence item
+const getEvidenceFileUrlQuery = graphql`
+  query ControlOverviewPageGetEvidenceFileUrlQuery($evidenceId: ID!) {
+    node(id: $evidenceId) {
+      ... on Evidence {
+        id
+        fileUrl
+      }
+    }
+  }
+`;
+
 function ControlOverviewPageContent({
   queryRef,
 }: {
@@ -165,6 +179,7 @@ function ControlOverviewPageContent({
   const { toast } = useToast();
   const { organizationId, frameworkId, controlId } = useParams();
   const navigate = useNavigate();
+  const environment = useRelayEnvironment();
   const [updateTaskState] =
     useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
       updateTaskStateMutation
@@ -206,6 +221,16 @@ function ControlOverviewPageContent({
   const [expandedEvidenceTaskId, setExpandedEvidenceTaskId] = useState<
     string | null
   >(null);
+
+  // Add state for the preview modal
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [previewEvidence, setPreviewEvidence] = useState<{
+    id: string;
+    filename: string;
+    mimeType: string;
+    fileUrl?: string;
+  } | null>(null);
+  const [isLoadingFileUrl, setIsLoadingFileUrl] = useState(false);
 
   const tasks = data.control.tasks?.edges.map((edge) => edge.node) || [];
 
@@ -537,6 +562,54 @@ function ControlOverviewPageContent({
     }
   };
 
+  // Simplified preview handler that opens the modal and sets the evidence
+  const handlePreviewEvidence = (evidence: {
+    id: string;
+    filename: string;
+    mimeType: string;
+  }) => {
+    // Just open the modal with the evidence info
+    setPreviewEvidence({
+      id: evidence.id,
+      filename: evidence.filename,
+      mimeType: evidence.mimeType,
+    });
+    setIsPreviewModalOpen(true);
+
+    // We'll fetch the fileUrl when the modal opens
+    setIsLoadingFileUrl(true);
+
+    // Use GraphQL query to fetch the fileUrl
+    fetchQuery(environment, getEvidenceFileUrlQuery, {
+      evidenceId: evidence.id,
+    })
+      .toPromise()
+      .then((response) => {
+        // Type assertion for the response
+        const data = response as { node?: { id: string; fileUrl?: string } };
+
+        if (data?.node?.fileUrl) {
+          setPreviewEvidence((prev) => {
+            if (!prev) return null;
+            return { ...prev, fileUrl: data.node!.fileUrl };
+          });
+        } else {
+          throw new Error("File URL not available in response");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching file URL:", error);
+        toast({
+          title: "Error fetching file URL",
+          description: error.message || "Could not load the file preview",
+          variant: "destructive",
+        });
+      })
+      .finally(() => {
+        setIsLoadingFileUrl(false);
+      });
+  };
+
   return (
     <>
       <Helmet>
@@ -829,27 +902,38 @@ function ControlOverviewPageContent({
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
-                                {evidence.mimeType.startsWith("image/") && (
-                                  <a
-                                    href={evidence.fileUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                {evidence.mimeType.startsWith("image/") ? (
+                                  <button
+                                    onClick={() =>
+                                      handlePreviewEvidence(evidence)
+                                    }
                                     className="p-1 rounded-full hover:bg-gray-100"
-                                    title="Preview"
+                                    title="Preview Image"
                                   >
                                     <Eye className="w-4 h-4 text-gray-600" />
-                                  </a>
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handlePreviewEvidence(evidence);
+                                    }}
+                                    className="p-1 rounded-full hover:bg-gray-100"
+                                    title="View File"
+                                  >
+                                    <Eye className="w-4 h-4 text-gray-600" />
+                                  </button>
                                 )}
-                                <a
-                                  href={evidence.fileUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handlePreviewEvidence(evidence);
+                                  }}
                                   className="p-1 rounded-full hover:bg-gray-100"
                                   title="Download"
-                                  download
                                 >
                                   <Download className="w-4 h-4 text-gray-600" />
-                                </a>
+                                </button>
                               </div>
                             </div>
                           );
@@ -940,6 +1024,85 @@ function ControlOverviewPageContent({
                 <Button type="submit">Upload</Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add the Preview Modal */}
+        <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
+          <DialogContent className="sm:max-w-4xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center justify-between">
+                <span>{previewEvidence?.filename}</span>
+                <button
+                  onClick={() => setIsPreviewModalOpen(false)}
+                  className="rounded-full p-1 hover:bg-gray-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center justify-center min-h-[300px] bg-gray-50 rounded-md p-4">
+              {isLoadingFileUrl ? (
+                <div className="flex flex-col items-center gap-2">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                  <p className="text-gray-500">Loading preview...</p>
+                </div>
+              ) : previewEvidence?.fileUrl ? (
+                previewEvidence.mimeType.startsWith("image/") ? (
+                  <img
+                    src={previewEvidence.fileUrl}
+                    alt={previewEvidence.filename}
+                    className="max-h-[70vh] object-contain"
+                  />
+                ) : previewEvidence.mimeType.includes("pdf") ? (
+                  <iframe
+                    src={previewEvidence.fileUrl}
+                    className="w-full h-[70vh]"
+                    title={previewEvidence.filename}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-4">
+                    <FileGeneric className="w-16 h-16 text-gray-400" />
+                    <p className="text-gray-600">
+                      Preview not available for this file type
+                    </p>
+                    <Button
+                      onClick={() => {
+                        if (previewEvidence?.fileUrl) {
+                          window.open(previewEvidence.fileUrl, "_blank");
+                        }
+                      }}
+                    >
+                      Download File
+                    </Button>
+                  </div>
+                )
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <FileGeneric className="w-12 h-12 text-gray-400" />
+                  <p className="text-gray-500">Failed to load preview</p>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsPreviewModalOpen(false)}
+              >
+                Close
+              </Button>
+              {previewEvidence?.fileUrl && (
+                <Button
+                  onClick={() => {
+                    if (previewEvidence?.fileUrl) {
+                      window.open(previewEvidence.fileUrl, "_blank");
+                    }
+                  }}
+                >
+                  Download
+                </Button>
+              )}
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
