@@ -76,6 +76,7 @@ const controlOverviewPageQuery = graphql`
                     id
                     fileUrl
                     mimeType
+                    filename
                     size
                     state
                     createdAt
@@ -816,7 +817,7 @@ function ControlOverviewPageContent({
                                 {getFileIcon(evidence.mimeType)}
                                 <div>
                                   <div className="text-sm font-medium text-gray-700">
-                                    {evidence.name}
+                                    {evidence.filename}
                                   </div>
                                   <div className="text-xs text-gray-500 flex items-center gap-2">
                                     <span>{formatFileSize(evidence.size)}</span>

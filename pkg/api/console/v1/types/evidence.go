@@ -44,6 +44,7 @@ func NewEvidence(e *coredata.Evidence) *Evidence {
 		ID:        e.ID,
 		State:     e.State,
 		FileURL:   "",
+		Filename:  e.Filename,
 		MimeType:  e.MimeType,
 		Size:      int(e.Size),
 		CreatedAt: e.CreatedAt,

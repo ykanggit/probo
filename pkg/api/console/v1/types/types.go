@@ -167,6 +167,7 @@ type Evidence struct {
 	MimeType         string                             `json:"mimeType"`
 	Size             int                                `json:"size"`
 	State            coredata.EvidenceState             `json:"state"`
+	Filename         string                             `json:"filename"`
 	StateTransisions *EvidenceStateTransitionConnection `json:"stateTransisions"`
 	CreatedAt        time.Time                          `json:"createdAt"`
 	UpdatedAt        time.Time                          `json:"updatedAt"`

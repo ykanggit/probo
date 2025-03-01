@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2ce0834e0bd8b3d2937b34ebf91f9a69>>
+ * @generated SignedSource<<005ee5181eeb4c0865e7e76dcb6b3aac>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -33,6 +33,7 @@ export type ControlOverviewPageQuery$data = {
               readonly node: {
                 readonly createdAt: string;
                 readonly fileUrl: string;
+                readonly filename: string;
                 readonly id: string;
                 readonly mimeType: string;
                 readonly size: number;
@@ -184,6 +185,13 @@ v11 = [
             "args": null,
             "kind": "ScalarField",
             "name": "mimeType",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "filename",
             "storageKey": null
           },
           {
@@ -413,7 +421,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9738657b3d99bf6d85fd5333972e68f1",
+    "cacheID": "0747630c87fd59b419e5264fcede33bf",
     "id": null,
     "metadata": {
       "connection": [
@@ -436,11 +444,11 @@ return {
     },
     "name": "ControlOverviewPageQuery",
     "operationKind": "query",
-    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  fileUrl\n                  mimeType\n                  size\n                  state\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  fileUrl\n                  mimeType\n                  filename\n                  size\n                  state\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5c2829a1e6bc18d96db9e608fbfc4d6f";
+(node as any).hash = "0fc29eb31e33b025168ac8972109f853";
 
 export default node;

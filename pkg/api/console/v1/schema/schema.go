@@ -141,6 +141,7 @@ type ComplexityRoot struct {
 	Evidence struct {
 		CreatedAt        func(childComplexity int) int
 		FileURL          func(childComplexity int) int
+		Filename         func(childComplexity int) int
 		ID               func(childComplexity int) int
 		MimeType         func(childComplexity int) int
 		Size             func(childComplexity int) int
@@ -701,6 +702,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Evidence.FileURL(childComplexity), true
+
+	case "Evidence.filename":
+		if e.complexity.Evidence.Filename == nil {
+			break
+		}
+
+		return e.complexity.Evidence.Filename(childComplexity), true
 
 	case "Evidence.id":
 		if e.complexity.Evidence.ID == nil {
@@ -2184,6 +2192,7 @@ type Evidence implements Node {
   mimeType: String!
   size: Int!
   state: EvidenceState!
+  filename: String!
 
   stateTransisions(
     first: Int
@@ -5319,6 +5328,44 @@ func (ec *executionContext) fieldContext_Evidence_state(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Evidence_filename(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_filename(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Filename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_filename(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Evidence_stateTransisions(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Evidence_stateTransisions(ctx, field)
 	if err != nil {
@@ -5617,6 +5664,8 @@ func (ec *executionContext) fieldContext_EvidenceEdge_node(_ context.Context, fi
 				return ec.fieldContext_Evidence_size(ctx, field)
 			case "state":
 				return ec.fieldContext_Evidence_state(ctx, field)
+			case "filename":
+				return ec.fieldContext_Evidence_filename(ctx, field)
 			case "stateTransisions":
 				return ec.fieldContext_Evidence_stateTransisions(ctx, field)
 			case "createdAt":
@@ -14028,6 +14077,11 @@ func (ec *executionContext) _Evidence(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "state":
 			out.Values[i] = ec._Evidence_state(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "filename":
+			out.Values[i] = ec._Evidence_filename(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}

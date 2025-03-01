@@ -324,6 +324,7 @@ type Evidence implements Node {
   mimeType: String!
   size: Int!
   state: EvidenceState!
+  filename: String!
 
   stateTransisions(
     first: Int
