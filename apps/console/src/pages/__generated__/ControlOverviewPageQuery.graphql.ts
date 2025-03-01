@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ba62806712d6eae0a97e09a9db5c5841>>
+ * @generated SignedSource<<2ce0834e0bd8b3d2937b34ebf91f9a69>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -23,10 +23,12 @@ export type ControlOverviewPageQuery$data = {
     readonly name?: string;
     readonly state?: ControlState;
     readonly tasks?: {
+      readonly __id: string;
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly description: string;
           readonly evidences: {
+            readonly __id: string;
             readonly edges: ReadonlyArray<{
               readonly node: {
                 readonly createdAt: string;
@@ -108,11 +110,55 @@ v7 = {
   "name": "__typename",
   "storageKey": null
 },
-v8 = [
+v8 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "cursor",
+  "storageKey": null
+},
+v9 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "PageInfo",
+  "kind": "LinkedField",
+  "name": "pageInfo",
+  "plural": false,
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "endCursor",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "hasNextPage",
+      "storageKey": null
+    }
+  ],
+  "storageKey": null
+},
+v10 = {
+  "kind": "ClientExtension",
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "__id",
+      "storageKey": null
+    }
+  ]
+},
+v11 = [
   {
     "alias": null,
     "args": null,
-    "concreteType": "TaskEdge",
+    "concreteType": "EvidenceEdge",
     "kind": "LinkedField",
     "name": "edges",
     "plural": true,
@@ -120,129 +166,64 @@ v8 = [
       {
         "alias": null,
         "args": null,
-        "concreteType": "Task",
+        "concreteType": "Evidence",
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
           (v2/*: any*/),
-          (v3/*: any*/),
-          (v4/*: any*/),
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "fileUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "mimeType",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "size",
+            "storageKey": null
+          },
           (v5/*: any*/),
           {
             "alias": null,
-            "args": [
-              {
-                "kind": "Literal",
-                "name": "first",
-                "value": 10
-              }
-            ],
-            "concreteType": "EvidenceConnection",
-            "kind": "LinkedField",
-            "name": "evidences",
-            "plural": false,
-            "selections": [
-              {
-                "alias": null,
-                "args": null,
-                "concreteType": "EvidenceEdge",
-                "kind": "LinkedField",
-                "name": "edges",
-                "plural": true,
-                "selections": [
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "Evidence",
-                    "kind": "LinkedField",
-                    "name": "node",
-                    "plural": false,
-                    "selections": [
-                      (v2/*: any*/),
-                      {
-                        "alias": null,
-                        "args": null,
-                        "kind": "ScalarField",
-                        "name": "fileUrl",
-                        "storageKey": null
-                      },
-                      {
-                        "alias": null,
-                        "args": null,
-                        "kind": "ScalarField",
-                        "name": "mimeType",
-                        "storageKey": null
-                      },
-                      {
-                        "alias": null,
-                        "args": null,
-                        "kind": "ScalarField",
-                        "name": "size",
-                        "storageKey": null
-                      },
-                      (v5/*: any*/),
-                      {
-                        "alias": null,
-                        "args": null,
-                        "kind": "ScalarField",
-                        "name": "createdAt",
-                        "storageKey": null
-                      }
-                    ],
-                    "storageKey": null
-                  }
-                ],
-                "storageKey": null
-              }
-            ],
-            "storageKey": "evidences(first:10)"
+            "args": null,
+            "kind": "ScalarField",
+            "name": "createdAt",
+            "storageKey": null
           },
           (v7/*: any*/)
         ],
         "storageKey": null
       },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "cursor",
-        "storageKey": null
-      }
+      (v8/*: any*/)
     ],
     "storageKey": null
   },
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "PageInfo",
-    "kind": "LinkedField",
-    "name": "pageInfo",
-    "plural": false,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "endCursor",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "hasNextPage",
-        "storageKey": null
-      }
-    ],
-    "storageKey": null
-  }
+  (v9/*: any*/),
+  (v10/*: any*/)
 ],
-v9 = [
+v12 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 100
+  }
+],
+v13 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 50
   }
 ];
 return {
@@ -275,7 +256,48 @@ return {
                 "kind": "LinkedField",
                 "name": "__ControlOverviewPage_tasks_connection",
                 "plural": false,
-                "selections": (v8/*: any*/),
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "TaskEdge",
+                    "kind": "LinkedField",
+                    "name": "edges",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "Task",
+                        "kind": "LinkedField",
+                        "name": "node",
+                        "plural": false,
+                        "selections": [
+                          (v2/*: any*/),
+                          (v3/*: any*/),
+                          (v4/*: any*/),
+                          (v5/*: any*/),
+                          {
+                            "alias": "evidences",
+                            "args": null,
+                            "concreteType": "EvidenceConnection",
+                            "kind": "LinkedField",
+                            "name": "__ControlOverviewPage_evidences_connection",
+                            "plural": false,
+                            "selections": (v11/*: any*/),
+                            "storageKey": null
+                          },
+                          (v7/*: any*/)
+                        ],
+                        "storageKey": null
+                      },
+                      (v8/*: any*/)
+                    ],
+                    "storageKey": null
+                  },
+                  (v9/*: any*/),
+                  (v10/*: any*/)
+                ],
                 "storageKey": null
               }
             ],
@@ -314,17 +336,67 @@ return {
               (v6/*: any*/),
               {
                 "alias": null,
-                "args": (v9/*: any*/),
+                "args": (v12/*: any*/),
                 "concreteType": "TaskConnection",
                 "kind": "LinkedField",
                 "name": "tasks",
                 "plural": false,
-                "selections": (v8/*: any*/),
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "TaskEdge",
+                    "kind": "LinkedField",
+                    "name": "edges",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "Task",
+                        "kind": "LinkedField",
+                        "name": "node",
+                        "plural": false,
+                        "selections": [
+                          (v2/*: any*/),
+                          (v3/*: any*/),
+                          (v4/*: any*/),
+                          (v5/*: any*/),
+                          {
+                            "alias": null,
+                            "args": (v13/*: any*/),
+                            "concreteType": "EvidenceConnection",
+                            "kind": "LinkedField",
+                            "name": "evidences",
+                            "plural": false,
+                            "selections": (v11/*: any*/),
+                            "storageKey": "evidences(first:50)"
+                          },
+                          {
+                            "alias": null,
+                            "args": (v13/*: any*/),
+                            "filters": null,
+                            "handle": "connection",
+                            "key": "ControlOverviewPage_evidences",
+                            "kind": "LinkedHandle",
+                            "name": "evidences"
+                          },
+                          (v7/*: any*/)
+                        ],
+                        "storageKey": null
+                      },
+                      (v8/*: any*/)
+                    ],
+                    "storageKey": null
+                  },
+                  (v9/*: any*/),
+                  (v10/*: any*/)
+                ],
                 "storageKey": "tasks(first:100)"
               },
               {
                 "alias": null,
-                "args": (v9/*: any*/),
+                "args": (v12/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "ControlOverviewPage_tasks",
@@ -341,10 +413,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ae3ac6c53719fa3d9c1953ff40c75005",
+    "cacheID": "9738657b3d99bf6d85fd5333972e68f1",
     "id": null,
     "metadata": {
       "connection": [
+        {
+          "count": null,
+          "cursor": null,
+          "direction": "forward",
+          "path": null
+        },
         {
           "count": null,
           "cursor": null,
@@ -358,11 +436,11 @@ return {
     },
     "name": "ControlOverviewPageQuery",
     "operationKind": "query",
-    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            evidences(first: 10) {\n              edges {\n                node {\n                  id\n                  fileUrl\n                  mimeType\n                  size\n                  state\n                  createdAt\n                }\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  fileUrl\n                  mimeType\n                  size\n                  state\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ad8c4a4980229230ca295c4cb9a2c836";
+(node as any).hash = "5c2829a1e6bc18d96db9e608fbfc4d6f";
 
 export default node;

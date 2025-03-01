@@ -4,7 +4,7 @@ import {
   useState,
   useRef,
   DragEvent,
-  useMemo,
+  useCallback,
 } from "react";
 import { useParams, useNavigate } from "react-router";
 import {
@@ -49,10 +49,7 @@ import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from ".
 import type { ControlOverviewPageUpdateTaskStateMutation as ControlOverviewPageUpdateTaskStateMutationType } from "./__generated__/ControlOverviewPageUpdateTaskStateMutation.graphql";
 import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreateTaskMutationType } from "./__generated__/ControlOverviewPageCreateTaskMutation.graphql";
 import type { ControlOverviewPageDeleteTaskMutation as ControlOverviewPageDeleteTaskMutationType } from "./__generated__/ControlOverviewPageDeleteTaskMutation.graphql";
-import type {
-  ControlOverviewPageUploadEvidenceMutation as ControlOverviewPageUploadEvidenceMutationType,
-  EvidenceState,
-} from "./__generated__/ControlOverviewPageUploadEvidenceMutation.graphql";
+import type { ControlOverviewPageUploadEvidenceMutation as ControlOverviewPageUploadEvidenceMutationType } from "./__generated__/ControlOverviewPageUploadEvidenceMutation.graphql";
 
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
@@ -64,13 +61,16 @@ const controlOverviewPageQuery = graphql`
         state
         category
         tasks(first: 100) @connection(key: "ControlOverviewPage_tasks") {
+          __id
           edges {
             node {
               id
               name
               description
               state
-              evidences(first: 10) {
+              evidences(first: 50)
+                @connection(key: "ControlOverviewPage_evidences") {
+                __id
                 edges {
                   node {
                     id
@@ -152,29 +152,6 @@ const uploadEvidenceMutation = graphql`
   }
 `;
 
-// Use the Relay-generated types with extensions for fields that might not be in the generated types yet
-type EvidenceNode = {
-  id: string;
-  name: string;
-  fileUrl: string;
-  mimeType: string;
-  size: number;
-  state: EvidenceState;
-  createdAt: string;
-};
-
-type TaskNode = {
-  id: string;
-  name: string;
-  description: string;
-  state: string;
-  evidences?: {
-    edges: Array<{
-      node: EvidenceNode | null;
-    } | null>;
-  };
-};
-
 function ControlOverviewPageContent({
   queryRef,
 }: {
@@ -199,9 +176,6 @@ function ControlOverviewPageContent({
     useMutation<ControlOverviewPageUploadEvidenceMutationType>(
       uploadEvidenceMutation
     );
-  const control = data.control;
-  const tasks =
-    control?.tasks?.edges.map((edge) => edge?.node as TaskNode) ?? [];
 
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
@@ -232,13 +206,19 @@ function ControlOverviewPageContent({
     string | null
   >(null);
 
-  // Get the connection ID for Relay
-  const connectionId = useMemo(() => {
-    // The connection key is defined in the GraphQL query as "ControlOverviewPage_tasks"
-    return control?.id ? `client:${control.id}:tasks{"first":100}` : null;
-  }, [control?.id]);
+  const tasks = data.control.tasks?.edges.map((edge) => edge.node) || [];
 
-  // Add global drag event handlers to detect when a file is being dragged
+  const getEvidenceConnectionId = useCallback(
+    (taskId: string) => {
+      const task = tasks.find((t) => t.id === taskId);
+      if (task?.evidences?.__id) {
+        return task.evidences.__id;
+      }
+      return null;
+    },
+    [tasks]
+  );
+
   useEffect(() => {
     const handleDragEnter = (e: globalThis.DragEvent) => {
       e.preventDefault();
@@ -289,11 +269,9 @@ function ControlOverviewPageContent({
       },
       optimisticResponse: {
         updateTaskState: {
-          taskEdge: {
-            node: {
-              id: taskId,
-              state: newState,
-            },
+          task: {
+            id: taskId,
+            state: newState,
           },
         },
       },
@@ -325,7 +303,7 @@ function ControlOverviewPageContent({
       return;
     }
 
-    if (!control?.id) {
+    if (!data.control.id) {
       toast({
         title: "Error creating task",
         description: "Control ID is missing",
@@ -336,9 +314,9 @@ function ControlOverviewPageContent({
 
     createTask({
       variables: {
-        connections: [],
+        connections: [`${data.control.tasks?.__id}`],
         input: {
-          controlId: control.id,
+          controlId: data.control.id,
           name: newTaskName,
           description: newTaskDescription,
         },
@@ -372,7 +350,7 @@ function ControlOverviewPageContent({
 
     deleteTask({
       variables: {
-        connections: connectionId ? [connectionId] : [],
+        connections: [`${data.control.tasks?.__id}`],
         input: {
           taskId: taskToDelete.id,
         },
@@ -413,6 +391,9 @@ function ControlOverviewPageContent({
 
     const file = fileInputRef.current.files[0];
 
+    // Get the evidence connection ID for this task
+    const evidenceConnectionId = getEvidenceConnectionId(taskForEvidence.id);
+
     uploadEvidence({
       variables: {
         input: {
@@ -420,7 +401,7 @@ function ControlOverviewPageContent({
           name: evidenceName || file.name,
           file: null,
         },
-        connections: connectionId ? [connectionId] : [],
+        connections: evidenceConnectionId ? [evidenceConnectionId] : [],
       },
       uploadables: {
         "input.file": file,
@@ -479,6 +460,9 @@ function ControlOverviewPageContent({
       description: `Uploading ${file.name}...`,
     });
 
+    // Get the evidence connection ID for this task
+    const evidenceConnectionId = getEvidenceConnectionId(taskId);
+
     uploadEvidence({
       variables: {
         input: {
@@ -486,7 +470,7 @@ function ControlOverviewPageContent({
           name: file.name,
           file: null,
         },
-        connections: connectionId ? [connectionId] : [],
+        connections: evidenceConnectionId ? [evidenceConnectionId] : [],
       },
       uploadables: {
         "input.file": file,
@@ -555,12 +539,12 @@ function ControlOverviewPageContent({
   return (
     <>
       <Helmet>
-        <title>{control?.name || "Control"} - Probo</title>
+        <title>{data.control.name || "Control"} - Probo</title>
       </Helmet>
       <div className="min-h-screen bg-white p-6 space-y-6">
         <div className="space-y-4 mb-8">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">{control?.name}</h1>
+            <h1 className="text-2xl font-semibold">{data.control.name}</h1>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleEditControl}>
                 Edit Control
@@ -576,7 +560,7 @@ function ControlOverviewPageContent({
               </div>
             </div>
           </div>
-          <p className="text-gray-600 max-w-3xl">{control?.description}</p>
+          <p className="text-gray-600 max-w-3xl">{data.control.description}</p>
         </div>
 
         <Card className="bg-gray-50 border border-gray-200">
@@ -587,14 +571,14 @@ function ControlOverviewPageContent({
               >
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    control?.state === "IMPLEMENTED"
+                    data.control.state === "IMPLEMENTED"
                       ? "bg-green-500"
                       : "bg-gray-300"
                   }`}
                 />
               </div>
               <span className="text-sm text-gray-700">
-                {control?.state === "IMPLEMENTED"
+                {data.control.state === "IMPLEMENTED"
                   ? "Validated"
                   : "Not validated"}
               </span>
@@ -818,60 +802,57 @@ function ControlOverviewPageContent({
 
                     {expandedEvidenceTaskId === task.id && (
                       <div className="bg-white border-t border-gray-200 p-3 space-y-2">
-                        {task.evidences.edges.map(
-                          (edge: { node: EvidenceNode | null } | null) => {
-                            const evidence = edge?.node;
-                            if (!evidence) return null;
+                        {task.evidences.edges.map((edge) => {
+                          if (!edge) return null;
+                          const evidence = edge.node;
+                          if (!evidence) return null;
 
-                            return (
-                              <div
-                                key={evidence.id}
-                                className="flex items-center justify-between p-2 rounded border border-gray-200 hover:border-blue-300 transition-colors"
-                              >
-                                <div className="flex items-center gap-2">
-                                  {getFileIcon(evidence.mimeType)}
-                                  <div>
-                                    <div className="text-sm font-medium text-gray-700">
-                                      {evidence.name}
-                                    </div>
-                                    <div className="text-xs text-gray-500 flex items-center gap-2">
-                                      <span>
-                                        {formatFileSize(evidence.size)}
-                                      </span>
-                                      <span>•</span>
-                                      <span>
-                                        {formatDate(evidence.createdAt)}
-                                      </span>
-                                    </div>
+                          return (
+                            <div
+                              key={evidence.id}
+                              className="flex items-center justify-between p-2 rounded border border-gray-200 hover:border-blue-300 transition-colors"
+                            >
+                              <div className="flex items-center gap-2">
+                                {getFileIcon(evidence.mimeType)}
+                                <div>
+                                  <div className="text-sm font-medium text-gray-700">
+                                    {evidence.name}
+                                  </div>
+                                  <div className="text-xs text-gray-500 flex items-center gap-2">
+                                    <span>{formatFileSize(evidence.size)}</span>
+                                    <span>•</span>
+                                    <span>
+                                      {formatDate(evidence.createdAt)}
+                                    </span>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  {evidence.mimeType.startsWith("image/") && (
-                                    <a
-                                      href={evidence.fileUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="p-1 rounded-full hover:bg-gray-100"
-                                      title="Preview"
-                                    >
-                                      <Eye className="w-4 h-4 text-gray-600" />
-                                    </a>
-                                  )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {evidence.mimeType.startsWith("image/") && (
                                   <a
                                     href={evidence.fileUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="p-1 rounded-full hover:bg-gray-100"
-                                    title="Download"
-                                    download
+                                    title="Preview"
                                   >
-                                    <Download className="w-4 h-4 text-gray-600" />
+                                    <Eye className="w-4 h-4 text-gray-600" />
                                   </a>
-                                </div>
+                                )}
+                                <a
+                                  href={evidence.fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1 rounded-full hover:bg-gray-100"
+                                  title="Download"
+                                  download
+                                >
+                                  <Download className="w-4 h-4 text-gray-600" />
+                                </a>
                               </div>
-                            );
-                          }
-                        )}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </>
