@@ -568,24 +568,18 @@ function ControlOverviewPageContent({
     filename: string;
     mimeType: string;
   }) => {
-    // Just open the modal with the evidence info
     setPreviewEvidence({
       id: evidence.id,
       filename: evidence.filename,
       mimeType: evidence.mimeType,
     });
     setIsPreviewModalOpen(true);
-
-    // We'll fetch the fileUrl when the modal opens
     setIsLoadingFileUrl(true);
-
-    // Use GraphQL query to fetch the fileUrl
     fetchQuery(environment, getEvidenceFileUrlQuery, {
       evidenceId: evidence.id,
     })
       .toPromise()
       .then((response) => {
-        // Type assertion for the response
         const data = response as { node?: { id: string; fileUrl?: string } };
 
         if (data?.node?.fileUrl) {
