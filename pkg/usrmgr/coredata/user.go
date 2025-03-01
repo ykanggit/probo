@@ -16,6 +16,7 @@ package coredata
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/getprobo/probo/pkg/gid"
@@ -26,30 +27,18 @@ import (
 
 type (
 	User struct {
-		ID             gid.GID
-		EmailAddress   string
-		HashedPassword []byte
-		FullName       string
-		OrganizationID gid.GID
-		CreatedAt      time.Time
-		UpdatedAt      time.Time
+		ID             gid.GID   `db:"id"`
+		EmailAddress   string    `db:"email_address"`
+		HashedPassword []byte    `db:"hashed_password"`
+		FullName       string    `db:"fullname"`
+		OrganizationID gid.GID   `db:"organization_id"`
+		CreatedAt      time.Time `db:"created_at"`
+		UpdatedAt      time.Time `db:"updated_at"`
 	}
 )
 
 func (u User) CursorKey() page.CursorKey {
 	return page.NewCursorKey(u.ID, u.CreatedAt)
-}
-
-func (u *User) scan(r pgx.Row) error {
-	return r.Scan(
-		&u.ID,
-		&u.EmailAddress,
-		&u.HashedPassword,
-		&u.FullName,
-		&u.OrganizationID,
-		&u.CreatedAt,
-		&u.UpdatedAt,
-	)
 }
 
 func (u *User) LoadByEmail(
@@ -75,14 +64,17 @@ LIMIT 1;
 
 	args := pgx.NamedArgs{"user_email": email}
 
-	r := conn.QueryRow(ctx, q, args)
-
-	u2 := User{}
-	if err := u2.scan(r); err != nil {
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query user: %w", err)
 	}
 
-	*u = u2
+	user, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[User])
+	if err != nil {
+		return fmt.Errorf("cannot collect user: %w", err)
+	}
+
+	*u = user
 
 	return nil
 }
@@ -110,14 +102,17 @@ LIMIT 1;
 
 	args := pgx.NamedArgs{"user_id": userID}
 
-	r := conn.QueryRow(ctx, q, args)
-
-	u2 := User{}
-	if err := u2.scan(r); err != nil {
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query user: %w", err)
 	}
 
-	*u = u2
+	user, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[User])
+	if err != nil {
+		return fmt.Errorf("cannot collect user: %w", err)
+	}
+
+	*u = user
 
 	return nil
 }

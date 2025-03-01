@@ -16,7 +16,6 @@ package coredata
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"maps"
 	"time"
@@ -29,15 +28,15 @@ import (
 
 type (
 	People struct {
-		ID                       gid.GID
-		OrganizationID           gid.GID
-		Kind                     PeopleKind
-		FullName                 string
-		PrimaryEmailAddress      string
-		AdditionalEmailAddresses []string
-		CreatedAt                time.Time
-		UpdatedAt                time.Time
-		Version                  int
+		ID                       gid.GID    `db:"id"`
+		OrganizationID           gid.GID    `db:"organization_id"`
+		Kind                     PeopleKind `db:"kind"`
+		FullName                 string     `db:"full_name"`
+		PrimaryEmailAddress      string     `db:"primary_email_address"`
+		AdditionalEmailAddresses []string   `db:"additional_email_addresses"`
+		CreatedAt                time.Time  `db:"created_at"`
+		UpdatedAt                time.Time  `db:"updated_at"`
+		Version                  int        `db:"version"`
 	}
 
 	Peoples []*People
@@ -53,20 +52,6 @@ type (
 
 func (p People) CursorKey() page.CursorKey {
 	return page.NewCursorKey(p.ID, p.CreatedAt)
-}
-
-func (p *People) scan(r pgx.Row) error {
-	return r.Scan(
-		&p.ID,
-		&p.OrganizationID,
-		&p.Kind,
-		&p.FullName,
-		&p.PrimaryEmailAddress,
-		&p.AdditionalEmailAddresses,
-		&p.CreatedAt,
-		&p.UpdatedAt,
-		&p.Version,
-	)
 }
 
 func (p *People) LoadByID(
@@ -99,14 +84,17 @@ LIMIT 1;
 	args := pgx.NamedArgs{"people_id": peopleID}
 	maps.Copy(args, scope.SQLArguments())
 
-	r := conn.QueryRow(ctx, q, args)
-
-	p2 := People{}
-	if err := p2.scan(r); err != nil {
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query people: %w", err)
 	}
 
-	*p = p2
+	people, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[People])
+	if err != nil {
+		return fmt.Errorf("cannot collect people: %w", err)
+	}
+
+	*p = people
 
 	return nil
 }
@@ -206,24 +194,14 @@ WHERE
 	maps.Copy(args, cursor.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
-	r, err := conn.Query(ctx, q, args)
+	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	peoples := Peoples{}
-	for r.Next() {
-		people := &People{}
-		if err := people.scan(r); err != nil {
-			return err
-		}
-
-		peoples = append(peoples, people)
+		return fmt.Errorf("cannot query people: %w", err)
 	}
 
-	if err := r.Err(); err != nil {
-		return err
+	peoples, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[People])
+	if err != nil {
+		return fmt.Errorf("cannot collect people: %w", err)
 	}
 
 	*p = peoples
@@ -282,16 +260,17 @@ RETURNING
 
 	maps.Copy(args, scope.SQLArguments())
 
-	r := conn.QueryRow(ctx, q, args)
-
-	p2 := People{}
-	if err := p2.scan(r); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return ErrConcurrentModification
-		}
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query people: %w", err)
 	}
 
-	*p = p2
+	people, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[People])
+	if err != nil {
+		return fmt.Errorf("cannot collect people: %w", err)
+	}
+
+	*p = people
+
 	return nil
 }

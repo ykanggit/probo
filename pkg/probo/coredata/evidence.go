@@ -28,15 +28,15 @@ import (
 
 type (
 	Evidence struct {
-		ID        gid.GID
-		TaskID    gid.GID
-		State     EvidenceState
-		ObjectKey string
-		MimeType  string
-		Size      uint64
-		Filename  string
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		ID        gid.GID       `db:"id"`
+		TaskID    gid.GID       `db:"task_id"`
+		State     EvidenceState `db:"state"`
+		ObjectKey string        `db:"object_key"`
+		MimeType  string        `db:"mime_type"`
+		Size      uint64        `db:"size"`
+		Filename  string        `db:"filename"`
+		CreatedAt time.Time     `db:"created_at"`
+		UpdatedAt time.Time     `db:"updated_at"`
 	}
 
 	Evidences []*Evidence
@@ -44,20 +44,6 @@ type (
 
 func (e Evidence) CursorKey() page.CursorKey {
 	return page.NewCursorKey(e.ID, e.CreatedAt)
-}
-
-func (e *Evidence) scan(r pgx.Row) error {
-	return r.Scan(
-		&e.ID,
-		&e.TaskID,
-		&e.State,
-		&e.ObjectKey,
-		&e.MimeType,
-		&e.Size,
-		&e.Filename,
-		&e.CreatedAt,
-		&e.UpdatedAt,
-	)
 }
 
 func (e Evidence) Insert(
@@ -149,14 +135,17 @@ LIMIT 1;
 	args := pgx.NamedArgs{"evidence_id": evidenceID}
 	maps.Copy(args, scope.SQLArguments())
 
-	r := conn.QueryRow(ctx, q, args)
-
-	e2 := Evidence{}
-	if err := e2.scan(r); err != nil {
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query evidence: %w", err)
 	}
 
-	*e = e2
+	evidence, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Evidence])
+	if err != nil {
+		return fmt.Errorf("cannot collect evidence: %w", err)
+	}
+
+	*e = evidence
 
 	return nil
 }
@@ -208,24 +197,14 @@ WHERE
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
-	r, err := conn.Query(ctx, q, args)
+	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	evidences := Evidences{}
-	for r.Next() {
-		evidence := &Evidence{}
-		if err := evidence.scan(r); err != nil {
-			return err
-		}
-
-		evidences = append(evidences, evidence)
+		return fmt.Errorf("cannot query evidence: %w", err)
 	}
 
-	if err := r.Err(); err != nil {
-		return err
+	evidences, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Evidence])
+	if err != nil {
+		return fmt.Errorf("cannot collect evidence: %w", err)
 	}
 
 	*e = evidences

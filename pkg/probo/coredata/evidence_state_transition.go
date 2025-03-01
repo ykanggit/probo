@@ -29,7 +29,7 @@ type (
 	EvidenceStateTransition struct {
 		StateTransition[EvidenceState]
 
-		EvidenceID gid.GID
+		EvidenceID gid.GID `db:"evidence_id"`
 	}
 
 	EvidenceStateTransitions []*EvidenceStateTransition
@@ -37,18 +37,6 @@ type (
 
 func (cst EvidenceStateTransition) CursorKey() page.CursorKey {
 	return page.NewCursorKey(cst.ID, cst.CreatedAt)
-}
-
-func (cst *EvidenceStateTransition) scan(r pgx.Row) error {
-	return r.Scan(
-		&cst.ID,
-		&cst.EvidenceID,
-		&cst.FromState,
-		&cst.ToState,
-		&cst.Reason,
-		&cst.CreatedAt,
-		&cst.UpdatedAt,
-	)
 }
 
 func (est EvidenceStateTransition) Insert(
@@ -119,24 +107,14 @@ WHERE
 	args := pgx.NamedArgs{"evidence_id": evidenceID}
 	maps.Copy(args, scope.SQLArguments())
 
-	r, err := conn.Query(ctx, q, args)
+	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	evidenceStateTransitions := EvidenceStateTransitions{}
-	for r.Next() {
-		evidenceStateTransition := &EvidenceStateTransition{}
-		if err := evidenceStateTransition.scan(r); err != nil {
-			return err
-		}
-
-		evidenceStateTransitions = append(evidenceStateTransitions, evidenceStateTransition)
+		return fmt.Errorf("cannot query evidence state transitions: %w", err)
 	}
 
-	if err := r.Err(); err != nil {
-		return err
+	evidenceStateTransitions, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[EvidenceStateTransition])
+	if err != nil {
+		return fmt.Errorf("cannot collect evidence state transitions: %w", err)
 	}
 
 	*cst = evidenceStateTransitions

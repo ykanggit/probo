@@ -16,7 +16,6 @@ package coredata
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"maps"
 	"time"
@@ -29,14 +28,14 @@ import (
 
 type (
 	Framework struct {
-		ID             gid.GID
-		OrganizationID gid.GID
-		Name           string
-		Description    string
-		ContentRef     string
-		CreatedAt      time.Time
-		UpdatedAt      time.Time
-		Version        int
+		ID             gid.GID   `db:"id"`
+		OrganizationID gid.GID   `db:"organization_id"`
+		Name           string    `db:"name"`
+		Description    string    `db:"description"`
+		ContentRef     string    `db:"content_ref"`
+		CreatedAt      time.Time `db:"created_at"`
+		UpdatedAt      time.Time `db:"updated_at"`
+		Version        int       `db:"version"`
 	}
 
 	Frameworks []*Framework
@@ -50,19 +49,6 @@ type (
 
 func (f Framework) CursorKey() page.CursorKey {
 	return page.NewCursorKey(f.ID, f.CreatedAt)
-}
-
-func (f *Framework) scan(r pgx.Row) error {
-	return r.Scan(
-		&f.ID,
-		&f.OrganizationID,
-		&f.Name,
-		&f.Description,
-		&f.ContentRef,
-		&f.CreatedAt,
-		&f.UpdatedAt,
-		&f.Version,
-	)
 }
 
 func (f *Frameworks) LoadByOrganizationID(
@@ -96,24 +82,14 @@ WHERE
 	maps.Copy(args, cursor.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
-	r, err := conn.Query(ctx, q, args)
+	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	frameworks := Frameworks{}
-	for r.Next() {
-		framework := &Framework{}
-		if err := framework.scan(r); err != nil {
-			return err
-		}
-
-		frameworks = append(frameworks, framework)
+		return fmt.Errorf("cannot query frameworks: %w", err)
 	}
 
-	if err := r.Err(); err != nil {
-		return err
+	frameworks, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Framework])
+	if err != nil {
+		return fmt.Errorf("cannot collect frameworks: %w", err)
 	}
 
 	*f = frameworks
@@ -149,14 +125,17 @@ LIMIT 1;
 
 	args := pgx.NamedArgs{"framework_id": frameworkID}
 	maps.Copy(args, scope.SQLArguments())
-	r := conn.QueryRow(ctx, q, args)
-
-	f2 := Framework{}
-	if err := f2.scan(r); err != nil {
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query frameworks: %w", err)
 	}
 
-	*f = f2
+	framework, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Framework])
+	if err != nil {
+		return fmt.Errorf("cannot collect framework: %w", err)
+	}
+
+	*f = framework
 
 	return nil
 }
@@ -267,16 +246,17 @@ RETURNING
 
 	maps.Copy(args, scope.SQLArguments())
 
-	r := conn.QueryRow(ctx, q, args)
-
-	f2 := Framework{}
-	if err := f2.scan(r); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return ErrConcurrentModification
-		}
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query frameworks: %w", err)
 	}
 
-	*f = f2
+	framework, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Framework])
+	if err != nil {
+		return fmt.Errorf("cannot collect framework: %w", err)
+	}
+
+	*f = framework
+
 	return nil
 }

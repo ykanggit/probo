@@ -16,7 +16,6 @@ package coredata
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"maps"
 	"time"
@@ -30,16 +29,16 @@ import (
 
 type (
 	Control struct {
-		ID          gid.GID
-		FrameworkID gid.GID
-		Category    string
-		Name        string
-		Description string
-		State       ControlState
-		ContentRef  string
-		CreatedAt   time.Time
-		UpdatedAt   time.Time
-		Version     int
+		ID          gid.GID      `db:"id"`
+		FrameworkID gid.GID      `db:"framework_id"`
+		Category    string       `db:"category"`
+		Name        string       `db:"name"`
+		Description string       `db:"description"`
+		State       ControlState `db:"state"`
+		ContentRef  string       `db:"content_ref"`
+		CreatedAt   time.Time    `db:"created_at"`
+		UpdatedAt   time.Time    `db:"updated_at"`
+		Version     int          `db:"version"`
 	}
 
 	Controls []*Control
@@ -57,22 +56,7 @@ func (c Control) CursorKey() page.CursorKey {
 	return page.NewCursorKey(c.ID, c.CreatedAt)
 }
 
-func (c *Control) scan(r pgx.Row) error {
-	return r.Scan(
-		&c.ID,
-		&c.FrameworkID,
-		&c.Category,
-		&c.Name,
-		&c.Description,
-		&c.State,
-		&c.ContentRef,
-		&c.CreatedAt,
-		&c.UpdatedAt,
-		&c.Version,
-	)
-}
-
-func (v *Control) LoadByID(
+func (c *Control) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope *Scope,
@@ -119,14 +103,17 @@ LIMIT 1;
 	args := pgx.NamedArgs{"control_id": controlID}
 	maps.Copy(args, scope.SQLArguments())
 
-	r := conn.QueryRow(ctx, q, args)
-
-	c2 := Control{}
-	if err := c2.scan(r); err != nil {
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query controls: %w", err)
 	}
 
-	*v = c2
+	control, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Control])
+	if err != nil {
+		return fmt.Errorf("cannot collect controls: %w", err)
+	}
+
+	*c = control
 
 	return nil
 }
@@ -222,24 +209,14 @@ WHERE
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
-	r, err := conn.Query(ctx, q, args)
+	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	controls := Controls{}
-	for r.Next() {
-		control := &Control{}
-		if err := control.scan(r); err != nil {
-			return err
-		}
-
-		controls = append(controls, control)
+		return fmt.Errorf("cannot query controls: %w", err)
 	}
 
-	if err := r.Err(); err != nil {
-		return err
+	controls, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Control])
+	if err != nil {
+		return fmt.Errorf("cannot collect controls: %w", err)
 	}
 
 	*c = controls
@@ -306,16 +283,17 @@ RETURNING
 
 	maps.Copy(args, scope.SQLArguments())
 
-	r := conn.QueryRow(ctx, q, args)
-
-	c2 := Control{}
-	if err := c2.scan(r); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return ErrConcurrentModification
-		}
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query controls: %w", err)
 	}
 
-	*c = c2
+	control, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Control])
+	if err != nil {
+		return fmt.Errorf("cannot collect controls: %w", err)
+	}
+
+	*c = control
+
 	return nil
 }

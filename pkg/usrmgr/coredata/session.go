@@ -16,6 +16,7 @@ package coredata
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/getprobo/probo/pkg/gid"
@@ -26,26 +27,16 @@ import (
 
 type (
 	Session struct {
-		ID        gid.GID
-		UserID    gid.GID
-		ExpiredAt time.Time
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		ID        gid.GID   `db:"id"`
+		UserID    gid.GID   `db:"user_id"`
+		ExpiredAt time.Time `db:"expired_at"`
+		CreatedAt time.Time `db:"created_at"`
+		UpdatedAt time.Time `db:"updated_at"`
 	}
 )
 
 func (s Session) CursorKey() page.CursorKey {
 	return page.NewCursorKey(s.ID, s.CreatedAt)
-}
-
-func (s *Session) scan(r pgx.Row) error {
-	return r.Scan(
-		&s.ID,
-		&s.UserID,
-		&s.ExpiredAt,
-		&s.CreatedAt,
-		&s.UpdatedAt,
-	)
 }
 
 func (s *Session) LoadByID(
@@ -69,14 +60,16 @@ LIMIT 1;
 
 	args := pgx.NamedArgs{"session_id": sessionID}
 
-	r := conn.QueryRow(ctx, q, args)
-
-	s2 := Session{}
-	if err := s2.scan(r); err != nil {
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query session: %w", err)
 	}
 
-	*s = s2
+	session, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Session])
+	if err != nil {
+		return fmt.Errorf("cannot collect session: %w", err)
+	}
+	*s = session
 
 	return nil
 }

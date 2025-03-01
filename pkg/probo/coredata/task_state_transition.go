@@ -27,9 +27,8 @@ import (
 
 type (
 	TaskStateTransition struct {
-		TaskID gid.GID
-
 		StateTransition[TaskState]
+		TaskID gid.GID `db:"task_id"`
 	}
 
 	TaskStateTransitions []*TaskStateTransition
@@ -37,18 +36,6 @@ type (
 
 func (tst TaskStateTransition) CursorKey() page.CursorKey {
 	return page.NewCursorKey(tst.ID, tst.CreatedAt)
-}
-
-func (tst *TaskStateTransition) scan(r pgx.Row) error {
-	return r.Scan(
-		&tst.ID,
-		&tst.TaskID,
-		&tst.FromState,
-		&tst.ToState,
-		&tst.Reason,
-		&tst.CreatedAt,
-		&tst.UpdatedAt,
-	)
 }
 
 func (tst TaskStateTransition) Insert(
@@ -119,24 +106,14 @@ WHERE
 	args := pgx.NamedArgs{"task_id": taskID}
 	maps.Copy(args, scope.SQLArguments())
 
-	r, err := conn.Query(ctx, q, args)
+	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	taskStateTransitions := TaskStateTransitions{}
-	for r.Next() {
-		taskStateTransition := &TaskStateTransition{}
-		if err := taskStateTransition.scan(r); err != nil {
-			return err
-		}
-
-		taskStateTransitions = append(taskStateTransitions, taskStateTransition)
+		return fmt.Errorf("cannot query task state transitions: %w", err)
 	}
 
-	if err := r.Err(); err != nil {
-		return err
+	taskStateTransitions, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[TaskStateTransition])
+	if err != nil {
+		return fmt.Errorf("cannot collect task state transitions: %w", err)
 	}
 
 	*tst = taskStateTransitions

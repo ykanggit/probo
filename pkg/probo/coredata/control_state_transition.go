@@ -29,7 +29,7 @@ type (
 	ControlStateTransition struct {
 		StateTransition[ControlState]
 
-		ControlID gid.GID
+		ControlID gid.GID `db:"control_id"`
 	}
 
 	ControlStateTransitions []*ControlStateTransition
@@ -37,18 +37,6 @@ type (
 
 func (cst ControlStateTransition) CursorKey() page.CursorKey {
 	return page.NewCursorKey(cst.ID, cst.CreatedAt)
-}
-
-func (cst *ControlStateTransition) scan(r pgx.Row) error {
-	return r.Scan(
-		&cst.ID,
-		&cst.ControlID,
-		&cst.FromState,
-		&cst.ToState,
-		&cst.Reason,
-		&cst.CreatedAt,
-		&cst.UpdatedAt,
-	)
 }
 
 func (cst ControlStateTransition) Insert(
@@ -119,27 +107,17 @@ WHERE
 	args := pgx.NamedArgs{"control_id": controlID}
 	maps.Copy(args, scope.SQLArguments())
 
-	r, err := conn.Query(ctx, q, args)
+	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	controlStateTransitions := ControlStateTransitions{}
-	for r.Next() {
-		controlStateTransition := &ControlStateTransition{}
-		if err := controlStateTransition.scan(r); err != nil {
-			return err
-		}
-
-		controlStateTransitions = append(controlStateTransitions, controlStateTransition)
+		return fmt.Errorf("cannot query control state transitions: %w", err)
 	}
 
-	if err := r.Err(); err != nil {
-		return err
+	controlStateTransitions, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[ControlStateTransition])
+	if err != nil {
+		return fmt.Errorf("cannot collect control state transitions: %w", err)
 	}
 
-	*cst = controlStateTransitions
+	*cst = ControlStateTransitions(controlStateTransitions)
 
 	return nil
 }

@@ -29,14 +29,14 @@ import (
 
 type (
 	Task struct {
-		ID          gid.GID
-		ControlID   gid.GID
-		Name        string
-		Description string
-		State       TaskState
-		ContentRef  string
-		CreatedAt   time.Time
-		UpdatedAt   time.Time
+		ID          gid.GID   `db:"id"`
+		ControlID   gid.GID   `db:"control_id"`
+		Name        string    `db:"name"`
+		Description string    `db:"description"`
+		State       TaskState `db:"state"`
+		ContentRef  string    `db:"content_ref"`
+		CreatedAt   time.Time `db:"created_at"`
+		UpdatedAt   time.Time `db:"updated_at"`
 	}
 
 	Tasks []*Task
@@ -44,19 +44,6 @@ type (
 
 func (t Task) CursorKey() page.CursorKey {
 	return page.NewCursorKey(t.ID, t.CreatedAt)
-}
-
-func (t *Task) scan(r pgx.Row) error {
-	return r.Scan(
-		&t.ID,
-		&t.ControlID,
-		&t.Name,
-		&t.Description,
-		&t.State,
-		&t.ContentRef,
-		&t.CreatedAt,
-		&t.UpdatedAt,
-	)
 }
 
 func (t *Task) LoadByID(
@@ -122,14 +109,17 @@ LIMIT 1;
 	args := pgx.NamedArgs{"task_id": taskID}
 	maps.Copy(args, scope.SQLArguments())
 
-	r := conn.QueryRow(ctx, q, args)
-
-	t2 := Task{}
-	if err := t2.scan(r); err != nil {
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query task: %w", err)
 	}
 
-	*t = t2
+	task, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Task])
+	if err != nil {
+		return fmt.Errorf("cannot collect task: %w", err)
+	}
+
+	*t = task
 
 	return nil
 }
@@ -245,24 +235,14 @@ WHERE
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
-	r, err := conn.Query(ctx, q, args)
+	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	tasks := Tasks{}
-	for r.Next() {
-		task := &Task{}
-		if err := task.scan(r); err != nil {
-			return err
-		}
-
-		tasks = append(tasks, task)
+		return fmt.Errorf("cannot query tasks: %w", err)
 	}
 
-	if err := r.Err(); err != nil {
-		return err
+	tasks, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Task])
+	if err != nil {
+		return fmt.Errorf("cannot collect tasks: %w", err)
 	}
 
 	*t = tasks
@@ -275,7 +255,6 @@ func (t *Task) Delete(
 	conn pg.Conn,
 	scope *Scope,
 ) error {
-	// Use a single transaction with conditional logic to handle both cases
 	q := `
 WITH control_count AS (
     SELECT COUNT(*) AS count FROM controls_tasks WHERE task_id = @task_id

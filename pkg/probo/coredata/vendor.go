@@ -31,20 +31,20 @@ var ErrConcurrentModification = errors.New("concurrent modification")
 
 type (
 	Vendor struct {
-		ID                   gid.GID
-		OrganizationID       gid.GID
-		Name                 string
-		Description          string
-		ServiceStartAt       time.Time
-		ServiceTerminationAt *time.Time
-		ServiceCriticality   ServiceCriticality
-		RiskTier             RiskTier
-		StatusPageURL        *string
-		TermsOfServiceURL    *string
-		PrivacyPolicyURL     *string
-		CreatedAt            time.Time
-		UpdatedAt            time.Time
-		Version              int
+		ID                   gid.GID            `db:"id"`
+		OrganizationID       gid.GID            `db:"organization_id"`
+		Name                 string             `db:"name"`
+		Description          string             `db:"description"`
+		ServiceStartAt       time.Time          `db:"service_start_at"`
+		ServiceTerminationAt *time.Time         `db:"service_termination_at"`
+		ServiceCriticality   ServiceCriticality `db:"service_criticality"`
+		RiskTier             RiskTier           `db:"risk_tier"`
+		StatusPageURL        *string            `db:"status_page_url"`
+		TermsOfServiceURL    *string            `db:"terms_of_service_url"`
+		PrivacyPolicyURL     *string            `db:"privacy_policy_url"`
+		CreatedAt            time.Time          `db:"created_at"`
+		UpdatedAt            time.Time          `db:"updated_at"`
+		Version              int                `db:"version"`
 	}
 
 	Vendors []*Vendor
@@ -65,25 +65,6 @@ type (
 
 func (v Vendor) CursorKey() page.CursorKey {
 	return page.NewCursorKey(v.ID, v.CreatedAt)
-}
-
-func (v *Vendor) scan(r pgx.Row) error {
-	return r.Scan(
-		&v.ID,
-		&v.OrganizationID,
-		&v.Name,
-		&v.Description,
-		&v.ServiceStartAt,
-		&v.ServiceTerminationAt,
-		&v.ServiceCriticality,
-		&v.RiskTier,
-		&v.StatusPageURL,
-		&v.TermsOfServiceURL,
-		&v.PrivacyPolicyURL,
-		&v.CreatedAt,
-		&v.UpdatedAt,
-		&v.Version,
-	)
 }
 
 func (v *Vendor) LoadByID(
@@ -121,14 +102,18 @@ LIMIT 1;
 	args := pgx.NamedArgs{"vendor_id": vendorID}
 	maps.Copy(args, scope.SQLArguments())
 
-	r := conn.QueryRow(ctx, q, args)
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query vendor: %w", err)
+	}
+	defer rows.Close()
 
-	v2 := Vendor{}
-	if err := v2.scan(r); err != nil {
-		return err
+	vendor, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Vendor])
+	if err != nil {
+		return fmt.Errorf("cannot collect vendor: %w", err)
 	}
 
-	*v = v2
+	*v = vendor
 
 	return nil
 }
@@ -247,24 +232,14 @@ WHERE
 	maps.Copy(args, cursor.SQLArguments())
 	maps.Copy(args, scope.SQLArguments())
 
-	r, err := conn.Query(ctx, q, args)
+	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	vendors := Vendors{}
-	for r.Next() {
-		vendor := &Vendor{}
-		if err := vendor.scan(r); err != nil {
-			return err
-		}
-
-		vendors = append(vendors, vendor)
+		return fmt.Errorf("cannot query vendors: %w", err)
 	}
 
-	if err := r.Err(); err != nil {
-		return err
+	vendors, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Vendor])
+	if err != nil {
+		return fmt.Errorf("cannot collect vendors: %w", err)
 	}
 
 	*v = vendors
@@ -348,16 +323,17 @@ RETURNING
 
 	maps.Copy(args, scope.SQLArguments())
 
-	r := conn.QueryRow(ctx, q, args)
-
-	v2 := Vendor{}
-	if err := v2.scan(r); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return ErrConcurrentModification
-		}
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query vendor: %w", err)
 	}
 
-	*v = v2
+	vendor, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Vendor])
+	if err != nil {
+		return fmt.Errorf("cannot collect vendor: %w", err)
+	}
+
+	*v = vendor
+
 	return nil
 }

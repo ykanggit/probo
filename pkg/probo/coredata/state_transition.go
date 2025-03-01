@@ -21,11 +21,11 @@ import (
 
 type (
 	StateTransition[T any] struct {
-		ID        gid.GID
-		FromState *T
-		ToState   T
-		Reason    *string
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		ID        gid.GID   `db:"id"`
+		ToState   T         `db:"to_state"`
+		FromState *T        `db:"from_state"`
+		Reason    *string   `db:"reason"`
+		CreatedAt time.Time `db:"created_at"`
+		UpdatedAt time.Time `db:"updated_at"`
 	}
 )

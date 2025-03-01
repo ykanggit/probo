@@ -27,23 +27,13 @@ import (
 
 type (
 	Organization struct {
-		ID        gid.GID
-		Name      string
-		LogoURL   string
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		ID        gid.GID   `db:"id"`
+		Name      string    `db:"name"`
+		LogoURL   string    `db:"logo_url"`
+		CreatedAt time.Time `db:"created_at"`
+		UpdatedAt time.Time `db:"updated_at"`
 	}
 )
-
-func (o *Organization) scan(r pgx.Row) error {
-	return r.Scan(
-		&o.ID,
-		&o.Name,
-		&o.LogoURL,
-		&o.CreatedAt,
-		&o.UpdatedAt,
-	)
-}
 
 func (o *Organization) LoadByID(
 	ctx context.Context,
@@ -71,14 +61,17 @@ LIMIT 1;
 	args := pgx.NamedArgs{"organization_id": organizationID}
 	maps.Copy(args, scope.SQLArguments())
 
-	r := conn.QueryRow(ctx, q, args)
-
-	o2 := Organization{}
-	if err := o2.scan(r); err != nil {
-		return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query organizations: %w", err)
 	}
 
-	*o = o2
+	organization, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Organization])
+	if err != nil {
+		return fmt.Errorf("cannot collect organization: %w", err)
+	}
+
+	*o = organization
 
 	return nil
 }
