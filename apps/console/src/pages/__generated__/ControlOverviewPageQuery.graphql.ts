@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<91fa70daabd409bc43d5e25a2fa98a13>>
+ * @generated SignedSource<<297a88bb87d59c4a4ed2f8dce93667c6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -22,7 +22,6 @@ export type ControlOverviewPageQuery$data = {
     readonly name?: string;
     readonly state?: ControlState;
     readonly tasks?: {
-      readonly __id: string;
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly description: string;
@@ -155,18 +154,6 @@ v8 = [
       }
     ],
     "storageKey": null
-  },
-  {
-    "kind": "ClientExtension",
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "__id",
-        "storageKey": null
-      }
-    ]
   }
 ],
 v9 = [
@@ -294,6 +281,6 @@ return {
 };
 })();
 
-(node as any).hash = "dfdddd9d98741d1e2bfabf4d4430756f";
+(node as any).hash = "dc8c7670eafe558966932c3fb4d45cd8";
 
 export default node;

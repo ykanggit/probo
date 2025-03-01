@@ -1,4 +1,11 @@
-import { Suspense, useEffect, useState, useRef } from "react";
+import {
+  Suspense,
+  useEffect,
+  useState,
+  useRef,
+  DragEvent,
+  useMemo,
+} from "react";
 import { useParams, useNavigate } from "react-router";
 import {
   graphql,
@@ -7,7 +14,14 @@ import {
   useQueryLoader,
   useMutation,
 } from "react-relay";
-import { CheckCircle2, Plus, Trash2, Upload } from "lucide-react";
+import {
+  CheckCircle2,
+  Plus,
+  Trash2,
+  Upload,
+  FileIcon,
+  Loader2,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -29,6 +43,7 @@ import type { ControlOverviewPageUpdateTaskStateMutation as ControlOverviewPageU
 import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreateTaskMutationType } from "./__generated__/ControlOverviewPageCreateTaskMutation.graphql";
 import type { ControlOverviewPageDeleteTaskMutation as ControlOverviewPageDeleteTaskMutationType } from "./__generated__/ControlOverviewPageDeleteTaskMutation.graphql";
 import type { ControlOverviewPageUploadEvidenceMutation as ControlOverviewPageUploadEvidenceMutationType } from "./__generated__/ControlOverviewPageUploadEvidenceMutation.graphql";
+
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
     control: node(id: $controlId) {
@@ -39,7 +54,6 @@ const controlOverviewPageQuery = graphql`
         state
         category
         tasks(first: 100) @connection(key: "ControlOverviewPage_tasks") {
-          __id
           edges {
             node {
               id
@@ -123,14 +137,14 @@ function ControlOverviewPageContent({
 }) {
   const data = usePreloadedQuery<ControlOverviewPageQueryType>(
     controlOverviewPageQuery,
-    queryRef,
+    queryRef
   );
   const { toast } = useToast();
   const { organizationId, frameworkId, controlId } = useParams();
   const navigate = useNavigate();
   const [updateTaskState] =
     useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
-      updateTaskStateMutation,
+      updateTaskStateMutation
     );
   const [createTask] =
     useMutation<ControlOverviewPageCreateTaskMutationType>(createTaskMutation);
@@ -138,7 +152,7 @@ function ControlOverviewPageContent({
     useMutation<ControlOverviewPageDeleteTaskMutationType>(deleteTaskMutation);
   const [uploadEvidence] =
     useMutation<ControlOverviewPageUploadEvidenceMutationType>(
-      uploadEvidenceMutation,
+      uploadEvidenceMutation
     );
   const control = data.control;
   const tasks = control?.tasks?.edges.map((edge) => edge?.node) ?? [];
@@ -160,6 +174,57 @@ function ControlOverviewPageContent({
   } | null>(null);
   const [evidenceName, setEvidenceName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [draggedOverTaskId, setDraggedOverTaskId] = useState<string | null>(
+    null
+  );
+  const [uploadingTaskId, setUploadingTaskId] = useState<string | null>(null);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
+
+  // Get the connection ID for Relay
+  const connectionId = useMemo(() => {
+    // The connection key is defined in the GraphQL query as "ControlOverviewPage_tasks"
+    return control?.id ? `client:${control.id}:tasks{"first":100}` : null;
+  }, [control?.id]);
+
+  // Add global drag event handlers to detect when a file is being dragged
+  useEffect(() => {
+    const handleDragEnter = (e: globalThis.DragEvent) => {
+      e.preventDefault();
+      if (e.dataTransfer?.types.includes("Files")) {
+        setIsDraggingFile(true);
+      }
+    };
+
+    const handleDragLeave = (e: globalThis.DragEvent) => {
+      e.preventDefault();
+      // Only set to false if we're leaving the window
+      if (!e.relatedTarget || (e.relatedTarget as Node).nodeName === "HTML") {
+        setIsDraggingFile(false);
+      }
+    };
+
+    const handleDragOver = (e: globalThis.DragEvent) => {
+      e.preventDefault();
+    };
+
+    const handleDrop = (e: globalThis.DragEvent) => {
+      e.preventDefault();
+      setIsDraggingFile(false);
+    };
+
+    document.addEventListener("dragenter", handleDragEnter);
+    document.addEventListener("dragleave", handleDragLeave);
+    document.addEventListener("dragover", handleDragOver);
+    document.addEventListener("drop", handleDrop);
+
+    return () => {
+      document.removeEventListener("dragenter", handleDragEnter);
+      document.removeEventListener("dragleave", handleDragLeave);
+      document.removeEventListener("dragover", handleDragOver);
+      document.removeEventListener("drop", handleDrop);
+    };
+  }, []);
 
   const handleTaskClick = (taskId: string, currentState: string) => {
     const newState = currentState === "DONE" ? "TODO" : "DONE";
@@ -220,7 +285,7 @@ function ControlOverviewPageContent({
 
     createTask({
       variables: {
-        connections: [`${data.control?.tasks?.__id}`],
+        connections: [],
         input: {
           controlId: control.id,
           name: newTaskName,
@@ -256,7 +321,7 @@ function ControlOverviewPageContent({
 
     deleteTask({
       variables: {
-        connections: [`${data.control?.tasks?.__id}`],
+        connections: connectionId ? [connectionId] : [],
         input: {
           taskId: taskToDelete.id,
         },
@@ -281,7 +346,7 @@ function ControlOverviewPageContent({
 
   const handleEditControl = () => {
     navigate(
-      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}/update`,
+      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}/update`
     );
   };
 
@@ -304,7 +369,7 @@ function ControlOverviewPageContent({
           name: evidenceName || file.name,
           file: null,
         },
-        connections: [`client:${taskForEvidence.id}`],
+        connections: connectionId ? [connectionId] : [],
       },
       uploadables: {
         "input.file": file,
@@ -322,6 +387,68 @@ function ControlOverviewPageContent({
         }
       },
       onError: (error) => {
+        toast({
+          title: "Error uploading evidence",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>, taskId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedOverTaskId !== taskId) {
+      setDraggedOverTaskId(taskId);
+    }
+  };
+
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDraggedOverTaskId(null);
+  };
+
+  const handleDrop = async (e: DragEvent<HTMLDivElement>, taskId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDraggedOverTaskId(null);
+    setIsDraggingFile(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length === 0) return;
+
+    const file = files[0];
+    setUploadingTaskId(taskId);
+
+    // Show toast for upload started
+    toast({
+      title: "Upload started",
+      description: `Uploading ${file.name}...`,
+    });
+
+    uploadEvidence({
+      variables: {
+        input: {
+          taskId: taskId,
+          name: file.name,
+          file: null,
+        },
+        connections: connectionId ? [connectionId] : [],
+      },
+      uploadables: {
+        "input.file": file,
+      },
+      onCompleted: () => {
+        setUploadingTaskId(null);
+        toast({
+          title: "Evidence uploaded",
+          description: "Evidence has been uploaded successfully.",
+        });
+      },
+      onError: (error) => {
+        setUploadingTaskId(null);
         toast({
           title: "Error uploading evidence",
           description: error.message,
@@ -384,72 +511,121 @@ function ControlOverviewPageContent({
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">Tasks</h2>
-            <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="flex items-center gap-1">
-                  <Plus className="w-4 h-4" />
-                  <span>Add Task</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New Task</DialogTitle>
-                  <DialogDescription>
-                    Add a new task to this control. Click save when you&apos;re
-                    done.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-medium">
-                      Task Name
-                    </label>
-                    <Input
-                      id="name"
-                      value={newTaskName}
-                      onChange={(e) => setNewTaskName(e.target.value)}
-                      placeholder="Enter task name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="description"
-                      className="text-sm font-medium"
-                    >
-                      Description (optional)
-                    </label>
-                    <Input
-                      id="description"
-                      value={newTaskDescription}
-                      onChange={(e) => setNewTaskDescription(e.target.value)}
-                      placeholder="Enter task description"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsCreateTaskOpen(false)}
-                  >
-                    Cancel
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-gray-500 flex items-center">
+                <FileIcon className="w-4 h-4 mr-1 text-gray-400" />
+                <span>Drag & drop files onto tasks to upload evidence</span>
+              </div>
+              <Dialog
+                open={isCreateTaskOpen}
+                onOpenChange={setIsCreateTaskOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button size="sm" className="flex items-center gap-1">
+                    <Plus className="w-4 h-4" />
+                    <span>Add Task</span>
                   </Button>
-                  <Button onClick={handleCreateTask}>Create Task</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Task</DialogTitle>
+                    <DialogDescription>
+                      Add a new task to this control. Click save when
+                      you&apos;re done.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <label htmlFor="name" className="text-sm font-medium">
+                        Task Name
+                      </label>
+                      <Input
+                        id="name"
+                        value={newTaskName}
+                        onChange={(e) => setNewTaskName(e.target.value)}
+                        placeholder="Enter task name"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="description"
+                        className="text-sm font-medium"
+                      >
+                        Description (optional)
+                      </label>
+                      <Input
+                        id="description"
+                        value={newTaskDescription}
+                        onChange={(e) => setNewTaskDescription(e.target.value)}
+                        placeholder="Enter task description"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsCreateTaskOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={handleCreateTask}>Create Task</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
-          <div className="space-y-2">
+          <div className={`space-y-2 ${isDraggingFile ? "space-y-4" : ""}`}>
             {tasks.map((task) => (
               <div
                 key={task?.id}
-                className="flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group"
+                className={`flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group relative transition-all duration-200 ${
+                  isDraggingFile && draggedOverTaskId !== task?.id
+                    ? "border border-dashed border-blue-300 rounded-md bg-blue-50 bg-opacity-30"
+                    : ""
+                } ${
+                  draggedOverTaskId === task?.id
+                    ? "bg-blue-50 border-2 border-blue-400 shadow-md rounded-md"
+                    : ""
+                }`}
+                onDragOver={(e) => task?.id && handleDragOver(e, task.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => task?.id && handleDrop(e, task.id)}
               >
+                {isDraggingFile && draggedOverTaskId !== task?.id && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-md z-10">
+                    <div className="flex items-center gap-2 text-blue-600 bg-white px-3 py-1.5 rounded-lg shadow-sm">
+                      <FileIcon className="w-4 h-4" />
+                      <p className="text-sm font-medium">Drop file here</p>
+                    </div>
+                  </div>
+                )}
+
+                {draggedOverTaskId === task?.id && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-blue-50 bg-opacity-80 rounded-md z-10 backdrop-blur-[1px]">
+                    <div className="flex flex-col items-center gap-2 text-blue-600 bg-white p-4 rounded-lg shadow-sm">
+                      <FileIcon className="w-12 h-12" />
+                      <p className="font-medium">
+                        Drop file to upload evidence
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {uploadingTaskId === task?.id && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 rounded-md z-10">
+                    <div className="flex flex-col items-center gap-2 text-blue-600">
+                      <Loader2 className="w-8 h-8 animate-spin" />
+                      <p className="font-medium">Uploading evidence...</p>
+                    </div>
+                  </div>
+                )}
+
                 <div
                   className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer ${
                     task?.state === "DONE"
                       ? "border-gray-400 bg-gray-100"
                       : "border-gray-300"
-                  }`}
+                  } ${isDraggingFile ? "opacity-50" : ""}`}
                   onClick={() =>
                     task?.id &&
                     task?.state &&
@@ -461,7 +637,9 @@ function ControlOverviewPageContent({
                   )}
                 </div>
                 <div
-                  className="flex-1 flex items-center justify-between cursor-pointer"
+                  className={`flex-1 flex items-center justify-between cursor-pointer ${
+                    isDraggingFile ? "opacity-50" : ""
+                  }`}
                   onClick={() =>
                     task?.id &&
                     task?.state &&
@@ -629,7 +807,7 @@ function ControlOverviewPageFallback() {
 export default function ControlOverviewPage() {
   const { controlId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<ControlOverviewPageQueryType>(
-    controlOverviewPageQuery,
+    controlOverviewPageQuery
   );
 
   useEffect(() => {
