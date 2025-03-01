@@ -117,7 +117,7 @@ WHERE
 		return fmt.Errorf("cannot collect control state transitions: %w", err)
 	}
 
-	*cst = ControlStateTransitions(controlStateTransitions)
+	*cst = controlStateTransitions
 
 	return nil
 }
