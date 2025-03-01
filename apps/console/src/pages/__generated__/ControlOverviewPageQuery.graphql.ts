@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<297a88bb87d59c4a4ed2f8dce93667c6>>
+ * @generated SignedSource<<ba62806712d6eae0a97e09a9db5c5841>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,6 +10,7 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
+export type EvidenceState = "EXPIRED" | "INVALID" | "VALID";
 export type TaskState = "DONE" | "TODO";
 export type ControlOverviewPageQuery$variables = {
   controlId: string;
@@ -25,6 +26,18 @@ export type ControlOverviewPageQuery$data = {
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly description: string;
+          readonly evidences: {
+            readonly edges: ReadonlyArray<{
+              readonly node: {
+                readonly createdAt: string;
+                readonly fileUrl: string;
+                readonly id: string;
+                readonly mimeType: string;
+                readonly size: number;
+                readonly state: EvidenceState;
+              };
+            }>;
+          };
           readonly id: string;
           readonly name: string;
           readonly state: TaskState;
@@ -116,6 +129,75 @@ v8 = [
           (v3/*: any*/),
           (v4/*: any*/),
           (v5/*: any*/),
+          {
+            "alias": null,
+            "args": [
+              {
+                "kind": "Literal",
+                "name": "first",
+                "value": 10
+              }
+            ],
+            "concreteType": "EvidenceConnection",
+            "kind": "LinkedField",
+            "name": "evidences",
+            "plural": false,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "EvidenceEdge",
+                "kind": "LinkedField",
+                "name": "edges",
+                "plural": true,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "Evidence",
+                    "kind": "LinkedField",
+                    "name": "node",
+                    "plural": false,
+                    "selections": [
+                      (v2/*: any*/),
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "fileUrl",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "mimeType",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "size",
+                        "storageKey": null
+                      },
+                      (v5/*: any*/),
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "createdAt",
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": null
+              }
+            ],
+            "storageKey": "evidences(first:10)"
+          },
           (v7/*: any*/)
         ],
         "storageKey": null
@@ -259,7 +341,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a13eb28fcbe162deaff92653c19cc22a",
+    "cacheID": "ae3ac6c53719fa3d9c1953ff40c75005",
     "id": null,
     "metadata": {
       "connection": [
@@ -276,11 +358,11 @@ return {
     },
     "name": "ControlOverviewPageQuery",
     "operationKind": "query",
-    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            evidences(first: 10) {\n              edges {\n                node {\n                  id\n                  fileUrl\n                  mimeType\n                  size\n                  state\n                  createdAt\n                }\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "dc8c7670eafe558966932c3fb4d45cd8";
+(node as any).hash = "ad8c4a4980229230ca295c4cb9a2c836";
 
 export default node;

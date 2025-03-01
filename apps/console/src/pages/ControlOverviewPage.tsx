@@ -21,6 +21,13 @@ import {
   Upload,
   FileIcon,
   Loader2,
+  ChevronDown,
+  ChevronUp,
+  Download,
+  Eye,
+  File as FileGeneric,
+  FileText,
+  Image,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -42,7 +49,10 @@ import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from ".
 import type { ControlOverviewPageUpdateTaskStateMutation as ControlOverviewPageUpdateTaskStateMutationType } from "./__generated__/ControlOverviewPageUpdateTaskStateMutation.graphql";
 import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreateTaskMutationType } from "./__generated__/ControlOverviewPageCreateTaskMutation.graphql";
 import type { ControlOverviewPageDeleteTaskMutation as ControlOverviewPageDeleteTaskMutationType } from "./__generated__/ControlOverviewPageDeleteTaskMutation.graphql";
-import type { ControlOverviewPageUploadEvidenceMutation as ControlOverviewPageUploadEvidenceMutationType } from "./__generated__/ControlOverviewPageUploadEvidenceMutation.graphql";
+import type {
+  ControlOverviewPageUploadEvidenceMutation as ControlOverviewPageUploadEvidenceMutationType,
+  EvidenceState,
+} from "./__generated__/ControlOverviewPageUploadEvidenceMutation.graphql";
 
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
@@ -60,6 +70,18 @@ const controlOverviewPageQuery = graphql`
               name
               description
               state
+              evidences(first: 10) {
+                edges {
+                  node {
+                    id
+                    fileUrl
+                    mimeType
+                    size
+                    state
+                    createdAt
+                  }
+                }
+              }
             }
           }
         }
@@ -130,6 +152,29 @@ const uploadEvidenceMutation = graphql`
   }
 `;
 
+// Use the Relay-generated types with extensions for fields that might not be in the generated types yet
+type EvidenceNode = {
+  id: string;
+  name: string;
+  fileUrl: string;
+  mimeType: string;
+  size: number;
+  state: EvidenceState;
+  createdAt: string;
+};
+
+type TaskNode = {
+  id: string;
+  name: string;
+  description: string;
+  state: string;
+  evidences?: {
+    edges: Array<{
+      node: EvidenceNode | null;
+    } | null>;
+  };
+};
+
 function ControlOverviewPageContent({
   queryRef,
 }: {
@@ -155,7 +200,8 @@ function ControlOverviewPageContent({
       uploadEvidenceMutation
     );
   const control = data.control;
-  const tasks = control?.tasks?.edges.map((edge) => edge?.node) ?? [];
+  const tasks =
+    control?.tasks?.edges.map((edge) => edge?.node as TaskNode) ?? [];
 
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
@@ -180,6 +226,11 @@ function ControlOverviewPageContent({
   );
   const [uploadingTaskId, setUploadingTaskId] = useState<string | null>(null);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
+
+  // State to track which task's evidence list is expanded
+  const [expandedEvidenceTaskId, setExpandedEvidenceTaskId] = useState<
+    string | null
+  >(null);
 
   // Get the connection ID for Relay
   const connectionId = useMemo(() => {
@@ -458,6 +509,49 @@ function ControlOverviewPageContent({
     });
   };
 
+  // Function to format file size
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  // Function to format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Function to toggle evidence list expansion
+  const toggleEvidenceList = (taskId: string) => {
+    if (expandedEvidenceTaskId === taskId) {
+      setExpandedEvidenceTaskId(null);
+    } else {
+      setExpandedEvidenceTaskId(taskId);
+    }
+  };
+
+  // Function to get file icon based on mime type
+  const getFileIcon = (mimeType: string) => {
+    if (mimeType.startsWith("image/")) {
+      return <Image className="w-4 h-4 text-blue-500" />;
+    } else if (mimeType.includes("pdf")) {
+      return <FileText className="w-4 h-4 text-red-500" />;
+    } else if (mimeType.includes("word") || mimeType.includes("document")) {
+      return <FileText className="w-4 h-4 text-blue-600" />;
+    } else if (mimeType.includes("excel") || mimeType.includes("spreadsheet")) {
+      return <FileText className="w-4 h-4 text-green-600" />;
+    } else {
+      return <FileGeneric className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -578,122 +672,210 @@ function ControlOverviewPageContent({
             {tasks.map((task) => (
               <div
                 key={task?.id}
-                className={`flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group relative transition-all duration-200 ${
-                  isDraggingFile && draggedOverTaskId !== task?.id
-                    ? "border border-dashed border-blue-300 rounded-md bg-blue-50 bg-opacity-30"
-                    : ""
-                } ${
-                  draggedOverTaskId === task?.id
-                    ? "bg-blue-50 border-2 border-blue-400 shadow-md rounded-md"
-                    : ""
-                }`}
-                onDragOver={(e) => task?.id && handleDragOver(e, task.id)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => task?.id && handleDrop(e, task.id)}
+                className="rounded-md overflow-hidden border border-gray-200"
               >
-                {isDraggingFile && draggedOverTaskId !== task?.id && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-md z-10">
-                    <div className="flex items-center gap-2 text-blue-600 bg-white px-3 py-1.5 rounded-lg shadow-sm">
-                      <FileIcon className="w-4 h-4" />
-                      <p className="text-sm font-medium">Drop file here</p>
-                    </div>
-                  </div>
-                )}
-
-                {draggedOverTaskId === task?.id && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-blue-50 bg-opacity-80 rounded-md z-10 backdrop-blur-[1px]">
-                    <div className="flex flex-col items-center gap-2 text-blue-600 bg-white p-4 rounded-lg shadow-sm">
-                      <FileIcon className="w-12 h-12" />
-                      <p className="font-medium">
-                        Drop file to upload evidence
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {uploadingTaskId === task?.id && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 rounded-md z-10">
-                    <div className="flex flex-col items-center gap-2 text-blue-600">
-                      <Loader2 className="w-8 h-8 animate-spin" />
-                      <p className="font-medium">Uploading evidence...</p>
-                    </div>
-                  </div>
-                )}
-
                 <div
-                  className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer ${
-                    task?.state === "DONE"
-                      ? "border-gray-400 bg-gray-100"
-                      : "border-gray-300"
-                  } ${isDraggingFile ? "opacity-50" : ""}`}
-                  onClick={() =>
-                    task?.id &&
-                    task?.state &&
-                    handleTaskClick(task.id, task.state)
-                  }
-                >
-                  {task?.state === "DONE" && (
-                    <CheckCircle2 className="w-4 h-4 text-gray-500" />
-                  )}
-                </div>
-                <div
-                  className={`flex-1 flex items-center justify-between cursor-pointer ${
-                    isDraggingFile ? "opacity-50" : ""
+                  className={`flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group relative transition-all duration-200 ${
+                    isDraggingFile && draggedOverTaskId !== task?.id
+                      ? "border-dashed border-blue-300 bg-blue-50 bg-opacity-30"
+                      : ""
+                  } ${
+                    draggedOverTaskId === task?.id
+                      ? "bg-blue-50 border-2 border-blue-400 shadow-md"
+                      : ""
                   }`}
-                  onClick={() =>
-                    task?.id &&
-                    task?.state &&
-                    handleTaskClick(task.id, task.state)
-                  }
+                  onDragOver={(e) => task?.id && handleDragOver(e, task.id)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => task?.id && handleDrop(e, task.id)}
                 >
-                  <div>
-                    <h3
-                      className={`text-sm ${
-                        task?.state === "DONE"
-                          ? "text-gray-500 line-through"
-                          : "text-gray-900"
-                      }`}
-                    >
-                      {task?.name}
-                    </h3>
-                    {task?.description && (
-                      <p
-                        className={`text-xs mt-1 ${
-                          task?.state === "DONE"
-                            ? "text-gray-400 line-through"
-                            : "text-gray-500"
-                        }`}
-                      >
-                        {task.description}
-                      </p>
+                  {isDraggingFile && draggedOverTaskId !== task?.id && (
+                    <div className="absolute inset-0 flex items-center justify-center rounded-md z-10">
+                      <div className="flex items-center gap-2 text-blue-600 bg-white px-3 py-1.5 rounded-lg shadow-sm">
+                        <FileIcon className="w-4 h-4" />
+                        <p className="text-sm font-medium">Drop file here</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {draggedOverTaskId === task?.id && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-blue-50 bg-opacity-80 rounded-md z-10 backdrop-blur-[1px]">
+                      <div className="flex flex-col items-center gap-2 text-blue-600 bg-white p-4 rounded-lg shadow-sm">
+                        <FileIcon className="w-12 h-12" />
+                        <p className="font-medium">
+                          Drop file to upload evidence
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {uploadingTaskId === task?.id && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 rounded-md z-10">
+                      <div className="flex flex-col items-center gap-2 text-blue-600">
+                        <Loader2 className="w-8 h-8 animate-spin" />
+                        <p className="font-medium">Uploading evidence...</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer ${
+                      task?.state === "DONE"
+                        ? "border-gray-400 bg-gray-100"
+                        : "border-gray-300"
+                    } ${isDraggingFile ? "opacity-50" : ""}`}
+                    onClick={() =>
+                      task?.id &&
+                      task?.state &&
+                      handleTaskClick(task.id, task.state)
+                    }
+                  >
+                    {task?.state === "DONE" && (
+                      <CheckCircle2 className="w-4 h-4 text-gray-500" />
                     )}
                   </div>
-                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="text-gray-400 text-sm">06.00 - 07.30</div>
-                    <button
-                      className="text-gray-400 hover:text-blue-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (task?.id && task?.name) {
-                          handleUploadEvidence(task.id, task.name);
-                        }
-                      }}
-                    >
-                      <Upload className="w-4 h-4" />
-                    </button>
-                    <button
-                      className="text-gray-400 hover:text-red-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (task?.id && task?.name) {
-                          handleDeleteTask(task.id, task.name);
-                        }
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                  <div
+                    className={`flex-1 flex items-center justify-between cursor-pointer ${
+                      isDraggingFile ? "opacity-50" : ""
+                    }`}
+                    onClick={() =>
+                      task?.id &&
+                      task?.state &&
+                      handleTaskClick(task.id, task.state)
+                    }
+                  >
+                    <div>
+                      <h3
+                        className={`text-sm ${
+                          task?.state === "DONE"
+                            ? "text-gray-500 line-through"
+                            : "text-gray-900"
+                        }`}
+                      >
+                        {task?.name}
+                      </h3>
+                      {task?.description && (
+                        <p
+                          className={`text-xs mt-1 ${
+                            task?.state === "DONE"
+                              ? "text-gray-400 line-through"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {task.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="text-gray-400 text-sm">06.00 - 07.30</div>
+                      <button
+                        className="text-gray-400 hover:text-blue-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (task?.id && task?.name) {
+                            handleUploadEvidence(task.id, task.name);
+                          }
+                        }}
+                      >
+                        <Upload className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="text-gray-400 hover:text-red-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (task?.id && task?.name) {
+                            handleDeleteTask(task.id, task.name);
+                          }
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
+
+                {/* Evidence section */}
+                {task?.evidences?.edges && task.evidences.edges.length > 0 && (
+                  <>
+                    <div
+                      className="bg-gray-50 border-t border-gray-200 px-4 py-2 flex justify-between items-center cursor-pointer hover:bg-gray-100"
+                      onClick={() => task.id && toggleEvidenceList(task.id)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <FileIcon className="w-4 h-4 text-gray-500" />
+                        <span className="text-xs font-medium text-gray-700">
+                          {task.evidences.edges.length}{" "}
+                          {task.evidences.edges.length === 1
+                            ? "Evidence"
+                            : "Evidences"}
+                        </span>
+                      </div>
+                      {expandedEvidenceTaskId === task.id ? (
+                        <ChevronUp className="w-4 h-4 text-gray-500" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-gray-500" />
+                      )}
+                    </div>
+
+                    {expandedEvidenceTaskId === task.id && (
+                      <div className="bg-white border-t border-gray-200 p-3 space-y-2">
+                        {task.evidences.edges.map(
+                          (edge: { node: EvidenceNode | null } | null) => {
+                            const evidence = edge?.node;
+                            if (!evidence) return null;
+
+                            return (
+                              <div
+                                key={evidence.id}
+                                className="flex items-center justify-between p-2 rounded border border-gray-200 hover:border-blue-300 transition-colors"
+                              >
+                                <div className="flex items-center gap-2">
+                                  {getFileIcon(evidence.mimeType)}
+                                  <div>
+                                    <div className="text-sm font-medium text-gray-700">
+                                      {evidence.name}
+                                    </div>
+                                    <div className="text-xs text-gray-500 flex items-center gap-2">
+                                      <span>
+                                        {formatFileSize(evidence.size)}
+                                      </span>
+                                      <span>•</span>
+                                      <span>
+                                        {formatDate(evidence.createdAt)}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {evidence.mimeType.startsWith("image/") && (
+                                    <a
+                                      href={evidence.fileUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="p-1 rounded-full hover:bg-gray-100"
+                                      title="Preview"
+                                    >
+                                      <Eye className="w-4 h-4 text-gray-600" />
+                                    </a>
+                                  )}
+                                  <a
+                                    href={evidence.fileUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-1 rounded-full hover:bg-gray-100"
+                                    title="Download"
+                                    download
+                                  >
+                                    <Download className="w-4 h-4 text-gray-600" />
+                                  </a>
+                                </div>
+                              </div>
+                            );
+                          }
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             ))}
 
