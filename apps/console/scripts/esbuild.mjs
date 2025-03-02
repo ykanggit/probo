@@ -6,6 +6,7 @@ import * as esbuild from "esbuild";
 import fs from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
+import process from "node:process";
 import tailwindcssPlugin from "@tailwindcss/postcss";
 
 
@@ -176,7 +177,7 @@ if (command === "watch") {
         headers: req.headers,
       };
 
-      const extensionPattern = /\.[^\/]+$/;
+      const extensionPattern = /\.[^/]+$/;
 
       const proxyReq = http.request(options, (proxyRes) => {
         if (proxyRes.statusCode === 404 && extensionPattern.test(req.url)) {
@@ -197,7 +198,8 @@ if (command === "watch") {
               res.writeHead(200, { "Content-Type": "text/html" });
               res.end(data);
             })
-            .catch((_err) => {
+            .catch((err) => {
+              console.error("Error reading index.html:", err);
               res.writeHead(500, { "Content-Type": "text/plain" });
               res.end("500 - Internal Server Error");
             });
