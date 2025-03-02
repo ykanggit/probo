@@ -6,7 +6,8 @@ import * as esbuild from "esbuild";
 import fs from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
-import tailwindcss from "tailwindcss";
+import tailwindcssPlugin from "@tailwindcss/postcss";
+
 
 async function copyRecursive(src, dest) {
   await fs.mkdir(dest, { recursive: true });
@@ -147,7 +148,7 @@ const defaultOptions = {
     relayPlugin,
     hotReloading,
     postCssPlugin({
-      plugins: [tailwindcss(), autoprefixer()],
+      plugins: [tailwindcssPlugin(), autoprefixer()],
     }),
   ],
   define: {

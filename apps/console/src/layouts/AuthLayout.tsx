@@ -12,7 +12,7 @@ export default function AuthLayout() {
             </main>
           </div>
         </div>
-        <div className="hidden flex-1 bg-gradient-to-br from-gray-900 to-gray-950 lg:block">
+        <div className="hidden flex-1 bg-linear-to-br from-gray-900 to-gray-950 lg:block">
           <div className="flex h-full items-center justify-center p-8">
             <div className="relative h-full w-full">
               <div className="absolute right-0 top-1/4 z-10">

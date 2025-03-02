@@ -330,7 +330,7 @@ function VendorListContent({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:bg-transparent [&>svg]:hover:text-destructive"
+                  className="h-8 w-8 text-muted-foreground hover:bg-transparent hover:[&>svg]:text-destructive"
                   onClick={(e) => {
                     e.preventDefault(); // Prevent navigation
                     if (

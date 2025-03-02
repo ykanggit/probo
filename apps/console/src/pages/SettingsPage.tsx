@@ -73,7 +73,7 @@ function SettingsPageContent({
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <label className="text-sm font-medium">Account email</label>
-              <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+              <div className="flex items-center justify-between rounded-lg border p-3 shadow-xs">
                 <div className="flex items-center gap-2">
                   <Mail className="h-5 w-5 text-muted-foreground" />
                   <span className="text-muted-foreground">
@@ -93,7 +93,7 @@ function SettingsPageContent({
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Organization logo</label>
-              <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+              <div className="flex items-center justify-between rounded-lg border p-3 shadow-xs">
                 <div className="flex items-center gap-3">
                   {organization.logoUrl ? (
                     <img
@@ -116,7 +116,7 @@ function SettingsPageContent({
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Organization name</label>
-              <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+              <div className="flex items-center justify-between rounded-lg border p-3 shadow-xs">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-muted-foreground" />
                   <span className="text-muted-foreground">
@@ -151,7 +151,7 @@ function SettingsPageContent({
               {members.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center justify-between rounded-lg border p-3 shadow-sm"
+                  className="flex items-center justify-between rounded-lg border p-3 shadow-xs"
                 >
                   <div className="flex items-center gap-3">
                     <Avatar>

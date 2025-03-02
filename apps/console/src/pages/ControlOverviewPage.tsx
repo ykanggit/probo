@@ -806,7 +806,7 @@ function ControlOverviewPageContent({
                 >
                   {isDraggingFile && draggedOverTaskId !== task?.id && (
                     <div className="absolute inset-0 flex items-center justify-center rounded-md z-10">
-                      <div className="flex items-center gap-2 text-blue-600 bg-white px-3 py-1.5 rounded-lg shadow-sm">
+                      <div className="flex items-center gap-2 text-blue-600 bg-white px-3 py-1.5 rounded-lg shadow-xs">
                         <FileIcon className="w-4 h-4" />
                         <p className="text-sm font-medium">Drop file here</p>
                       </div>
@@ -815,7 +815,7 @@ function ControlOverviewPageContent({
 
                   {draggedOverTaskId === task?.id && (
                     <div className="absolute inset-0 flex items-center justify-center bg-blue-50 bg-opacity-80 rounded-md z-10 backdrop-blur-[1px]">
-                      <div className="flex flex-col items-center gap-2 text-blue-600 bg-white p-4 rounded-lg shadow-sm">
+                      <div className="flex flex-col items-center gap-2 text-blue-600 bg-white p-4 rounded-lg shadow-xs">
                         <FileIcon className="w-12 h-12" />
                         <p className="font-medium">
                           Drop file to upload evidence
