@@ -1,5 +1,5 @@
 import babel from "@babel/core";
-import postCssPlugin from "@deanc/esbuild-plugin-postcss";
+import postCssPlugin from "@probo/esbuild-plugin-postcss";
 import autoprefixer from "autoprefixer";
 import { execSync, spawn } from "child_process";
 import * as esbuild from "esbuild";
@@ -8,7 +8,6 @@ import http from "node:http";
 import path from "node:path";
 import process from "node:process";
 import tailwindcssPlugin from "@tailwindcss/postcss";
-
 
 async function copyRecursive(src, dest) {
   await fs.mkdir(dest, { recursive: true });
