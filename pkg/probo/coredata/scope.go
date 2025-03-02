@@ -26,8 +26,8 @@ func NewScope() *Scope {
 	return &Scope{}
 }
 
-func (*Scope) SQLArguments() pgx.NamedArgs {
-	return pgx.NamedArgs{}
+func (*Scope) SQLArguments() pgx.StrictNamedArgs {
+	return pgx.StrictNamedArgs{}
 }
 
 func (*Scope) SQLFragment() string {

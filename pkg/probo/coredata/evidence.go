@@ -74,7 +74,7 @@ VALUES (
 )
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"evidence_id": e.ID,
 		"task_id":     e.TaskID,
 		"object_key":  e.ObjectKey,
@@ -132,7 +132,7 @@ LIMIT 1;
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{"evidence_id": evidenceID}
+	args := pgx.StrictNamedArgs{"evidence_id": evidenceID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -193,7 +193,7 @@ WHERE
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.NamedArgs{"task_id": taskID}
+	args := pgx.StrictNamedArgs{"task_id": taskID}
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
@@ -227,7 +227,7 @@ WHERE
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{"evidence_id": e.ID}
+	args := pgx.StrictNamedArgs{"evidence_id": e.ID}
 	maps.Copy(args, scope.SQLArguments())
 
 	_, err := conn.Exec(ctx, q, args)

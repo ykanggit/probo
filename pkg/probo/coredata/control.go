@@ -100,7 +100,7 @@ LIMIT 1;
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{"control_id": controlID}
+	args := pgx.StrictNamedArgs{"control_id": controlID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -148,7 +148,7 @@ VALUES (
 );
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"control_id":   c.ID,
 		"framework_id": c.FrameworkID,
 		"category":     c.Category,
@@ -205,7 +205,7 @@ WHERE
 `
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.NamedArgs{"framework_id": frameworkID}
+	args := pgx.StrictNamedArgs{"framework_id": frameworkID}
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
@@ -265,7 +265,7 @@ RETURNING
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"control_id":       c.ID,
 		"expected_version": params.ExpectedVersion,
 		"updated_at":       time.Now(),

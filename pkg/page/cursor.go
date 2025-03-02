@@ -88,7 +88,7 @@ LIMIT @cursor_limit
 `
 }
 
-func (c *Cursor) SQLArguments() pgx.NamedArgs {
+func (c *Cursor) SQLArguments() pgx.StrictNamedArgs {
 	var size = c.Size
 	if c.Key == nil {
 		size += 1
@@ -96,7 +96,7 @@ func (c *Cursor) SQLArguments() pgx.NamedArgs {
 		size += 2
 	}
 
-	arguments := pgx.NamedArgs{
+	arguments := pgx.StrictNamedArgs{
 		"cursor_order":   c.Position.ToDirection(),
 		"cursor_limit":   size,
 		"cursor_from_id": nil,

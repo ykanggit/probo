@@ -337,7 +337,7 @@ WHERE
     user_id = @user_id;
 `
 
-	args := pgx.NamedArgs{"user_id": userID}
+	args := pgx.StrictNamedArgs{"user_id": userID}
 
 	var organizationIDs []gid.GID
 
@@ -387,7 +387,7 @@ VALUES
 ON CONFLICT (user_id, organization_id) DO NOTHING;
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"user_id":         userID,
 		"organization_id": organizationID,
 	}

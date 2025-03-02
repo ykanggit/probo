@@ -58,7 +58,7 @@ WHERE
 LIMIT 1;
 `
 
-	args := pgx.NamedArgs{"session_id": sessionID}
+	args := pgx.StrictNamedArgs{"session_id": sessionID}
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -90,7 +90,7 @@ VALUES (
 )
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"session_id": s.ID,
 		"user_id":    s.UserID,
 		"expired_at": s.ExpiredAt,
@@ -115,7 +115,7 @@ WHERE
     id = @session_id
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"session_id": s.ID,
 		"expired_at": s.ExpiredAt,
 		"updated_at": s.UpdatedAt,
@@ -137,7 +137,7 @@ WHERE
     id = @session_id
 `
 
-	args := pgx.NamedArgs{"session_id": sessionID}
+	args := pgx.StrictNamedArgs{"session_id": sessionID}
 
 	_, err := conn.Exec(ctx, q, args)
 	return err

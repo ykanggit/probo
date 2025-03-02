@@ -62,7 +62,7 @@ WHERE
 LIMIT 1;
 `
 
-	args := pgx.NamedArgs{"user_email": email}
+	args := pgx.StrictNamedArgs{"user_email": email}
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -100,7 +100,7 @@ WHERE
 LIMIT 1;
 `
 
-	args := pgx.NamedArgs{"user_id": userID}
+	args := pgx.StrictNamedArgs{"user_id": userID}
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -135,7 +135,7 @@ VALUES (
 )
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"user_id":         u.ID,
 		"email_address":   u.EmailAddress,
 		"hashed_password": u.HashedPassword,

@@ -58,7 +58,7 @@ LIMIT 1;
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{"organization_id": organizationID}
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -90,7 +90,7 @@ INSERT INTO organizations (
 ) VALUES (@id, @name, @logo_url, @created_at, @updated_at)
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"id":         o.ID,
 		"name":       o.Name,
 		"logo_url":   o.LogoURL,

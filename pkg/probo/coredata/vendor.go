@@ -99,7 +99,7 @@ LIMIT 1;
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{"vendor_id": vendorID}
+	args := pgx.StrictNamedArgs{"vendor_id": vendorID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -158,7 +158,7 @@ VALUES (
 )
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"vendor_id":              v.ID,
 		"organization_id":        v.OrganizationID,
 		"name":                   v.Name,
@@ -188,7 +188,7 @@ DELETE FROM vendors WHERE %s AND id = @vendor_id
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{"vendor_id": v.ID}
+	args := pgx.StrictNamedArgs{"vendor_id": v.ID}
 	maps.Copy(args, scope.SQLArguments())
 
 	_, err := conn.Exec(ctx, q, args)
@@ -228,7 +228,7 @@ WHERE
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.NamedArgs{"organization_id": organizationID}
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
 	maps.Copy(args, cursor.SQLArguments())
 	maps.Copy(args, scope.SQLArguments())
 
@@ -287,7 +287,7 @@ RETURNING
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"vendor_id":        v.ID,
 		"expected_version": params.ExpectedVersion,
 		"updated_at":       time.Now(),

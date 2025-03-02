@@ -78,7 +78,7 @@ WHERE
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.NamedArgs{"organization_id": organizationID}
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
 	maps.Copy(args, cursor.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
@@ -123,7 +123,7 @@ LIMIT 1;
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{"framework_id": frameworkID}
+	args := pgx.StrictNamedArgs{"framework_id": frameworkID}
 	maps.Copy(args, scope.SQLArguments())
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -168,7 +168,7 @@ VALUES (
 );
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"framework_id":    f.ID,
 		"organization_id": f.OrganizationID,
 		"name":            f.Name,
@@ -196,7 +196,7 @@ WHERE
     AND id = @framework_id;
 `
 
-	args := pgx.NamedArgs{"framework_id": f.ID}
+	args := pgx.StrictNamedArgs{"framework_id": f.ID}
 	maps.Copy(args, scope.SQLArguments())
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
@@ -231,7 +231,7 @@ RETURNING
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"framework_id":     f.ID,
 		"expected_version": params.ExpectedVersion,
 		"updated_at":       time.Now(),

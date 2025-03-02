@@ -65,7 +65,7 @@ VALUES (
 );
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"control_state_transition_id": cst.ID,
 		"control_id":                  cst.ControlID,
 		"from_state":                  cst.FromState,
@@ -104,7 +104,7 @@ WHERE
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.NamedArgs{"control_id": controlID}
+	args := pgx.StrictNamedArgs{"control_id": controlID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)

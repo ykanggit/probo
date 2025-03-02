@@ -65,7 +65,7 @@ VALUES (
 );
 `
 
-	args := pgx.NamedArgs{
+	args := pgx.StrictNamedArgs{
 		"evidence_state_transition_id": est.ID,
 		"evidence_id":                  est.EvidenceID,
 		"from_state":                   est.FromState,
@@ -104,7 +104,7 @@ WHERE
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.NamedArgs{"evidence_id": evidenceID}
+	args := pgx.StrictNamedArgs{"evidence_id": evidenceID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -138,7 +138,7 @@ WHERE
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{"evidence_id": evidenceID}
+	args := pgx.StrictNamedArgs{"evidence_id": evidenceID}
 	maps.Copy(args, scope.SQLArguments())
 
 	_, err := conn.Exec(ctx, q, args)
