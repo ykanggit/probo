@@ -96,23 +96,7 @@ function PolicyOverviewPageContent({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Policy Content</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none">
-                <div
-                  className="policy-content"
-                  dangerouslySetInnerHTML={{ __html: policy.content || "" }}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
+      <div className="grid grid-cols-1 gap-6">
         <div>
           <Card>
             <CardHeader>
@@ -142,6 +126,22 @@ function PolicyOverviewPageContent({
             </CardContent>
           </Card>
         </div>
+
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Policy Content</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none">
+                <div
+                  className="policy-content"
+                  dangerouslySetInnerHTML={{ __html: policy.content || "" }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
@@ -162,24 +162,7 @@ function PolicyOverviewPageFallback() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <Card>
-            <CardHeader>
-              <div className="h-6 w-32 bg-muted animate-pulse rounded" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="h-4 w-full bg-muted animate-pulse rounded" />
-                <div className="h-4 w-full bg-muted animate-pulse rounded" />
-                <div className="h-4 w-3/4 bg-muted animate-pulse rounded" />
-                <div className="h-4 w-full bg-muted animate-pulse rounded" />
-                <div className="h-4 w-5/6 bg-muted animate-pulse rounded" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
+      <div className="grid grid-cols-1 gap-6">
         <div>
           <Card>
             <CardHeader>
@@ -199,6 +182,23 @@ function PolicyOverviewPageFallback() {
                   <div className="h-4 w-24 bg-muted animate-pulse rounded mb-2" />
                   <div className="h-6 w-48 bg-muted animate-pulse rounded" />
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div>
+          <Card>
+            <CardHeader>
+              <div className="h-6 w-32 bg-muted animate-pulse rounded" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="h-4 w-full bg-muted animate-pulse rounded" />
+                <div className="h-4 w-full bg-muted animate-pulse rounded" />
+                <div className="h-4 w-3/4 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-full bg-muted animate-pulse rounded" />
+                <div className="h-4 w-5/6 bg-muted animate-pulse rounded" />
               </div>
             </CardContent>
           </Card>
