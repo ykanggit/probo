@@ -6,6 +6,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { RelayEnvironmentProvider } from "react-relay";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./App.css";
+import "./styles/policy-content.css";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ConsoleLayout from "./layouts/ConsoleLayout";
 import AuthLayout from "./layouts/AuthLayout";

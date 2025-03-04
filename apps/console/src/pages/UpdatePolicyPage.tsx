@@ -12,11 +12,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { FileText } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Suspense } from "react";
+import PolicyEditor from "@/components/PolicyEditor";
 import type { UpdatePolicyPageQuery as UpdatePolicyPageQueryType } from "./__generated__/UpdatePolicyPageQuery.graphql";
 import type { UpdatePolicyPageMutation as UpdatePolicyPageMutationType } from "./__generated__/UpdatePolicyPageMutation.graphql";
 
@@ -59,10 +59,19 @@ function UpdatePolicyPageContent({
     queryRef
   );
 
+  console.log("UpdatePolicyPage data:", data.node);
+
   const [name, setName] = useState(data.node.name);
-  const [content, setContent] = useState(data.node.content);
+  const [content, setContent] = useState(data.node.content || "");
   const [status, setStatus] = useState(data.node.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  console.log(
+    "UpdatePolicyPage state - content:",
+    content
+      ? content.substring(0, 50) + (content.length > 50 ? "..." : "")
+      : "empty"
+  );
 
   const [commitMutation] =
     useMutation<UpdatePolicyPageMutationType>(UpdatePolicyMutation);
@@ -152,14 +161,12 @@ function UpdatePolicyPageContent({
 
                 <div className="space-y-2">
                   <Label htmlFor="content">Policy Content</Label>
-                  <Textarea
-                    id="content"
-                    placeholder="Enter policy content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="min-h-[200px]"
-                    required
-                  />
+                  <div className="min-h-[300px]">
+                    <PolicyEditor
+                      initialContent={content}
+                      onChange={(html) => setContent(html)}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">

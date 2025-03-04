@@ -6,10 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { FileText } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import PolicyEditor from "@/components/PolicyEditor";
 import type { CreatePolicyPageMutation } from "./__generated__/CreatePolicyPageMutation.graphql";
 
 const CreatePolicyMutation = graphql`
@@ -38,6 +38,13 @@ export default function CreatePolicyPage() {
   const [status, setStatus] = useState<"DRAFT" | "ACTIVE">("DRAFT");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  console.log(
+    "CreatePolicyPage state - content:",
+    content
+      ? content.substring(0, 50) + (content.length > 50 ? "..." : "")
+      : "empty"
+  );
 
   const [commitMutation] =
     useMutation<CreatePolicyPageMutation>(CreatePolicyMutation);
@@ -136,14 +143,12 @@ export default function CreatePolicyPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="content">Policy Content</Label>
-                  <Textarea
-                    id="content"
-                    placeholder="Enter policy content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="min-h-[200px]"
-                    required
-                  />
+                  <div className="min-h-[300px]">
+                    <PolicyEditor
+                      initialContent={content}
+                      onChange={(html) => setContent(html)}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">

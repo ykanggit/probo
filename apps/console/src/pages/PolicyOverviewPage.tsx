@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { PolicyOverviewPageQuery as PolicyOverviewPageQueryType } from "./__generated__/PolicyOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
+import "../styles/policy-content.css";
 
 const PolicyOverviewPageQuery = graphql`
   query PolicyOverviewPageQuery($policyId: ID!) {
@@ -102,8 +103,9 @@ function PolicyOverviewPageContent({
               <CardTitle>Policy Content</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose max-w-none">
+              <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none">
                 <div
+                  className="policy-content"
                   dangerouslySetInnerHTML={{ __html: policy.content || "" }}
                 />
               </div>
