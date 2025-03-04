@@ -4,9 +4,10 @@ import {
   $getSelection,
   $isRangeSelection,
   FORMAT_TEXT_COMMAND,
-  FORMAT_ELEMENT_COMMAND,
   UNDO_COMMAND,
   REDO_COMMAND,
+  Point,
+  RangeSelection,
 } from "lexical";
 import {
   $createHeadingNode,
@@ -14,8 +15,6 @@ import {
   $isHeadingNode,
 } from "@lexical/rich-text";
 import {
-  $createListItemNode,
-  $createListNode,
   $isListNode,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
@@ -25,13 +24,11 @@ import {
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import {
   $getSelectionStyleValueForProperty,
-  $isParentElementRTL,
   $patchStyleText,
   $setBlocksType,
 } from "@lexical/selection";
 import { $getNearestNodeOfType } from "@lexical/utils";
 import { useCallback, useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import {
   Bold,
   Italic,
@@ -54,18 +51,14 @@ import {
 
 export function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
-  const [activeEditor, setActiveEditor] = useState(editor);
+  const [activeEditor] = useState(editor);
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isLink, setIsLink] = useState(false);
   const [blockType, setBlockType] = useState("paragraph");
-  const [selectedElementKey, setSelectedElementKey] = useState<string | null>(
-    null
-  );
-  const [linkUrl, setLinkUrl] = useState("");
-  const [isLinkEditMode, setIsLinkEditMode] = useState(false);
+  const [, setSelectedElementKey] = useState<string | null>(null);
   const [textAlignment, setTextAlignment] = useState<
     "left" | "center" | "right" | "justify"
   >("left");
@@ -391,7 +384,7 @@ export function ToolbarPlugin() {
   );
 }
 
-function getSelectedNode(selection: any) {
+function getSelectedNode(selection: RangeSelection) {
   const anchor = selection.anchor;
   const focus = selection.focus;
   const anchorNode = selection.anchor.getNode();
@@ -407,6 +400,6 @@ function getSelectedNode(selection: any) {
   }
 }
 
-function $isAtNodeEnd(point: any) {
+function $isAtNodeEnd(point: Point) {
   return point.offset === point.getNode().getTextContentSize();
 }
