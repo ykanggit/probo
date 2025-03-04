@@ -121,6 +121,13 @@ type Organization implements Node {
     before: CursorKey
   ): PeopleConnection! @goField(forceResolver: true)
 
+  policies(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): PolicyConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -404,6 +411,9 @@ type Mutation {
   updateControl(input: UpdateControlInput!): UpdateControlPayload!
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
+  createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
+  updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
+  deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
 }
 
 input CreateVendorInput {
@@ -620,4 +630,67 @@ input DeleteEvidenceInput {
 
 type DeleteEvidencePayload {
   deletedEvidenceId: ID!
+}
+
+enum PolicyStatus
+  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PolicyStatus") {
+  DRAFT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.PolicyStatusDraft"
+    )
+  ACTIVE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.PolicyStatusActive"
+    )
+}
+
+input CreatePolicyInput {
+  organizationId: ID!
+  name: String!
+  content: String!
+  status: PolicyStatus!
+}
+
+input UpdatePolicyInput {
+  id: ID!
+  expectedVersion: Int!
+  name: String
+  content: String
+  status: PolicyStatus
+}
+
+input DeletePolicyInput {
+  policyId: ID!
+}
+
+type CreatePolicyPayload {
+  policyEdge: PolicyEdge!
+}
+
+type UpdatePolicyPayload {
+  policy: Policy!
+}
+
+type DeletePolicyPayload {
+  deletedPolicyId: ID!
+}
+
+type Policy implements Node {
+  id: ID!
+  version: Int!
+  name: String!
+  status: PolicyStatus!
+  content: String!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type PolicyConnection {
+  edges: [PolicyEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PolicyEdge {
+  cursor: CursorKey!
+  node: Policy!
 }

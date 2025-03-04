@@ -24,6 +24,8 @@ import { ConsoleLayoutBreadcrumbControlOverviewQuery } from "./__generated__/Con
 import { ConsoleLayoutOrganizationQuery } from "./__generated__/ConsoleLayoutOrganizationQuery.graphql";
 import { ConsoleLayoutBreadcrumbCreateControlQuery } from "./__generated__/ConsoleLayoutBreadcrumbCreateControlQuery.graphql";
 import { ConsoleLayoutBreadcrumbUpdateFrameworkQuery } from "./__generated__/ConsoleLayoutBreadcrumbUpdateFrameworkQuery.graphql";
+import { ConsoleLayoutBreadcrumbPolicyOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbPolicyOverviewQuery.graphql";
+import { ConsoleLayoutBreadcrumbUpdatePolicyQuery } from "./__generated__/ConsoleLayoutBreadcrumbUpdatePolicyQuery.graphql";
 
 function BreadcrumbHome({ children }: { children: React.ReactNode }) {
   const { organizationId } = useParams();
@@ -58,7 +60,7 @@ function BreadcrumbHome({ children }: { children: React.ReactNode }) {
       }
     `,
     { organizationId: organizationId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -118,7 +120,7 @@ function BreadcrumbFrameworkOverview() {
         }
       }
     `,
-    { frameworkId: frameworkId! },
+    { frameworkId: frameworkId! }
   );
 
   return (
@@ -152,7 +154,7 @@ function BreadcrumbUpdateFramework() {
       }
     `,
     { frameworkId: frameworkId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -209,7 +211,7 @@ function BreadcrumbVendorOverview() {
       }
     `,
     { vendorId: vendorId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -269,7 +271,7 @@ function BreadcrumbPeopleOverview() {
       }
     `,
     { peopleId: peopleId! },
-    { fetchPolicy: "store-or-network" },
+    { fetchPolicy: "store-or-network" }
   );
 
   return (
@@ -302,7 +304,7 @@ function BreadcrumbControlOverview() {
         }
       }
     `,
-    { controlId: controlId! },
+    { controlId: controlId! }
   );
 
   return (
@@ -333,7 +335,7 @@ function BreadcrumbCreateControl() {
         }
       }
     `,
-    { frameworkId: frameworkId! },
+    { frameworkId: frameworkId! }
   );
 
   return (
@@ -352,6 +354,104 @@ function BreadcrumbCreateControl() {
       <BreadcrumbItem>
         <BreadcrumbPage>Create Control</BreadcrumbPage>
       </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbPolicyList() {
+  const { organizationId } = useParams();
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to={`/organizations/${organizationId}/policies`}>Policies</Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbCreatePolicy() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Create Policy</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbPolicyOverview() {
+  const { organizationId, policyId } = useParams();
+  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbPolicyOverviewQuery>(
+    graphql`
+      query ConsoleLayoutBreadcrumbPolicyOverviewQuery($policyId: ID!) {
+        policy: node(id: $policyId) {
+          id
+          ... on Policy {
+            name
+          }
+        }
+      }
+    `,
+    { policyId: policyId! },
+    { fetchPolicy: "store-or-network" }
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link to={`/organizations/${organizationId}/policies/${policyId}`}>
+            {data.policy?.name}
+          </Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbUpdatePolicy() {
+  const { organizationId, policyId } = useParams();
+  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbUpdatePolicyQuery>(
+    graphql`
+      query ConsoleLayoutBreadcrumbUpdatePolicyQuery($policyId: ID!) {
+        policy: node(id: $policyId) {
+          id
+          ... on Policy {
+            name
+          }
+        }
+      }
+    `,
+    { policyId: policyId! },
+    { fetchPolicy: "store-or-network" }
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink
+          asChild
+          className="max-w-[160px] truncate"
+          aria-label={data.policy?.name}
+        >
+          <Link to={`/organizations/${organizationId}/policies/${policyId}`}>
+            {data.policy?.name}
+          </Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Update</BreadcrumbPage>
+      </BreadcrumbItem>
+      <Outlet />
     </>
   );
 }
@@ -409,6 +509,17 @@ export default function ConsoleLayout() {
                       path=":vendorId"
                       element={<BreadcrumbVendorOverview />}
                     />
+                  </Route>
+                  <Route path="policies" element={<BreadcrumbPolicyList />}>
+                    <Route
+                      path=":policyId"
+                      element={<BreadcrumbPolicyOverview />}
+                    />
+                    <Route
+                      path=":policyId/update"
+                      element={<BreadcrumbUpdatePolicy />}
+                    />
+                    <Route path="create" element={<BreadcrumbCreatePolicy />} />
                   </Route>
                 </Routes>
               )}

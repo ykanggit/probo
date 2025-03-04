@@ -114,6 +114,10 @@ type ComplexityRoot struct {
 		PeopleEdge func(childComplexity int) int
 	}
 
+	CreatePolicyPayload struct {
+		PolicyEdge func(childComplexity int) int
+	}
+
 	CreateTaskPayload struct {
 		TaskEdge func(childComplexity int) int
 	}
@@ -132,6 +136,10 @@ type ComplexityRoot struct {
 
 	DeletePeoplePayload struct {
 		DeletedPeopleID func(childComplexity int) int
+	}
+
+	DeletePolicyPayload struct {
+		DeletedPolicyID func(childComplexity int) int
 	}
 
 	DeleteTaskPayload struct {
@@ -208,16 +216,19 @@ type ComplexityRoot struct {
 		CreateFramework    func(childComplexity int, input types.CreateFrameworkInput) int
 		CreateOrganization func(childComplexity int, input types.CreateOrganizationInput) int
 		CreatePeople       func(childComplexity int, input types.CreatePeopleInput) int
+		CreatePolicy       func(childComplexity int, input types.CreatePolicyInput) int
 		CreateTask         func(childComplexity int, input types.CreateTaskInput) int
 		CreateVendor       func(childComplexity int, input types.CreateVendorInput) int
 		DeleteEvidence     func(childComplexity int, input types.DeleteEvidenceInput) int
 		DeleteOrganization func(childComplexity int, input types.DeleteOrganizationInput) int
 		DeletePeople       func(childComplexity int, input types.DeletePeopleInput) int
+		DeletePolicy       func(childComplexity int, input types.DeletePolicyInput) int
 		DeleteTask         func(childComplexity int, input types.DeleteTaskInput) int
 		DeleteVendor       func(childComplexity int, input types.DeleteVendorInput) int
 		UpdateControl      func(childComplexity int, input types.UpdateControlInput) int
 		UpdateFramework    func(childComplexity int, input types.UpdateFrameworkInput) int
 		UpdatePeople       func(childComplexity int, input types.UpdatePeopleInput) int
+		UpdatePolicy       func(childComplexity int, input types.UpdatePolicyInput) int
 		UpdateTaskState    func(childComplexity int, input types.UpdateTaskStateInput) int
 		UpdateVendor       func(childComplexity int, input types.UpdateVendorInput) int
 		UploadEvidence     func(childComplexity int, input types.UploadEvidenceInput) int
@@ -230,6 +241,7 @@ type ComplexityRoot struct {
 		LogoURL    func(childComplexity int) int
 		Name       func(childComplexity int) int
 		Peoples    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		Policies   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 		UpdatedAt  func(childComplexity int) int
 		Vendors    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 	}
@@ -268,6 +280,26 @@ type ComplexityRoot struct {
 	}
 
 	PeopleEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	Policy struct {
+		Content   func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Status    func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+		Version   func(childComplexity int) int
+	}
+
+	PolicyConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	PolicyEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
 	}
@@ -332,6 +364,10 @@ type ComplexityRoot struct {
 
 	UpdatePeoplePayload struct {
 		People func(childComplexity int) int
+	}
+
+	UpdatePolicyPayload struct {
+		Policy func(childComplexity int) int
 	}
 
 	UpdateTaskStatePayload struct {
@@ -412,11 +448,15 @@ type MutationResolver interface {
 	UpdateControl(ctx context.Context, input types.UpdateControlInput) (*types.UpdateControlPayload, error)
 	UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error)
 	DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error)
+	CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error)
+	UpdatePolicy(ctx context.Context, input types.UpdatePolicyInput) (*types.UpdatePolicyPayload, error)
+	DeletePolicy(ctx context.Context, input types.DeletePolicyInput) (*types.DeletePolicyPayload, error)
 }
 type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
 	Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.VendorConnection, error)
 	Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PeopleConnection, error)
+	Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PolicyConnection, error)
 }
 type QueryResolver interface {
 	Node(ctx context.Context, id gid.GID) (types.Node, error)
@@ -655,6 +695,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CreatePeoplePayload.PeopleEdge(childComplexity), true
 
+	case "CreatePolicyPayload.policyEdge":
+		if e.complexity.CreatePolicyPayload.PolicyEdge == nil {
+			break
+		}
+
+		return e.complexity.CreatePolicyPayload.PolicyEdge(childComplexity), true
+
 	case "CreateTaskPayload.taskEdge":
 		if e.complexity.CreateTaskPayload.TaskEdge == nil {
 			break
@@ -689,6 +736,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeletePeoplePayload.DeletedPeopleID(childComplexity), true
+
+	case "DeletePolicyPayload.deletedPolicyId":
+		if e.complexity.DeletePolicyPayload.DeletedPolicyID == nil {
+			break
+		}
+
+		return e.complexity.DeletePolicyPayload.DeletedPolicyID(childComplexity), true
 
 	case "DeleteTaskPayload.deletedTaskId":
 		if e.complexity.DeleteTaskPayload.DeletedTaskID == nil {
@@ -1000,6 +1054,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreatePeople(childComplexity, args["input"].(types.CreatePeopleInput)), true
 
+	case "Mutation.createPolicy":
+		if e.complexity.Mutation.CreatePolicy == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createPolicy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreatePolicy(childComplexity, args["input"].(types.CreatePolicyInput)), true
+
 	case "Mutation.createTask":
 		if e.complexity.Mutation.CreateTask == nil {
 			break
@@ -1060,6 +1126,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeletePeople(childComplexity, args["input"].(types.DeletePeopleInput)), true
 
+	case "Mutation.deletePolicy":
+		if e.complexity.Mutation.DeletePolicy == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deletePolicy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeletePolicy(childComplexity, args["input"].(types.DeletePolicyInput)), true
+
 	case "Mutation.deleteTask":
 		if e.complexity.Mutation.DeleteTask == nil {
 			break
@@ -1119,6 +1197,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdatePeople(childComplexity, args["input"].(types.UpdatePeopleInput)), true
+
+	case "Mutation.updatePolicy":
+		if e.complexity.Mutation.UpdatePolicy == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePolicy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePolicy(childComplexity, args["input"].(types.UpdatePolicyInput)), true
 
 	case "Mutation.updateTaskState":
 		if e.complexity.Mutation.UpdateTaskState == nil {
@@ -1207,6 +1297,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Organization.Peoples(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+
+	case "Organization.policies":
+		if e.complexity.Organization.Policies == nil {
+			break
+		}
+
+		args, err := ec.field_Organization_policies_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Organization.Policies(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
 
 	case "Organization.updatedAt":
 		if e.complexity.Organization.UpdatedAt == nil {
@@ -1366,6 +1468,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PeopleEdge.Node(childComplexity), true
+
+	case "Policy.content":
+		if e.complexity.Policy.Content == nil {
+			break
+		}
+
+		return e.complexity.Policy.Content(childComplexity), true
+
+	case "Policy.createdAt":
+		if e.complexity.Policy.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Policy.CreatedAt(childComplexity), true
+
+	case "Policy.id":
+		if e.complexity.Policy.ID == nil {
+			break
+		}
+
+		return e.complexity.Policy.ID(childComplexity), true
+
+	case "Policy.name":
+		if e.complexity.Policy.Name == nil {
+			break
+		}
+
+		return e.complexity.Policy.Name(childComplexity), true
+
+	case "Policy.status":
+		if e.complexity.Policy.Status == nil {
+			break
+		}
+
+		return e.complexity.Policy.Status(childComplexity), true
+
+	case "Policy.updatedAt":
+		if e.complexity.Policy.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Policy.UpdatedAt(childComplexity), true
+
+	case "Policy.version":
+		if e.complexity.Policy.Version == nil {
+			break
+		}
+
+		return e.complexity.Policy.Version(childComplexity), true
+
+	case "PolicyConnection.edges":
+		if e.complexity.PolicyConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.PolicyConnection.Edges(childComplexity), true
+
+	case "PolicyConnection.pageInfo":
+		if e.complexity.PolicyConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.PolicyConnection.PageInfo(childComplexity), true
+
+	case "PolicyEdge.cursor":
+		if e.complexity.PolicyEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.PolicyEdge.Cursor(childComplexity), true
+
+	case "PolicyEdge.node":
+		if e.complexity.PolicyEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.PolicyEdge.Node(childComplexity), true
 
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
@@ -1585,6 +1764,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdatePeoplePayload.People(childComplexity), true
 
+	case "UpdatePolicyPayload.policy":
+		if e.complexity.UpdatePolicyPayload.Policy == nil {
+			break
+		}
+
+		return e.complexity.UpdatePolicyPayload.Policy(childComplexity), true
+
 	case "UpdateTaskStatePayload.task":
 		if e.complexity.UpdateTaskStatePayload.Task == nil {
 			break
@@ -1784,16 +1970,19 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateFrameworkInput,
 		ec.unmarshalInputCreateOrganizationInput,
 		ec.unmarshalInputCreatePeopleInput,
+		ec.unmarshalInputCreatePolicyInput,
 		ec.unmarshalInputCreateTaskInput,
 		ec.unmarshalInputCreateVendorInput,
 		ec.unmarshalInputDeleteEvidenceInput,
 		ec.unmarshalInputDeleteOrganizationInput,
 		ec.unmarshalInputDeletePeopleInput,
+		ec.unmarshalInputDeletePolicyInput,
 		ec.unmarshalInputDeleteTaskInput,
 		ec.unmarshalInputDeleteVendorInput,
 		ec.unmarshalInputUpdateControlInput,
 		ec.unmarshalInputUpdateFrameworkInput,
 		ec.unmarshalInputUpdatePeopleInput,
+		ec.unmarshalInputUpdatePolicyInput,
 		ec.unmarshalInputUpdateTaskStateInput,
 		ec.unmarshalInputUpdateVendorInput,
 		ec.unmarshalInputUploadEvidenceInput,
@@ -2016,6 +2205,13 @@ type Organization implements Node {
     last: Int
     before: CursorKey
   ): PeopleConnection! @goField(forceResolver: true)
+
+  policies(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): PolicyConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -2300,6 +2496,9 @@ type Mutation {
   updateControl(input: UpdateControlInput!): UpdateControlPayload!
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
+  createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
+  updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
+  deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
 }
 
 input CreateVendorInput {
@@ -2516,6 +2715,69 @@ input DeleteEvidenceInput {
 
 type DeleteEvidencePayload {
   deletedEvidenceId: ID!
+}
+
+enum PolicyStatus
+  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PolicyStatus") {
+  DRAFT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.PolicyStatusDraft"
+    )
+  ACTIVE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/probo/coredata.PolicyStatusActive"
+    )
+}
+
+input CreatePolicyInput {
+  organizationId: ID!
+  name: String!
+  content: String!
+  status: PolicyStatus!
+}
+
+input UpdatePolicyInput {
+  id: ID!
+  expectedVersion: Int!
+  name: String
+  content: String
+  status: PolicyStatus
+}
+
+input DeletePolicyInput {
+  policyId: ID!
+}
+
+type CreatePolicyPayload {
+  policyEdge: PolicyEdge!
+}
+
+type UpdatePolicyPayload {
+  policy: Policy!
+}
+
+type DeletePolicyPayload {
+  deletedPolicyId: ID!
+}
+
+type Policy implements Node {
+  id: ID!
+  version: Int!
+  name: String!
+  status: PolicyStatus!
+  content: String!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type PolicyConnection {
+  edges: [PolicyEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PolicyEdge {
+  cursor: CursorKey!
+  node: Policy!
 }
 `, BuiltIn: false},
 }
@@ -2925,6 +3187,29 @@ func (ec *executionContext) field_Mutation_createPeople_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_createPolicy_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createPolicy_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createPolicy_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreatePolicyInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreatePolicyInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePolicyInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreatePolicyInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_createTask_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3040,6 +3325,29 @@ func (ec *executionContext) field_Mutation_deletePeople_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_deletePolicy_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deletePolicy_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deletePolicy_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeletePolicyInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeletePolicyInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeletePolicyInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeletePolicyInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteTask_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3152,6 +3460,29 @@ func (ec *executionContext) field_Mutation_updatePeople_argsInput(
 	}
 
 	var zeroVal types.UpdatePeopleInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePolicy_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updatePolicy_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updatePolicy_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UpdatePolicyInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdatePolicyInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyInput(ctx, tmp)
+	}
+
+	var zeroVal types.UpdatePolicyInput
 	return zeroVal, nil
 }
 
@@ -3366,6 +3697,83 @@ func (ec *executionContext) field_Organization_peoples_argsLast(
 }
 
 func (ec *executionContext) field_Organization_peoples_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_policies_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Organization_policies_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Organization_policies_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Organization_policies_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Organization_policies_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	return args, nil
+}
+func (ec *executionContext) field_Organization_policies_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_policies_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_policies_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_policies_argsBefore(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*page.CursorKey, error) {
@@ -4958,6 +5366,50 @@ func (ec *executionContext) fieldContext_CreatePeoplePayload_peopleEdge(_ contex
 	return fc, nil
 }
 
+func (ec *executionContext) _CreatePolicyPayload_policyEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreatePolicyPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreatePolicyPayload_policyEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PolicyEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyEdge)
+	fc.Result = res
+	return ec.marshalNPolicyEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreatePolicyPayload_policyEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreatePolicyPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_PolicyEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_PolicyEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CreateTaskPayload_taskEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateTaskPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CreateTaskPayload_taskEdge(ctx, field)
 	if err != nil {
@@ -5150,6 +5602,44 @@ func (ec *executionContext) _DeletePeoplePayload_deletedPeopleId(ctx context.Con
 func (ec *executionContext) fieldContext_DeletePeoplePayload_deletedPeopleId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeletePeoplePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeletePolicyPayload_deletedPolicyId(ctx context.Context, field graphql.CollectedField, obj *types.DeletePolicyPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeletePolicyPayload_deletedPolicyId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedPolicyID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeletePolicyPayload_deletedPolicyId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeletePolicyPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -7441,6 +7931,147 @@ func (ec *executionContext) fieldContext_Mutation_deleteEvidence(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createPolicy(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createPolicy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreatePolicy(rctx, fc.Args["input"].(types.CreatePolicyInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreatePolicyPayload)
+	fc.Result = res
+	return ec.marshalNCreatePolicyPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePolicyPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createPolicy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "policyEdge":
+				return ec.fieldContext_CreatePolicyPayload_policyEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreatePolicyPayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createPolicy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updatePolicy(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePolicy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePolicy(rctx, fc.Args["input"].(types.UpdatePolicyInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UpdatePolicyPayload)
+	fc.Result = res
+	return ec.marshalNUpdatePolicyPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePolicy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "policy":
+				return ec.fieldContext_UpdatePolicyPayload_policy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdatePolicyPayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePolicy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deletePolicy(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deletePolicy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeletePolicy(rctx, fc.Args["input"].(types.DeletePolicyInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeletePolicyPayload)
+	fc.Result = res
+	return ec.marshalNDeletePolicyPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeletePolicyPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deletePolicy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedPolicyId":
+				return ec.fieldContext_DeletePolicyPayload_deletedPolicyId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeletePolicyPayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deletePolicy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Organization_id(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Organization_id(ctx, field)
 	if err != nil {
@@ -7702,6 +8333,55 @@ func (ec *executionContext) fieldContext_Organization_peoples(ctx context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _Organization_policies(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_policies(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Organization().Policies(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyConnection)
+	fc.Result = res
+	return ec.marshalNPolicyConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_policies(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_PolicyConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_PolicyConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyConnection", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Organization_policies_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Organization_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Organization_createdAt(ctx, field)
 	if err != nil {
@@ -7953,6 +8633,8 @@ func (ec *executionContext) fieldContext_OrganizationEdge_node(_ context.Context
 				return ec.fieldContext_Organization_vendors(ctx, field)
 			case "peoples":
 				return ec.fieldContext_Organization_peoples(ctx, field)
+			case "policies":
+				return ec.fieldContext_Organization_policies(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Organization_createdAt(ctx, field)
 			case "updatedAt":
@@ -8595,6 +9277,456 @@ func (ec *executionContext) fieldContext_PeopleEdge_node(_ context.Context, fiel
 				return ec.fieldContext_People_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Policy_id(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Policy_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Policy",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Policy_version(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_version(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Version, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Policy_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Policy",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Policy_name(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Policy_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Policy",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Policy_status(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.PolicyStatus)
+	fc.Result = res
+	return ec.marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Policy_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Policy",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PolicyStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Policy_content(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_content(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Policy_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Policy",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Policy_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Policy_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Policy",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Policy_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Policy_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Policy",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.PolicyConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.PolicyEdge)
+	fc.Result = res
+	return ec.marshalNPolicyEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_PolicyEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_PolicyEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.PolicyConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.PolicyEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.PolicyEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Policy)
+	fc.Result = res
+	return ec.marshalNPolicy2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicy(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Policy_id(ctx, field)
+			case "version":
+				return ec.fieldContext_Policy_version(ctx, field)
+			case "name":
+				return ec.fieldContext_Policy_name(ctx, field)
+			case "status":
+				return ec.fieldContext_Policy_status(ctx, field)
+			case "content":
+				return ec.fieldContext_Policy_content(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Policy_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Policy_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Policy", field.Name)
 		},
 	}
 	return fc, nil
@@ -9963,6 +11095,60 @@ func (ec *executionContext) fieldContext_UpdatePeoplePayload_people(_ context.Co
 				return ec.fieldContext_People_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdatePolicyPayload_policy(ctx context.Context, field graphql.CollectedField, obj *types.UpdatePolicyPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdatePolicyPayload_policy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Policy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Policy)
+	fc.Result = res
+	return ec.marshalNPolicy2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicy(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdatePolicyPayload_policy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdatePolicyPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Policy_id(ctx, field)
+			case "version":
+				return ec.fieldContext_Policy_version(ctx, field)
+			case "name":
+				return ec.fieldContext_Policy_name(ctx, field)
+			case "status":
+				return ec.fieldContext_Policy_status(ctx, field)
+			case "content":
+				return ec.fieldContext_Policy_content(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Policy_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Policy_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Policy", field.Name)
 		},
 	}
 	return fc, nil
@@ -12773,6 +13959,54 @@ func (ec *executionContext) unmarshalInputCreatePeopleInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreatePolicyInput(ctx context.Context, obj any) (types.CreatePolicyInput, error) {
+	var it types.CreatePolicyInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"organizationId", "name", "content", "status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, obj any) (types.CreateTaskInput, error) {
 	var it types.CreateTaskInput
 	asMap := map[string]any{}
@@ -12979,6 +14213,33 @@ func (ec *executionContext) unmarshalInputDeletePeopleInput(ctx context.Context,
 				return it, err
 			}
 			it.PeopleID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDeletePolicyInput(ctx context.Context, obj any) (types.DeletePolicyInput, error) {
+	var it types.DeletePolicyInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"policyId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "policyId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("policyId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PolicyID = data
 		}
 	}
 
@@ -13205,6 +14466,61 @@ func (ec *executionContext) unmarshalInputUpdatePeopleInput(ctx context.Context,
 				return it, err
 			}
 			it.Kind = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdatePolicyInput(ctx context.Context, obj any) (types.UpdatePolicyInput, error) {
+	var it types.UpdatePolicyInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "expectedVersion", "name", "content", "status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "expectedVersion":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expectedVersion"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExpectedVersion = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
 		}
 	}
 
@@ -13447,6 +14763,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._User(ctx, sel, obj)
+	case types.Policy:
+		return ec._Policy(ctx, sel, &obj)
+	case *types.Policy:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Policy(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -13982,6 +15305,45 @@ func (ec *executionContext) _CreatePeoplePayload(ctx context.Context, sel ast.Se
 	return out
 }
 
+var createPolicyPayloadImplementors = []string{"CreatePolicyPayload"}
+
+func (ec *executionContext) _CreatePolicyPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreatePolicyPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createPolicyPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreatePolicyPayload")
+		case "policyEdge":
+			out.Values[i] = ec._CreatePolicyPayload_policyEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createTaskPayloadImplementors = []string{"CreateTaskPayload"}
 
 func (ec *executionContext) _CreateTaskPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateTaskPayload) graphql.Marshaler {
@@ -14151,6 +15513,45 @@ func (ec *executionContext) _DeletePeoplePayload(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("DeletePeoplePayload")
 		case "deletedPeopleId":
 			out.Values[i] = ec._DeletePeoplePayload_deletedPeopleId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deletePolicyPayloadImplementors = []string{"DeletePolicyPayload"}
+
+func (ec *executionContext) _DeletePolicyPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeletePolicyPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deletePolicyPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeletePolicyPayload")
+		case "deletedPolicyId":
+			out.Values[i] = ec._DeletePolicyPayload_deletedPolicyId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -14941,6 +16342,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createPolicy":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createPolicy(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatePolicy":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePolicy(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletePolicy":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deletePolicy(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15057,6 +16479,37 @@ func (ec *executionContext) _Organization(ctx context.Context, sel ast.Selection
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				res = ec._Organization_peoples(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "policies":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				res = ec._Organization_policies(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15388,6 +16841,163 @@ func (ec *executionContext) _PeopleEdge(ctx context.Context, sel ast.SelectionSe
 			}
 		case "node":
 			out.Values[i] = ec._PeopleEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var policyImplementors = []string{"Policy", "Node"}
+
+func (ec *executionContext) _Policy(ctx context.Context, sel ast.SelectionSet, obj *types.Policy) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, policyImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Policy")
+		case "id":
+			out.Values[i] = ec._Policy_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "version":
+			out.Values[i] = ec._Policy_version(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Policy_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "status":
+			out.Values[i] = ec._Policy_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "content":
+			out.Values[i] = ec._Policy_content(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Policy_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Policy_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var policyConnectionImplementors = []string{"PolicyConnection"}
+
+func (ec *executionContext) _PolicyConnection(ctx context.Context, sel ast.SelectionSet, obj *types.PolicyConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, policyConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PolicyConnection")
+		case "edges":
+			out.Values[i] = ec._PolicyConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._PolicyConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var policyEdgeImplementors = []string{"PolicyEdge"}
+
+func (ec *executionContext) _PolicyEdge(ctx context.Context, sel ast.SelectionSet, obj *types.PolicyEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, policyEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PolicyEdge")
+		case "cursor":
+			out.Values[i] = ec._PolicyEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._PolicyEdge_node(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -15993,6 +17603,45 @@ func (ec *executionContext) _UpdatePeoplePayload(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("UpdatePeoplePayload")
 		case "people":
 			out.Values[i] = ec._UpdatePeoplePayload_people(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updatePolicyPayloadImplementors = []string{"UpdatePolicyPayload"}
+
+func (ec *executionContext) _UpdatePolicyPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdatePolicyPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updatePolicyPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdatePolicyPayload")
+		case "policy":
+			out.Values[i] = ec._UpdatePolicyPayload_policy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -16993,6 +18642,25 @@ func (ec *executionContext) marshalNCreatePeoplePayload2ᚖgithubᚗcomᚋgetpro
 	return ec._CreatePeoplePayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreatePolicyInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePolicyInput(ctx context.Context, v any) (types.CreatePolicyInput, error) {
+	res, err := ec.unmarshalInputCreatePolicyInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreatePolicyPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePolicyPayload(ctx context.Context, sel ast.SelectionSet, v types.CreatePolicyPayload) graphql.Marshaler {
+	return ec._CreatePolicyPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreatePolicyPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreatePolicyPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreatePolicyPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreatePolicyPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateTaskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTaskInput(ctx context.Context, v any) (types.CreateTaskInput, error) {
 	res, err := ec.unmarshalInputCreateTaskInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -17116,6 +18784,25 @@ func (ec *executionContext) marshalNDeletePeoplePayload2ᚖgithubᚗcomᚋgetpro
 		return graphql.Null
 	}
 	return ec._DeletePeoplePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeletePolicyInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeletePolicyInput(ctx context.Context, v any) (types.DeletePolicyInput, error) {
+	res, err := ec.unmarshalInputDeletePolicyInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeletePolicyPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeletePolicyPayload(ctx context.Context, sel ast.SelectionSet, v types.DeletePolicyPayload) graphql.Marshaler {
+	return ec._DeletePolicyPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeletePolicyPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeletePolicyPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeletePolicyPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeletePolicyPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeleteTaskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteTaskInput(ctx context.Context, v any) (types.DeleteTaskInput, error) {
@@ -17622,6 +19309,105 @@ var (
 	}
 )
 
+func (ec *executionContext) marshalNPolicy2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicy(ctx context.Context, sel ast.SelectionSet, v *types.Policy) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Policy(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPolicyConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyConnection(ctx context.Context, sel ast.SelectionSet, v types.PolicyConnection) graphql.Marshaler {
+	return ec._PolicyConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPolicyConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyConnection(ctx context.Context, sel ast.SelectionSet, v *types.PolicyConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PolicyConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPolicyEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.PolicyEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPolicyEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPolicyEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyEdge(ctx context.Context, sel ast.SelectionSet, v *types.PolicyEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PolicyEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx context.Context, v any) (coredata.PolicyStatus, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx context.Context, sel ast.SelectionSet, v coredata.PolicyStatus) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus = map[string]coredata.PolicyStatus{
+		"DRAFT":  coredata.PolicyStatusDraft,
+		"ACTIVE": coredata.PolicyStatusActive,
+	}
+	marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus = map[coredata.PolicyStatus]string{
+		coredata.PolicyStatusDraft:  "DRAFT",
+		coredata.PolicyStatusActive: "ACTIVE",
+	}
+)
+
 func (ec *executionContext) unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx context.Context, v any) (coredata.RiskTier, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier[tmp]
@@ -17953,6 +19739,25 @@ func (ec *executionContext) marshalNUpdatePeoplePayload2ᚖgithubᚗcomᚋgetpro
 		return graphql.Null
 	}
 	return ec._UpdatePeoplePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdatePolicyInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyInput(ctx context.Context, v any) (types.UpdatePolicyInput, error) {
+	res, err := ec.unmarshalInputUpdatePolicyInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdatePolicyPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyPayload(ctx context.Context, sel ast.SelectionSet, v types.UpdatePolicyPayload) graphql.Marshaler {
+	return ec._UpdatePolicyPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdatePolicyPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyPayload(ctx context.Context, sel ast.SelectionSet, v *types.UpdatePolicyPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdatePolicyPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateTaskStateInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateTaskStateInput(ctx context.Context, v any) (types.UpdateTaskStateInput, error) {
@@ -18503,6 +20308,34 @@ var (
 	marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind = map[coredata.PeopleKind]string{
 		coredata.PeopleKindEmployee:   "EMPLOYEE",
 		coredata.PeopleKindContractor: "CONTRACTOR",
+	}
+)
+
+func (ec *executionContext) unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx context.Context, v any) (*coredata.PolicyStatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx context.Context, sel ast.SelectionSet, v *coredata.PolicyStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalString(marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus[*v])
+	return res
+}
+
+var (
+	unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus = map[string]coredata.PolicyStatus{
+		"DRAFT":  coredata.PolicyStatusDraft,
+		"ACTIVE": coredata.PolicyStatusActive,
+	}
+	marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus = map[coredata.PolicyStatus]string{
+		coredata.PolicyStatusDraft:  "DRAFT",
+		coredata.PolicyStatusActive: "ACTIVE",
 	}
 )
 

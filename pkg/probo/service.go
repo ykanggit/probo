@@ -30,10 +30,17 @@ type (
 		scope  *coredata.Scope
 		s3     *s3.Client
 		bucket string
+
+		Policies *PolicyService
 	}
 )
 
-func NewService(ctx context.Context, pgClient *pg.Client, s3Client *s3.Client, bucket string) (*Service, error) {
+func NewService(
+	ctx context.Context,
+	pgClient *pg.Client,
+	s3Client *s3.Client,
+	bucket string,
+) (*Service, error) {
 	err := migrator.NewMigrator(pgClient, coredata.Migrations).Run(ctx, "migrations")
 	if err != nil {
 		return nil, fmt.Errorf("cannot migrate database schema: %w", err)
@@ -43,10 +50,14 @@ func NewService(ctx context.Context, pgClient *pg.Client, s3Client *s3.Client, b
 		return nil, fmt.Errorf("bucket is required")
 	}
 
-	return &Service{
+	svc := &Service{
 		pg:     pgClient,
 		s3:     s3Client,
 		scope:  coredata.NewScope(), // must be created from auth
 		bucket: bucket,
-	}, nil
+	}
+
+	svc.Policies = &PolicyService{svc: svc}
+
+	return svc, nil
 }

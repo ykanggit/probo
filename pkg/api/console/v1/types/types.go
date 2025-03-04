@@ -102,6 +102,17 @@ type CreatePeoplePayload struct {
 	PeopleEdge *PeopleEdge `json:"peopleEdge"`
 }
 
+type CreatePolicyInput struct {
+	OrganizationID gid.GID               `json:"organizationId"`
+	Name           string                `json:"name"`
+	Content        string                `json:"content"`
+	Status         coredata.PolicyStatus `json:"status"`
+}
+
+type CreatePolicyPayload struct {
+	PolicyEdge *PolicyEdge `json:"policyEdge"`
+}
+
 type CreateTaskInput struct {
 	ControlID   gid.GID `json:"controlId"`
 	Name        string  `json:"name"`
@@ -151,6 +162,14 @@ type DeletePeopleInput struct {
 
 type DeletePeoplePayload struct {
 	DeletedPeopleID gid.GID `json:"deletedPeopleId"`
+}
+
+type DeletePolicyInput struct {
+	PolicyID gid.GID `json:"policyId"`
+}
+
+type DeletePolicyPayload struct {
+	DeletedPolicyID gid.GID `json:"deletedPolicyId"`
 }
 
 type DeleteTaskInput struct {
@@ -246,6 +265,7 @@ type Organization struct {
 	Frameworks *FrameworkConnection `json:"frameworks"`
 	Vendors    *VendorConnection    `json:"vendors"`
 	Peoples    *PeopleConnection    `json:"peoples"`
+	Policies   *PolicyConnection    `json:"policies"`
 	CreatedAt  time.Time            `json:"createdAt"`
 	UpdatedAt  time.Time            `json:"updatedAt"`
 }
@@ -292,6 +312,29 @@ type PeopleConnection struct {
 type PeopleEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *People        `json:"node"`
+}
+
+type Policy struct {
+	ID        gid.GID               `json:"id"`
+	Version   int                   `json:"version"`
+	Name      string                `json:"name"`
+	Status    coredata.PolicyStatus `json:"status"`
+	Content   string                `json:"content"`
+	CreatedAt time.Time             `json:"createdAt"`
+	UpdatedAt time.Time             `json:"updatedAt"`
+}
+
+func (Policy) IsNode()             {}
+func (this Policy) GetID() gid.GID { return this.ID }
+
+type PolicyConnection struct {
+	Edges    []*PolicyEdge `json:"edges"`
+	PageInfo *PageInfo     `json:"pageInfo"`
+}
+
+type PolicyEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Policy        `json:"node"`
 }
 
 type Query struct {
@@ -380,6 +423,18 @@ type UpdatePeopleInput struct {
 
 type UpdatePeoplePayload struct {
 	People *People `json:"people"`
+}
+
+type UpdatePolicyInput struct {
+	ID              gid.GID                `json:"id"`
+	ExpectedVersion int                    `json:"expectedVersion"`
+	Name            *string                `json:"name,omitempty"`
+	Content         *string                `json:"content,omitempty"`
+	Status          *coredata.PolicyStatus `json:"status,omitempty"`
+}
+
+type UpdatePolicyPayload struct {
+	Policy *Policy `json:"policy"`
 }
 
 type UpdateTaskStateInput struct {

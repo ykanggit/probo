@@ -375,6 +375,53 @@ func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.Delet
 	}, nil
 }
 
+// CreatePolicy is the resolver for the createPolicy field.
+func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error) {
+	policy, err := r.proboSvc.Policies.Create(ctx, probo.CreatePolicyRequest{
+		OrganizationID: input.OrganizationID,
+		Name:           input.Name,
+		Content:        input.Content,
+		Status:         input.Status,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create policy: %w", err)
+	}
+
+	return &types.CreatePolicyPayload{
+		PolicyEdge: types.NewPolicyEdge(policy),
+	}, nil
+}
+
+// UpdatePolicy is the resolver for the updatePolicy field.
+func (r *mutationResolver) UpdatePolicy(ctx context.Context, input types.UpdatePolicyInput) (*types.UpdatePolicyPayload, error) {
+	policy, err := r.proboSvc.Policies.Update(ctx, probo.UpdatePolicyRequest{
+		ID:              input.ID,
+		ExpectedVersion: input.ExpectedVersion,
+		Name:            input.Name,
+		Content:         input.Content,
+		Status:          input.Status,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update policy: %w", err)
+	}
+
+	return &types.UpdatePolicyPayload{
+		Policy: types.NewPolicy(policy),
+	}, nil
+}
+
+// DeletePolicy is the resolver for the deletePolicy field.
+func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeletePolicyInput) (*types.DeletePolicyPayload, error) {
+	err := r.proboSvc.Policies.Delete(ctx, input.PolicyID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete policy: %w", err)
+	}
+
+	return &types.DeletePolicyPayload{
+		DeletedPolicyID: input.PolicyID,
+	}, nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	cursor := types.NewCursor(first, after, last, before)
@@ -409,6 +456,18 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 	}
 
 	return types.NewPeopleConnection(page), nil
+}
+
+// Policies is the resolver for the policies field.
+func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PolicyConnection, error) {
+	cursor := types.NewCursor(first, after, last, before)
+
+	page, err := r.proboSvc.Policies.ListByOrganization(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list organization policies: %w", err)
+	}
+
+	return types.NewPolicyConnection(page), nil
 }
 
 // Node is the resolver for the node field.
@@ -463,6 +522,12 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 		}
 
 		return types.NewEvidence(evidence), nil
+	case coredata.PolicyEntityType:
+		policy, err := r.proboSvc.Policies.Get(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		return types.NewPolicy(policy), nil
 	default:
 	}
 

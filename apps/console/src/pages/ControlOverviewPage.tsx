@@ -186,7 +186,7 @@ function ControlOverviewPageContent({
 }) {
   const data = usePreloadedQuery<ControlOverviewPageQueryType>(
     controlOverviewPageQuery,
-    queryRef,
+    queryRef
   );
   const { toast } = useToast();
   const { organizationId, frameworkId, controlId } = useParams();
@@ -194,7 +194,7 @@ function ControlOverviewPageContent({
   const environment = useRelayEnvironment();
   const [updateTaskState] =
     useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
-      updateTaskStateMutation,
+      updateTaskStateMutation
     );
   const [createTask] =
     useMutation<ControlOverviewPageCreateTaskMutationType>(createTaskMutation);
@@ -202,11 +202,11 @@ function ControlOverviewPageContent({
     useMutation<ControlOverviewPageDeleteTaskMutationType>(deleteTaskMutation);
   const [uploadEvidence] =
     useMutation<ControlOverviewPageUploadEvidenceMutationType>(
-      uploadEvidenceMutation,
+      uploadEvidenceMutation
     );
   const [deleteEvidence] =
     useMutation<ControlOverviewPageDeleteEvidenceMutationType>(
-      deleteEvidenceMutation,
+      deleteEvidenceMutation
     );
 
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
@@ -228,7 +228,7 @@ function ControlOverviewPageContent({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [draggedOverTaskId, setDraggedOverTaskId] = useState<string | null>(
-    null,
+    null
   );
   const [uploadingTaskId, setUploadingTaskId] = useState<string | null>(null);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
@@ -265,7 +265,7 @@ function ControlOverviewPageContent({
       }
       return null;
     },
-    [tasks],
+    [tasks]
   );
 
   useEffect(() => {
@@ -424,7 +424,7 @@ function ControlOverviewPageContent({
 
   const handleEditControl = () => {
     navigate(
-      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}/update`,
+      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}/update`
     );
   };
 
@@ -630,7 +630,7 @@ function ControlOverviewPageContent({
   const handleDeleteEvidence = (
     evidenceId: string,
     filename: string,
-    taskId: string,
+    taskId: string
   ) => {
     setEvidenceToDelete({ id: evidenceId, filename, taskId });
     setIsDeleteEvidenceOpen(true);
@@ -640,7 +640,7 @@ function ControlOverviewPageContent({
     if (!evidenceToDelete) return;
 
     const evidenceConnectionId = getEvidenceConnectionId(
-      evidenceToDelete.taskId,
+      evidenceToDelete.taskId
     );
 
     deleteEvidence({
@@ -998,10 +998,10 @@ function ControlOverviewPageContent({
                                     handleDeleteEvidence(
                                       evidence.id,
                                       evidence.filename,
-                                      task.id,
+                                      task.id
                                     );
                                   }}
-                                  className="p-1 rounded-full hover:bg-gray-100 hover:bg-red-50 hover:text-red-600"
+                                  className="p-1 rounded-full hover:bg-gray-10 hover:text-red-600"
                                   title="Delete Evidence"
                                 >
                                   <Trash2 className="w-4 h-4 text-gray-600 hover:text-red-600" />
@@ -1238,7 +1238,7 @@ function ControlOverviewPageFallback() {
 export default function ControlOverviewPage() {
   const { controlId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<ControlOverviewPageQueryType>(
-    controlOverviewPageQuery,
+    controlOverviewPageQuery
   );
 
   useEffect(() => {

@@ -24,7 +24,7 @@ posthog.init(process.env.POSTHOG_KEY!, {
 });
 
 const OrganizationSelectionPage = lazy(
-  () => import("./pages/OrganizationSelectionPage"),
+  () => import("./pages/OrganizationSelectionPage")
 );
 const HomePage = lazy(() => import("./pages/HomePage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
@@ -35,19 +35,24 @@ const VendorOverviewPage = lazy(() => import("./pages/VendorOverviewPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const CreatePeoplePage = lazy(() => import("./pages/CreatePeoplePage"));
 const FrameworkOverviewPage = lazy(
-  () => import("./pages/FrameworkOverviewPage"),
+  () => import("./pages/FrameworkOverviewPage")
 );
 const ControlOverviewPage = lazy(() => import("./pages/ControlOverviewPage"));
 const PeopleOverviewPage = lazy(() => import("./pages/PeopleOverviewPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const CreateOrganizationPage = lazy(
-  () => import("./pages/CreateOrganizationPage"),
+  () => import("./pages/CreateOrganizationPage")
 );
 const CreateFrameworkPage = lazy(() => import("./pages/CreateFrameworkPage"));
 const CreateControlPage = lazy(() => import("./pages/CreateControlPage"));
 const UpdateFrameworkPage = lazy(() => import("./pages/UpdateFrameworkPage"));
 const UpdateControlPage = lazy(() => import("./pages/UpdateControlPage"));
+// Policy pages
+const PolicyListPage = lazy(() => import("./pages/PolicyListPage"));
+const PolicyOverviewPage = lazy(() => import("./pages/PolicyOverviewPage"));
+const CreatePolicyPage = lazy(() => import("./pages/CreatePolicyPage"));
+const UpdatePolicyPage = lazy(() => import("./pages/UpdatePolicyPage"));
 
 function App() {
   return (
@@ -278,6 +283,47 @@ function App() {
                             <Suspense>
                               <ErrorBoundaryWithLocation>
                                 <VendorOverviewPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        {/* Policy Routes */}
+                        <Route
+                          path="policies"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <PolicyListPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="policies/create"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <CreatePolicyPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="policies/:policyId"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <PolicyOverviewPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="policies/:policyId/update"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <UpdatePolicyPage />
                               </ErrorBoundaryWithLocation>
                             </Suspense>
                           }

@@ -9,6 +9,7 @@ import {
   Send,
   Settings,
   Building,
+  FileText,
 } from "lucide-react";
 import {
   graphql,
@@ -63,6 +64,13 @@ function getNavItems(organizationId?: string) {
               },
             ]
           : [],
+      },
+      {
+        title: "Policies",
+        url: organizationId
+          ? `/organizations/${organizationId}/policies`
+          : undefined,
+        icon: FileText,
       },
       {
         title: "Settings",

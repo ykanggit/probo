@@ -25,4 +25,5 @@ const (
 	VendorEntityType
 	PeopleEntityType
 	EvidenceStateTransitionEntityType
+	PolicyEntityType
 )
