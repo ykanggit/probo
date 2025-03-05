@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<beb534549abc2d40828f7a5d0aaa96e6>>
+ * @generated SignedSource<<ecd63bc4d12703ce647666a146598810>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -27,6 +27,7 @@ export type UpdatePolicyPageMutation$data = {
       readonly id: string;
       readonly name: string;
       readonly status: PolicyStatus;
+      readonly version: number;
     };
   };
 };
@@ -93,6 +94,13 @@ v1 = [
             "kind": "ScalarField",
             "name": "status",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "version",
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -119,16 +127,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "712914b4586e7c5f722f908c8d64bbc1",
+    "cacheID": "ca013100ee6a0bf7c4e572474f1ba088",
     "id": null,
     "metadata": {},
     "name": "UpdatePolicyPageMutation",
     "operationKind": "mutation",
-    "text": "mutation UpdatePolicyPageMutation(\n  $input: UpdatePolicyInput!\n) {\n  updatePolicy(input: $input) {\n    policy {\n      id\n      name\n      content\n      status\n    }\n  }\n}\n"
+    "text": "mutation UpdatePolicyPageMutation(\n  $input: UpdatePolicyInput!\n) {\n  updatePolicy(input: $input) {\n    policy {\n      id\n      name\n      content\n      status\n      version\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "25a2ddb0078d821584c5497227a6d364";
+(node as any).hash = "c17a1ff9bf786b0e251374a14fff0086";
 
 export default node;

@@ -42,6 +42,7 @@ const UpdatePolicyMutation = graphql`
         name
         content
         status
+        version
       }
     }
   }
