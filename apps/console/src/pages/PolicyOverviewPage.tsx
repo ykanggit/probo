@@ -24,6 +24,7 @@ const PolicyOverviewPageQuery = graphql`
         content
         createdAt
         updatedAt
+        reviewDate
         status
       }
     }
@@ -210,7 +211,11 @@ function PolicyOverviewPageContent({
                     <FileText className="h-4 w-4" />
                     <span className="text-sm">Review Due</span>
                   </div>
-                  <p className="font-medium">2025-02-15</p>
+                  <p className="font-medium">
+                    {policy.reviewDate
+                      ? formatDate(policy.reviewDate)
+                      : "Not set"}
+                  </p>
                 </div>
 
                 <div>

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { FileText } from "lucide-react";
+import { FileText, Calendar } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PolicyEditor from "@/components/PolicyEditor";
 import type { CreatePolicyPageMutation } from "./__generated__/CreatePolicyPageMutation.graphql";
@@ -24,6 +24,7 @@ const CreatePolicyMutation = graphql`
           name
           content
           status
+          reviewDate
         }
       }
     }
@@ -36,6 +37,7 @@ export default function CreatePolicyPage() {
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
   const [status, setStatus] = useState<"DRAFT" | "ACTIVE">("DRAFT");
+  const [reviewDate, setReviewDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -53,11 +55,18 @@ export default function CreatePolicyPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Convert reviewDate string to ISO format for the API
+    let reviewDateValue = null;
+    if (reviewDate) {
+      reviewDateValue = new Date(reviewDate).toISOString();
+    }
+
     const input = {
       organizationId: organizationId!,
       name,
       content,
       status,
+      reviewDate: reviewDateValue,
     };
 
     commitMutation({
@@ -173,6 +182,22 @@ export default function CreatePolicyPage() {
                       </Label>
                     </div>
                   </RadioGroup>
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="reviewDate"
+                    className="flex items-center gap-2"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    Review Date
+                  </Label>
+                  <Input
+                    id="reviewDate"
+                    type="date"
+                    value={reviewDate}
+                    onChange={(e) => setReviewDate(e.target.value)}
+                  />
                 </div>
               </CardContent>
             </Card>

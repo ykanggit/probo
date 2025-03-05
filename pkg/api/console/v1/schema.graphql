@@ -649,6 +649,7 @@ input CreatePolicyInput {
   name: String!
   content: String!
   status: PolicyStatus!
+  reviewDate: Datetime
 }
 
 input UpdatePolicyInput {
@@ -657,6 +658,7 @@ input UpdatePolicyInput {
   name: String
   content: String
   status: PolicyStatus
+  reviewDate: Datetime
 }
 
 input DeletePolicyInput {
@@ -681,6 +683,7 @@ type Policy implements Node {
   name: String!
   status: PolicyStatus!
   content: String!
+  reviewDate: Datetime
   createdAt: Datetime!
   updatedAt: Datetime!
 }

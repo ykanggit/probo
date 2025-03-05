@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c20ef485780e9d9544f536609ae060af>>
+ * @generated SignedSource<<d242fdb748915009dc461be5596b6fc1>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,6 +14,7 @@ export type CreatePolicyInput = {
   content: string;
   name: string;
   organizationId: string;
+  reviewDate?: string | null | undefined;
   status: PolicyStatus;
 };
 export type CreatePolicyPageMutation$variables = {
@@ -27,6 +28,7 @@ export type CreatePolicyPageMutation$data = {
         readonly content: string;
         readonly id: string;
         readonly name: string;
+        readonly reviewDate: string | null | undefined;
         readonly status: PolicyStatus;
       };
     };
@@ -97,6 +99,13 @@ v3 = {
           "args": null,
           "kind": "ScalarField",
           "name": "status",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "reviewDate",
           "storageKey": null
         }
       ],
@@ -171,16 +180,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "f9d97eecb99b47365557e372c724af41",
+    "cacheID": "64796b84575bf926f45da4c98d31e645",
     "id": null,
     "metadata": {},
     "name": "CreatePolicyPageMutation",
     "operationKind": "mutation",
-    "text": "mutation CreatePolicyPageMutation(\n  $input: CreatePolicyInput!\n) {\n  createPolicy(input: $input) {\n    policyEdge {\n      node {\n        id\n        name\n        content\n        status\n      }\n    }\n  }\n}\n"
+    "text": "mutation CreatePolicyPageMutation(\n  $input: CreatePolicyInput!\n) {\n  createPolicy(input: $input) {\n    policyEdge {\n      node {\n        id\n        name\n        content\n        status\n        reviewDate\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "dca08dd146693bcf614e7d02785e57b5";
+(node as any).hash = "b7ecb61ced1e31c0c0093946135eca3b";
 
 export default node;

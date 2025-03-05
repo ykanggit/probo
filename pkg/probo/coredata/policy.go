@@ -19,6 +19,7 @@ type (
 		Status         PolicyStatus `db:"status"`
 		Name           string       `db:"name"`
 		Content        string       `db:"content"`
+		ReviewDate     *time.Time   `db:"review_date"`
 		CreatedAt      time.Time    `db:"created_at"`
 		UpdatedAt      time.Time    `db:"updated_at"`
 		Version        int          `db:"version"`
@@ -31,6 +32,7 @@ type (
 		Name            *string
 		Content         *string
 		Status          *PolicyStatus
+		ReviewDate      **time.Time
 	}
 )
 
@@ -51,6 +53,7 @@ SELECT
     name,
 	status,
     content,
+    review_date,
     created_at,
     updated_at,
     version
@@ -96,6 +99,7 @@ SELECT
     name,
 	status,
     content,
+    review_date,
     created_at,
     updated_at,
     version
@@ -140,6 +144,7 @@ INSERT INTO
         name,
 		status,
         content,
+        review_date,
         created_at,
         updated_at,
         version
@@ -150,6 +155,7 @@ VALUES (
     @name,
     @status,
     @content,
+    @review_date,
     @created_at,
     @updated_at,
     @version
@@ -162,6 +168,7 @@ VALUES (
 		"name":            p.Name,
 		"status":          p.Status,
 		"content":         p.Content,
+		"review_date":     p.ReviewDate,
 		"created_at":      p.CreatedAt,
 		"updated_at":      p.UpdatedAt,
 		"version":         p.Version,
@@ -199,6 +206,7 @@ UPDATE policies SET
     name = COALESCE(@name, name),
     status = COALESCE(@status, status),
     content = COALESCE(@content, content),
+    review_date = COALESCE(@review_date, review_date),
     updated_at = @updated_at,
     version = version + 1
 WHERE %s
@@ -209,6 +217,7 @@ RETURNING
     organization_id,
     name,
     content,
+    review_date,
     created_at,
     updated_at,
 	status,
@@ -230,6 +239,9 @@ RETURNING
 	}
 	if params.Status != nil {
 		args["status"] = *params.Status
+	}
+	if params.ReviewDate != nil {
+		args["review_date"] = *params.ReviewDate
 	}
 
 	maps.Copy(args, scope.SQLArguments())

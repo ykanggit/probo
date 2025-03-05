@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b7ecab3dac17a6d1b23ec639484a4322>>
+ * @generated SignedSource<<5ee387b238e8fdc7c41851c7e6740c95>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,6 +18,7 @@ export type UpdatePolicyPageQuery$data = {
     readonly content?: string;
     readonly id: string;
     readonly name?: string;
+    readonly reviewDate?: string | null | undefined;
     readonly status?: PolicyStatus;
     readonly version?: number;
   };
@@ -79,6 +80,13 @@ v3 = {
       "kind": "ScalarField",
       "name": "version",
       "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "reviewDate",
+      "storageKey": null
     }
   ],
   "type": "Policy",
@@ -137,16 +145,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ed70bb0199119ba5b9080ed86081ac79",
+    "cacheID": "fc062f2d2fcce04954feb69436433093",
     "id": null,
     "metadata": {},
     "name": "UpdatePolicyPageQuery",
     "operationKind": "query",
-    "text": "query UpdatePolicyPageQuery(\n  $policyId: ID!\n) {\n  node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      status\n      version\n    }\n  }\n}\n"
+    "text": "query UpdatePolicyPageQuery(\n  $policyId: ID!\n) {\n  node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      status\n      version\n      reviewDate\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "303abaec54b66ef4f5c886d1cd606f12";
+(node as any).hash = "4ae49cad4f03a09d87475483c271bd94";
 
 export default node;

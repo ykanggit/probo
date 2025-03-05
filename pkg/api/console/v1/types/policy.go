@@ -21,13 +21,14 @@ import (
 
 func NewPolicy(policy *coredata.Policy) *Policy {
 	return &Policy{
-		ID:        policy.ID,
-		Version:   policy.Version,
-		Name:      policy.Name,
-		Content:   policy.Content,
-		CreatedAt: policy.CreatedAt,
-		UpdatedAt: policy.UpdatedAt,
-		Status:    policy.Status,
+		ID:         policy.ID,
+		Version:    policy.Version,
+		Name:       policy.Name,
+		Content:    policy.Content,
+		CreatedAt:  policy.CreatedAt,
+		UpdatedAt:  policy.UpdatedAt,
+		Status:     policy.Status,
+		ReviewDate: policy.ReviewDate,
 	}
 }
 

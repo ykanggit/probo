@@ -21,6 +21,7 @@ type (
 		Name           string
 		Status         coredata.PolicyStatus
 		Content        string
+		ReviewDate     *time.Time
 	}
 
 	UpdatePolicyRequest struct {
@@ -29,6 +30,7 @@ type (
 		Name            *string
 		Content         *string
 		Status          *coredata.PolicyStatus
+		ReviewDate      *time.Time
 	}
 )
 
@@ -69,6 +71,7 @@ func (s *PolicyService) Create(
 		Name:           req.Name,
 		Content:        req.Content,
 		Status:         req.Status,
+		ReviewDate:     req.ReviewDate,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
@@ -104,6 +107,7 @@ func (s *PolicyService) Update(
 		Name:            req.Name,
 		Content:         req.Content,
 		Status:          req.Status,
+		ReviewDate:      &req.ReviewDate,
 	}
 
 	policy := &coredata.Policy{ID: req.ID}

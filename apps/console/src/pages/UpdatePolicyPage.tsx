@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { FileText } from "lucide-react";
+import { FileText, Calendar } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Suspense } from "react";
 import PolicyEditor from "@/components/PolicyEditor";
@@ -29,6 +29,7 @@ const UpdatePolicyPageQuery = graphql`
         content
         status
         version
+        reviewDate
       }
     }
   }
@@ -43,6 +44,7 @@ const UpdatePolicyMutation = graphql`
         content
         status
         version
+        reviewDate
       }
     }
   }
@@ -65,6 +67,7 @@ function UpdatePolicyPageContent({
   const [name, setName] = useState(data.node.name);
   const [content, setContent] = useState(data.node.content || "");
   const [status, setStatus] = useState(data.node.status);
+  const [reviewDate, setReviewDate] = useState(data.node.reviewDate || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   console.log(
@@ -81,6 +84,12 @@ function UpdatePolicyPageContent({
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Convert reviewDate string to ISO format for the API
+    let reviewDateValue = null;
+    if (reviewDate) {
+      reviewDateValue = new Date(reviewDate).toISOString();
+    }
+
     commitMutation({
       variables: {
         input: {
@@ -88,6 +97,7 @@ function UpdatePolicyPageContent({
           name,
           content,
           status,
+          reviewDate: reviewDateValue,
           expectedVersion: data.node.version!,
         },
       },
@@ -98,19 +108,16 @@ function UpdatePolicyPageContent({
           toast({
             title: "Error",
             description: "Failed to update policy. Please try again.",
-            variant: "destructive",
           });
           return;
         }
 
         toast({
           title: "Success",
-          description: "Policy updated successfully!",
+          description: "Policy updated successfully.",
         });
 
-        navigate(
-          `/organizations/${organizationId}/policies/${response.updatePolicy.policy.id}`
-        );
+        navigate(`/organizations/${organizationId}/policies/${policyId}`);
       },
       onError: (error) => {
         setIsSubmitting(false);
@@ -118,7 +125,6 @@ function UpdatePolicyPageContent({
         toast({
           title: "Error",
           description: "Failed to update policy. Please try again.",
-          variant: "destructive",
         });
       },
     });
@@ -192,6 +198,22 @@ function UpdatePolicyPageContent({
                       </Label>
                     </div>
                   </RadioGroup>
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="reviewDate"
+                    className="flex items-center gap-2"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    Review Date
+                  </Label>
+                  <Input
+                    id="reviewDate"
+                    type="date"
+                    value={reviewDate}
+                    onChange={(e) => setReviewDate(e.target.value)}
+                  />
                 </div>
               </CardContent>
             </Card>

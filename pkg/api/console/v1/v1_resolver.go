@@ -382,6 +382,7 @@ func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreateP
 		Name:           input.Name,
 		Content:        input.Content,
 		Status:         input.Status,
+		ReviewDate:     input.ReviewDate,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot create policy: %w", err)
@@ -400,6 +401,7 @@ func (r *mutationResolver) UpdatePolicy(ctx context.Context, input types.UpdateP
 		Name:            input.Name,
 		Content:         input.Content,
 		Status:          input.Status,
+		ReviewDate:      input.ReviewDate,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update policy: %w", err)

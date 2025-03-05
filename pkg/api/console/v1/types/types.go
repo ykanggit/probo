@@ -107,6 +107,7 @@ type CreatePolicyInput struct {
 	Name           string                `json:"name"`
 	Content        string                `json:"content"`
 	Status         coredata.PolicyStatus `json:"status"`
+	ReviewDate     *time.Time            `json:"reviewDate,omitempty"`
 }
 
 type CreatePolicyPayload struct {
@@ -315,13 +316,14 @@ type PeopleEdge struct {
 }
 
 type Policy struct {
-	ID        gid.GID               `json:"id"`
-	Version   int                   `json:"version"`
-	Name      string                `json:"name"`
-	Status    coredata.PolicyStatus `json:"status"`
-	Content   string                `json:"content"`
-	CreatedAt time.Time             `json:"createdAt"`
-	UpdatedAt time.Time             `json:"updatedAt"`
+	ID         gid.GID               `json:"id"`
+	Version    int                   `json:"version"`
+	Name       string                `json:"name"`
+	Status     coredata.PolicyStatus `json:"status"`
+	Content    string                `json:"content"`
+	ReviewDate *time.Time            `json:"reviewDate,omitempty"`
+	CreatedAt  time.Time             `json:"createdAt"`
+	UpdatedAt  time.Time             `json:"updatedAt"`
 }
 
 func (Policy) IsNode()             {}
@@ -431,6 +433,7 @@ type UpdatePolicyInput struct {
 	Name            *string                `json:"name,omitempty"`
 	Content         *string                `json:"content,omitempty"`
 	Status          *coredata.PolicyStatus `json:"status,omitempty"`
+	ReviewDate      *time.Time             `json:"reviewDate,omitempty"`
 }
 
 type UpdatePolicyPayload struct {
