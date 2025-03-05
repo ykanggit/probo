@@ -80,6 +80,7 @@ func New() *Implm {
 				CookieHTTPOnly:  true,
 				CookieDomain:    "localhost",
 				CookiePath:      "/",
+				CookieSecret:    "this-is-a-secure-secret-for-cookie-signing-at-least-32-bytes",
 			},
 			AWS: awsConfig{
 				Region:          "us-east-1",
@@ -122,6 +123,12 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot get pepper bytes: %w", err)
 	}
 
+	// Validate cookie secret
+	_, err = impl.cfg.Auth.GetCookieSecretBytes()
+	if err != nil {
+		return fmt.Errorf("cannot get cookie secret bytes: %w", err)
+	}
+
 	awsConfig := awsconfig.NewConfig(
 		l,
 		httpclient.DefaultPooledClient(
@@ -162,6 +169,7 @@ func (impl *Implm) Run(
 				CookieDomain:    impl.cfg.Auth.CookieDomain,
 				CookiePath:      impl.cfg.Auth.CookiePath,
 				SessionDuration: time.Duration(impl.cfg.Auth.SessionDuration) * time.Hour,
+				CookieSecret:    impl.cfg.Auth.CookieSecret,
 			},
 		},
 	)

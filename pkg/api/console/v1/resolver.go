@@ -44,6 +44,7 @@ type (
 		CookieDomain    string
 		CookiePath      string
 		SessionDuration time.Duration
+		CookieSecret    string
 	}
 
 	Resolver struct {
@@ -143,20 +144,24 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		// Extract session from cookie
 		cookie, err := r.Cookie(authCfg.CookieName)
 		if err == nil && cookie.Value != "" {
-			// Parse the session ID
-			sessionID, err := gid.ParseGID(cookie.Value)
+			// Verify the cookie signature
+			originalValue, err := verifyCookieValue(cookie.Value, authCfg.CookieSecret)
 			if err == nil {
-				// Get the session
-				session, err := usrmgrSvc.GetSession(r.Context(), sessionID)
+				// Parse the session ID
+				sessionID, err := gid.ParseGID(originalValue)
 				if err == nil {
-					// Add session to context
-					ctx = context.WithValue(ctx, sessionContextKey, session)
-
-					// Get the user
-					user, err := usrmgrSvc.GetUserBySession(r.Context(), sessionID)
+					// Get the session
+					session, err := usrmgrSvc.GetSession(r.Context(), sessionID)
 					if err == nil {
-						// Add user to context
-						ctx = context.WithValue(ctx, userContextKey, user)
+						// Add session to context
+						ctx = context.WithValue(ctx, sessionContextKey, session)
+
+						// Get the user
+						user, err := usrmgrSvc.GetUserBySession(r.Context(), sessionID)
+						if err == nil {
+							// Add user to context
+							ctx = context.WithValue(ctx, userContextKey, user)
+						}
 					}
 				}
 			}

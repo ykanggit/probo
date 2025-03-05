@@ -176,8 +176,15 @@ func LogoutHandler(usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.HandlerFu
 			return
 		}
 
+		// Verify the cookie signature
+		originalValue, err := verifyCookieValue(cookie.Value, authCfg.CookieSecret)
+		if err != nil {
+			http.Error(w, "Invalid session cookie", http.StatusBadRequest)
+			return
+		}
+
 		// Parse the session ID
-		sessionID, err := gid.ParseGID(cookie.Value)
+		sessionID, err := gid.ParseGID(originalValue)
 		if err != nil {
 			http.Error(w, "Invalid session ID", http.StatusBadRequest)
 			return

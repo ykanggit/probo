@@ -30,16 +30,15 @@ type (
 		CookieHTTPOnly  bool   `json:"cookie-http-only"`
 		CookieDomain    string `json:"cookie-domain"`
 		CookiePath      string `json:"cookie-path"`
+		CookieSecret string `json:"cookie-secret"`
 	}
 )
 
-// GetPepperBytes returns the pepper as a byte array
 func (c authConfig) GetPepperBytes() ([]byte, error) {
 	if c.Pepper == "" {
 		return nil, fmt.Errorf("pepper cannot be empty")
 	}
 
-	// If the pepper is base64 encoded, decode it
 	if decoded, err := base64.StdEncoding.DecodeString(c.Pepper); err == nil {
 		if len(decoded) < 32 {
 			return nil, fmt.Errorf("decoded pepper must be at least 32 bytes long")
@@ -47,10 +46,28 @@ func (c authConfig) GetPepperBytes() ([]byte, error) {
 		return decoded, nil
 	}
 
-	// Otherwise use the raw string as the pepper
 	if len(c.Pepper) < 32 {
 		return nil, fmt.Errorf("pepper must be at least 32 bytes long")
 	}
 
 	return []byte(c.Pepper), nil
+}
+
+func (c authConfig) GetCookieSecretBytes() ([]byte, error) {
+	if c.CookieSecret == "" {
+		return nil, fmt.Errorf("cookie secret cannot be empty")
+	}
+
+	if decoded, err := base64.StdEncoding.DecodeString(c.CookieSecret); err == nil {
+		if len(decoded) < 32 {
+			return nil, fmt.Errorf("decoded cookie secret must be at least 32 bytes long")
+		}
+		return decoded, nil
+	}
+
+	if len(c.CookieSecret) < 32 {
+		return nil, fmt.Errorf("cookie secret must be at least 32 bytes long")
+	}
+
+	return []byte(c.CookieSecret), nil
 }
