@@ -186,7 +186,7 @@ function PolicyOverviewPageContent({
           <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild>
               <Link
-                to={`/organizations/${organizationId}/policies/${policy.id}/edit`}
+                to={`/organizations/${organizationId}/policies/${policy.id}/update`}
               >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
