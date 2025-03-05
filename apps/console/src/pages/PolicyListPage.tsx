@@ -314,7 +314,7 @@ function PolicyListPageContent({
                 >
                   <PolicyCard
                     title={policy.name}
-                    content={(policy as any).content}
+                    content={policy.content}
                     status={policy.status}
                     updatedAt={policy.updatedAt}
                   />
