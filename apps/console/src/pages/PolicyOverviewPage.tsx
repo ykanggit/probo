@@ -171,7 +171,12 @@ function PolicyOverviewPageContent({
                 {policy.owner && (
                   <div className="flex items-center gap-1">
                     <User className="h-3 w-3" />
-                    <span>{policy.owner.fullName}</span>
+                    <Link
+                      to={`/organizations/${organizationId}/peoples/${policy.owner.id}`}
+                      className="hover:underline"
+                    >
+                      {policy.owner.fullName}
+                    </Link>
                   </div>
                 )}
                 {policy.reviewDate && (
@@ -361,9 +366,14 @@ function PolicyOverviewPageContent({
                       <User className="h-4 w-4" />
                       <span className="text-sm">Owner</span>
                     </div>
-                    <p className="font-medium">
-                      {policy.owner ? policy.owner.fullName : "Not assigned"}
-                    </p>
+                    <Link
+                      to={`/organizations/${organizationId}/peoples/${policy.owner?.id}`}
+                      className="hover:underline"
+                    >
+                      <p className="font-medium">
+                        {policy.owner ? policy.owner.fullName : "Not assigned"}
+                      </p>
+                    </Link>
                   </div>
                 </div>
               </CardContent>
