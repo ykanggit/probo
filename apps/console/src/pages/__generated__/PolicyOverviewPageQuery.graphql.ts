@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0d5fd744f67f5e3c2d357a41e392acfb>>
+ * @generated SignedSource<<be4844f007d260c332082a01fe125a57>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,11 +16,11 @@ export type PolicyOverviewPageQuery$variables = {
 export type PolicyOverviewPageQuery$data = {
   readonly node: {
     readonly content?: string;
-    readonly createdAt?: any;
+    readonly createdAt?: string;
     readonly id: string;
     readonly name?: string;
     readonly status?: PolicyStatus;
-    readonly updatedAt?: any;
+    readonly updatedAt?: string;
   };
 };
 export type PolicyOverviewPageQuery = {

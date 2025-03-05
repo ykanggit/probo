@@ -27,6 +27,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "fuse.js": "^7.1.0",
     "lexical": "^0.27.0",
     "lucide-react": "^0.475.0",

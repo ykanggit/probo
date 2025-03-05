@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4225a13c40221ef783ffebcfda157db9>>
+ * @generated SignedSource<<a49c4b1ca92e109b1091a1431fe0c871>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,6 +18,7 @@ export type PolicyListPageQuery$data = {
     readonly policies?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
+          readonly content: string;
           readonly createdAt: string;
           readonly id: string;
           readonly name: string;
@@ -85,6 +86,13 @@ v4 = [
             "args": null,
             "kind": "ScalarField",
             "name": "name",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "content",
             "storageKey": null
           },
           {
@@ -242,7 +250,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "abc2b7659c3b58aa3df934d4ee3aa78a",
+    "cacheID": "5aa6e466b6daa957aa9c582530e385ec",
     "id": null,
     "metadata": {
       "connection": [
@@ -259,11 +267,11 @@ return {
     },
     "name": "PolicyListPageQuery",
     "operationKind": "query",
-    "text": "query PolicyListPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      policies(first: 25) {\n        edges {\n          node {\n            id\n            name\n            createdAt\n            updatedAt\n            status\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query PolicyListPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      policies(first: 25) {\n        edges {\n          node {\n            id\n            name\n            content\n            createdAt\n            updatedAt\n            status\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "75262b569185ae2e6bfda8c19fd7ac9d";
+(node as any).hash = "853e3413fd1b3f8781b11a1b7679c08f";
 
 export default node;
