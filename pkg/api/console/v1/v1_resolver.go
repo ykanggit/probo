@@ -383,6 +383,7 @@ func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreateP
 		Content:        input.Content,
 		Status:         input.Status,
 		ReviewDate:     input.ReviewDate,
+		OwnerID:        input.OwnerID,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot create policy: %w", err)
@@ -402,6 +403,7 @@ func (r *mutationResolver) UpdatePolicy(ctx context.Context, input types.UpdateP
 		Content:         input.Content,
 		Status:          input.Status,
 		ReviewDate:      input.ReviewDate,
+		OwnerID:         input.OwnerID,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update policy: %w", err)
@@ -470,6 +472,22 @@ func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organiza
 	}
 
 	return types.NewPolicyConnection(page), nil
+}
+
+// Owner is the resolver for the owner field.
+func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.People, error) {
+	policy, err := r.proboSvc.Policies.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get policy: %w", err)
+	}
+
+	// Get the owner
+	owner, err := r.proboSvc.GetPeople(ctx, policy.OwnerID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get owner: %w", err)
+	}
+
+	return types.NewPeople(owner), nil
 }
 
 // Node is the resolver for the node field.
@@ -613,6 +631,9 @@ func (r *Resolver) Mutation() schema.MutationResolver { return &mutationResolver
 // Organization returns schema.OrganizationResolver implementation.
 func (r *Resolver) Organization() schema.OrganizationResolver { return &organizationResolver{r} }
 
+// Policy returns schema.PolicyResolver implementation.
+func (r *Resolver) Policy() schema.PolicyResolver { return &policyResolver{r} }
+
 // Query returns schema.QueryResolver implementation.
 func (r *Resolver) Query() schema.QueryResolver { return &queryResolver{r} }
 
@@ -627,6 +648,7 @@ type evidenceResolver struct{ *Resolver }
 type frameworkResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
+type policyResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }

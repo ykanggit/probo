@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0eb945d3cbf8f223621fe7aa2b93eddc>>
+ * @generated SignedSource<<67ee63bc3751efdd9ecdf2ad9ab5e197>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -19,6 +19,11 @@ export type PolicyOverviewPageQuery$data = {
     readonly createdAt?: string;
     readonly id: string;
     readonly name?: string;
+    readonly owner?: {
+      readonly fullName: string;
+      readonly id: string;
+      readonly primaryEmailAddress: string;
+    };
     readonly reviewDate?: string | null | undefined;
     readonly status?: PolicyStatus;
     readonly updatedAt?: string;
@@ -95,6 +100,32 @@ v3 = {
       "kind": "ScalarField",
       "name": "status",
       "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "concreteType": "People",
+      "kind": "LinkedField",
+      "name": "owner",
+      "plural": false,
+      "selections": [
+        (v2/*: any*/),
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "fullName",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "primaryEmailAddress",
+          "storageKey": null
+        }
+      ],
+      "storageKey": null
     }
   ],
   "type": "Policy",
@@ -153,16 +184,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d3b31142132a379f9c3a8812ddcfb7da",
+    "cacheID": "c57fd1a2ff5ffa776bebb9f15bd534bc",
     "id": null,
     "metadata": {},
     "name": "PolicyOverviewPageQuery",
     "operationKind": "query",
-    "text": "query PolicyOverviewPageQuery(\n  $policyId: ID!\n) {\n  node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      createdAt\n      updatedAt\n      reviewDate\n      status\n    }\n  }\n}\n"
+    "text": "query PolicyOverviewPageQuery(\n  $policyId: ID!\n) {\n  node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      createdAt\n      updatedAt\n      reviewDate\n      status\n      owner {\n        id\n        fullName\n        primaryEmailAddress\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "1519b589fe7da5a258621ad445970ca7";
+(node as any).hash = "e6c4f286358df61d18ea6deb367d7182";
 
 export default node;

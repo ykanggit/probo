@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9a54ece29b9ff9a2efa624f67f40f803>>
+ * @generated SignedSource<<f37225ac5a4b6774dadbd4f23c3bbfe9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,6 +15,7 @@ export type UpdatePolicyInput = {
   expectedVersion: number;
   id: string;
   name?: string | null | undefined;
+  ownerId?: string | null | undefined;
   reviewDate?: string | null | undefined;
   status?: PolicyStatus | null | undefined;
 };
@@ -27,6 +28,10 @@ export type UpdatePolicyPageMutation$data = {
       readonly content: string;
       readonly id: string;
       readonly name: string;
+      readonly owner: {
+        readonly fullName: string;
+        readonly id: string;
+      };
       readonly reviewDate: string | null | undefined;
       readonly status: PolicyStatus;
       readonly version: number;
@@ -46,7 +51,14 @@ var v0 = [
     "name": "input"
   }
 ],
-v1 = [
+v1 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v2 = [
   {
     "alias": null,
     "args": [
@@ -69,13 +81,7 @@ v1 = [
         "name": "policy",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "id",
-            "storageKey": null
-          },
+          (v1/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -110,6 +116,25 @@ v1 = [
             "kind": "ScalarField",
             "name": "reviewDate",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "People",
+            "kind": "LinkedField",
+            "name": "owner",
+            "plural": false,
+            "selections": [
+              (v1/*: any*/),
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "fullName",
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -124,7 +149,7 @@ return {
     "kind": "Fragment",
     "metadata": null,
     "name": "UpdatePolicyPageMutation",
-    "selections": (v1/*: any*/),
+    "selections": (v2/*: any*/),
     "type": "Mutation",
     "abstractKey": null
   },
@@ -133,19 +158,19 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
     "name": "UpdatePolicyPageMutation",
-    "selections": (v1/*: any*/)
+    "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "ce2ccf9449b52e3df3b2b9bb82c55166",
+    "cacheID": "cab3ba1fb88944fade60b5d6a0e0b7b9",
     "id": null,
     "metadata": {},
     "name": "UpdatePolicyPageMutation",
     "operationKind": "mutation",
-    "text": "mutation UpdatePolicyPageMutation(\n  $input: UpdatePolicyInput!\n) {\n  updatePolicy(input: $input) {\n    policy {\n      id\n      name\n      content\n      status\n      version\n      reviewDate\n    }\n  }\n}\n"
+    "text": "mutation UpdatePolicyPageMutation(\n  $input: UpdatePolicyInput!\n) {\n  updatePolicy(input: $input) {\n    policy {\n      id\n      name\n      content\n      status\n      version\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d5329966d0e13b8931d6f01d9afb74e2";
+(node as any).hash = "51e4a0e297540f4e83dcb6d809430ac7";
 
 export default node;

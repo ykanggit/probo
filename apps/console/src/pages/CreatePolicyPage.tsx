@@ -1,16 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import { ConnectionHandler, graphql, useMutation } from "react-relay";
+import {
+  ConnectionHandler,
+  graphql,
+  useMutation,
+  useQueryLoader,
+  usePreloadedQuery,
+  PreloadedQuery,
+} from "react-relay";
 import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Calendar } from "lucide-react";
+import { FileText, Calendar, User } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PolicyEditor from "@/components/PolicyEditor";
+import PeopleSelector from "@/components/PeopleSelector";
+import { Suspense } from "react";
 import type { CreatePolicyPageMutation } from "./__generated__/CreatePolicyPageMutation.graphql";
+import type { CreatePolicyPageQuery as CreatePolicyPageQueryType } from "./__generated__/CreatePolicyPageQuery.graphql";
+
+const CreatePolicyQuery = graphql`
+  query CreatePolicyPageQuery($organizationId: ID!) {
+    organization: node(id: $organizationId) {
+      ...PeopleSelector_organization
+    }
+  }
+`;
 
 const CreatePolicyMutation = graphql`
   mutation CreatePolicyPageMutation(
@@ -25,19 +43,32 @@ const CreatePolicyMutation = graphql`
           content
           status
           reviewDate
+          owner {
+            id
+            fullName
+          }
         }
       }
     }
   }
 `;
 
-export default function CreatePolicyPage() {
+function CreatePolicyForm({
+  queryRef,
+}: {
+  queryRef: PreloadedQuery<CreatePolicyPageQueryType>;
+}) {
   const navigate = useNavigate();
   const { organizationId } = useParams();
+  const data = usePreloadedQuery<CreatePolicyPageQueryType>(
+    CreatePolicyQuery,
+    queryRef
+  );
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
   const [status, setStatus] = useState<"DRAFT" | "ACTIVE">("DRAFT");
   const [reviewDate, setReviewDate] = useState("");
+  const [ownerId, setOwnerId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -53,6 +84,16 @@ export default function CreatePolicyPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!ownerId) {
+      toast({
+        title: "Error",
+        description: "Please select an owner for the policy.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     // Convert reviewDate string to ISO format for the API
@@ -67,6 +108,7 @@ export default function CreatePolicyPage() {
       content,
       status,
       reviewDate: reviewDateValue,
+      ownerId,
     };
 
     commitMutation({
@@ -185,6 +227,20 @@ export default function CreatePolicyPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="owner" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Policy Owner
+                  </Label>
+                  <PeopleSelector
+                    organizationRef={data.organization}
+                    selectedPersonId={ownerId}
+                    onSelect={setOwnerId}
+                    placeholder="Select policy owner"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label
                     htmlFor="reviewDate"
                     className="flex items-center gap-2"
@@ -220,5 +276,40 @@ export default function CreatePolicyPage() {
         </form>
       </div>
     </>
+  );
+}
+
+function CreatePolicyPageFallback() {
+  return (
+    <div className="container mx-auto py-6">
+      <div className="flex items-center mb-6">
+        <div className="mr-4">
+          <div className="h-12 w-12 bg-muted animate-pulse rounded-lg" />
+        </div>
+        <div>
+          <div className="h-8 w-48 bg-muted animate-pulse rounded mb-2" />
+          <div className="h-4 w-64 bg-muted animate-pulse rounded" />
+        </div>
+      </div>
+      <div className="bg-muted animate-pulse rounded-lg h-[600px]" />
+    </div>
+  );
+}
+
+export default function CreatePolicyPage() {
+  const { organizationId } = useParams();
+  const [queryRef, loadQuery] =
+    useQueryLoader<CreatePolicyPageQueryType>(CreatePolicyQuery);
+
+  useEffect(() => {
+    if (organizationId) {
+      loadQuery({ organizationId });
+    }
+  }, [organizationId, loadQuery]);
+
+  return (
+    <Suspense fallback={<CreatePolicyPageFallback />}>
+      {queryRef && <CreatePolicyForm queryRef={queryRef} />}
+    </Suspense>
   );
 }

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d242fdb748915009dc461be5596b6fc1>>
+ * @generated SignedSource<<29caed5a50be912ff48f9c131ce4045b>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,6 +14,7 @@ export type CreatePolicyInput = {
   content: string;
   name: string;
   organizationId: string;
+  ownerId: string;
   reviewDate?: string | null | undefined;
   status: PolicyStatus;
 };
@@ -28,6 +29,10 @@ export type CreatePolicyPageMutation$data = {
         readonly content: string;
         readonly id: string;
         readonly name: string;
+        readonly owner: {
+          readonly fullName: string;
+          readonly id: string;
+        };
         readonly reviewDate: string | null | undefined;
         readonly status: PolicyStatus;
       };
@@ -60,6 +65,13 @@ v2 = [
 v3 = {
   "alias": null,
   "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v4 = {
+  "alias": null,
+  "args": null,
   "concreteType": "PolicyEdge",
   "kind": "LinkedField",
   "name": "policyEdge",
@@ -73,13 +85,7 @@ v3 = {
       "name": "node",
       "plural": false,
       "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "id",
-          "storageKey": null
-        },
+        (v3/*: any*/),
         {
           "alias": null,
           "args": null,
@@ -107,6 +113,25 @@ v3 = {
           "kind": "ScalarField",
           "name": "reviewDate",
           "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "concreteType": "People",
+          "kind": "LinkedField",
+          "name": "owner",
+          "plural": false,
+          "selections": [
+            (v3/*: any*/),
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "fullName",
+              "storageKey": null
+            }
+          ],
+          "storageKey": null
         }
       ],
       "storageKey": null
@@ -132,7 +157,7 @@ return {
         "name": "createPolicy",
         "plural": false,
         "selections": [
-          (v3/*: any*/)
+          (v4/*: any*/)
         ],
         "storageKey": null
       }
@@ -157,7 +182,7 @@ return {
         "name": "createPolicy",
         "plural": false,
         "selections": [
-          (v3/*: any*/),
+          (v4/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -180,16 +205,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "64796b84575bf926f45da4c98d31e645",
+    "cacheID": "cf17928879d0f2b2e68367ed2c132d0a",
     "id": null,
     "metadata": {},
     "name": "CreatePolicyPageMutation",
     "operationKind": "mutation",
-    "text": "mutation CreatePolicyPageMutation(\n  $input: CreatePolicyInput!\n) {\n  createPolicy(input: $input) {\n    policyEdge {\n      node {\n        id\n        name\n        content\n        status\n        reviewDate\n      }\n    }\n  }\n}\n"
+    "text": "mutation CreatePolicyPageMutation(\n  $input: CreatePolicyInput!\n) {\n  createPolicy(input: $input) {\n    policyEdge {\n      node {\n        id\n        name\n        content\n        status\n        reviewDate\n        owner {\n          id\n          fullName\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "b7ecb61ced1e31c0c0093946135eca3b";
+(node as any).hash = "1ddb9b7010ecf1fe55e2b56aaa034295";
 
 export default node;

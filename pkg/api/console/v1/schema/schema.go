@@ -47,6 +47,7 @@ type ResolverRoot interface {
 	Framework() FrameworkResolver
 	Mutation() MutationResolver
 	Organization() OrganizationResolver
+	Policy() PolicyResolver
 	Query() QueryResolver
 	Task() TaskResolver
 	User() UserResolver
@@ -289,6 +290,7 @@ type ComplexityRoot struct {
 		CreatedAt  func(childComplexity int) int
 		ID         func(childComplexity int) int
 		Name       func(childComplexity int) int
+		Owner      func(childComplexity int) int
 		ReviewDate func(childComplexity int) int
 		Status     func(childComplexity int) int
 		UpdatedAt  func(childComplexity int) int
@@ -458,6 +460,9 @@ type OrganizationResolver interface {
 	Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.VendorConnection, error)
 	Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PeopleConnection, error)
 	Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PolicyConnection, error)
+}
+type PolicyResolver interface {
+	Owner(ctx context.Context, obj *types.Policy) (*types.People, error)
 }
 type QueryResolver interface {
 	Node(ctx context.Context, id gid.GID) (types.Node, error)
@@ -1497,6 +1502,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Policy.Name(childComplexity), true
+
+	case "Policy.owner":
+		if e.complexity.Policy.Owner == nil {
+			break
+		}
+
+		return e.complexity.Policy.Owner(childComplexity), true
 
 	case "Policy.reviewDate":
 		if e.complexity.Policy.ReviewDate == nil {
@@ -2743,6 +2755,7 @@ input CreatePolicyInput {
   content: String!
   status: PolicyStatus!
   reviewDate: Datetime
+  ownerId: ID!
 }
 
 input UpdatePolicyInput {
@@ -2752,6 +2765,7 @@ input UpdatePolicyInput {
   content: String
   status: PolicyStatus
   reviewDate: Datetime
+  ownerId: ID
 }
 
 input DeletePolicyInput {
@@ -2777,6 +2791,7 @@ type Policy implements Node {
   status: PolicyStatus!
   content: String!
   reviewDate: Datetime
+  owner: People! @goField(forceResolver: true)
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -9518,6 +9533,62 @@ func (ec *executionContext) fieldContext_Policy_reviewDate(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Policy_owner(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_owner(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Policy().Owner(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Policy_owner(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Policy",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			case "version":
+				return ec.fieldContext_People_version(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Policy_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Policy_createdAt(ctx, field)
 	if err != nil {
@@ -9769,6 +9840,8 @@ func (ec *executionContext) fieldContext_PolicyEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Policy_content(ctx, field)
 			case "reviewDate":
 				return ec.fieldContext_Policy_reviewDate(ctx, field)
+			case "owner":
+				return ec.fieldContext_Policy_owner(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Policy_createdAt(ctx, field)
 			case "updatedAt":
@@ -11193,6 +11266,8 @@ func (ec *executionContext) fieldContext_UpdatePolicyPayload_policy(_ context.Co
 				return ec.fieldContext_Policy_content(ctx, field)
 			case "reviewDate":
 				return ec.fieldContext_Policy_reviewDate(ctx, field)
+			case "owner":
+				return ec.fieldContext_Policy_owner(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Policy_createdAt(ctx, field)
 			case "updatedAt":
@@ -14016,7 +14091,7 @@ func (ec *executionContext) unmarshalInputCreatePolicyInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "content", "status", "reviewDate"}
+	fieldsInOrder := [...]string{"organizationId", "name", "content", "status", "reviewDate", "ownerId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14058,6 +14133,13 @@ func (ec *executionContext) unmarshalInputCreatePolicyInput(ctx context.Context,
 				return it, err
 			}
 			it.ReviewDate = data
+		case "ownerId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OwnerID = data
 		}
 	}
 
@@ -14536,7 +14618,7 @@ func (ec *executionContext) unmarshalInputUpdatePolicyInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "expectedVersion", "name", "content", "status", "reviewDate"}
+	fieldsInOrder := [...]string{"id", "expectedVersion", "name", "content", "status", "reviewDate", "ownerId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14585,6 +14667,13 @@ func (ec *executionContext) unmarshalInputUpdatePolicyInput(ctx context.Context,
 				return it, err
 			}
 			it.ReviewDate = data
+		case "ownerId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerId"))
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OwnerID = data
 		}
 	}
 
@@ -16945,39 +17034,70 @@ func (ec *executionContext) _Policy(ctx context.Context, sel ast.SelectionSet, o
 		case "id":
 			out.Values[i] = ec._Policy_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "version":
 			out.Values[i] = ec._Policy_version(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Policy_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
 			out.Values[i] = ec._Policy_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "content":
 			out.Values[i] = ec._Policy_content(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "reviewDate":
 			out.Values[i] = ec._Policy_reviewDate(ctx, field, obj)
+		case "owner":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				res = ec._Policy_owner(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Policy_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Policy_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -19276,6 +19396,10 @@ func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋprobo�
 	return ec._PageInfo(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNPeople2githubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx context.Context, sel ast.SelectionSet, v types.People) graphql.Marshaler {
+	return ec._People(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx context.Context, sel ast.SelectionSet, v *types.People) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -20332,6 +20456,22 @@ var (
 		coredata.EvidenceStateExpired: "EXPIRED",
 	}
 )
+
+func (ec *executionContext) unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, v any) (*gid.GID, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := types.UnmarshalGIDScalar(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, sel ast.SelectionSet, v *gid.GID) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := types.MarshalGIDScalar(*v)
+	return res
+}
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
 	if v == nil {

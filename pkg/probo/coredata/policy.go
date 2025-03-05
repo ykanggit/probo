@@ -16,6 +16,7 @@ type (
 	Policy struct {
 		ID             gid.GID      `db:"id"`
 		OrganizationID gid.GID      `db:"organization_id"`
+		OwnerID        gid.GID      `db:"owner_id"`
 		Status         PolicyStatus `db:"status"`
 		Name           string       `db:"name"`
 		Content        string       `db:"content"`
@@ -33,6 +34,7 @@ type (
 		Content         *string
 		Status          *PolicyStatus
 		ReviewDate      **time.Time
+		OwnerID         *gid.GID
 	}
 )
 
@@ -50,6 +52,7 @@ func (p *Policy) LoadByID(
 SELECT
     id,
     organization_id,
+    owner_id,
     name,
 	status,
     content,
@@ -96,6 +99,7 @@ func (p *Policies) LoadByOrganizationID(
 SELECT
     id,
     organization_id,
+    owner_id,
     name,
 	status,
     content,
@@ -141,6 +145,7 @@ INSERT INTO
     policies (
         id,
         organization_id,
+        owner_id,
         name,
 		status,
         content,
@@ -152,6 +157,7 @@ INSERT INTO
 VALUES (
     @policy_id,
     @organization_id,
+    @owner_id,
     @name,
     @status,
     @content,
@@ -165,6 +171,7 @@ VALUES (
 	args := pgx.StrictNamedArgs{
 		"policy_id":       p.ID,
 		"organization_id": p.OrganizationID,
+		"owner_id":        p.OwnerID,
 		"name":            p.Name,
 		"status":          p.Status,
 		"content":         p.Content,
@@ -207,6 +214,7 @@ UPDATE policies SET
     status = COALESCE(@status, status),
     content = COALESCE(@content, content),
     review_date = COALESCE(@review_date, review_date),
+    owner_id = COALESCE(@owner_id, owner_id),
     updated_at = @updated_at,
     version = version + 1
 WHERE %s
@@ -215,6 +223,7 @@ WHERE %s
 RETURNING 
     id,
     organization_id,
+    owner_id,
     name,
     content,
     review_date,
@@ -242,6 +251,9 @@ RETURNING
 	}
 	if params.ReviewDate != nil {
 		args["review_date"] = *params.ReviewDate
+	}
+	if params.OwnerID != nil {
+		args["owner_id"] = *params.OwnerID
 	}
 
 	maps.Copy(args, scope.SQLArguments())

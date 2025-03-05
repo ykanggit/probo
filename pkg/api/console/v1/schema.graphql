@@ -650,6 +650,7 @@ input CreatePolicyInput {
   content: String!
   status: PolicyStatus!
   reviewDate: Datetime
+  ownerId: ID!
 }
 
 input UpdatePolicyInput {
@@ -659,6 +660,7 @@ input UpdatePolicyInput {
   content: String
   status: PolicyStatus
   reviewDate: Datetime
+  ownerId: ID
 }
 
 input DeletePolicyInput {
@@ -684,6 +686,7 @@ type Policy implements Node {
   status: PolicyStatus!
   content: String!
   reviewDate: Datetime
+  owner: People! @goField(forceResolver: true)
   createdAt: Datetime!
   updatedAt: Datetime!
 }

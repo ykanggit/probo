@@ -13,16 +13,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { FileText, Calendar } from "lucide-react";
+import { FileText, Calendar, User } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Suspense } from "react";
 import PolicyEditor from "@/components/PolicyEditor";
+import PeopleSelector from "@/components/PeopleSelector";
 import type { UpdatePolicyPageQuery as UpdatePolicyPageQueryType } from "./__generated__/UpdatePolicyPageQuery.graphql";
 import type { UpdatePolicyPageMutation as UpdatePolicyPageMutationType } from "./__generated__/UpdatePolicyPageMutation.graphql";
 
 const UpdatePolicyPageQuery = graphql`
-  query UpdatePolicyPageQuery($policyId: ID!) {
-    node(id: $policyId) {
+  query UpdatePolicyPageQuery($policyId: ID!, $organizationId: ID!) {
+    policy: node(id: $policyId) {
       id
       ... on Policy {
         name
@@ -30,7 +31,14 @@ const UpdatePolicyPageQuery = graphql`
         status
         version
         reviewDate
+        owner {
+          id
+          fullName
+        }
       }
+    }
+    organization: node(id: $organizationId) {
+      ...PeopleSelector_organization
     }
   }
 `;
@@ -45,6 +53,10 @@ const UpdatePolicyMutation = graphql`
         status
         version
         reviewDate
+        owner {
+          id
+          fullName
+        }
       }
     }
   }
@@ -62,12 +74,15 @@ function UpdatePolicyPageContent({
     queryRef
   );
 
-  console.log("UpdatePolicyPage data:", data.node);
+  console.log("UpdatePolicyPage data:", data.policy);
 
-  const [name, setName] = useState(data.node.name);
-  const [content, setContent] = useState(data.node.content || "");
-  const [status, setStatus] = useState(data.node.status);
-  const [reviewDate, setReviewDate] = useState(data.node.reviewDate || "");
+  const [name, setName] = useState(data.policy.name);
+  const [content, setContent] = useState(data.policy.content || "");
+  const [status, setStatus] = useState(data.policy.status);
+  const [reviewDate, setReviewDate] = useState(data.policy.reviewDate || "");
+  const [ownerId, setOwnerId] = useState<string | null>(
+    data.policy.owner?.id || null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   console.log(
@@ -93,12 +108,13 @@ function UpdatePolicyPageContent({
     commitMutation({
       variables: {
         input: {
-          id: data.node.id,
+          id: data.policy.id,
           name,
           content,
           status,
           reviewDate: reviewDateValue,
-          expectedVersion: data.node.version!,
+          ownerId,
+          expectedVersion: data.policy.version!,
         },
       },
       onCompleted: (response, errors) => {
@@ -201,6 +217,20 @@ function UpdatePolicyPageContent({
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="owner" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Policy Owner
+                  </Label>
+                  <PeopleSelector
+                    organizationRef={data.organization}
+                    selectedPersonId={ownerId}
+                    onSelect={setOwnerId}
+                    placeholder="Select policy owner"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label
                     htmlFor="reviewDate"
                     className="flex items-center gap-2"
@@ -253,48 +283,26 @@ function UpdatePolicyPageFallback() {
           <div className="h-4 w-64 bg-muted animate-pulse rounded" />
         </div>
       </div>
-
-      <div className="grid gap-6">
-        <Card>
-          <CardHeader>
-            <div className="h-6 w-32 bg-muted animate-pulse rounded" />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="space-y-2">
-                <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                <div className="h-10 w-full bg-muted animate-pulse rounded" />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+      <div className="bg-muted animate-pulse rounded-lg h-[600px]" />
     </div>
   );
 }
 
 export default function UpdatePolicyPage() {
+  const { organizationId, policyId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<UpdatePolicyPageQueryType>(
     UpdatePolicyPageQuery
   );
-  const { policyId } = useParams();
 
   useEffect(() => {
-    loadQuery({ policyId: policyId! });
-  }, [loadQuery, policyId]);
-
-  if (!queryRef) {
-    return <UpdatePolicyPageFallback />;
-  }
+    if (organizationId && policyId) {
+      loadQuery({ organizationId, policyId });
+    }
+  }, [organizationId, policyId, loadQuery]);
 
   return (
-    <>
-      <Helmet>
-        <title>Update Policy - Probo Console</title>
-      </Helmet>
-      <Suspense fallback={<UpdatePolicyPageFallback />}>
-        <UpdatePolicyPageContent queryRef={queryRef} />
-      </Suspense>
-    </>
+    <Suspense fallback={<UpdatePolicyPageFallback />}>
+      {queryRef && <UpdatePolicyPageContent queryRef={queryRef} />}
+    </Suspense>
   );
 }

@@ -108,6 +108,7 @@ type CreatePolicyInput struct {
 	Content        string                `json:"content"`
 	Status         coredata.PolicyStatus `json:"status"`
 	ReviewDate     *time.Time            `json:"reviewDate,omitempty"`
+	OwnerID        gid.GID               `json:"ownerId"`
 }
 
 type CreatePolicyPayload struct {
@@ -322,6 +323,7 @@ type Policy struct {
 	Status     coredata.PolicyStatus `json:"status"`
 	Content    string                `json:"content"`
 	ReviewDate *time.Time            `json:"reviewDate,omitempty"`
+	Owner      *People               `json:"owner"`
 	CreatedAt  time.Time             `json:"createdAt"`
 	UpdatedAt  time.Time             `json:"updatedAt"`
 }
@@ -434,6 +436,7 @@ type UpdatePolicyInput struct {
 	Content         *string                `json:"content,omitempty"`
 	Status          *coredata.PolicyStatus `json:"status,omitempty"`
 	ReviewDate      *time.Time             `json:"reviewDate,omitempty"`
+	OwnerID         *gid.GID               `json:"ownerId,omitempty"`
 }
 
 type UpdatePolicyPayload struct {

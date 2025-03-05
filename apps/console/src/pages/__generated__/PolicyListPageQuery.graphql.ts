@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ebffaaa37d8815b22f9fa75aca6e75d2>>
+ * @generated SignedSource<<a49c4b1ca92e109b1091a1431fe0c871>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -19,11 +19,11 @@ export type PolicyListPageQuery$data = {
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly content: string;
-          readonly createdAt: any;
+          readonly createdAt: string;
           readonly id: string;
           readonly name: string;
           readonly status: PolicyStatus;
-          readonly updatedAt: any;
+          readonly updatedAt: string;
         };
       }>;
     };
