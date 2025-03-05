@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<67ee63bc3751efdd9ecdf2ad9ab5e197>>
+ * @generated SignedSource<<9f20d32c64386c207a4b2374a340b05a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,7 +16,7 @@ export type PolicyOverviewPageQuery$variables = {
 export type PolicyOverviewPageQuery$data = {
   readonly node: {
     readonly content?: string;
-    readonly createdAt?: string;
+    readonly createdAt?: any;
     readonly id: string;
     readonly name?: string;
     readonly owner?: {
@@ -24,9 +24,9 @@ export type PolicyOverviewPageQuery$data = {
       readonly id: string;
       readonly primaryEmailAddress: string;
     };
-    readonly reviewDate?: string | null | undefined;
+    readonly reviewDate?: any | null | undefined;
     readonly status?: PolicyStatus;
-    readonly updatedAt?: string;
+    readonly updatedAt?: any;
   };
 };
 export type PolicyOverviewPageQuery = {

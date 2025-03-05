@@ -1,10 +1,12 @@
-import { Suspense, useEffect, useState } from "react";
-import { useParams, Link } from "react-router";
+import { Suspense, useEffect, useState, useCallback } from "react";
+import { useParams, Link, useNavigate } from "react-router";
 import {
   graphql,
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
+  useMutation,
+  ConnectionHandler,
 } from "react-relay";
 import { Edit, Download, Shield, User, FileText, Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,8 +14,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PolicyOverviewPageQuery as PolicyOverviewPageQueryType } from "./__generated__/PolicyOverviewPageQuery.graphql";
+import type { PolicyOverviewPageDeleteMutation } from "./__generated__/PolicyOverviewPageDeleteMutation.graphql";
 import { Helmet } from "react-helmet-async";
 import "../styles/policy-content.css";
+import { useToast } from "@/hooks/use-toast";
 
 const PolicyOverviewPageQuery = graphql`
   query PolicyOverviewPageQuery($policyId: ID!) {
@@ -36,6 +40,17 @@ const PolicyOverviewPageQuery = graphql`
   }
 `;
 
+const DeletePolicyMutation = graphql`
+  mutation PolicyOverviewPageDeleteMutation(
+    $input: DeletePolicyInput!
+    $connections: [ID!]!
+  ) {
+    deletePolicy(input: $input) {
+      deletedPolicyId @deleteEdge(connections: $connections)
+    }
+  }
+`;
+
 function PolicyOverviewPageContent({
   queryRef,
 }: {
@@ -44,7 +59,65 @@ function PolicyOverviewPageContent({
   const data = usePreloadedQuery(PolicyOverviewPageQuery, queryRef);
   const policy = data.node;
   const { organizationId } = useParams();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("content");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
+
+  const [commitDeleteMutation] =
+    useMutation<PolicyOverviewPageDeleteMutation>(DeletePolicyMutation);
+
+  const handleDeletePolicy = useCallback(() => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this policy? This action cannot be undone."
+      )
+    ) {
+      setIsDeleting(true);
+
+      commitDeleteMutation({
+        variables: {
+          input: {
+            policyId: policy.id,
+          },
+          connections: [
+            ConnectionHandler.getConnectionID(
+              organizationId!,
+              "PolicyListPage_policies"
+            ),
+          ],
+        },
+        onCompleted: (_, errors) => {
+          setIsDeleting(false);
+          if (errors) {
+            console.error("Error deleting policy:", errors);
+            toast({
+              title: "Error",
+              description: "Failed to delete policy. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          toast({
+            title: "Success",
+            description: "Policy deleted successfully.",
+          });
+
+          navigate(`/organizations/${organizationId}/policies`);
+        },
+        onError: (error) => {
+          setIsDeleting(false);
+          console.error("Error deleting policy:", error);
+          toast({
+            title: "Error",
+            description: "Failed to delete policy. Please try again.",
+            variant: "destructive",
+          });
+        },
+      });
+    }
+  }, [policy.id, organizationId, commitDeleteMutation, navigate]);
 
   // Extract a short description from the content
   const getDescription = (content: string | undefined) => {
@@ -312,7 +385,12 @@ function PolicyOverviewPageContent({
                   Permanently delete this policy and all of its data. This
                   action cannot be undone.
                 </p>
-                <Button variant="destructive" className="w-full">
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={handleDeletePolicy}
+                  disabled={isDeleting}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -329,7 +407,7 @@ function PolicyOverviewPageContent({
                     <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                     <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
                   </svg>
-                  Delete Policy
+                  {isDeleting ? "Deleting..." : "Delete Policy"}
                 </Button>
               </CardContent>
             </Card>
