@@ -18,6 +18,7 @@ package console_v1
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -161,9 +162,12 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 			}
 		}
 
-		// Update the request with the new context
-		r = r.WithContext(ctx)
+		srv.ServeHTTP(w, r.WithContext(ctx))
 
-		srv.ServeHTTP(w, r)
+		if session := SessionFromContext(r.Context()); session != nil {
+			if err := usrmgrSvc.UpdateSession(r.Context(), session); err != nil {
+				panic(fmt.Errorf("failed to update session: %w", err))
+			}
+		}
 	}
 }

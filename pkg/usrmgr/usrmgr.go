@@ -420,3 +420,19 @@ func (s Service) GetUserIDFromContext(ctx context.Context) (gid.GID, error) {
 
 	return session.UserID, nil
 }
+
+// UpdateSession updates a session in the database
+func (s Service) UpdateSession(
+	ctx context.Context,
+	session *coredata.Session,
+) error {
+	session.UpdatedAt = time.Now()
+	session.ExpiredAt = time.Now().Add(24 * time.Hour)
+
+	return s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			return session.Update(ctx, tx)
+		},
+	)
+}

@@ -27,12 +27,15 @@ import (
 
 type (
 	Session struct {
-		ID        gid.GID   `db:"id"`
-		UserID    gid.GID   `db:"user_id"`
-		ExpiredAt time.Time `db:"expired_at"`
-		CreatedAt time.Time `db:"created_at"`
-		UpdatedAt time.Time `db:"updated_at"`
+		ID        gid.GID     `db:"id"`
+		UserID    gid.GID     `db:"user_id"`
+		Data      SessionData `db:"data"`
+		ExpiredAt time.Time   `db:"expired_at"`
+		CreatedAt time.Time   `db:"created_at"`
+		UpdatedAt time.Time   `db:"updated_at"`
 	}
+
+	SessionData struct{}
 )
 
 func (s Session) CursorKey() page.CursorKey {
@@ -48,6 +51,7 @@ func (s *Session) LoadByID(
 SELECT
     id,
     user_id,
+	data,
     expired_at,
     created_at,
     updated_at
@@ -80,10 +84,11 @@ func (s *Session) Insert(
 ) error {
 	q := `
 INSERT INTO
-    usrmgr_sessions (id, user_id, expired_at, created_at, updated_at)
+    usrmgr_sessions (id, user_id, data, expired_at, created_at, updated_at)
 VALUES (
     @session_id,
     @user_id,
+    @data,
     @expired_at,
     @created_at,
     @updated_at
@@ -93,6 +98,7 @@ VALUES (
 	args := pgx.StrictNamedArgs{
 		"session_id": s.ID,
 		"user_id":    s.UserID,
+		"data":       s.Data,
 		"expired_at": s.ExpiredAt,
 		"created_at": s.CreatedAt,
 		"updated_at": s.UpdatedAt,
@@ -110,13 +116,15 @@ func (s *Session) Update(
 UPDATE usrmgr_sessions
 SET
     expired_at = @expired_at,
-    updated_at = @updated_at
+    updated_at = @updated_at,
+    data = @data
 WHERE
     id = @session_id
 `
 
 	args := pgx.StrictNamedArgs{
 		"session_id": s.ID,
+		"user_id":    s.UserID,
 		"expired_at": s.ExpiredAt,
 		"updated_at": s.UpdatedAt,
 	}
