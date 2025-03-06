@@ -1,6 +1,6 @@
 CREATE TABLE usrmgr_user_organizations (
     user_id TEXT REFERENCES usrmgr_users(id) NOT NULL,
-    organization_id TEXT REFERENCES organizations(id) NOT NULL,
+    organization_id TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (user_id, organization_id)
 );
