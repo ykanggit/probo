@@ -57,17 +57,14 @@ function FrameworkOverviewPageContent({
   const { organizationId } = useParams();
 
   // Group controls by their category
-  const controlsByCategory = controls.reduce(
-    (acc, control) => {
-      if (!control?.category) return acc;
-      if (!acc[control.category]) {
-        acc[control.category] = [];
-      }
-      acc[control.category].push(control);
-      return acc;
-    },
-    {} as Record<string, typeof controls>,
-  );
+  const controlsByCategory = controls.reduce((acc, control) => {
+    if (!control?.category) return acc;
+    if (!acc[control.category]) {
+      acc[control.category] = [];
+    }
+    acc[control.category].push(control);
+    return acc;
+  }, {} as Record<string, typeof controls>);
 
   const controlCards = Object.entries(controlsByCategory).map(
     ([category, controls]) => ({
@@ -75,11 +72,11 @@ function FrameworkOverviewPageContent({
       controls,
       completed: controls.filter((c) => c?.state === "IMPLEMENTED").length,
       total: controls.length,
-    }),
+    })
   );
 
   const totalImplemented = controls.filter(
-    (c) => c?.state === "IMPLEMENTED",
+    (c) => c?.state === "IMPLEMENTED"
   ).length;
 
   return (
@@ -106,54 +103,6 @@ function FrameworkOverviewPageContent({
                 Create Control
               </Link>
             </Button>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Timeline</h2>
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#F3F4F6] text-[#059669] text-sm">
-            <Clock className="w-4 h-4" />
-            <span>12 hours left</span>
-          </div>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-card">
-          <div className="p-6">
-            <h3 className="font-medium mb-4">Preparation phase</h3>
-            <div className="relative">
-              <div className="flex w-full">
-                <div className="w-[10%]">
-                  <div className="h-2 rounded-sm bg-[#D1FA84]" />
-                </div>
-                <div className="w-[8px] bg-transparent z-10" />
-                <div className="w-[70%]">
-                  <div className="h-2 rounded-sm bg-muted" />
-                </div>
-                <div className="w-[8px] bg-transparent z-10" />
-                <div className="w-[10%]">
-                  <div className="h-2 rounded-sm bg-muted" />
-                </div>
-                <div className="w-[8px] bg-transparent z-10" />
-                <div className="w-[10%]">
-                  <div className="h-2 rounded-sm bg-muted" />
-                </div>
-              </div>
-              <div className="mt-2 flex w-full text-sm text-muted-foreground">
-                <div className="w-[10%]">
-                  <span>Preparation</span>
-                </div>
-                <div className="w-[70%]">
-                  <span>Observation period: 3 month</span>
-                </div>
-                <div className="w-[10%]">
-                  <span>Audit: 6-9 days</span>
-                </div>
-                <div className="w-[10%]">
-                  <span>Report: 10-14 days</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -210,7 +159,7 @@ function FrameworkOverviewPageContent({
                           onClick={() => {
                             if (control?.id) {
                               navigate(
-                                `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`,
+                                `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
                               );
                             }
                           }}
@@ -294,7 +243,7 @@ function FrameworkOverviewPageContent({
               </div>
             </div>
           </div>,
-          document.body,
+          document.body
         )}
     </div>
   );
@@ -328,7 +277,7 @@ function FrameworkOverviewPageFallback() {
 export default function FrameworkOverviewPage() {
   const { frameworkId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<FrameworkOverviewPageQueryType>(
-    FrameworkOverviewPageQuery,
+    FrameworkOverviewPageQuery
   );
 
   useEffect(() => {
