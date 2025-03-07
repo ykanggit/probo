@@ -1,4 +1,5 @@
 import { AppSidebarShell } from "./AppSidebarShell";
+import { NavMainSkeleton } from "./NavMainSkeleton";
 import { NavUserSkeleton } from "./NavUserSkeleton";
 import { OrganizationSwitcherSkeleton } from "./OrganizationSwitcherSkeleton";
 import { Sidebar } from "./ui/sidebar";
@@ -9,6 +10,7 @@ export function AppSidebarSkeleton(
   return (
     <AppSidebarShell
       organizationSwitcher={<OrganizationSwitcherSkeleton />}
+      navMain={<NavMainSkeleton />}
       navUser={<NavUserSkeleton />}
       {...props}
     />

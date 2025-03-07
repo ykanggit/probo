@@ -1,8 +1,5 @@
 "use client";
 
-import { ChevronsUpDown } from "lucide-react";
-
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -17,20 +14,14 @@ export function NavUserSkeleton() {
           isActive
           disabled
           size="lg"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground animate-pulse"
         >
-          <Avatar className="h-9 w-9">
-            <AvatarFallback className="bg-slate-400 text-gray-100 animate-pulse" />
-          </Avatar>
-          <div className="grid flex-1">
-            <div className="py-[3px]">
-              <div className="h-3.5 animate-pulse w-20 rounded-sm bg-slate-500" />
-            </div>
-            <div className="py-[3px]">
-              <div className="h-3.5 animate-pulse w-30 rounded-sm bg-slate-500" />
-            </div>
+          <div className="bg-gray-400 size-9 rounded-full animate-pulse" />
+          <div className="flex-1 space-y-[3px] animate-pulse">
+            <div className="h-3.5 w-20 rounded-sm bg-gray-400" />
+            <div className="h-3.5 w-30 rounded-sm bg-gray-400" />
           </div>
-          <ChevronsUpDown className="ml-auto size-4" />
+          <div className="ml-auto size-4 rounded-lg bg-gray-400" />
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>

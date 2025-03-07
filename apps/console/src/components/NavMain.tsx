@@ -19,71 +19,35 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import {
+  BookOpen,
+  Building,
+  FileText,
+  Settings,
+  ToyBrick,
+  Users,
+} from "lucide-react";
+import { NavMainSkeleton } from "./NavMainSkeleton";
 
-export function NavMain({
-  items,
-}: {
-  items: {
+interface NavItem {
+  title: string;
+  url?: string;
+  icon: LucideIcon;
+  isActive?: boolean;
+  items?: {
     title: string;
-    url?: string;
+    url: string;
     icon: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
   }[];
-}) {
+}
+
+export function NavMain() {
   const location = useLocation();
   const { organizationId } = useParams();
+  const items: NavItem[] = getNavItems(organizationId);
 
-  const noOrganizationSelected = organizationId === undefined;
-
-  if (noOrganizationSelected) {
-    return (
-      <SidebarGroup>
-        <SidebarGroupLabel>
-          <div className="h-4 w-28 rounded-md bg-gray-200 animate-pulse" />
-        </SidebarGroupLabel>
-        <SidebarMenu className="space-y-1.5">
-          {/* First item - simple item */}
-          <SidebarMenuItem>
-            <SidebarMenuButton className="animate-pulse">
-              <div className="h-4 w-4 rounded-md bg-gray-200" />
-              <div className="h-4 w-32 rounded-md bg-gray-200 ml-2" />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          {/* Second item - with dropdown */}
-          <SidebarMenuItem>
-            <SidebarMenuButton className="animate-pulse">
-              <div className="h-4 w-4 rounded-md bg-gray-200" />
-              <div className="h-4 w-28 rounded-md bg-gray-200 ml-2" />
-              <div className="ml-auto">
-                <div className="h-4 w-4 rounded-md bg-gray-200" />
-              </div>
-            </SidebarMenuButton>
-            <SidebarMenuSub>
-              {[1, 2].map((i) => (
-                <SidebarMenuSubItem key={i}>
-                  <SidebarMenuSubButton className="animate-pulse pl-8">
-                    <div className="h-3 w-20 rounded-md bg-gray-200" />
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              ))}
-            </SidebarMenuSub>
-          </SidebarMenuItem>
-
-          {/* Third item - simple item */}
-          <SidebarMenuItem>
-            <SidebarMenuButton className="animate-pulse">
-              <div className="h-4 w-4 rounded-md bg-gray-200" />
-              <div className="h-4 w-24 rounded-md bg-gray-200 ml-2" />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroup>
-    );
+  if (!organizationId) {
+    return <NavMainSkeleton />;
   }
 
   const isItemActive = (item: { url?: string; items?: { url: string }[] }) => {
@@ -170,4 +134,52 @@ export function NavMain({
       </SidebarMenu>
     </SidebarGroup>
   );
+}
+
+function getNavItems(organizationId?: string): NavItem[] {
+  // Always return the same structure, but with or without URLs depending on whether an organization is selected
+  return [
+    {
+      title: "Frameworks",
+      url: organizationId
+        ? `/organizations/${organizationId}/frameworks`
+        : undefined,
+      icon: BookOpen,
+    },
+    {
+      title: "Organizations",
+      icon: Building,
+      url: organizationId
+        ? `/organizations/${organizationId}/peoples`
+        : undefined,
+      items: organizationId
+        ? [
+            {
+              title: "Peoples",
+              url: `/organizations/${organizationId}/peoples`,
+              icon: Users,
+            },
+            {
+              title: "Vendors",
+              url: `/organizations/${organizationId}/vendors`,
+              icon: ToyBrick,
+            },
+          ]
+        : [],
+    },
+    {
+      title: "Policies",
+      url: organizationId
+        ? `/organizations/${organizationId}/policies`
+        : undefined,
+      icon: FileText,
+    },
+    {
+      title: "Settings",
+      url: organizationId
+        ? `/organizations/${organizationId}/settings`
+        : undefined,
+      icon: Settings,
+    },
+  ];
 }

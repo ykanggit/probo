@@ -1,7 +1,6 @@
 import * as React from "react";
-import { type LucideIcon } from "lucide-react";
-import { useLocation } from "react-router";
 
+import { LifeBuoy, Send } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -10,43 +9,27 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-export function NavSecondary({
-  items,
-  ...props
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon: LucideIcon;
-  }[];
-} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
-  const location = useLocation();
-  const noOrganizationSelected = location.pathname === "/";
+const navItems = [
+  {
+    title: "Support",
+    url: "#",
+    icon: LifeBuoy,
+  },
+  {
+    title: "Feedback",
+    url: "#",
+    icon: Send,
+  },
+];
 
-  if (noOrganizationSelected) {
-    return (
-      <SidebarGroup {...props}>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {[1, 2].map((i) => (
-              <SidebarMenuItem key={i}>
-                <SidebarMenuButton size="sm" className="animate-pulse">
-                  <div className="h-3 w-3 rounded-lg bg-gray-200" />
-                  <div className="h-3 w-16 rounded-lg bg-gray-200 ml-2" />
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-    );
-  }
-
+export function NavSecondary(
+  props: React.ComponentPropsWithoutRef<typeof SidebarGroup>
+) {
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => (
+          {navItems.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild={item.url !== "#"}

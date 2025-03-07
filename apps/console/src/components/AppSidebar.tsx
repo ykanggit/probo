@@ -13,6 +13,7 @@ import type { AppSidebarQuery as AppSidebarQueryType } from "./__generated__/App
 import { OrganizationSwitcher } from "@/components/OrganizationSwitcher";
 import { AppSidebarShell } from "./AppSidebarShell";
 import { AppSidebarSkeleton } from "./AppSidebarSkeleton";
+import { NavMain } from "./NavMain";
 
 const AppSidebarQuery = graphql`
   query AppSidebarQuery {
@@ -37,6 +38,7 @@ function AppSidebarContent({
       organizationSwitcher={
         <OrganizationSwitcher organizations={data.viewer} />
       }
+      navMain={<NavMain />}
       navUser={<NavUser viewer={data.viewer} />}
       {...props}
     />

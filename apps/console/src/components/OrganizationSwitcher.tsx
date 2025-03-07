@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronsUpDown, Plus, Building } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 import { graphql, useFragment } from "react-relay";
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -25,6 +25,7 @@ import {
   OrganizationSwitcher_organizations$data,
 } from "./__generated__/OrganizationSwitcher_organizations.graphql";
 import { cn } from "@/lib/utils";
+import { OrganizationSwitcherSkeleton } from "./OrganizationSwitcherSkeleton";
 
 export const organizationSwitcherFragment = graphql`
   fragment OrganizationSwitcher_organizations on User {
@@ -95,20 +96,7 @@ export function OrganizationSwitcher({
   };
 
   if (!hasOrganizations) {
-    return (
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <SidebarMenuButton size="lg" className="animate-pulse">
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gray-200" />
-            <div className="flex-1 space-y-1">
-              <div className="h-4 w-3/4 rounded-lg bg-gray-200" />
-              <div className="h-3 w-1/2 rounded-lg bg-gray-200" />
-            </div>
-            <div className="ml-auto h-4 w-4 rounded-lg bg-gray-200" />
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    );
+    return <OrganizationSwitcherSkeleton />;
   }
 
   return (
@@ -118,32 +106,33 @@ export function OrganizationSwitcher({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className={`data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-2.5 ${
-                !currentOrganization
-                  ? "border border-dashed border-gray-400"
-                  : ""
-              }`}
+              className={cn(
+                "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-2.5",
+                !currentOrganization && "border border-dashed border-gray-300"
+              )}
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-slate-400 text-sidebar-primary-foreground overflow-hidden">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-slate-400 text-gray-100">
                 {currentOrganization ? (
                   <LogoComponent org={currentOrganization} className="size-8" />
                 ) : (
-                  <Building className="size-8 text-gray-400" />
+                  <div className="size-8 bg-slate-400 rounded-sm" />
                 )}
               </div>
               <div className="grid text-left leading-tight">
-                <span
-                  className={`truncate font-medium text-lg leading-5 ${
-                    !currentOrganization ? "text-gray-500" : "text-gray-900"
-                  }`}
-                >
-                  {currentOrganization
-                    ? currentOrganization.name
-                    : "Select Organization"}
-                </span>
-                <span className="truncate text-xs text-gray-500 font-medium">
-                  {currentOrganization ? "Free" : "No organization selected"}
-                </span>
+                {currentOrganization ? (
+                  <>
+                    <span className="truncate font-medium text-lg leading-5 text-gray-900">
+                      {currentOrganization.name}
+                    </span>
+                    <span className="truncate text-xs text-gray-500 font-medium">
+                      Free
+                    </span>
+                  </>
+                ) : (
+                  <span className="truncate text-gray-500 font-medium">
+                    Select Organization
+                  </span>
+                )}
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>

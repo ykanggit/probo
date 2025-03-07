@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { NavUser_viewer$key } from "./__generated__/NavUser_viewer.graphql";
+import { NavUserSkeleton } from "./NavUserSkeleton";
 
 export const navUserFragment = graphql`
   fragment NavUser_viewer on User {
@@ -44,28 +45,14 @@ export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { organizationId } = useParams();
-  const noOrganizationSelected = !organizationId;
 
   const handleLogout = async () => {
     await logout();
     navigate("/login");
   };
 
-  if (noOrganizationSelected) {
-    return (
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <SidebarMenuButton size="lg" className="animate-pulse">
-            <div className="h-8 w-8 rounded-lg bg-gray-200" />
-            <div className="flex-1 space-y-1">
-              <div className="h-4 w-3/4 rounded-lg bg-gray-200" />
-              <div className="h-3 w-1/2 rounded-lg bg-gray-200" />
-            </div>
-            <div className="ml-auto h-4 w-4 rounded-lg bg-gray-200" />
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    );
+  if (!organizationId) {
+    return <NavUserSkeleton />;
   }
 
   return (
