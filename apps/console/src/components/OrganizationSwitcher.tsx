@@ -61,6 +61,7 @@ const LogoComponent = ({
       />
     );
   }
+
   return org.name.substring(0, 2).toUpperCase();
 };
 
@@ -144,11 +145,7 @@ export function OrganizationSwitcher({
                   {currentOrganization ? "Free" : "No organization selected"}
                 </span>
               </div>
-              <ChevronsUpDown
-                className={`ml-auto ${
-                  !currentOrganization ? "text-gray-400" : ""
-                }`}
-              />
+              <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
