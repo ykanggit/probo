@@ -188,7 +188,7 @@ function VendorListContent({
   const { toast } = useToast();
   const data = usePreloadedQuery<VendorListPageQueryType>(
     vendorListPageQuery,
-    queryRef,
+    queryRef
   );
   const [, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
@@ -323,7 +323,7 @@ function VendorListContent({
               <div className="flex items-center gap-2">
                 <Badge
                   variant="secondary"
-                  className="bg-[#8BB563] text-white rounded-full px-3 py-0.5 text-xs font-medium"
+                  className="bg-lime-9 text-white rounded-full px-3 py-0.5 text-xs font-medium"
                 >
                   Low Risk
                 </Badge>
@@ -335,7 +335,7 @@ function VendorListContent({
                     e.preventDefault(); // Prevent navigation
                     if (
                       window.confirm(
-                        "Are you sure you want to delete this vendor?",
+                        "Are you sure you want to delete this vendor?"
                       )
                     ) {
                       deleteVendor({

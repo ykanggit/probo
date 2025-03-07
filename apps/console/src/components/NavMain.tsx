@@ -93,7 +93,7 @@ export function NavMain({
 
     if (item.items?.length) {
       return item.items.some((subItem) =>
-        location.pathname.startsWith(subItem.url),
+        location.pathname.startsWith(subItem.url)
       );
     }
 
@@ -102,7 +102,9 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Compliance</SidebarGroupLabel>
+      <SidebarGroupLabel className="text-gray-500 pl-3">
+        Compliance
+      </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const active = isItemActive(item) || item.isActive;
@@ -114,11 +116,12 @@ export function NavMain({
                   asChild
                   tooltip={item.title}
                   data-active={active ? "true" : undefined}
-                  className={active ? "text-primary font-medium" : ""}
                 >
                   <Link to={item.url ?? "#"}>
-                    <item.icon />
-                    <span>{item.title}</span>
+                    <item.icon
+                      className={active ? "text-lime-9" : "text-lime-6"}
+                    />
+                    <span className="font-medium">{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
                 {item.items?.length ? (
@@ -133,7 +136,7 @@ export function NavMain({
                       <SidebarMenuSub>
                         {item.items?.map((subItem) => {
                           const subItemActive = location.pathname.startsWith(
-                            subItem.url,
+                            subItem.url
                           );
 
                           return (
@@ -143,12 +146,14 @@ export function NavMain({
                                 data-active={subItemActive ? "true" : undefined}
                                 className={
                                   subItemActive
-                                    ? "text-primary font-medium"
-                                    : ""
+                                    ? "text-primary"
+                                    : "text-gray-600"
                                 }
                               >
                                 <Link to={subItem.url}>
-                                  <span>{subItem.title}</span>
+                                  <span className="font-medium">
+                                    {subItem.title}
+                                  </span>
                                 </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>

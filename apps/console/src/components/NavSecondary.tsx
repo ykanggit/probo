@@ -59,12 +59,12 @@ export function NavSecondary({
                 {item.url !== "#" ? (
                   <a href={item.url}>
                     <item.icon />
-                    <span>{item.title}</span>
+                    <span className="font-medium">{item.title}</span>
                   </a>
                 ) : (
                   <>
                     <item.icon />
-                    <span>{item.title}</span>
+                    <span className="font-medium">{item.title}</span>
                   </>
                 )}
               </SidebarMenuButton>

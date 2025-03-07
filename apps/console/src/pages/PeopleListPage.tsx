@@ -134,7 +134,7 @@ function PeopleListContent({
 }) {
   const data = usePreloadedQuery<PeopleListPageQueryType>(
     peopleListPageQuery,
-    queryRef,
+    queryRef
   );
   const [, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
@@ -211,13 +211,13 @@ function PeopleListContent({
               <div className="flex items-center gap-2">
                 <Badge
                   variant="secondary"
-                  className="bg-[#8BB563] text-white rounded-full px-3 py-0.5 text-xs font-medium"
+                  className="bg-lime-9 text-white rounded-full px-3 py-0.5 text-xs font-medium"
                 >
                   {person?.kind === "EMPLOYEE"
                     ? "Employee"
                     : person?.kind === "CONTRACTOR"
-                      ? "Contractor"
-                      : "Vendor"}
+                    ? "Contractor"
+                    : "Vendor"}
                 </Badge>
                 <Button
                   variant="ghost"
@@ -227,7 +227,7 @@ function PeopleListContent({
                     e.preventDefault();
                     if (
                       window.confirm(
-                        "Are you sure you want to delete this person?",
+                        "Are you sure you want to delete this person?"
                       )
                     ) {
                       deletePeople({

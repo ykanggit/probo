@@ -24,6 +24,7 @@ import {
   OrganizationSwitcher_organizations$key,
   OrganizationSwitcher_organizations$data,
 } from "./__generated__/OrganizationSwitcher_organizations.graphql";
+import { cn } from "@/lib/utils";
 
 export const organizationSwitcherFragment = graphql`
   fragment OrganizationSwitcher_organizations on User {
@@ -52,9 +53,15 @@ const LogoComponent = ({
   className?: string;
 }) => {
   if (org.logoUrl) {
-    return <img src={org.logoUrl} alt={org.name} className={className} />;
+    return (
+      <img
+        src={org.logoUrl}
+        alt={org.name}
+        className={cn("rounded-md", className)}
+      />
+    );
   }
-  return null;
+  return org.name.substring(0, 2).toUpperCase();
 };
 
 export function OrganizationSwitcher({
@@ -74,7 +81,7 @@ export function OrganizationSwitcher({
   useEffect(() => {
     if (hasOrganizations) {
       const org = data.organizations.edges.find(
-        (edge) => edge.node.id === organizationId,
+        (edge) => edge.node.id === organizationId
       );
       if (org) {
         setCurrentOrganization(org.node);
@@ -110,34 +117,30 @@ export function OrganizationSwitcher({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className={`data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ${
+              className={`data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-2.5 ${
                 !currentOrganization
                   ? "border border-dashed border-gray-400"
                   : ""
               }`}
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-slate-400 text-sidebar-primary-foreground overflow-hidden">
                 {currentOrganization ? (
-                  <LogoComponent org={currentOrganization} className="size-4" />
+                  <LogoComponent org={currentOrganization} className="size-8" />
                 ) : (
-                  <Building className="size-4 text-gray-400" />
+                  <Building className="size-8 text-gray-400" />
                 )}
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
+              <div className="grid text-left leading-tight">
                 <span
-                  className={`truncate font-semibold ${
-                    !currentOrganization ? "text-gray-500" : ""
+                  className={`truncate font-medium text-lg leading-5 ${
+                    !currentOrganization ? "text-gray-500" : "text-gray-900"
                   }`}
                 >
                   {currentOrganization
                     ? currentOrganization.name
                     : "Select Organization"}
                 </span>
-                <span
-                  className={`truncate text-xs ${
-                    !currentOrganization ? "text-gray-400" : ""
-                  }`}
-                >
+                <span className="truncate text-xs text-gray-500 font-medium">
                   {currentOrganization ? "Free" : "No organization selected"}
                 </span>
               </div>
@@ -166,7 +169,7 @@ export function OrganizationSwitcher({
                     edge.node.id === organizationId ? "bg-muted" : ""
                   }`}
                 >
-                  <div className="flex size-6 items-center justify-center rounded-sm border">
+                  <div className="flex size-6 items-center justify-center rounded-sm">
                     <LogoComponent
                       org={edge.node}
                       className="size-4 shrink-0"
