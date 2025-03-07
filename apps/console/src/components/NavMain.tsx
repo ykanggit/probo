@@ -108,13 +108,15 @@ export function NavMain() {
                               <SidebarMenuSubButton
                                 asChild
                                 data-active={subItemActive ? "true" : undefined}
-                                className={
-                                  subItemActive
-                                    ? "text-primary"
-                                    : "text-gray-600"
-                                }
                               >
                                 <Link to={subItem.url}>
+                                  <subItem.icon
+                                    className={
+                                      subItemActive
+                                        ? "text-lime-9"
+                                        : "text-lime-6"
+                                    }
+                                  />
                                   <span className="font-medium">
                                     {subItem.title}
                                   </span>
