@@ -134,6 +134,8 @@ go.gearno.de/kit v0.0.0-20250308195817-268b4b34992c h1:APb8N85kyvQZBQNnIWCC9J3eK
 go.gearno.de/kit v0.0.0-20250308195817-268b4b34992c/go.mod h1:RsqqVkwq+p4rmtOfYLX8NmQ+kIDi0tgyzAr2GsuLUnE=
 go.gearno.de/kit v0.0.0-20250308213944-095c1cb1316f h1:56SgklE7xrXeWz3oy6r7Xqi1d0iqSemTOePak5gF08k=
 go.gearno.de/kit v0.0.0-20250308213944-095c1cb1316f/go.mod h1:RsqqVkwq+p4rmtOfYLX8NmQ+kIDi0tgyzAr2GsuLUnE=
+go.gearno.de/kit v0.0.0-20250308215532-082d0731efae h1:CrC8b2quMUZQ0ry16N40rvz7EktnEpOyBJrAId0Hdc8=
+go.gearno.de/kit v0.0.0-20250308215532-082d0731efae/go.mod h1:RsqqVkwq+p4rmtOfYLX8NmQ+kIDi0tgyzAr2GsuLUnE=
 go.gearno.de/x/panicf v0.1.1 h1:E3Cr9NB8Ry2EsvEG/1eHr7kplP3tEjTf5d56dTX64VQ=
 go.gearno.de/x/panicf v0.1.1/go.mod h1:VnB8oF0UefMZcYeD4v+Wk4U5Z1uza7PHLlhT2CbNEbU=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
