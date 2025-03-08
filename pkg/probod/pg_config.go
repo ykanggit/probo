@@ -15,16 +15,20 @@
 package probod
 
 import (
+	"crypto/x509"
+	"encoding/pem"
+
 	"go.gearno.de/kit/pg"
 )
 
 type (
 	pgConfig struct {
-		Addr     string `json:"addr"`
-		Username string `json:"username"`
-		Password string `json:"password"`
-		Database string `json:"database"`
-		PoolSize int32  `json:"pool-size"`
+		Addr         string `json:"addr"`
+		Username     string `json:"username"`
+		Password     string `json:"password"`
+		Database     string `json:"database"`
+		PoolSize     int32  `json:"pool-size"`
+		CACertBundle string `json:"ca-cert-bundle,omitempty"`
 	}
 )
 
@@ -35,6 +39,31 @@ func (cfg pgConfig) Options(options ...pg.Option) []pg.Option {
 		pg.WithPassword(cfg.Password),
 		pg.WithDatabase(cfg.Database),
 		pg.WithPoolSize(cfg.PoolSize),
+	}
+
+	if cfg.CACertBundle != "" {
+		var certs []*x509.Certificate
+		pemData := []byte(cfg.CACertBundle)
+
+		for len(pemData) > 0 {
+			var block *pem.Block
+			block, pemData = pem.Decode(pemData)
+			if block == nil {
+				break
+			}
+			if block.Type != "CERTIFICATE" {
+				continue
+			}
+
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err == nil {
+				certs = append(certs, cert)
+			}
+		}
+
+		if len(certs) > 0 {
+			opts = append(opts, pg.WithTLS(certs))
+		}
 	}
 
 	opts = append(opts, options...)
