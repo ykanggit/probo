@@ -94,7 +94,7 @@ func New() *Implm {
 }
 
 func (impl *Implm) GetConfiguration() any {
-	return impl.cfg
+	return &impl.cfg
 }
 
 func (impl *Implm) Run(
