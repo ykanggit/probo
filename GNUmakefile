@@ -35,7 +35,7 @@ vet:
 	$(GO) vet ./...
 
 .PHONY: build
-build: @probo/console bin/probod docker-build
+build: @probo/console bin/probod
 
 .PHONY: docker-build
 docker-build:

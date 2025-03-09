@@ -6,7 +6,7 @@ on:
   pull_request:
     branches:
       - "main"
-  
+
 jobs:
   docker-build:
     name: "docker-build"
@@ -26,7 +26,7 @@ jobs:
       - run: "make docker-build"
         env:
           DOCKER_BUILD_FLAGS: "--push"
-  probod:
+  build:
     name: "bin/probod"
     runs-on: "ubuntu-22.04"
     permissions:
@@ -34,20 +34,11 @@ jobs:
     steps:
       - uses: "actions/checkout@v4"
       - uses: "actions/setup-go@v5"
-      - run: "make bin/probod"
-  console:
-    name: "@probo/console"
-    runs-on: "ubuntu-22.04"
-    permissions:
-      contents: "read"
-    steps:
-      - uses: "actions/checkout@v4"
       - uses: "actions/setup-node@v4"
         with:
           node-version: 22
       - run: "npm ci"
-      - run: "npm run lint"
-      - run: "make @probo/console"
+      - run: "make build"
   fmt-check:
     name: "fmt-check"
     runs-on: "ubuntu-22.04"
