@@ -27,7 +27,7 @@ jobs:
         env:
           DOCKER_BUILD_FLAGS: "--push"
   build:
-    name: "bin/probod"
+    name: "build"
     runs-on: "ubuntu-22.04"
     permissions:
       contents: "read"
