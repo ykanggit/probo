@@ -6,7 +6,7 @@ import {
   usePreloadedQuery,
   useQueryLoader,
 } from "react-relay";
-import { Shield, MoveUpRight, Clock, Plus } from "lucide-react";
+import { Shield, MoveUpRight, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
