@@ -6,4 +6,5 @@ dist
 Dockerfile
 compose
 **/node_modules
+**/dist
 
