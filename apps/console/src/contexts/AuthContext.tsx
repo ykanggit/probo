@@ -21,7 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = async (): Promise<boolean> => {
     try {
       // Make a request to an endpoint that requires authentication
-      const response = await fetch(buildEndpoint("/console/v1/query"), {
+      const response = await fetch(buildEndpoint("/api/console/v1/query"), {
         method: "POST",
         credentials: "include",
         headers: {

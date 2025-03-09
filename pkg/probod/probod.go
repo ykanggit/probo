@@ -24,10 +24,10 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/getprobo/probo/pkg/api"
-	console_v1 "github.com/getprobo/probo/pkg/api/console/v1"
 	"github.com/getprobo/probo/pkg/awsconfig"
 	"github.com/getprobo/probo/pkg/probo"
+	"github.com/getprobo/probo/pkg/server"
+	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.gearno.de/kit/httpclient"
@@ -157,11 +157,11 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot create probo service: %w", err)
 	}
 
-	apiServer, err := api.NewServer(
-		api.Config{
+	serverHandler, err := server.NewServer(
+		server.Config{
+			AllowedOrigins: impl.cfg.Api.Cors.AllowedOrigins,
 			Probo:          proboService,
 			Usrmgr:         usrmgrService,
-			AllowedOrigins: impl.cfg.Api.Cors.AllowedOrigins,
 			Auth: console_v1.AuthConfig{
 				CookieName:      impl.cfg.Auth.CookieName,
 				CookieSecure:    impl.cfg.Auth.CookieSecure,
@@ -174,7 +174,7 @@ func (impl *Implm) Run(
 		},
 	)
 	if err != nil {
-		return fmt.Errorf("cannot create api server: %w", err)
+		return fmt.Errorf("cannot create server: %w", err)
 	}
 
 	apiServerCtx, stopApiServer := context.WithCancel(context.Background())
@@ -182,7 +182,7 @@ func (impl *Implm) Run(
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := impl.runApiServer(apiServerCtx, l, r, tp, apiServer); err != nil {
+		if err := impl.runApiServer(apiServerCtx, l, r, tp, serverHandler); err != nil {
 			cancel(fmt.Errorf("api server crashed: %w", err))
 		}
 	}()

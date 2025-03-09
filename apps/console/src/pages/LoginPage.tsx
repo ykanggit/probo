@@ -20,7 +20,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(buildEndpoint("/console/v1/auth/login"), {
+      const response = await fetch(buildEndpoint("/api/console/v1/auth/login"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

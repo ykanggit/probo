@@ -18,8 +18,8 @@ import (
 	"errors"
 	"net/http"
 
-	console_v1 "github.com/getprobo/probo/pkg/api/console/v1"
 	"github.com/getprobo/probo/pkg/probo"
+	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"

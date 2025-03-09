@@ -70,7 +70,7 @@
   "relay": {
     "src": "src",
     "language": "typescript",
-    "schema": "../../pkg/api/console/v1/schema.graphql",
+    "schema": "../../pkg/server/api/console/v1/schema.graphql",
     "noFutureProofEnums": true,
     "customScalarTypes": {
       "Datetime": "string",

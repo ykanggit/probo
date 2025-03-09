@@ -35,26 +35,25 @@ vet:
 	$(GO) vet ./...
 
 .PHONY: build
-build: bin/probod @probo/console docker-build
+build: @probo/console bin/probod docker-build
 
 .PHONY: docker-build
 docker-build:
 	$(DOCKER_BUILD) --tag $(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME) --file Dockerfile .
 
 .PHONY: bin/probod
-bin/probod: pkg/api/console/v1/schema/schema.go pkg/api/console/v1/types/types.go pkg/api/console/v1/v1_resolver.go vet
+bin/probod: pkg/server/api/console/v1/schema/schema.go pkg/server/api/console/v1/types/types.go pkg/server/api/console/v1/v1_resolver.go vet
 	$(GO_BUILD) -o $(PROBOD_BIN) $(PROBOD_SRC)
 
 .PHONY: @probo/console
 @probo/console: NODE_ENV=production
 @probo/console:
-	$(NPM) --workspace $@ run typecheck
 	$(NPM) --workspace $@ run build
 
-pkg/api/console/v1/schema/schema.go \
-pkg/api/console/v1/types/types.go \
-pkg/api/console/v1/v1_resolver.go: pkg/api/console/v1/gqlgen.yaml pkg/api/console/v1/schema.graphql
-	$(GO_GENERATE) ./pkg/api/console/v1
+pkg/server/api/console/v1/schema/schema.go \
+pkg/server/api/console/v1/types/types.go \
+pkg/server/api/console/v1/v1_resolver.go: pkg/server/api/console/v1/gqlgen.yaml pkg/server/api/console/v1/schema.graphql
+	$(GO_GENERATE) ./pkg/server/api/console/v1
 
 .PHONY: fmt
 fmt: fmt-markdown fmt-go
@@ -92,3 +91,4 @@ stack-ps:
 .PHONY: psql
 psql:
 	$(DOCKER_COMPOSE) exec postgres psql -U probod -d probod
+
