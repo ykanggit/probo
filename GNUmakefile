@@ -48,6 +48,7 @@ bin/probod: pkg/server/api/console/v1/schema/schema.go pkg/server/api/console/v1
 .PHONY: @probo/console
 @probo/console: NODE_ENV=production
 @probo/console:
+	$(NPM) --workspace $@ run typecheck
 	$(NPM) --workspace $@ run build
 
 pkg/server/api/console/v1/schema/schema.go \
