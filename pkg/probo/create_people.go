@@ -63,7 +63,7 @@ func (s Service) CreatePeople(
 				return fmt.Errorf("cannot load organization %q: %w", req.OrganizationID, err)
 			}
 
-			if err := people.Insert(ctx, conn); err != nil {
+			if err := people.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert people: %w", err)
 			}
 

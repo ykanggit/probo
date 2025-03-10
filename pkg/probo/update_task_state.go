@@ -72,7 +72,7 @@ func (s Service) UpdateTaskState(
 	err = s.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			if err := taskStateTransition.Insert(ctx, conn); err != nil {
+			if err := taskStateTransition.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert task state transition: %w", err)
 			}
 

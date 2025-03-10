@@ -57,7 +57,7 @@ func (p People) CursorKey() page.CursorKey {
 func (p *People) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	peopleID gid.GID,
 ) error {
 	q := `
@@ -102,10 +102,12 @@ LIMIT 1;
 func (p People) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
     peoples (
+        tenant_id,
         id,
         organization_id,
         kind,
@@ -117,6 +119,7 @@ INSERT INTO
         version
     )
 VALUES (
+    @tenant_id,
     @people_id,
     @organization_id,
     @kind,
@@ -130,6 +133,7 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":                  scope.GetTenantID(),
 		"people_id":                  p.ID,
 		"organization_id":            p.OrganizationID,
 		"kind":                       p.Kind,
@@ -147,7 +151,7 @@ VALUES (
 func (p People) Delete(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 ) error {
 	q := `
 DELETE FROM peoples WHERE %s AND id = @people_id
@@ -165,7 +169,7 @@ DELETE FROM peoples WHERE %s AND id = @people_id
 func (p *Peoples) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	organizationID gid.GID,
 	cursor *page.Cursor,
 ) error {
@@ -212,7 +216,7 @@ WHERE
 func (p *People) Update(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	params UpdatePeopleParams,
 ) error {
 	q := `

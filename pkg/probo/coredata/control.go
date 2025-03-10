@@ -59,7 +59,7 @@ func (c Control) CursorKey() page.CursorKey {
 func (c *Control) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	controlID gid.GID,
 ) error {
 	q := `
@@ -121,10 +121,12 @@ LIMIT 1;
 func (c Control) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
     controls (
+        tenant_id,
         id,
         framework_id,
 		category,
@@ -136,6 +138,7 @@ INSERT INTO
 		version
     )
 VALUES (
+    @tenant_id,
     @control_id,
     @framework_id,
 	@category,
@@ -149,6 +152,7 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":    scope.GetTenantID(),
 		"control_id":   c.ID,
 		"framework_id": c.FrameworkID,
 		"category":     c.Category,
@@ -166,7 +170,7 @@ VALUES (
 func (c *Controls) LoadByFrameworkID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	frameworkID gid.GID,
 	cursor *page.Cursor,
 ) error {
@@ -227,7 +231,7 @@ WHERE
 func (c *Control) Update(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	params UpdateControlParams,
 ) error {
 	q := `

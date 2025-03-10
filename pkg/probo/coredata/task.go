@@ -49,7 +49,7 @@ func (t Task) CursorKey() page.CursorKey {
 func (t *Task) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	taskID gid.GID,
 ) error {
 	q := `
@@ -127,10 +127,12 @@ LIMIT 1;
 func (t Task) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 WITH task_insert AS (
    INSERT INTO tasks (
+       tenant_id,
        id,
        name,
        description,
@@ -139,6 +141,7 @@ WITH task_insert AS (
        updated_at
    )
    VALUES (
+       @tenant_id,
        @task_id,
        @name,
        @description,
@@ -161,6 +164,7 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":   scope.GetTenantID(),
 		"task_id":     t.ID,
 		"control_id":  t.ControlID,
 		"name":        t.Name,
@@ -176,7 +180,7 @@ VALUES (
 func (t *Tasks) LoadByControlID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	controlID gid.GID,
 	cursor *page.Cursor,
 ) error {
@@ -253,7 +257,7 @@ WHERE
 func (t *Task) Delete(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 ) error {
 	q := `
 WITH control_count AS (

@@ -42,10 +42,12 @@ func (cst EvidenceStateTransition) CursorKey() page.CursorKey {
 func (est EvidenceStateTransition) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
     evidence_state_transitions (
+		tenant_id,
         id,
         evidence_id,
         from_state,
@@ -55,6 +57,7 @@ INSERT INTO
         updated_at
     )
 VALUES (
+	@tenant_id,
     @evidence_state_transition_id,
     @evidence_id,
     @from_state,
@@ -66,6 +69,7 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":                    scope.GetTenantID(),
 		"evidence_state_transition_id": est.ID,
 		"evidence_id":                  est.EvidenceID,
 		"from_state":                   est.FromState,
@@ -81,7 +85,7 @@ VALUES (
 func (cst *EvidenceStateTransitions) LoadByEvidenceID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	evidenceID gid.GID,
 	cursor *page.Cursor,
 ) error {
@@ -125,7 +129,7 @@ WHERE
 func (cst *EvidenceStateTransitions) DeleteForEvidenceID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	evidenceID gid.GID,
 ) error {
 	q := `

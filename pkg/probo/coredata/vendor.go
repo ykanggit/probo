@@ -70,7 +70,7 @@ func (v Vendor) CursorKey() page.CursorKey {
 func (v *Vendor) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	vendorID gid.GID,
 ) error {
 	q := `
@@ -121,10 +121,12 @@ LIMIT 1;
 func (v Vendor) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
     vendors (
+        tenant_id,
         id,
         organization_id,
         name,
@@ -141,6 +143,7 @@ INSERT INTO
         version
     )
 VALUES (
+    @tenant_id,
     @vendor_id,
     @organization_id,
     @name,
@@ -159,6 +162,7 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":              scope.GetTenantID(),
 		"vendor_id":              v.ID,
 		"organization_id":        v.OrganizationID,
 		"name":                   v.Name,
@@ -180,7 +184,7 @@ VALUES (
 func (v Vendor) Delete(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 ) error {
 	q := `
 DELETE FROM vendors WHERE %s AND id = @vendor_id
@@ -198,7 +202,7 @@ DELETE FROM vendors WHERE %s AND id = @vendor_id
 func (v *Vendors) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	organizationID gid.GID,
 	cursor *page.Cursor,
 ) error {
@@ -250,7 +254,7 @@ WHERE
 func (v *Vendor) Update(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	params UpdateVendorParams,
 ) error {
 	q := `

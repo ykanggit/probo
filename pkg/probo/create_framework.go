@@ -56,7 +56,7 @@ func (s Service) CreateFramework(
 	err = s.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return framework.Insert(ctx, conn)
+			return framework.Insert(ctx, conn, s.scope)
 		},
 	)
 

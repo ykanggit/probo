@@ -38,7 +38,7 @@ type (
 func (o *Organization) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	organizationID gid.GID,
 ) error {
 	q := `
@@ -79,18 +79,21 @@ LIMIT 1;
 func (o *Organization) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 INSERT INTO organizations (
+    tenant_id,
     id,
     name,
     logo_url,
     created_at,
     updated_at
-) VALUES (@id, @name, @logo_url, @created_at, @updated_at)
+) VALUES (@tenant_id, @id, @name, @logo_url, @created_at, @updated_at)
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":  scope.GetTenantID(),
 		"id":         o.ID,
 		"name":       o.Name,
 		"logo_url":   o.LogoURL,

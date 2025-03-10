@@ -86,7 +86,7 @@ func (s *PolicyService) Create(
 				return fmt.Errorf("cannot load organization %q: %w", req.OrganizationID, err)
 			}
 
-			if err := policy.Insert(ctx, conn); err != nil {
+			if err := policy.Insert(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert policy: %w", err)
 			}
 

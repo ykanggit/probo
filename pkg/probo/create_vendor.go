@@ -73,7 +73,7 @@ func (s Service) CreateVendor(
 				return fmt.Errorf("cannot load organization %q: %w", req.OrganizationID, err)
 			}
 
-			if err := vendor.Insert(ctx, conn); err != nil {
+			if err := vendor.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert vendor: %w", err)
 			}
 

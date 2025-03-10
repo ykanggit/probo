@@ -41,10 +41,12 @@ func (tst TaskStateTransition) CursorKey() page.CursorKey {
 func (tst TaskStateTransition) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
     task_state_transitions (
+		tenant_id,
         id,
         task_id,
         from_state,
@@ -54,6 +56,7 @@ INSERT INTO
         updated_at
     )
 VALUES (
+    @tenant_id,
     @task_state_transition_id,
     @task_id,
     @from_state,
@@ -65,6 +68,7 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":                scope.GetTenantID(),
 		"task_state_transition_id": tst.ID,
 		"task_id":                  tst.TaskID,
 		"from_state":               tst.FromState,
@@ -80,7 +84,7 @@ VALUES (
 func (tst *TaskStateTransitions) LoadByTaskID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	taskID gid.GID,
 	cursor *page.Cursor,
 ) error {

@@ -42,10 +42,12 @@ func (cst ControlStateTransition) CursorKey() page.CursorKey {
 func (cst ControlStateTransition) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
     control_state_transitions (
+		tenant_id,
         id,
         control_id,
         from_state,
@@ -55,6 +57,7 @@ INSERT INTO
         updated_at
     )
 VALUES (
+	@tenant_id,
     @control_state_transition_id,
     @control_id,
     @from_state,
@@ -66,6 +69,7 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":                   scope.GetTenantID(),
 		"control_state_transition_id": cst.ID,
 		"control_id":                  cst.ControlID,
 		"from_state":                  cst.FromState,
@@ -81,7 +85,7 @@ VALUES (
 func (cst *ControlStateTransitions) LoadByControlID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	controlID gid.GID,
 	cursor *page.Cursor,
 ) error {

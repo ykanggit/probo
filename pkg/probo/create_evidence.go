@@ -117,11 +117,11 @@ func (s Service) CreateEvidence(
 				return fmt.Errorf("cannot load task %q: %w", req.TaskID, err)
 			}
 
-			if err := evidence.Insert(ctx, conn); err != nil {
+			if err := evidence.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert evidence: %w", err)
 			}
 
-			if err := evidenceStateTransition.Insert(ctx, conn); err != nil {
+			if err := evidenceStateTransition.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert evidence state transition: %w", err)
 			}
 

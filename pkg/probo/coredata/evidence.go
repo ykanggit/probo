@@ -49,10 +49,12 @@ func (e Evidence) CursorKey() page.CursorKey {
 func (e Evidence) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
     evidences (
+        tenant_id,
         id,
         task_id,
         object_key,
@@ -63,6 +65,7 @@ INSERT INTO
         updated_at
     )
 VALUES (
+    @tenant_id,
     @evidence_id,
     @task_id,
     @object_key,
@@ -75,6 +78,7 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":   scope.GetTenantID(),
 		"evidence_id": e.ID,
 		"task_id":     e.TaskID,
 		"object_key":  e.ObjectKey,
@@ -91,7 +95,7 @@ VALUES (
 func (e *Evidence) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	evidenceID gid.GID,
 ) error {
 	q := `
@@ -153,7 +157,7 @@ LIMIT 1;
 func (e *Evidences) LoadByTaskID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	taskID gid.GID,
 	cursor *page.Cursor,
 ) error {
@@ -215,7 +219,7 @@ WHERE
 func (e Evidence) Delete(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 ) error {
 	q := `
 DELETE FROM

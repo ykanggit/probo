@@ -79,11 +79,11 @@ func (s Service) CreateTask(
 				return fmt.Errorf("cannot laod control %q: %w", req.ControlID, err)
 			}
 
-			if err := task.Insert(ctx, conn); err != nil {
+			if err := task.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert task: %w", err)
 			}
 
-			if err := taskStateTransition.Insert(ctx, conn); err != nil {
+			if err := taskStateTransition.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert task state transition: %w", err)
 			}
 

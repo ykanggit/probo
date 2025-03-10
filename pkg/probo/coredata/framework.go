@@ -54,7 +54,7 @@ func (f Framework) CursorKey() page.CursorKey {
 func (f *Frameworks) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	organizationID gid.GID,
 	cursor *page.Cursor,
 ) error {
@@ -100,7 +100,7 @@ WHERE
 func (f *Framework) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	frameworkID gid.GID,
 ) error {
 	q := `
@@ -143,10 +143,12 @@ LIMIT 1;
 func (f Framework) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
     frameworks (
+        tenant_id,
         id,
         organization_id,
         name,
@@ -157,6 +159,7 @@ INSERT INTO
         version
     )
 VALUES (
+    @tenant_id,
     @framework_id,
     @organization_id,
     @name,
@@ -169,6 +172,7 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":       scope.GetTenantID(),
 		"framework_id":    f.ID,
 		"organization_id": f.OrganizationID,
 		"name":            f.Name,
@@ -185,7 +189,7 @@ VALUES (
 func (f Framework) Delete(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 ) error {
 	q := `
 DELETE
@@ -207,7 +211,7 @@ WHERE
 func (f *Framework) Update(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	params UpdateFrameworkParams,
 ) error {
 	q := `

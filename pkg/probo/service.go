@@ -27,9 +27,9 @@ import (
 type (
 	Service struct {
 		pg     *pg.Client
-		scope  *coredata.Scope
 		s3     *s3.Client
 		bucket string
+		scope  coredata.Scoper
 
 		Policies *PolicyService
 	}
@@ -53,11 +53,24 @@ func NewService(
 	svc := &Service{
 		pg:     pgClient,
 		s3:     s3Client,
-		scope:  coredata.NewScope(), // must be created from auth
 		bucket: bucket,
+		scope:  coredata.NewNoScope(),
 	}
 
 	svc.Policies = &PolicyService{svc: svc}
 
 	return svc, nil
+}
+
+func (s *Service) WithTenant(tenantID string) *Service {
+	newSvc := &Service{
+		pg:     s.pg,
+		s3:     s.s3,
+		bucket: s.bucket,
+		scope:  coredata.NewScope(tenantID),
+	}
+
+	newSvc.Policies = &PolicyService{svc: newSvc}
+
+	return newSvc
 }

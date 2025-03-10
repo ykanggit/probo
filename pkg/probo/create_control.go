@@ -81,11 +81,11 @@ func (s Service) CreateControl(
 				return fmt.Errorf("cannot load framework %q: %w", req.FrameworkID, err)
 			}
 
-			if err := control.Insert(ctx, conn); err != nil {
+			if err := control.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert control: %w", err)
 			}
 
-			if err := controlStateTransition.Insert(ctx, conn); err != nil {
+			if err := controlStateTransition.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert control state transition: %w", err)
 			}
 

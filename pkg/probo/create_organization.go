@@ -50,7 +50,7 @@ func (s Service) CreateOrganization(
 	err = s.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			if err := organization.Insert(ctx, conn); err != nil {
+			if err := organization.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert control: %w", err)
 			}
 

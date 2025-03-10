@@ -19,17 +19,56 @@ import (
 )
 
 type (
-	Scope struct{}
+	Scoper interface {
+		SQLArguments() pgx.StrictNamedArgs
+		SQLFragment() string
+		GetTenantID() *string
+	}
+
+	NoScope struct{}
+
+	Scope struct {
+		TenantID string
+	}
 )
 
-func NewScope() *Scope {
-	return &Scope{}
+var (
+	_ Scoper = (*NoScope)(nil)
+	_ Scoper = (*Scope)(nil)
+)
+
+func NewNoScope() *NoScope {
+	return &NoScope{}
 }
 
-func (*Scope) SQLArguments() pgx.StrictNamedArgs {
+func (*NoScope) SQLArguments() pgx.StrictNamedArgs {
 	return pgx.StrictNamedArgs{}
 }
 
-func (*Scope) SQLFragment() string {
+func (*NoScope) SQLFragment() string {
 	return "TRUE"
+}
+
+func (*NoScope) GetTenantID() *string {
+	return nil
+}
+
+func NewScope(tenantID string) *Scope {
+	return &Scope{
+		TenantID: tenantID,
+	}
+}
+
+func (s *Scope) SQLArguments() pgx.StrictNamedArgs {
+	return pgx.StrictNamedArgs{
+		"tenant_id": s.TenantID,
+	}
+}
+
+func (*Scope) SQLFragment() string {
+	return "tenant_id = @tenant_id"
+}
+
+func (s *Scope) GetTenantID() *string {
+	return &s.TenantID
 }

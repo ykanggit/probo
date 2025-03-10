@@ -45,7 +45,7 @@ func (p Policy) CursorKey() page.CursorKey {
 func (p *Policy) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	policyID gid.GID,
 ) error {
 	q := `
@@ -91,7 +91,7 @@ LIMIT 1;
 func (p *Policies) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	organizationID gid.GID,
 	cursor *page.Cursor,
 ) error {
@@ -139,10 +139,12 @@ WHERE
 func (p Policy) Insert(
 	ctx context.Context,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
     policies (
+        tenant_id,
         id,
         organization_id,
         owner_id,
@@ -155,6 +157,7 @@ INSERT INTO
         version
     )
 VALUES (
+    @tenant_id,
     @policy_id,
     @organization_id,
     @owner_id,
@@ -169,6 +172,7 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
+		"tenant_id":       scope.GetTenantID(),
 		"policy_id":       p.ID,
 		"organization_id": p.OrganizationID,
 		"owner_id":        p.OwnerID,
@@ -187,7 +191,7 @@ VALUES (
 func (p Policy) Delete(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 ) error {
 	q := `
 DELETE FROM policies WHERE %s AND id = @policy_id
@@ -205,7 +209,7 @@ DELETE FROM policies WHERE %s AND id = @policy_id
 func (p *Policy) Update(
 	ctx context.Context,
 	conn pg.Conn,
-	scope *Scope,
+	scope Scoper,
 	params UpdatePolicyParams,
 ) error {
 	q := `
