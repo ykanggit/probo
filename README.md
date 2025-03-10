@@ -75,11 +75,8 @@ Probo is designed to be accessible, transparent, and community-driven.
    # Build the project
    make build
 
-   # In one terminal - start the API server
+   # Start the application
    bin/probod
-
-   # In another terminal - start the frontend
-   npm -w @probo/console run dev
    ```
 
 The application will be available at:
