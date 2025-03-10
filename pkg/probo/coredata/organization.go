@@ -79,7 +79,6 @@ LIMIT 1;
 func (o *Organization) Insert(
 	ctx context.Context,
 	conn pg.Conn,
-	scope Scoper,
 ) error {
 	q := `
 INSERT INTO organizations (
@@ -93,7 +92,7 @@ INSERT INTO organizations (
 `
 
 	args := pgx.StrictNamedArgs{
-		"tenant_id":  scope.GetTenantID(),
+		"tenant_id":  o.ID, // We use the organization ID as tenant ID
 		"id":         o.ID,
 		"name":       o.Name,
 		"logo_url":   o.LogoURL,
