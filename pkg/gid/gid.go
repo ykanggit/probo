@@ -10,12 +10,11 @@ import (
 )
 
 const (
-	GIDSize = 32 // 256 bits total
+	GIDSize = 24 // 192 bits total
 )
 
 type (
-	GID      [GIDSize]byte
-	TenantID [16]byte // 128-bit tenant ID
+	GID [GIDSize]byte
 )
 
 var (
@@ -44,25 +43,25 @@ func New(tenantID TenantID, entityType uint16) GID {
 
 // NewGID creates a new GID with the specified entity type and tenant ID
 // Structure:
-// - Bytes 0-15: Tenant ID (full 16 bytes)
-// - Bytes 16-17: Entity Type (uint16)
-// - Bytes 18-25: Timestamp (milliseconds since epoch)
-// - Bytes 26-31: Random data for uniqueness
+// - Bytes 0-7: Tenant ID (8 bytes)
+// - Bytes 8-9: Entity Type (uint16)
+// - Bytes 10-17: Timestamp (milliseconds since epoch)
+// - Bytes 18-23: Random data for uniqueness
 func NewGID(tenantID TenantID, entityType uint16) (GID, error) {
 	var id GID
 
-	// Write full tenant ID (16 bytes)
-	copy(id[0:16], tenantID[:])
+	// Write full tenant ID (8 bytes)
+	copy(id[0:8], tenantID[:])
 
 	// Write entity type (2 bytes)
-	binary.BigEndian.PutUint16(id[16:18], entityType)
+	binary.BigEndian.PutUint16(id[8:10], entityType)
 
 	// Get current timestamp (milliseconds) and write it (8 bytes)
 	now := time.Now().UnixMilli()
-	binary.BigEndian.PutUint64(id[18:26], uint64(now))
+	binary.BigEndian.PutUint64(id[10:18], uint64(now))
 
 	// Fill the rest with random data (6 bytes)
-	_, err := rand.Read(id[26:32])
+	_, err := rand.Read(id[18:24])
 	if err != nil {
 		return Nil, fmt.Errorf("failed to generate random bytes: %v", err)
 	}
@@ -78,18 +77,18 @@ func (gid GID) Value() (driver.Value, error) {
 // TenantID extracts the tenant ID from the GID
 func (gid GID) TenantID() TenantID {
 	var tenantID TenantID
-	copy(tenantID[:], gid[0:16])
+	copy(tenantID[:], gid[0:8])
 	return tenantID
 }
 
 // EntityType extracts the entity type from the GID
 func (gid GID) EntityType() uint16 {
-	return binary.BigEndian.Uint16(gid[16:18])
+	return binary.BigEndian.Uint16(gid[8:10])
 }
 
 // Timestamp extracts the timestamp from the GID
 func (gid GID) Timestamp() time.Time {
-	millis := binary.BigEndian.Uint64(gid[18:26])
+	millis := binary.BigEndian.Uint64(gid[10:18])
 	return time.UnixMilli(int64(millis))
 }
 

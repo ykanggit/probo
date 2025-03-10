@@ -11,6 +11,9 @@ import (
 	"time"
 )
 
+// TenantID represents a tenant identifier (64 bits/8 bytes total)
+type TenantID [8]byte
+
 var (
 	// NilTenant represents an empty tenant ID
 	NilTenant = TenantID{}
@@ -22,8 +25,7 @@ var (
 // TenantGenerator handles creation of unique tenant IDs
 type tenantGenerator struct {
 	// Process-specific values
-	machineID [6]byte // 48 bits for machine identifier
-	processID uint16  // 16 bits for process
+	machineID [3]byte // 24 bits for machine identifier
 	counter   uint32  // Counter for the sequence
 }
 
@@ -63,48 +65,34 @@ func newTenantGenerator() *tenantGenerator {
 		// Pad with timestamp bits if hostname is short
 		if len(hostname) < len(g.machineID) {
 			ts := time.Now().UnixNano()
-			binary.BigEndian.PutUint32(g.machineID[len(hostname):], uint32(ts))
+			binary.BigEndian.PutUint16(g.machineID[len(hostname):], uint16(ts))
 		}
 	}
-
-	// Set process ID from OS PID
-	g.processID = uint16(os.Getpid() & 0xFFFF)
 
 	return g
 }
 
-// NewTenantID generates a new 128-bit tenant ID with the structure:
-// - 48 bits: Machine ID (random, unique per machine)
-// - 16 bits: Process ID (unique per process on machine)
-// - 48 bits: Timestamp (milliseconds, sequential)
+// NewTenantID generates a new 64-bit tenant ID with the structure:
+// - 24 bits: Machine ID (random, unique per machine)
+// - 24 bits: Timestamp (truncated Unix time in seconds)
 // - 16 bits: Counter (increments per ID)
 func (g *tenantGenerator) NewTenantID() TenantID {
 	// Create new ID
 	var id TenantID
 
-	// 1. Get timestamp (48 bits = milliseconds since epoch)
-	now := time.Now().UnixMilli()
+	// 1. Copy machine ID (first 3 bytes)
+	copy(id[0:3], g.machineID[:])
 
-	// 2. Increment counter atomically (16 bits used)
+	// 2. Add timestamp (next 3 bytes) - Unix time in seconds (truncated)
+	// Using seconds instead of milliseconds gives us until year 2286
+	now := uint32(time.Now().Unix())
+	id[3] = byte(now >> 16)
+	id[4] = byte(now >> 8)
+	id[5] = byte(now)
+
+	// 3. Increment counter atomically (last 2 bytes)
 	count := atomic.AddUint32(&g.counter, 1) & 0xFFFF
-
-	// 3. Assemble the ID
-	// First 6 bytes: Machine ID
-	copy(id[0:6], g.machineID[:])
-
-	// Next 2 bytes: Process ID
-	binary.BigEndian.PutUint16(id[6:8], g.processID)
-
-	// Next 6 bytes: Timestamp (48 bits)
-	id[8] = byte(now >> 40)
-	id[9] = byte(now >> 32)
-	id[10] = byte(now >> 24)
-	id[11] = byte(now >> 16)
-	id[12] = byte(now >> 8)
-	id[13] = byte(now)
-
-	// Last 2 bytes: Counter
-	binary.BigEndian.PutUint16(id[14:16], uint16(count))
+	binary.BigEndian.PutUint16(id[6:8], uint16(count))
 
 	return id
 }
@@ -167,7 +155,6 @@ func (id TenantID) IsValid() bool {
 
 // Timestamp extracts the timestamp from the TenantID
 func (id TenantID) Timestamp() time.Time {
-	millis := int64(id[8])<<40 | int64(id[9])<<32 | int64(id[10])<<24 |
-		int64(id[11])<<16 | int64(id[12])<<8 | int64(id[13])
-	return time.UnixMilli(millis)
+	seconds := uint32(id[3])<<16 | uint32(id[4])<<8 | uint32(id[5])
+	return time.Unix(int64(seconds), 0)
 }
