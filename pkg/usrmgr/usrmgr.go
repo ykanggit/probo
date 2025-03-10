@@ -109,7 +109,7 @@ func (s Service) RegisterUser(
 
 	now := time.Now()
 	user := &coredata.User{
-		ID:             gid.New(),
+		ID:             gid.New(gid.NilTenant, 0),
 		EmailAddress:   params.Email,
 		HashedPassword: hashedPassword,
 		FullName:       params.FullName,
@@ -151,8 +151,8 @@ func (s Service) Login(
 	now := time.Now()
 	user := &coredata.User{}
 	session := &coredata.Session{
-		ID:        gid.New(),
-		UserID:    gid.GID{}, // Will be set after user is loaded
+		ID:        gid.New(gid.NilTenant, 0),
+		UserID:    gid.Nil,
 		ExpiredAt: now.Add(24 * time.Hour),
 		CreatedAt: now,
 		UpdatedAt: now,
@@ -308,19 +308,6 @@ func (s Service) GetUserBySession(
 	}
 
 	return s.GetUserByID(ctx, session.UserID)
-}
-
-// GetUserOrganization gets the organization ID for a user
-func (s Service) GetUserOrganization(
-	ctx context.Context,
-	userID gid.GID,
-) (gid.GID, error) {
-	user, err := s.GetUserByID(ctx, userID)
-	if err != nil {
-		return gid.GID{}, err
-	}
-
-	return user.OrganizationID, nil
 }
 
 // GetUserOrganizations gets all organizations for a user

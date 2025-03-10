@@ -15,7 +15,7 @@
 package coredata
 
 const (
-	OrganizationEntityType uint32 = iota
+	OrganizationEntityType uint16 = iota
 	FrameworkEntityType
 	ControlEntityType
 	TaskEntityType

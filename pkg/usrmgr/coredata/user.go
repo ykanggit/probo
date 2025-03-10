@@ -31,7 +31,6 @@ type (
 		EmailAddress   string    `db:"email_address"`
 		HashedPassword []byte    `db:"hashed_password"`
 		FullName       string    `db:"fullname"`
-		OrganizationID gid.GID   `db:"organization_id"`
 		CreatedAt      time.Time `db:"created_at"`
 		UpdatedAt      time.Time `db:"updated_at"`
 	}
@@ -52,7 +51,6 @@ SELECT
     email_address,
     hashed_password,
     fullname,
-    organization_id,
     created_at,
     updated_at
 FROM
@@ -90,7 +88,6 @@ SELECT
     email_address,
     hashed_password,
     fullname,
-    organization_id,
     created_at,
     updated_at
 FROM
@@ -123,13 +120,12 @@ func (u *User) Insert(
 ) error {
 	q := `
 INSERT INTO
-    usrmgr_users (id, email_address, hashed_password, fullname, organization_id, created_at, updated_at)
+    usrmgr_users (id, email_address, hashed_password, fullname, created_at, updated_at)
 VALUES (
     @user_id,
     @email_address,
     @hashed_password,
     @fullname,
-    @organization_id,
     @created_at,
     @updated_at
 )
@@ -140,7 +136,6 @@ VALUES (
 		"email_address":   u.EmailAddress,
 		"hashed_password": u.HashedPassword,
 		"fullname":        u.FullName,
-		"organization_id": "AZSfP_xAcAC5IAAAAAAltA",
 		"created_at":      u.CreatedAt,
 		"updated_at":      u.UpdatedAt,
 	}

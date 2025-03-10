@@ -39,7 +39,7 @@ func (s Service) CreatePeople(
 	req CreatePeopleRequest,
 ) (*coredata.People, error) {
 	now := time.Now()
-	peopleID, err := gid.NewGID(coredata.PeopleEntityType)
+	peopleID, err := gid.NewGID(s.scope.GetTenantID(), coredata.PeopleEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create people global id: %w", err)
 	}

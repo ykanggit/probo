@@ -39,11 +39,11 @@ func (s Service) CreateTask(
 	req CreateTaskRequest,
 ) (*coredata.Task, error) {
 	now := time.Now()
-	taskID, err := gid.NewGID(coredata.TaskEntityType)
+	taskID, err := gid.NewGID(s.scope.GetTenantID(), coredata.TaskEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create task global id: %w", err)
 	}
-	taskStateTransitionID, err := gid.NewGID(coredata.TaskStateTransitionEntityType)
+	taskStateTransitionID, err := gid.NewGID(s.scope.GetTenantID(), coredata.TaskStateTransitionEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create task state transition global id: %w", err)
 	}

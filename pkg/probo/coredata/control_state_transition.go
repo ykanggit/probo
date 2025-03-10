@@ -92,6 +92,7 @@ func (cst *ControlStateTransitions) LoadByControlID(
 	q := `
 SELECT
     id,
+	tenant_id,
     control_id,
     from_state,
     to_state,

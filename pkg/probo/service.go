@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata"
 	"go.gearno.de/kit/migrator"
 	"go.gearno.de/kit/pg"
@@ -62,7 +63,7 @@ func NewService(
 	return svc, nil
 }
 
-func (s *Service) WithTenant(tenantID string) *Service {
+func (s *Service) WithTenant(tenantID gid.TenantID) *Service {
 	newSvc := &Service{
 		pg:     s.pg,
 		s3:     s.s3,

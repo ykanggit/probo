@@ -44,7 +44,7 @@ func (s Service) CreateVendor(
 	req CreateVendorRequest,
 ) (*coredata.Vendor, error) {
 	now := time.Now()
-	vendorID, err := gid.NewGID(coredata.VendorEntityType)
+	vendorID, err := gid.NewGID(s.scope.GetTenantID(), coredata.VendorEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create vendor global id: %w", err)
 	}

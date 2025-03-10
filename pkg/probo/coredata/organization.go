@@ -27,11 +27,12 @@ import (
 
 type (
 	Organization struct {
-		ID        gid.GID   `db:"id"`
-		Name      string    `db:"name"`
-		LogoURL   string    `db:"logo_url"`
-		CreatedAt time.Time `db:"created_at"`
-		UpdatedAt time.Time `db:"updated_at"`
+		ID        gid.GID      `db:"id"`
+		TenantID  gid.TenantID `db:"tenant_id"`
+		Name      string       `db:"name"`
+		LogoURL   string       `db:"logo_url"`
+		CreatedAt time.Time    `db:"created_at"`
+		UpdatedAt time.Time    `db:"updated_at"`
 	}
 )
 
@@ -43,6 +44,7 @@ func (o *Organization) LoadByID(
 ) error {
 	q := `
 SELECT
+    tenant_id,
     id,
     name,
     logo_url,
@@ -92,7 +94,7 @@ INSERT INTO organizations (
 `
 
 	args := pgx.StrictNamedArgs{
-		"tenant_id":  o.ID, // We use the organization ID as tenant ID
+		"tenant_id":  o.TenantID,
 		"id":         o.ID,
 		"name":       o.Name,
 		"logo_url":   o.LogoURL,

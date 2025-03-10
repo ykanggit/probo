@@ -34,14 +34,17 @@ func (s Service) CreateOrganization(
 	ctx context.Context,
 	req CreateOrganizationRequest,
 ) (*coredata.Organization, error) {
+	tenantID := gid.NewTenantID()
+
 	now := time.Now()
-	organizationID, err := gid.NewGID(coredata.OrganizationEntityType)
+	organizationID, err := gid.NewGID(tenantID, coredata.OrganizationEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create organization global id: %w", err)
 	}
 
 	organization := &coredata.Organization{
 		ID:        organizationID,
+		TenantID:  tenantID,
 		Name:      req.Name,
 		CreatedAt: now,
 		UpdatedAt: now,

@@ -46,7 +46,7 @@ func (s Service) UpdateTaskState(
 		return task, nil
 	}
 
-	taskStateTransitionID, err := gid.NewGID(coredata.TaskStateTransitionEntityType)
+	taskStateTransitionID, err := gid.NewGID(s.scope.GetTenantID(), coredata.TaskStateTransitionEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create task state transition global id: %w", err)
 	}

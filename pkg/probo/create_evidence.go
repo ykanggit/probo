@@ -44,11 +44,11 @@ func (s Service) CreateEvidence(
 	req CreateEvidenceRequest,
 ) (*coredata.Evidence, error) {
 	now := time.Now()
-	evidenceID, err := gid.NewGID(coredata.EvidenceEntityType)
+	evidenceID, err := gid.NewGID(s.scope.GetTenantID(), coredata.EvidenceEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create evidence global id: %w", err)
 	}
-	evidenceStateTransitionID, err := gid.NewGID(coredata.EvidenceStateTransitionEntityType)
+	evidenceStateTransitionID, err := gid.NewGID(s.scope.GetTenantID(), coredata.EvidenceStateTransitionEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create evidence state transition: %w", err)
 	}

@@ -69,7 +69,7 @@ WITH
              controls_tasks ct ON
                  ct.task_id = t.id
          WHERE
-             %s
+             t.tenant_id = @tenant_id
              AND id = @task_id
     ),
     task_states AS (
@@ -104,9 +104,7 @@ WHERE
 LIMIT 1;
 `
 
-	q = fmt.Sprintf(q, scope.SQLFragment())
-
-	args := pgx.StrictNamedArgs{"task_id": taskID}
+	args := pgx.StrictNamedArgs{"tenant_id": scope.GetTenantID(), "task_id": taskID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -153,11 +151,13 @@ WITH task_insert AS (
 )
 INSERT INTO controls_tasks (
    task_id,
+   tenant_id,
    control_id,
    created_at
 )
 VALUES (
    (SELECT id FROM task_insert),
+   @tenant_id,
    @control_id,
    @created_at
 );
@@ -202,7 +202,7 @@ WITH
                  ct.task_id = t.id
                  AND ct.control_id = @control_id
          WHERE
-             %s
+             t.tenant_id = @tenant_id
     ),
     task_states AS (
         SELECT
@@ -233,9 +233,9 @@ WHERE
     AND %s
 `
 
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, cursor.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"control_id": controlID}
+	args := pgx.StrictNamedArgs{"tenant_id": scope.GetTenantID(), "control_id": controlID}
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 

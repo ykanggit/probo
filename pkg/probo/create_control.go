@@ -40,11 +40,11 @@ func (s Service) CreateControl(
 	req CreateControlRequest,
 ) (*coredata.Control, error) {
 	now := time.Now()
-	controlID, err := gid.NewGID(coredata.ControlEntityType)
+	controlID, err := gid.NewGID(s.scope.GetTenantID(), coredata.ControlEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create control global id: %w", err)
 	}
-	controlStateTransitionID, err := gid.NewGID(coredata.ControlStateTransitionEntityType)
+	controlStateTransitionID, err := gid.NewGID(s.scope.GetTenantID(), coredata.ControlStateTransitionEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create control state transition global id: %w", err)
 	}

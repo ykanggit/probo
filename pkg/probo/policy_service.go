@@ -61,7 +61,7 @@ func (s *PolicyService) Create(
 	req CreatePolicyRequest,
 ) (*coredata.Policy, error) {
 	now := time.Now()
-	policyID, err := gid.NewGID(coredata.PolicyEntityType)
+	policyID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.PolicyEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create policy global id: %w", err)
 	}

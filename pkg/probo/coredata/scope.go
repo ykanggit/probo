@@ -15,6 +15,9 @@
 package coredata
 
 import (
+	"fmt"
+
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -22,13 +25,13 @@ type (
 	Scoper interface {
 		SQLArguments() pgx.StrictNamedArgs
 		SQLFragment() string
-		GetTenantID() *string
+		GetTenantID() gid.TenantID
 	}
 
 	NoScope struct{}
 
 	Scope struct {
-		TenantID string
+		tenantID gid.TenantID
 	}
 )
 
@@ -49,19 +52,19 @@ func (*NoScope) SQLFragment() string {
 	return "TRUE"
 }
 
-func (*NoScope) GetTenantID() *string {
-	return nil
+func (*NoScope) GetTenantID() gid.TenantID {
+	panic(fmt.Errorf("cannot get tenant id from no scope"))
 }
 
-func NewScope(tenantID string) *Scope {
+func NewScope(tenantID gid.TenantID) *Scope {
 	return &Scope{
-		TenantID: tenantID,
+		tenantID: tenantID,
 	}
 }
 
 func (s *Scope) SQLArguments() pgx.StrictNamedArgs {
 	return pgx.StrictNamedArgs{
-		"tenant_id": s.TenantID,
+		"tenant_id": s.tenantID,
 	}
 }
 
@@ -69,6 +72,6 @@ func (*Scope) SQLFragment() string {
 	return "tenant_id = @tenant_id"
 }
 
-func (s *Scope) GetTenantID() *string {
-	return &s.TenantID
+func (s *Scope) GetTenantID() gid.TenantID {
+	return s.tenantID
 }

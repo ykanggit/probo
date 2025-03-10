@@ -38,7 +38,7 @@ func (s Service) CreateFramework(
 	req CreateFrameworkRequest,
 ) (*coredata.Framework, error) {
 	now := time.Now()
-	frameworkID, err := gid.NewGID(coredata.FrameworkEntityType)
+	frameworkID, err := gid.NewGID(s.scope.GetTenantID(), coredata.FrameworkEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global id: %w", err)
 	}
