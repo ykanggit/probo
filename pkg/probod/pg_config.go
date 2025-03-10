@@ -28,7 +28,7 @@ type (
 		Password     string `json:"password"`
 		Database     string `json:"database"`
 		PoolSize     int32  `json:"pool-size"`
-		CACertBundle string `json:"ca-cert-bundle,omitempty"`
+		CACertBundle string `json:"ca-cert-bundle"`
 	}
 )
 
