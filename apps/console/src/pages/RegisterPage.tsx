@@ -52,7 +52,7 @@ export default function RegisterPage() {
         description: "Account created successfully",
       });
 
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (error) {
       toast({
         title: "Error",
