@@ -51,28 +51,18 @@ type (
 		usrmgrSvc *usrmgr.Service
 		authCfg   AuthConfig
 	}
-
-	contextKey string
-
-	httpContext struct {
-		ResponseWriter http.ResponseWriter
-		Request        *http.Request
-	}
 )
 
-const (
-	sessionContextKey contextKey = "session"
-	userContextKey    contextKey = "user"
-	httpContextKey    contextKey = "http"
+var (
+	sessionContextKey = struct{}{}
+	userContextKey    = struct{}{}
 )
 
-// SessionFromContext retrieves the session from the context
 func SessionFromContext(ctx context.Context) *coredata.Session {
 	session, _ := ctx.Value(sessionContextKey).(*coredata.Session)
 	return session
 }
 
-// UserFromContext retrieves the user from the context
 func UserFromContext(ctx context.Context) *coredata.User {
 	user, _ := ctx.Value(userContextKey).(*coredata.User)
 	return user
@@ -81,10 +71,10 @@ func UserFromContext(ctx context.Context) *coredata.User {
 func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig) *chi.Mux {
 	r := chi.NewMux()
 
-	// Register authentication routes
-	RegisterAuthRoutes(r, usrmgrSvc, authCfg)
+	r.Post("/auth/register", SignUpHandler(usrmgrSvc, authCfg))
+	r.Post("/auth/login", SignInHandler(usrmgrSvc, authCfg))
+	r.Delete("/auth/logout", SignOutHandler(usrmgrSvc, authCfg))
 
-	// GraphQL playground and query endpoint
 	r.Get("/", playground.Handler("GraphQL", "/console/v1/query"))
 	r.Post("/query", graphqlHandler(proboSvc, usrmgrSvc, authCfg))
 
@@ -111,14 +101,11 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 	})
 	srv.Use(extension.Introspection{})
 
-	// Add operation middleware for authentication
 	srv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
-		// Skip authentication for introspection queries
 		if op := graphql.GetOperationContext(ctx); op.OperationName == "IntrospectionQuery" {
 			return next(ctx)
 		}
 
-		// Get the user from context
 		user := UserFromContext(ctx)
 		if user == nil {
 			return func(ctx context.Context) *graphql.Response {
@@ -128,17 +115,11 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 			}
 		}
 
-		// Continue with the operation
 		return next(ctx)
 	})
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Create HTTP context
-		httpCtx := &httpContext{
-			ResponseWriter: w,
-			Request:        r,
-		}
-		ctx := context.WithValue(r.Context(), httpContextKey, httpCtx)
+		ctx := r.Context()
 
 		cookieValue, err := securecookie.Get(r, securecookie.DefaultConfig(
 			authCfg.CookieName,
@@ -148,31 +129,52 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 			if !errors.Is(err, securecookie.ErrCookieNotFound) {
 				panic(fmt.Errorf("failed to get session: %w", err))
 			}
+
+			srv.ServeHTTP(w, r)
+			return
 		}
 
 		sessionID, err := gid.ParseGID(cookieValue)
-		if err == nil {
-			// Get the session
-			session, err := usrmgrSvc.GetSession(r.Context(), sessionID)
-			if err == nil {
-				// Add session to context
-				ctx = context.WithValue(ctx, sessionContextKey, session)
+		if err != nil {
+			securecookie.Clear(w, securecookie.DefaultConfig(
+				authCfg.CookieName,
+				authCfg.CookieSecret,
+			))
 
-				// Get the user
-				user, err := usrmgrSvc.GetUserBySession(r.Context(), sessionID)
-				if err == nil {
-					// Add user to context
-					ctx = context.WithValue(ctx, userContextKey, user)
-				}
-			}
+			srv.ServeHTTP(w, r)
+			return
 		}
+
+		session, err := usrmgrSvc.GetSession(ctx, sessionID)
+		if err != nil {
+			securecookie.Clear(w, securecookie.DefaultConfig(
+				authCfg.CookieName,
+				authCfg.CookieSecret,
+			))
+
+			srv.ServeHTTP(w, r)
+			return
+		}
+
+		user, err := usrmgrSvc.GetUserBySession(ctx, sessionID)
+		if err != nil {
+			securecookie.Clear(w, securecookie.DefaultConfig(
+				authCfg.CookieName,
+				authCfg.CookieSecret,
+			))
+
+			srv.ServeHTTP(w, r)
+			return
+		}
+
+		ctx = context.WithValue(ctx, sessionContextKey, session)
+		ctx = context.WithValue(ctx, userContextKey, user)
 
 		srv.ServeHTTP(w, r.WithContext(ctx))
 
-		if session := SessionFromContext(r.Context()); session != nil {
-			if err := usrmgrSvc.UpdateSession(r.Context(), session); err != nil {
-				panic(fmt.Errorf("failed to update session: %w", err))
-			}
+		if err := usrmgrSvc.UpdateSession(r.Context(), session); err != nil {
+			panic(fmt.Errorf("failed to update session: %w", err))
 		}
+
 	}
 }
