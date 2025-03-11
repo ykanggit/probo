@@ -14,9 +14,9 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
+	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
-	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/types"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -1845,20 +1845,14 @@ enum ControlState
 
 enum TaskState
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.TaskState") {
-  TODO
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.TaskStateTodo")
-  DONE
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.TaskStateDone")
+  TODO @goEnum(value: "github.com/getprobo/probo/pkg/coredata.TaskStateTodo")
+  DONE @goEnum(value: "github.com/getprobo/probo/pkg/coredata.TaskStateDone")
 }
 
 enum EvidenceState
-  @goModel(
-    model: "github.com/getprobo/probo/pkg/coredata.EvidenceState"
-  ) {
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceState") {
   VALID
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateValid"
-    )
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateValid")
   INVALID
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateInvalid"
@@ -1872,9 +1866,7 @@ enum EvidenceState
 enum PeopleKind
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.PeopleKind") {
   EMPLOYEE
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.PeopleKindEmployee"
-    )
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PeopleKindEmployee")
   CONTRACTOR
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PeopleKindContractor"
@@ -2181,9 +2173,7 @@ input UpdatePeopleInput {
 }
 
 enum ServiceCriticality
-  @goModel(
-    model: "github.com/getprobo/probo/pkg/coredata.ServiceCriticality"
-  ) {
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ServiceCriticality") {
   LOW
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityLow"
@@ -2201,17 +2191,11 @@ enum ServiceCriticality
 enum RiskTier
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskTier") {
   CRITICAL
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.RiskTierCritical"
-    )
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierCritical")
   SIGNIFICANT
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.RiskTierSignificant"
-    )
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierSignificant")
   GENERAL
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.RiskTierGeneral"
-    )
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierGeneral")
 }
 
 input UpdateVendorInput {
@@ -2352,13 +2336,9 @@ type DeleteEvidencePayload {
 enum PolicyStatus
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
   DRAFT
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft"
-    )
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft")
   ACTIVE
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusActive"
-    )
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusActive")
 }
 
 input CreatePolicyInput {
@@ -3871,7 +3851,7 @@ func (ec *executionContext) _Control_state(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(coredata.ControlState)
 	fc.Result = res
-	return ec.marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx, field.Selections, res)
+	return ec.marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Control_state(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4910,7 +4890,7 @@ func (ec *executionContext) _Evidence_state(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(coredata.EvidenceState)
 	fc.Result = res
-	return ec.marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx, field.Selections, res)
+	return ec.marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Evidence_state(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7521,7 +7501,7 @@ func (ec *executionContext) _People_kind(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(coredata.PeopleKind)
 	fc.Result = res
-	return ec.marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx, field.Selections, res)
+	return ec.marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_People_kind(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7973,7 +7953,7 @@ func (ec *executionContext) _Policy_status(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(coredata.PolicyStatus)
 	fc.Result = res
-	return ec.marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx, field.Selections, res)
+	return ec.marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Policy_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8840,7 +8820,7 @@ func (ec *executionContext) _Task_state(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(coredata.TaskState)
 	fc.Result = res
-	return ec.marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx, field.Selections, res)
+	return ec.marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Task_state(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10007,7 +9987,7 @@ func (ec *executionContext) _Vendor_serviceCriticality(ctx context.Context, fiel
 	}
 	res := resTmp.(coredata.ServiceCriticality)
 	fc.Result = res
-	return ec.marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx, field.Selections, res)
+	return ec.marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Vendor_serviceCriticality(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10045,7 +10025,7 @@ func (ec *executionContext) _Vendor_riskTier(ctx context.Context, field graphql.
 	}
 	res := resTmp.(coredata.RiskTier)
 	fc.Result = res
-	return ec.marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx, field.Selections, res)
+	return ec.marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Vendor_riskTier(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12335,7 +12315,7 @@ func (ec *executionContext) unmarshalInputCreatePeopleInput(ctx context.Context,
 			it.AdditionalEmailAddresses = data
 		case "kind":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("kind"))
-			data, err := ec.unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx, v)
+			data, err := ec.unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12383,7 +12363,7 @@ func (ec *executionContext) unmarshalInputCreatePolicyInput(ctx context.Context,
 			it.Content = data
 		case "status":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx, v)
+			data, err := ec.unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12500,14 +12480,14 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 			it.ServiceTerminationAt = data
 		case "serviceCriticality":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceCriticality"))
-			data, err := ec.unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx, v)
+			data, err := ec.unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ServiceCriticality = data
 		case "riskTier":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("riskTier"))
-			data, err := ec.unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx, v)
+			data, err := ec.unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12752,7 +12732,7 @@ func (ec *executionContext) unmarshalInputUpdateControlInput(ctx context.Context
 			it.Category = data
 		case "state":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("state"))
-			data, err := ec.unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx, v)
+			data, err := ec.unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12862,7 +12842,7 @@ func (ec *executionContext) unmarshalInputUpdatePeopleInput(ctx context.Context,
 			it.AdditionalEmailAddresses = data
 		case "kind":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("kind"))
-			data, err := ec.unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx, v)
+			data, err := ec.unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12917,7 +12897,7 @@ func (ec *executionContext) unmarshalInputUpdatePolicyInput(ctx context.Context,
 			it.Content = data
 		case "status":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx, v)
+			data, err := ec.unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12986,7 +12966,7 @@ func (ec *executionContext) unmarshalInputUpdateTaskInput(ctx context.Context, o
 			it.Description = data
 		case "state":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("state"))
-			data, err := ec.unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx, v)
+			data, err := ec.unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13055,14 +13035,14 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 			it.ServiceTerminationAt = data
 		case "serviceCriticality":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceCriticality"))
-			data, err := ec.unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx, v)
+			data, err := ec.unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ServiceCriticality = data
 		case "riskTier":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("riskTier"))
-			data, err := ec.unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx, v)
+			data, err := ec.unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16415,14 +16395,14 @@ func (ec *executionContext) marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋpro
 	return ec._ControlEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx context.Context, v any) (coredata.ControlState, error) {
+func (ec *executionContext) unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState(ctx context.Context, v any) (coredata.ControlState, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState[tmp]
+	res := unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx context.Context, sel ast.SelectionSet, v coredata.ControlState) graphql.Marshaler {
-	res := graphql.MarshalString(marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState[v])
+func (ec *executionContext) marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState(ctx context.Context, sel ast.SelectionSet, v coredata.ControlState) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -16432,13 +16412,13 @@ func (ec *executionContext) marshalNControlState2githubᚗcomᚋgetproboᚋprobo
 }
 
 var (
-	unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState = map[string]coredata.ControlState{
+	unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState = map[string]coredata.ControlState{
 		"NOT_STARTED":    coredata.ControlStateNotStarted,
 		"IN_PROGRESS":    coredata.ControlStateInProgress,
 		"NOT_APPLICABLE": coredata.ControlStateNotApplicable,
 		"IMPLEMENTED":    coredata.ControlStateImplemented,
 	}
-	marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState = map[coredata.ControlState]string{
+	marshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState = map[coredata.ControlState]string{
 		coredata.ControlStateNotStarted:    "NOT_STARTED",
 		coredata.ControlStateInProgress:    "IN_PROGRESS",
 		coredata.ControlStateNotApplicable: "NOT_APPLICABLE",
@@ -16795,14 +16775,14 @@ func (ec *executionContext) marshalNEvidenceEdge2ᚖgithubᚗcomᚋgetproboᚋpr
 	return ec._EvidenceEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx context.Context, v any) (coredata.EvidenceState, error) {
+func (ec *executionContext) unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceState(ctx context.Context, v any) (coredata.EvidenceState, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState[tmp]
+	res := unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceState[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState(ctx context.Context, sel ast.SelectionSet, v coredata.EvidenceState) graphql.Marshaler {
-	res := graphql.MarshalString(marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState[v])
+func (ec *executionContext) marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceState(ctx context.Context, sel ast.SelectionSet, v coredata.EvidenceState) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceState[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -16812,12 +16792,12 @@ func (ec *executionContext) marshalNEvidenceState2githubᚗcomᚋgetproboᚋprob
 }
 
 var (
-	unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState = map[string]coredata.EvidenceState{
+	unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceState = map[string]coredata.EvidenceState{
 		"VALID":   coredata.EvidenceStateValid,
 		"INVALID": coredata.EvidenceStateInvalid,
 		"EXPIRED": coredata.EvidenceStateExpired,
 	}
-	marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐEvidenceState = map[coredata.EvidenceState]string{
+	marshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceState = map[coredata.EvidenceState]string{
 		coredata.EvidenceStateValid:   "VALID",
 		coredata.EvidenceStateInvalid: "INVALID",
 		coredata.EvidenceStateExpired: "EXPIRED",
@@ -17094,14 +17074,14 @@ func (ec *executionContext) marshalNPeopleEdge2ᚖgithubᚗcomᚋgetproboᚋprob
 	return ec._PeopleEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx context.Context, v any) (coredata.PeopleKind, error) {
+func (ec *executionContext) unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind(ctx context.Context, v any) (coredata.PeopleKind, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind[tmp]
+	res := unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx context.Context, sel ast.SelectionSet, v coredata.PeopleKind) graphql.Marshaler {
-	res := graphql.MarshalString(marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind[v])
+func (ec *executionContext) marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind(ctx context.Context, sel ast.SelectionSet, v coredata.PeopleKind) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -17111,11 +17091,11 @@ func (ec *executionContext) marshalNPeopleKind2githubᚗcomᚋgetproboᚋprobo�
 }
 
 var (
-	unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind = map[string]coredata.PeopleKind{
+	unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind = map[string]coredata.PeopleKind{
 		"EMPLOYEE":   coredata.PeopleKindEmployee,
 		"CONTRACTOR": coredata.PeopleKindContractor,
 	}
-	marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind = map[coredata.PeopleKind]string{
+	marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind = map[coredata.PeopleKind]string{
 		coredata.PeopleKindEmployee:   "EMPLOYEE",
 		coredata.PeopleKindContractor: "CONTRACTOR",
 	}
@@ -17193,14 +17173,14 @@ func (ec *executionContext) marshalNPolicyEdge2ᚖgithubᚗcomᚋgetproboᚋprob
 	return ec._PolicyEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx context.Context, v any) (coredata.PolicyStatus, error) {
+func (ec *executionContext) unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx context.Context, v any) (coredata.PolicyStatus, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus[tmp]
+	res := unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx context.Context, sel ast.SelectionSet, v coredata.PolicyStatus) graphql.Marshaler {
-	res := graphql.MarshalString(marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus[v])
+func (ec *executionContext) marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx context.Context, sel ast.SelectionSet, v coredata.PolicyStatus) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -17210,24 +17190,24 @@ func (ec *executionContext) marshalNPolicyStatus2githubᚗcomᚋgetproboᚋprobo
 }
 
 var (
-	unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus = map[string]coredata.PolicyStatus{
+	unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus = map[string]coredata.PolicyStatus{
 		"DRAFT":  coredata.PolicyStatusDraft,
 		"ACTIVE": coredata.PolicyStatusActive,
 	}
-	marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus = map[coredata.PolicyStatus]string{
+	marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus = map[coredata.PolicyStatus]string{
 		coredata.PolicyStatusDraft:  "DRAFT",
 		coredata.PolicyStatusActive: "ACTIVE",
 	}
 )
 
-func (ec *executionContext) unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx context.Context, v any) (coredata.RiskTier, error) {
+func (ec *executionContext) unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx context.Context, v any) (coredata.RiskTier, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier[tmp]
+	res := unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx context.Context, sel ast.SelectionSet, v coredata.RiskTier) graphql.Marshaler {
-	res := graphql.MarshalString(marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier[v])
+func (ec *executionContext) marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx context.Context, sel ast.SelectionSet, v coredata.RiskTier) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -17237,26 +17217,26 @@ func (ec *executionContext) marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋp
 }
 
 var (
-	unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier = map[string]coredata.RiskTier{
+	unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier = map[string]coredata.RiskTier{
 		"CRITICAL":    coredata.RiskTierCritical,
 		"SIGNIFICANT": coredata.RiskTierSignificant,
 		"GENERAL":     coredata.RiskTierGeneral,
 	}
-	marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier = map[coredata.RiskTier]string{
+	marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier = map[coredata.RiskTier]string{
 		coredata.RiskTierCritical:    "CRITICAL",
 		coredata.RiskTierSignificant: "SIGNIFICANT",
 		coredata.RiskTierGeneral:     "GENERAL",
 	}
 )
 
-func (ec *executionContext) unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx context.Context, v any) (coredata.ServiceCriticality, error) {
+func (ec *executionContext) unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx context.Context, v any) (coredata.ServiceCriticality, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality[tmp]
+	res := unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx context.Context, sel ast.SelectionSet, v coredata.ServiceCriticality) graphql.Marshaler {
-	res := graphql.MarshalString(marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality[v])
+func (ec *executionContext) marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx context.Context, sel ast.SelectionSet, v coredata.ServiceCriticality) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -17266,12 +17246,12 @@ func (ec *executionContext) marshalNServiceCriticality2githubᚗcomᚋgetprobo�
 }
 
 var (
-	unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality = map[string]coredata.ServiceCriticality{
+	unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality = map[string]coredata.ServiceCriticality{
 		"LOW":    coredata.ServiceCriticalityLow,
 		"MEDIUM": coredata.ServiceCriticalityMedium,
 		"HIGH":   coredata.ServiceCriticalityHigh,
 	}
-	marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality = map[coredata.ServiceCriticality]string{
+	marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality = map[coredata.ServiceCriticality]string{
 		coredata.ServiceCriticalityLow:    "LOW",
 		coredata.ServiceCriticalityMedium: "MEDIUM",
 		coredata.ServiceCriticalityHigh:   "HIGH",
@@ -17397,14 +17377,14 @@ func (ec *executionContext) marshalNTaskEdge2ᚖgithubᚗcomᚋgetproboᚋprobo�
 	return ec._TaskEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx context.Context, v any) (coredata.TaskState, error) {
+func (ec *executionContext) unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState(ctx context.Context, v any) (coredata.TaskState, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState[tmp]
+	res := unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx context.Context, sel ast.SelectionSet, v coredata.TaskState) graphql.Marshaler {
-	res := graphql.MarshalString(marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState[v])
+func (ec *executionContext) marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState(ctx context.Context, sel ast.SelectionSet, v coredata.TaskState) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -17414,11 +17394,11 @@ func (ec *executionContext) marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋ
 }
 
 var (
-	unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState = map[string]coredata.TaskState{
+	unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState = map[string]coredata.TaskState{
 		"TODO": coredata.TaskStateTodo,
 		"DONE": coredata.TaskStateDone,
 	}
-	marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState = map[coredata.TaskState]string{
+	marshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState = map[coredata.TaskState]string{
 		coredata.TaskStateTodo: "TODO",
 		coredata.TaskStateDone: "DONE",
 	}
@@ -17913,31 +17893,31 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx context.Context, v any) (*coredata.ControlState, error) {
+func (ec *executionContext) unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState(ctx context.Context, v any) (*coredata.ControlState, error) {
 	if v == nil {
 		return nil, nil
 	}
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState[tmp]
+	res := unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState[tmp]
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState(ctx context.Context, sel ast.SelectionSet, v *coredata.ControlState) graphql.Marshaler {
+func (ec *executionContext) marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState(ctx context.Context, sel ast.SelectionSet, v *coredata.ControlState) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalString(marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState[*v])
+	res := graphql.MarshalString(marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState[*v])
 	return res
 }
 
 var (
-	unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState = map[string]coredata.ControlState{
+	unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState = map[string]coredata.ControlState{
 		"NOT_STARTED":    coredata.ControlStateNotStarted,
 		"IN_PROGRESS":    coredata.ControlStateInProgress,
 		"NOT_APPLICABLE": coredata.ControlStateNotApplicable,
 		"IMPLEMENTED":    coredata.ControlStateImplemented,
 	}
-	marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐControlState = map[coredata.ControlState]string{
+	marshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState = map[coredata.ControlState]string{
 		coredata.ControlStateNotStarted:    "NOT_STARTED",
 		coredata.ControlStateInProgress:    "IN_PROGRESS",
 		coredata.ControlStateNotApplicable: "NOT_APPLICABLE",
@@ -18009,116 +17989,116 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx context.Context, v any) (*coredata.PeopleKind, error) {
+func (ec *executionContext) unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind(ctx context.Context, v any) (*coredata.PeopleKind, error) {
 	if v == nil {
 		return nil, nil
 	}
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind[tmp]
+	res := unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind[tmp]
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind(ctx context.Context, sel ast.SelectionSet, v *coredata.PeopleKind) graphql.Marshaler {
+func (ec *executionContext) marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind(ctx context.Context, sel ast.SelectionSet, v *coredata.PeopleKind) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalString(marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind[*v])
+	res := graphql.MarshalString(marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind[*v])
 	return res
 }
 
 var (
-	unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind = map[string]coredata.PeopleKind{
+	unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind = map[string]coredata.PeopleKind{
 		"EMPLOYEE":   coredata.PeopleKindEmployee,
 		"CONTRACTOR": coredata.PeopleKindContractor,
 	}
-	marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPeopleKind = map[coredata.PeopleKind]string{
+	marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind = map[coredata.PeopleKind]string{
 		coredata.PeopleKindEmployee:   "EMPLOYEE",
 		coredata.PeopleKindContractor: "CONTRACTOR",
 	}
 )
 
-func (ec *executionContext) unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx context.Context, v any) (*coredata.PolicyStatus, error) {
+func (ec *executionContext) unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx context.Context, v any) (*coredata.PolicyStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus[tmp]
+	res := unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus[tmp]
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus(ctx context.Context, sel ast.SelectionSet, v *coredata.PolicyStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx context.Context, sel ast.SelectionSet, v *coredata.PolicyStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalString(marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus[*v])
+	res := graphql.MarshalString(marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus[*v])
 	return res
 }
 
 var (
-	unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus = map[string]coredata.PolicyStatus{
+	unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus = map[string]coredata.PolicyStatus{
 		"DRAFT":  coredata.PolicyStatusDraft,
 		"ACTIVE": coredata.PolicyStatusActive,
 	}
-	marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐPolicyStatus = map[coredata.PolicyStatus]string{
+	marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus = map[coredata.PolicyStatus]string{
 		coredata.PolicyStatusDraft:  "DRAFT",
 		coredata.PolicyStatusActive: "ACTIVE",
 	}
 )
 
-func (ec *executionContext) unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx context.Context, v any) (*coredata.RiskTier, error) {
+func (ec *executionContext) unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx context.Context, v any) (*coredata.RiskTier, error) {
 	if v == nil {
 		return nil, nil
 	}
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier[tmp]
+	res := unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier[tmp]
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier(ctx context.Context, sel ast.SelectionSet, v *coredata.RiskTier) graphql.Marshaler {
+func (ec *executionContext) marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx context.Context, sel ast.SelectionSet, v *coredata.RiskTier) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalString(marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier[*v])
+	res := graphql.MarshalString(marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier[*v])
 	return res
 }
 
 var (
-	unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier = map[string]coredata.RiskTier{
+	unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier = map[string]coredata.RiskTier{
 		"CRITICAL":    coredata.RiskTierCritical,
 		"SIGNIFICANT": coredata.RiskTierSignificant,
 		"GENERAL":     coredata.RiskTierGeneral,
 	}
-	marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐRiskTier = map[coredata.RiskTier]string{
+	marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier = map[coredata.RiskTier]string{
 		coredata.RiskTierCritical:    "CRITICAL",
 		coredata.RiskTierSignificant: "SIGNIFICANT",
 		coredata.RiskTierGeneral:     "GENERAL",
 	}
 )
 
-func (ec *executionContext) unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx context.Context, v any) (*coredata.ServiceCriticality, error) {
+func (ec *executionContext) unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx context.Context, v any) (*coredata.ServiceCriticality, error) {
 	if v == nil {
 		return nil, nil
 	}
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality[tmp]
+	res := unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality[tmp]
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality(ctx context.Context, sel ast.SelectionSet, v *coredata.ServiceCriticality) graphql.Marshaler {
+func (ec *executionContext) marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx context.Context, sel ast.SelectionSet, v *coredata.ServiceCriticality) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalString(marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality[*v])
+	res := graphql.MarshalString(marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality[*v])
 	return res
 }
 
 var (
-	unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality = map[string]coredata.ServiceCriticality{
+	unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality = map[string]coredata.ServiceCriticality{
 		"LOW":    coredata.ServiceCriticalityLow,
 		"MEDIUM": coredata.ServiceCriticalityMedium,
 		"HIGH":   coredata.ServiceCriticalityHigh,
 	}
-	marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐServiceCriticality = map[coredata.ServiceCriticality]string{
+	marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality = map[coredata.ServiceCriticality]string{
 		coredata.ServiceCriticalityLow:    "LOW",
 		coredata.ServiceCriticalityMedium: "MEDIUM",
 		coredata.ServiceCriticalityHigh:   "HIGH",
@@ -18179,29 +18159,29 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx context.Context, v any) (*coredata.TaskState, error) {
+func (ec *executionContext) unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState(ctx context.Context, v any) (*coredata.TaskState, error) {
 	if v == nil {
 		return nil, nil
 	}
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState[tmp]
+	res := unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState[tmp]
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx context.Context, sel ast.SelectionSet, v *coredata.TaskState) graphql.Marshaler {
+func (ec *executionContext) marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState(ctx context.Context, sel ast.SelectionSet, v *coredata.TaskState) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalString(marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState[*v])
+	res := graphql.MarshalString(marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState[*v])
 	return res
 }
 
 var (
-	unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState = map[string]coredata.TaskState{
+	unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState = map[string]coredata.TaskState{
 		"TODO": coredata.TaskStateTodo,
 		"DONE": coredata.TaskStateDone,
 	}
-	marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState = map[coredata.TaskState]string{
+	marshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState = map[coredata.TaskState]string{
 		coredata.TaskStateTodo: "TODO",
 		coredata.TaskStateDone: "DONE",
 	}

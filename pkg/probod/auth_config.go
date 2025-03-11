@@ -21,53 +21,57 @@ import (
 
 type (
 	authConfig struct {
-		// Pepper is a secret key used for password hashing
-		// It should be at least 32 bytes long
-		Pepper          string `json:"pepper"`
-		SessionDuration int    `json:"session-duration"`
-		CookieName      string `json:"cookie-name"`
-		CookieSecure    bool   `json:"cookie-secure"`
-		CookieHTTPOnly  bool   `json:"cookie-http-only"`
-		CookieDomain    string `json:"cookie-domain"`
-		CookiePath      string `json:"cookie-path"`
-		CookieSecret string `json:"cookie-secret"`
+		Cookie   cookieConfig   `json:"cookie"`
+		Password passwordConfig `json:"password"`
+	}
+
+	cookieConfig struct {
+		Domain   string `json:"domain"`
+		Secret   string `json:"secret"`
+		Duration int    `json:"duration"`
+		Name     string `json:"name"`
+	}
+
+	passwordConfig struct {
+		Iterations uint32 `json:"iterations"`
+		Pepper     string `json:"pepper"`
 	}
 )
 
 func (c authConfig) GetPepperBytes() ([]byte, error) {
-	if c.Pepper == "" {
+	if c.Password.Pepper == "" {
 		return nil, fmt.Errorf("pepper cannot be empty")
 	}
 
-	if decoded, err := base64.StdEncoding.DecodeString(c.Pepper); err == nil {
+	if decoded, err := base64.StdEncoding.DecodeString(c.Password.Pepper); err == nil {
 		if len(decoded) < 32 {
 			return nil, fmt.Errorf("decoded pepper must be at least 32 bytes long")
 		}
 		return decoded, nil
 	}
 
-	if len(c.Pepper) < 32 {
+	if len(c.Password.Pepper) < 32 {
 		return nil, fmt.Errorf("pepper must be at least 32 bytes long")
 	}
 
-	return []byte(c.Pepper), nil
+	return []byte(c.Password.Pepper), nil
 }
 
 func (c authConfig) GetCookieSecretBytes() ([]byte, error) {
-	if c.CookieSecret == "" {
+	if c.Cookie.Secret == "" {
 		return nil, fmt.Errorf("cookie secret cannot be empty")
 	}
 
-	if decoded, err := base64.StdEncoding.DecodeString(c.CookieSecret); err == nil {
+	if decoded, err := base64.StdEncoding.DecodeString(c.Cookie.Secret); err == nil {
 		if len(decoded) < 32 {
 			return nil, fmt.Errorf("decoded cookie secret must be at least 32 bytes long")
 		}
 		return decoded, nil
 	}
 
-	if len(c.CookieSecret) < 32 {
+	if len(c.Cookie.Secret) < 32 {
 		return nil, fmt.Errorf("cookie secret must be at least 32 bytes long")
 	}
 
-	return []byte(c.CookieSecret), nil
+	return []byte(c.Cookie.Secret), nil
 }

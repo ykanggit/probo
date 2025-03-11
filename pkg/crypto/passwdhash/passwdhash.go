@@ -27,32 +27,34 @@ import (
 
 type (
 	Profile struct {
-		minIterations uint
-		saltLength    uint
-		keyLength     uint
-		pepper        []byte
+		iterations uint32
+		saltLength uint
+		keyLength  uint
+		pepper     []byte
 	}
 )
 
 const (
 	versionByte   = 0x01 // Version identifier
 	algorithmByte = 0x01 // Algorithm identifier (0x01 for PBKDF2-SHA256)
+
+	minIterations = 600000
 )
 
-func NewProfile(pepper []byte) (*Profile, error) {
+func NewProfile(pepper []byte, iterations uint32) (*Profile, error) {
 	if len(pepper) < 32 {
 		return nil, fmt.Errorf("pepper must be at least 32 bytes")
 	}
 
-	// NIST SP 800-63B recommendations:
-	// - At least 32 bits of salt (we use 256 bits/32 bytes for extra security)
-	// - At least 1000 iterations (we use higher based on processing capabilities)
-	// - Resulting key length should be at least 160 bits (we use 256 bits)
+	if iterations < minIterations {
+		return nil, fmt.Errorf("iterations below minimum security threshold")
+	}
+
 	return &Profile{
-		minIterations: 600000, // Minimum iterations (adjusted based on hardware speed)
-		saltLength:    32,     // Salt length in bytes (256 bits)
-		keyLength:     32,     // Output key length in bytes (256 bits)
-		pepper:        pepper, // Pepper length in bytes (256 bits)
+		iterations: iterations,
+		saltLength: 32,
+		keyLength:  32,
+		pepper:     pepper,
 	}, nil
 }
 
@@ -62,14 +64,14 @@ func (hp Profile) applyPepper(input []byte) []byte {
 	return mac.Sum(nil)
 }
 
-func (hp Profile) HashPassword(password []byte, iterations uint32) ([]byte, error) {
+func (hp Profile) HashPassword(password []byte) ([]byte, error) {
 	salt := make([]byte, hp.saltLength)
 	if _, err := rand.Read(salt); err != nil {
 		return nil, fmt.Errorf("error generating salt: %v", err)
 	}
 
 	pepperedPassword := hp.applyPepper([]byte(password))
-	hash := pbkdf2.Key(pepperedPassword, salt, int(iterations), int(hp.keyLength), sha256.New)
+	hash := pbkdf2.Key(pepperedPassword, salt, int(hp.iterations), int(hp.keyLength), sha256.New)
 
 	// Binary format:
 	// [1B version][1B algorithm][4B iterations][1B salt length][salt bytes][hash bytes]
@@ -81,7 +83,7 @@ func (hp Profile) HashPassword(password []byte, iterations uint32) ([]byte, erro
 
 	// Iterations (4 bytes, big endian)
 	iterBytes := make([]byte, 4)
-	binary.BigEndian.PutUint32(iterBytes, iterations)
+	binary.BigEndian.PutUint32(iterBytes, hp.iterations)
 	binaryHash = append(binaryHash, iterBytes...)
 
 	// Salt length and salt
@@ -110,13 +112,13 @@ func (hp Profile) ComparePasswordAndHash(password, passwordHash []byte) (bool, e
 	// Extract iterations
 	iterations := binary.BigEndian.Uint32(passwordHash[2:6])
 
-	if iterations < uint32(hp.minIterations) {
+	if iterations < minIterations {
 		return false, fmt.Errorf("iterations below minimum security threshold")
 	}
 
 	// Extract salt length and validate
 	saltLen := int(passwordHash[6])
-	if saltLen < 32 { // NIST minimum requirement
+	if saltLen < 32 {
 		return false, fmt.Errorf("salt length below security minimum")
 	}
 

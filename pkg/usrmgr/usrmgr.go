@@ -16,7 +16,9 @@ package usrmgr
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/getprobo/probo/pkg/coredata"
@@ -32,14 +34,20 @@ type (
 		hp *passwdhash.Profile
 	}
 
-	RegisterUserParams struct {
-		Email    string
-		Password string
-		FullName string
-	}
-
 	ErrInvalidCredentials struct {
 		message string
+	}
+
+	ErrInvalidEmail struct {
+		email string
+	}
+
+	ErrInvalidPassword struct {
+		length int
+	}
+
+	ErrInvalidFullName struct {
+		fullName string
 	}
 
 	ErrUserAlreadyExists struct {
@@ -71,60 +79,76 @@ func (e ErrSessionExpired) Error() string {
 	return e.message
 }
 
+func (e ErrInvalidEmail) Error() string {
+	return fmt.Sprintf("invalid email: %s", e.email)
+}
+
+func (e ErrInvalidPassword) Error() string {
+	return fmt.Sprintf("invalid password: the length must be at least %d characters", e.length)
+}
+
+func (e ErrInvalidFullName) Error() string {
+	return fmt.Sprintf("invalid full name: %s", e.fullName)
+}
+
 func NewService(
 	ctx context.Context,
 	pgClient *pg.Client,
-	pepper []byte,
+	hp *passwdhash.Profile,
 ) (*Service, error) {
-	hp, err := passwdhash.NewProfile(pepper)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create hashing profile: %w", err)
-	}
-
 	return &Service{
 		pg: pgClient,
 		hp: hp,
 	}, nil
 }
 
-func (s Service) RegisterUser(
+func (s Service) SignUp(
 	ctx context.Context,
-	params RegisterUserParams,
-) (*coredata.User, error) {
-	if params.Email == "" || params.Password == "" || params.FullName == "" {
-		return nil, fmt.Errorf("email, password, and full name are required")
+	email, password, fullName string,
+) (*coredata.User, *coredata.Session, error) {
+	if !strings.Contains(email, "@") {
+		return nil, nil, &ErrInvalidEmail{email}
 	}
 
-	// Use a high iteration count for password hashing
-	const iterations = 600000
-	hashedPassword, err := s.hp.HashPassword([]byte(params.Password), iterations)
+	if len(password) < 8 {
+		return nil, nil, &ErrInvalidPassword{len(password)}
+	}
+
+	if fullName == "" {
+		return nil, nil, &ErrInvalidFullName{fullName}
+	}
+
+	hashedPassword, err := s.hp.HashPassword([]byte(password))
 	if err != nil {
-		return nil, fmt.Errorf("cannot hash password: %w", err)
+		return nil, nil, fmt.Errorf("cannot hash password: %w", err)
 	}
 
 	now := time.Now()
 	user := &coredata.User{
 		ID:             gid.New(gid.NilTenant, coredata.UserEntityType),
-		EmailAddress:   params.Email,
+		EmailAddress:   email,
 		HashedPassword: hashedPassword,
-		FullName:       params.FullName,
+		FullName:       fullName,
 		CreatedAt:      now,
 		UpdatedAt:      now,
+	}
+
+	session := &coredata.Session{
+		ID:        gid.New(gid.NilTenant, coredata.SessionEntityType),
+		UserID:    user.ID,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
 	err = s.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
-			// Check if user already exists
-			existingUser := &coredata.User{}
-			err := existingUser.LoadByEmail(ctx, tx, params.Email)
-			if err == nil {
-				return &ErrUserAlreadyExists{message: "user with this email already exists"}
-			}
-
-			// Insert the new user
 			if err := user.Insert(ctx, tx); err != nil {
 				return fmt.Errorf("cannot insert user: %w", err)
+			}
+
+			if err := session.Insert(ctx, tx); err != nil {
+				return fmt.Errorf("cannot insert session: %w", err)
 			}
 
 			return nil
@@ -132,17 +156,16 @@ func (s Service) RegisterUser(
 	)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return user, nil
+	return user, session, nil
 }
 
-func (s Service) Login(
+func (s Service) SignIn(
 	ctx context.Context,
-	email string,
-	password string,
-) (*coredata.Session, error) {
+	email, password string,
+) (*coredata.User, *coredata.Session, error) {
 	now := time.Now()
 	user := &coredata.User{}
 	session := &coredata.Session{
@@ -157,7 +180,13 @@ func (s Service) Login(
 		ctx,
 		func(tx pg.Conn) error {
 			if err := user.LoadByEmail(ctx, tx, email); err != nil {
-				return &ErrInvalidCredentials{message: "invalid email or password"}
+				var errUserNotFound *coredata.ErrUserNotFound
+
+				if errors.As(err, &errUserNotFound) {
+					return &ErrInvalidCredentials{message: "invalid email or password"}
+				}
+
+				return fmt.Errorf("cannot load user by email: %w", err)
 			}
 
 			ok, err := s.hp.ComparePasswordAndHash([]byte(password), user.HashedPassword)
@@ -169,7 +198,6 @@ func (s Service) Login(
 				return &ErrInvalidCredentials{message: "invalid email or password"}
 			}
 
-			// Set the user ID in the session
 			session.UserID = user.ID
 
 			if err := session.Insert(ctx, tx); err != nil {
@@ -181,20 +209,25 @@ func (s Service) Login(
 	)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return session, nil
+	return user, session, nil
 }
 
-func (s Service) Logout(
+func (s Service) SignOut(
 	ctx context.Context,
 	sessionID gid.GID,
 ) error {
-	return s.pg.WithTx(
+	return s.pg.WithConn(
 		ctx,
 		func(tx pg.Conn) error {
-			return coredata.DeleteSession(ctx, tx, sessionID)
+			err := coredata.DeleteSession(ctx, tx, sessionID)
+			if err != nil {
+				return fmt.Errorf("cannot delete session: %w", err)
+			}
+
+			return nil
 		},
 	)
 }

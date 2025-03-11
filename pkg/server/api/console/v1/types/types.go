@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
-	"github.com/getprobo/probo/pkg/coredata"
 )
 
 type Node interface {

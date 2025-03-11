@@ -26,6 +26,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/awsconfig"
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/crypto/passwdhash"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/server"
 	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
@@ -75,14 +76,16 @@ func New() *Implm {
 				PoolSize: 100,
 			},
 			Auth: authConfig{
-				Pepper:          "this-is-a-secure-pepper-for-password-hashing-at-least-32-bytes",
-				SessionDuration: 24,
-				CookieName:      "SSID",
-				CookieSecure:    false,
-				CookieHTTPOnly:  true,
-				CookieDomain:    "localhost",
-				CookiePath:      "/",
-				CookieSecret:    "this-is-a-secure-secret-for-cookie-signing-at-least-32-bytes",
+				Password: passwordConfig{
+					Pepper:     "this-is-a-secure-pepper-for-password-hashing-at-least-32-bytes",
+					Iterations: 1000000,
+				},
+				Cookie: cookieConfig{
+					Name:     "SSID",
+					Secret:   "this-is-a-secure-secret-for-cookie-signing-at-least-32-bytes",
+					Duration: 24,
+					Domain:   "localhost",
+				},
 			},
 			AWS: awsConfig{
 				Region:          "us-east-1",
@@ -153,7 +156,12 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot migrate database schema: %w", err)
 	}
 
-	usrmgrService, err := usrmgr.NewService(ctx, pgClient, pepper)
+	hp, err := passwdhash.NewProfile(pepper, uint32(impl.cfg.Auth.Password.Iterations))
+	if err != nil {
+		return fmt.Errorf("cannot create hashing profile: %w", err)
+	}
+
+	usrmgrService, err := usrmgr.NewService(ctx, pgClient, hp)
 	if err != nil {
 		return fmt.Errorf("cannot create usrmgr service: %w", err)
 	}
@@ -169,13 +177,10 @@ func (impl *Implm) Run(
 			Probo:          proboService,
 			Usrmgr:         usrmgrService,
 			Auth: console_v1.AuthConfig{
-				CookieName:      impl.cfg.Auth.CookieName,
-				CookieSecure:    impl.cfg.Auth.CookieSecure,
-				CookieHTTPOnly:  impl.cfg.Auth.CookieHTTPOnly,
-				CookieDomain:    impl.cfg.Auth.CookieDomain,
-				CookiePath:      impl.cfg.Auth.CookiePath,
-				SessionDuration: time.Duration(impl.cfg.Auth.SessionDuration) * time.Hour,
-				CookieSecret:    impl.cfg.Auth.CookieSecret,
+				CookieName:      impl.cfg.Auth.Cookie.Name,
+				CookieDomain:    impl.cfg.Auth.Cookie.Domain,
+				SessionDuration: time.Duration(impl.cfg.Auth.Cookie.Duration) * time.Hour,
+				CookieSecret:    impl.cfg.Auth.Cookie.Secret,
 			},
 		},
 	)

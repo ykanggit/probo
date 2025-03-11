@@ -16,12 +16,15 @@ package coredata
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"go.gearno.de/kit/pg"
 )
 
@@ -34,7 +37,23 @@ type (
 		CreatedAt      time.Time `db:"created_at"`
 		UpdatedAt      time.Time `db:"updated_at"`
 	}
+
+	ErrUserNotFound struct {
+		Identifier string
+	}
+
+	ErrUserAlreadyExists struct {
+		message string
+	}
 )
+
+func (e ErrUserNotFound) Error() string {
+	return fmt.Sprintf("user not found: %q", e.Identifier)
+}
+
+func (e ErrUserAlreadyExists) Error() string {
+	return e.message
+}
 
 func (u User) CursorKey() page.CursorKey {
 	return page.NewCursorKey(u.ID, u.CreatedAt)
@@ -69,6 +88,10 @@ LIMIT 1;
 
 	user, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[User])
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return &ErrUserNotFound{Identifier: email}
+		}
+
 		return fmt.Errorf("cannot collect user: %w", err)
 	}
 
@@ -106,6 +129,10 @@ LIMIT 1;
 
 	user, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[User])
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return &ErrUserNotFound{Identifier: userID.String()}
+		}
+
 		return fmt.Errorf("cannot collect user: %w", err)
 	}
 
@@ -141,5 +168,19 @@ VALUES (
 	}
 
 	_, err := conn.Exec(ctx, q, args)
-	return err
+
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "23505" && strings.Contains(pgErr.ConstraintName, "email_address") {
+				return &ErrUserAlreadyExists{
+					message: fmt.Sprintf("user with email %s already exists", u.EmailAddress),
+				}
+			}
+		}
+
+		return err
+	}
+
+	return nil
 }

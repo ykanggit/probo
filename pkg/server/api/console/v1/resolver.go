@@ -18,6 +18,7 @@ package console_v1
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -30,6 +31,7 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo"
+	"github.com/getprobo/probo/pkg/securecookie"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/schema"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
@@ -39,10 +41,7 @@ import (
 type (
 	AuthConfig struct {
 		CookieName      string
-		CookieSecure    bool
-		CookieHTTPOnly  bool
 		CookieDomain    string
-		CookiePath      string
 		SessionDuration time.Duration
 		CookieSecret    string
 	}
@@ -141,28 +140,29 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		}
 		ctx := context.WithValue(r.Context(), httpContextKey, httpCtx)
 
-		// Extract session from cookie
-		cookie, err := r.Cookie(authCfg.CookieName)
-		if err == nil && cookie.Value != "" {
-			// Verify the cookie signature
-			originalValue, err := verifyCookieValue(cookie.Value, authCfg.CookieSecret)
-			if err == nil {
-				// Parse the session ID
-				sessionID, err := gid.ParseGID(originalValue)
-				if err == nil {
-					// Get the session
-					session, err := usrmgrSvc.GetSession(r.Context(), sessionID)
-					if err == nil {
-						// Add session to context
-						ctx = context.WithValue(ctx, sessionContextKey, session)
+		cookieValue, err := securecookie.Get(r, securecookie.DefaultConfig(
+			authCfg.CookieName,
+			authCfg.CookieSecret,
+		))
+		if err != nil {
+			if !errors.Is(err, securecookie.ErrCookieNotFound) {
+				panic(fmt.Errorf("failed to get session: %w", err))
+			}
+		}
 
-						// Get the user
-						user, err := usrmgrSvc.GetUserBySession(r.Context(), sessionID)
-						if err == nil {
-							// Add user to context
-							ctx = context.WithValue(ctx, userContextKey, user)
-						}
-					}
+		sessionID, err := gid.ParseGID(cookieValue)
+		if err == nil {
+			// Get the session
+			session, err := usrmgrSvc.GetSession(r.Context(), sessionID)
+			if err == nil {
+				// Add session to context
+				ctx = context.WithValue(ctx, sessionContextKey, session)
+
+				// Get the user
+				user, err := usrmgrSvc.GetUserBySession(r.Context(), sessionID)
+				if err == nil {
+					// Add user to context
+					ctx = context.WithValue(ctx, userContextKey, user)
 				}
 			}
 		}
