@@ -30,12 +30,13 @@ import (
 
 type (
 	User struct {
-		ID             gid.GID   `db:"id"`
-		EmailAddress   string    `db:"email_address"`
-		HashedPassword []byte    `db:"hashed_password"`
-		FullName       string    `db:"fullname"`
-		CreatedAt      time.Time `db:"created_at"`
-		UpdatedAt      time.Time `db:"updated_at"`
+		ID                   gid.GID   `db:"id"`
+		EmailAddress         string    `db:"email_address"`
+		HashedPassword       []byte    `db:"hashed_password"`
+		FullName             string    `db:"fullname"`
+		EmailAddressVerified bool      `db:"email_address_verified"`
+		CreatedAt            time.Time `db:"created_at"`
+		UpdatedAt            time.Time `db:"updated_at"`
 	}
 
 	ErrUserNotFound struct {

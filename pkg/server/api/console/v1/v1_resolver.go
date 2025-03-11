@@ -23,7 +23,7 @@ func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *
 	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := svc.ListControlTasks(ctx, obj.ID, cursor)
+	page, err := svc.Tasks.ListForControlID(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list control tasks: %w", err)
 	}
@@ -35,7 +35,7 @@ func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *
 func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (string, error) {
 	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
 
-	fileURL, err := svc.GetEvidenceFileURL(ctx, obj.ID, 15*time.Minute)
+	fileURL, err := svc.Evidences.GenerateFileURL(ctx, obj.ID, 15*time.Minute)
 	if err != nil {
 		return "", fmt.Errorf("cannot generate file URL: %w", err)
 	}
@@ -48,7 +48,7 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := svc.ListFrameworkControls(ctx, obj.ID, cursor)
+	page, err := svc.Controls.ListForFrameworkID(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list framework controls: %w", err)
 	}
@@ -60,7 +60,7 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error) {
 	svc := r.proboSvc.WithTenant(input.OrganizationID.TenantID())
 
-	vendor, err := svc.CreateVendor(ctx, probo.CreateVendorRequest{
+	vendor, err := svc.Vendors.Create(ctx, probo.CreateVendorRequest{
 		OrganizationID:       input.OrganizationID,
 		Name:                 input.Name,
 		Description:          input.Description,
@@ -84,7 +84,7 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.UpdateVendorPayload, error) {
 	svc := r.proboSvc.WithTenant(input.ID.TenantID())
 
-	vendor, err := svc.UpdateVendor(ctx, probo.UpdateVendorRequest{
+	vendor, err := svc.Vendors.Update(ctx, probo.UpdateVendorRequest{
 		ID:                   input.ID,
 		ExpectedVersion:      input.ExpectedVersion,
 		Name:                 input.Name,
@@ -110,7 +110,7 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error) {
 	svc := r.proboSvc.WithTenant(input.VendorID.TenantID())
 
-	err := svc.DeleteVendor(ctx, input.VendorID)
+	err := svc.Vendors.Delete(ctx, input.VendorID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete vendor: %w", err)
 	}
@@ -124,7 +124,7 @@ func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteV
 func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error) {
 	svc := r.proboSvc.WithTenant(input.OrganizationID.TenantID())
 
-	people, err := svc.CreatePeople(ctx, probo.CreatePeopleRequest{
+	people, err := svc.Peoples.Create(ctx, probo.CreatePeopleRequest{
 		OrganizationID:           input.OrganizationID,
 		FullName:                 input.FullName,
 		PrimaryEmailAddress:      input.PrimaryEmailAddress,
@@ -145,7 +145,7 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.UpdatePeoplePayload, error) {
 	svc := r.proboSvc.WithTenant(input.ID.TenantID())
 
-	people, err := svc.UpdatePeople(ctx, probo.UpdatePeopleRequest{
+	people, err := svc.Peoples.Update(ctx, probo.UpdatePeopleRequest{
 		ID:                       input.ID,
 		ExpectedVersion:          input.ExpectedVersion,
 		FullName:                 input.FullName,
@@ -166,7 +166,7 @@ func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdateP
 func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error) {
 	svc := r.proboSvc.WithTenant(input.PeopleID.TenantID())
 
-	err := svc.DeletePeople(ctx, input.PeopleID)
+	err := svc.Peoples.Delete(ctx, input.PeopleID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete people: %w", err)
 	}
@@ -178,7 +178,9 @@ func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeleteP
 
 // CreateOrganization is the resolver for the createOrganization field.
 func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error) {
-	organization, err := r.proboSvc.CreateOrganization(ctx, probo.CreateOrganizationRequest{
+	svc := r.proboSvc.WithTenant(gid.NewTenantID())
+
+	organization, err := svc.Organizations.Create(ctx, probo.CreateOrganizationRequest{
 		Name: input.Name,
 	})
 	if err != nil {
@@ -204,7 +206,7 @@ func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.D
 func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error) {
 	svc := r.proboSvc.WithTenant(input.ControlID.TenantID())
 
-	task, err := svc.CreateTask(ctx, probo.CreateTaskRequest{
+	task, err := svc.Tasks.Create(ctx, probo.CreateTaskRequest{
 		ControlID:   input.ControlID,
 		Name:        input.Name,
 		Description: input.Description,
@@ -222,7 +224,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error) {
 	svc := r.proboSvc.WithTenant(input.TaskID.TenantID())
 
-	task, err := svc.UpdateTask(ctx, probo.UpdateTaskRequest{
+	task, err := svc.Tasks.Update(ctx, probo.UpdateTaskRequest{
 		ID:              input.TaskID,
 		ExpectedVersion: input.ExpectedVersion,
 		Name:            input.Name,
@@ -242,7 +244,7 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTas
 func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error) {
 	svc := r.proboSvc.WithTenant(input.TaskID.TenantID())
 
-	err := svc.DeleteTask(ctx, input.TaskID)
+	err := svc.Tasks.Delete(ctx, input.TaskID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete task: %w", err)
 	}
@@ -256,7 +258,7 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTas
 func (r *mutationResolver) CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error) {
 	svc := r.proboSvc.WithTenant(input.OrganizationID.TenantID())
 
-	framework, err := svc.CreateFramework(ctx, probo.CreateFrameworkRequest{
+	framework, err := svc.Frameworks.Create(ctx, probo.CreateFrameworkRequest{
 		OrganizationID: input.OrganizationID,
 		Name:           input.Name,
 		Description:    input.Description,
@@ -274,7 +276,7 @@ func (r *mutationResolver) CreateFramework(ctx context.Context, input types.Crea
 func (r *mutationResolver) CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error) {
 	svc := r.proboSvc.WithTenant(input.FrameworkID.TenantID())
 
-	control, err := svc.CreateControl(ctx, probo.CreateControlRequest{
+	control, err := svc.Controls.Create(ctx, probo.CreateControlRequest{
 		FrameworkID: input.FrameworkID,
 		Name:        input.Name,
 		Description: input.Description,
@@ -293,7 +295,7 @@ func (r *mutationResolver) CreateControl(ctx context.Context, input types.Create
 func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error) {
 	svc := r.proboSvc.WithTenant(input.ID.TenantID())
 
-	framework, err := svc.UpdateFramework(ctx, probo.UpdateFrameworkRequest{
+	framework, err := svc.Frameworks.Update(ctx, probo.UpdateFrameworkRequest{
 		ID:              input.ID,
 		ExpectedVersion: input.ExpectedVersion,
 		Name:            input.Name,
@@ -312,7 +314,7 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 func (r *mutationResolver) UpdateControl(ctx context.Context, input types.UpdateControlInput) (*types.UpdateControlPayload, error) {
 	svc := r.proboSvc.WithTenant(input.ID.TenantID())
 
-	control, err := svc.UpdateControl(ctx, probo.UpdateControlRequest{
+	control, err := svc.Controls.Update(ctx, probo.UpdateControlRequest{
 		ID:              input.ID,
 		ExpectedVersion: input.ExpectedVersion,
 		Name:            input.Name,
@@ -339,7 +341,7 @@ func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.Uploa
 		File:   input.File.File,
 	}
 
-	evidence, err := svc.CreateEvidence(ctx, req)
+	evidence, err := svc.Evidences.Create(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create evidence: %w", err)
 	}
@@ -353,7 +355,7 @@ func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.Uploa
 func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error) {
 	svc := r.proboSvc.WithTenant(input.EvidenceID.TenantID())
 
-	err := svc.DeleteEvidence(ctx, input.EvidenceID)
+	err := svc.Evidences.Delete(ctx, input.EvidenceID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to delete evidence: %w", err)
 	}
@@ -426,7 +428,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := svc.ListOrganizationFrameworks(ctx, obj.ID, cursor)
+	page, err := svc.Frameworks.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
 	}
@@ -440,7 +442,7 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := svc.ListOrganizationVendors(ctx, obj.ID, cursor)
+	page, err := svc.Vendors.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list organization vendors: %w", err)
 	}
@@ -454,7 +456,7 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := svc.ListOrganizationPeoples(ctx, obj.ID, cursor)
+	page, err := svc.Peoples.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list organization peoples: %w", err)
 	}
@@ -467,7 +469,7 @@ func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organiza
 	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := svc.Policies.ListByOrganization(ctx, obj.ID, cursor)
+	page, err := svc.Policies.ListByOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list organization policies: %w", err)
 	}
@@ -485,7 +487,7 @@ func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.P
 	}
 
 	// Get the owner
-	owner, err := svc.GetPeople(ctx, policy.OwnerID)
+	owner, err := svc.Peoples.Get(ctx, policy.OwnerID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get owner: %w", err)
 	}
@@ -499,49 +501,49 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 
 	switch id.EntityType() {
 	case coredata.OrganizationEntityType:
-		organization, err := svc.GetOrganization(ctx, id)
+		organization, err := svc.Organizations.Get(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewOrganization(organization), nil
 	case coredata.PeopleEntityType:
-		people, err := svc.GetPeople(ctx, id)
+		people, err := svc.Peoples.Get(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewPeople(people), nil
 	case coredata.VendorEntityType:
-		vendor, err := svc.GetVendor(ctx, id)
+		vendor, err := svc.Vendors.Get(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewVendor(vendor), nil
 	case coredata.FrameworkEntityType:
-		framework, err := svc.GetFramework(ctx, id)
+		framework, err := svc.Frameworks.Get(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewFramework(framework), nil
 	case coredata.ControlEntityType:
-		control, err := svc.GetControl(ctx, id)
+		control, err := svc.Controls.Get(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewControl(control), nil
 	case coredata.TaskEntityType:
-		task, err := svc.GetTask(ctx, id)
+		task, err := svc.Tasks.Get(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
 		return types.NewTask(task), nil
 	case coredata.EvidenceEntityType:
-		evidence, err := svc.GetEvidence(ctx, id)
+		evidence, err := svc.Evidences.Get(ctx, id)
 		if err != nil {
 			return nil, err
 		}
@@ -570,9 +572,9 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
 	cursor := types.NewCursor(first, after, last, before)
 
-	page, err := svc.ListTaskEvidences(ctx, obj.ID, cursor)
+	page, err := svc.Evidences.ListForTaskID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
+		return nil, fmt.Errorf("cannot list task evidences: %w", err)
 	}
 
 	return types.NewEvidenceConnection(page), nil
@@ -597,7 +599,9 @@ func (r *userResolver) Organizations(ctx context.Context, obj *types.User, first
 	// Get the organization details for each organization ID
 	var edges []*types.OrganizationEdge
 	for _, organizationID := range organizationIDs {
-		organization, err := r.proboSvc.GetOrganization(ctx, organizationID)
+		svc := r.proboSvc.WithTenant(organizationID.TenantID())
+
+		organization, err := svc.Organizations.Get(ctx, organizationID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get organization details: %w", err)
 		}

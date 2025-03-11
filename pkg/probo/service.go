@@ -29,9 +29,23 @@ type (
 		pg     *pg.Client
 		s3     *s3.Client
 		bucket string
-		scope  coredata.Scoper
+	}
 
-		Policies *PolicyService
+	TenantService struct {
+		pg     *pg.Client
+		s3     *s3.Client
+		bucket string
+
+		scope coredata.Scoper
+
+		Policies      *PolicyService
+		Controls      *ControlService
+		Evidences     *EvidenceService
+		Frameworks    *FrameworkService
+		Tasks         *TaskService
+		Peoples       *PeopleService
+		Organizations *OrganizationService
+		Vendors       *VendorService
 	}
 )
 
@@ -49,23 +63,27 @@ func NewService(
 		pg:     pgClient,
 		s3:     s3Client,
 		bucket: bucket,
-		scope:  coredata.NewNoScope(),
 	}
-
-	svc.Policies = &PolicyService{svc: svc}
 
 	return svc, nil
 }
 
-func (s *Service) WithTenant(tenantID gid.TenantID) *Service {
-	newSvc := &Service{
+func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
+	tenantService := &TenantService{
 		pg:     s.pg,
 		s3:     s.s3,
 		bucket: s.bucket,
 		scope:  coredata.NewScope(tenantID),
 	}
 
-	newSvc.Policies = &PolicyService{svc: newSvc}
+	tenantService.Policies = &PolicyService{svc: tenantService}
+	tenantService.Controls = &ControlService{svc: tenantService}
+	tenantService.Evidences = &EvidenceService{svc: tenantService}
+	tenantService.Frameworks = &FrameworkService{svc: tenantService}
+	tenantService.Tasks = &TaskService{svc: tenantService}
+	tenantService.Peoples = &PeopleService{svc: tenantService}
+	tenantService.Organizations = &OrganizationService{svc: tenantService}
+	tenantService.Vendors = &VendorService{svc: tenantService}
 
-	return newSvc
+	return tenantService
 }

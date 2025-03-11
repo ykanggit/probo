@@ -25,32 +25,34 @@ import (
 )
 
 type (
+	OrganizationService struct {
+		svc *TenantService
+	}
+
 	CreateOrganizationRequest struct {
 		Name string
 	}
 )
 
-func (s Service) CreateOrganization(
+func (s OrganizationService) Create(
 	ctx context.Context,
 	req CreateOrganizationRequest,
 ) (*coredata.Organization, error) {
-	tenantID := gid.NewTenantID()
-
 	now := time.Now()
-	organizationID, err := gid.NewGID(tenantID, coredata.OrganizationEntityType)
+	organizationID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.OrganizationEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create organization global id: %w", err)
 	}
 
 	organization := &coredata.Organization{
 		ID:        organizationID,
-		TenantID:  tenantID,
+		TenantID:  s.svc.scope.GetTenantID(),
 		Name:      req.Name,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
 
-	err = s.pg.WithConn(
+	err = s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := organization.Insert(ctx, conn); err != nil {
@@ -58,6 +60,31 @@ func (s Service) CreateOrganization(
 			}
 
 			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return organization, nil
+}
+
+func (s OrganizationService) Get(
+	ctx context.Context,
+	organizationID gid.GID,
+) (*coredata.Organization, error) {
+	organization := &coredata.Organization{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return organization.LoadByID(
+				ctx,
+				conn,
+				s.svc.scope,
+				organizationID,
+			)
 		},
 	)
 

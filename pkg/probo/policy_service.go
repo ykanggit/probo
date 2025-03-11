@@ -12,7 +12,7 @@ import (
 )
 
 type PolicyService struct {
-	svc *Service
+	svc *TenantService
 }
 
 type (
@@ -142,7 +142,7 @@ func (s *PolicyService) Delete(
 	)
 }
 
-func (s *PolicyService) ListByOrganization(
+func (s *PolicyService) ListByOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
 	cursor *page.Cursor,

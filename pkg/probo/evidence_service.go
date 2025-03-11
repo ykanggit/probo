@@ -26,11 +26,16 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/page"
 	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
 
 type (
+	EvidenceService struct {
+		svc *TenantService
+	}
+
 	CreateEvidenceRequest struct {
 		TaskID gid.GID
 		Name   string
@@ -38,12 +43,32 @@ type (
 	}
 )
 
-func (s Service) CreateEvidence(
+func (s EvidenceService) Get(
+	ctx context.Context,
+	evidenceID gid.GID,
+) (*coredata.Evidence, error) {
+	evidence := &coredata.Evidence{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return evidence.LoadByID(ctx, conn, s.svc.scope, evidenceID)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return evidence, nil
+}
+
+func (s EvidenceService) Create(
 	ctx context.Context,
 	req CreateEvidenceRequest,
 ) (*coredata.Evidence, error) {
 	now := time.Now()
-	evidenceID, err := gid.NewGID(s.scope.GetTenantID(), coredata.EvidenceEntityType)
+	evidenceID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.EvidenceEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create evidence global id: %w", err)
 	}
@@ -60,8 +85,8 @@ func (s Service) CreateEvidence(
 		return nil, fmt.Errorf("cannot generate object key: %w", err)
 	}
 
-	putObjectOutput, err := s.s3.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(s.bucket),
+	putObjectOutput, err := s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
+		Bucket:      aws.String(s.svc.bucket),
 		Key:         aws.String(objectKey.String()),
 		Body:        req.File,
 		ContentType: aws.String(contentType),
@@ -70,8 +95,8 @@ func (s Service) CreateEvidence(
 		return nil, fmt.Errorf("cannot upload file to S3: %w", err)
 	}
 
-	headOutput, err := s.s3.HeadObject(ctx, &s3.HeadObjectInput{
-		Bucket: aws.String(s.bucket),
+	headOutput, err := s.svc.s3.HeadObject(ctx, &s3.HeadObjectInput{
+		Bucket: aws.String(s.svc.bucket),
 		Key:    aws.String(objectKey.String()),
 	})
 	if err != nil {
@@ -93,14 +118,14 @@ func (s Service) CreateEvidence(
 		UpdatedAt: now,
 	}
 
-	err = s.pg.WithTx(
+	err = s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			if err := task.LoadByID(ctx, conn, s.scope, req.TaskID); err != nil {
+			if err := task.LoadByID(ctx, conn, s.svc.scope, req.TaskID); err != nil {
 				return fmt.Errorf("cannot load task %q: %w", req.TaskID, err)
 			}
 
-			if err := evidence.Insert(ctx, conn, s.scope); err != nil {
+			if err := evidence.Insert(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert evidence: %w", err)
 			}
 
@@ -114,4 +139,76 @@ func (s Service) CreateEvidence(
 	}
 
 	return evidence, nil
+}
+
+func (s EvidenceService) GenerateFileURL(
+	ctx context.Context,
+	evidenceID gid.GID,
+	expiresIn time.Duration,
+) (*string, error) {
+	evidence, err := s.Get(ctx, evidenceID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get evidence: %w", err)
+	}
+
+	presignClient := s3.NewPresignClient(s.svc.s3)
+
+	presignedReq, err := presignClient.PresignGetObject(ctx, &s3.GetObjectInput{
+		Bucket:                     aws.String(s.svc.bucket),
+		Key:                        aws.String(evidence.ObjectKey),
+		ResponseContentType:        aws.String(evidence.MimeType),
+		ResponseContentDisposition: aws.String(fmt.Sprintf("attachment; filename=\"%s\"", evidence.Filename)),
+	}, func(opts *s3.PresignOptions) {
+		opts.Expires = expiresIn
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot presign GetObject request: %w", err)
+	}
+
+	return &presignedReq.URL, nil
+}
+
+func (s EvidenceService) ListForTaskID(
+	ctx context.Context,
+	taskID gid.GID,
+	cursor *page.Cursor,
+) (*page.Page[*coredata.Evidence], error) {
+	var evidences coredata.Evidences
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return evidences.LoadByTaskID(
+				ctx,
+				conn,
+				s.svc.scope,
+				taskID,
+				cursor,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(evidences, cursor), nil
+}
+
+func (s *EvidenceService) Delete(
+	ctx context.Context,
+	evidenceID gid.GID,
+) error {
+	evidence := &coredata.Evidence{ID: evidenceID}
+
+	return s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := evidence.Delete(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot delete evidence: %w", err)
+			}
+
+			return nil
+		},
+	)
 }
