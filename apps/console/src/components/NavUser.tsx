@@ -27,9 +27,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/contexts/AuthContext";
 import { NavUser_viewer$key } from "./__generated__/NavUser_viewer.graphql";
 import { NavUserSkeleton } from "./NavUserSkeleton";
+import { buildEndpoint } from "@/utils";
 
 export const navUserFragment = graphql`
   fragment NavUser_viewer on User {
@@ -42,13 +42,16 @@ export const navUserFragment = graphql`
 export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
   const { isMobile } = useSidebar();
   const currentUser = useFragment(navUserFragment, viewer);
-  const { logout } = useAuth();
   const navigate = useNavigate();
   const { organizationId } = useParams();
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/login");
+    fetch(buildEndpoint("/auth/logout"), {
+      method: "POST",
+      credentials: "include",
+    }).then(() => {
+      navigate("/login");
+    });
   };
 
   if (!organizationId) {

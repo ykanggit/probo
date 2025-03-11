@@ -6,6 +6,17 @@ import {
   Store,
 } from "relay-runtime";
 import { buildEndpoint } from "./utils";
+import { GraphQLError } from "graphql";
+
+export class UnAuthenticatedError extends Error {
+  constructor() {
+    super("UNAUTHENTICATED");
+    this.name = "UnAuthenticatedError";
+  }
+}
+
+const hasUnauthenticatedError = (error: GraphQLError) =>
+  error.extensions?.code == "UNAUTHENTICATED";
 
 const fetchRelay: FetchFunction = async (
   request,
@@ -66,7 +77,13 @@ const fetchRelay: FetchFunction = async (
 
   const json = await response.json();
 
-  if (Array.isArray(json.errors)) {
+  if (json.errors) {
+    const errors = json.errors as GraphQLError[];
+
+    if (errors.find(hasUnauthenticatedError)) {
+      throw new UnAuthenticatedError();
+    }
+
     throw new Error(
       `Error fetching GraphQL query '${
         request.name

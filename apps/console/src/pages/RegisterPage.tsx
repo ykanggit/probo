@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { buildEndpoint } from "@/utils";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -15,7 +14,6 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { checkAuth } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,14 +30,17 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(buildEndpoint("/api/console/v1/auth/register"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password, fullName }),
-      });
+      const response = await fetch(
+        buildEndpoint("/api/console/v1/auth/register"),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ email, password, fullName }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -51,10 +52,6 @@ export default function RegisterPage() {
         description: "Account created successfully",
       });
 
-      // Check authentication status after registration
-      await checkAuth();
-
-      // Redirect to home page after successful registration
       navigate("/");
     } catch (error) {
       toast({

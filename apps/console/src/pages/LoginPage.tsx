@@ -1,49 +1,48 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { buildEndpoint } from "@/utils";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const { checkAuth } = useAuth();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.authRequired) {
+      toast({
+        title: "Authentication Required",
+        description: "You need to log in to access this resource",
+        variant: "destructive",
+      });
+    }
+  }, [location, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await fetch(buildEndpoint("/api/console/v1/auth/login"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: "include",
-      });
+      const response = await fetch(
+        buildEndpoint("/api/console/v1/auth/login"),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Failed to login");
-      }
-
-      const authenticated = await checkAuth();
-      if (authenticated) {
-        toast({
-          title: "Success",
-          description: "Logged in successfully",
-          variant: "default",
-        });
-        navigate("/");
-      } else {
-        throw new Error("Authentication failed");
       }
     } catch (error: unknown) {
       toast({

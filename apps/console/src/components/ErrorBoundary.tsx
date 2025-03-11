@@ -1,5 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { ErrorPage } from "@/pages/ErrorPage";
+import { UnAuthenticatedError } from "@/RelayEnvironment";
+import { Navigate } from "react-router";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -9,16 +11,20 @@ interface ErrorBoundaryProps {
 interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
+  isUnAuthenticated: boolean;
 }
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, isUnAuthenticated: false };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
+    if (error instanceof UnAuthenticatedError) {
+      return { hasError: true, error, isUnAuthenticated: true };
+    }
+    return { hasError: true, error, isUnAuthenticated: false };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
@@ -27,6 +33,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   render(): ReactNode {
+    if (this.state.isUnAuthenticated) {
+      return <Navigate to="/login" replace state={{ authRequired: true }} />;
+    }
+
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;

@@ -110,7 +110,14 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		if user == nil {
 			return func(ctx context.Context) *graphql.Response {
 				return &graphql.Response{
-					Errors: gqlerror.List{gqlerror.Errorf("authentication required")},
+					Errors: gqlerror.List{
+						&gqlerror.Error{
+							Message: "authentication required",
+							Extensions: map[string]any{
+								"code": "UNAUTHENTICATED",
+							},
+						},
+					},
 				}
 			}
 		}
