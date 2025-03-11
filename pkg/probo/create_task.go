@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	"gearno.de/ref"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata"
 	"go.gearno.de/kit/pg"
@@ -43,10 +42,6 @@ func (s Service) CreateTask(
 	if err != nil {
 		return nil, fmt.Errorf("cannot create task global id: %w", err)
 	}
-	taskStateTransitionID, err := gid.NewGID(s.scope.GetTenantID(), coredata.TaskStateTransitionEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create task state transition global id: %w", err)
-	}
 
 	control := &coredata.Control{}
 	task := &coredata.Task{
@@ -54,22 +49,10 @@ func (s Service) CreateTask(
 		ControlID:   req.ControlID,
 		Name:        req.Name,
 		ContentRef:  req.ContentRef,
-		Description: req.Description,
 		State:       coredata.TaskStateTodo,
+		Description: req.Description,
 		CreatedAt:   now,
 		UpdatedAt:   now,
-	}
-
-	taskStateTransition := coredata.TaskStateTransition{
-		StateTransition: coredata.StateTransition[coredata.TaskState]{
-			ID:        taskStateTransitionID,
-			FromState: nil,
-			ToState:   task.State,
-			Reason:    ref.Ref("Initial state"),
-			CreatedAt: now,
-			UpdatedAt: now,
-		},
-		TaskID: task.ID,
 	}
 
 	err = s.pg.WithTx(
@@ -81,10 +64,6 @@ func (s Service) CreateTask(
 
 			if err := task.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert task: %w", err)
-			}
-
-			if err := taskStateTransition.Insert(ctx, conn, s.scope); err != nil {
-				return fmt.Errorf("cannot insert task state transition: %w", err)
 			}
 
 			return nil

@@ -22,7 +22,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"gearno.de/ref"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/gid"
@@ -47,10 +46,6 @@ func (s Service) CreateEvidence(
 	evidenceID, err := gid.NewGID(s.scope.GetTenantID(), coredata.EvidenceEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create evidence global id: %w", err)
-	}
-	evidenceStateTransitionID, err := gid.NewGID(s.scope.GetTenantID(), coredata.EvidenceStateTransitionEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create evidence state transition: %w", err)
 	}
 
 	contentType := "application/octet-stream"
@@ -98,18 +93,6 @@ func (s Service) CreateEvidence(
 		UpdatedAt: now,
 	}
 
-	evidenceStateTransition := coredata.EvidenceStateTransition{
-		StateTransition: coredata.StateTransition[coredata.EvidenceState]{
-			ID:        evidenceStateTransitionID,
-			FromState: nil,
-			ToState:   evidence.State,
-			Reason:    ref.Ref("Initial state"),
-			CreatedAt: now,
-			UpdatedAt: now,
-		},
-		EvidenceID: evidence.ID,
-	}
-
 	err = s.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
@@ -119,10 +102,6 @@ func (s Service) CreateEvidence(
 
 			if err := evidence.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert evidence: %w", err)
-			}
-
-			if err := evidenceStateTransition.Insert(ctx, conn, s.scope); err != nil {
-				return fmt.Errorf("cannot insert evidence state transition: %w", err)
 			}
 
 			return nil

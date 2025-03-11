@@ -63,38 +63,22 @@ func (c *Control) LoadByID(
 	controlID gid.GID,
 ) error {
 	q := `
-WITH control_states AS (
-    SELECT
-        control_id,
-        to_state,
-        reason,
-        RANK() OVER w
-    FROM
-        control_state_transitions
-    WHERE
-        control_id = @control_id
-    WINDOW
-        w AS (PARTITION BY control_id ORDER BY created_at DESC)
-)
 SELECT
     id,
     framework_id,
     category,
     name,
     description,
-    cs.to_state AS state,
+    state,
     content_ref,
     created_at,
     updated_at,
 	version
 FROM
     controls
-INNER JOIN
-    control_states cs ON cs.control_id = controls.id
 WHERE
     %s
     AND id = @control_id
-    AND cs.rank = 1
 LIMIT 1;
 `
 
@@ -131,6 +115,7 @@ INSERT INTO
         framework_id,
 		category,
         name,
+		state,
         description,
         content_ref,
         created_at,
@@ -143,6 +128,7 @@ VALUES (
     @framework_id,
 	@category,
     @name,
+	@state,
     @description,
     @content_ref,
     @created_at,
@@ -162,6 +148,7 @@ VALUES (
 		"content_ref":  c.ContentRef,
 		"created_at":   c.CreatedAt,
 		"updated_at":   c.UpdatedAt,
+		"state":        c.State,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -175,36 +162,22 @@ func (c *Controls) LoadByFrameworkID(
 	cursor *page.Cursor,
 ) error {
 	q := `
-WITH control_states AS (
-    SELECT
-        control_id,
-        to_state,
-        reason,
-        RANK() OVER w
-    FROM
-        control_state_transitions
-    WINDOW
-        w AS (PARTITION BY control_id ORDER BY created_at DESC)
-)
 SELECT
     id,
     framework_id,
 	category,
     name,
     description,
-    cs.to_state AS state,
+    state,
     content_ref,
     created_at,
     updated_at,
 	version
 FROM
     controls
-INNER JOIN
-    control_states cs ON cs.control_id = controls.id
 WHERE
     %s
     AND framework_id = @framework_id
-    AND cs.rank = 1
     AND %s
 `
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
@@ -235,21 +208,11 @@ func (c *Control) Update(
 	params UpdateControlParams,
 ) error {
 	q := `
-WITH control_states AS (
-    SELECT
-        control_id,
-        to_state,
-        reason,
-        RANK() OVER w
-    FROM
-        control_state_transitions
-    WINDOW
-        w AS (PARTITION BY control_id ORDER BY created_at DESC)
-)
 UPDATE controls SET
     name = COALESCE(@name, name),
     description = COALESCE(@description, description),
     category = COALESCE(@category, category),
+	state = COALESCE(@state, state),
     updated_at = @updated_at,
     version = version + 1
 WHERE %s
@@ -261,7 +224,7 @@ RETURNING
     category,
     name,
     description,
-	(SELECT to_state FROM control_states WHERE control_id = controls.id AND rank = 1) AS state,
+	state,
     content_ref,
     created_at,
     updated_at,
@@ -269,11 +232,13 @@ RETURNING
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{
+	args := pgx.NamedArgs{
 		"control_id":       c.ID,
 		"expected_version": params.ExpectedVersion,
 		"updated_at":       time.Now(),
 	}
+
+	maps.Copy(args, scope.SQLArguments())
 
 	if params.Name != nil {
 		args["name"] = *params.Name

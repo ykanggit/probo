@@ -18,34 +18,39 @@ import (
 	"context"
 
 	"github.com/getprobo/probo/pkg/gid"
-	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/probo/coredata"
 	"go.gearno.de/kit/pg"
 )
 
-func (s Service) ListTaskStateTransitions(
-	ctx context.Context,
-	taskID gid.GID,
-	cursor *page.Cursor,
-) (*page.Page[*coredata.TaskStateTransition], error) {
-	var taskStateTransitions coredata.TaskStateTransitions
+type UpdateTaskRequest struct {
+	ID              gid.GID
+	ExpectedVersion int
+	Name            *string
+	Description     *string
+	State           *coredata.TaskState
+}
 
-	err := s.pg.WithConn(
+func (s Service) UpdateTask(
+	ctx context.Context,
+	req UpdateTaskRequest,
+) (*coredata.Task, error) {
+	params := coredata.UpdateTaskParams{
+		ExpectedVersion: req.ExpectedVersion,
+		Name:            req.Name,
+		Description:     req.Description,
+		State:           req.State,
+	}
+
+	task := &coredata.Task{ID: req.ID}
+
+	err := s.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return taskStateTransitions.LoadByTaskID(
-				ctx,
-				conn,
-				s.scope,
-				taskID,
-				cursor,
-			)
-		},
-	)
-
+			return task.Update(ctx, conn, s.scope, params)
+		})
 	if err != nil {
 		return nil, err
 	}
 
-	return page.NewPage(taskStateTransitions, cursor), nil
+	return task, nil
 }

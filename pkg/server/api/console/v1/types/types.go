@@ -17,16 +17,15 @@ type Node interface {
 }
 
 type Control struct {
-	ID               gid.GID                           `json:"id"`
-	Version          int                               `json:"version"`
-	Category         string                            `json:"category"`
-	Name             string                            `json:"name"`
-	Description      string                            `json:"description"`
-	State            coredata.ControlState             `json:"state"`
-	StateTransisions *ControlStateTransitionConnection `json:"stateTransisions"`
-	Tasks            *TaskConnection                   `json:"tasks"`
-	CreatedAt        time.Time                         `json:"createdAt"`
-	UpdatedAt        time.Time                         `json:"updatedAt"`
+	ID          gid.GID               `json:"id"`
+	Version     int                   `json:"version"`
+	Category    string                `json:"category"`
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	State       coredata.ControlState `json:"state"`
+	Tasks       *TaskConnection       `json:"tasks"`
+	CreatedAt   time.Time             `json:"createdAt"`
+	UpdatedAt   time.Time             `json:"updatedAt"`
 }
 
 func (Control) IsNode()             {}
@@ -40,25 +39,6 @@ type ControlConnection struct {
 type ControlEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Control       `json:"node"`
-}
-
-type ControlStateTransition struct {
-	ID        gid.GID                `json:"id"`
-	FromState *coredata.ControlState `json:"fromState,omitempty"`
-	ToState   coredata.ControlState  `json:"toState"`
-	Reason    *string                `json:"reason,omitempty"`
-	CreatedAt time.Time              `json:"createdAt"`
-	UpdatedAt time.Time              `json:"updatedAt"`
-}
-
-type ControlStateTransitionConnection struct {
-	Edges    []*ControlStateTransitionEdge `json:"edges"`
-	PageInfo *PageInfo                     `json:"pageInfo"`
-}
-
-type ControlStateTransitionEdge struct {
-	Cursor page.CursorKey          `json:"cursor"`
-	Node   *ControlStateTransition `json:"node"`
 }
 
 type CreateControlInput struct {
@@ -191,15 +171,14 @@ type DeleteVendorPayload struct {
 }
 
 type Evidence struct {
-	ID               gid.GID                            `json:"id"`
-	FileURL          string                             `json:"fileUrl"`
-	MimeType         string                             `json:"mimeType"`
-	Size             int                                `json:"size"`
-	State            coredata.EvidenceState             `json:"state"`
-	Filename         string                             `json:"filename"`
-	StateTransisions *EvidenceStateTransitionConnection `json:"stateTransisions"`
-	CreatedAt        time.Time                          `json:"createdAt"`
-	UpdatedAt        time.Time                          `json:"updatedAt"`
+	ID        gid.GID                `json:"id"`
+	FileURL   string                 `json:"fileUrl"`
+	MimeType  string                 `json:"mimeType"`
+	Size      int                    `json:"size"`
+	State     coredata.EvidenceState `json:"state"`
+	Filename  string                 `json:"filename"`
+	CreatedAt time.Time              `json:"createdAt"`
+	UpdatedAt time.Time              `json:"updatedAt"`
 }
 
 func (Evidence) IsNode()             {}
@@ -213,25 +192,6 @@ type EvidenceConnection struct {
 type EvidenceEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Evidence      `json:"node"`
-}
-
-type EvidenceStateTransition struct {
-	ID        gid.GID                 `json:"id"`
-	FromState *coredata.EvidenceState `json:"fromState,omitempty"`
-	ToState   coredata.EvidenceState  `json:"toState"`
-	Reason    *string                 `json:"reason,omitempty"`
-	CreatedAt time.Time               `json:"createdAt"`
-	UpdatedAt time.Time               `json:"updatedAt"`
-}
-
-type EvidenceStateTransitionConnection struct {
-	Edges    []*EvidenceStateTransitionEdge `json:"edges"`
-	PageInfo *PageInfo                      `json:"pageInfo"`
-}
-
-type EvidenceStateTransitionEdge struct {
-	Cursor page.CursorKey           `json:"cursor"`
-	Node   *EvidenceStateTransition `json:"node"`
 }
 
 type Framework struct {
@@ -350,14 +310,14 @@ type Session struct {
 }
 
 type Task struct {
-	ID               gid.GID                        `json:"id"`
-	Name             string                         `json:"name"`
-	Description      string                         `json:"description"`
-	State            coredata.TaskState             `json:"state"`
-	StateTransisions *TaskStateTransitionConnection `json:"stateTransisions"`
-	Evidences        *EvidenceConnection            `json:"evidences"`
-	CreatedAt        time.Time                      `json:"createdAt"`
-	UpdatedAt        time.Time                      `json:"updatedAt"`
+	ID          gid.GID             `json:"id"`
+	Version     int                 `json:"version"`
+	Name        string              `json:"name"`
+	Description string              `json:"description"`
+	State       coredata.TaskState  `json:"state"`
+	Evidences   *EvidenceConnection `json:"evidences"`
+	CreatedAt   time.Time           `json:"createdAt"`
+	UpdatedAt   time.Time           `json:"updatedAt"`
 }
 
 func (Task) IsNode()             {}
@@ -371,25 +331,6 @@ type TaskConnection struct {
 type TaskEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Task          `json:"node"`
-}
-
-type TaskStateTransition struct {
-	ID        gid.GID             `json:"id"`
-	FromState *coredata.TaskState `json:"fromState,omitempty"`
-	ToState   coredata.TaskState  `json:"toState"`
-	Reason    *string             `json:"reason,omitempty"`
-	CreatedAt time.Time           `json:"createdAt"`
-	UpdatedAt time.Time           `json:"updatedAt"`
-}
-
-type TaskStateTransitionConnection struct {
-	Edges    []*TaskStateTransitionEdge `json:"edges"`
-	PageInfo *PageInfo                  `json:"pageInfo"`
-}
-
-type TaskStateTransitionEdge struct {
-	Cursor page.CursorKey       `json:"cursor"`
-	Node   *TaskStateTransition `json:"node"`
 }
 
 type UpdateControlInput struct {
@@ -441,6 +382,18 @@ type UpdatePolicyInput struct {
 
 type UpdatePolicyPayload struct {
 	Policy *Policy `json:"policy"`
+}
+
+type UpdateTaskInput struct {
+	TaskID          gid.GID             `json:"taskId"`
+	ExpectedVersion int                 `json:"expectedVersion"`
+	Name            *string             `json:"name,omitempty"`
+	Description     *string             `json:"description,omitempty"`
+	State           *coredata.TaskState `json:"state,omitempty"`
+}
+
+type UpdateTaskPayload struct {
+	Task *Task `json:"task"`
 }
 
 type UpdateTaskStateInput struct {

@@ -47,5 +47,6 @@ func NewTask(t *coredata.Task) *Task {
 		State:       t.State,
 		CreatedAt:   t.CreatedAt,
 		UpdatedAt:   t.UpdatedAt,
+		Version:     t.Version,
 	}
 }

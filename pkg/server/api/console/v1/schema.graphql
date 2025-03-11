@@ -225,13 +225,6 @@ type Control implements Node {
   description: String!
   state: ControlState!
 
-  stateTransisions(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-  ): ControlStateTransitionConnection! @goField(forceResolver: true)
-
   tasks(
     first: Int
     after: CursorKey
@@ -239,25 +232,6 @@ type Control implements Node {
     before: CursorKey
   ): TaskConnection! @goField(forceResolver: true)
 
-  createdAt: Datetime!
-  updatedAt: Datetime!
-}
-
-type ControlStateTransitionConnection {
-  edges: [ControlStateTransitionEdge!]!
-  pageInfo: PageInfo!
-}
-
-type ControlStateTransitionEdge {
-  cursor: CursorKey!
-  node: ControlStateTransition!
-}
-
-type ControlStateTransition {
-  id: ID!
-  fromState: ControlState
-  toState: ControlState!
-  reason: String
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -274,16 +248,10 @@ type TaskEdge {
 
 type Task implements Node {
   id: ID!
+  version: Int!
   name: String!
   description: String!
   state: TaskState!
-
-  stateTransisions(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-  ): TaskStateTransitionConnection! @goField(forceResolver: true)
 
   evidences(
     first: Int
@@ -292,25 +260,6 @@ type Task implements Node {
     before: CursorKey
   ): EvidenceConnection! @goField(forceResolver: true)
 
-  createdAt: Datetime!
-  updatedAt: Datetime!
-}
-
-type TaskStateTransitionConnection {
-  edges: [TaskStateTransitionEdge!]!
-  pageInfo: PageInfo!
-}
-
-type TaskStateTransitionEdge {
-  cursor: CursorKey!
-  node: TaskStateTransition!
-}
-
-type TaskStateTransition {
-  id: ID!
-  fromState: TaskState
-  toState: TaskState!
-  reason: String
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -333,32 +282,6 @@ type Evidence implements Node {
   state: EvidenceState!
   filename: String!
 
-  stateTransisions(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-  ): EvidenceStateTransitionConnection! @goField(forceResolver: true)
-
-  createdAt: Datetime!
-  updatedAt: Datetime!
-}
-
-type EvidenceStateTransitionConnection {
-  edges: [EvidenceStateTransitionEdge!]!
-  pageInfo: PageInfo!
-}
-
-type EvidenceStateTransitionEdge {
-  cursor: CursorKey!
-  node: EvidenceStateTransition!
-}
-
-type EvidenceStateTransition {
-  id: ID!
-  fromState: EvidenceState
-  toState: EvidenceState!
-  reason: String
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -402,8 +325,8 @@ type Mutation {
   deleteOrganization(
     input: DeleteOrganizationInput!
   ): DeleteOrganizationPayload!
-  updateTaskState(input: UpdateTaskStateInput!): UpdateTaskStatePayload!
   createTask(input: CreateTaskInput!): CreateTaskPayload!
+  updateTask(input: UpdateTaskInput!): UpdateTaskPayload!
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   createControl(input: CreateControlInput!): CreateControlPayload!
@@ -532,15 +455,6 @@ type CreateOrganizationPayload {
 
 type DeleteOrganizationPayload {
   deletedOrganizationId: ID!
-}
-
-input UpdateTaskStateInput {
-  taskId: ID!
-  state: TaskState!
-}
-
-type UpdateTaskStatePayload {
-  task: Task!
 }
 
 input CreateTaskInput {
@@ -699,4 +613,16 @@ type PolicyConnection {
 type PolicyEdge {
   cursor: CursorKey!
   node: Policy!
+}
+
+input UpdateTaskInput {
+  taskId: ID!
+  expectedVersion: Int!
+  name: String
+  description: String
+  state: TaskState
+}
+
+type UpdateTaskPayload {
+  task: Task!
 }

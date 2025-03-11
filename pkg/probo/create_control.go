@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	"gearno.de/ref"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo/coredata"
 	"go.gearno.de/kit/pg"
@@ -44,10 +43,6 @@ func (s Service) CreateControl(
 	if err != nil {
 		return nil, fmt.Errorf("cannot create control global id: %w", err)
 	}
-	controlStateTransitionID, err := gid.NewGID(s.scope.GetTenantID(), coredata.ControlStateTransitionEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create control state transition global id: %w", err)
-	}
 
 	framework := &coredata.Framework{}
 	control := &coredata.Control{
@@ -62,18 +57,6 @@ func (s Service) CreateControl(
 		UpdatedAt:   now,
 	}
 
-	controlStateTransition := coredata.ControlStateTransition{
-		StateTransition: coredata.StateTransition[coredata.ControlState]{
-			ID:        controlStateTransitionID,
-			FromState: nil,
-			ToState:   control.State,
-			Reason:    ref.Ref("Initial state"),
-			CreatedAt: now,
-			UpdatedAt: now,
-		},
-		ControlID: control.ID,
-	}
-
 	err = s.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
@@ -83,10 +66,6 @@ func (s Service) CreateControl(
 
 			if err := control.Insert(ctx, conn, s.scope); err != nil {
 				return fmt.Errorf("cannot insert control: %w", err)
-			}
-
-			if err := controlStateTransition.Insert(ctx, conn, s.scope); err != nil {
-				return fmt.Errorf("cannot insert control state transition: %w", err)
 			}
 
 			return nil

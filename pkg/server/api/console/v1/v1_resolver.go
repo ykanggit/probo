@@ -18,19 +18,6 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
-// StateTransisions is the resolver for the stateTransisions field.
-func (r *controlResolver) StateTransisions(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.ControlStateTransitionConnection, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
-	cursor := types.NewCursor(first, after, last, before)
-
-	page, err := svc.ListControlStateTransitions(ctx, obj.ID, cursor)
-	if err != nil {
-		return nil, fmt.Errorf("cannot list control tasks: %w", err)
-	}
-
-	return types.NewControlStateTransitionConnection(page), nil
-}
-
 // Tasks is the resolver for the tasks field.
 func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskConnection, error) {
 	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
@@ -54,19 +41,6 @@ func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (st
 	}
 
 	return *fileURL, nil
-}
-
-// StateTransisions is the resolver for the stateTransisions field.
-func (r *evidenceResolver) StateTransisions(ctx context.Context, obj *types.Evidence, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceStateTransitionConnection, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
-	cursor := types.NewCursor(first, after, last, before)
-
-	page, err := svc.ListEvidenceStateTransitions(ctx, obj.ID, cursor)
-	if err != nil {
-		return nil, fmt.Errorf("cannot list evidence state transitions: %w", err)
-	}
-
-	return types.NewEvidenceStateTransitionConnection(page), nil
 }
 
 // Controls is the resolver for the controls field.
@@ -226,24 +200,6 @@ func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.D
 	panic(fmt.Errorf("not implemented: DeleteOrganization - deleteOrganization"))
 }
 
-// UpdateTaskState is the resolver for the updateTaskState field.
-func (r *mutationResolver) UpdateTaskState(ctx context.Context, input types.UpdateTaskStateInput) (*types.UpdateTaskStatePayload, error) {
-	svc := r.proboSvc.WithTenant(input.TaskID.TenantID())
-
-	task, err := svc.UpdateTaskState(ctx, probo.UpdateTaskStateRequest{
-		TaskID: input.TaskID,
-		State:  input.State,
-		Reason: nil,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cannot update task state: %w", err)
-	}
-
-	return &types.UpdateTaskStatePayload{
-		Task: types.NewTask(task),
-	}, nil
-}
-
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error) {
 	svc := r.proboSvc.WithTenant(input.ControlID.TenantID())
@@ -259,6 +215,26 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 
 	return &types.CreateTaskPayload{
 		TaskEdge: types.NewTaskEdge(task),
+	}, nil
+}
+
+// UpdateTask is the resolver for the updateTask field.
+func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error) {
+	svc := r.proboSvc.WithTenant(input.TaskID.TenantID())
+
+	task, err := svc.UpdateTask(ctx, probo.UpdateTaskRequest{
+		ID:              input.TaskID,
+		ExpectedVersion: input.ExpectedVersion,
+		Name:            input.Name,
+		Description:     input.Description,
+		State:           input.State,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update task: %w", err)
+	}
+
+	return &types.UpdateTaskPayload{
+		Task: types.NewTask(task),
 	}, nil
 }
 
@@ -587,19 +563,6 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 func (r *queryResolver) Viewer(ctx context.Context) (*types.User, error) {
 	user := UserFromContext(ctx)
 	return types.NewUser(user), nil
-}
-
-// StateTransisions is the resolver for the stateTransisions field.
-func (r *taskResolver) StateTransisions(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskStateTransitionConnection, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
-	cursor := types.NewCursor(first, after, last, before)
-
-	page, err := svc.ListTaskStateTransitions(ctx, obj.ID, cursor)
-	if err != nil {
-		return nil, fmt.Errorf("cannot list control tasks: %w", err)
-	}
-
-	return types.NewTaskStateTransitionConnection(page), nil
 }
 
 // Evidences is the resolver for the evidences field.

@@ -162,22 +162,10 @@ func (e *Evidences) LoadByTaskID(
 	cursor *page.Cursor,
 ) error {
 	q := `
-WITH
-    evidence_states AS (
-        SELECT
-            evidence_id,
-            to_state AS state,
-            reason,
-            RANK() OVER w
-        FROM
-            evidence_state_transitions
-        WINDOW
-            w AS (PARTITION BY evidence_id ORDER BY created_at DESC)
-    )
 SELECT
     id,
     task_id,
-    es.state,
+    state,
     object_key,
     mime_type,
     size,
@@ -186,12 +174,9 @@ SELECT
     updated_at
 FROM
     evidences
-INNER JOIN
-    evidence_states es ON es.evidence_id = evidences.id
 WHERE
     %s
     AND task_id = @task_id
-    AND es.rank = 1
     AND %s
 `
 

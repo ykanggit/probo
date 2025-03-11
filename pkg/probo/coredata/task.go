@@ -37,9 +37,17 @@ type (
 		ContentRef  string    `db:"content_ref"`
 		CreatedAt   time.Time `db:"created_at"`
 		UpdatedAt   time.Time `db:"updated_at"`
+		Version     int       `db:"version"`
 	}
 
 	Tasks []*Task
+
+	UpdateTaskParams struct {
+		ExpectedVersion int
+		Name            *string
+		Description     *string
+		State           *TaskState
+	}
 )
 
 func (t Task) CursorKey() page.CursorKey {
@@ -53,58 +61,27 @@ func (t *Task) LoadByID(
 	taskID gid.GID,
 ) error {
 	q := `
-WITH
-    control_tasks AS (
-        SELECT
-            t.id,
-            ct.control_id AS control_id,
-            t.name,
-            t.description,
-            t.content_ref,
-            t.created_at,
-            t.updated_at
-         FROM
-             tasks t
-         INNER JOIN
-             controls_tasks ct ON
-                 ct.task_id = t.id
-         WHERE
-             t.tenant_id = @tenant_id
-             AND id = @task_id
-    ),
-    task_states AS (
-        SELECT
-            task_id,
-            to_state AS state,
-            reason,
-            RANK() OVER w
-        FROM
-            task_state_transitions
-        WHERE
-            task_id = @task_id
-        WINDOW
-            w AS (PARTITION BY task_id ORDER BY created_at DESC)
-    )
 SELECT
     id,
     control_id,
     name,
     description,
-    ts.state AS state,
+    state,
     content_ref,
     created_at,
-    updated_at
+    updated_at,
+    version
 FROM
-    control_tasks
-INNER JOIN
-    task_states ts ON ts.task_id = control_tasks.id
+    tasks
 WHERE
-    ts.rank = 1
-    AND id = @task_id
+    %s
+    AND task_id = @task_id
 LIMIT 1;
 `
 
-	args := pgx.StrictNamedArgs{"tenant_id": scope.GetTenantID(), "task_id": taskID}
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"task_id": taskID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -128,38 +105,29 @@ func (t Task) Insert(
 	scope Scoper,
 ) error {
 	q := `
-WITH task_insert AS (
-   INSERT INTO tasks (
-       tenant_id,
-       id,
-       name,
-       description,
-       content_ref,
-       created_at,
-       updated_at
-   )
-   VALUES (
-       @tenant_id,
-       @task_id,
-       @name,
-       @description,
-       @content_ref,
-       @created_at,
-       @updated_at
-   )
-   RETURNING id
-)
-INSERT INTO controls_tasks (
-   task_id,
-   tenant_id,
-   control_id,
-   created_at
+INSERT INTO tasks (
+    tenant_id,
+    id,
+    name,
+    control_id,
+    description,
+    content_ref,
+    created_at,
+    updated_at,
+    version,
+    state
 )
 VALUES (
-   (SELECT id FROM task_insert),
-   @tenant_id,
-   @control_id,
-   @created_at
+    @tenant_id,
+    @task_id,
+    @name,
+    @control_id,
+    @description,
+    @content_ref,
+    @created_at,
+    @updated_at,
+    @version,
+    @state
 );
 `
 
@@ -172,6 +140,8 @@ VALUES (
 		"content_ref": t.ContentRef,
 		"created_at":  t.CreatedAt,
 		"updated_at":  t.UpdatedAt,
+		"version":     t.Version,
+		"state":       t.State,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -185,57 +155,27 @@ func (t *Tasks) LoadByControlID(
 	cursor *page.Cursor,
 ) error {
 	q := `
-WITH
-    control_tasks AS (
-        SELECT
-            t.id,
-            @control_id AS control_id,
-            t.name,
-            t.description,
-            t.content_ref,
-            t.created_at,
-            t.updated_at
-         FROM
-             tasks t
-         INNER JOIN
-             controls_tasks ct ON
-                 ct.task_id = t.id
-                 AND ct.control_id = @control_id
-         WHERE
-             t.tenant_id = @tenant_id
-    ),
-    task_states AS (
-        SELECT
-            task_id,
-            to_state AS state,
-            reason,
-            RANK() OVER w
-        FROM
-            task_state_transitions
-        WINDOW
-            w AS (PARTITION BY task_id ORDER BY created_at DESC)
-    )
 SELECT
     id,
     control_id,
     name,
     description,
-    ts.state AS state,
+    state,
     content_ref,
     created_at,
-    updated_at
+    updated_at,
+    version
 FROM
-    control_tasks
-INNER JOIN
-    task_states ts ON ts.task_id = control_tasks.id
+    tasks
 WHERE
-    ts.rank = 1
+    %s
+    AND control_id = @control_id
     AND %s
 `
 
-	q = fmt.Sprintf(q, cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"tenant_id": scope.GetTenantID(), "control_id": controlID}
+	args := pgx.StrictNamedArgs{"control_id": controlID}
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
@@ -252,6 +192,43 @@ WHERE
 	*t = tasks
 
 	return nil
+}
+
+func (t *Task) Update(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	params UpdateTaskParams,
+) error {
+	q := `
+UPDATE tasks
+SET
+    name = COALESCE(@name, name),
+    description = COALESCE(@description, description),
+    state = COALESCE(@state, state),
+    updated_at = @updated_at,
+    version = version + 1
+WHERE
+    %s
+    AND id = @task_id
+    AND version = @expected_version
+RETURNING
+    version;
+`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{
+		"task_id":          t.ID,
+		"expected_version": params.ExpectedVersion,
+		"name":             params.Name,
+		"description":      params.Description,
+		"state":            params.State,
+		"updated_at":       time.Now(),
+	}
+	maps.Copy(args, scope.SQLArguments())
+
+	err := conn.QueryRow(ctx, q, args).Scan(&t.Version)
+	return err
 }
 
 func (t *Task) Delete(
