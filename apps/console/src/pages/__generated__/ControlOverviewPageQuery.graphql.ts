@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e1f21afb2bf00563c8343f3700c08c6e>>
+ * @generated SignedSource<<b26c1748d5c4ae346ebbe98ea97b7459>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -43,6 +43,7 @@ export type ControlOverviewPageQuery$data = {
           readonly id: string;
           readonly name: string;
           readonly state: TaskState;
+          readonly version: number;
         };
       }>;
     };
@@ -107,17 +108,24 @@ v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "__typename",
+  "name": "version",
   "storageKey": null
 },
 v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "cursor",
+  "name": "__typename",
   "storageKey": null
 },
 v9 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "cursor",
+  "storageKey": null
+},
+v10 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -142,7 +150,7 @@ v9 = {
   ],
   "storageKey": null
 },
-v10 = {
+v11 = {
   "kind": "ClientExtension",
   "selections": [
     {
@@ -154,7 +162,7 @@ v10 = {
     }
   ]
 },
-v11 = [
+v12 = [
   {
     "alias": null,
     "args": null,
@@ -201,25 +209,25 @@ v11 = [
             "name": "createdAt",
             "storageKey": null
           },
-          (v7/*: any*/)
+          (v8/*: any*/)
         ],
         "storageKey": null
       },
-      (v8/*: any*/)
+      (v9/*: any*/)
     ],
     "storageKey": null
   },
-  (v9/*: any*/),
-  (v10/*: any*/)
+  (v10/*: any*/),
+  (v11/*: any*/)
 ],
-v12 = [
+v13 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 100
   }
 ],
-v13 = [
+v14 = [
   {
     "kind": "Literal",
     "name": "first",
@@ -277,6 +285,7 @@ return {
                           (v3/*: any*/),
                           (v4/*: any*/),
                           (v5/*: any*/),
+                          (v7/*: any*/),
                           {
                             "alias": "evidences",
                             "args": null,
@@ -284,19 +293,19 @@ return {
                             "kind": "LinkedField",
                             "name": "__ControlOverviewPage_evidences_connection",
                             "plural": false,
-                            "selections": (v11/*: any*/),
+                            "selections": (v12/*: any*/),
                             "storageKey": null
                           },
-                          (v7/*: any*/)
+                          (v8/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v8/*: any*/)
+                      (v9/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v9/*: any*/),
-                  (v10/*: any*/)
+                  (v10/*: any*/),
+                  (v11/*: any*/)
                 ],
                 "storageKey": null
               }
@@ -325,7 +334,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v7/*: any*/),
+          (v8/*: any*/),
           (v2/*: any*/),
           {
             "kind": "InlineFragment",
@@ -336,7 +345,7 @@ return {
               (v6/*: any*/),
               {
                 "alias": null,
-                "args": (v12/*: any*/),
+                "args": (v13/*: any*/),
                 "concreteType": "TaskConnection",
                 "kind": "LinkedField",
                 "name": "tasks",
@@ -362,41 +371,42 @@ return {
                           (v3/*: any*/),
                           (v4/*: any*/),
                           (v5/*: any*/),
+                          (v7/*: any*/),
                           {
                             "alias": null,
-                            "args": (v13/*: any*/),
+                            "args": (v14/*: any*/),
                             "concreteType": "EvidenceConnection",
                             "kind": "LinkedField",
                             "name": "evidences",
                             "plural": false,
-                            "selections": (v11/*: any*/),
+                            "selections": (v12/*: any*/),
                             "storageKey": "evidences(first:50)"
                           },
                           {
                             "alias": null,
-                            "args": (v13/*: any*/),
+                            "args": (v14/*: any*/),
                             "filters": null,
                             "handle": "connection",
                             "key": "ControlOverviewPage_evidences",
                             "kind": "LinkedHandle",
                             "name": "evidences"
                           },
-                          (v7/*: any*/)
+                          (v8/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v8/*: any*/)
+                      (v9/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v9/*: any*/),
-                  (v10/*: any*/)
+                  (v10/*: any*/),
+                  (v11/*: any*/)
                 ],
                 "storageKey": "tasks(first:100)"
               },
               {
                 "alias": null,
-                "args": (v12/*: any*/),
+                "args": (v13/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "ControlOverviewPage_tasks",
@@ -413,7 +423,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "4364cf9b985fb746dde62c1e94063390",
+    "cacheID": "c8fb4975f792904f5106fb8518406063",
     "id": null,
     "metadata": {
       "connection": [
@@ -436,11 +446,11 @@ return {
     },
     "name": "ControlOverviewPageQuery",
     "operationKind": "query",
-    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            version\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "b91e90b278ccedc6b44d3a3c53593e73";
+(node as any).hash = "bd552dffe1a33e64e693a9170074989f";
 
 export default node;

@@ -72,6 +72,7 @@ const controlOverviewPageQuery = graphql`
               name
               description
               state
+              version
               evidences(first: 50)
                 @connection(key: "ControlOverviewPage_evidences") {
                 __id
@@ -96,12 +97,13 @@ const controlOverviewPageQuery = graphql`
 
 const updateTaskStateMutation = graphql`
   mutation ControlOverviewPageUpdateTaskStateMutation(
-    $input: UpdateTaskStateInput!
+    $input: UpdateTaskInput!
   ) {
-    updateTaskState(input: $input) {
+    updateTask(input: $input) {
       task {
         id
         state
+        version
       }
     }
   }
@@ -192,7 +194,7 @@ function ControlOverviewPageContent({
   const { organizationId, frameworkId, controlId } = useParams();
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
-  const [updateTaskState] =
+  const [updateTask] =
     useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
       updateTaskStateMutation
     );
@@ -306,22 +308,19 @@ function ControlOverviewPageContent({
     };
   }, []);
 
-  const handleTaskClick = (taskId: string, currentState: string) => {
+  const handleTaskClick = (
+    taskId: string,
+    currentState: string,
+    version: number
+  ) => {
     const newState = currentState === "DONE" ? "TODO" : "DONE";
 
-    updateTaskState({
+    updateTask({
       variables: {
         input: {
           taskId,
           state: newState,
-        },
-      },
-      optimisticResponse: {
-        updateTaskState: {
-          task: {
-            id: taskId,
-            state: newState,
-          },
+          expectedVersion: version,
         },
       },
       onCompleted: () => {
@@ -842,7 +841,7 @@ function ControlOverviewPageContent({
                     onClick={() =>
                       task?.id &&
                       task?.state &&
-                      handleTaskClick(task.id, task.state)
+                      handleTaskClick(task.id, task.state, task.version)
                     }
                   >
                     {task?.state === "DONE" && (
@@ -856,7 +855,7 @@ function ControlOverviewPageContent({
                     onClick={() =>
                       task?.id &&
                       task?.state &&
-                      handleTaskClick(task.id, task.state)
+                      handleTaskClick(task.id, task.state, task.version)
                     }
                   >
                     <div>

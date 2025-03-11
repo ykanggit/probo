@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<168d543d518d84054b1f194ee13feeaa>>
+ * @generated SignedSource<<c6eaf570ef3d4e5a289ab266f6662546>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,18 +10,22 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type TaskState = "DONE" | "TODO";
-export type UpdateTaskStateInput = {
-  state: TaskState;
+export type UpdateTaskInput = {
+  description?: string | null | undefined;
+  expectedVersion: number;
+  name?: string | null | undefined;
+  state?: TaskState | null | undefined;
   taskId: string;
 };
 export type ControlOverviewPageUpdateTaskStateMutation$variables = {
-  input: UpdateTaskStateInput;
+  input: UpdateTaskInput;
 };
 export type ControlOverviewPageUpdateTaskStateMutation$data = {
-  readonly updateTaskState: {
+  readonly updateTask: {
     readonly task: {
       readonly id: string;
       readonly state: TaskState;
+      readonly version: number;
     };
   };
 };
@@ -48,9 +52,9 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "UpdateTaskStatePayload",
+    "concreteType": "UpdateTaskPayload",
     "kind": "LinkedField",
-    "name": "updateTaskState",
+    "name": "updateTask",
     "plural": false,
     "selections": [
       {
@@ -73,6 +77,13 @@ v1 = [
             "args": null,
             "kind": "ScalarField",
             "name": "state",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "version",
             "storageKey": null
           }
         ],
@@ -100,16 +111,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "7099089b96d6ca450d88f0a3597b2203",
+    "cacheID": "4ebc7b830cc1c2129ec26429ab681c44",
     "id": null,
     "metadata": {},
     "name": "ControlOverviewPageUpdateTaskStateMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlOverviewPageUpdateTaskStateMutation(\n  $input: UpdateTaskStateInput!\n) {\n  updateTaskState(input: $input) {\n    task {\n      id\n      state\n    }\n  }\n}\n"
+    "text": "mutation ControlOverviewPageUpdateTaskStateMutation(\n  $input: UpdateTaskInput!\n) {\n  updateTask(input: $input) {\n    task {\n      id\n      state\n      version\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a81e1f58fa9931a70b85633b6ad0bd7a";
+(node as any).hash = "9a076b4306fee5793009ea3082e5cde2";
 
 export default node;
