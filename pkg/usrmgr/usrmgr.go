@@ -246,9 +246,7 @@ func (s Service) GetSession(
 				return &ErrSessionNotFound{message: "session not found"}
 			}
 
-			// Check if session is expired
 			if time.Now().After(session.ExpiredAt) {
-				// Delete expired session
 				if err := coredata.DeleteSession(ctx, tx, sessionID); err != nil {
 					return fmt.Errorf("cannot delete expired session: %w", err)
 				}
