@@ -17,8 +17,8 @@ package probo
 import (
 	"context"
 
+	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
-	"github.com/getprobo/probo/pkg/probo/coredata"
 	"go.gearno.de/kit/pg"
 )
 

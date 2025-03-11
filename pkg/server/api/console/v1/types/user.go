@@ -15,7 +15,7 @@
 package types
 
 import (
-	"github.com/getprobo/probo/pkg/usrmgr/coredata"
+	"github.com/getprobo/probo/pkg/coredata"
 )
 
 func NewUser(u *coredata.User) *User {

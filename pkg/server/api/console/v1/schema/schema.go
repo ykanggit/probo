@@ -16,7 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
-	"github.com/getprobo/probo/pkg/probo/coredata"
+	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/types"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -1824,60 +1824,60 @@ interface Node {
 }
 
 enum ControlState
-  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.ControlState") {
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ControlState") {
   NOT_STARTED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotStarted"
+      value: "github.com/getprobo/probo/pkg/coredata.ControlStateNotStarted"
     )
   IN_PROGRESS
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateInProgress"
+      value: "github.com/getprobo/probo/pkg/coredata.ControlStateInProgress"
     )
   NOT_APPLICABLE
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateNotApplicable"
+      value: "github.com/getprobo/probo/pkg/coredata.ControlStateNotApplicable"
     )
   IMPLEMENTED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.ControlStateImplemented"
+      value: "github.com/getprobo/probo/pkg/coredata.ControlStateImplemented"
     )
 }
 
 enum TaskState
-  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.TaskState") {
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.TaskState") {
   TODO
-    @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateTodo")
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.TaskStateTodo")
   DONE
-    @goEnum(value: "github.com/getprobo/probo/pkg/probo/coredata.TaskStateDone")
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.TaskStateDone")
 }
 
 enum EvidenceState
   @goModel(
-    model: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceState"
+    model: "github.com/getprobo/probo/pkg/coredata.EvidenceState"
   ) {
   VALID
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateValid"
+      value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateValid"
     )
   INVALID
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateInvalid"
+      value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateInvalid"
     )
   EXPIRED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.EvidenceStateExpired"
+      value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateExpired"
     )
 }
 
 enum PeopleKind
-  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKind") {
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PeopleKind") {
   EMPLOYEE
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindEmployee"
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleKindEmployee"
     )
   CONTRACTOR
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.PeopleKindContractor"
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleKindContractor"
     )
 }
 
@@ -2182,35 +2182,35 @@ input UpdatePeopleInput {
 
 enum ServiceCriticality
   @goModel(
-    model: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticality"
+    model: "github.com/getprobo/probo/pkg/coredata.ServiceCriticality"
   ) {
   LOW
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityLow"
+      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityLow"
     )
   MEDIUM
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityMedium"
+      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityMedium"
     )
   HIGH
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.ServiceCriticalityHigh"
+      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityHigh"
     )
 }
 
 enum RiskTier
-  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.RiskTier") {
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskTier") {
   CRITICAL
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierCritical"
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTierCritical"
     )
   SIGNIFICANT
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierSignificant"
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTierSignificant"
     )
   GENERAL
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.RiskTierGeneral"
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTierGeneral"
     )
 }
 
@@ -2350,14 +2350,14 @@ type DeleteEvidencePayload {
 }
 
 enum PolicyStatus
-  @goModel(model: "github.com/getprobo/probo/pkg/probo/coredata.PolicyStatus") {
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
   DRAFT
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.PolicyStatusDraft"
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft"
     )
   ACTIVE
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/probo/coredata.PolicyStatusActive"
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusActive"
     )
 }
 

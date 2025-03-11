@@ -19,9 +19,8 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
-	"github.com/getprobo/probo/pkg/probo/coredata"
-	"go.gearno.de/kit/migrator"
 	"go.gearno.de/kit/pg"
 )
 
@@ -42,11 +41,6 @@ func NewService(
 	s3Client *s3.Client,
 	bucket string,
 ) (*Service, error) {
-	err := migrator.NewMigrator(pgClient, coredata.Migrations).Run(ctx, "migrations")
-	if err != nil {
-		return nil, fmt.Errorf("cannot migrate database schema: %w", err)
-	}
-
 	if bucket == "" {
 		return nil, fmt.Errorf("bucket is required")
 	}

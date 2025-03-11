@@ -12,7 +12,7 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package usrmgr
+package passwdhash
 
 import (
 	"crypto/hmac"
@@ -26,7 +26,7 @@ import (
 )
 
 type (
-	HashingProfile struct {
+	Profile struct {
 		minIterations uint
 		saltLength    uint
 		keyLength     uint
@@ -39,7 +39,7 @@ const (
 	algorithmByte = 0x01 // Algorithm identifier (0x01 for PBKDF2-SHA256)
 )
 
-func NewHashingProfile(pepper []byte) (*HashingProfile, error) {
+func NewProfile(pepper []byte) (*Profile, error) {
 	if len(pepper) < 32 {
 		return nil, fmt.Errorf("pepper must be at least 32 bytes")
 	}
@@ -48,7 +48,7 @@ func NewHashingProfile(pepper []byte) (*HashingProfile, error) {
 	// - At least 32 bits of salt (we use 256 bits/32 bytes for extra security)
 	// - At least 1000 iterations (we use higher based on processing capabilities)
 	// - Resulting key length should be at least 160 bits (we use 256 bits)
-	return &HashingProfile{
+	return &Profile{
 		minIterations: 600000, // Minimum iterations (adjusted based on hardware speed)
 		saltLength:    32,     // Salt length in bytes (256 bits)
 		keyLength:     32,     // Output key length in bytes (256 bits)
@@ -56,13 +56,13 @@ func NewHashingProfile(pepper []byte) (*HashingProfile, error) {
 	}, nil
 }
 
-func (hp HashingProfile) applyPepper(input []byte) []byte {
+func (hp Profile) applyPepper(input []byte) []byte {
 	mac := hmac.New(sha256.New, hp.pepper)
 	mac.Write(input)
 	return mac.Sum(nil)
 }
 
-func (hp HashingProfile) HashPassword(password []byte, iterations uint32) ([]byte, error) {
+func (hp Profile) HashPassword(password []byte, iterations uint32) ([]byte, error) {
 	salt := make([]byte, hp.saltLength)
 	if _, err := rand.Read(salt); err != nil {
 		return nil, fmt.Errorf("error generating salt: %v", err)
@@ -94,7 +94,7 @@ func (hp HashingProfile) HashPassword(password []byte, iterations uint32) ([]byt
 	return binaryHash, nil
 }
 
-func (hp HashingProfile) ComparePasswordAndHash(password, passwordHash []byte) (bool, error) {
+func (hp Profile) ComparePasswordAndHash(password, passwordHash []byte) (bool, error) {
 	if len(passwordHash) < 7 {
 		return false, fmt.Errorf("hash too short")
 	}

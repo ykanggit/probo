@@ -25,6 +25,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/awsconfig"
+	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/server"
 	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
@@ -33,6 +34,7 @@ import (
 	"go.gearno.de/kit/httpclient"
 	"go.gearno.de/kit/httpserver"
 	"go.gearno.de/kit/log"
+	"go.gearno.de/kit/migrator"
 	"go.gearno.de/kit/pg"
 	"go.gearno.de/kit/unit"
 	"go.opentelemetry.io/otel/trace"
@@ -146,7 +148,11 @@ func (impl *Implm) Run(
 
 	s3Client := s3.NewFromConfig(awsConfig)
 
-	// TODO: merge usrmgr and probo service
+	err = migrator.NewMigrator(pgClient, coredata.Migrations).Run(ctx, "migrations")
+	if err != nil {
+		return fmt.Errorf("cannot migrate database schema: %w", err)
+	}
+
 	usrmgrService, err := usrmgr.NewService(ctx, pgClient, pepper)
 	if err != nil {
 		return fmt.Errorf("cannot create usrmgr service: %w", err)

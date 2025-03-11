@@ -24,8 +24,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
-	"github.com/getprobo/probo/pkg/probo/coredata"
 	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )

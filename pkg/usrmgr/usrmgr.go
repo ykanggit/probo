@@ -19,17 +19,17 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/crypto/passwdhash"
 	"github.com/getprobo/probo/pkg/gid"
-	"github.com/getprobo/probo/pkg/usrmgr/coredata"
 	"github.com/jackc/pgx/v5"
-	"go.gearno.de/kit/migrator"
 	"go.gearno.de/kit/pg"
 )
 
 type (
 	Service struct {
 		pg *pg.Client
-		hp *HashingProfile
+		hp *passwdhash.Profile
 	}
 
 	RegisterUserParams struct {
@@ -76,12 +76,7 @@ func NewService(
 	pgClient *pg.Client,
 	pepper []byte,
 ) (*Service, error) {
-	err := migrator.NewMigrator(pgClient, coredata.Migrations).Run(ctx, "migrations")
-	if err != nil {
-		return nil, fmt.Errorf("cannot migrate database schema: %w", err)
-	}
-
-	hp, err := NewHashingProfile(pepper)
+	hp, err := passwdhash.NewProfile(pepper)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create hashing profile: %w", err)
 	}
@@ -109,7 +104,7 @@ func (s Service) RegisterUser(
 
 	now := time.Now()
 	user := &coredata.User{
-		ID:             gid.New(gid.NilTenant, 0),
+		ID:             gid.New(gid.NilTenant, coredata.UserEntityType),
 		EmailAddress:   params.Email,
 		HashedPassword: hashedPassword,
 		FullName:       params.FullName,
@@ -151,7 +146,7 @@ func (s Service) Login(
 	now := time.Now()
 	user := &coredata.User{}
 	session := &coredata.Session{
-		ID:        gid.New(gid.NilTenant, 0),
+		ID:        gid.New(gid.NilTenant, coredata.SessionEntityType),
 		UserID:    gid.Nil,
 		ExpiredAt: now.Add(24 * time.Hour),
 		CreatedAt: now,

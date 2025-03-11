@@ -14,11 +14,18 @@
 
 package coredata
 
-import (
-	"embed"
-)
-
-var (
-	//go:embed migrations/*.sql
-	Migrations embed.FS
+const (
+	OrganizationEntityType uint16 = iota
+	FrameworkEntityType
+	ControlEntityType
+	TaskEntityType
+	EvidenceEntityType
+	ControlStateTransitionEntityType
+	TaskStateTransitionEntityType
+	VendorEntityType
+	PeopleEntityType
+	EvidenceStateTransitionEntityType
+	PolicyEntityType
+	UserEntityType
+	SessionEntityType
 )

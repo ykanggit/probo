@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
-	"github.com/getprobo/probo/pkg/probo/coredata"
 	"go.gearno.de/kit/pg"
 )
 
