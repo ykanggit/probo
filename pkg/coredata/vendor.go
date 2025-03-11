@@ -292,37 +292,18 @@ RETURNING
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
-		"vendor_id":        v.ID,
-		"expected_version": params.ExpectedVersion,
-		"updated_at":       time.Now(),
-	}
-
-	if params.Name != nil {
-		args["name"] = *params.Name
-	}
-	if params.Description != nil {
-		args["description"] = *params.Description
-	}
-	if params.ServiceStartAt != nil {
-		args["service_start_at"] = *params.ServiceStartAt
-	}
-	if params.ServiceTerminationAt != nil {
-		args["service_termination_at"] = *params.ServiceTerminationAt
-	}
-	if params.ServiceCriticality != nil {
-		args["service_criticality"] = *params.ServiceCriticality
-	}
-	if params.RiskTier != nil {
-		args["risk_tier"] = *params.RiskTier
-	}
-	if params.StatusPageURL != nil {
-		args["status_page_url"] = *params.StatusPageURL
-	}
-	if params.TermsOfServiceURL != nil {
-		args["terms_of_service_url"] = *params.TermsOfServiceURL
-	}
-	if params.PrivacyPolicyURL != nil {
-		args["privacy_policy_url"] = *params.PrivacyPolicyURL
+		"vendor_id":              v.ID,
+		"expected_version":       params.ExpectedVersion,
+		"updated_at":             time.Now(),
+		"name":                   params.Name,
+		"description":            params.Description,
+		"service_start_at":       params.ServiceStartAt,
+		"service_termination_at": params.ServiceTerminationAt,
+		"service_criticality":    params.ServiceCriticality,
+		"risk_tier":              params.RiskTier,
+		"status_page_url":        params.StatusPageURL,
+		"terms_of_service_url":   params.TermsOfServiceURL,
+		"privacy_policy_url":     params.PrivacyPolicyURL,
 	}
 
 	maps.Copy(args, scope.SQLArguments())
