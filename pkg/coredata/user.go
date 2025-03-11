@@ -54,7 +54,7 @@ SELECT
     created_at,
     updated_at
 FROM
-    usrmgr_users
+    users
 WHERE
     email_address = @user_email
 LIMIT 1;
@@ -91,7 +91,7 @@ SELECT
     created_at,
     updated_at
 FROM
-    usrmgr_users
+    users
 WHERE
     id = @user_id
 LIMIT 1;
@@ -120,7 +120,7 @@ func (u *User) Insert(
 ) error {
 	q := `
 INSERT INTO
-    usrmgr_users (id, email_address, hashed_password, fullname, created_at, updated_at)
+    users (id, email_address, hashed_password, fullname, created_at, updated_at)
 VALUES (
     @user_id,
     @email_address,

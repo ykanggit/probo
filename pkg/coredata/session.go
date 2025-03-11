@@ -56,7 +56,7 @@ SELECT
     created_at,
     updated_at
 FROM
-    usrmgr_sessions
+    sessions
 WHERE
     id = @session_id
 LIMIT 1;
@@ -84,7 +84,7 @@ func (s *Session) Insert(
 ) error {
 	q := `
 INSERT INTO
-    usrmgr_sessions (id, user_id, data, expired_at, created_at, updated_at)
+    sessions (id, user_id, data, expired_at, created_at, updated_at)
 VALUES (
     @session_id,
     @user_id,
@@ -140,7 +140,7 @@ func DeleteSession(
 ) error {
 	q := `
 DELETE FROM
-    usrmgr_sessions
+    sessions
 WHERE
     id = @session_id
 `
