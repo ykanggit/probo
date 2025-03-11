@@ -51,11 +51,13 @@ type (
 		usrmgrSvc *usrmgr.Service
 		authCfg   AuthConfig
 	}
+
+	ctxKey struct{}
 )
 
 var (
-	sessionContextKey = struct{}{}
-	userContextKey    = struct{}{}
+	sessionContextKey ctxKey = struct{}{}
+	userContextKey    ctxKey = struct{}{}
 )
 
 func SessionFromContext(ctx context.Context) *coredata.Session {
