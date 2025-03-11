@@ -113,7 +113,7 @@ func (s *Session) Update(
 	conn pg.Conn,
 ) error {
 	q := `
-UPDATE usrmgr_sessions
+UPDATE sessions
 SET
     expired_at = @expired_at,
     updated_at = @updated_at,
@@ -124,7 +124,7 @@ WHERE
 
 	args := pgx.StrictNamedArgs{
 		"session_id": s.ID,
-		"user_id":    s.UserID,
+		"data":       s.Data,
 		"expired_at": s.ExpiredAt,
 		"updated_at": s.UpdatedAt,
 	}
