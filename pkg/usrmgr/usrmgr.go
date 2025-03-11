@@ -136,6 +136,7 @@ func (s Service) SignUp(
 	session := &coredata.Session{
 		ID:        gid.New(gid.NilTenant, coredata.SessionEntityType),
 		UserID:    user.ID,
+		ExpiredAt: now.Add(24 * time.Hour),
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
