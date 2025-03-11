@@ -396,15 +396,6 @@ type UpdateTaskPayload struct {
 	Task *Task `json:"task"`
 }
 
-type UpdateTaskStateInput struct {
-	TaskID gid.GID            `json:"taskId"`
-	State  coredata.TaskState `json:"state"`
-}
-
-type UpdateTaskStatePayload struct {
-	Task *Task `json:"task"`
-}
-
 type UpdateVendorInput struct {
 	ID                   gid.GID                      `json:"id"`
 	ExpectedVersion      int                          `json:"expectedVersion"`

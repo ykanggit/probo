@@ -318,10 +318,6 @@ type ComplexityRoot struct {
 		Task func(childComplexity int) int
 	}
 
-	UpdateTaskStatePayload struct {
-		Task func(childComplexity int) int
-	}
-
 	UpdateVendorPayload struct {
 		Vendor func(childComplexity int) int
 	}
@@ -1500,13 +1496,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateTaskPayload.Task(childComplexity), true
 
-	case "UpdateTaskStatePayload.task":
-		if e.complexity.UpdateTaskStatePayload.Task == nil {
-			break
-		}
-
-		return e.complexity.UpdateTaskStatePayload.Task(childComplexity), true
-
 	case "UpdateVendorPayload.vendor":
 		if e.complexity.UpdateVendorPayload.Vendor == nil {
 			break
@@ -1713,7 +1702,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdatePeopleInput,
 		ec.unmarshalInputUpdatePolicyInput,
 		ec.unmarshalInputUpdateTaskInput,
-		ec.unmarshalInputUpdateTaskStateInput,
 		ec.unmarshalInputUpdateVendorInput,
 		ec.unmarshalInputUploadEvidenceInput,
 	)
@@ -2270,15 +2258,6 @@ type CreateOrganizationPayload {
 
 type DeleteOrganizationPayload {
   deletedOrganizationId: ID!
-}
-
-input UpdateTaskStateInput {
-  taskId: ID!
-  state: TaskState!
-}
-
-type UpdateTaskStatePayload {
-  task: Task!
 }
 
 input CreateTaskInput {
@@ -9470,62 +9449,6 @@ func (ec *executionContext) fieldContext_UpdateTaskPayload_task(_ context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _UpdateTaskStatePayload_task(ctx context.Context, field graphql.CollectedField, obj *types.UpdateTaskStatePayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UpdateTaskStatePayload_task(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Task, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.Task)
-	fc.Result = res
-	return ec.marshalNTask2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTask(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_UpdateTaskStatePayload_task(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UpdateTaskStatePayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Task_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Task_version(ctx, field)
-			case "name":
-				return ec.fieldContext_Task_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Task_description(ctx, field)
-			case "state":
-				return ec.fieldContext_Task_state(ctx, field)
-			case "evidences":
-				return ec.fieldContext_Task_evidences(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Task_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Task_updatedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _UpdateVendorPayload_vendor(ctx context.Context, field graphql.CollectedField, obj *types.UpdateVendorPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateVendorPayload_vendor(ctx, field)
 	if err != nil {
@@ -13074,40 +12997,6 @@ func (ec *executionContext) unmarshalInputUpdateTaskInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateTaskStateInput(ctx context.Context, obj any) (types.UpdateTaskStateInput, error) {
-	var it types.UpdateTaskStateInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"taskId", "state"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "taskId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("taskId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TaskID = data
-		case "state":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("state"))
-			data, err := ec.unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋproboᚋcoredataᚐTaskState(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.State = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context, obj any) (types.UpdateVendorInput, error) {
 	var it types.UpdateVendorInput
 	asMap := map[string]any{}
@@ -15735,45 +15624,6 @@ func (ec *executionContext) _UpdateTaskPayload(ctx context.Context, sel ast.Sele
 			out.Values[i] = graphql.MarshalString("UpdateTaskPayload")
 		case "task":
 			out.Values[i] = ec._UpdateTaskPayload_task(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var updateTaskStatePayloadImplementors = []string{"UpdateTaskStatePayload"}
-
-func (ec *executionContext) _UpdateTaskStatePayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdateTaskStatePayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, updateTaskStatePayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("UpdateTaskStatePayload")
-		case "task":
-			out.Values[i] = ec._UpdateTaskStatePayload_task(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
