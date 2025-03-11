@@ -242,24 +242,12 @@ RETURNING
 		"policy_id":        p.ID,
 		"expected_version": params.ExpectedVersion,
 		"updated_at":       time.Now(),
+		"name":             params.Name,
+		"content":          params.Content,
+		"status":           params.Status,
+		"review_date":      params.ReviewDate,
+		"owner_id":         params.OwnerID,
 	}
-
-	if params.Name != nil {
-		args["name"] = *params.Name
-	}
-	if params.Content != nil {
-		args["content"] = *params.Content
-	}
-	if params.Status != nil {
-		args["status"] = *params.Status
-	}
-	if params.ReviewDate != nil {
-		args["review_date"] = *params.ReviewDate
-	}
-	if params.OwnerID != nil {
-		args["owner_id"] = *params.OwnerID
-	}
-
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
