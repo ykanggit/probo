@@ -1,1 +1,0 @@
-ALTER TABLE usrmgr_users DROP COLUMN organization_id;
