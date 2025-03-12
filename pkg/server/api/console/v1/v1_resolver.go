@@ -178,8 +178,7 @@ func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeleteP
 
 // CreateOrganization is the resolver for the createOrganization field.
 func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error) {
-	// TODO: fix does not work now
-	svc := r.GetTenantServiceIfAuthorized(ctx, gid.NewTenantID())
+	svc := r.proboSvc.WithTenant(gid.NewTenantID())
 
 	organization, err := svc.Organizations.Create(ctx, probo.CreateOrganizationRequest{
 		Name: input.Name,
