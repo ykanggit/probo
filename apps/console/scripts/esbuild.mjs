@@ -49,7 +49,7 @@ const envVars = Object.fromEntries(
   Object.entries(process.env).map(([key, value]) => [
     `process.env.${key}`,
     JSON.stringify(value),
-  ]),
+  ])
 );
 
 const hotReloading = {
@@ -176,10 +176,14 @@ if (command === "watch") {
         headers: req.headers,
       };
 
+      const urlObj = new URL(req.url, `http://${req.headers.host}`);
       const extensionPattern = /\.[^/]+$/;
 
       const proxyReq = http.request(options, (proxyRes) => {
-        if (proxyRes.statusCode === 404 && extensionPattern.test(req.url)) {
+        if (
+          proxyRes.statusCode === 404 &&
+          extensionPattern.test(urlObj.pathname)
+        ) {
           res.writeHead(404, { "Content-Type": "text/plain" });
           res.end("404 - Not Found");
           return;
@@ -189,7 +193,7 @@ if (command === "watch") {
           const indexPath = path.join(
             import.meta.dirname,
             "../dist",
-            "index.html",
+            "index.html"
           );
 
           fs.readFile(indexPath, "utf8")
