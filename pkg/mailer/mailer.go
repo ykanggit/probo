@@ -17,6 +17,7 @@ package mailer
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net"
@@ -92,7 +93,7 @@ func (m *Mailer) sendMailWithTimeout(ctx context.Context, to []string, msg []byt
 	defer c.Quit()
 
 	if m.cfg.TLSRequired {
-		if err := c.StartTLS(nil); err != nil {
+		if err := c.StartTLS(&tls.Config{ServerName: host}); err != nil {
 			return fmt.Errorf("TLS negotiation error: %w", err)
 		}
 	}
