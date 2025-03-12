@@ -48,11 +48,12 @@ type (
 	}
 
 	config struct {
-		Pg     pgConfig     `json:"pg"`
-		Api    apiConfig    `json:"api"`
-		Auth   authConfig   `json:"auth"`
-		AWS    awsConfig    `json:"aws"`
-		Mailer mailerConfig `json:"mailer"`
+		Hostname string       `json:"hostname"`
+		Pg       pgConfig     `json:"pg"`
+		Api      apiConfig    `json:"api"`
+		Auth     authConfig   `json:"auth"`
+		AWS      awsConfig    `json:"aws"`
+		Mailer   mailerConfig `json:"mailer"`
 	}
 )
 
@@ -64,6 +65,7 @@ var (
 func New() *Implm {
 	return &Implm{
 		cfg: config{
+			Hostname: "localhost:8080",
 			Api: apiConfig{
 				Addr: "localhost:8080",
 				Cors: corsConfig{
@@ -170,7 +172,13 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot create hashing profile: %w", err)
 	}
 
-	usrmgrService, err := usrmgr.NewService(ctx, pgClient, hp)
+	usrmgrService, err := usrmgr.NewService(
+		ctx,
+		pgClient,
+		hp,
+		impl.cfg.Auth.Cookie.Secret,
+		impl.cfg.Hostname,
+	)
 	if err != nil {
 		return fmt.Errorf("cannot create usrmgr service: %w", err)
 	}

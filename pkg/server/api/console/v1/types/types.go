@@ -16,6 +16,14 @@ type Node interface {
 	GetID() gid.GID
 }
 
+type ConfirmEmailInput struct {
+	Token string `json:"token"`
+}
+
+type ConfirmEmailPayload struct {
+	Success bool `json:"success"`
+}
+
 type Control struct {
 	ID          gid.GID               `json:"id"`
 	Version     int                   `json:"version"`

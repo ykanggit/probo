@@ -329,6 +329,8 @@ type Mutation {
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
   updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
+
+  confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
 }
 
 input CreateVendorInput {
@@ -605,4 +607,12 @@ input UpdateTaskInput {
 
 type UpdateTaskPayload {
   task: Task!
+}
+
+input ConfirmEmailInput {
+  token: String!
+}
+
+type ConfirmEmailPayload {
+  success: Boolean!
 }

@@ -18,20 +18,23 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/crypto/passwdhash"
 	"github.com/getprobo/probo/pkg/gid"
-	"github.com/jackc/pgx/v5"
+	"github.com/getprobo/probo/pkg/statelesstoken"
 	"go.gearno.de/kit/pg"
 )
 
 type (
 	Service struct {
-		pg *pg.Client
-		hp *passwdhash.Profile
+		pg          *pg.Client
+		hp          *passwdhash.Profile
+		hostname    string
+		tokenSecret string
 	}
 
 	ErrInvalidCredentials struct {
@@ -61,6 +64,31 @@ type (
 	ErrSessionExpired struct {
 		message string
 	}
+
+	ErrInvalidTokenType struct {
+		message string
+	}
+
+	EmailConfirmationData struct {
+		UserID gid.GID `json:"uid"`
+		Email  string  `json:"email"`
+	}
+)
+
+// Token types
+const (
+	TokenTypeEmailConfirmation = "email_confirmation"
+	TokenTypePasswordReset     = "password_reset"
+)
+
+var (
+	signupEmailSubject  = "Confirm your email address"
+	signupEmailTemplate = `
+	Thanks joining Probo!
+	Please confirm your email address by clicking the link below[1]
+
+	[1] %s
+	`
 )
 
 func (e ErrInvalidCredentials) Error() string {
@@ -91,14 +119,22 @@ func (e ErrInvalidFullName) Error() string {
 	return fmt.Sprintf("invalid full name: %s", e.fullName)
 }
 
+func (e ErrInvalidTokenType) Error() string {
+	return e.message
+}
+
 func NewService(
 	ctx context.Context,
 	pgClient *pg.Client,
 	hp *passwdhash.Profile,
+	tokenSecret string,
+	hostname string,
 ) (*Service, error) {
 	return &Service{
-		pg: pgClient,
-		hp: hp,
+		pg:          pgClient,
+		hp:          hp,
+		hostname:    hostname,
+		tokenSecret: tokenSecret,
 	}, nil
 }
 
@@ -141,6 +177,31 @@ func (s Service) SignUp(
 		UpdatedAt: now,
 	}
 
+	confirmationToken, err := statelesstoken.NewToken(
+		s.tokenSecret,
+		TokenTypeEmailConfirmation,
+		1*time.Hour,
+		EmailConfirmationData{UserID: user.ID, Email: user.EmailAddress},
+	)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot generate confirmation token: %w", err)
+	}
+
+	confirmationEmailUrl := url.URL{
+		Host: s.hostname,
+		Path: "/confirm-email",
+		RawQuery: url.Values{
+			"token": []string{confirmationToken},
+		}.Encode(),
+	}
+
+	confirmationEmail := coredata.NewEmail(
+		user.FullName,
+		user.EmailAddress,
+		signupEmailSubject,
+		fmt.Sprintf(signupEmailTemplate, confirmationEmailUrl.String()),
+	)
+
 	err = s.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
@@ -150,6 +211,10 @@ func (s Service) SignUp(
 
 			if err := session.Insert(ctx, tx); err != nil {
 				return fmt.Errorf("cannot insert session: %w", err)
+			}
+
+			if err := confirmationEmail.Insert(ctx, tx); err != nil {
+				return fmt.Errorf("cannot insert email: %w", err)
 			}
 
 			return nil
@@ -391,6 +456,38 @@ func (s Service) UpdateSession(
 		ctx,
 		func(tx pg.Conn) error {
 			return session.Update(ctx, tx)
+		},
+	)
+}
+
+func (s Service) ConfirmEmail(ctx context.Context, tokenString string) error {
+	token, err := statelesstoken.ValidateToken[EmailConfirmationData](
+		s.tokenSecret,
+		TokenTypeEmailConfirmation,
+		tokenString,
+	)
+	if err != nil {
+		return fmt.Errorf("cannot validate email confirmation token: %w", err)
+	}
+
+	return s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			user := &coredata.User{}
+
+			if err := user.LoadByID(ctx, tx, token.Data.UserID); err != nil {
+				return fmt.Errorf("user not found: %w", err)
+			}
+
+			if user.EmailAddress != token.Data.Email {
+				return fmt.Errorf("token email does not match user email")
+			}
+
+			if err := user.UpdateEmailVerification(ctx, tx, true); err != nil {
+				return fmt.Errorf("cannot update user email verification: %w", err)
+			}
+
+			return nil
 		},
 	)
 }

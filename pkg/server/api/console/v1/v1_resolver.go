@@ -423,6 +423,17 @@ func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeleteP
 	}, nil
 }
 
+// ConfirmEmail is the resolver for the confirmEmail field.
+func (r *mutationResolver) ConfirmEmail(ctx context.Context, input types.ConfirmEmailInput) (*types.ConfirmEmailPayload, error) {
+	err := r.usrmgrSvc.ConfirmEmail(ctx, input.Token)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.ConfirmEmailPayload{Success: true}, nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())

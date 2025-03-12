@@ -70,6 +70,7 @@ SELECT
     id,
     email_address,
     hashed_password,
+    email_address_verified,
     fullname,
     created_at,
     updated_at
@@ -111,6 +112,7 @@ SELECT
     id,
     email_address,
     hashed_password,
+	email_address_verified,
     fullname,
     created_at,
     updated_at
@@ -148,11 +150,12 @@ func (u *User) Insert(
 ) error {
 	q := `
 INSERT INTO
-    users (id, email_address, hashed_password, fullname, created_at, updated_at)
+    users (id, email_address, hashed_password, email_address_verified, fullname, created_at, updated_at)
 VALUES (
     @user_id,
     @email_address,
     @hashed_password,
+    @email_address_verified,
     @fullname,
     @created_at,
     @updated_at
@@ -160,12 +163,13 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
-		"user_id":         u.ID,
-		"email_address":   u.EmailAddress,
-		"hashed_password": u.HashedPassword,
-		"fullname":        u.FullName,
-		"created_at":      u.CreatedAt,
-		"updated_at":      u.UpdatedAt,
+		"user_id":                u.ID,
+		"email_address":          u.EmailAddress,
+		"hashed_password":        u.HashedPassword,
+		"fullname":               u.FullName,
+		"created_at":             u.CreatedAt,
+		"updated_at":             u.UpdatedAt,
+		"email_address_verified": u.EmailAddressVerified,
 	}
 
 	_, err := conn.Exec(ctx, q, args)
@@ -182,6 +186,38 @@ VALUES (
 
 		return err
 	}
+
+	return nil
+}
+
+func (u *User) UpdateEmailVerification(
+	ctx context.Context,
+	conn pg.Conn,
+	verified bool,
+) error {
+	q := `
+UPDATE
+    users
+SET
+    email_address_verified = @email_address_verified,
+    updated_at = @updated_at
+WHERE
+    id = @user_id
+`
+
+	args := pgx.StrictNamedArgs{
+		"user_id":                u.ID,
+		"email_address_verified": verified,
+		"updated_at":             time.Now(),
+	}
+
+	_, err := conn.Exec(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot update user email verification: %w", err)
+	}
+
+	u.EmailAddressVerified = verified
+	u.UpdatedAt = args["updated_at"].(time.Time)
 
 	return nil
 }

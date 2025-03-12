@@ -40,6 +40,7 @@ const ControlOverviewPage = lazy(() => import("./pages/ControlOverviewPage"));
 const PeopleOverviewPage = lazy(() => import("./pages/PeopleOverviewPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const ConfirmEmailPage = lazy(() => import("./pages/ConfirmEmailPage"));
 const CreateOrganizationPage = lazy(
   () => import("./pages/CreateOrganizationPage")
 );
@@ -97,6 +98,26 @@ function App() {
                         <Suspense>
                           <ErrorBoundaryWithLocation>
                             <RegisterPage />
+                          </ErrorBoundaryWithLocation>
+                        </Suspense>
+                      }
+                    />
+                  </Route>
+
+                  <Route
+                    path="/confirm-email"
+                    element={
+                      <ErrorBoundaryWithLocation>
+                        <AuthLayout />
+                      </ErrorBoundaryWithLocation>
+                    }
+                  >
+                    <Route
+                      index
+                      element={
+                        <Suspense>
+                          <ErrorBoundaryWithLocation>
+                            <ConfirmEmailPage />
                           </ErrorBoundaryWithLocation>
                         </Suspense>
                       }
