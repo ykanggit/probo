@@ -78,7 +78,7 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 	r.Post("/auth/login", SignInHandler(usrmgrSvc, authCfg))
 	r.Delete("/auth/logout", SignOutHandler(usrmgrSvc, authCfg))
 
-	r.Get("/", playground.Handler("GraphQL", "/console/v1/query"))
+	r.Get("/", playground.Handler("GraphQL", "/api/console/v1/query"))
 	r.Post("/query", graphqlHandler(proboSvc, usrmgrSvc, authCfg))
 
 	return r
