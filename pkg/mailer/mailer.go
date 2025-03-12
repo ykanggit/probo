@@ -40,7 +40,9 @@ type (
 		SenderName  string
 		SenderEmail string
 		Addr        string
-		Timeout     time.Duration // Timeout for SMTP operations
+		Timeout     time.Duration
+		User        string
+		Password    string
 	}
 )
 
@@ -67,8 +69,8 @@ LOOP:
 	}
 }
 
-func sendMailWithTimeout(ctx context.Context, addr string, a smtp.Auth, from string, to []string, msg []byte) error {
-	host, _, err := net.SplitHostPort(addr)
+func (m *Mailer) sendMailWithTimeout(ctx context.Context, to []string, msg []byte) error {
+	host, _, err := net.SplitHostPort(m.cfg.Addr)
 	if err != nil {
 		return fmt.Errorf("invalid address: %w", err)
 	}
@@ -76,7 +78,7 @@ func sendMailWithTimeout(ctx context.Context, addr string, a smtp.Auth, from str
 	var d net.Dialer
 	d.Timeout = 5 * time.Second
 
-	conn, err := d.DialContext(ctx, "tcp", addr)
+	conn, err := d.DialContext(ctx, "tcp", m.cfg.Addr)
 	if err != nil {
 		return fmt.Errorf("connection error: %w", err)
 	}
@@ -88,7 +90,14 @@ func sendMailWithTimeout(ctx context.Context, addr string, a smtp.Auth, from str
 	}
 	defer c.Quit()
 
-	if err = c.Mail(from); err != nil {
+	if m.cfg.User != "" && m.cfg.Password != "" {
+		auth := smtp.PlainAuth("", m.cfg.User, m.cfg.Password, host)
+		if err = c.Auth(auth); err != nil {
+			return fmt.Errorf("SMTP authentication error: %w", err)
+		}
+	}
+
+	if err = c.Mail(m.cfg.SenderEmail); err != nil {
 		return fmt.Errorf("MAIL FROM error: %w", err)
 	}
 
@@ -145,7 +154,7 @@ func (m *Mailer) batchSendEmails(ctx context.Context) error {
 				sendCtx, cancel := context.WithTimeout(ctx, m.cfg.Timeout)
 				defer cancel()
 
-				if err := sendMailWithTimeout(sendCtx, m.cfg.Addr, nil, m.cfg.SenderEmail, []string{email.RecipientEmail}, buf.Bytes()); err != nil {
+				if err := m.sendMailWithTimeout(sendCtx, []string{email.RecipientEmail}, buf.Bytes()); err != nil {
 					if errors.Is(err, context.DeadlineExceeded) {
 						return fmt.Errorf("email sending timed out after %s: %w", m.cfg.Timeout, err)
 					}

@@ -220,6 +220,8 @@ func (impl *Implm) Run(
 		SenderEmail: impl.cfg.Mailer.SenderEmail,
 		SenderName:  impl.cfg.Mailer.SenderName,
 		Addr:        impl.cfg.Mailer.SMTP.Addr,
+		User:        impl.cfg.Mailer.SMTP.User,
+		Password:    impl.cfg.Mailer.SMTP.Password,
 		Timeout:     time.Second * 10,
 	})
 	wg.Add(1)
