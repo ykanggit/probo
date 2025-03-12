@@ -43,6 +43,7 @@ type (
 		Timeout     time.Duration
 		User        string
 		Password    string
+		TLSRequired bool
 	}
 )
 
@@ -89,6 +90,12 @@ func (m *Mailer) sendMailWithTimeout(ctx context.Context, to []string, msg []byt
 		return fmt.Errorf("SMTP client creation error: %w", err)
 	}
 	defer c.Quit()
+
+	if m.cfg.TLSRequired {
+		if err := c.StartTLS(nil); err != nil {
+			return fmt.Errorf("TLS negotiation error: %w", err)
+		}
+	}
 
 	if m.cfg.User != "" && m.cfg.Password != "" {
 		auth := smtp.PlainAuth("", m.cfg.User, m.cfg.Password, host)

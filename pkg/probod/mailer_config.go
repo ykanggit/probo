@@ -22,8 +22,9 @@ type (
 	}
 
 	smtpConfig struct {
-		Addr     string `json:"addr"`
-		User     string `json:"user"`
-		Password string `json:"password"`
+		Addr        string `json:"addr"`
+		User        string `json:"user"`
+		Password    string `json:"password"`
+		TLSRequired bool   `json:"tls-required"`
 	}
 )

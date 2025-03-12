@@ -222,6 +222,7 @@ func (impl *Implm) Run(
 		Addr:        impl.cfg.Mailer.SMTP.Addr,
 		User:        impl.cfg.Mailer.SMTP.User,
 		Password:    impl.cfg.Mailer.SMTP.Password,
+		TLSRequired: impl.cfg.Mailer.SMTP.TLSRequired,
 		Timeout:     time.Second * 10,
 	})
 	wg.Add(1)
