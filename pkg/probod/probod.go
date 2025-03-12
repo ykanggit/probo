@@ -220,6 +220,7 @@ func (impl *Implm) Run(
 		SenderEmail: impl.cfg.Mailer.SenderEmail,
 		SenderName:  impl.cfg.Mailer.SenderName,
 		Addr:        impl.cfg.Mailer.SMTP.Addr,
+		Timeout:     time.Second * 10,
 	})
 	wg.Add(1)
 	go func() {

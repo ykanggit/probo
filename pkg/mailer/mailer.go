@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/smtp"
 	"time"
 
@@ -39,10 +40,15 @@ type (
 		SenderName  string
 		SenderEmail string
 		Addr        string
+		Timeout     time.Duration // Timeout for SMTP operations
 	}
 )
 
 func NewMailer(pg *pg.Client, l *log.Logger, cfg Config) *Mailer {
+	// Set a default timeout if not provided
+	if cfg.Timeout == 0 {
+		cfg.Timeout = 10 * time.Second
+	}
 	return &Mailer{pg: pg, l: l, cfg: cfg}
 }
 
@@ -59,6 +65,54 @@ LOOP:
 
 		goto LOOP
 	}
+}
+
+func sendMailWithTimeout(ctx context.Context, addr string, a smtp.Auth, from string, to []string, msg []byte) error {
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return fmt.Errorf("invalid address: %w", err)
+	}
+
+	var d net.Dialer
+	d.Timeout = 5 * time.Second
+
+	conn, err := d.DialContext(ctx, "tcp", addr)
+	if err != nil {
+		return fmt.Errorf("connection error: %w", err)
+	}
+	defer conn.Close()
+
+	c, err := smtp.NewClient(conn, host)
+	if err != nil {
+		return fmt.Errorf("SMTP client creation error: %w", err)
+	}
+	defer c.Quit()
+
+	if err = c.Mail(from); err != nil {
+		return fmt.Errorf("MAIL FROM error: %w", err)
+	}
+
+	for _, addr := range to {
+		if err = c.Rcpt(addr); err != nil {
+			return fmt.Errorf("RCPT TO error: %w", err)
+		}
+	}
+
+	w, err := c.Data()
+	if err != nil {
+		return fmt.Errorf("DATA command error: %w", err)
+	}
+
+	_, err = w.Write(msg)
+	if err != nil {
+		return fmt.Errorf("message write error: %w", err)
+	}
+
+	if err = w.Close(); err != nil {
+		return fmt.Errorf("message close error: %w", err)
+	}
+
+	return c.Quit()
 }
 
 func (m *Mailer) batchSendEmails(ctx context.Context) error {
@@ -88,7 +142,13 @@ func (m *Mailer) batchSendEmails(ctx context.Context) error {
 					return fmt.Errorf("cannot encode email: %w", err)
 				}
 
-				if err := smtp.SendMail(m.cfg.Addr, nil, m.cfg.SenderEmail, []string{email.RecipientEmail}, buf.Bytes()); err != nil {
+				sendCtx, cancel := context.WithTimeout(ctx, m.cfg.Timeout)
+				defer cancel()
+
+				if err := sendMailWithTimeout(sendCtx, m.cfg.Addr, nil, m.cfg.SenderEmail, []string{email.RecipientEmail}, buf.Bytes()); err != nil {
+					if errors.Is(err, context.DeadlineExceeded) {
+						return fmt.Errorf("email sending timed out after %s: %w", m.cfg.Timeout, err)
+					}
 					return fmt.Errorf("cannot send email: %w", err)
 				}
 
