@@ -27,6 +27,7 @@ import (
 	"github.com/getprobo/probo/pkg/awsconfig"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/crypto/passwdhash"
+	"github.com/getprobo/probo/pkg/mailer"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/server"
 	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
@@ -47,10 +48,11 @@ type (
 	}
 
 	config struct {
-		Pg   pgConfig   `json:"pg"`
-		Api  apiConfig  `json:"api"`
-		Auth authConfig `json:"auth"`
-		AWS  awsConfig  `json:"aws"`
+		Pg     pgConfig     `json:"pg"`
+		Api    apiConfig    `json:"api"`
+		Auth   authConfig   `json:"auth"`
+		AWS    awsConfig    `json:"aws"`
+		Mailer mailerConfig `json:"mailer"`
 	}
 )
 
@@ -93,6 +95,13 @@ func New() *Implm {
 				AccessKeyID:     "probod",
 				SecretAccessKey: "thisisnotasecret",
 				Endpoint:        "http://127.0.0.1:9000",
+			},
+			Mailer: mailerConfig{
+				SenderEmail: "no-reply@notification.getprobo.com",
+				SenderName:  "Probo",
+				SMTP: smtpConfig{
+					Addr: "localhost:1025",
+				},
 			},
 		},
 	}
@@ -198,8 +207,23 @@ func (impl *Implm) Run(
 		}
 	}()
 
+	mailerCtx, stopMailer := context.WithCancel(context.Background())
+	mailer := mailer.NewMailer(pgClient, l, mailer.Config{
+		SenderEmail: impl.cfg.Mailer.SenderEmail,
+		SenderName:  impl.cfg.Mailer.SenderName,
+		Addr:        impl.cfg.Mailer.SMTP.Addr,
+	})
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := mailer.Run(mailerCtx); err != nil {
+			cancel(fmt.Errorf("mailer crashed: %w", err))
+		}
+	}()
+
 	<-ctx.Done()
 
+	stopMailer()
 	stopApiServer()
 
 	wg.Wait()

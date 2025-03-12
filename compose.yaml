@@ -1,4 +1,3 @@
-
 services:
   postgres:
     image: "postgres:16"
@@ -75,6 +74,14 @@ services:
     volumes:
       - "./compose/tempo/tempo.yaml:/etc/tempo.yaml:ro"
       - "tempo-data:/var/tempo:rw"
+  mailhog:
+    image: "mailhog/mailhog:latest"
+    platform: linux/amd64 
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web UI
+    environment:
+      - MH_STORAGE=memory
 
 volumes:
   postgres-data:
@@ -82,4 +89,3 @@ volumes:
   grafana-data:
   prometheus-data:
   tempo-data:
-  

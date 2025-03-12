@@ -12,21 +12,18 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package coredata
+package probod
 
-const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	ControlEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ControlStateTransitionEntityType
-	TaskStateTransitionEntityType
-	VendorEntityType
-	PeopleEntityType
-	EvidenceStateTransitionEntityType
-	PolicyEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
+type (
+	mailerConfig struct {
+		SenderName  string     `json:"sender-name"`
+		SenderEmail string     `json:"sender-email"`
+		SMTP        smtpConfig `json:"smtp"`
+	}
+
+	smtpConfig struct {
+		Addr     string `json:"addr"`
+		User     string `json:"user"`
+		Password string `json:"password"`
+	}
 )
