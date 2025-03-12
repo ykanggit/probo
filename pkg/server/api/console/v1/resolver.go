@@ -52,12 +52,12 @@ type (
 		authCfg   AuthConfig
 	}
 
-	ctxKey struct{}
+	ctxKey struct{ name string }
 )
 
 var (
-	sessionContextKey ctxKey = struct{}{}
-	userContextKey    ctxKey = struct{}{}
+	sessionContextKey    = &ctxKey{name: "session"}
+	userContextKey       = &ctxKey{name: "user"}
 )
 
 func SessionFromContext(ctx context.Context) *coredata.Session {
