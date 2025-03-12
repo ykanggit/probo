@@ -20,7 +20,7 @@ import (
 
 // Tasks is the resolver for the tasks field.
 func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskConnection, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 	cursor := types.NewCursor(first, after, last, before)
 
 	page, err := svc.Tasks.ListForControlID(ctx, obj.ID, cursor)
@@ -33,7 +33,7 @@ func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *
 
 // FileURL is the resolver for the fileUrl field.
 func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (string, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
 	fileURL, err := svc.Evidences.GenerateFileURL(ctx, obj.ID, 15*time.Minute)
 	if err != nil {
@@ -45,7 +45,7 @@ func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (st
 
 // Controls is the resolver for the controls field.
 func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.ControlConnection, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 	cursor := types.NewCursor(first, after, last, before)
 
 	page, err := svc.Controls.ListForFrameworkID(ctx, obj.ID, cursor)
@@ -58,7 +58,7 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 
 // CreateVendor is the resolver for the createVendor field.
 func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error) {
-	svc := r.proboSvc.WithTenant(input.OrganizationID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
 
 	vendor, err := svc.Vendors.Create(ctx, probo.CreateVendorRequest{
 		OrganizationID:       input.OrganizationID,
@@ -82,7 +82,7 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 
 // UpdateVendor is the resolver for the updateVendor field.
 func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.UpdateVendorPayload, error) {
-	svc := r.proboSvc.WithTenant(input.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
 	vendor, err := svc.Vendors.Update(ctx, probo.UpdateVendorRequest{
 		ID:                   input.ID,
@@ -108,7 +108,7 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 
 // DeleteVendor is the resolver for the deleteVendor field.
 func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error) {
-	svc := r.proboSvc.WithTenant(input.VendorID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.VendorID.TenantID())
 
 	err := svc.Vendors.Delete(ctx, input.VendorID)
 	if err != nil {
@@ -122,7 +122,7 @@ func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteV
 
 // CreatePeople is the resolver for the createPeople field.
 func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error) {
-	svc := r.proboSvc.WithTenant(input.OrganizationID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
 
 	people, err := svc.Peoples.Create(ctx, probo.CreatePeopleRequest{
 		OrganizationID:           input.OrganizationID,
@@ -143,7 +143,7 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 
 // UpdatePeople is the resolver for the updatePeople field.
 func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.UpdatePeoplePayload, error) {
-	svc := r.proboSvc.WithTenant(input.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
 	people, err := svc.Peoples.Update(ctx, probo.UpdatePeopleRequest{
 		ID:                       input.ID,
@@ -164,7 +164,7 @@ func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdateP
 
 // DeletePeople is the resolver for the deletePeople field.
 func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error) {
-	svc := r.proboSvc.WithTenant(input.PeopleID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.PeopleID.TenantID())
 
 	err := svc.Peoples.Delete(ctx, input.PeopleID)
 	if err != nil {
@@ -178,7 +178,8 @@ func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeleteP
 
 // CreateOrganization is the resolver for the createOrganization field.
 func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error) {
-	svc := r.proboSvc.WithTenant(gid.NewTenantID())
+	// TODO: fix does not work now
+	svc := r.GetTenantServiceIfAuthorized(ctx, gid.NewTenantID())
 
 	organization, err := svc.Organizations.Create(ctx, probo.CreateOrganizationRequest{
 		Name: input.Name,
@@ -187,7 +188,7 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.C
 		return nil, fmt.Errorf("cannot create organization: %w", err)
 	}
 
-	err = r.usrmgrSvc.AddUserToOrganization(ctx, UserFromContext(ctx).ID, organization.ID)
+	err = r.usrmgrSvc.EnrollUserInOrganization(ctx, UserFromContext(ctx).ID, organization.ID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot add user to organization: %w", err)
 	}
@@ -204,7 +205,7 @@ func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.D
 
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error) {
-	svc := r.proboSvc.WithTenant(input.ControlID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.ControlID.TenantID())
 
 	task, err := svc.Tasks.Create(ctx, probo.CreateTaskRequest{
 		ControlID:   input.ControlID,
@@ -222,7 +223,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 
 // UpdateTask is the resolver for the updateTask field.
 func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error) {
-	svc := r.proboSvc.WithTenant(input.TaskID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
 
 	task, err := svc.Tasks.Update(ctx, probo.UpdateTaskRequest{
 		ID:              input.TaskID,
@@ -242,7 +243,7 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTas
 
 // DeleteTask is the resolver for the deleteTask field.
 func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error) {
-	svc := r.proboSvc.WithTenant(input.TaskID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
 
 	err := svc.Tasks.Delete(ctx, input.TaskID)
 	if err != nil {
@@ -256,7 +257,7 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTas
 
 // CreateFramework is the resolver for the createFramework field.
 func (r *mutationResolver) CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error) {
-	svc := r.proboSvc.WithTenant(input.OrganizationID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
 
 	framework, err := svc.Frameworks.Create(ctx, probo.CreateFrameworkRequest{
 		OrganizationID: input.OrganizationID,
@@ -274,7 +275,7 @@ func (r *mutationResolver) CreateFramework(ctx context.Context, input types.Crea
 
 // CreateControl is the resolver for the createControl field.
 func (r *mutationResolver) CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error) {
-	svc := r.proboSvc.WithTenant(input.FrameworkID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.FrameworkID.TenantID())
 
 	control, err := svc.Controls.Create(ctx, probo.CreateControlRequest{
 		FrameworkID: input.FrameworkID,
@@ -293,7 +294,7 @@ func (r *mutationResolver) CreateControl(ctx context.Context, input types.Create
 
 // UpdateFramework is the resolver for the updateFramework field.
 func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error) {
-	svc := r.proboSvc.WithTenant(input.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
 	framework, err := svc.Frameworks.Update(ctx, probo.UpdateFrameworkRequest{
 		ID:              input.ID,
@@ -312,7 +313,7 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 
 // UpdateControl is the resolver for the updateControl field.
 func (r *mutationResolver) UpdateControl(ctx context.Context, input types.UpdateControlInput) (*types.UpdateControlPayload, error) {
-	svc := r.proboSvc.WithTenant(input.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
 	control, err := svc.Controls.Update(ctx, probo.UpdateControlRequest{
 		ID:              input.ID,
@@ -333,7 +334,7 @@ func (r *mutationResolver) UpdateControl(ctx context.Context, input types.Update
 
 // UploadEvidence is the resolver for the uploadEvidence field.
 func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error) {
-	svc := r.proboSvc.WithTenant(input.TaskID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
 
 	req := probo.CreateEvidenceRequest{
 		TaskID: input.TaskID,
@@ -353,7 +354,7 @@ func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.Uploa
 
 // DeleteEvidence is the resolver for the deleteEvidence field.
 func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error) {
-	svc := r.proboSvc.WithTenant(input.EvidenceID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.EvidenceID.TenantID())
 
 	err := svc.Evidences.Delete(ctx, input.EvidenceID)
 	if err != nil {
@@ -367,7 +368,7 @@ func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.Delet
 
 // CreatePolicy is the resolver for the createPolicy field.
 func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error) {
-	svc := r.proboSvc.WithTenant(input.OrganizationID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
 
 	policy, err := svc.Policies.Create(ctx, probo.CreatePolicyRequest{
 		OrganizationID: input.OrganizationID,
@@ -388,7 +389,7 @@ func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreateP
 
 // UpdatePolicy is the resolver for the updatePolicy field.
 func (r *mutationResolver) UpdatePolicy(ctx context.Context, input types.UpdatePolicyInput) (*types.UpdatePolicyPayload, error) {
-	svc := r.proboSvc.WithTenant(input.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
 	policy, err := svc.Policies.Update(ctx, probo.UpdatePolicyRequest{
 		ID:              input.ID,
@@ -410,7 +411,7 @@ func (r *mutationResolver) UpdatePolicy(ctx context.Context, input types.UpdateP
 
 // DeletePolicy is the resolver for the deletePolicy field.
 func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeletePolicyInput) (*types.DeletePolicyPayload, error) {
-	svc := r.proboSvc.WithTenant(input.PolicyID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.PolicyID.TenantID())
 
 	err := svc.Policies.Delete(ctx, input.PolicyID)
 	if err != nil {
@@ -424,7 +425,7 @@ func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeleteP
 
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
 	cursor := types.NewCursor(first, after, last, before)
 
@@ -438,7 +439,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 
 // Vendors is the resolver for the vendors field.
 func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.VendorConnection, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
 	cursor := types.NewCursor(first, after, last, before)
 
@@ -452,7 +453,7 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 
 // Peoples is the resolver for the peoples field.
 func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PeopleConnection, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
 	cursor := types.NewCursor(first, after, last, before)
 
@@ -466,7 +467,7 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 
 // Policies is the resolver for the policies field.
 func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PolicyConnection, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 	cursor := types.NewCursor(first, after, last, before)
 
 	page, err := svc.Policies.ListByOrganizationID(ctx, obj.ID, cursor)
@@ -479,7 +480,7 @@ func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organiza
 
 // Owner is the resolver for the owner field.
 func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.People, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
 	policy, err := svc.Policies.Get(ctx, obj.ID)
 	if err != nil {
@@ -497,7 +498,7 @@ func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.P
 
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error) {
-	svc := r.proboSvc.WithTenant(id.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, id.TenantID())
 
 	switch id.EntityType() {
 	case coredata.OrganizationEntityType:
@@ -569,12 +570,12 @@ func (r *queryResolver) Viewer(ctx context.Context) (*types.User, error) {
 
 // Evidences is the resolver for the evidences field.
 func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceConnection, error) {
-	svc := r.proboSvc.WithTenant(obj.ID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 	cursor := types.NewCursor(first, after, last, before)
 
 	page, err := svc.Evidences.ListForTaskID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list task evidences: %w", err)
+		panic(fmt.Errorf("failed to list task evidences: %w", err))
 	}
 
 	return types.NewEvidenceConnection(page), nil
@@ -582,29 +583,13 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 
 // Organizations is the resolver for the organizations field.
 func (r *userResolver) Organizations(ctx context.Context, obj *types.User, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.OrganizationConnection, error) {
-	// Get the user's organization IDs
-	organizationIDs, err := r.usrmgrSvc.GetUserOrganizations(ctx, obj.ID)
+	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user organizations: %w", err)
+		panic(fmt.Errorf("failed to list organizations for user: %w", err))
 	}
 
-	// If the user doesn't have any organizations, return an empty connection
-	if len(organizationIDs) == 0 {
-		return &types.OrganizationConnection{
-			Edges:    []*types.OrganizationEdge{},
-			PageInfo: &types.PageInfo{},
-		}, nil
-	}
-
-	// Get the organization details for each organization ID
 	var edges []*types.OrganizationEdge
-	for _, organizationID := range organizationIDs {
-		svc := r.proboSvc.WithTenant(organizationID.TenantID())
-
-		organization, err := svc.Organizations.Get(ctx, organizationID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get organization details: %w", err)
-		}
+	for _, organization := range organizations {
 		edges = append(edges, types.NewOrganizationEdge(organization))
 	}
 

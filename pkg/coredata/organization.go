@@ -34,6 +34,8 @@ type (
 		CreatedAt time.Time    `db:"created_at"`
 		UpdatedAt time.Time    `db:"updated_at"`
 	}
+
+	Organizations []*Organization
 )
 
 func (o *Organization) LoadByID(

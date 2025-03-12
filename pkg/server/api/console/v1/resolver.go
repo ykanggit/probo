@@ -58,6 +58,7 @@ type (
 var (
 	sessionContextKey    = &ctxKey{name: "session"}
 	userContextKey       = &ctxKey{name: "user"}
+	userTenantContextKey = &ctxKey{name: "user_tenants"}
 )
 
 func SessionFromContext(ctx context.Context) *coredata.Session {
@@ -109,6 +110,7 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		}
 
 		user := UserFromContext(ctx)
+
 		if user == nil {
 			return func(ctx context.Context) *graphql.Response {
 				return &graphql.Response{
@@ -176,8 +178,14 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 			return
 		}
 
+		tenantIDs, err := usrmgrSvc.ListTenantsForUserID(ctx, user.ID)
+		if err != nil {
+			panic(fmt.Errorf("failed to list tenants for user: %w", err))
+		}
+
 		ctx = context.WithValue(ctx, sessionContextKey, session)
 		ctx = context.WithValue(ctx, userContextKey, user)
+		ctx = context.WithValue(ctx, userTenantContextKey, tenantIDs)
 
 		srv.ServeHTTP(w, r.WithContext(ctx))
 
@@ -186,4 +194,16 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		}
 
 	}
+}
+
+func (r *Resolver) GetTenantServiceIfAuthorized(ctx context.Context, tenantID gid.TenantID) *probo.TenantService {
+	tenantIDs, _ := ctx.Value(userTenantContextKey).([]gid.TenantID)
+
+	for _, id := range tenantIDs {
+		if id == tenantID {
+			return r.proboSvc.WithTenant(tenantID)
+		}
+	}
+
+	panic(fmt.Errorf("tenant not found"))
 }
