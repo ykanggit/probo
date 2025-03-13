@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<03490b3e2c1e510c108108be2aabdb60>>
+ * @generated SignedSource<<1e5aa858fdcd0179ebfd8ffba00b6bd7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -32,8 +32,10 @@ export type VendorListPageCreateVendorMutation$data = {
     readonly vendorEdge: {
       readonly node: {
         readonly createdAt: string;
+        readonly description: string;
         readonly id: string;
         readonly name: string;
+        readonly riskTier: RiskTier;
         readonly updatedAt: string;
       };
     };
@@ -96,6 +98,13 @@ v3 = {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
+          "name": "description",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
           "name": "createdAt",
           "storageKey": null
         },
@@ -104,6 +113,13 @@ v3 = {
           "args": null,
           "kind": "ScalarField",
           "name": "updatedAt",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "riskTier",
           "storageKey": null
         }
       ],
@@ -178,16 +194,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ddfddd8b4266631b16341e6fe2e04cb5",
+    "cacheID": "7ab96ef77e598ee748273b37bb9b42d2",
     "id": null,
     "metadata": {},
     "name": "VendorListPageCreateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorListPageCreateVendorMutation(\n  $input: CreateVendorInput!\n) {\n  createVendor(input: $input) {\n    vendorEdge {\n      node {\n        id\n        name\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation VendorListPageCreateVendorMutation(\n  $input: CreateVendorInput!\n) {\n  createVendor(input: $input) {\n    vendorEdge {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "03c48ba8f1db919da507322208e5e136";
+(node as any).hash = "603ba3f92a342a8e1fb20057612b7c79";
 
 export default node;

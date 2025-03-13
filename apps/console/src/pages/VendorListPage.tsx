@@ -84,8 +84,10 @@ const createVendorMutation = graphql`
         node {
           id
           name
+          description
           createdAt
           updatedAt
+          riskTier
         }
       }
     }
@@ -332,9 +334,15 @@ function VendorListContent({
               <div className="flex items-center gap-2">
                 <Badge
                   variant="secondary"
-                  className="bg-lime-9 text-white rounded-full px-3 py-0.5 text-xs font-medium"
+                  className={
+                    vendor.riskTier === "CRITICAL"
+                      ? "bg-red-100 text-red-900 rounded-full px-3 py-0.5 text-xs font-medium"
+                      : vendor?.riskTier === "SIGNIFICANT"
+                      ? "bg-yellow-100 text-yellow-900 rounded-full px-3 py-0.5 text-xs font-medium"
+                      : "bg-green-100 text-green-900 rounded-full px-3 py-0.5 text-xs font-medium"
+                  }
                 >
-                  {vendor?.riskTier}
+                  {vendor.riskTier}
                 </Badge>
                 <Button
                   variant="ghost"
