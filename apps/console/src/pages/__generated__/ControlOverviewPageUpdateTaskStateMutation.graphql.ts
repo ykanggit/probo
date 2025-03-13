@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c6eaf570ef3d4e5a289ab266f6662546>>
+ * @generated SignedSource<<2e946185d02bd4e3d510d81c68cb9863>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,6 +16,7 @@ export type UpdateTaskInput = {
   name?: string | null | undefined;
   state?: TaskState | null | undefined;
   taskId: string;
+  timeEstimate?: any | null | undefined;
 };
 export type ControlOverviewPageUpdateTaskStateMutation$variables = {
   input: UpdateTaskInput;

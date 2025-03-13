@@ -38,6 +38,7 @@ type (
 		CreatedAt    time.Time     `db:"created_at"`
 		UpdatedAt    time.Time     `db:"updated_at"`
 		Version      int           `db:"version"`
+		AssignedTo   *gid.GID      `db:"assigned_to"`
 		TimeEstimate time.Duration `db:"time_estimate"`
 	}
 
@@ -70,6 +71,7 @@ SELECT
     description,
 	time_estimate,
     state,
+	assigned_to,
     content_ref,
     created_at,
     updated_at,
@@ -78,7 +80,7 @@ FROM
     tasks
 WHERE
     %s
-    AND task_id = @task_id
+    AND id = @task_id
 LIMIT 1;
 `
 
@@ -119,7 +121,8 @@ INSERT INTO tasks (
     updated_at,
     version,
     state,
-	time_estimate
+	time_estimate,
+	assigned_to
 )
 VALUES (
     @tenant_id,
@@ -132,7 +135,8 @@ VALUES (
     @updated_at,
     @version,
     @state,
-	@time_estimate
+	@time_estimate,
+	@assigned_to
 );
 `
 
@@ -148,6 +152,7 @@ VALUES (
 		"version":       t.Version,
 		"state":         t.State,
 		"time_estimate": t.TimeEstimate,
+		"assigned_to":   t.AssignedTo,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -171,7 +176,8 @@ SELECT
     content_ref,
     created_at,
     updated_at,
-    version
+    version,
+	assigned_to
 FROM
     tasks
 WHERE
@@ -237,6 +243,58 @@ RETURNING
 	maps.Copy(args, scope.SQLArguments())
 
 	err := conn.QueryRow(ctx, q, args).Scan(&t.Version)
+	return err
+}
+
+func (t *Task) AssignTo(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	assignedTo gid.GID,
+) error {
+	q := `
+UPDATE tasks
+SET
+    assigned_to = @assigned_to
+WHERE
+    %s
+    AND id = @task_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{
+		"task_id":     t.ID,
+		"assigned_to": assignedTo,
+	}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
+func (t *Task) Unassign(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+) error {
+	q := `
+UPDATE tasks
+SET
+    assigned_to = NULL
+WHERE
+    %s
+    AND id = @task_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{
+		"task_id": t.ID,
+	}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
 	return err
 }
 

@@ -16,6 +16,15 @@ type Node interface {
 	GetID() gid.GID
 }
 
+type AssignTaskInput struct {
+	TaskID       gid.GID `json:"taskId"`
+	AssignedToID gid.GID `json:"assignedToId"`
+}
+
+type AssignTaskPayload struct {
+	Task *Task `json:"task"`
+}
+
 type ConfirmEmailInput struct {
 	Token string `json:"token"`
 }
@@ -110,6 +119,7 @@ type CreateTaskInput struct {
 	Name         string        `json:"name"`
 	Description  string        `json:"description"`
 	TimeEstimate time.Duration `json:"timeEstimate"`
+	AssignedToID *gid.GID      `json:"assignedToId,omitempty"`
 }
 
 type CreateTaskPayload struct {
@@ -336,6 +346,7 @@ type Task struct {
 	Description  string              `json:"description"`
 	State        coredata.TaskState  `json:"state"`
 	TimeEstimate time.Duration       `json:"timeEstimate"`
+	AssignedTo   *People             `json:"assignedTo,omitempty"`
 	Evidences    *EvidenceConnection `json:"evidences"`
 	CreatedAt    time.Time           `json:"createdAt"`
 	UpdatedAt    time.Time           `json:"updatedAt"`
@@ -352,6 +363,14 @@ type TaskConnection struct {
 type TaskEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Task          `json:"node"`
+}
+
+type UnassignTaskInput struct {
+	TaskID gid.GID `json:"taskId"`
+}
+
+type UnassignTaskPayload struct {
+	Task *Task `json:"task"`
 }
 
 type UpdateControlInput struct {
@@ -422,6 +441,7 @@ type UpdateTaskInput struct {
 	Name            *string             `json:"name,omitempty"`
 	Description     *string             `json:"description,omitempty"`
 	State           *coredata.TaskState `json:"state,omitempty"`
+	TimeEstimate    *time.Duration      `json:"timeEstimate,omitempty"`
 }
 
 type UpdateTaskPayload struct {

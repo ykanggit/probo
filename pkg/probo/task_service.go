@@ -36,6 +36,7 @@ type (
 		ContentRef   string
 		Description  string
 		TimeEstimate time.Duration
+		AssignedTo   *gid.GID
 	}
 
 	UpdateTaskRequest struct {
@@ -67,6 +68,7 @@ func (s TaskService) Create(
 		State:        coredata.TaskStateTodo,
 		Description:  req.Description,
 		TimeEstimate: req.TimeEstimate,
+		AssignedTo:   req.AssignedTo,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
@@ -80,6 +82,67 @@ func (s TaskService) Create(
 
 			if err := task.Insert(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert task: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return task, nil
+}
+
+func (s TaskService) Assign(
+	ctx context.Context,
+	taskID gid.GID,
+	assignedTo gid.GID,
+) (*coredata.Task, error) {
+	task := &coredata.Task{ID: taskID}
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := task.LoadByID(ctx, conn, s.svc.scope, taskID); err != nil {
+				return fmt.Errorf("cannot load task %q: %w", taskID, err)
+			}
+
+			task.AssignedTo = &assignedTo
+
+			if err := task.AssignTo(ctx, conn, s.svc.scope, assignedTo); err != nil {
+				return fmt.Errorf("cannot assign task %q to %q: %w", taskID, assignedTo, err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return task, nil
+}
+
+func (s TaskService) Unassign(
+	ctx context.Context,
+	taskID gid.GID,
+) (*coredata.Task, error) {
+	task := &coredata.Task{ID: taskID}
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := task.LoadByID(ctx, conn, s.svc.scope, taskID); err != nil {
+				return fmt.Errorf("cannot load task %q: %w", taskID, err)
+			}
+
+			task.AssignedTo = nil
+
+			if err := task.Unassign(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot unassign task %q: %w", taskID, err)
 			}
 
 			return nil

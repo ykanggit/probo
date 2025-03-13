@@ -57,6 +57,10 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AssignTaskPayload struct {
+		Task func(childComplexity int) int
+	}
+
 	ConfirmEmailPayload struct {
 		Success func(childComplexity int) int
 	}
@@ -182,6 +186,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AssignTask         func(childComplexity int, input types.AssignTaskInput) int
 		ConfirmEmail       func(childComplexity int, input types.ConfirmEmailInput) int
 		CreateControl      func(childComplexity int, input types.CreateControlInput) int
 		CreateFramework    func(childComplexity int, input types.CreateFrameworkInput) int
@@ -197,6 +202,7 @@ type ComplexityRoot struct {
 		DeleteTask         func(childComplexity int, input types.DeleteTaskInput) int
 		DeleteVendor       func(childComplexity int, input types.DeleteVendorInput) int
 		ImportFramework    func(childComplexity int, input types.ImportFrameworkInput) int
+		UnassignTask       func(childComplexity int, input types.UnassignTaskInput) int
 		UpdateControl      func(childComplexity int, input types.UpdateControlInput) int
 		UpdateFramework    func(childComplexity int, input types.UpdateFrameworkInput) int
 		UpdateOrganization func(childComplexity int, input types.UpdateOrganizationInput) int
@@ -290,6 +296,7 @@ type ComplexityRoot struct {
 	}
 
 	Task struct {
+		AssignedTo   func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
 		Description  func(childComplexity int) int
 		Evidences    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
@@ -309,6 +316,10 @@ type ComplexityRoot struct {
 	TaskEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
+	}
+
+	UnassignTaskPayload struct {
+		Task func(childComplexity int) int
 	}
 
 	UpdateControlPayload struct {
@@ -401,6 +412,8 @@ type MutationResolver interface {
 	CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error)
 	UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error)
 	DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error)
+	AssignTask(ctx context.Context, input types.AssignTaskInput) (*types.AssignTaskPayload, error)
+	UnassignTask(ctx context.Context, input types.UnassignTaskInput) (*types.UnassignTaskPayload, error)
 	CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error)
 	UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error)
 	ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error)
@@ -427,6 +440,7 @@ type QueryResolver interface {
 	Viewer(ctx context.Context) (*types.User, error)
 }
 type TaskResolver interface {
+	AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error)
 	Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceConnection, error)
 }
 type UserResolver interface {
@@ -451,6 +465,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AssignTaskPayload.task":
+		if e.complexity.AssignTaskPayload.Task == nil {
+			break
+		}
+
+		return e.complexity.AssignTaskPayload.Task(childComplexity), true
 
 	case "ConfirmEmailPayload.success":
 		if e.complexity.ConfirmEmailPayload.Success == nil {
@@ -826,6 +847,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ImportFrameworkPayload.FrameworkEdge(childComplexity), true
 
+	case "Mutation.assignTask":
+		if e.complexity.Mutation.AssignTask == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_assignTask_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AssignTask(childComplexity, args["input"].(types.AssignTaskInput)), true
+
 	case "Mutation.confirmEmail":
 		if e.complexity.Mutation.ConfirmEmail == nil {
 			break
@@ -1005,6 +1038,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ImportFramework(childComplexity, args["input"].(types.ImportFrameworkInput)), true
+
+	case "Mutation.unassignTask":
+		if e.complexity.Mutation.UnassignTask == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_unassignTask_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UnassignTask(childComplexity, args["input"].(types.UnassignTaskInput)), true
 
 	case "Mutation.updateControl":
 		if e.complexity.Mutation.UpdateControl == nil {
@@ -1449,6 +1494,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Session.ID(childComplexity), true
 
+	case "Task.assignedTo":
+		if e.complexity.Task.AssignedTo == nil {
+			break
+		}
+
+		return e.complexity.Task.AssignedTo(childComplexity), true
+
 	case "Task.createdAt":
 		if e.complexity.Task.CreatedAt == nil {
 			break
@@ -1544,6 +1596,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TaskEdge.Node(childComplexity), true
+
+	case "UnassignTaskPayload.task":
+		if e.complexity.UnassignTaskPayload.Task == nil {
+			break
+		}
+
+		return e.complexity.UnassignTaskPayload.Task(childComplexity), true
 
 	case "UpdateControlPayload.control":
 		if e.complexity.UpdateControlPayload.Control == nil {
@@ -1775,6 +1834,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputAssignTaskInput,
 		ec.unmarshalInputConfirmEmailInput,
 		ec.unmarshalInputCreateControlInput,
 		ec.unmarshalInputCreateFrameworkInput,
@@ -1790,6 +1850,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeleteTaskInput,
 		ec.unmarshalInputDeleteVendorInput,
 		ec.unmarshalInputImportFrameworkInput,
+		ec.unmarshalInputUnassignTaskInput,
 		ec.unmarshalInputUpdateControlInput,
 		ec.unmarshalInputUpdateFrameworkInput,
 		ec.unmarshalInputUpdateOrganizationInput,
@@ -2160,6 +2221,7 @@ type Task implements Node {
   description: String!
   state: TaskState!
   timeEstimate: Duration!
+  assignedTo: People @goField(forceResolver: true)
 
   evidences(
     first: Int
@@ -2242,6 +2304,8 @@ type Mutation {
   createTask(input: CreateTaskInput!): CreateTaskPayload!
   updateTask(input: UpdateTaskInput!): UpdateTaskPayload!
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
+  assignTask(input: AssignTaskInput!): AssignTaskPayload!
+  unassignTask(input: UnassignTaskInput!): UnassignTaskPayload!
 
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
@@ -2385,6 +2449,7 @@ input CreateTaskInput {
   name: String!
   description: String!
   timeEstimate: Duration!
+  assignedToId: ID
 }
 
 type CreateTaskPayload {
@@ -2543,6 +2608,7 @@ input UpdateTaskInput {
   name: String
   description: String
   state: TaskState
+  timeEstimate: Duration
 }
 
 type UpdateTaskPayload {
@@ -2564,6 +2630,23 @@ input ImportFrameworkInput {
 
 type ImportFrameworkPayload {
   frameworkEdge: FrameworkEdge!
+}
+
+input AssignTaskInput {
+  taskId: ID!
+  assignedToId: ID!
+}
+
+type AssignTaskPayload {
+  task: Task!
+}
+
+input UnassignTaskInput {
+  taskId: ID!
+}
+
+type UnassignTaskPayload {
+  task: Task!
 }
 `, BuiltIn: false},
 }
@@ -2724,6 +2807,29 @@ func (ec *executionContext) field_Framework_controls_argsBefore(
 	}
 
 	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_assignTask_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_assignTask_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_assignTask_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.AssignTaskInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNAssignTaskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssignTaskInput(ctx, tmp)
+	}
+
+	var zeroVal types.AssignTaskInput
 	return zeroVal, nil
 }
 
@@ -3069,6 +3175,29 @@ func (ec *executionContext) field_Mutation_importFramework_argsInput(
 	}
 
 	var zeroVal types.ImportFrameworkInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_unassignTask_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_unassignTask_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_unassignTask_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UnassignTaskInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUnassignTaskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUnassignTaskInput(ctx, tmp)
+	}
+
+	var zeroVal types.UnassignTaskInput
 	return zeroVal, nil
 }
 
@@ -3863,6 +3992,66 @@ func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AssignTaskPayload_task(ctx context.Context, field graphql.CollectedField, obj *types.AssignTaskPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AssignTaskPayload_task(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Task, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Task)
+	fc.Result = res
+	return ec.marshalNTask2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTask(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AssignTaskPayload_task(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AssignTaskPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Task_id(ctx, field)
+			case "version":
+				return ec.fieldContext_Task_version(ctx, field)
+			case "name":
+				return ec.fieldContext_Task_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Task_description(ctx, field)
+			case "state":
+				return ec.fieldContext_Task_state(ctx, field)
+			case "timeEstimate":
+				return ec.fieldContext_Task_timeEstimate(ctx, field)
+			case "assignedTo":
+				return ec.fieldContext_Task_assignedTo(ctx, field)
+			case "evidences":
+				return ec.fieldContext_Task_evidences(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _ConfirmEmailPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.ConfirmEmailPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ConfirmEmailPayload_success(ctx, field)
@@ -6572,6 +6761,100 @@ func (ec *executionContext) fieldContext_Mutation_deleteTask(ctx context.Context
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_assignTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_assignTask(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AssignTask(rctx, fc.Args["input"].(types.AssignTaskInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.AssignTaskPayload)
+	fc.Result = res
+	return ec.marshalNAssignTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssignTaskPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_assignTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "task":
+				return ec.fieldContext_AssignTaskPayload_task(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AssignTaskPayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_assignTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_unassignTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_unassignTask(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UnassignTask(rctx, fc.Args["input"].(types.UnassignTaskInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UnassignTaskPayload)
+	fc.Result = res
+	return ec.marshalNUnassignTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUnassignTaskPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_unassignTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "task":
+				return ec.fieldContext_UnassignTaskPayload_task(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UnassignTaskPayload", field.Name)
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_unassignTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -9362,6 +9645,59 @@ func (ec *executionContext) fieldContext_Task_timeEstimate(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Task_assignedTo(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_assignedTo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().AssignedTo(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalOPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_assignedTo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			case "version":
+				return ec.fieldContext_People_version(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Task_evidences(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_evidences(ctx, field)
 	if err != nil {
@@ -9662,6 +9998,68 @@ func (ec *executionContext) fieldContext_TaskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Task_state(ctx, field)
 			case "timeEstimate":
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
+			case "assignedTo":
+				return ec.fieldContext_Task_assignedTo(ctx, field)
+			case "evidences":
+				return ec.fieldContext_Task_evidences(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UnassignTaskPayload_task(ctx context.Context, field graphql.CollectedField, obj *types.UnassignTaskPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UnassignTaskPayload_task(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Task, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Task)
+	fc.Result = res
+	return ec.marshalNTask2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTask(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UnassignTaskPayload_task(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UnassignTaskPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Task_id(ctx, field)
+			case "version":
+				return ec.fieldContext_Task_version(ctx, field)
+			case "name":
+				return ec.fieldContext_Task_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Task_description(ctx, field)
+			case "state":
+				return ec.fieldContext_Task_state(ctx, field)
+			case "timeEstimate":
+				return ec.fieldContext_Task_timeEstimate(ctx, field)
+			case "assignedTo":
+				return ec.fieldContext_Task_assignedTo(ctx, field)
 			case "evidences":
 				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
@@ -10006,6 +10404,8 @@ func (ec *executionContext) fieldContext_UpdateTaskPayload_task(_ context.Contex
 				return ec.fieldContext_Task_state(ctx, field)
 			case "timeEstimate":
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
+			case "assignedTo":
+				return ec.fieldContext_Task_assignedTo(ctx, field)
 			case "evidences":
 				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
@@ -12745,6 +13145,40 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAssignTaskInput(ctx context.Context, obj any) (types.AssignTaskInput, error) {
+	var it types.AssignTaskInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"taskId", "assignedToId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "taskId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("taskId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TaskID = data
+		case "assignedToId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignedToId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AssignedToID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputConfirmEmailInput(ctx context.Context, obj any) (types.ConfirmEmailInput, error) {
 	var it types.ConfirmEmailInput
 	asMap := map[string]any{}
@@ -13019,7 +13453,7 @@ func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"controlId", "name", "description", "timeEstimate"}
+	fieldsInOrder := [...]string{"controlId", "name", "description", "timeEstimate", "assignedToId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13054,6 +13488,13 @@ func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, o
 				return it, err
 			}
 			it.TimeEstimate = data
+		case "assignedToId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignedToId"))
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AssignedToID = data
 		}
 	}
 
@@ -13340,6 +13781,33 @@ func (ec *executionContext) unmarshalInputImportFrameworkInput(ctx context.Conte
 				return it, err
 			}
 			it.File = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUnassignTaskInput(ctx context.Context, obj any) (types.UnassignTaskInput, error) {
+	var it types.UnassignTaskInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"taskId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "taskId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("taskId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TaskID = data
 		}
 	}
 
@@ -13642,7 +14110,7 @@ func (ec *executionContext) unmarshalInputUpdateTaskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"taskId", "expectedVersion", "name", "description", "state"}
+	fieldsInOrder := [...]string{"taskId", "expectedVersion", "name", "description", "state", "timeEstimate"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13684,6 +14152,13 @@ func (ec *executionContext) unmarshalInputUpdateTaskInput(ctx context.Context, o
 				return it, err
 			}
 			it.State = data
+		case "timeEstimate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timeEstimate"))
+			data, err := ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TimeEstimate = data
 		}
 	}
 
@@ -13907,6 +14382,45 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var assignTaskPayloadImplementors = []string{"AssignTaskPayload"}
+
+func (ec *executionContext) _AssignTaskPayload(ctx context.Context, sel ast.SelectionSet, obj *types.AssignTaskPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, assignTaskPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AssignTaskPayload")
+		case "task":
+			out.Values[i] = ec._AssignTaskPayload_task(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var confirmEmailPayloadImplementors = []string{"ConfirmEmailPayload"}
 
@@ -15165,6 +15679,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "assignTask":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_assignTask(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "unassignTask":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_unassignTask(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createFramework":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createFramework(ctx, field)
@@ -16105,6 +16633,34 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "assignedTo":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				res = ec._Task_assignedTo(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "evidences":
 			field := field
 
@@ -16231,6 +16787,45 @@ func (ec *executionContext) _TaskEdge(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "node":
 			out.Values[i] = ec._TaskEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var unassignTaskPayloadImplementors = []string{"UnassignTaskPayload"}
+
+func (ec *executionContext) _UnassignTaskPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UnassignTaskPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, unassignTaskPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UnassignTaskPayload")
+		case "task":
+			out.Values[i] = ec._UnassignTaskPayload_task(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -17168,6 +17763,25 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
+
+func (ec *executionContext) unmarshalNAssignTaskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssignTaskInput(ctx context.Context, v any) (types.AssignTaskInput, error) {
+	res, err := ec.unmarshalInputAssignTaskInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAssignTaskPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssignTaskPayload(ctx context.Context, sel ast.SelectionSet, v types.AssignTaskPayload) graphql.Marshaler {
+	return ec._AssignTaskPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAssignTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssignTaskPayload(ctx context.Context, sel ast.SelectionSet, v *types.AssignTaskPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AssignTaskPayload(ctx, sel, v)
+}
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
@@ -18347,6 +18961,25 @@ var (
 	}
 )
 
+func (ec *executionContext) unmarshalNUnassignTaskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUnassignTaskInput(ctx context.Context, v any) (types.UnassignTaskInput, error) {
+	res, err := ec.unmarshalInputUnassignTaskInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUnassignTaskPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUnassignTaskPayload(ctx context.Context, sel ast.SelectionSet, v types.UnassignTaskPayload) graphql.Marshaler {
+	return ec._UnassignTaskPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUnassignTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUnassignTaskPayload(ctx context.Context, sel ast.SelectionSet, v *types.UnassignTaskPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UnassignTaskPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNUpdateControlInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateControlInput(ctx context.Context, v any) (types.UpdateControlInput, error) {
 	res, err := ec.unmarshalInputUpdateControlInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -18949,6 +19582,22 @@ func (ec *executionContext) marshalODatetime2ᚖtimeᚐTime(ctx context.Context,
 	return res
 }
 
+func (ec *executionContext) unmarshalODuration2ᚖtimeᚐDuration(ctx context.Context, v any) (*time.Duration, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalDuration(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalODuration2ᚖtimeᚐDuration(ctx context.Context, sel ast.SelectionSet, v *time.Duration) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalDuration(*v)
+	return res
+}
+
 func (ec *executionContext) unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, v any) (*gid.GID, error) {
 	if v == nil {
 		return nil, nil
@@ -18979,6 +19628,13 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	}
 	res := graphql.MarshalInt(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx context.Context, sel ast.SelectionSet, v *types.People) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._People(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind(ctx context.Context, v any) (*coredata.PeopleKind, error) {

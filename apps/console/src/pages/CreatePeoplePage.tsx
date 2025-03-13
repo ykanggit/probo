@@ -99,6 +99,10 @@ function CreatePeoplePageContent() {
             organizationId!,
             "PeopleSelector_organization_peoples"
           ),
+          ConnectionHandler.getConnectionID(
+            organizationId!,
+            "ControlOverviewPage_peoples"
+          ),
         ],
         input: {
           organizationId: organizationId!,

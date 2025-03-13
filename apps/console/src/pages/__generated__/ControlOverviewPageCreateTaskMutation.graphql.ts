@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<502600204c0e5180095f00fe3372ea5a>>
+ * @generated SignedSource<<1b8a07c3040e6ae6265d0b4eabc394ad>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,6 +11,7 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type TaskState = "DONE" | "TODO";
 export type CreateTaskInput = {
+  assignedToId?: string | null | undefined;
   controlId: string;
   description: string;
   name: string;
@@ -24,6 +25,11 @@ export type ControlOverviewPageCreateTaskMutation$data = {
   readonly createTask: {
     readonly taskEdge: {
       readonly node: {
+        readonly assignedTo: {
+          readonly fullName: string;
+          readonly id: string;
+          readonly primaryEmailAddress: string;
+        } | null | undefined;
         readonly description: string;
         readonly id: string;
         readonly name: string;
@@ -59,6 +65,13 @@ v2 = [
 v3 = {
   "alias": null,
   "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v4 = {
+  "alias": null,
+  "args": null,
   "concreteType": "TaskEdge",
   "kind": "LinkedField",
   "name": "taskEdge",
@@ -72,13 +85,7 @@ v3 = {
       "name": "node",
       "plural": false,
       "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "id",
-          "storageKey": null
-        },
+        (v3/*: any*/),
         {
           "alias": null,
           "args": null,
@@ -106,6 +113,32 @@ v3 = {
           "kind": "ScalarField",
           "name": "state",
           "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "concreteType": "People",
+          "kind": "LinkedField",
+          "name": "assignedTo",
+          "plural": false,
+          "selections": [
+            (v3/*: any*/),
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "fullName",
+              "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "primaryEmailAddress",
+              "storageKey": null
+            }
+          ],
+          "storageKey": null
         }
       ],
       "storageKey": null
@@ -131,7 +164,7 @@ return {
         "name": "createTask",
         "plural": false,
         "selections": [
-          (v3/*: any*/)
+          (v4/*: any*/)
         ],
         "storageKey": null
       }
@@ -156,7 +189,7 @@ return {
         "name": "createTask",
         "plural": false,
         "selections": [
-          (v3/*: any*/),
+          (v4/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -179,16 +212,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ed1842681cbb14392603c1b73e82b6f9",
+    "cacheID": "7e8741b4f438fecdf0d991843d0e206a",
     "id": null,
     "metadata": {},
     "name": "ControlOverviewPageCreateTaskMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlOverviewPageCreateTaskMutation(\n  $input: CreateTaskInput!\n) {\n  createTask(input: $input) {\n    taskEdge {\n      node {\n        id\n        name\n        description\n        timeEstimate\n        state\n      }\n    }\n  }\n}\n"
+    "text": "mutation ControlOverviewPageCreateTaskMutation(\n  $input: CreateTaskInput!\n) {\n  createTask(input: $input) {\n    taskEdge {\n      node {\n        id\n        name\n        description\n        timeEstimate\n        state\n        assignedTo {\n          id\n          fullName\n          primaryEmailAddress\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d2e06ccdb00312c0862187a18f374d23";
+(node as any).hash = "1622754b77775d1662f4cb6af68ca775";
 
 export default node;

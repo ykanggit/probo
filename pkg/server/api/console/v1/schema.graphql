@@ -263,6 +263,7 @@ type Task implements Node {
   description: String!
   state: TaskState!
   timeEstimate: Duration!
+  assignedTo: People @goField(forceResolver: true)
 
   evidences(
     first: Int
@@ -345,6 +346,8 @@ type Mutation {
   createTask(input: CreateTaskInput!): CreateTaskPayload!
   updateTask(input: UpdateTaskInput!): UpdateTaskPayload!
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
+  assignTask(input: AssignTaskInput!): AssignTaskPayload!
+  unassignTask(input: UnassignTaskInput!): UnassignTaskPayload!
 
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
@@ -488,6 +491,7 @@ input CreateTaskInput {
   name: String!
   description: String!
   timeEstimate: Duration!
+  assignedToId: ID
 }
 
 type CreateTaskPayload {
@@ -646,6 +650,7 @@ input UpdateTaskInput {
   name: String
   description: String
   state: TaskState
+  timeEstimate: Duration
 }
 
 type UpdateTaskPayload {
@@ -667,4 +672,21 @@ input ImportFrameworkInput {
 
 type ImportFrameworkPayload {
   frameworkEdge: FrameworkEdge!
+}
+
+input AssignTaskInput {
+  taskId: ID!
+  assignedToId: ID!
+}
+
+type AssignTaskPayload {
+  task: Task!
+}
+
+input UnassignTaskInput {
+  taskId: ID!
+}
+
+type UnassignTaskPayload {
+  task: Task!
 }

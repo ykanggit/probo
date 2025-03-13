@@ -31,6 +31,9 @@ import {
   FileText,
   Image,
   X,
+  UserPlus,
+  UserMinus,
+  User,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -46,6 +49,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import { Helmet } from "react-helmet-async";
 import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from "./__generated__/ControlOverviewPageQuery.graphql";
@@ -54,6 +62,9 @@ import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreate
 import type { ControlOverviewPageDeleteTaskMutation as ControlOverviewPageDeleteTaskMutationType } from "./__generated__/ControlOverviewPageDeleteTaskMutation.graphql";
 import type { ControlOverviewPageUploadEvidenceMutation as ControlOverviewPageUploadEvidenceMutationType } from "./__generated__/ControlOverviewPageUploadEvidenceMutation.graphql";
 import type { ControlOverviewPageDeleteEvidenceMutation as ControlOverviewPageDeleteEvidenceMutationType } from "./__generated__/ControlOverviewPageDeleteEvidenceMutation.graphql";
+import type { ControlOverviewPageAssignTaskMutation as ControlOverviewPageAssignTaskMutationType } from "./__generated__/ControlOverviewPageAssignTaskMutation.graphql";
+import type { ControlOverviewPageUnassignTaskMutation as ControlOverviewPageUnassignTaskMutationType } from "./__generated__/ControlOverviewPageUnassignTaskMutation.graphql";
+import type { ControlOverviewPageOrganizationQuery$data } from "./__generated__/ControlOverviewPageOrganizationQuery.graphql";
 import { Textarea } from "@/components/ui/textarea";
 
 // Function to format ISO8601 duration to human-readable format
@@ -113,6 +124,11 @@ const controlOverviewPageQuery = graphql`
               state
               timeEstimate
               version
+              assignedTo {
+                id
+                fullName
+                primaryEmailAddress
+              }
               evidences(first: 50)
                 @connection(key: "ControlOverviewPage_evidences") {
                 __id
@@ -162,6 +178,11 @@ const createTaskMutation = graphql`
           description
           timeEstimate
           state
+          assignedTo {
+            id
+            fullName
+            primaryEmailAddress
+          }
         }
       }
     }
@@ -222,6 +243,57 @@ const getEvidenceFileUrlQuery = graphql`
   }
 `;
 
+const assignTaskMutation = graphql`
+  mutation ControlOverviewPageAssignTaskMutation($input: AssignTaskInput!) {
+    assignTask(input: $input) {
+      task {
+        id
+        version
+        assignedTo {
+          id
+          fullName
+          primaryEmailAddress
+        }
+      }
+    }
+  }
+`;
+
+const unassignTaskMutation = graphql`
+  mutation ControlOverviewPageUnassignTaskMutation($input: UnassignTaskInput!) {
+    unassignTask(input: $input) {
+      task {
+        id
+        version
+        assignedTo {
+          id
+          fullName
+          primaryEmailAddress
+        }
+      }
+    }
+  }
+`;
+
+const organizationQuery = graphql`
+  query ControlOverviewPageOrganizationQuery($organizationId: ID!) {
+    organization: node(id: $organizationId) {
+      id
+      ... on Organization {
+        peoples(first: 100) @connection(key: "ControlOverviewPage_peoples") {
+          edges {
+            node {
+              id
+              fullName
+              primaryEmailAddress
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 function ControlOverviewPageContent({
   queryRef,
 }: {
@@ -235,6 +307,32 @@ function ControlOverviewPageContent({
   const { organizationId, frameworkId, controlId } = useParams();
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
+
+  // Load organization data for people selector
+  const [organizationData, setOrganizationData] =
+    useState<ControlOverviewPageOrganizationQuery$data | null>(null);
+
+  useEffect(() => {
+    if (organizationId) {
+      fetchQuery(environment, organizationQuery, {
+        organizationId,
+      })
+        .toPromise()
+        .then((response) => {
+          setOrganizationData(
+            response as ControlOverviewPageOrganizationQuery$data
+          );
+        })
+        .catch((error) => {
+          console.error("Error fetching organization data:", error);
+          toast({
+            title: "Error",
+            description: "Failed to load people data",
+            variant: "destructive",
+          });
+        });
+    }
+  }, [organizationId, environment, toast]);
 
   const formatImportance = (importance: string | undefined): string => {
     if (!importance) return "";
@@ -304,6 +402,12 @@ function ControlOverviewPageContent({
     useMutation<ControlOverviewPageDeleteEvidenceMutationType>(
       deleteEvidenceMutation
     );
+  const [assignTask] =
+    useMutation<ControlOverviewPageAssignTaskMutationType>(assignTaskMutation);
+  const [unassignTask] =
+    useMutation<ControlOverviewPageUnassignTaskMutationType>(
+      unassignTaskMutation
+    );
 
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
@@ -353,6 +457,16 @@ function ControlOverviewPageContent({
     filename: string;
     taskId: string;
   } | null>(null);
+
+  // Add state for people selector
+  const [peoplePopoverOpen, setPeoplePopoverOpen] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  // Add state for people search
+  const [peopleSearch, setPeopleSearch] = useState<{
+    [key: string]: string;
+  }>({});
 
   const tasks = data.control.tasks?.edges.map((edge) => edge.node) || [];
 
@@ -796,6 +910,57 @@ function ControlOverviewPageContent({
     });
   };
 
+  // Function to handle assigning a person to a task
+  const handleAssignPerson = (taskId: string, personId: string) => {
+    assignTask({
+      variables: {
+        input: {
+          taskId,
+          assignedToId: personId,
+        },
+      },
+      onCompleted: () => {
+        toast({
+          title: "Task assigned",
+          description: "Task has been assigned successfully.",
+        });
+        // Close the popover
+        setPeoplePopoverOpen((prev) => ({ ...prev, [taskId]: false }));
+      },
+      onError: (error) => {
+        toast({
+          title: "Error assigning task",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  // Function to handle unassigning a person from a task
+  const handleUnassignPerson = (taskId: string) => {
+    unassignTask({
+      variables: {
+        input: {
+          taskId,
+        },
+      },
+      onCompleted: () => {
+        toast({
+          title: "Task unassigned",
+          description: "Task has been unassigned successfully.",
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Error unassigning task",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
   return (
     <>
       <Helmet>
@@ -1015,25 +1180,21 @@ function ControlOverviewPageContent({
                         ? "border-gray-400 bg-gray-100"
                         : "border-gray-300"
                     } ${isDraggingFile ? "opacity-50" : ""}`}
-                    onClick={() =>
-                      task?.id &&
-                      task?.state &&
-                      handleTaskClick(task.id, task.state, task.version)
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (task?.id && task?.state) {
+                        handleTaskClick(task.id, task.state, task.version);
+                      }
+                    }}
                   >
                     {task?.state === "DONE" && (
                       <CheckCircle2 className="w-4 h-4 text-gray-500" />
                     )}
                   </div>
                   <div
-                    className={`flex-1 flex items-center justify-between cursor-pointer ${
+                    className={`flex-1 flex items-center justify-between ${
                       isDraggingFile ? "opacity-50" : ""
                     }`}
-                    onClick={() =>
-                      task?.id &&
-                      task?.state &&
-                      handleTaskClick(task.id, task.state, task.version)
-                    }
                   >
                     <div>
                       <h3
@@ -1057,9 +1218,182 @@ function ControlOverviewPageContent({
                           <span>{formatDuration(task.timeEstimate)}</span>
                         </p>
                       )}
+                      {task?.assignedTo && (
+                        <p className="text-xs mt-1 flex items-center text-gray-600">
+                          <User className="w-3 h-3 mr-1" />
+                          <span>{task.assignedTo.fullName}</span>
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* People Selector */}
+                      <Popover
+                        open={peoplePopoverOpen[task?.id || ""]}
+                        onOpenChange={(open: boolean) => {
+                          if (task?.id) {
+                            setPeoplePopoverOpen((prev) => ({
+                              ...prev,
+                              [task.id]: open,
+                            }));
+                          }
+                        }}
+                      >
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            className="text-gray-400 hover:text-blue-600"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (task?.id) {
+                                setPeoplePopoverOpen((prev) => ({
+                                  ...prev,
+                                  [task.id]: !prev[task.id],
+                                }));
+                              }
+                            }}
+                          >
+                            {task?.assignedTo ? (
+                              <UserMinus className="w-4 h-4" />
+                            ) : (
+                              <UserPlus className="w-4 h-4" />
+                            )}
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[250px] p-0" align="end">
+                          {task?.assignedTo ? (
+                            <div className="p-4 space-y-4">
+                              <div className="flex items-center gap-2">
+                                <User className="w-4 h-4 text-gray-500" />
+                                <div className="text-sm">
+                                  <p className="font-medium">
+                                    {task.assignedTo.fullName}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {task.assignedTo.primaryEmailAddress}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="w-full"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (task?.id) {
+                                    handleUnassignPerson(task.id);
+                                  }
+                                }}
+                              >
+                                <UserMinus className="w-4 h-4 mr-2" />
+                                Unassign
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="max-h-[300px] overflow-y-auto">
+                              <div className="p-2 border-b">
+                                <input
+                                  type="text"
+                                  placeholder="Search people to assign..."
+                                  className="w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  value={peopleSearch[task?.id || ""] || ""}
+                                  onChange={(e) => {
+                                    if (task?.id) {
+                                      setPeopleSearch((prev) => ({
+                                        ...prev,
+                                        [task.id]: e.target.value,
+                                      }));
+                                    }
+                                  }}
+                                />
+                              </div>
+                              <div className="px-3 py-2 text-xs text-gray-500">
+                                Click on a person to assign them to this task
+                              </div>
+                              <div className="py-1">
+                                {!organizationData?.organization?.peoples?.edges?.some(
+                                  (edge) => {
+                                    if (!edge?.node) return false;
+                                    const searchTerm = (
+                                      peopleSearch[task?.id || ""] || ""
+                                    ).toLowerCase();
+                                    return (
+                                      !searchTerm ||
+                                      edge.node.fullName
+                                        .toLowerCase()
+                                        .includes(searchTerm) ||
+                                      edge.node.primaryEmailAddress
+                                        .toLowerCase()
+                                        .includes(searchTerm)
+                                    );
+                                  }
+                                ) && (
+                                  <div className="py-6 text-center text-sm">
+                                    No people found.
+                                  </div>
+                                )}
+                                {organizationData?.organization?.peoples?.edges?.map(
+                                  (edge) => {
+                                    if (!edge?.node) return null;
+
+                                    const searchTerm = (
+                                      peopleSearch[task?.id || ""] || ""
+                                    ).toLowerCase();
+                                    if (
+                                      searchTerm &&
+                                      !edge.node.fullName
+                                        .toLowerCase()
+                                        .includes(searchTerm) &&
+                                      !edge.node.primaryEmailAddress
+                                        .toLowerCase()
+                                        .includes(searchTerm)
+                                    ) {
+                                      return null;
+                                    }
+
+                                    return (
+                                      <div
+                                        key={edge.node.id}
+                                        className="px-2 py-1 hover:bg-blue-50 cursor-pointer"
+                                      >
+                                        <button
+                                          type="button"
+                                          className="flex items-center w-full text-left"
+                                          onClick={() => {
+                                            if (task?.id) {
+                                              handleAssignPerson(
+                                                task.id,
+                                                edge.node.id
+                                              );
+                                              setPeoplePopoverOpen((prev) => ({
+                                                ...prev,
+                                                [task.id]: false,
+                                              }));
+                                            }
+                                          }}
+                                        >
+                                          <User className="mr-2 h-4 w-4 text-blue-500 flex-shrink-0" />
+                                          <div>
+                                            <p className="font-medium">
+                                              {edge.node.fullName}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                              {edge.node.primaryEmailAddress}
+                                            </p>
+                                          </div>
+                                        </button>
+                                      </div>
+                                    );
+                                  }
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </PopoverContent>
+                      </Popover>
+
                       <button
+                        type="button"
                         className="text-gray-400 hover:text-blue-600"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1071,6 +1405,7 @@ function ControlOverviewPageContent({
                         <Upload className="w-4 h-4" />
                       </button>
                       <button
+                        type="button"
                         className="text-gray-400 hover:text-red-600"
                         onClick={(e) => {
                           e.stopPropagation();

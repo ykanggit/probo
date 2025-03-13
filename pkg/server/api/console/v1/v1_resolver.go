@@ -255,6 +255,34 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTas
 	}, nil
 }
 
+// AssignTask is the resolver for the assignTask field.
+func (r *mutationResolver) AssignTask(ctx context.Context, input types.AssignTaskInput) (*types.AssignTaskPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+
+	task, err := svc.Tasks.Assign(ctx, input.TaskID, input.AssignedToID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot assign task: %w", err)
+	}
+
+	return &types.AssignTaskPayload{
+		Task: types.NewTask(task),
+	}, nil
+}
+
+// UnassignTask is the resolver for the unassignTask field.
+func (r *mutationResolver) UnassignTask(ctx context.Context, input types.UnassignTaskInput) (*types.UnassignTaskPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+
+	task, err := svc.Tasks.Unassign(ctx, input.TaskID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot unassign task: %w", err)
+	}
+
+	return &types.UnassignTaskPayload{
+		Task: types.NewTask(task),
+	}, nil
+}
+
 // CreateFramework is the resolver for the createFramework field.
 func (r *mutationResolver) CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
@@ -579,6 +607,27 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 func (r *queryResolver) Viewer(ctx context.Context) (*types.User, error) {
 	user := UserFromContext(ctx)
 	return types.NewUser(user), nil
+}
+
+// AssignedTo is the resolver for the assignedTo field.
+func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	task, err := svc.Tasks.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get task: %w", err)
+	}
+
+	if task.AssignedTo == nil {
+		return nil, nil
+	}
+
+	people, err := svc.Peoples.Get(ctx, *task.AssignedTo)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get assigned to: %w", err)
+	}
+
+	return types.NewPeople(people), nil
 }
 
 // Evidences is the resolver for the evidences field.
