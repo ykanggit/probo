@@ -192,6 +192,9 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.C
 		return nil, fmt.Errorf("cannot add user to organization: %w", err)
 	}
 
+	tenantIDs, _ := ctx.Value(userTenantContextKey).(*[]gid.TenantID)
+	*tenantIDs = append(*tenantIDs, organization.ID.TenantID())
+
 	return &types.CreateOrganizationPayload{
 		OrganizationEdge: types.NewOrganizationEdge(organization),
 	}, nil

@@ -185,7 +185,7 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 
 		ctx = context.WithValue(ctx, sessionContextKey, session)
 		ctx = context.WithValue(ctx, userContextKey, user)
-		ctx = context.WithValue(ctx, userTenantContextKey, tenantIDs)
+		ctx = context.WithValue(ctx, userTenantContextKey, &tenantIDs)
 
 		srv.ServeHTTP(w, r.WithContext(ctx))
 
@@ -197,9 +197,9 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 }
 
 func (r *Resolver) GetTenantServiceIfAuthorized(ctx context.Context, tenantID gid.TenantID) *probo.TenantService {
-	tenantIDs, _ := ctx.Value(userTenantContextKey).([]gid.TenantID)
+	tenantIDs, _ := ctx.Value(userTenantContextKey).(*[]gid.TenantID)
 
-	for _, id := range tenantIDs {
+	for _, id := range *tenantIDs {
 		if id == tenantID {
 			return r.proboSvc.WithTenant(tenantID)
 		}
