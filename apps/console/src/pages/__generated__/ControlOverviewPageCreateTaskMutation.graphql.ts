@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1454591ad65fc1aa76b9ac37604383ce>>
+ * @generated SignedSource<<502600204c0e5180095f00fe3372ea5a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,6 +14,7 @@ export type CreateTaskInput = {
   controlId: string;
   description: string;
   name: string;
+  timeEstimate: any;
 };
 export type ControlOverviewPageCreateTaskMutation$variables = {
   connections: ReadonlyArray<string>;
@@ -27,6 +28,7 @@ export type ControlOverviewPageCreateTaskMutation$data = {
         readonly id: string;
         readonly name: string;
         readonly state: TaskState;
+        readonly timeEstimate: any;
       };
     };
   };
@@ -89,6 +91,13 @@ v3 = {
           "args": null,
           "kind": "ScalarField",
           "name": "description",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "timeEstimate",
           "storageKey": null
         },
         {
@@ -170,16 +179,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a181d85ad48dde4a694a7def2700ee96",
+    "cacheID": "ed1842681cbb14392603c1b73e82b6f9",
     "id": null,
     "metadata": {},
     "name": "ControlOverviewPageCreateTaskMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlOverviewPageCreateTaskMutation(\n  $input: CreateTaskInput!\n) {\n  createTask(input: $input) {\n    taskEdge {\n      node {\n        id\n        name\n        description\n        state\n      }\n    }\n  }\n}\n"
+    "text": "mutation ControlOverviewPageCreateTaskMutation(\n  $input: CreateTaskInput!\n) {\n  createTask(input: $input) {\n    taskEdge {\n      node {\n        id\n        name\n        description\n        timeEstimate\n        state\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3e4ccc4d984d30492fc65afc16e6930c";
+(node as any).hash = "d2e06ccdb00312c0862187a18f374d23";
 
 export default node;

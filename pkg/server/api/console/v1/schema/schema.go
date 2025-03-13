@@ -290,14 +290,15 @@ type ComplexityRoot struct {
 	}
 
 	Task struct {
-		CreatedAt   func(childComplexity int) int
-		Description func(childComplexity int) int
-		Evidences   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		State       func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		Version     func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		Description  func(childComplexity int) int
+		Evidences    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		ID           func(childComplexity int) int
+		Name         func(childComplexity int) int
+		State        func(childComplexity int) int
+		TimeEstimate func(childComplexity int) int
+		UpdatedAt    func(childComplexity int) int
+		Version      func(childComplexity int) int
 	}
 
 	TaskConnection struct {
@@ -1495,6 +1496,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.State(childComplexity), true
 
+	case "Task.timeEstimate":
+		if e.complexity.Task.TimeEstimate == nil {
+			break
+		}
+
+		return e.complexity.Task.TimeEstimate(childComplexity), true
+
 	case "Task.updatedAt":
 		if e.complexity.Task.UpdatedAt == nil {
 			break
@@ -1904,6 +1912,7 @@ scalar CursorKey
 scalar Void
 scalar Datetime
 scalar Upload
+scalar Duration
 
 interface Node {
   id: ID!
@@ -2150,6 +2159,7 @@ type Task implements Node {
   name: String!
   description: String!
   state: TaskState!
+  timeEstimate: Duration!
 
   evidences(
     first: Int
@@ -2374,6 +2384,7 @@ input CreateTaskInput {
   controlId: ID!
   name: String!
   description: String!
+  timeEstimate: Duration!
 }
 
 type CreateTaskPayload {
@@ -9313,6 +9324,44 @@ func (ec *executionContext) fieldContext_Task_state(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Task_timeEstimate(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_timeEstimate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TimeEstimate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Duration)
+	fc.Result = res
+	return ec.marshalNDuration2timeᚐDuration(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_timeEstimate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Duration does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Task_evidences(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_evidences(ctx, field)
 	if err != nil {
@@ -9611,6 +9660,8 @@ func (ec *executionContext) fieldContext_TaskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Task_description(ctx, field)
 			case "state":
 				return ec.fieldContext_Task_state(ctx, field)
+			case "timeEstimate":
+				return ec.fieldContext_Task_timeEstimate(ctx, field)
 			case "evidences":
 				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
@@ -9953,6 +10004,8 @@ func (ec *executionContext) fieldContext_UpdateTaskPayload_task(_ context.Contex
 				return ec.fieldContext_Task_description(ctx, field)
 			case "state":
 				return ec.fieldContext_Task_state(ctx, field)
+			case "timeEstimate":
+				return ec.fieldContext_Task_timeEstimate(ctx, field)
 			case "evidences":
 				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
@@ -12966,7 +13019,7 @@ func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"controlId", "name", "description"}
+	fieldsInOrder := [...]string{"controlId", "name", "description", "timeEstimate"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12994,6 +13047,13 @@ func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, o
 				return it, err
 			}
 			it.Description = data
+		case "timeEstimate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timeEstimate"))
+			data, err := ec.unmarshalNDuration2timeᚐDuration(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TimeEstimate = data
 		}
 	}
 
@@ -16040,6 +16100,11 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "timeEstimate":
+			out.Values[i] = ec._Task_timeEstimate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "evidences":
 			field := field
 
@@ -17545,6 +17610,21 @@ func (ec *executionContext) marshalNDeleteVendorPayload2ᚖgithubᚗcomᚋgetpro
 		return graphql.Null
 	}
 	return ec._DeleteVendorPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDuration2timeᚐDuration(ctx context.Context, v any) (time.Duration, error) {
+	res, err := graphql.UnmarshalDuration(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDuration2timeᚐDuration(ctx context.Context, sel ast.SelectionSet, v time.Duration) graphql.Marshaler {
+	res := graphql.MarshalDuration(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNEvidence2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidence(ctx context.Context, sel ast.SelectionSet, v *types.Evidence) graphql.Marshaler {

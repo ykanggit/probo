@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5f28c9407a05834be16d66330e268caa>>
+ * @generated SignedSource<<1a0065809cf4bdeff6f4bb7ff087cdf7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -45,6 +45,7 @@ export type ControlOverviewPageQuery$data = {
           readonly id: string;
           readonly name: string;
           readonly state: TaskState;
+          readonly timeEstimate: any;
           readonly version: number;
         };
       }>;
@@ -117,24 +118,31 @@ v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "version",
+  "name": "timeEstimate",
   "storageKey": null
 },
 v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "__typename",
+  "name": "version",
   "storageKey": null
 },
 v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "cursor",
+  "name": "__typename",
   "storageKey": null
 },
 v11 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "cursor",
+  "storageKey": null
+},
+v12 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -159,7 +167,7 @@ v11 = {
   ],
   "storageKey": null
 },
-v12 = {
+v13 = {
   "kind": "ClientExtension",
   "selections": [
     {
@@ -171,7 +179,7 @@ v12 = {
     }
   ]
 },
-v13 = [
+v14 = [
   {
     "alias": null,
     "args": null,
@@ -218,25 +226,25 @@ v13 = [
             "name": "createdAt",
             "storageKey": null
           },
-          (v9/*: any*/)
+          (v10/*: any*/)
         ],
         "storageKey": null
       },
-      (v10/*: any*/)
+      (v11/*: any*/)
     ],
     "storageKey": null
   },
-  (v11/*: any*/),
-  (v12/*: any*/)
+  (v12/*: any*/),
+  (v13/*: any*/)
 ],
-v14 = [
+v15 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 100
   }
 ],
-v15 = [
+v16 = [
   {
     "kind": "Literal",
     "name": "first",
@@ -296,6 +304,7 @@ return {
                           (v4/*: any*/),
                           (v5/*: any*/),
                           (v8/*: any*/),
+                          (v9/*: any*/),
                           {
                             "alias": "evidences",
                             "args": null,
@@ -303,19 +312,19 @@ return {
                             "kind": "LinkedField",
                             "name": "__ControlOverviewPage_evidences_connection",
                             "plural": false,
-                            "selections": (v13/*: any*/),
+                            "selections": (v14/*: any*/),
                             "storageKey": null
                           },
-                          (v9/*: any*/)
+                          (v10/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v10/*: any*/)
+                      (v11/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v11/*: any*/),
-                  (v12/*: any*/)
+                  (v12/*: any*/),
+                  (v13/*: any*/)
                 ],
                 "storageKey": null
               }
@@ -344,7 +353,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v9/*: any*/),
+          (v10/*: any*/),
           (v2/*: any*/),
           {
             "kind": "InlineFragment",
@@ -356,7 +365,7 @@ return {
               (v7/*: any*/),
               {
                 "alias": null,
-                "args": (v14/*: any*/),
+                "args": (v15/*: any*/),
                 "concreteType": "TaskConnection",
                 "kind": "LinkedField",
                 "name": "tasks",
@@ -383,41 +392,42 @@ return {
                           (v4/*: any*/),
                           (v5/*: any*/),
                           (v8/*: any*/),
+                          (v9/*: any*/),
                           {
                             "alias": null,
-                            "args": (v15/*: any*/),
+                            "args": (v16/*: any*/),
                             "concreteType": "EvidenceConnection",
                             "kind": "LinkedField",
                             "name": "evidences",
                             "plural": false,
-                            "selections": (v13/*: any*/),
+                            "selections": (v14/*: any*/),
                             "storageKey": "evidences(first:50)"
                           },
                           {
                             "alias": null,
-                            "args": (v15/*: any*/),
+                            "args": (v16/*: any*/),
                             "filters": null,
                             "handle": "connection",
                             "key": "ControlOverviewPage_evidences",
                             "kind": "LinkedHandle",
                             "name": "evidences"
                           },
-                          (v9/*: any*/)
+                          (v10/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v10/*: any*/)
+                      (v11/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v11/*: any*/),
-                  (v12/*: any*/)
+                  (v12/*: any*/),
+                  (v13/*: any*/)
                 ],
                 "storageKey": "tasks(first:100)"
               },
               {
                 "alias": null,
-                "args": (v14/*: any*/),
+                "args": (v15/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "ControlOverviewPage_tasks",
@@ -434,7 +444,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "1dc4bdedef3b39fd2e441f5259f83d29",
+    "cacheID": "bd9679f5980ac0eed07f28e4f0cf4f27",
     "id": null,
     "metadata": {
       "connection": [
@@ -457,11 +467,11 @@ return {
     },
     "name": "ControlOverviewPageQuery",
     "operationKind": "query",
-    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      importance\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            version\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      importance\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            version\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ff1a734556fc0d56e90ddae161a93408";
+(node as any).hash = "81d519cc3ea015284326fa7d5052b25f";
 
 export default node;

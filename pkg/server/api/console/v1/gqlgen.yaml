@@ -28,3 +28,6 @@ models:
   CursorKey:
     model:
       - "github.com/getprobo/probo/pkg/server/api/console/v1/types.CursorKeyScalar"
+  Duration:
+    model:
+      - "github.com/99designs/gqlgen/graphql.Duration"

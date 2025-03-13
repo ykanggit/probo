@@ -56,6 +56,43 @@ import type { ControlOverviewPageUploadEvidenceMutation as ControlOverviewPageUp
 import type { ControlOverviewPageDeleteEvidenceMutation as ControlOverviewPageDeleteEvidenceMutationType } from "./__generated__/ControlOverviewPageDeleteEvidenceMutation.graphql";
 import { Textarea } from "@/components/ui/textarea";
 
+// Function to format ISO8601 duration to human-readable format
+const formatDuration = (isoDuration: string): string => {
+  if (!isoDuration || !isoDuration.startsWith("P")) {
+    return isoDuration;
+  }
+
+  try {
+    const durationRegex =
+      /P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?/;
+    const matches = isoDuration.match(durationRegex);
+
+    if (!matches) return isoDuration;
+
+    const years = matches[1] ? parseInt(matches[1]) : 0;
+    const months = matches[2] ? parseInt(matches[2]) : 0;
+    const days = matches[3] ? parseInt(matches[3]) : 0;
+    const hours = matches[4] ? parseInt(matches[4]) : 0;
+    const minutes = matches[5] ? parseInt(matches[5]) : 0;
+    const seconds = matches[6] ? parseInt(matches[6]) : 0;
+
+    const parts = [];
+    if (years) parts.push(`${years} ${years === 1 ? "year" : "years"}`);
+    if (months) parts.push(`${months} ${months === 1 ? "month" : "months"}`);
+    if (days) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
+    if (hours) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
+    if (minutes)
+      parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
+    if (seconds)
+      parts.push(`${seconds} ${seconds === 1 ? "second" : "seconds"}`);
+
+    return parts.length > 0 ? parts.join(", ") : "No duration";
+  } catch (error) {
+    console.error("Error parsing duration:", error);
+    return isoDuration;
+  }
+};
+
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
     control: node(id: $controlId) {
@@ -74,6 +111,7 @@ const controlOverviewPageQuery = graphql`
               name
               description
               state
+              timeEstimate
               version
               evidences(first: 50)
                 @connection(key: "ControlOverviewPage_evidences") {
@@ -122,6 +160,7 @@ const createTaskMutation = graphql`
           id
           name
           description
+          timeEstimate
           state
         }
       }
@@ -269,6 +308,9 @@ function ControlOverviewPageContent({
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
+  const [timeEstimateDays, setTimeEstimateDays] = useState("");
+  const [timeEstimateHours, setTimeEstimateHours] = useState("");
+  const [timeEstimateMinutes, setTimeEstimateMinutes] = useState("");
 
   const [isDeleteTaskOpen, setIsDeleteTaskOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<{
@@ -324,6 +366,33 @@ function ControlOverviewPageContent({
     },
     [tasks]
   );
+
+  // Function to convert days, hours, and minutes to ISO 8601 duration format
+  const convertToISODuration = useCallback(() => {
+    let duration = "P";
+
+    if (timeEstimateDays && parseInt(timeEstimateDays) > 0) {
+      duration += `${parseInt(timeEstimateDays)}D`;
+    }
+
+    if (
+      (timeEstimateHours && parseInt(timeEstimateHours) > 0) ||
+      (timeEstimateMinutes && parseInt(timeEstimateMinutes) > 0)
+    ) {
+      duration += "T";
+
+      if (timeEstimateHours && parseInt(timeEstimateHours) > 0) {
+        duration += `${parseInt(timeEstimateHours)}H`;
+      }
+
+      if (timeEstimateMinutes && parseInt(timeEstimateMinutes) > 0) {
+        duration += `${parseInt(timeEstimateMinutes)}M`;
+      }
+    }
+
+    // Return empty string if no time components were provided
+    return duration === "P" ? "" : duration;
+  }, [timeEstimateDays, timeEstimateHours, timeEstimateMinutes]);
 
   useEffect(() => {
     const handleDragEnter = (e: globalThis.DragEvent) => {
@@ -415,6 +484,9 @@ function ControlOverviewPageContent({
       return;
     }
 
+    // Convert the time estimate components to ISO 8601 format
+    const isoTimeEstimate = convertToISODuration();
+
     createTask({
       variables: {
         connections: [`${data.control.tasks?.__id}`],
@@ -422,6 +494,7 @@ function ControlOverviewPageContent({
           controlId: data.control.id,
           name: newTaskName,
           description: newTaskDescription,
+          timeEstimate: isoTimeEstimate,
         },
       },
       onCompleted: () => {
@@ -431,6 +504,9 @@ function ControlOverviewPageContent({
         });
         setNewTaskName("");
         setNewTaskDescription("");
+        setTimeEstimateDays("");
+        setTimeEstimateHours("");
+        setTimeEstimateMinutes("");
         setIsCreateTaskOpen(false);
       },
       onError: (error) => {
@@ -804,6 +880,72 @@ function ControlOverviewPageContent({
                         placeholder="Enter task description"
                       />
                     </div>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="timeEstimate"
+                        className="text-sm font-medium"
+                      >
+                        Time Estimate (optional)
+                      </label>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <label
+                            htmlFor="days"
+                            className="text-xs text-gray-500 block mb-1"
+                          >
+                            Days
+                          </label>
+                          <Input
+                            id="days"
+                            type="number"
+                            min="0"
+                            value={timeEstimateDays}
+                            onChange={(e) =>
+                              setTimeEstimateDays(e.target.value)
+                            }
+                            placeholder="0"
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="hours"
+                            className="text-xs text-gray-500 block mb-1"
+                          >
+                            Hours
+                          </label>
+                          <Input
+                            id="hours"
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={timeEstimateHours}
+                            onChange={(e) =>
+                              setTimeEstimateHours(e.target.value)
+                            }
+                            placeholder="0"
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="minutes"
+                            className="text-xs text-gray-500 block mb-1"
+                          >
+                            Minutes
+                          </label>
+                          <Input
+                            id="minutes"
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={timeEstimateMinutes}
+                            onChange={(e) =>
+                              setTimeEstimateMinutes(e.target.value)
+                            }
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <DialogFooter>
                     <Button
@@ -903,15 +1045,16 @@ function ControlOverviewPageContent({
                       >
                         {task?.name}
                       </h3>
-                      {task?.description && (
+                      {task?.timeEstimate && (
                         <p
-                          className={`text-xs mt-1 ${
+                          className={`text-xs mt-1 flex items-center ${
                             task?.state === "DONE"
                               ? "text-gray-400 line-through"
-                              : "text-gray-500"
+                              : "text-blue-500"
                           }`}
                         >
-                          {task.description}
+                          <span className="inline-block w-4 h-4 mr-1">⏱️</span>
+                          <span>{formatDuration(task.timeEstimate)}</span>
                         </p>
                       )}
                     </div>

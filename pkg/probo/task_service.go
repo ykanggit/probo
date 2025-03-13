@@ -31,10 +31,11 @@ type (
 	}
 
 	CreateTaskRequest struct {
-		ControlID   gid.GID
-		Name        string
-		ContentRef  string
-		Description string
+		ControlID    gid.GID
+		Name         string
+		ContentRef   string
+		Description  string
+		TimeEstimate time.Duration
 	}
 
 	UpdateTaskRequest struct {
@@ -43,6 +44,7 @@ type (
 		Name            *string
 		Description     *string
 		State           *coredata.TaskState
+		TimeEstimate    *time.Duration
 	}
 )
 
@@ -58,14 +60,15 @@ func (s TaskService) Create(
 
 	control := &coredata.Control{}
 	task := &coredata.Task{
-		ID:          taskID,
-		ControlID:   req.ControlID,
-		Name:        req.Name,
-		ContentRef:  req.ContentRef,
-		State:       coredata.TaskStateTodo,
-		Description: req.Description,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		ID:           taskID,
+		ControlID:    req.ControlID,
+		Name:         req.Name,
+		ContentRef:   req.ContentRef,
+		State:        coredata.TaskStateTodo,
+		Description:  req.Description,
+		TimeEstimate: req.TimeEstimate,
+		CreatedAt:    now,
+		UpdatedAt:    now,
 	}
 
 	err = s.svc.pg.WithTx(
@@ -99,6 +102,7 @@ func (s TaskService) Update(
 		Name:            req.Name,
 		Description:     req.Description,
 		State:           req.State,
+		TimeEstimate:    req.TimeEstimate,
 	}
 
 	task := &coredata.Task{ID: req.ID}

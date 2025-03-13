@@ -106,9 +106,10 @@ type CreatePolicyPayload struct {
 }
 
 type CreateTaskInput struct {
-	ControlID   gid.GID `json:"controlId"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
+	ControlID    gid.GID       `json:"controlId"`
+	Name         string        `json:"name"`
+	Description  string        `json:"description"`
+	TimeEstimate time.Duration `json:"timeEstimate"`
 }
 
 type CreateTaskPayload struct {
@@ -329,14 +330,15 @@ type Session struct {
 }
 
 type Task struct {
-	ID          gid.GID             `json:"id"`
-	Version     int                 `json:"version"`
-	Name        string              `json:"name"`
-	Description string              `json:"description"`
-	State       coredata.TaskState  `json:"state"`
-	Evidences   *EvidenceConnection `json:"evidences"`
-	CreatedAt   time.Time           `json:"createdAt"`
-	UpdatedAt   time.Time           `json:"updatedAt"`
+	ID           gid.GID             `json:"id"`
+	Version      int                 `json:"version"`
+	Name         string              `json:"name"`
+	Description  string              `json:"description"`
+	State        coredata.TaskState  `json:"state"`
+	TimeEstimate time.Duration       `json:"timeEstimate"`
+	Evidences    *EvidenceConnection `json:"evidences"`
+	CreatedAt    time.Time           `json:"createdAt"`
+	UpdatedAt    time.Time           `json:"updatedAt"`
 }
 
 func (Task) IsNode()             {}

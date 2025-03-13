@@ -15,6 +15,7 @@ scalar CursorKey
 scalar Void
 scalar Datetime
 scalar Upload
+scalar Duration
 
 interface Node {
   id: ID!
@@ -261,6 +262,7 @@ type Task implements Node {
   name: String!
   description: String!
   state: TaskState!
+  timeEstimate: Duration!
 
   evidences(
     first: Int
@@ -485,6 +487,7 @@ input CreateTaskInput {
   controlId: ID!
   name: String!
   description: String!
+  timeEstimate: Duration!
 }
 
 type CreateTaskPayload {

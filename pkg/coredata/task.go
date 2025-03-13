@@ -29,15 +29,16 @@ import (
 
 type (
 	Task struct {
-		ID          gid.GID   `db:"id"`
-		ControlID   gid.GID   `db:"control_id"`
-		Name        string    `db:"name"`
-		Description string    `db:"description"`
-		State       TaskState `db:"state"`
-		ContentRef  string    `db:"content_ref"`
-		CreatedAt   time.Time `db:"created_at"`
-		UpdatedAt   time.Time `db:"updated_at"`
-		Version     int       `db:"version"`
+		ID           gid.GID       `db:"id"`
+		ControlID    gid.GID       `db:"control_id"`
+		Name         string        `db:"name"`
+		Description  string        `db:"description"`
+		State        TaskState     `db:"state"`
+		ContentRef   string        `db:"content_ref"`
+		CreatedAt    time.Time     `db:"created_at"`
+		UpdatedAt    time.Time     `db:"updated_at"`
+		Version      int           `db:"version"`
+		TimeEstimate time.Duration `db:"time_estimate"`
 	}
 
 	Tasks []*Task
@@ -47,6 +48,7 @@ type (
 		Name            *string
 		Description     *string
 		State           *TaskState
+		TimeEstimate    *time.Duration
 	}
 )
 
@@ -66,6 +68,7 @@ SELECT
     control_id,
     name,
     description,
+	time_estimate,
     state,
     content_ref,
     created_at,
@@ -115,7 +118,8 @@ INSERT INTO tasks (
     created_at,
     updated_at,
     version,
-    state
+    state,
+	time_estimate
 )
 VALUES (
     @tenant_id,
@@ -127,21 +131,23 @@ VALUES (
     @created_at,
     @updated_at,
     @version,
-    @state
+    @state,
+	@time_estimate
 );
 `
 
 	args := pgx.StrictNamedArgs{
-		"tenant_id":   scope.GetTenantID(),
-		"task_id":     t.ID,
-		"control_id":  t.ControlID,
-		"name":        t.Name,
-		"description": t.Description,
-		"content_ref": t.ContentRef,
-		"created_at":  t.CreatedAt,
-		"updated_at":  t.UpdatedAt,
-		"version":     t.Version,
-		"state":       t.State,
+		"tenant_id":     scope.GetTenantID(),
+		"task_id":       t.ID,
+		"control_id":    t.ControlID,
+		"name":          t.Name,
+		"description":   t.Description,
+		"content_ref":   t.ContentRef,
+		"created_at":    t.CreatedAt,
+		"updated_at":    t.UpdatedAt,
+		"version":       t.Version,
+		"state":         t.State,
+		"time_estimate": t.TimeEstimate,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -161,6 +167,7 @@ SELECT
     name,
     description,
     state,
+	time_estimate,
     content_ref,
     created_at,
     updated_at,
@@ -206,6 +213,7 @@ SET
     name = COALESCE(@name, name),
     description = COALESCE(@description, description),
     state = COALESCE(@state, state),
+	time_estimate = COALESCE(@time_estimate, time_estimate),
     updated_at = @updated_at,
     version = version + 1
 WHERE
@@ -223,6 +231,7 @@ RETURNING
 		"name":             params.Name,
 		"description":      params.Description,
 		"state":            params.State,
+		"time_estimate":    params.TimeEstimate,
 		"updated_at":       time.Now(),
 	}
 	maps.Copy(args, scope.SQLArguments())

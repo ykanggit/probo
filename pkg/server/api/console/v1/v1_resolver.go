@@ -207,9 +207,10 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.ControlID.TenantID())
 
 	task, err := svc.Tasks.Create(ctx, probo.CreateTaskRequest{
-		ControlID:   input.ControlID,
-		Name:        input.Name,
-		Description: input.Description,
+		ControlID:    input.ControlID,
+		Name:         input.Name,
+		Description:  input.Description,
+		TimeEstimate: input.TimeEstimate,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot create task: %w", err)
