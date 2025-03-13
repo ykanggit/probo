@@ -1,0 +1,365 @@
+framework:
+  name: soc2
+  description: SOC 2
+  content-ref: "8d133718-f74b-4393-b072-e5fc89bcb952"
+  controls:
+    - content-ref: "44be4eb5-ae65-4c84-b7ac-083979af3f64"
+      category: "Secure your offices and internet access"
+      importance: "MANDATORY"
+      standards: ["CC 6.4"]
+      name: "Implement Physical Access Control"
+      description: |
+        Even if you do most of your business online, you still have offices, computers or even printed document: you need to make sure those assets are physically secured (we will focus on the digital access later).
+    - content-ref: "c878ed70-01d3-4796-8572-0228ff6dda0c"
+      category: "Secure your offices and internet access"
+      name: "Use VPNs to Secure Access for Remote Devices"
+      importance: "PREFERRED"
+      standards: ["CC 6.4", "CC 6.6", "CC 6.7"]
+      description: |
+        In short, implementing a VPN will encrypt your data and ensure a safe transmission between your employees devices and your internal network (even when using untrusted networks like a public wifi) ⇒ it offers a layer of security for your data.
+    - content-ref: "4ebc26df-6a3e-47fa-8adb-42fb8f0f5703"
+      category: "Secure your offices and internet access"
+      name: "Cloud datacenter physical security"
+      importance: "PREFERRED"
+      standards: ["CC 6.4"]
+      description: |
+        You know how critical a data center is. You don’t want unauthorized people to access it.
+    - content-ref: "23590469-5569-4d13-8f13-89de55f7cc77"
+      category: "Secure your offices and internet access"
+      name: "Implement Visitor Access Policies"
+      importance: "MANDATORY"
+      standards: ["CC 6.4"]
+      description: |
+        Even if you do most of your business online, you still have offices, computers or even printed document: you need to make sure those assets are physically secured (we will focus on the digital access later) regarding visitors.
+    - content-ref: "07402b58-762f-4a8d-a08b-dfddf7beca6c"
+      category: "Manage your computers"
+      name: "Protect your employees devices"
+      importance: "MANDATORY"
+      standards:
+        ["CC 2.1", "CC 6.1", "CC 6.6", "CC 6.7", "CC 6.8", "CC 7.1", "CC 7.2"]
+      description: |
+        Mobile devices often have access to sensitive company data ⇒ you need to ensure that all devices are secure and compliant with established security policies.
+    - content-ref: "edef4ee7-01bf-43df-a815-ce1862e6fef1"
+      category: "Set up your employees for success"
+      name: "Integrate security checklist in your onboarding process"
+      importance: "MANDATORY"
+      standards: ["CC 1.4", "CC 5.3"]
+      description: |
+        It is the perfect timing to ensure that every employees has:
+
+        - accepted and signed all documents
+        - the access needed to perform his/her tasks
+        - started his/her security training
+    - content-ref: "578170a0-e0a5-47ef-9fdb-6971deee2958"
+      category: "Set up your employees for success"
+      name: "Properly off-board your employees"
+      importance: "MANDATORY"
+      standards: ["CC 5.3", "CC 6.2", "CC 6.5"]
+      description: |
+        Yes, people will leave your company (either by your decision or theirs). And you want to be prepare! If an early employee leaves and you forgot to change the ownership on his/her document, you might lose the documents.
+
+        Also, you want to be sure people can’t access the company data or systems once they left!
+    - content-ref: "03e71306-95dc-4e59-9e35-71dba7b2a831"
+      category: "Set up your employees for success"
+      name: "Know your recruits"
+      importance: "MANDATORY"
+      standards: ["CC 1.4"]
+      description: |
+        When recruiting someone, you want to be sure of who you are hiring: by performing reference checks (it can also be background checks), you add an additional layer of certainty on the candidate by looking for potential red flags in the candidate’s past (history of unethical behavior, harassment, fraud, etc..).
+    - content-ref: "1bf9192a-1b6a-48da-b232-a6e01c0c4e06"
+      category: "Set up your employees for success"
+      name: "Train your employees on security"
+      importance: "PREFERRED"
+      standards: ["CC 1.4", "CC 2.2"]
+      description: |
+        Your employees are the main target of cyber threats (especially phishing and social engineering), and education is one of the best way to reduce risk. Awareness of your employees will improve your company security.
+    - content-ref: "0296ff7e-f57a-4e68-abad-1146b7b8311b"
+      category: "Set up your employees for success"
+      name: "Implement confidential whistleblower process"
+      importance: "ADVANCED"
+      standards: ["CC 2.2"]
+      description: |
+        It encourages and enables employees to raise serious concerns (violations of your code of ethics or law or regulations) in order for them to be addressed and corrected while being protected from any retaliation.
+    - content-ref: "dfd5fa7a-db83-4c34-b21f-846e7775c594"
+      category: "Set up your employees for success"
+      name: "Run performance reviews"
+      importance: "PREFERRED"
+      standards: ["CC 1.3", "CC 1.4", "CC 1.5", "CC 4.2", "CC 5.3"]
+      description: |
+        Makes sure your team has the skills and focus needed to protect what matters most in your business. They help spot training gaps, reinforce accountability and ensure everyone is aligned with your operational goals - security being one of them. It's all about building a culture that proactively minimizes risks while continuously improving.
+    - content-ref: "ce18a430-13af-4c76-9e43-816877e82ddd"
+      category: "Set up your employees for success"
+      name: "Specify security responsabilities"
+      importance: "MANDATORY"
+      standards: ["CC 1.3", "CC 1.4", "CC 2.2", "CC 5.3", "CC 1.2"]
+      description: |
+        Having clear ownership improve accountability, it helps employees figure out what is legit and what is not.
+    - content-ref: "08df0530-0d7e-430c-9a1d-c97db46e2c66"
+      category: "Secure your emails"
+      name: "Implement email filtering and warning system"
+      importance: "MANDATORY"
+      standards: ["CC 6.1", "CC 6.8"]
+      description: |
+        As you know ⇒ email is the most common entry point. Each phishing email filtered out of your employee mailbox is less mental load for you and your employees and less risk faced by your company.
+    - content-ref: "25fa20e1-0772-4103-8d57-24da3d59f7d1"
+      category: "Secure your emails"
+      name: "Implement email authentication (DMARC)"
+      importance: "PREFERRED"
+      standards: ["CC 6.8", "CC 7.2"]
+      description: |
+        DMARK (Domain-based Message Authentication, Reporting, and Conformance) helps prevent email spoofing and phishing attacks by verifying the authenticity of emails sent from your domain.
+
+        It will do two things:
+
+        - your recipient will know for sure it is coming from you and it will protect your company reputation (with gmail and cie).
+        - you will be sure (if activated) that the email you received is really from the said company (if they parametered DMARC as well)
+    - content-ref: "54dcea24-d714-46a7-8e8e-3967a8dad962"
+      category: "Secure your emails"
+      name: "Quarantine suspicious emails"
+      importance: "ADVANCED"
+      standards: ["CC 6.8", "CC 7.2"]
+      description: |
+        If you set up email quarantine in Google Workspace, you prevent potentially harmful emails from reaching your employees. By following the steps below, you can create customized rules to catch and review spam, phishing attempts, and malicious content, ensuring a more secure email environment.
+    - content-ref: "e8c50ebe-a395-40df-b1d6-54d4020babcc"
+      category: "Configure your system access"
+      name: "Enable 2FA on critical services"
+      importance: "MANDATORY"
+      standards: ["CC 6.1", "CC 6.8"]
+      description: |
+        In order to minimize the threat of someone getting access to something they should not, we follow the **secure principle:** nobody can easily get access to data/systems.
+
+        We need to ensure that if someone has access to your password, they still cannot log into your account. Multi-Factor Authentication (MFA) adds extra layers of security by requiring users to provide additional authentication factors beyond their passwords. The most standard solution is 2FA: your password + something else.
+    - content-ref: "51e1ae1f-fe5b-4c65-bc0f-cd90a156437e"
+      category: "Configure your system access"
+      name: "Setup slack channel for access request"
+      importance: "MANDATORY"
+      standards: ["CC 6.2", "CC 6.3"]
+      description: |
+        In order to minimize the threat of someone getting access to something they should not, we follow the continuous update principle: making sure the privileges are up to date. We need to setup a proper process to define how we grant and revoke access to different systems.
+    - content-ref: "4f2b2e96-50a2-465f-8c31-85db878a402c"
+      category: "Configure your system access"
+      name: "Setup a password manager"
+      importance: "PREFERRED"
+      standards: ["CC 6.1"]
+      description: |
+        In order to minimize the threat of someone getting access to something they should not, we want to ensure a few things:
+
+        - The password used in your company are complex enough
+        - They are stored encrypted 
+        - They are shared safely when needed (not openly, on slack or by text)
+        - They are not compromised
+
+        The easiest way to implement those is to use a password manager.
+    - content-ref: "077349b3-5df1-44eb-9c8e-3b3d291c0199"
+      category: "Configure your system access"
+      name: "Setup role based access (RBAC)"
+      importance: "PREFERRED"
+      standards: ["CC 2.1", "CC 6.1"]
+      description: |
+        In order to minimize the threat of someone getting access to something they should not, we follow the least privilege principle: access is limited to what's necessary for job duties. We need to define which function should have access to which tool in your company to serve as a reference when providing access to people (password manager vaults etc.).
+    - content-ref: "0245ebe5-7108-4fc6-b64f-96e0e0b24f67"
+      category: "Configure your system access"
+      name: "Enforce SSO when possible"
+      importance: "PREFERRED"
+      standards: ["CC 6.1"]
+      description: |
+        To minimize the risk of unauthorized access, it's important to centralize and secure authentication across your organization. Single Sign-On (SSO) enhances security by enabling better control over account access, enforcing consistent security policies (e.g., 2FA), and making it easier to revoke access when someone leaves the organization.
+    - content-ref: "66fabe67-82d1-4957-af81-c4b89485212a"
+      category: "Secure your codebase"
+      name: "Require Pull Requests (PRs)"
+      importance: "MANDATORY"
+      standards: ["CC 1.4", "CC 8.1", "CC 5.2"]
+      description: |
+        Requiring pull requests and code reviews ensures higher code quality and security by allowing multiple team members to catch bugs, inefficiencies, and potential vulnerabilities before code is merged. It also promotes collaboration, knowledge sharing, and accountability within the team. This process helps prevent issues in production and maintains adherence to coding standards.
+    - content-ref: "a1fcbc72-de61-47c1-b65d-cbc7c75c158d"
+      category: "Secure your codebase"
+      name: "Set-up dependancy vulnerability alerts"
+      importance: "MANDATORY"
+      standards: ["CC 4.1", "CC 8.1"]
+      description: |
+        It ensures your project stays secure and up-to-date without manual tracking of dependencies. It also reduces the risk of using outdated or insecure libraries in your codebase.
+    - content-ref: "2bb3102d-6bc7-4869-a86d-3ee2e6cb7756"
+      category: "Secure your codebase"
+      name: "Set-up 2FA for all contributors"
+      importance: "MANDATORY"
+      standards: ["CC 5.2"]
+      description: |
+        It reduces the risk of account compromise for all contributors, especially the ones not in your company.
+    - content-ref: "515c6c80-2274-40f0-82cd-cc912a2be1f9"
+      category: "Secure your codebase"
+      name: "Enable code scanning"
+      importance: "PREFERRED"
+      standards: ["CC 4.1", "CC 8.1"]
+      description: |
+        It ensures that potential security flaws are detected early. This proactive approach strengthens your security posture and helps maintain high code quality.
+    - content-ref: "f88963fe-2641-47b7-8a03-f18704952024"
+      category: "Secure your codebase"
+      name: "Document your development lifecycle"
+      importance: "PREFERRED"
+      standards: ["CC 1.4", "CC 5.2", "CC 8.1"]
+      description: |
+        Formalizing a proper development lifecycle helps your engineer in their jobs and helps you to scale your team. It reduces the chances of human error.
+    - content-ref: "8a5d46b7-ece7-4f84-b720-ccf88c5d49f8"
+      category: "Secure your infrastructure"
+      name: "List of your assets"
+      importance: "MANDATORY"
+      standards: ["CC 2.1", "CC 4.1"]
+      description: |
+        The assets that are storing or processing data are potential vulnerabilities that could be exploited. ⇒ You need to know which assets your company has in order to be able to properly manage and secure them.
+    - content-ref: "6a8a1745-850b-44ee-a688-d3e126ad46fa"
+      category: "Secure your infrastructure"
+      name: "Scan for Security updates"
+      importance: "MANDATORY"
+      standards: ["CC 4.1", "CC 6.8", "CC 7.1"]
+      description: |
+        An automated security scanning software on your infrastructure components enables you to fix potential vulnerabilities as soon as they are uncovered.
+    - content-ref: "5c18790f-f0f6-41ce-ae4b-6f6b3bcb7058"
+      category: "Secure your infrastructure"
+      name: "Implement IAM for database authentication"
+      importance: "PREFERRED"
+      standards: ["CC 6.1"]
+      description: |
+        You want to ensure that only the proper people can access your production database. You also want to avoid the burden of managing another list of users or rotating credentials.
+    - content-ref: "3274441b-b8b9-44ea-bd2a-bc2652b48973"
+      category: "Secure your infrastructure"
+      name: "Plug GCP & Github"
+      importance: "MANDATORY"
+      standards: ["CC 6.1", "CC 6.8 6.3"]
+      description: |
+        Having credentials to manage can become a nightmare (especially if you need to change/rotate them often) - it quickly becomes time consuming. It is the same with lifetime tokens - someone leaving and you need to change them.
+    - content-ref: "b0c11cc1-07f4-43ab-badb-e6ebf0cd9152"
+      category: "Secure your infrastructure"
+      name: "Manage your service accounts"
+      importance: "MANDATORY"
+      standards: ["CC 6.3"]
+      description: |
+        You don’t want to use the “default” service account, it has way too many permissions - it is a super administrator. Even GCP is asking you not to use it, it is only here for legacy reasons. In the same idea, grant your service accounts only what is necessary.
+    - content-ref: "cd865af6-0ab8-4366-b4eb-fb84baf03a87"
+      category: "Secure your infrastructure"
+      name: "Keep an history of all your changes"
+      importance: "MANDATORY"
+      standards: ["CC 7.1", "CC 7.2", "CC 8.1", "CC 5.3"]
+      description: |
+        Infrastructure as Code (IaC) makes sure all your infrastructure changes are done in a standardized and repeatable process - the chance of human error is lower. Moreover, IaC enables version control and peer reviews. When growing, you will have to do it - the earlier the better (later, it can become really painful).
+    - content-ref: "2553b667-5abd-426f-adc4-e9824e8d0994"
+      category: "Secure your infrastructure"
+      name: "Streamline your patch management"
+      importance: "MANDATORY"
+      standards: ["CC 7.1"]
+      description: |
+        New OS version vulnerabilities are regularly discovered - not applying patches for those leaves your application “open” to a publicly known vulnerability. If you don’t streamline the process, it will requires investment on your side and increase the exposure duration.
+    - content-ref: "c152fa68-0c76-405c-b07c-8fb413af06d0"
+      category: "Protect your Network"
+      name: "Restrict public access on your infrastructure"
+      importance: "MANDATORY"
+      standards: ["CC 6.1", "CC 6.6", "CC 6.7"]
+      description: |
+        Public access to your company's infrastructure is a serious security risk. By configuring your cloud provider to restrict public access, you can reduce the risk of unauthorized access to your sensitive data and systems.
+    - content-ref: "f68a9024-44b1-4bdd-b659-b086ff5865a4"
+      category: "Protect your Network"
+      name: "Set-up a WAF"
+      importance: "PREFERRED"
+      standards: ["CC 6.1", "CC 6.6"]
+      description: |
+        Cloudflare filters malicious traffic, preventing attacks (like SQL injections and cross-site scripting) and mitigates risks of service disruptions. Additionally, Cloudflare can masks your origin IP, reducing exposure and limiting direct access to your infrastructure.
+    - content-ref: "845e0d1e-ee55-4b7d-80dd-ea333818e61e"
+      category: "Protect your Network"
+      name: "Run a penetration test"
+      importance: "ADVANCED"
+      standards: ["CC 3.2", "CC 4.1", "CC 8.1"]
+      description: |
+        It is a good way to safeguard your company’s data. It is a real-life simulation of attack scenarios on your company: it enables you to identify potential vulnerabilities that can be fixed before being exploited.
+    - content-ref: "1c3819b4-3f2c-4480-ad97-2a7b0283f8d8"
+      category: "Safeguard your data"
+      name: "Automated backup"
+      importance: "MANDATORY"
+      standards: ["CC 7.5", "CC 9.1"]
+      description: |
+        Automated backups ensure that your data - one of your company’s most important assets - is regularly and securely saved, reducing the risk of data loss. The back-up keep it safe and available, the automated and regular allows for a restoration just before any disruption, minimizing loss.
+    - content-ref: "f3395da7-b717-46b4-8092-9fca304c8344"
+      category: "Safeguard your data"
+      name: "Help the auditor with a data-flow diagram"
+      importance: "MANDATORY"
+      standards: ["CC 2.1", "CC 2.2"]
+      description: |
+        The auditor doesn’t know your company and your systems. Providing him with a diagram that show all account data accross your systems & networks will enable him/her to understand your challenges faster and also to better evaluate your tradeoffs (when needed). It will also help you be 100% clear on how you process your data, and help with onboarding.
+    - content-ref: "5d9fb42c-7d7b-466a-85b1-afb535dbf4a6"
+      category: "Safeguard your data"
+      name: "Encrypt your data storage"
+      importance: "MANDATORY"
+      standards: ["CC 6.1", "CC 6.6", "CC 6.7"]
+      description: |
+        By encrypting data, you ensure that loss or theft of a device won’t result in a data breach. It also protects sensitive information from unauthorized access.
+    - content-ref: "44816697-458b-4768-9821-1e90325f0558"
+      category: "Safeguard your data"
+      name: "Encrypt your data in transit"
+      importance: "MANDATORY"
+      standards: ["CC 6.1", "CC 6.6", "CC 6.7"]
+      description: |
+        Data sent over networks can be intercepted and read - the encryption ensure it won’t be intelligible. It secure it from potential threats.
+    - content-ref: "0c650a10-8407-4035-bcb1-6f4cd035122b"
+      category: "Safeguard your data"
+      name: "Data inventory"
+      importance: "MANDATORY"
+      standards: ["CC 2.1", "CC 6.1", "CC 9.2"]
+      description: |
+        Having an accurate and up-to-date inventory of all your data assets (databases, cloud storage or even file shares) enables you to be exhaustive in how you treat your data safety.
+    - content-ref: "32d8584d-d171-43e2-8428-b52cf0b5ad0d"
+      category: "Log collection and monitoring"
+      name: "Configure logs and implement real-time monitoring"
+      importance: "MANDATORY"
+      standards:
+        ["CC 2.1", "CC 6.1", "CC 6.6", "CC 6.8", "CC 7.1", "CC 7.2", "CC 7.3"]
+      description: |
+        It allows you to detect and respond to potential security incidents or system failures immediately, minimizing downtime and reducing the risk of data breaches. It maintain visibility into system performance and security events.
+    - content-ref: "99b96e82-f750-4bca-85cc-860dcc681298"
+      category: "Log collection and monitoring"
+      name: "Keep your logs"
+      importance: "MANDATORY"
+      standards: ["CC 7.3"]
+      description: |
+        Logs help you to detect and investigate security incidents and troubleshoot operational issues. They provide an audit trail.
+    - content-ref: "0c384a4d-da22-4a90-ba0f-a83812a17f49"
+      category: "Log collection and monitoring"
+      name: "Be automatically notified of issues"
+      importance: "MANDATORY"
+      standards: ["6.1", "6.6", "6.8", "CC 7.1", "CC 7.2", "CC 7.3"]
+      description: |
+        Setting up alerting allows you to respond quickly and minimize downtime or potential data breaches. It ensures that important events, such as unauthorized access or system failures, are addressed promptly.
+    - content-ref: "c3fb8a93-4be5-44da-bcbc-8ee01cb31d2e"
+      category: "Prepare for incidents"
+      name: "Build an incident response process"
+      importance: "MANDATORY"
+      standards: ["CC 2.2"]
+      description: |
+        An incident response plan is crucial for quickly identifying, containing, and resolving incidents, minimizing potential disruptions. It ensures you’re prepared effectively and that you keep your operations running smoothly, even in the face of unexpected threats.
+    - content-ref: "07659ea9-7fce-4557-932e-49384b01bc10"
+      category: "Prepare for incidents"
+      name: "Create & test your disaster recovery plan"
+      importance: "MANDATORY"
+      standards: ["CC 3.2", "CC 5.1", "CC 7.5", "CC 8.1"]
+      description: |
+        Disasters might seem far-fetched, but data loss, service outages, and misconfigurations can happen. Whether it's a simple human error or a regional outage, a DRP helps your team recover fast and maintain customer trust.
+    - content-ref: "3745b7c3-d5ac-45da-80a5-3cf2009bd946"
+      category: "Share your SOC 2"
+      name: "Have a security page"
+      importance: "MANDATORY"
+      standards: ["CC 2.3"]
+      description: |
+        Having SOC-2 for yourself is useless, you want to leverage it as much as possible.
+    - content-ref: "be4808c3-8b1e-4d0a-a936-b067716d88e1"
+      category: "Share your SOC 2"
+      name: "Clearly explain your services"
+      importance: "MANDATORY"
+      standards: ["CC 2.3"]
+      description: |
+        Here, we are not enhancing security, we are helping the auditor be more efficient. As part of the audit, he/she will need to understand clear boundaries for the audit, identify the relevant risk and then check how you mitigate them. 
+
+        A proper service description is key for your customers, but it also help the auditor understands what your customers are expecting from you.
+    - content-ref: "83a018c0-1031-4637-b9ca-7210330be626"
+      category: "Share your SOC 2"
+      name: "External support available"
+      importance: "PREFERRED"
+      standards: ["CC 2.3"]
+      description: |
+        External support is not required for SOC 2, but it enhances transparency by showcasing your security practices, policies, and compliance efforts, building trust with customers and stakeholders. - Ultimately, this is what SOC 2 is about: reassuring your prospect and customer on how you work.
