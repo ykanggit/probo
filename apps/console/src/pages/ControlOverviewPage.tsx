@@ -220,7 +220,6 @@ function ControlOverviewPageContent({
     if (upperState === "NOT_APPLICABLE") return "Not Applicable";
     if (upperState === "IMPLEMENTED") return "Implemented";
 
-    // Fallback for any other states
     const formatted = state.toLowerCase();
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   };
