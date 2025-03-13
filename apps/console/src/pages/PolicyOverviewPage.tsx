@@ -228,15 +228,6 @@ function PolicyOverviewPageContent({
                     <Shield className="h-6 w-6" />
                   </div>
                   <div className="flex gap-2">
-                    <Badge
-                      variant="outline"
-                      className="bg-black text-white hover:bg-black/90 px-3 py-1 rounded-md font-medium"
-                    >
-                      SOC2
-                    </Badge>
-                    <Badge className="px-3 py-1 rounded-md font-medium">
-                      Security
-                    </Badge>
                     {policy.status && (
                       <Badge
                         className={`px-3 py-1 rounded-md font-medium ${
