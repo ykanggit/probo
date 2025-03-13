@@ -253,7 +253,7 @@ type Mutation struct {
 type Organization struct {
 	ID         gid.GID              `json:"id"`
 	Name       string               `json:"name"`
-	LogoURL    string               `json:"logoUrl"`
+	LogoURL    *string              `json:"logoUrl,omitempty"`
 	Frameworks *FrameworkConnection `json:"frameworks"`
 	Vendors    *VendorConnection    `json:"vendors"`
 	Peoples    *PeopleConnection    `json:"peoples"`
@@ -399,9 +399,9 @@ type UpdateFrameworkPayload struct {
 }
 
 type UpdateOrganizationInput struct {
-	OrganizationID gid.GID `json:"organizationId"`
-	Name           *string `json:"name,omitempty"`
-	LogoURL        *string `json:"logoUrl,omitempty"`
+	OrganizationID gid.GID         `json:"organizationId"`
+	Name           *string         `json:"name,omitempty"`
+	Logo           *graphql.Upload `json:"logo,omitempty"`
 }
 
 type UpdateOrganizationPayload struct {

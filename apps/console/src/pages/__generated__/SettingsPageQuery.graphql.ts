@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9a5ce377f093c4bbbb2375aacc373fb0>>
+ * @generated SignedSource<<eb02c3812f7904bcf7d937d1c29d9905>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,7 +15,7 @@ export type SettingsPageQuery$variables = {
 export type SettingsPageQuery$data = {
   readonly organization: {
     readonly id: string;
-    readonly logoUrl?: string;
+    readonly logoUrl?: string | null | undefined;
     readonly name?: string;
   };
 };

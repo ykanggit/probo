@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e71f99685baea9efcb9f603d577f7412>>
+ * @generated SignedSource<<075aa1caf8416e0cce7536d0da9b5ca9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,7 +16,7 @@ export type OrganizationSwitcher_organizations$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly id: string;
-        readonly logoUrl: string;
+        readonly logoUrl: string | null | undefined;
         readonly name: string;
       };
     }>;

@@ -1,4 +1,4 @@
-import { Mail, Building2, Upload, MoreVertical } from "lucide-react";
+import { Building2, Upload, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,21 +15,48 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Helmet } from "react-helmet-async";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import {
   graphql,
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
+  useMutation,
 } from "react-relay";
 import { useParams } from "react-router";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__/SettingsPageQuery.graphql";
+import type { SettingsPageUpdateOrganizationMutation as SettingsPageUpdateOrganizationMutationType } from "./__generated__/SettingsPageUpdateOrganizationMutation.graphql";
 
 const settingsPageQuery = graphql`
   query SettingsPageQuery($organizationID: ID!) {
     organization: node(id: $organizationID) {
       id
       ... on Organization {
+        name
+        logoUrl
+      }
+    }
+  }
+`;
+
+const updateOrganizationMutation = graphql`
+  mutation SettingsPageUpdateOrganizationMutation(
+    $input: UpdateOrganizationInput!
+  ) {
+    updateOrganization(input: $input) {
+      organization {
+        id
         name
         logoUrl
       }
@@ -52,6 +79,88 @@ function SettingsPageContent({
   const data = usePreloadedQuery(settingsPageQuery, queryRef);
   const organization = data.organization;
   const members: Member[] = [];
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isEditNameOpen, setIsEditNameOpen] = useState(false);
+  const [organizationName, setOrganizationName] = useState(
+    organization.name || ""
+  );
+  const [isUploading, setIsUploading] = useState(false);
+
+  const [updateOrganization] =
+    useMutation<SettingsPageUpdateOrganizationMutationType>(
+      updateOrganizationMutation
+    );
+
+  const handleUpdateName = () => {
+    updateOrganization({
+      variables: {
+        input: {
+          organizationId: organization.id,
+          name: organizationName,
+        },
+      },
+      onCompleted: () => {
+        toast({
+          title: "Organization updated",
+          description: "Organization name has been updated successfully.",
+          variant: "default",
+        });
+        setIsEditNameOpen(false);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error updating organization",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Create a FileReader to read the file as a data URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setIsUploading(true);
+
+      updateOrganization({
+        variables: {
+          input: {
+            organizationId: organization.id,
+            logo: null,
+          },
+        },
+        uploadables: {
+          "input.logo": file,
+        },
+        onCompleted: () => {
+          setIsUploading(false);
+          toast({
+            title: "Logo updated",
+            description: "Organization logo has been updated successfully.",
+            variant: "default",
+          });
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+        },
+        onError: (error) => {
+          setIsUploading(false);
+          toast({
+            title: "Error updating logo",
+            description: error.message,
+            variant: "destructive",
+          });
+        },
+      });
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <>
@@ -65,32 +174,10 @@ function SettingsPageContent({
 
         <Card>
           <CardHeader>
-            <CardTitle>User & Organisation information</CardTitle>
-            <CardDescription>
-              Publish your trust page to the web
-            </CardDescription>
+            <CardTitle>Organization information</CardTitle>
+            <CardDescription>Manage your organization details</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Account email</label>
-              <div className="flex items-center justify-between rounded-lg border p-3 shadow-xs">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-muted-foreground">
-                    This is your email to connect to Probo
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-green-600">
-                    john.doe@example.com
-                  </span>
-                  <Button variant="outline" size="sm">
-                    Edit
-                  </Button>
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-2">
               <label className="text-sm font-medium">Organization logo</label>
               <div className="flex items-center justify-between rounded-lg border p-3 shadow-xs">
@@ -110,7 +197,23 @@ function SettingsPageContent({
                     Upload a logo to be displayed at the top of your trust page
                   </span>
                 </div>
-                <Button variant="outline">Change image</Button>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleLogoUpload}
+                    accept="image/*"
+                    className="hidden"
+                    id="logo-upload"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? "Uploading..." : "Change image"}
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -125,16 +228,19 @@ function SettingsPageContent({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm">{organization.name}</span>
-                  <Button variant="outline" size="sm">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setOrganizationName(organization.name || "");
+                      setIsEditNameOpen(true);
+                    }}
+                  >
                     Edit
                   </Button>
                 </div>
               </div>
             </div>
-
-            <Button variant="destructive" className="mt-6">
-              Delete Organization
-            </Button>
           </CardContent>
         </Card>
 
@@ -193,6 +299,34 @@ function SettingsPageContent({
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={isEditNameOpen} onOpenChange={setIsEditNameOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Organization Name</DialogTitle>
+            <DialogDescription>
+              Update the name of your organization.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="organization-name">Organization Name</Label>
+              <Input
+                id="organization-name"
+                value={organizationName}
+                onChange={(e) => setOrganizationName(e.target.value)}
+                placeholder="Enter organization name"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditNameOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateName}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

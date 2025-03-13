@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<75687d4b60d4ae79658fffb99ea6f52b>>
+ * @generated SignedSource<<a147a01f27db2e92570cd66f6b9c1df9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -21,7 +21,7 @@ export type CreateOrganizationPageCreateOrganizationMutation$data = {
     readonly organizationEdge: {
       readonly node: {
         readonly id: string;
-        readonly logoUrl: string;
+        readonly logoUrl: string | null | undefined;
         readonly name: string;
       };
     };

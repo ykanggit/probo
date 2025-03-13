@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<59c4e8be77fdb5ebcc76c2a611f38052>>
+ * @generated SignedSource<<d50c4986386f83d9755379cd44eb7c2c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,7 +17,7 @@ export type OrganizationSelectionPageQuery$data = {
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly id: string;
-          readonly logoUrl: string;
+          readonly logoUrl: string | null | undefined;
           readonly name: string;
         };
       }>;

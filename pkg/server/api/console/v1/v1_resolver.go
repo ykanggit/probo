@@ -197,6 +197,29 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.C
 	}, nil
 }
 
+// UpdateOrganization is the resolver for the updateOrganization field.
+func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.UpdateOrganizationInput) (*types.UpdateOrganizationPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+
+	req := probo.UpdateOrganizationRequest{
+		ID:   input.OrganizationID,
+		Name: input.Name,
+	}
+
+	if input.Logo != nil {
+		req.File = input.Logo.File
+	}
+
+	organization, err := svc.Organizations.Update(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("cannot update organization: %w", err)
+	}
+
+	return &types.UpdateOrganizationPayload{
+		Organization: types.NewOrganization(organization),
+	}, nil
+}
+
 // DeleteOrganization is the resolver for the deleteOrganization field.
 func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error) {
 	panic(fmt.Errorf("not implemented: DeleteOrganization - deleteOrganization"))
@@ -318,6 +341,11 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 	return &types.UpdateFrameworkPayload{
 		Framework: types.NewFramework(framework),
 	}, nil
+}
+
+// ImportFramework is the resolver for the importFramework field.
+func (r *mutationResolver) ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error) {
+	panic(fmt.Errorf("not implemented: ImportFramework - importFramework"))
 }
 
 // CreateControl is the resolver for the createControl field.
@@ -462,6 +490,13 @@ func (r *mutationResolver) ConfirmEmail(ctx context.Context, input types.Confirm
 	}
 
 	return &types.ConfirmEmailPayload{Success: true}, nil
+}
+
+// LogoURL is the resolver for the logoUrl field.
+func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organization) (*string, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	return svc.Organizations.GenerateLogoURL(ctx, obj.ID, 1*time.Hour)
 }
 
 // Frameworks is the resolver for the frameworks field.

@@ -17,10 +17,14 @@ package probo
 import (
 	"context"
 	"fmt"
+	"io"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
+	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
 
@@ -31,6 +35,12 @@ type (
 
 	CreateOrganizationRequest struct {
 		Name string
+	}
+
+	UpdateOrganizationRequest struct {
+		ID   gid.GID
+		Name *string
+		File io.Reader
 	}
 )
 
@@ -93,4 +103,86 @@ func (s OrganizationService) Get(
 	}
 
 	return organization, nil
+}
+
+func (s OrganizationService) Update(
+	ctx context.Context,
+	req UpdateOrganizationRequest,
+) (*coredata.Organization, error) {
+	organization := &coredata.Organization{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			organization.UpdatedAt = time.Now()
+
+			if req.Name != nil {
+				organization.Name = *req.Name
+			}
+
+			if req.File != nil {
+				objectKey, err := uuid.NewV7()
+				if err != nil {
+					return fmt.Errorf("cannot generate object key: %w", err)
+				}
+
+				_, err = s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
+					Bucket: aws.String(s.svc.bucket),
+					Key:    aws.String(objectKey.String()),
+					Body:   req.File,
+				})
+
+				if err != nil {
+					return fmt.Errorf("cannot upload file to S3: %w", err)
+				}
+
+				organization.LogoObjectKey = objectKey.String()
+			}
+
+			if err := organization.Update(ctx, s.svc.scope, conn); err != nil {
+				return fmt.Errorf("cannot update organization: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return organization, nil
+}
+
+func (s OrganizationService) GenerateLogoURL(
+	ctx context.Context,
+	organizationID gid.GID,
+	expiresIn time.Duration,
+) (*string, error) {
+	organization, err := s.Get(ctx, organizationID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get organization: %w", err)
+	}
+
+	if organization.LogoObjectKey == "" {
+		return nil, nil
+	}
+
+	presignClient := s3.NewPresignClient(s.svc.s3)
+
+	presignedReq, err := presignClient.PresignGetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(s.svc.bucket),
+		Key:    aws.String(organization.LogoObjectKey),
+	}, func(opts *s3.PresignOptions) {
+		opts.Expires = expiresIn
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot presign GetObject request: %w", err)
+	}
+
+	return &presignedReq.URL, nil
 }

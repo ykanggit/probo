@@ -107,7 +107,7 @@ type OrganizationEdge {
 type Organization implements Node {
   id: ID!
   name: String!
-  logoUrl: String!
+  logoUrl: String @goField(forceResolver: true)
 
   frameworks(
     first: Int
@@ -467,7 +467,7 @@ input CreateOrganizationInput {
 input UpdateOrganizationInput {
   organizationId: ID!
   name: String
-  logoUrl: String
+  logo: Upload
 }
 
 input DeleteOrganizationInput {
