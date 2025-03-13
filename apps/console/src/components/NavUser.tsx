@@ -42,7 +42,6 @@ export const navUserFragment = graphql`
 export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
   const { isMobile } = useSidebar();
   const currentUser = useFragment(navUserFragment, viewer);
-  const navigate = useNavigate();
   const { organizationId } = useParams();
 
   const handleLogout = async () => {
@@ -50,7 +49,7 @@ export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
       method: "DELETE",
       credentials: "include",
     }).then(() => {
-      navigate("/login");
+      window.location.href = "https://www.getprobo.com";
     });
   };
 
