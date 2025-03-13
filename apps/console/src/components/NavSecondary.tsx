@@ -12,7 +12,7 @@ import {
 const navItems = [
   {
     title: "Support",
-    url: "#",
+    url: "mailto:support@getprobo.com",
     icon: LifeBuoy,
   },
   {
