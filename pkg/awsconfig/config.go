@@ -15,12 +15,16 @@
 package awsconfig
 
 import (
+	"context"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/credentials/ec2rolecreds"
+	"github.com/aws/aws-sdk-go-v2/credentials/endpointcreds"
+	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 	"go.gearno.de/kit/httpclient"
 	"go.gearno.de/kit/log"
 )
@@ -68,14 +72,35 @@ func NewConfig(logger *log.Logger, httpClient *http.Client, opts Options) aws.Co
 	// cfg.Logger = logger TODO: add logger interface for aws
 
 	if opts.AccessKeyID != "" && opts.SecretAccessKey != "" {
+		// Use static credentials if provided
 		cfg.Credentials = credentials.NewStaticCredentialsProvider(
 			opts.AccessKeyID,
 			opts.SecretAccessKey,
 			opts.SessionName,
 		)
 	} else {
+		imdsClient := imds.New(imds.Options{HTTPClient: httpClient})
+
+		ec2Provider := ec2rolecreds.New(func(options *ec2rolecreds.Options) {
+			options.Client = imdsClient
+		})
+
+		ecsCredentialsURI := os.Getenv("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI")
+		ecsProvider := endpointcreds.New("http://169.254.170.2"+ecsCredentialsURI,
+			func(options *endpointcreds.Options) {
+				options.HTTPClient = httpClient
+			},
+		)
+
 		cfg.Credentials = aws.NewCredentialsCache(
-			ec2rolecreds.New(),
+			aws.CredentialsProviderFunc(func(ctx context.Context) (aws.Credentials, error) {
+				creds, err := ecsProvider.Retrieve(ctx)
+				if err == nil {
+					return creds, nil
+				}
+
+				return ec2Provider.Retrieve(ctx)
+			}),
 			func(o *aws.CredentialsCacheOptions) {
 				o.ExpiryWindow = 10 * time.Minute
 			},

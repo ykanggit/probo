@@ -148,8 +148,6 @@ github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 h1:gEOO8jv9F4OT7lGC
 github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1/go.mod h1:Ohn+xnUBiLI6FVj/9LpzZWtj1/D6lUovWYBkxHVV3aM=
 go.gearno.de/crypto/uuid v0.1.0 h1:94BYg7GYItJ6yYZ1GJayb3VYhI9/FjxuR1nFaduR4hE=
 go.gearno.de/crypto/uuid v0.1.0/go.mod h1:fnIIvKO9QnsyLO3ZJLJT3r8KZv/p0FOeT5eZKilYWXg=
-go.gearno.de/kit v0.0.0-20250308215532-082d0731efae h1:CrC8b2quMUZQ0ry16N40rvz7EktnEpOyBJrAId0Hdc8=
-go.gearno.de/kit v0.0.0-20250308215532-082d0731efae/go.mod h1:RsqqVkwq+p4rmtOfYLX8NmQ+kIDi0tgyzAr2GsuLUnE=
 go.gearno.de/kit v0.0.0-20250313103045-779e525d954c h1:zriqh+c5QMPBL6fZtSxKNLgULooI9Oxnyh4IL9y0Fzs=
 go.gearno.de/kit v0.0.0-20250313103045-779e525d954c/go.mod h1:RsqqVkwq+p4rmtOfYLX8NmQ+kIDi0tgyzAr2GsuLUnE=
 go.gearno.de/x/panicf v0.1.1 h1:E3Cr9NB8Ry2EsvEG/1eHr7kplP3tEjTf5d56dTX64VQ=
