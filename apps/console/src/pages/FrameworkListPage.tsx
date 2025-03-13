@@ -28,7 +28,8 @@ const FrameworkListPageQuery = graphql`
   query FrameworkListPageQuery($organizationId: ID!) {
     organization: node(id: $organizationId) {
       ... on Organization {
-        frameworks(first: 25) @connection(key: "FrameworkListPage_frameworks") {
+        frameworks(first: 100)
+          @connection(key: "FrameworkListPage_frameworks") {
           edges {
             node {
               id
