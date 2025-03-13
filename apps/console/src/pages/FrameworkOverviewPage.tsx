@@ -126,9 +126,6 @@ function FrameworkOverviewPageContent({
                   <Shield className="w-4 h-4 text-muted-foreground" />
                   <span className="text-sm font-medium">{card.title}</span>
                 </div>
-                <Avatar className="h-6 w-6 rounded-full">
-                  <AvatarFallback>U</AvatarFallback>
-                </Avatar>
               </div>
               <div className="mt-4 space-y-2">
                 <div className="flex gap-1">
@@ -214,9 +211,6 @@ function FrameworkOverviewPageContent({
                   </div>
                   <div className="bg-[#2A2A2A] text-white px-2 py-1 rounded-full text-xs">
                     Mandatory
-                  </div>
-                  <div className="bg-[#2A2A2A] text-white px-2 py-1 rounded-full text-xs">
-                    Assigned to you
                   </div>
                 </div>
                 <MoveUpRight className="w-4 h-4 cursor-pointer hover:text-[#A3E635] transition-colors" />
