@@ -61,6 +61,7 @@ const vendorListFragment = graphql`
           description
           createdAt
           updatedAt
+          riskTier
         }
       }
       pageInfo {
@@ -333,7 +334,7 @@ function VendorListContent({
                   variant="secondary"
                   className="bg-lime-9 text-white rounded-full px-3 py-0.5 text-xs font-medium"
                 >
-                  Low Risk
+                  {vendor?.riskTier}
                 </Badge>
                 <Button
                   variant="ghost"

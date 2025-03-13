@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<81cac01f1ba6637b3367363835258e4c>>
+ * @generated SignedSource<<21747064508d0bb73d846aed7ed6b97a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,12 +9,14 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type ControlImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type UpdateControlInput = {
   category?: string | null | undefined;
   description?: string | null | undefined;
   expectedVersion: number;
   id: string;
+  importance?: ControlImportance | null | undefined;
   name?: string | null | undefined;
   state?: ControlState | null | undefined;
 };

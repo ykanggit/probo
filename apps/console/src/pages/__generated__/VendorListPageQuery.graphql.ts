@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0325c8c8e750f1d254a8dffb9e26870e>>
+ * @generated SignedSource<<5b261d2af4d8fef41cbe574d9b08ef28>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -209,6 +209,13 @@ return {
                             "name": "updatedAt",
                             "storageKey": null
                           },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "riskTier",
+                            "storageKey": null
+                          },
                           (v8/*: any*/)
                         ],
                         "storageKey": null
@@ -296,12 +303,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "7aa223f9a0e9a5f57269b5dbdd339625",
+    "cacheID": "c898734b8c7718e6374ac856827fa4f6",
     "id": null,
     "metadata": {},
     "name": "VendorListPageQuery",
     "operationKind": "query",
-    "text": "query VendorListPageQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...VendorListPage_vendors_pbnwq\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query VendorListPageQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...VendorListPage_vendors_pbnwq\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();

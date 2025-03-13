@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<36b79f3dc10a438f4bebae5387130337>>
+ * @generated SignedSource<<4061e153ecdb5d4c746bf6e5dd33537a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -207,6 +207,13 @@ return {
                             "name": "updatedAt",
                             "storageKey": null
                           },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "riskTier",
+                            "storageKey": null
+                          },
                           (v7/*: any*/)
                         ],
                         "storageKey": null
@@ -294,16 +301,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "3ebbf3bc033c96f10ad0e06f53ef3551",
+    "cacheID": "36b6d950eacaed69ecef277f51ce7b2f",
     "id": null,
     "metadata": {},
     "name": "VendorListPagePaginationQuery",
     "operationKind": "query",
-    "text": "query VendorListPagePaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...VendorListPage_vendors_pbnwq\n    id\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query VendorListPagePaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...VendorListPage_vendors_pbnwq\n    id\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3e2b7b3ee9248d288c34bcd156a0604d";
+(node as any).hash = "7b7bdfacd87b8fa297e905e56cc44423";
 
 export default node;
