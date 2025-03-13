@@ -10,7 +10,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CreateControlPageCreateControlMutation } from "./__generated__/CreateControlPageCreateControlMutation.graphql";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  CreateControlPageCreateControlMutation,
+  ControlImportance,
+} from "./__generated__/CreateControlPageCreateControlMutation.graphql";
 
 const createControlMutation = graphql`
   mutation CreateControlPageCreateControlMutation(
@@ -71,7 +81,7 @@ function EditableField({
           }
           className={cn(
             "w-full resize-none",
-            required && !value && "border-red-500",
+            required && !value && "border-red-500"
           )}
           placeholder={`Enter ${label.toLowerCase()}`}
           rows={4}
@@ -100,6 +110,7 @@ function CreateControlPageContent() {
     name: "",
     description: "",
     category: "",
+    importance: "MANDATORY" as ControlImportance,
   });
 
   const [commit, isInFlight] =
@@ -126,7 +137,7 @@ function CreateControlPageContent() {
 
     const connectionId = ConnectionHandler.getConnectionID(
       frameworkId!,
-      "FrameworkOverviewPage_controls",
+      "FrameworkOverviewPage_controls"
     );
 
     commit({
@@ -136,6 +147,7 @@ function CreateControlPageContent() {
           name: formData.name,
           description: formData.description,
           category: formData.category,
+          importance: formData.importance,
         },
         connections: [connectionId],
       },
@@ -155,7 +167,7 @@ function CreateControlPageContent() {
         });
 
         navigate(
-          `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${data.createControl.controlEdge.node.id}`,
+          `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${data.createControl.controlEdge.node.id}`
         );
       },
       onError(error) {
@@ -207,6 +219,27 @@ function CreateControlPageContent() {
               helpText="Provide a detailed description of the control"
             />
 
+            <div className="space-y-2">
+              <Label htmlFor="importance" className="text-sm font-medium">
+                Importance
+              </Label>
+              <Select
+                value={formData.importance}
+                onValueChange={(value) =>
+                  handleFieldChange("importance", value as ControlImportance)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select importance" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="MANDATORY">Mandatory</SelectItem>
+                  <SelectItem value="PREFERRED">Preferred</SelectItem>
+                  <SelectItem value="ADVANCED">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex justify-end gap-3">
               <Button
                 type="button"
@@ -215,7 +248,7 @@ function CreateControlPageContent() {
                   navigate(
                     `/organizations/${
                       frameworkId?.split(":")[1]
-                    }/frameworks/${frameworkId}`,
+                    }/frameworks/${frameworkId}`
                   )
                 }
               >

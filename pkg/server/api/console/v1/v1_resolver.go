@@ -272,25 +272,6 @@ func (r *mutationResolver) CreateFramework(ctx context.Context, input types.Crea
 	}, nil
 }
 
-// CreateControl is the resolver for the createControl field.
-func (r *mutationResolver) CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.FrameworkID.TenantID())
-
-	control, err := svc.Controls.Create(ctx, probo.CreateControlRequest{
-		FrameworkID: input.FrameworkID,
-		Name:        input.Name,
-		Description: input.Description,
-		Category:    input.Category,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cannot create control: %w", err)
-	}
-
-	return &types.CreateControlPayload{
-		ControlEdge: types.NewControlEdge(control),
-	}, nil
-}
-
 // UpdateFramework is the resolver for the updateFramework field.
 func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
@@ -307,6 +288,26 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 
 	return &types.UpdateFrameworkPayload{
 		Framework: types.NewFramework(framework),
+	}, nil
+}
+
+// CreateControl is the resolver for the createControl field.
+func (r *mutationResolver) CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.FrameworkID.TenantID())
+
+	control, err := svc.Controls.Create(ctx, probo.CreateControlRequest{
+		FrameworkID: input.FrameworkID,
+		Name:        input.Name,
+		Description: input.Description,
+		Category:    input.Category,
+		Importance:  input.Importance,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create control: %w", err)
+	}
+
+	return &types.CreateControlPayload{
+		ControlEdge: types.NewControlEdge(control),
 	}, nil
 }
 
