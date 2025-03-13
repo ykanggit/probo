@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ab4612fbd353c97f896f1eb3846aa0a8>>
+ * @generated SignedSource<<25802163c3ca6cc24524ebbc1388cd95>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -63,14 +63,21 @@ v2 = {
   "name": "id",
   "storageKey": null
 },
-v3 = {
+v3 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 100
+  }
+],
+v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v4 = [
+v5 = [
   {
     "alias": null,
     "args": null,
@@ -104,7 +111,7 @@ v4 = [
           },
           {
             "alias": null,
-            "args": null,
+            "args": (v3/*: any*/),
             "concreteType": "ControlConnection",
             "kind": "LinkedField",
             "name": "controls",
@@ -141,7 +148,7 @@ v4 = [
                 "storageKey": null
               }
             ],
-            "storageKey": null
+            "storageKey": "controls(first:100)"
           },
           {
             "alias": null,
@@ -157,7 +164,7 @@ v4 = [
             "name": "updatedAt",
             "storageKey": null
           },
-          (v3/*: any*/)
+          (v4/*: any*/)
         ],
         "storageKey": null
       },
@@ -196,13 +203,6 @@ v4 = [
     ],
     "storageKey": null
   }
-],
-v5 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 100
-  }
 ];
 return {
   "fragment": {
@@ -229,7 +229,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__FrameworkListPage_frameworks_connection",
                 "plural": false,
-                "selections": (v4/*: any*/),
+                "selections": (v5/*: any*/),
                 "storageKey": null
               }
             ],
@@ -257,23 +257,23 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v3/*: any*/),
+          (v4/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v5/*: any*/),
+                "args": (v3/*: any*/),
                 "concreteType": "FrameworkConnection",
                 "kind": "LinkedField",
                 "name": "frameworks",
                 "plural": false,
-                "selections": (v4/*: any*/),
+                "selections": (v5/*: any*/),
                 "storageKey": "frameworks(first:100)"
               },
               {
                 "alias": null,
-                "args": (v5/*: any*/),
+                "args": (v3/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "FrameworkListPage_frameworks",
@@ -291,7 +291,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "6f96390f8befc1d8b61680912acef21d",
+    "cacheID": "b55da571816341f2576684823b6d67d0",
     "id": null,
     "metadata": {
       "connection": [
@@ -308,11 +308,11 @@ return {
     },
     "name": "FrameworkListPageQuery",
     "operationKind": "query",
-    "text": "query FrameworkListPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            controls {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query FrameworkListPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            controls(first: 100) {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "29d2fa74d6f479b9deab19473201a232";
+(node as any).hash = "2070e0cdfaf5b1e5b4dfbb262127218b";
 
 export default node;
