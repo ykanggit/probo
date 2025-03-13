@@ -15,7 +15,7 @@ require (
 	github.com/prometheus/client_golang v1.21.1
 	github.com/vektah/gqlparser/v2 v2.5.23
 	go.gearno.de/crypto/uuid v0.1.0
-	go.gearno.de/kit v0.0.0-20250308215532-082d0731efae
+	go.gearno.de/kit v0.0.0-20250313103045-779e525d954c
 	go.opentelemetry.io/otel/trace v1.35.0
 	golang.org/x/crypto v0.36.0
 )
