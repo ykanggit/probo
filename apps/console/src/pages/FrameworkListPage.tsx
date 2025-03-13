@@ -62,7 +62,7 @@ const FrameworkListPageImportFrameworkMutation = graphql`
           id
           name
           description
-          controls {
+          controls(first: 100) {
             edges {
               node {
                 id

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<886db9744d1d937174d0138601e644a5>>
+ * @generated SignedSource<<92f143ac22d00fc2373928c607a105fa>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -106,7 +106,13 @@ v2 = [
               },
               {
                 "alias": null,
-                "args": null,
+                "args": [
+                  {
+                    "kind": "Literal",
+                    "name": "first",
+                    "value": 100
+                  }
+                ],
                 "concreteType": "ControlConnection",
                 "kind": "LinkedField",
                 "name": "controls",
@@ -143,7 +149,7 @@ v2 = [
                     "storageKey": null
                   }
                 ],
-                "storageKey": null
+                "storageKey": "controls(first:100)"
               },
               {
                 "alias": null,
@@ -187,16 +193,16 @@ return {
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "2ea6f840625bd25b0469103c8f98d3f2",
+    "cacheID": "946e840d5f7bb3a33e7ee1d0e2180bb5",
     "id": null,
     "metadata": {},
     "name": "FrameworkListPageImportFrameworkMutation",
     "operationKind": "mutation",
-    "text": "mutation FrameworkListPageImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n        controls {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation FrameworkListPageImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n        controls(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "cb68b53c21e128e59354c51048f347cc";
+(node as any).hash = "715a97d6fde9a26f202e8281b9211b1f";
 
 export default node;

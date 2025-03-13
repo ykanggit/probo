@@ -20,7 +20,8 @@ const FrameworkOverviewPageQuery = graphql`
       ... on Framework {
         name
         description
-        controls(first: 90) @connection(key: "FrameworkOverviewPage_controls") {
+        controls(first: 100)
+          @connection(key: "FrameworkOverviewPage_controls") {
           edges {
             node {
               id

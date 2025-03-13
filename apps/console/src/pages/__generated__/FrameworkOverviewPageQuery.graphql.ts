@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f5c15295df1bbb71ef99c60ec2417464>>
+ * @generated SignedSource<<d673a8265dbda865ed008ca8d8d91c38>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -166,7 +166,7 @@ v7 = [
   {
     "kind": "Literal",
     "name": "first",
-    "value": 90
+    "value": 100
   }
 ];
 return {
@@ -240,7 +240,7 @@ return {
                 "name": "controls",
                 "plural": false,
                 "selections": (v6/*: any*/),
-                "storageKey": "controls(first:90)"
+                "storageKey": "controls(first:100)"
               },
               {
                 "alias": null,
@@ -261,7 +261,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "6a4fc22ad7657a6861027975b620b08e",
+    "cacheID": "d1033e296ed81f7dd74c61e04dbc7d1f",
     "id": null,
     "metadata": {
       "connection": [
@@ -278,11 +278,11 @@ return {
     },
     "name": "FrameworkOverviewPageQuery",
     "operationKind": "query",
-    "text": "query FrameworkOverviewPageQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls(first: 90) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            category\n            importance\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query FrameworkOverviewPageQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            category\n            importance\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "0a7d8e6c782dae1777ee687c768d0ad6";
+(node as any).hash = "0f64849d3b9455a880811d65870243e0";
 
 export default node;
