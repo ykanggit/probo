@@ -703,6 +703,7 @@ function ControlOverviewPageContent({
         toast({
           title: "Evidence uploaded",
           description: "Evidence has been uploaded successfully.",
+          variant: "default",
         });
         setIsUploadEvidenceOpen(false);
         setTaskForEvidence(null);
@@ -751,6 +752,7 @@ function ControlOverviewPageContent({
     toast({
       title: "Upload started",
       description: `Uploading ${file.name}...`,
+      variant: "default",
     });
 
     // Get the evidence connection ID for this task
@@ -773,6 +775,7 @@ function ControlOverviewPageContent({
         toast({
           title: "Evidence uploaded",
           description: "Evidence has been uploaded successfully.",
+          variant: "default",
         });
       },
       onError: (error) => {
@@ -996,9 +999,9 @@ function ControlOverviewPageContent({
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">Tasks</h2>
-            <div className="flex items-center gap-2">
-              <div className="text-sm text-gray-500 flex items-center">
-                <FileIcon className="w-4 h-4 mr-1 text-gray-400" />
+            <div className="flex items-center gap-3">
+              <div className="text-sm text-gray-500 flex items-center bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
+                <FileIcon className="w-4 h-4 mr-2 text-blue-500" />
                 <span>Drag & drop files onto tasks to upload evidence</span>
               </div>
               <Dialog
@@ -1155,10 +1158,10 @@ function ControlOverviewPageContent({
                   )}
 
                   {draggedOverTaskId === task?.id && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-blue-50 bg-opacity-80 rounded-md z-10 backdrop-blur-[1px]">
-                      <div className="flex flex-col items-center gap-2 text-blue-600 bg-white p-4 rounded-lg shadow-xs">
-                        <FileIcon className="w-12 h-12" />
-                        <p className="font-medium">
+                    <div className="absolute inset-0 flex items-center justify-center rounded-md z-10 bg-blue-50 bg-opacity-90 backdrop-blur-sm border-2 border-dashed border-blue-400">
+                      <div className="flex items-center gap-2 text-blue-600 bg-white p-5 rounded-lg shadow-md">
+                        <Upload className="w-4 h-4 text-blue-500" />
+                        <p className="text-sm font-medium text-center">
                           Drop file to upload evidence
                         </p>
                       </div>
@@ -1166,10 +1169,11 @@ function ControlOverviewPageContent({
                   )}
 
                   {uploadingTaskId === task?.id && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 rounded-md z-10">
-                      <div className="flex flex-col items-center gap-2 text-blue-600">
-                        <Loader2 className="w-8 h-8 animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-95 rounded-md z-10 backdrop-blur-sm">
+                      <div className="flex flex-col items-center gap-3 text-blue-600">
+                        <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
                         <p className="font-medium">Uploading evidence...</p>
+                        <p className="text-sm text-gray-500">Please wait</p>
                       </div>
                     </div>
                   )}
@@ -1424,12 +1428,12 @@ function ControlOverviewPageContent({
                 {task?.evidences?.edges && task.evidences.edges.length > 0 && (
                   <>
                     <div
-                      className="bg-gray-50 border-t border-gray-200 px-4 py-2 flex justify-between items-center cursor-pointer hover:bg-gray-100"
+                      className="bg-gray-50 border-t border-gray-200 px-4 py-2.5 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors"
                       onClick={() => task.id && toggleEvidenceList(task.id)}
                     >
                       <div className="flex items-center gap-2">
-                        <FileIcon className="w-4 h-4 text-gray-500" />
-                        <span className="text-xs font-medium text-gray-700">
+                        <FileIcon className="w-4 h-4 text-blue-500" />
+                        <span className="text-sm font-medium text-gray-700">
                           {task.evidences.edges.length}{" "}
                           {task.evidences.edges.length === 1
                             ? "Evidence"
@@ -1444,7 +1448,7 @@ function ControlOverviewPageContent({
                     </div>
 
                     {expandedEvidenceTaskId === task.id && (
-                      <div className="bg-white border-t border-gray-200 p-3 space-y-2">
+                      <div className="bg-white border-t border-gray-200 p-3 space-y-2.5">
                         {task.evidences.edges.map((edge) => {
                           if (!edge) return null;
                           const evidence = edge.node;
@@ -1453,16 +1457,20 @@ function ControlOverviewPageContent({
                           return (
                             <div
                               key={evidence.id}
-                              className="flex items-center justify-between p-2 rounded border border-gray-200 hover:border-blue-300 transition-colors"
+                              className="flex items-center justify-between p-3 rounded-md border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all bg-gray-50"
                             >
-                              <div className="flex items-center gap-2">
-                                {getFileIcon(evidence.mimeType)}
+                              <div className="flex items-center gap-3">
+                                <div className="bg-white p-2 rounded-md border border-gray-200">
+                                  {getFileIcon(evidence.mimeType)}
+                                </div>
                                 <div>
-                                  <div className="text-sm font-medium text-gray-700">
+                                  <div className="text-sm font-medium text-gray-800">
                                     {evidence.filename}
                                   </div>
-                                  <div className="text-xs text-gray-500 flex items-center gap-2">
-                                    <span>{formatFileSize(evidence.size)}</span>
+                                  <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
+                                    <span className="font-medium text-gray-600">
+                                      {formatFileSize(evidence.size)}
+                                    </span>
                                     <span>•</span>
                                     <span>
                                       {formatDate(evidence.createdAt)}
@@ -1470,16 +1478,16 @@ function ControlOverviewPageContent({
                                   </div>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
                                 {evidence.mimeType.startsWith("image/") ? (
                                   <button
                                     onClick={() =>
                                       handlePreviewEvidence(evidence)
                                     }
-                                    className="p-1 rounded-full hover:bg-gray-100"
+                                    className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
                                     title="Preview Image"
                                   >
-                                    <Eye className="w-4 h-4 text-gray-600" />
+                                    <Eye className="w-4 h-4 text-blue-600" />
                                   </button>
                                 ) : (
                                   <button
@@ -1487,10 +1495,10 @@ function ControlOverviewPageContent({
                                       e.preventDefault();
                                       handlePreviewEvidence(evidence);
                                     }}
-                                    className="p-1 rounded-full hover:bg-gray-100"
-                                    title="View File"
+                                    className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                    title="Download"
                                   >
-                                    <Eye className="w-4 h-4 text-gray-600" />
+                                    <Download className="w-4 h-4 text-blue-600" />
                                   </button>
                                 )}
                                 <button
@@ -1498,24 +1506,26 @@ function ControlOverviewPageContent({
                                     e.preventDefault();
                                     handlePreviewEvidence(evidence);
                                   }}
-                                  className="p-1 rounded-full hover:bg-gray-100"
+                                  className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
                                   title="Download"
                                 >
-                                  <Download className="w-4 h-4 text-gray-600" />
+                                  <Download className="w-4 h-4 text-blue-600" />
                                 </button>
                                 <button
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    handleDeleteEvidence(
-                                      evidence.id,
-                                      evidence.filename,
-                                      task.id
-                                    );
+                                    if (task?.id) {
+                                      handleDeleteEvidence(
+                                        evidence.id,
+                                        evidence.filename,
+                                        task.id
+                                      );
+                                    }
                                   }}
-                                  className="p-1 rounded-full hover:bg-gray-10 hover:text-red-600"
-                                  title="Delete Evidence"
+                                  className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
+                                  title="Delete"
                                 >
-                                  <Trash2 className="w-4 h-4 text-gray-600 hover:text-red-600" />
+                                  <Trash2 className="w-4 h-4 text-red-500" />
                                 </button>
                               </div>
                             </div>
@@ -1565,7 +1575,7 @@ function ControlOverviewPageContent({
           open={isUploadEvidenceOpen}
           onOpenChange={setIsUploadEvidenceOpen}
         >
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Upload Evidence</DialogTitle>
               <DialogDescription>
@@ -1574,7 +1584,7 @@ function ControlOverviewPageContent({
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={confirmUploadEvidence}>
-              <div className="space-y-4 py-4">
+              <div className="space-y-6 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="evidence-name">
                     Evidence Name (Optional)
@@ -1584,16 +1594,31 @@ function ControlOverviewPageContent({
                     placeholder="Enter a name for this evidence"
                     value={evidenceName}
                     onChange={(e) => setEvidenceName(e.target.value)}
+                    className="w-full"
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="evidence-file">File</Label>
-                  <Input
-                    id="evidence-file"
-                    type="file"
-                    ref={fileInputRef}
-                    required
-                  />
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 transition-colors hover:border-blue-400 bg-gray-50">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <Upload className="w-10 h-10 text-blue-500" />
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-gray-700">
+                          Drag and drop your file here, or click to browse
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Supported file types: PDF, images, documents
+                        </p>
+                      </div>
+                      <Input
+                        id="evidence-file"
+                        type="file"
+                        ref={fileInputRef}
+                        required
+                        className="w-full opacity-0 absolute inset-0 cursor-pointer"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
               <DialogFooter>
