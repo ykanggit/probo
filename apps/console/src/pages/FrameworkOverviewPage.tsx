@@ -8,7 +8,6 @@ import {
 } from "react-relay";
 import { Shield, MoveUpRight, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
