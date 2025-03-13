@@ -54,6 +54,7 @@ import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreate
 import type { ControlOverviewPageDeleteTaskMutation as ControlOverviewPageDeleteTaskMutationType } from "./__generated__/ControlOverviewPageDeleteTaskMutation.graphql";
 import type { ControlOverviewPageUploadEvidenceMutation as ControlOverviewPageUploadEvidenceMutationType } from "./__generated__/ControlOverviewPageUploadEvidenceMutation.graphql";
 import type { ControlOverviewPageDeleteEvidenceMutation as ControlOverviewPageDeleteEvidenceMutationType } from "./__generated__/ControlOverviewPageDeleteEvidenceMutation.graphql";
+import { Textarea } from "@/components/ui/textarea";
 
 const controlOverviewPageQuery = graphql`
   query ControlOverviewPageQuery($controlId: ID!) {
@@ -686,9 +687,6 @@ function ControlOverviewPageContent({
               <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
                 Mandatory
               </div>
-              <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                Assigned to you
-              </div>
             </div>
           </div>
           <p className="text-gray-600 max-w-3xl">{data.control.description}</p>
@@ -762,7 +760,7 @@ function ControlOverviewPageContent({
                       >
                         Description (optional)
                       </label>
-                      <Input
+                      <Textarea
                         id="description"
                         value={newTaskDescription}
                         onChange={(e) => setNewTaskDescription(e.target.value)}
@@ -881,7 +879,6 @@ function ControlOverviewPageContent({
                       )}
                     </div>
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="text-gray-400 text-sm">06.00 - 07.30</div>
                       <button
                         className="text-gray-400 hover:text-blue-600"
                         onClick={(e) => {
