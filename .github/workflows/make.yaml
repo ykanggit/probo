@@ -39,12 +39,3 @@ jobs:
           node-version: 22
       - run: "npm ci"
       - run: "make build"
-  fmt-check:
-    name: "fmt-check"
-    runs-on: "ubuntu-22.04"
-    permissions:
-      contents: "read"
-    steps:
-      - uses: "actions/checkout@v4"
-      - uses: "actions/setup-node@v4"
-      - run: "make fmt-check"
