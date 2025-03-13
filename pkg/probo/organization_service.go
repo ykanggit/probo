@@ -56,7 +56,7 @@ func (s OrganizationService) Create(
 
 	organization := &coredata.Organization{
 		ID:        organizationID,
-		TenantID:  s.svc.scope.GetTenantID(),
+		TenantID:  organizationID.TenantID(),
 		Name:      req.Name,
 		CreatedAt: now,
 		UpdatedAt: now,
