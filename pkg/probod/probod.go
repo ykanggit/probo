@@ -92,11 +92,8 @@ func New() *Implm {
 				},
 			},
 			AWS: awsConfig{
-				Region:          "us-east-1",
-				Bucket:          "probod",
-				AccessKeyID:     "probod",
-				SecretAccessKey: "thisisnotasecret",
-				Endpoint:        "http://127.0.0.1:9000",
+				Region: "us-east-1",
+				Bucket: "probod",
 			},
 			Mailer: mailerConfig{
 				SenderEmail: "no-reply@notification.getprobo.com",

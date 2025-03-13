@@ -2,3 +2,7 @@ probod:
   api:
     cors:
       allowed-origins: ["http://localhost:3000"]
+  aws:
+    access-key-id: "probod"
+    secret-access-key: "thisisnotasecret"
+    endpoint: "http://127.0.0.1:9000"
