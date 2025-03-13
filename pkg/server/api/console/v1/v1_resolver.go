@@ -6,6 +6,7 @@ package console_v1
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -348,7 +349,21 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 
 // ImportFramework is the resolver for the importFramework field.
 func (r *mutationResolver) ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error) {
-	panic(fmt.Errorf("not implemented: ImportFramework - importFramework"))
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+
+	req := probo.ImportFrameworkRequest{}
+	if err := json.NewDecoder(input.File.File).Decode(&req.Data); err != nil {
+		return nil, fmt.Errorf("cannot decode framework: %w", err)
+	}
+
+	framework, err := svc.Frameworks.Import(ctx, input.OrganizationID, req)
+	if err != nil {
+		return nil, fmt.Errorf("cannot import framework: %w", err)
+	}
+
+	return &types.ImportFrameworkPayload{
+		FrameworkEdge: types.NewFrameworkEdge(framework),
+	}, nil
 }
 
 // CreateControl is the resolver for the createControl field.

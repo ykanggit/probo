@@ -1,16 +1,28 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import {
   graphql,
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
+  useMutation,
 } from "react-relay";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useParams } from "react-router";
 import type { FrameworkListPageQuery as FrameworkListPageQueryType } from "./__generated__/FrameworkListPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { FrameworkListPageImportFrameworkMutation as FrameworkListPageImportFrameworkMutationType } from "./__generated__/FrameworkListPageImportFrameworkMutation.graphql";
 
 const FrameworkListPageQuery = graphql`
   query FrameworkListPageQuery($organizationId: ID!) {
@@ -34,6 +46,32 @@ const FrameworkListPageQuery = graphql`
               updatedAt
             }
           }
+        }
+      }
+    }
+  }
+`;
+
+const FrameworkListPageImportFrameworkMutation = graphql`
+  mutation FrameworkListPageImportFrameworkMutation(
+    $input: ImportFrameworkInput!
+  ) {
+    importFramework(input: $input) {
+      frameworkEdge {
+        node {
+          id
+          name
+          description
+          controls {
+            edges {
+              node {
+                id
+                state
+              }
+            }
+          }
+          createdAt
+          updatedAt
         }
       }
     }
@@ -88,11 +126,59 @@ function FrameworkListPageContent({
 }) {
   const data = usePreloadedQuery<FrameworkListPageQueryType>(
     FrameworkListPageQuery,
-    queryRef,
+    queryRef
   );
   const { organizationId } = useParams();
   const frameworks =
     data.organization.frameworks?.edges.map((edge) => edge?.node) ?? [];
+
+  const [importFramework] =
+    useMutation<FrameworkListPageImportFrameworkMutationType>(
+      FrameworkListPageImportFrameworkMutation
+    );
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+
+    importFramework({
+      variables: {
+        input: {
+          organizationId: organizationId!,
+          file: null,
+        },
+      },
+      uploadables: {
+        "input.file": file,
+      },
+      onCompleted: () => {
+        setIsUploading(false);
+        setIsImportDialogOpen(false);
+        toast({
+          title: "Framework imported",
+          description: "Framework has been imported successfully.",
+          variant: "default",
+        });
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      },
+      onError: (error) => {
+        setIsUploading(false);
+        toast({
+          title: "Error importing framework",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
 
   return (
     <>
@@ -107,18 +193,54 @@ function FrameworkListPageContent({
               Manage your compliance frameworks
             </p>
           </div>
-          <Button asChild>
-            <Link to={`/organizations/${organizationId}/frameworks/create`}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Framework
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Dialog
+              open={isImportDialogOpen}
+              onOpenChange={setIsImportDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import Framework
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Import Framework</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="framework-file">
+                      Upload Framework File
+                    </Label>
+                    <Input
+                      id="framework-file"
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      disabled={isUploading}
+                      accept=".json"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Upload a JSON file containing your framework definition.
+                    </p>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <Button asChild>
+              <Link to={`/organizations/${organizationId}/frameworks/create`}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Framework
+              </Link>
+            </Button>
+          </div>
         </div>
         <div className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
             {frameworks.map((framework) => {
               const validatedControls = framework.controls.edges.filter(
-                (edge) => edge?.node?.state === "IMPLEMENTED",
+                (edge) => edge?.node?.state === "IMPLEMENTED"
               ).length;
               const totalControls = framework.controls.edges.length;
 
@@ -185,7 +307,7 @@ function FrameworkListPageFallback() {
 
 export default function FrameworkListPage() {
   const [queryRef, loadQuery] = useQueryLoader<FrameworkListPageQueryType>(
-    FrameworkListPageQuery,
+    FrameworkListPageQuery
   );
 
   const { organizationId } = useParams();

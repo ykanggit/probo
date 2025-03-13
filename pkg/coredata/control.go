@@ -40,6 +40,7 @@ type (
 		CreatedAt   time.Time         `db:"created_at"`
 		UpdatedAt   time.Time         `db:"updated_at"`
 		Version     int               `db:"version"`
+		Standards   []string          `db:"standards"`
 	}
 
 	Controls []*Control
@@ -76,6 +77,7 @@ SELECT
     content_ref,
     created_at,
     updated_at,
+	standards,
 	version
 FROM
     controls
@@ -124,6 +126,7 @@ INSERT INTO
         content_ref,
         created_at,
         updated_at,
+		standards,
 		version
     )
 VALUES (
@@ -138,6 +141,7 @@ VALUES (
     @content_ref,
     @created_at,
     @updated_at,
+	@standards,
     @version
 );
 `
@@ -155,6 +159,7 @@ VALUES (
 		"updated_at":   c.UpdatedAt,
 		"state":        c.State,
 		"importance":   c.Importance,
+		"standards":    c.Standards,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -179,6 +184,7 @@ SELECT
     content_ref,
     created_at,
     updated_at,
+	standards,
 	version
 FROM
     controls
@@ -237,7 +243,8 @@ RETURNING
     content_ref,
     created_at,
     updated_at,
-    version
+    version,
+	standards
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 

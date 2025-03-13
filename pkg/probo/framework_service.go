@@ -43,6 +43,25 @@ type (
 		Name            *string
 		Description     *string
 	}
+
+	ImportFrameworkRequest struct {
+		Data struct {
+			Framework struct {
+				Name        string `json:"name"`
+				ContentRef  string `json:"content-ref"`
+				Description string `json:"description"`
+				Version     string `json:"version"`
+				Controls    []struct {
+					ContentRef  string                     `json:"content-ref"`
+					Category    string                     `json:"category"`
+					Importance  coredata.ControlImportance `json:"importance"`
+					Standards   []string                   `json:"standards"`
+					Name        string                     `json:"name"`
+					Description string                     `json:"description"`
+				} `json:"controls"`
+			} `json:"framework"`
+		}
+	}
 )
 
 func (s FrameworkService) Create(
@@ -162,4 +181,77 @@ func (s FrameworkService) Delete(
 			return framework.Delete(ctx, conn, s.svc.scope)
 		},
 	)
+}
+
+func (s FrameworkService) Import(
+	ctx context.Context,
+	organizationID gid.GID,
+	req ImportFrameworkRequest,
+) (*coredata.Framework, error) {
+
+	now := time.Now()
+
+	frameworkID, err := gid.NewGID(organizationID.TenantID(), coredata.FrameworkEntityType)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create global id: %w", err)
+	}
+
+	framework := &coredata.Framework{
+		ID:             frameworkID,
+		OrganizationID: organizationID,
+		Name:           req.Data.Framework.Name,
+		Description:    req.Data.Framework.Description,
+		ContentRef:     req.Data.Framework.ContentRef,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+	}
+
+	importedControls := coredata.Controls{}
+	for _, control := range req.Data.Framework.Controls {
+		controlID, err := gid.NewGID(organizationID.TenantID(), coredata.ControlEntityType)
+		if err != nil {
+			return nil, fmt.Errorf("cannot create global id: %w", err)
+		}
+
+		importedControl := &coredata.Control{
+			ID:          controlID,
+			FrameworkID: frameworkID,
+			Category:    control.Category,
+			Importance:  coredata.ControlImportance(control.Importance),
+			Name:        control.Name,
+			Description: control.Description,
+			State:       coredata.ControlStateNotStarted,
+			ContentRef:  control.ContentRef,
+			CreatedAt:   now,
+			UpdatedAt:   now,
+			Standards:   control.Standards,
+		}
+
+		importedControls = append(importedControls, importedControl)
+	}
+
+	err = s.svc.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+
+			err := framework.Insert(ctx, tx, s.svc.scope)
+			if err != nil {
+				return fmt.Errorf("cannot insert framework: %w", err)
+			}
+
+			for _, importedControl := range importedControls {
+				if err := importedControl.Insert(ctx, tx, s.svc.scope); err != nil {
+					return fmt.Errorf("cannot insert control: %w", err)
+				}
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return framework, nil
 }
