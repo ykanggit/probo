@@ -124,9 +124,6 @@ export function OrganizationSwitcher({
                     <span className="truncate font-medium text-lg leading-5 text-gray-900">
                       {currentOrganization.name}
                     </span>
-                    <span className="truncate text-xs text-gray-500 font-medium">
-                      Free
-                    </span>
                   </>
                 ) : (
                   <span className="truncate text-gray-500 font-medium">
