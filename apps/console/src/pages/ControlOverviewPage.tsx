@@ -54,6 +54,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import ReactMarkdown from "react-markdown";
 
 import { Helmet } from "react-helmet-async";
 import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from "./__generated__/ControlOverviewPageQuery.graphql";
@@ -993,7 +994,13 @@ function ControlOverviewPageContent({
               </div>
             </div>
           </div>
-          <p className="text-gray-600 max-w-3xl">{data.control.description}</p>
+          <Card className="mt-4">
+            <CardContent className="pt-6">
+              <div className="prose prose-gray prose-sm md:prose-base text-gray-600 max-w-3xl">
+                <ReactMarkdown>{data.control.description}</ReactMarkdown>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div>
