@@ -60,6 +60,7 @@ INSERT INTO
         object_key,
         mime_type,
         size,
+        state,
         filename,
         created_at,
         updated_at
@@ -71,6 +72,7 @@ VALUES (
     @object_key,
     @mime_type,
     @size,
+    @state,
     @filename,
     @created_at,
     @updated_at
@@ -87,6 +89,7 @@ VALUES (
 		"filename":    e.Filename,
 		"created_at":  e.CreatedAt,
 		"updated_at":  e.UpdatedAt,
+		"state":       e.State,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -99,24 +102,10 @@ func (e *Evidence) LoadByID(
 	evidenceID gid.GID,
 ) error {
 	q := `
-WITH
-    evidence_states AS (
-        SELECT
-            evidence_id,
-            to_state AS state,
-            reason,
-            RANK() OVER w
-        FROM
-            evidence_state_transitions
-        WHERE
-            evidence_id = @evidence_id
-        WINDOW
-            w AS (PARTITION BY evidence_id ORDER BY created_at DESC)
-    )
 SELECT
     id,
     task_id,
-    es.state,
+    state,
     object_key,
     mime_type,
     size,
@@ -125,12 +114,9 @@ SELECT
     updated_at
 FROM
     evidences
-INNER JOIN
-    evidence_states es ON es.evidence_id = evidences.id
 WHERE
     %s
     AND id = @evidence_id
-    AND es.rank = 1
 LIMIT 1;
 `
 
