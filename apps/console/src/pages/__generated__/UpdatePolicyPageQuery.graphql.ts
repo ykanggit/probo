@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<04e2a37d31d4cd204101efdd85471dc5>>
+ * @generated SignedSource<<7b013568b7e507b2394323b6cdc4d8ba>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -137,7 +137,14 @@ v7 = {
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
-};
+},
+v8 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 100
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": [
@@ -219,13 +226,7 @@ return {
             "selections": [
               {
                 "alias": null,
-                "args": [
-                  {
-                    "kind": "Literal",
-                    "name": "first",
-                    "value": 100
-                  }
-                ],
+                "args": (v8/*: any*/),
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
                 "name": "peoples",
@@ -255,8 +256,41 @@ return {
                             "kind": "ScalarField",
                             "name": "primaryEmailAddress",
                             "storageKey": null
-                          }
+                          },
+                          (v7/*: any*/)
                         ],
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "cursor",
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "PageInfo",
+                    "kind": "LinkedField",
+                    "name": "pageInfo",
+                    "plural": false,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "endCursor",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "hasNextPage",
                         "storageKey": null
                       }
                     ],
@@ -264,6 +298,15 @@ return {
                   }
                 ],
                 "storageKey": "peoples(first:100)"
+              },
+              {
+                "alias": null,
+                "args": (v8/*: any*/),
+                "filters": null,
+                "handle": "connection",
+                "key": "PeopleSelector_organization_peoples",
+                "kind": "LinkedHandle",
+                "name": "peoples"
               }
             ],
             "type": "Organization",
@@ -275,12 +318,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "abbd1265e5fbacc34d5442772cbd645b",
+    "cacheID": "48cf7497849c327c91bff96c755645eb",
     "id": null,
     "metadata": {},
     "name": "UpdatePolicyPageQuery",
     "operationKind": "query",
-    "text": "query UpdatePolicyPageQuery(\n  $policyId: ID!\n  $organizationId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      status\n      version\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n      }\n    }\n  }\n}\n"
+    "text": "query UpdatePolicyPageQuery(\n  $policyId: ID!\n  $organizationId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      status\n      version\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0229a3e8e814cf3971479aa5abc20322>>
+ * @generated SignedSource<<8bfccae4e1629a74d3651300b7f45768>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -42,9 +42,23 @@ v2 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v3 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
   "name": "id",
   "storageKey": null
-};
+},
+v4 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 100
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": (v0/*: any*/),
@@ -86,26 +100,14 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "__typename",
-            "storageKey": null
-          },
           (v2/*: any*/),
+          (v3/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": [
-                  {
-                    "kind": "Literal",
-                    "name": "first",
-                    "value": 100
-                  }
-                ],
+                "args": (v4/*: any*/),
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
                 "name": "peoples",
@@ -127,7 +129,7 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v2/*: any*/),
+                          (v3/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -141,8 +143,41 @@ return {
                             "kind": "ScalarField",
                             "name": "primaryEmailAddress",
                             "storageKey": null
-                          }
+                          },
+                          (v2/*: any*/)
                         ],
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "cursor",
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "PageInfo",
+                    "kind": "LinkedField",
+                    "name": "pageInfo",
+                    "plural": false,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "endCursor",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "hasNextPage",
                         "storageKey": null
                       }
                     ],
@@ -150,6 +185,15 @@ return {
                   }
                 ],
                 "storageKey": "peoples(first:100)"
+              },
+              {
+                "alias": null,
+                "args": (v4/*: any*/),
+                "filters": null,
+                "handle": "connection",
+                "key": "PeopleSelector_organization_peoples",
+                "kind": "LinkedHandle",
+                "name": "peoples"
               }
             ],
             "type": "Organization",
@@ -161,12 +205,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "edb18dbe0439fa7ca7bc791e607cd447",
+    "cacheID": "cb5621c91f5548cd81c31d40b51ac894",
     "id": null,
     "metadata": {},
     "name": "CreatePolicyPageQuery",
     "operationKind": "query",
-    "text": "query CreatePolicyPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n      }\n    }\n  }\n}\n"
+    "text": "query CreatePolicyPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();

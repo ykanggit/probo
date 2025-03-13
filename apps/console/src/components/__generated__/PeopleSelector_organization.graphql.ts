@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<40624c6362024ecac90d44c5dd174a1c>>
+ * @generated SignedSource<<78caa409132a5db72b83629bdcd023d5>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -39,22 +39,27 @@ var v0 = {
 return {
   "argumentDefinitions": [],
   "kind": "Fragment",
-  "metadata": null,
+  "metadata": {
+    "connection": [
+      {
+        "count": null,
+        "cursor": null,
+        "direction": "forward",
+        "path": [
+          "peoples"
+        ]
+      }
+    ]
+  },
   "name": "PeopleSelector_organization",
   "selections": [
     (v0/*: any*/),
     {
-      "alias": null,
-      "args": [
-        {
-          "kind": "Literal",
-          "name": "first",
-          "value": 100
-        }
-      ],
+      "alias": "peoples",
+      "args": null,
       "concreteType": "PeopleConnection",
       "kind": "LinkedField",
-      "name": "peoples",
+      "name": "__PeopleSelector_organization_peoples_connection",
       "plural": false,
       "selections": [
         {
@@ -87,15 +92,54 @@ return {
                   "kind": "ScalarField",
                   "name": "primaryEmailAddress",
                   "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "__typename",
+                  "storageKey": null
                 }
               ],
+              "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "cursor",
+              "storageKey": null
+            }
+          ],
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "concreteType": "PageInfo",
+          "kind": "LinkedField",
+          "name": "pageInfo",
+          "plural": false,
+          "selections": [
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "endCursor",
+              "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "hasNextPage",
               "storageKey": null
             }
           ],
           "storageKey": null
         }
       ],
-      "storageKey": "peoples(first:100)"
+      "storageKey": null
     }
   ],
   "type": "Organization",
@@ -103,6 +147,6 @@ return {
 };
 })();
 
-(node as any).hash = "33e28b2889fa1180f6bf491e428fbafd";
+(node as any).hash = "ed86f67795b049ec359cb7e5e55500a0";
 
 export default node;
