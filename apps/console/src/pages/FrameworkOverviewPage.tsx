@@ -28,6 +28,7 @@ const FrameworkOverviewPageQuery = graphql`
               description
               state
               category
+              importance
             }
           }
         }
@@ -209,7 +210,10 @@ function FrameworkOverviewPageContent({
                     30 min
                   </div>
                   <div className="bg-[#2A2A2A] text-white px-2 py-1 rounded-full text-xs">
-                    Mandatory
+                    {
+                      controlCards[hoveredCard]?.controls[hoveredControl]
+                        ?.importance
+                    }
                   </div>
                 </div>
                 <MoveUpRight className="w-4 h-4 cursor-pointer hover:text-[#A3E635] transition-colors" />

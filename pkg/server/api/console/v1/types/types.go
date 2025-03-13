@@ -25,15 +25,16 @@ type ConfirmEmailPayload struct {
 }
 
 type Control struct {
-	ID          gid.GID               `json:"id"`
-	Version     int                   `json:"version"`
-	Category    string                `json:"category"`
-	Name        string                `json:"name"`
-	Description string                `json:"description"`
-	State       coredata.ControlState `json:"state"`
-	Tasks       *TaskConnection       `json:"tasks"`
-	CreatedAt   time.Time             `json:"createdAt"`
-	UpdatedAt   time.Time             `json:"updatedAt"`
+	ID          gid.GID                    `json:"id"`
+	Version     int                        `json:"version"`
+	Category    string                     `json:"category"`
+	Name        string                     `json:"name"`
+	Description string                     `json:"description"`
+	State       coredata.ControlState      `json:"state"`
+	Importance  coredata.ControlImportance `json:"importance"`
+	Tasks       *TaskConnection            `json:"tasks"`
+	CreatedAt   time.Time                  `json:"createdAt"`
+	UpdatedAt   time.Time                  `json:"updatedAt"`
 }
 
 func (Control) IsNode()             {}
@@ -50,10 +51,11 @@ type ControlEdge struct {
 }
 
 type CreateControlInput struct {
-	FrameworkID gid.GID `json:"frameworkId"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Category    string  `json:"category"`
+	FrameworkID gid.GID                    `json:"frameworkId"`
+	Name        string                     `json:"name"`
+	Description string                     `json:"description"`
+	Category    string                     `json:"category"`
+	Importance  coredata.ControlImportance `json:"importance"`
 }
 
 type CreateControlPayload struct {
@@ -225,6 +227,15 @@ type FrameworkEdge struct {
 	Node   *Framework     `json:"node"`
 }
 
+type ImportFrameworkInput struct {
+	OrganizationID gid.GID        `json:"organizationId"`
+	File           graphql.Upload `json:"file"`
+}
+
+type ImportFrameworkPayload struct {
+	FrameworkEdge *FrameworkEdge `json:"frameworkEdge"`
+}
+
 type Mutation struct {
 }
 
@@ -342,12 +353,13 @@ type TaskEdge struct {
 }
 
 type UpdateControlInput struct {
-	ID              gid.GID                `json:"id"`
-	ExpectedVersion int                    `json:"expectedVersion"`
-	Name            *string                `json:"name,omitempty"`
-	Description     *string                `json:"description,omitempty"`
-	Category        *string                `json:"category,omitempty"`
-	State           *coredata.ControlState `json:"state,omitempty"`
+	ID              gid.GID                     `json:"id"`
+	ExpectedVersion int                         `json:"expectedVersion"`
+	Name            *string                     `json:"name,omitempty"`
+	Description     *string                     `json:"description,omitempty"`
+	Category        *string                     `json:"category,omitempty"`
+	State           *coredata.ControlState      `json:"state,omitempty"`
+	Importance      *coredata.ControlImportance `json:"importance,omitempty"`
 }
 
 type UpdateControlPayload struct {
@@ -363,6 +375,16 @@ type UpdateFrameworkInput struct {
 
 type UpdateFrameworkPayload struct {
 	Framework *Framework `json:"framework"`
+}
+
+type UpdateOrganizationInput struct {
+	OrganizationID gid.GID `json:"organizationId"`
+	Name           *string `json:"name,omitempty"`
+	LogoURL        *string `json:"logoUrl,omitempty"`
+}
+
+type UpdateOrganizationPayload struct {
+	Organization *Organization `json:"organization"`
 }
 
 type UpdatePeopleInput struct {

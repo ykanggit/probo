@@ -70,6 +70,22 @@ enum PeopleKind
     )
 }
 
+enum ControlImportance
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ControlImportance") {
+  MANDATORY
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ControlImportanceMandatory"
+    )
+  PREFERRED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ControlImportancePreferred"
+    )
+  ADVANCED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ControlImportanceAdvanced"
+    )
+}
+
 type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
@@ -216,6 +232,7 @@ type Control implements Node {
   name: String!
   description: String!
   state: ControlState!
+  importance: ControlImportance!
 
   tasks(
     first: Int
@@ -308,24 +325,35 @@ type Mutation {
   createVendor(input: CreateVendorInput!): CreateVendorPayload!
   updateVendor(input: UpdateVendorInput!): UpdateVendorPayload!
   deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
+
   createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
   updatePeople(input: UpdatePeopleInput!): UpdatePeoplePayload!
   deletePeople(input: DeletePeopleInput!): DeletePeoplePayload!
+
   createOrganization(
     input: CreateOrganizationInput!
   ): CreateOrganizationPayload!
+  updateOrganization(
+    input: UpdateOrganizationInput!
+  ): UpdateOrganizationPayload!
   deleteOrganization(
     input: DeleteOrganizationInput!
   ): DeleteOrganizationPayload!
+
   createTask(input: CreateTaskInput!): CreateTaskPayload!
   updateTask(input: UpdateTaskInput!): UpdateTaskPayload!
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
+
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
-  createControl(input: CreateControlInput!): CreateControlPayload!
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
+  importFramework(input: ImportFrameworkInput!): ImportFrameworkPayload!
+
+  createControl(input: CreateControlInput!): CreateControlPayload!
   updateControl(input: UpdateControlInput!): UpdateControlPayload!
+
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
+
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
   updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
@@ -431,12 +459,22 @@ input CreateOrganizationInput {
   name: String!
 }
 
+input UpdateOrganizationInput {
+  organizationId: ID!
+  name: String
+  logoUrl: String
+}
+
 input DeleteOrganizationInput {
   organizationId: ID!
 }
 
 type CreateOrganizationPayload {
   organizationEdge: OrganizationEdge!
+}
+
+type UpdateOrganizationPayload {
+  organization: Organization!
 }
 
 type DeleteOrganizationPayload {
@@ -483,6 +521,7 @@ input CreateControlInput {
   name: String!
   description: String!
   category: String!
+  importance: ControlImportance!
 }
 
 type CreateControlPayload {
@@ -508,6 +547,7 @@ input UpdateControlInput {
   description: String
   category: String
   state: ControlState
+  importance: ControlImportance
 }
 
 type UpdateControlPayload {
@@ -615,4 +655,13 @@ input ConfirmEmailInput {
 
 type ConfirmEmailPayload {
   success: Boolean!
+}
+
+input ImportFrameworkInput {
+  organizationId: ID!
+  file: Upload!
+}
+
+type ImportFrameworkPayload {
+  frameworkEdge: FrameworkEdge!
 }

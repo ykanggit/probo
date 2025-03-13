@@ -36,6 +36,7 @@ type (
 		Description string
 		ContentRef  string
 		Category    string
+		Importance  coredata.ControlImportance
 	}
 
 	UpdateControlRequest struct {
@@ -45,6 +46,7 @@ type (
 		Description     *string
 		Category        *string
 		State           *coredata.ControlState
+		Importance      *coredata.ControlImportance
 	}
 )
 
@@ -78,6 +80,7 @@ func (s ControlService) Update(
 		Description:     req.Description,
 		Category:        req.Category,
 		State:           req.State,
+		Importance:      req.Importance,
 	}
 
 	control := &coredata.Control{ID: req.ID}
@@ -139,6 +142,7 @@ func (s ControlService) Create(
 		Description: req.Description,
 		Category:    req.Category,
 		State:       coredata.ControlStateNotStarted,
+		Importance:  req.Importance,
 		ContentRef:  req.ContentRef,
 		CreatedAt:   now,
 		UpdatedAt:   now,

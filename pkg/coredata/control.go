@@ -29,16 +29,17 @@ import (
 
 type (
 	Control struct {
-		ID          gid.GID      `db:"id"`
-		FrameworkID gid.GID      `db:"framework_id"`
-		Category    string       `db:"category"`
-		Name        string       `db:"name"`
-		Description string       `db:"description"`
-		State       ControlState `db:"state"`
-		ContentRef  string       `db:"content_ref"`
-		CreatedAt   time.Time    `db:"created_at"`
-		UpdatedAt   time.Time    `db:"updated_at"`
-		Version     int          `db:"version"`
+		ID          gid.GID           `db:"id"`
+		FrameworkID gid.GID           `db:"framework_id"`
+		Category    string            `db:"category"`
+		Name        string            `db:"name"`
+		Description string            `db:"description"`
+		Importance  ControlImportance `db:"importance"`
+		State       ControlState      `db:"state"`
+		ContentRef  string            `db:"content_ref"`
+		CreatedAt   time.Time         `db:"created_at"`
+		UpdatedAt   time.Time         `db:"updated_at"`
+		Version     int               `db:"version"`
 	}
 
 	Controls []*Control
@@ -49,6 +50,7 @@ type (
 		Description     *string
 		Category        *string
 		State           *ControlState
+		Importance      *ControlImportance
 	}
 )
 
@@ -70,6 +72,7 @@ SELECT
     name,
     description,
     state,
+	importance,
     content_ref,
     created_at,
     updated_at,
@@ -115,6 +118,7 @@ INSERT INTO
         framework_id,
 		category,
         name,
+		importance,
 		state,
         description,
         content_ref,
@@ -128,6 +132,7 @@ VALUES (
     @framework_id,
 	@category,
     @name,
+	@importance,
 	@state,
     @description,
     @content_ref,
@@ -149,6 +154,7 @@ VALUES (
 		"created_at":   c.CreatedAt,
 		"updated_at":   c.UpdatedAt,
 		"state":        c.State,
+		"importance":   c.Importance,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -169,6 +175,7 @@ SELECT
     name,
     description,
     state,
+	importance,
     content_ref,
     created_at,
     updated_at,
@@ -213,6 +220,7 @@ UPDATE controls SET
     description = COALESCE(@description, description),
     category = COALESCE(@category, category),
 	state = COALESCE(@state, state),
+	importance = COALESCE(@importance, importance),
     updated_at = @updated_at,
     version = version + 1
 WHERE %s
@@ -224,6 +232,7 @@ RETURNING
     category,
     name,
     description,
+	importance,
 	state,
     content_ref,
     created_at,
@@ -235,19 +244,12 @@ RETURNING
 	args := pgx.NamedArgs{
 		"control_id":       c.ID,
 		"expected_version": params.ExpectedVersion,
+		"name":             params.Name,
+		"description":      params.Description,
+		"category":         params.Category,
+		"state":            params.State,
+		"importance":       params.Importance,
 		"updated_at":       time.Now(),
-	}
-
-	maps.Copy(args, scope.SQLArguments())
-
-	if params.Name != nil {
-		args["name"] = *params.Name
-	}
-	if params.Description != nil {
-		args["description"] = *params.Description
-	}
-	if params.Category != nil {
-		args["category"] = *params.Category
 	}
 
 	maps.Copy(args, scope.SQLArguments())

@@ -23,10 +23,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-// Type imports will be available after Relay compiler runs
-// import type { UpdateControlPageQuery as UpdateControlPageQueryType } from "./__generated__/UpdateControlPageQuery.graphql";
-// import type { UpdateControlPageUpdateControlMutation as UpdateControlPageUpdateControlMutationType } from "./__generated__/UpdateControlPageUpdateControlMutation.graphql";
+import type { UpdateControlPageUpdateControlMutation as UpdateControlPageUpdateControlMutationType } from "./__generated__/UpdateControlPageUpdateControlMutation.graphql";
+import type {
+  ControlState,
+  ControlImportance,
+} from "./__generated__/UpdateControlPageUpdateControlMutation.graphql";
 
 const updateControlMutation = graphql`
   mutation UpdateControlPageUpdateControlMutation($input: UpdateControlInput!) {
@@ -36,6 +37,7 @@ const updateControlMutation = graphql`
         name
         description
         category
+        importance
         state
         version
       }
@@ -51,6 +53,7 @@ const updateControlQuery = graphql`
         name
         description
         category
+        importance
         state
         version
       }
@@ -98,7 +101,7 @@ function EditableField({
           }
           className={cn(
             "w-full resize-none",
-            required && !value && "border-red-500",
+            required && !value && "border-red-500"
           )}
           placeholder={`Enter ${label.toLowerCase()}`}
           rows={4}
@@ -135,6 +138,7 @@ function UpdateControlPageContent({
     description: "",
     category: "",
     state: "",
+    importance: "",
   });
 
   useEffect(() => {
@@ -144,12 +148,15 @@ function UpdateControlPageContent({
         description: data.node.description || "",
         category: data.node.category || "",
         state: data.node.state || "",
+        importance: data.node.importance || "",
       });
     }
   }, [data.node]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [commit, isInFlight] = useMutation<any>(updateControlMutation);
+  const [commit, isInFlight] =
+    useMutation<UpdateControlPageUpdateControlMutationType>(
+      updateControlMutation
+    );
 
   const handleFieldChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({
@@ -161,7 +168,7 @@ function UpdateControlPageContent({
 
   const handleCancel = () => {
     navigate(
-      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`,
+      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`
     );
   };
 
@@ -185,7 +192,8 @@ function UpdateControlPageContent({
       name?: string;
       description?: string;
       category?: string;
-      state?: string;
+      state?: ControlState;
+      importance?: ControlImportance;
     } = {
       id: controlId!,
       expectedVersion: data.node.version,
@@ -201,7 +209,10 @@ function UpdateControlPageContent({
       input.category = formData.category;
     }
     if (editedFields.has("state")) {
-      input.state = formData.state;
+      input.state = formData.state as ControlState;
+    }
+    if (editedFields.has("importance")) {
+      input.importance = formData.importance as ControlImportance;
     }
 
     commit({
@@ -224,7 +235,7 @@ function UpdateControlPageContent({
         });
 
         navigate(
-          `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`,
+          `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`
         );
       },
       onError(error) {
@@ -272,6 +283,27 @@ function UpdateControlPageContent({
               onChange={(value) => handleFieldChange("category", value)}
               required
             />
+
+            <div className="space-y-2">
+              <Label htmlFor="importance" className="text-sm font-medium">
+                Importance
+              </Label>
+              <Select
+                value={formData.importance}
+                onValueChange={(value) =>
+                  handleFieldChange("importance", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select importance" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="MANDATORY">Mandatory</SelectItem>
+                  <SelectItem value="PREFERRED">Preferred</SelectItem>
+                  <SelectItem value="ADVANCED">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="state" className="text-sm font-medium">

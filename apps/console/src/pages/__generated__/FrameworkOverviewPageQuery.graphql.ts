@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6f707328d181f9b362855a7b6023acc0>>
+ * @generated SignedSource<<f5c15295df1bbb71ef99c60ec2417464>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type ControlImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type FrameworkOverviewPageQuery$variables = {
   frameworkId: string;
@@ -21,6 +22,7 @@ export type FrameworkOverviewPageQuery$data = {
           readonly category: string;
           readonly description: string;
           readonly id: string;
+          readonly importance: ControlImportance;
           readonly name: string;
           readonly state: ControlState;
         };
@@ -111,6 +113,13 @@ v6 = [
             "args": null,
             "kind": "ScalarField",
             "name": "category",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "importance",
             "storageKey": null
           },
           (v5/*: any*/)
@@ -252,7 +261,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "77f347f74c922dbf3c1dd0baf0e37efd",
+    "cacheID": "6a4fc22ad7657a6861027975b620b08e",
     "id": null,
     "metadata": {
       "connection": [
@@ -269,11 +278,11 @@ return {
     },
     "name": "FrameworkOverviewPageQuery",
     "operationKind": "query",
-    "text": "query FrameworkOverviewPageQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls(first: 90) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            category\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query FrameworkOverviewPageQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls(first: 90) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            category\n            importance\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "de913888fcb5a475baf829a5773326a3";
+(node as any).hash = "0a7d8e6c782dae1777ee687c768d0ad6";
 
 export default node;

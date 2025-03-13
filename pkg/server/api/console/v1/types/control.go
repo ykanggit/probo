@@ -47,6 +47,7 @@ func NewControl(c *coredata.Control) *Control {
 		Name:        c.Name,
 		Description: c.Description,
 		State:       c.State,
+		Importance:  c.Importance,
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
 	}

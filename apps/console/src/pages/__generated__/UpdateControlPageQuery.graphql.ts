@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<daddf46b2039f01b80967778f24dd7f4>>
+ * @generated SignedSource<<86f7062f21c125e478c5a7a58b495d6c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type ControlImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type UpdateControlPageQuery$variables = {
   controlId: string;
@@ -18,6 +19,7 @@ export type UpdateControlPageQuery$data = {
     readonly category?: string;
     readonly description?: string;
     readonly id?: string;
+    readonly importance?: ControlImportance;
     readonly name?: string;
     readonly state?: ControlState;
     readonly version?: number;
@@ -75,10 +77,17 @@ v6 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "state",
+  "name": "importance",
   "storageKey": null
 },
 v7 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "state",
+  "storageKey": null
+},
+v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
@@ -108,7 +117,8 @@ return {
               (v4/*: any*/),
               (v5/*: any*/),
               (v6/*: any*/),
-              (v7/*: any*/)
+              (v7/*: any*/),
+              (v8/*: any*/)
             ],
             "type": "Control",
             "abstractKey": null
@@ -149,7 +159,8 @@ return {
               (v4/*: any*/),
               (v5/*: any*/),
               (v6/*: any*/),
-              (v7/*: any*/)
+              (v7/*: any*/),
+              (v8/*: any*/)
             ],
             "type": "Control",
             "abstractKey": null
@@ -160,16 +171,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "c44526d8079e0c539d634841a1f14923",
+    "cacheID": "8b9ee499b6fc5726d6ce679205b59501",
     "id": null,
     "metadata": {},
     "name": "UpdateControlPageQuery",
     "operationKind": "query",
-    "text": "query UpdateControlPageQuery(\n  $controlId: ID!\n) {\n  node(id: $controlId) {\n    __typename\n    ... on Control {\n      id\n      name\n      description\n      category\n      state\n      version\n    }\n    id\n  }\n}\n"
+    "text": "query UpdateControlPageQuery(\n  $controlId: ID!\n) {\n  node(id: $controlId) {\n    __typename\n    ... on Control {\n      id\n      name\n      description\n      category\n      importance\n      state\n      version\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d0a9cc6ebcb5b97ea57567edea1f7d5f";
+(node as any).hash = "f3336cff42059e52e983e4cd9d6c2f1e";
 
 export default node;

@@ -64,6 +64,7 @@ const controlOverviewPageQuery = graphql`
         name
         description
         state
+        importance
         category
         tasks(first: 100) @connection(key: "ControlOverviewPage_tasks") {
           __id
@@ -195,6 +196,60 @@ function ControlOverviewPageContent({
   const { organizationId, frameworkId, controlId } = useParams();
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
+
+  const formatImportance = (importance: string | undefined): string => {
+    if (!importance) return "";
+
+    const upperImportance = importance.toUpperCase();
+
+    if (upperImportance === "MANDATORY") return "Mandatory";
+    if (upperImportance === "PREFERRED") return "Preferred";
+    if (upperImportance === "ADVANCED") return "Advanced";
+
+    const formatted = importance.toLowerCase();
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  };
+
+  const formatState = (state: string | undefined): string => {
+    if (!state) return "";
+
+    const upperState = state.toUpperCase();
+
+    if (upperState === "NOT_STARTED") return "Not Started";
+    if (upperState === "IN_PROGRESS") return "In Progress";
+    if (upperState === "NOT_APPLICABLE") return "Not Applicable";
+    if (upperState === "IMPLEMENTED") return "Implemented";
+
+    // Fallback for any other states
+    const formatted = state.toLowerCase();
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  };
+
+  const getStateColor = (state: string | undefined): string => {
+    if (!state) return "bg-gray-100 text-gray-800";
+
+    const upperState = state.toUpperCase();
+
+    if (upperState === "NOT_STARTED") return "bg-gray-100 text-gray-800";
+    if (upperState === "IN_PROGRESS") return "bg-blue-100 text-blue-800";
+    if (upperState === "NOT_APPLICABLE") return "bg-purple-100 text-purple-800";
+    if (upperState === "IMPLEMENTED") return "bg-green-100 text-green-800";
+
+    return "bg-gray-100 text-gray-800";
+  };
+
+  const getImportanceColor = (importance: string | undefined): string => {
+    if (!importance) return "bg-gray-100 text-gray-800";
+
+    const upperImportance = importance.toUpperCase();
+
+    if (upperImportance === "MANDATORY") return "bg-red-100 text-red-800";
+    if (upperImportance === "PREFERRED") return "bg-orange-100 text-orange-800";
+    if (upperImportance === "ADVANCED") return "bg-blue-100 text-blue-800";
+
+    return "bg-gray-100 text-gray-800";
+  };
+
   const [updateTask] =
     useMutation<ControlOverviewPageUpdateTaskStateMutationType>(
       updateTaskStateMutation
@@ -542,7 +597,6 @@ function ControlOverviewPageContent({
     });
   };
 
-  // Function to format file size
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
@@ -551,7 +605,6 @@ function ControlOverviewPageContent({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  // Function to format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -681,39 +734,24 @@ function ControlOverviewPageContent({
               <Button variant="outline" size="sm" onClick={handleEditControl}>
                 Edit Control
               </Button>
-              <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-                30 min
+              <div
+                className={`${getStateColor(
+                  data.control.state
+                )} px-3 py-1 rounded-full text-sm`}
+              >
+                {formatState(data.control.state)}
               </div>
-              <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                Mandatory
+              <div
+                className={`${getImportanceColor(
+                  data.control.importance
+                )} px-3 py-1 rounded-full text-sm`}
+              >
+                {formatImportance(data.control.importance)}
               </div>
             </div>
           </div>
           <p className="text-gray-600 max-w-3xl">{data.control.description}</p>
         </div>
-
-        <Card className="bg-gray-50 border border-gray-200">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div
-                className={`w-4 h-4 rounded-full bg-white flex items-center justify-center border border-gray-200`}
-              >
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    data.control.state === "IMPLEMENTED"
-                      ? "bg-green-500"
-                      : "bg-gray-300"
-                  }`}
-                />
-              </div>
-              <span className="text-sm text-gray-700">
-                {data.control.state === "IMPLEMENTED"
-                  ? "Validated"
-                  : "Not validated"}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
 
         <div>
           <div className="flex items-center justify-between mb-6">

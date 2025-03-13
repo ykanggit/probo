@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<21747064508d0bb73d846aed7ed6b97a>>
+ * @generated SignedSource<<8eaa34f32a83e626da3331f2e0c6a7cf>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -29,6 +29,7 @@ export type UpdateControlPageUpdateControlMutation$data = {
       readonly category: string;
       readonly description: string;
       readonly id: string;
+      readonly importance: ControlImportance;
       readonly name: string;
       readonly state: ControlState;
       readonly version: number;
@@ -103,6 +104,13 @@ v1 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
+            "name": "importance",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
             "name": "state",
             "storageKey": null
           },
@@ -138,16 +146,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "1e9e2b8000a1b3061fcfda07260413ed",
+    "cacheID": "3d05aa40f4dba0b24241235c54b85c4f",
     "id": null,
     "metadata": {},
     "name": "UpdateControlPageUpdateControlMutation",
     "operationKind": "mutation",
-    "text": "mutation UpdateControlPageUpdateControlMutation(\n  $input: UpdateControlInput!\n) {\n  updateControl(input: $input) {\n    control {\n      id\n      name\n      description\n      category\n      state\n      version\n    }\n  }\n}\n"
+    "text": "mutation UpdateControlPageUpdateControlMutation(\n  $input: UpdateControlInput!\n) {\n  updateControl(input: $input) {\n    control {\n      id\n      name\n      description\n      category\n      importance\n      state\n      version\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "861813b150cef2977f8d9455a9bcf4fa";
+(node as any).hash = "0de0b5b9560213e95af60cc1732dee4c";
 
 export default node;

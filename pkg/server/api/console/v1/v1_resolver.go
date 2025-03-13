@@ -321,6 +321,7 @@ func (r *mutationResolver) UpdateControl(ctx context.Context, input types.Update
 		Description:     input.Description,
 		Category:        input.Category,
 		State:           input.State,
+		Importance:      input.Importance,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update control: %w", err)
