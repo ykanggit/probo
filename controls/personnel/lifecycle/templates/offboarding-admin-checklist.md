@@ -1,9 +1,0 @@
-- [ ] 💰 Make sure we closed the contract on Payfit
-- [ ] 💻 Get back and Reset laptop
-- [ ] 🔁 Transfert the docs ownership in Google
-- [ ] 📧 Suppress the Google account
-- [ ] 🖋 Disconnect manually Notion
-- [ ] 🛠 Disconnect Slack
-- [ ] 🔐 Delete from 1 Password (not suspended, billed)
-- [ ] 🗄 Disconnect manually Github
-- [ ] 🧐 Double check with the manager for important tool
