@@ -46,8 +46,8 @@ export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
   const { organizationId } = useParams();
 
   const handleLogout = async () => {
-    fetch(buildEndpoint("/auth/logout"), {
-      method: "POST",
+    fetch(buildEndpoint("/api/console/v1/auth/logout"), {
+      method: "DELETE",
       credentials: "include",
     }).then(() => {
       navigate("/login");
