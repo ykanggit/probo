@@ -143,6 +143,10 @@ function LoadAboveButton({
   hasMore: boolean;
   onLoadMore: () => void;
 }) {
+  if (!hasMore) {
+    return null;
+  }
+
   return (
     <div className="flex justify-center">
       <Button
@@ -166,6 +170,10 @@ function LoadBelowButton({
   hasMore: boolean;
   onLoadMore: () => void;
 }) {
+  if (!hasMore) {
+    return null;
+  }
+
   return (
     <div className="flex justify-center">
       <Button

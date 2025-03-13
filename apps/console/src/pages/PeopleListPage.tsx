@@ -90,12 +90,16 @@ function LoadAboveButton({
   hasMore: boolean;
   onLoadMore: () => void;
 }) {
+  if (!hasMore) {
+    return null;
+  }
+
   return (
     <div className="flex justify-center">
       <Button
         variant="outline"
         onClick={onLoadMore}
-        disabled={isLoading || !hasMore}
+        disabled={isLoading}
         className="w-full"
       >
         {isLoading ? "Loading..." : "Load above"}
@@ -113,6 +117,10 @@ function LoadBelowButton({
   hasMore: boolean;
   onLoadMore: () => void;
 }) {
+  if (!hasMore) {
+    return null;
+  }
+
   return (
     <div className="flex justify-center">
       <Button
@@ -170,7 +178,6 @@ function PeopleListContent({
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground">1 people needs to get onboarded</p>
         <Button
           asChild
           variant="outline"
