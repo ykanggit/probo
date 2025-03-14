@@ -65,10 +65,6 @@ type ComplexityRoot struct {
 		Success func(childComplexity int) int
 	}
 
-	ConfirmInvitationPayload struct {
-		Success func(childComplexity int) int
-	}
-
 	Control struct {
 		Category    func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
@@ -196,7 +192,6 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AssignTask         func(childComplexity int, input types.AssignTaskInput) int
 		ConfirmEmail       func(childComplexity int, input types.ConfirmEmailInput) int
-		ConfirmInvitation  func(childComplexity int, input types.ConfirmInvitationInput) int
 		CreateControl      func(childComplexity int, input types.CreateControlInput) int
 		CreateFramework    func(childComplexity int, input types.CreateFrameworkInput) int
 		CreateOrganization func(childComplexity int, input types.CreateOrganizationInput) int
@@ -457,7 +452,6 @@ type MutationResolver interface {
 	DeletePolicy(ctx context.Context, input types.DeletePolicyInput) (*types.DeletePolicyPayload, error)
 	ConfirmEmail(ctx context.Context, input types.ConfirmEmailInput) (*types.ConfirmEmailPayload, error)
 	InviteUser(ctx context.Context, input types.InviteUserInput) (*types.InviteUserPayload, error)
-	ConfirmInvitation(ctx context.Context, input types.ConfirmInvitationInput) (*types.ConfirmInvitationPayload, error)
 	RemoveUser(ctx context.Context, input types.RemoveUserInput) (*types.RemoveUserPayload, error)
 }
 type OrganizationResolver interface {
@@ -515,13 +509,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ConfirmEmailPayload.Success(childComplexity), true
-
-	case "ConfirmInvitationPayload.success":
-		if e.complexity.ConfirmInvitationPayload.Success == nil {
-			break
-		}
-
-		return e.complexity.ConfirmInvitationPayload.Success(childComplexity), true
 
 	case "Control.category":
 		if e.complexity.Control.Category == nil {
@@ -920,18 +907,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ConfirmEmail(childComplexity, args["input"].(types.ConfirmEmailInput)), true
-
-	case "Mutation.confirmInvitation":
-		if e.complexity.Mutation.ConfirmInvitation == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_confirmInvitation_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ConfirmInvitation(childComplexity, args["input"].(types.ConfirmInvitationInput)), true
 
 	case "Mutation.createControl":
 		if e.complexity.Mutation.CreateControl == nil {
@@ -1983,7 +1958,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAssignTaskInput,
 		ec.unmarshalInputConfirmEmailInput,
-		ec.unmarshalInputConfirmInvitationInput,
 		ec.unmarshalInputCreateControlInput,
 		ec.unmarshalInputCreateFrameworkInput,
 		ec.unmarshalInputCreateOrganizationInput,
@@ -2495,7 +2469,6 @@ type Mutation {
 
   confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
   inviteUser(input: InviteUserInput!): InviteUserPayload!
-  confirmInvitation(input: ConfirmInvitationInput!): ConfirmInvitationPayload!
   removeUser(input: RemoveUserInput!): RemoveUserPayload!
 }
 
@@ -2834,15 +2807,6 @@ type InviteUserPayload {
   success: Boolean!
 }
 
-input ConfirmInvitationInput {
-  token: String!
-  password: String!
-}
-
-type ConfirmInvitationPayload {
-  success: Boolean!
-}
-
 input RemoveUserInput {
   organizationId: ID!
   userId: ID!
@@ -3056,29 +3020,6 @@ func (ec *executionContext) field_Mutation_confirmEmail_argsInput(
 	}
 
 	var zeroVal types.ConfirmEmailInput
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_confirmInvitation_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_confirmInvitation_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_confirmInvitation_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (types.ConfirmInvitationInput, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNConfirmInvitationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐConfirmInvitationInput(ctx, tmp)
-	}
-
-	var zeroVal types.ConfirmInvitationInput
 	return zeroVal, nil
 }
 
@@ -4430,44 +4371,6 @@ func (ec *executionContext) _ConfirmEmailPayload_success(ctx context.Context, fi
 func (ec *executionContext) fieldContext_ConfirmEmailPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ConfirmEmailPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ConfirmInvitationPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.ConfirmInvitationPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ConfirmInvitationPayload_success(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ConfirmInvitationPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ConfirmInvitationPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -7844,53 +7747,6 @@ func (ec *executionContext) fieldContext_Mutation_inviteUser(ctx context.Context
 	}
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_inviteUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_confirmInvitation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_confirmInvitation(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ConfirmInvitation(rctx, fc.Args["input"].(types.ConfirmInvitationInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.ConfirmInvitationPayload)
-	fc.Result = res
-	return ec.marshalNConfirmInvitationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐConfirmInvitationPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_confirmInvitation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "success":
-				return ec.fieldContext_ConfirmInvitationPayload_success(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ConfirmInvitationPayload", field.Name)
-		},
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_confirmInvitation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -14122,40 +13978,6 @@ func (ec *executionContext) unmarshalInputConfirmEmailInput(ctx context.Context,
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputConfirmInvitationInput(ctx context.Context, obj any) (types.ConfirmInvitationInput, error) {
-	var it types.ConfirmInvitationInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"token", "password"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "token":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Token = data
-		case "password":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Password = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputCreateControlInput(ctx context.Context, obj any) (types.CreateControlInput, error) {
 	var it types.CreateControlInput
 	asMap := map[string]any{}
@@ -15460,45 +15282,6 @@ func (ec *executionContext) _ConfirmEmailPayload(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("ConfirmEmailPayload")
 		case "success":
 			out.Values[i] = ec._ConfirmEmailPayload_success(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var confirmInvitationPayloadImplementors = []string{"ConfirmInvitationPayload"}
-
-func (ec *executionContext) _ConfirmInvitationPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ConfirmInvitationPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, confirmInvitationPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ConfirmInvitationPayload")
-		case "success":
-			out.Values[i] = ec._ConfirmInvitationPayload_success(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -16876,13 +16659,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "inviteUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_inviteUser(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "confirmInvitation":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_confirmInvitation(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -19164,25 +18940,6 @@ func (ec *executionContext) marshalNConfirmEmailPayload2ᚖgithubᚗcomᚋgetpro
 		return graphql.Null
 	}
 	return ec._ConfirmEmailPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNConfirmInvitationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐConfirmInvitationInput(ctx context.Context, v any) (types.ConfirmInvitationInput, error) {
-	res, err := ec.unmarshalInputConfirmInvitationInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNConfirmInvitationPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐConfirmInvitationPayload(ctx context.Context, sel ast.SelectionSet, v types.ConfirmInvitationPayload) graphql.Marshaler {
-	return ec._ConfirmInvitationPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNConfirmInvitationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐConfirmInvitationPayload(ctx context.Context, sel ast.SelectionSet, v *types.ConfirmInvitationPayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ConfirmInvitationPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNControl2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControl(ctx context.Context, sel ast.SelectionSet, v *types.Control) graphql.Marshaler {

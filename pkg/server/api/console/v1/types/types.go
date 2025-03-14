@@ -33,15 +33,6 @@ type ConfirmEmailPayload struct {
 	Success bool `json:"success"`
 }
 
-type ConfirmInvitationInput struct {
-	Token    string `json:"token"`
-	Password string `json:"password"`
-}
-
-type ConfirmInvitationPayload struct {
-	Success bool `json:"success"`
-}
-
 type Control struct {
 	ID          gid.GID                    `json:"id"`
 	Version     int                        `json:"version"`

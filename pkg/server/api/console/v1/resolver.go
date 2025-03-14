@@ -77,6 +77,7 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 	r.Post("/auth/register", SignUpHandler(usrmgrSvc, authCfg))
 	r.Post("/auth/login", SignInHandler(usrmgrSvc, authCfg))
 	r.Delete("/auth/logout", SignOutHandler(usrmgrSvc, authCfg))
+	r.Post("/auth/invitation", InvitationConfirmationHandler(usrmgrSvc, authCfg))
 
 	r.Get("/", playground.Handler("GraphQL", "/api/console/v1/query"))
 	r.Post("/query", graphqlHandler(proboSvc, usrmgrSvc, authCfg))
@@ -105,10 +106,6 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 	srv.Use(extension.Introspection{})
 
 	srv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
-		if op := graphql.GetOperationContext(ctx); op.OperationName == "IntrospectionQuery" {
-			return next(ctx)
-		}
-
 		user := UserFromContext(ctx)
 
 		if user == nil {

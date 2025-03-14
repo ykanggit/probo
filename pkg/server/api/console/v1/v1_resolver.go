@@ -533,16 +533,6 @@ func (r *mutationResolver) InviteUser(ctx context.Context, input types.InviteUse
 	return nil, fmt.Errorf("organization not found")
 }
 
-// ConfirmInvitation is the resolver for the confirmInvitation field.
-func (r *mutationResolver) ConfirmInvitation(ctx context.Context, input types.ConfirmInvitationInput) (*types.ConfirmInvitationPayload, error) {
-	err := r.usrmgrSvc.ConfirmInvitation(ctx, input.Token, input.Password)
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.ConfirmInvitationPayload{Success: true}, nil
-}
-
 // RemoveUser is the resolver for the removeUser field.
 func (r *mutationResolver) RemoveUser(ctx context.Context, input types.RemoveUserInput) (*types.RemoveUserPayload, error) {
 	user := UserFromContext(ctx)

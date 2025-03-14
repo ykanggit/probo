@@ -4,12 +4,9 @@ import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router";
-import { useMutation } from "react-relay";
-import { graphql } from "relay-runtime";
-import { PayloadError } from "relay-runtime";
-import { ConfirmInvitationPageMutation } from "./__generated__/ConfirmInvitationPageMutation.graphql";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { buildEndpoint } from "@/utils";
 import {
   Card,
   CardContent,
@@ -18,14 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-const ConfirmInvitationMutation = graphql`
-  mutation ConfirmInvitationPageMutation($input: ConfirmInvitationInput!) {
-    confirmInvitation(input: $input) {
-      success
-    }
-  }
-`;
 
 export default function ConfirmInvitationPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,9 +26,6 @@ export default function ConfirmInvitationPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [commitMutation] = useMutation<ConfirmInvitationPageMutation>(
-    ConfirmInvitationMutation
-  );
 
   useEffect(() => {
     // Extract token from URL and prefill the form
@@ -81,34 +67,30 @@ export default function ConfirmInvitationPage() {
     }
 
     try {
-      commitMutation({
-        variables: {
-          input: {
+      const response = await fetch(
+        buildEndpoint("/api/console/v1/auth/invitation"),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
             token: token.trim(),
             password: password,
-          },
-        },
-        onCompleted: (response, errors: PayloadError[] | null) => {
-          if (errors) {
-            throw new Error(
-              errors[0]?.message || "Failed to confirm invitation"
-            );
-          }
+          }),
+        }
+      );
 
-          setIsConfirmed(true);
-          toast({
-            title: "Success",
-            description: "Your invitation has been confirmed successfully",
-          });
+      const data = await response.json();
 
-          setIsLoading(false);
-        },
-        onError: (err) => {
-          setError(
-            err.message || "Failed to confirm invitation. Please try again."
-          );
-          setIsLoading(false);
-        },
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to confirm invitation");
+      }
+
+      setIsConfirmed(true);
+      toast({
+        title: "Success",
+        description: "Your invitation has been confirmed successfully",
       });
     } catch (error) {
       setError(
@@ -116,6 +98,7 @@ export default function ConfirmInvitationPage() {
           ? error.message
           : "Failed to confirm invitation. Please try again."
       );
+    } finally {
       setIsLoading(false);
     }
   };
