@@ -1,6 +1,6 @@
 import { Link, Outlet, Route, Routes, useParams } from "react-router";
 import { AppSidebar } from "@/components/AppSidebar";
-import React from "react";
+import React, { Suspense } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,10 +22,7 @@ import { ConsoleLayoutBreadcrumbPeopleOverviewQuery } from "./__generated__/Cons
 import { ConsoleLayoutBreadcrumbVendorOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbVendorOverviewQuery.graphql";
 import { ConsoleLayoutBreadcrumbControlOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbControlOverviewQuery.graphql";
 import { ConsoleLayoutOrganizationQuery } from "./__generated__/ConsoleLayoutOrganizationQuery.graphql";
-import { ConsoleLayoutBreadcrumbCreateControlQuery } from "./__generated__/ConsoleLayoutBreadcrumbCreateControlQuery.graphql";
-import { ConsoleLayoutBreadcrumbUpdateFrameworkQuery } from "./__generated__/ConsoleLayoutBreadcrumbUpdateFrameworkQuery.graphql";
 import { ConsoleLayoutBreadcrumbPolicyOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbPolicyOverviewQuery.graphql";
-import { ConsoleLayoutBreadcrumbUpdatePolicyQuery } from "./__generated__/ConsoleLayoutBreadcrumbUpdatePolicyQuery.graphql";
 
 function BreadcrumbHome({ children }: { children: React.ReactNode }) {
   const { organizationId } = useParams();
@@ -141,43 +138,12 @@ function BreadcrumbFrameworkOverview() {
 }
 
 function BreadcrumbUpdateFramework() {
-  const { organizationId, frameworkId } = useParams();
-  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbUpdateFrameworkQuery>(
-    graphql`
-      query ConsoleLayoutBreadcrumbUpdateFrameworkQuery($frameworkId: ID!) {
-        framework: node(id: $frameworkId) {
-          id
-          ... on Framework {
-            name
-          }
-        }
-      }
-    `,
-    { frameworkId: frameworkId! },
-    { fetchPolicy: "store-or-network" }
-  );
-
   return (
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink
-          asChild
-          className="max-w-[160px] truncate"
-          aria-label={data.framework?.name}
-        >
-          <Link
-            to={`/organizations/${organizationId}/frameworks/${frameworkId}`}
-          >
-            {data.framework?.name}
-          </Link>
-        </BreadcrumbLink>
-      </BreadcrumbItem>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
         <BreadcrumbPage>Update</BreadcrumbPage>
       </BreadcrumbItem>
-      <Outlet />
     </>
   );
 }
@@ -324,32 +290,8 @@ function BreadcrumbControlOverview() {
 }
 
 function BreadcrumbCreateControl() {
-  const { organizationId, frameworkId } = useParams();
-  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbCreateControlQuery>(
-    graphql`
-      query ConsoleLayoutBreadcrumbCreateControlQuery($frameworkId: ID!) {
-        framework: node(id: $frameworkId) {
-          ... on Framework {
-            name
-          }
-        }
-      }
-    `,
-    { frameworkId: frameworkId! }
-  );
-
   return (
     <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link
-            to={`/organizations/${organizationId}/frameworks/${frameworkId}`}
-          >
-            {data.framework?.name}
-          </Link>
-        </BreadcrumbLink>
-      </BreadcrumbItem>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbPage>Create Control</BreadcrumbPage>
@@ -417,41 +359,12 @@ function BreadcrumbPolicyOverview() {
 }
 
 function BreadcrumbUpdatePolicy() {
-  const { organizationId, policyId } = useParams();
-  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbUpdatePolicyQuery>(
-    graphql`
-      query ConsoleLayoutBreadcrumbUpdatePolicyQuery($policyId: ID!) {
-        policy: node(id: $policyId) {
-          id
-          ... on Policy {
-            name
-          }
-        }
-      }
-    `,
-    { policyId: policyId! },
-    { fetchPolicy: "store-or-network" }
-  );
-
   return (
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink
-          asChild
-          className="max-w-[160px] truncate"
-          aria-label={data.policy?.name}
-        >
-          <Link to={`/organizations/${organizationId}/policies/${policyId}`}>
-            {data.policy?.name}
-          </Link>
-        </BreadcrumbLink>
-      </BreadcrumbItem>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
         <BreadcrumbPage>Update</BreadcrumbPage>
       </BreadcrumbItem>
-      <Outlet />
     </>
   );
 }
@@ -468,62 +381,93 @@ export default function ConsoleLayout() {
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <BreadcrumbHome>
-              {showBreadcrumb && (
-                <Routes>
-                  <Route
-                    path="frameworks"
-                    element={<BreadcrumbFrameworkList />}
-                  >
-                    <Route
-                      path=":frameworkId"
-                      element={<BreadcrumbFrameworkOverview />}
-                    >
+            <Suspense>
+              <BreadcrumbHome>
+                {showBreadcrumb && (
+                  <Routes>
+                    <Route path="organizations/:organizationsId">
                       <Route
-                        path="controls/create"
-                        element={<BreadcrumbCreateControl />}
-                      />
-                      <Route
-                        path="controls/:controlId"
-                        element={<BreadcrumbControlOverview />}
-                      />
+                        path="frameworks"
+                        element={<BreadcrumbFrameworkList />}
+                      >
+                        <Route
+                          path=":frameworkId"
+                          element={
+                            <Suspense>
+                              <BreadcrumbFrameworkOverview />
+                            </Suspense>
+                          }
+                        >
+                          <Route
+                            path="controls/create"
+                            element={<BreadcrumbCreateControl />}
+                          />
+                          <Route
+                            path="controls/:controlId"
+                            element={
+                              <Suspense>
+                                <BreadcrumbControlOverview />
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="update"
+                            element={<BreadcrumbUpdateFramework />}
+                          />
+                        </Route>
+                        <Route
+                          path="create"
+                          element={<BreadcrumbCreateFramework />}
+                        />
+                      </Route>
+                      <Route path="peoples" element={<BreadcrumbPeopleList />}>
+                        <Route
+                          path=":peopleId"
+                          element={
+                            <Suspense>
+                              <BreadcrumbPeopleOverview />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="create"
+                          element={<BreadcrumbCreatePeople />}
+                        />
+                      </Route>
+                      <Route path="vendors" element={<BreadcrumbVendorList />}>
+                        <Route
+                          path=":vendorId"
+                          element={
+                            <Suspense>
+                              <BreadcrumbVendorOverview />
+                            </Suspense>
+                          }
+                        />
+                      </Route>
+                      <Route path="policies" element={<BreadcrumbPolicyList />}>
+                        <Route
+                          path=":policyId"
+                          element={
+                            <Suspense>
+                              <BreadcrumbPolicyOverview />
+                            </Suspense>
+                          }
+                        >
+                          <Route
+                            path="update"
+                            element={<BreadcrumbUpdatePolicy />}
+                          />
+                        </Route>
+                        <Route
+                          path="create"
+                          element={<BreadcrumbCreatePolicy />}
+                        />
+                      </Route>
                     </Route>
-                    <Route
-                      path=":frameworkId/update"
-                      element={<BreadcrumbUpdateFramework />}
-                    />
-                    <Route
-                      path="create"
-                      element={<BreadcrumbCreateFramework />}
-                    />
-                  </Route>
-                  <Route path="peoples" element={<BreadcrumbPeopleList />}>
-                    <Route
-                      path=":peopleId"
-                      element={<BreadcrumbPeopleOverview />}
-                    />
-                    <Route path="create" element={<BreadcrumbCreatePeople />} />
-                  </Route>
-                  <Route path="vendors" element={<BreadcrumbVendorList />}>
-                    <Route
-                      path=":vendorId"
-                      element={<BreadcrumbVendorOverview />}
-                    />
-                  </Route>
-                  <Route path="policies" element={<BreadcrumbPolicyList />}>
-                    <Route
-                      path=":policyId"
-                      element={<BreadcrumbPolicyOverview />}
-                    />
-                    <Route
-                      path=":policyId/update"
-                      element={<BreadcrumbUpdatePolicy />}
-                    />
-                    <Route path="create" element={<BreadcrumbCreatePolicy />} />
-                  </Route>
-                </Routes>
-              )}
-            </BreadcrumbHome>
+                  </Routes>
+                )}
+              </BreadcrumbHome>
+            </Suspense>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
