@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
 import { createPortal } from "react-dom";
+import { PageHeader } from "./PageHeader";
 
 const FrameworkOverviewPageQuery = graphql`
   query FrameworkOverviewPageQuery($frameworkId: ID!) {
@@ -81,14 +82,13 @@ function FrameworkOverviewPageContent({
   ).length;
 
   return (
-    <div className="min-h-screen bg-background p-6 space-y-6">
-      <div className="space-y-4 mb-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-semibold mb-1">{framework.name}</h2>
-            <p className="text-muted-foreground">{framework.description}</p>
-          </div>
-          <div className="flex gap-2">
+    <div className="container space-y-6">
+      <PageHeader
+        className="mb-17"
+        title={framework.name ?? ""}
+        description={framework.description ?? ""}
+        actions={
+          <div className="flex gap-4">
             <Button variant="outline" asChild>
               <Link
                 to={`/organizations/${organizationId}/frameworks/${framework.id}/update`}
@@ -105,8 +105,8 @@ function FrameworkOverviewPageContent({
               </Link>
             </Button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       <div className="mb-6 flex justify-between items-center">
         <h2 className="text-xl font-semibold">Controls</h2>

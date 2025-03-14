@@ -23,6 +23,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FrameworkListPageImportFrameworkMutation as FrameworkListPageImportFrameworkMutationType } from "./__generated__/FrameworkListPageImportFrameworkMutation.graphql";
+import { PageHeader } from "./PageHeader";
 
 const FrameworkListPageQuery = graphql`
   query FrameworkListPageQuery($organizationId: ID!) {
@@ -186,57 +187,56 @@ function FrameworkListPageContent({
       <Helmet>
         <title>Frameworks - Probo</title>
       </Helmet>
-      <div className="container mx-auto py-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold">Frameworks</h1>
-            <p className="text-muted-foreground">
-              Manage your compliance frameworks
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Dialog
-              open={isImportDialogOpen}
-              onOpenChange={setIsImportDialogOpen}
-            >
-              <DialogTrigger asChild>
-                <Button variant="outline">
-                  <Upload className="mr-2 h-4 w-4" />
-                  Import Framework
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Import Framework</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="framework-file">
-                      Upload Framework File
-                    </Label>
-                    <Input
-                      id="framework-file"
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                      disabled={isUploading}
-                      accept=".json"
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Upload a JSON file containing your framework definition.
-                    </p>
+      <div className="container">
+        <PageHeader
+          className="mb-17"
+          title="Frameworks"
+          description="Manage your compliance frameworks"
+          actions={
+            <div className="flex gap-4">
+              <Dialog
+                open={isImportDialogOpen}
+                onOpenChange={setIsImportDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <Upload className="mr-2 h-4 w-4" />
+                    Import Framework
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Import Framework</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="framework-file">
+                        Upload Framework File
+                      </Label>
+                      <Input
+                        id="framework-file"
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        disabled={isUploading}
+                        accept=".json"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Upload a JSON file containing your framework definition.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-            <Button asChild>
-              <Link to={`/organizations/${organizationId}/frameworks/create`}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Framework
-              </Link>
-            </Button>
-          </div>
-        </div>
+                </DialogContent>
+              </Dialog>
+              <Button asChild>
+                <Link to={`/organizations/${organizationId}/frameworks/create`}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Framework
+                </Link>
+              </Button>
+            </div>
+          }
+        />
         <div className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
             {frameworks.map((framework) => {

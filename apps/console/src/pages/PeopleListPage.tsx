@@ -18,6 +18,7 @@ import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generat
 import type { PeopleListPageDeletePeopleMutation } from "./__generated__/PeopleListPageDeletePeopleMutation.graphql";
 import { PeopleListPagePaginationQuery } from "./__generated__/PeopleListPagePaginationQuery.graphql";
 import { PeopleListPage_peoples$key } from "./__generated__/PeopleListPage_peoples.graphql";
+import { PageHeader } from "./PageHeader";
 
 const ITEMS_PER_PAGE = 25;
 
@@ -168,124 +169,127 @@ function PeopleListContent({
   const pageInfo = peoplesConnection.peoples.pageInfo;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold mb-1">Employees</h2>
-        <p className="text-muted-foreground">
-          Keep track of your company{"'"}s workforce and their progress towards
-          completing tasks assigned to them.
-        </p>
-      </div>
+    <>
+      <Helmet>
+        <title>People - Probo</title>
+      </Helmet>
+      <div className="container space-y-6">
+        <PageHeader
+          className="mb-17"
+          title="Employees"
+          description="Keep track of your company's workforce and their progress
+            towards completing tasks assigned to them."
+          actions={
+            <Button
+              asChild
+              variant="outline"
+              style={{ borderRadius: "0.5rem" }}
+              className="gap-2"
+            >
+              <Link to={`/organizations/${organizationId}/people/create`}>
+                <UserPlus className="h-4 w-4" />
+                Add a person
+              </Link>
+            </Button>
+          }
+        />
 
-      <div className="flex items-center justify-between">
-        <Button
-          asChild
-          variant="outline"
-          style={{ borderRadius: "0.5rem" }}
-          className="gap-2"
-        >
-          <Link to={`/organizations/${organizationId}/people/create`}>
-            <UserPlus className="h-4 w-4" />
-            Add a people
-          </Link>
-        </Button>
-      </div>
-
-      <div className="space-y-2">
-        {peoples.map((person) => (
-          <Link
-            key={person?.id}
-            to={`/organizations/${organizationId}/people/${person?.id}`}
-            className="block"
-          >
-            <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>{person?.fullName?.[0]}</AvatarFallback>
-                </Avatar>
+        <div className="space-y-2">
+          {peoples.map((person) => (
+            <Link
+              key={person?.id}
+              to={`/organizations/${organizationId}/people/${person?.id}`}
+              className="block"
+            >
+              <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>{person?.fullName?.[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">{person?.fullName}</p>
+                    {person?.primaryEmailAddress && (
+                      <>
+                        <span className="text-muted-foreground">•</span>
+                        <p className="text-sm text-muted-foreground">
+                          {person.primaryEmailAddress}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
                 <div className="flex items-center gap-2">
-                  <p className="font-medium">{person?.fullName}</p>
-                  {person?.primaryEmailAddress && (
-                    <>
-                      <span className="text-muted-foreground">•</span>
-                      <p className="text-sm text-muted-foreground">
-                        {person.primaryEmailAddress}
-                      </p>
-                    </>
-                  )}
+                  <Badge
+                    variant="secondary"
+                    className="bg-lime-9 text-white rounded-full px-3 py-0.5 text-xs font-medium"
+                  >
+                    {person?.kind === "EMPLOYEE"
+                      ? "Employee"
+                      : person?.kind === "CONTRACTOR"
+                      ? "Contractor"
+                      : "Vendor"}
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:bg-transparent hover:[&>svg]:text-destructive"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (
+                        window.confirm(
+                          "Are you sure you want to delete this person?"
+                        )
+                      ) {
+                        deletePeople({
+                          variables: {
+                            connections: [peoplesConnection.peoples.__id],
+                            input: {
+                              peopleId: person.id,
+                            },
+                          },
+                        });
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 transition-colors" />
+                  </Button>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant="secondary"
-                  className="bg-lime-9 text-white rounded-full px-3 py-0.5 text-xs font-medium"
-                >
-                  {person?.kind === "EMPLOYEE"
-                    ? "Employee"
-                    : person?.kind === "CONTRACTOR"
-                    ? "Contractor"
-                    : "Vendor"}
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:bg-transparent hover:[&>svg]:text-destructive"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (
-                      window.confirm(
-                        "Are you sure you want to delete this person?"
-                      )
-                    ) {
-                      deletePeople({
-                        variables: {
-                          connections: [peoplesConnection.peoples.__id],
-                          input: {
-                            peopleId: person.id,
-                          },
-                        },
-                      });
-                    }
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 transition-colors" />
-                </Button>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
 
-      <LoadAboveButton
-        isLoading={isLoadingPrevious}
-        hasMore={hasPrevious}
-        onLoadMore={() => {
-          startTransition(() => {
-            setSearchParams((prev) => {
-              prev.set("before", pageInfo?.startCursor || "");
-              prev.delete("after");
-              return prev;
+        <LoadAboveButton
+          isLoading={isLoadingPrevious}
+          hasMore={hasPrevious}
+          onLoadMore={() => {
+            startTransition(() => {
+              setSearchParams((prev) => {
+                prev.set("before", pageInfo?.startCursor || "");
+                prev.delete("after");
+                return prev;
+              });
+              loadPrevious(ITEMS_PER_PAGE);
             });
-            loadPrevious(ITEMS_PER_PAGE);
-          });
-        }}
-      />
-      <LoadBelowButton
-        isLoading={isLoadingNext}
-        hasMore={hasNext}
-        onLoadMore={() => {
-          startTransition(() => {
-            setSearchParams((prev) => {
-              prev.set("after", pageInfo?.endCursor || "");
-              prev.delete("before");
-              return prev;
+          }}
+        />
+        <LoadBelowButton
+          isLoading={isLoadingNext}
+          hasMore={hasNext}
+          onLoadMore={() => {
+            startTransition(() => {
+              setSearchParams((prev) => {
+                prev.set("after", pageInfo?.endCursor || "");
+                prev.delete("before");
+                return prev;
+              });
+              loadNext(ITEMS_PER_PAGE);
             });
-            loadNext(ITEMS_PER_PAGE);
-          });
-        }}
-      />
-    </div>
+          }}
+        />
+      </div>
+    </>
   );
 }
 

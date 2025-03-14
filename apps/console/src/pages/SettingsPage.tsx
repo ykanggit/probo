@@ -39,6 +39,7 @@ import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__
 import type { SettingsPageUpdateOrganizationMutation as SettingsPageUpdateOrganizationMutationType } from "./__generated__/SettingsPageUpdateOrganizationMutation.graphql";
 import type { SettingsPageInviteUserMutation as SettingsPageInviteUserMutationType } from "./__generated__/SettingsPageInviteUserMutation.graphql";
 import type { SettingsPageRemoveUserMutation as SettingsPageRemoveUserMutationType } from "./__generated__/SettingsPageRemoveUserMutation.graphql";
+import { PageHeader } from "./PageHeader";
 
 const settingsPageQuery = graphql`
   query SettingsPageQuery($organizationID: ID!) {
@@ -290,13 +291,12 @@ function SettingsPageContent({
 
   return (
     <>
-      <div className="container mx-auto p-6 space-y-6">
-        <div>
-          <h1 className="text-4xl font-medium tracking-tight">Settings</h1>
-          <p className="text-lg text-muted-foreground">
-            Manage your details and personal preferences here.
-          </p>
-        </div>
+      <div className="container space-y-6">
+        <PageHeader
+          className="mb-17"
+          title="Settings"
+          description="Manage your details and personal preferences here"
+        />
 
         <Card>
           <CardHeader>

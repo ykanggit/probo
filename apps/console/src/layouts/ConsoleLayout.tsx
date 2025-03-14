@@ -381,8 +381,8 @@ export default function ConsoleLayout() {
       <Suspense>
         <AppSidebar className="p-4" />
       </Suspense>
-      <SidebarInset className="flex items-center">
-        <div className="w-lg md:w-xl lg:w-3xl xl:w-4xl 2xl:w-5xl p-8">
+      <SidebarInset>
+        <div className="mx-auto w-lg md:w-xl lg:w-3xl xl:w-4xl 2xl:w-5xl p-8">
           <header className="flex shrink-0 items-center gap-2">
             <Routes>
               <Route

@@ -34,6 +34,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import type { PolicyListPageQuery as PolicyListPageQueryType } from "./__generated__/PolicyListPageQuery.graphql";
+import { PageHeader } from "./PageHeader";
 
 const PolicyListPageQuery = graphql`
   query PolicyListPageQuery($organizationId: ID!) {
@@ -223,21 +224,20 @@ function PolicyListPageContent({
       <Helmet>
         <title>Policies - Probo</title>
       </Helmet>
-      <div className="container mx-auto py-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold">Policies</h1>
-            <p className="text-muted-foreground">
-              Manage your organization{"'"}s policies
-            </p>
-          </div>
-          <Button asChild>
-            <Link to={`/organizations/${organizationId}/policies/create`}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Policy
-            </Link>
-          </Button>
-        </div>
+      <div className="container space-y-6">
+        <PageHeader
+          className="mb-17"
+          title="Policies"
+          description="Manage your organization's policies"
+          actions={
+            <Button asChild>
+              <Link to={`/organizations/${organizationId}/policies/create`}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Policy
+              </Link>
+            </Button>
+          }
+        />
 
         {/* Search and filter controls */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
