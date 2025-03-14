@@ -69,7 +69,7 @@ func New() *Implm {
 			Api: apiConfig{
 				Addr: "localhost:8080",
 				Cors: corsConfig{
-					AllowedOrigins: []string{},
+					AllowedOrigins: []string{"http://localhost:3000"},
 				},
 			},
 			Pg: pgConfig{
