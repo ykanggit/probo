@@ -38,6 +38,7 @@ import {
 import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__/SettingsPageQuery.graphql";
 import type { SettingsPageUpdateOrganizationMutation as SettingsPageUpdateOrganizationMutationType } from "./__generated__/SettingsPageUpdateOrganizationMutation.graphql";
 import type { SettingsPageInviteUserMutation as SettingsPageInviteUserMutationType } from "./__generated__/SettingsPageInviteUserMutation.graphql";
+import type { SettingsPageRemoveUserMutation as SettingsPageRemoveUserMutationType } from "./__generated__/SettingsPageRemoveUserMutation.graphql";
 
 const settingsPageQuery = graphql`
   query SettingsPageQuery($organizationID: ID!) {
@@ -83,6 +84,14 @@ const inviteUserMutation = graphql`
   }
 `;
 
+const removeUserMutation = graphql`
+  mutation SettingsPageRemoveUserMutation($input: RemoveUserInput!) {
+    removeUser(input: $input) {
+      success
+    }
+  }
+`;
+
 function SettingsPageContent({
   queryRef,
 }: {
@@ -103,6 +112,7 @@ function SettingsPageContent({
     organization.name || ""
   );
   const [isUploading, setIsUploading] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   const [updateOrganization] =
     useMutation<SettingsPageUpdateOrganizationMutationType>(
@@ -111,6 +121,13 @@ function SettingsPageContent({
 
   const [inviteUser] =
     useMutation<SettingsPageInviteUserMutationType>(inviteUserMutation);
+
+  const [removeUser] =
+    useMutation<SettingsPageRemoveUserMutationType>(removeUserMutation);
+
+  const { organizationId } = useParams();
+  const [, loadQuery] =
+    useQueryLoader<SettingsPageQueryType>(settingsPageQuery);
 
   const handleUpdateName = () => {
     updateOrganization({
@@ -225,6 +242,45 @@ function SettingsPageContent({
         setIsInviting(false);
         toast({
           title: "Error sending invitation",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const handleRemoveUser = (userId: string) => {
+    setIsRemoving(true);
+
+    removeUser({
+      variables: {
+        input: {
+          organizationId: organization.id,
+          userId: userId,
+        },
+      },
+      onCompleted: (response) => {
+        setIsRemoving(false);
+        if (response.removeUser?.success) {
+          toast({
+            title: "User removed",
+            description: "The user has been removed from the organization.",
+            variant: "default",
+          });
+          // Refresh the query to update the UI
+          loadQuery({ organizationID: organizationId! });
+        } else {
+          toast({
+            title: "Error removing user",
+            description: "The user could not be removed. Please try again.",
+            variant: "destructive",
+          });
+        }
+      },
+      onError: (error) => {
+        setIsRemoving(false);
+        toast({
+          title: "Error removing user",
           description: error.message,
           variant: "destructive",
         });
@@ -377,8 +433,12 @@ function SettingsPageContent({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="text-red-600">
-                            Remove member
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onClick={() => handleRemoveUser(user.id)}
+                            disabled={isRemoving}
+                          >
+                            {isRemoving ? "Removing..." : "Remove member"}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

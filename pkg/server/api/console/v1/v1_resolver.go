@@ -543,6 +543,29 @@ func (r *mutationResolver) ConfirmInvitation(ctx context.Context, input types.Co
 	return &types.ConfirmInvitationPayload{Success: true}, nil
 }
 
+// RemoveUser is the resolver for the removeUser field.
+func (r *mutationResolver) RemoveUser(ctx context.Context, input types.RemoveUserInput) (*types.RemoveUserPayload, error) {
+	user := UserFromContext(ctx)
+
+	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to list organizations for user: %w", err))
+	}
+
+	for _, organization := range organizations {
+		if organization.ID == input.OrganizationID {
+			err := r.usrmgrSvc.RemoveUser(ctx, input.OrganizationID, input.UserID)
+			if err != nil {
+				return nil, err
+			}
+
+			return &types.RemoveUserPayload{Success: true}, nil
+		}
+	}
+
+	return nil, fmt.Errorf("organization not found")
+}
+
 // LogoURL is the resolver for the logoUrl field.
 func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organization) (*string, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())

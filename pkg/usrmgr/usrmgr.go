@@ -542,6 +542,46 @@ func (s Service) InviteUser(
 		return &ErrInvalidFullName{fullName}
 	}
 
+	var userExists bool
+	err := s.pg.WithConn(
+		ctx,
+		func(tx pg.Conn) error {
+			user := &coredata.User{}
+
+			if err := user.LoadByEmail(ctx, tx, emailAddress); err != nil {
+				var errUserNotFound *coredata.ErrUserNotFound
+
+				if errors.As(err, &errUserNotFound) {
+					userExists = false
+					return nil
+				}
+
+				return fmt.Errorf("cannot load user by email: %w", err)
+			}
+
+			userExists = true
+			uo := coredata.UserOrganization{
+				UserID:         user.ID,
+				OrganizationID: organizationID,
+				CreatedAt:      time.Now(),
+			}
+
+			if err := uo.Insert(ctx, tx); err != nil {
+				return fmt.Errorf("cannot insert user organization: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if userExists {
+		return nil
+	}
+
 	confirmationToken, err := statelesstoken.NewToken(
 		s.tokenSecret,
 		TokenTypeOrganizationInvitation,
@@ -634,6 +674,24 @@ func (s Service) ConfirmInvitation(ctx context.Context, tokenString string, pass
 
 			if err := uo.Insert(ctx, tx); err != nil {
 				return fmt.Errorf("cannot insert user organization: %w", err)
+			}
+
+			return nil
+		},
+	)
+}
+
+func (s Service) RemoveUser(ctx context.Context, organizationID gid.GID, userID gid.GID) error {
+	return s.pg.WithConn(
+		ctx,
+		func(tx pg.Conn) error {
+			uo := coredata.UserOrganization{
+				UserID:         userID,
+				OrganizationID: organizationID,
+			}
+
+			if err := uo.Delete(ctx, tx); err != nil {
+				return fmt.Errorf("cannot delete user organization: %w", err)
 			}
 
 			return nil

@@ -354,6 +354,15 @@ type PolicyEdge struct {
 type Query struct {
 }
 
+type RemoveUserInput struct {
+	OrganizationID gid.GID `json:"organizationId"`
+	UserID         gid.GID `json:"userId"`
+}
+
+type RemoveUserPayload struct {
+	Success bool `json:"success"`
+}
+
 type Session struct {
 	ID        gid.GID   `json:"id"`
 	ExpiresAt time.Time `json:"expiresAt"`
