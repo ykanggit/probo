@@ -479,8 +479,8 @@ export default function ConsoleLayout() {
             </Routes>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="w-full max-w-[1000px] px-6">
+        <div className="flex flex-1 flex-col gap-4 px-8 pt-0">
+          <div className="w-full max-w-[1000px]">
             <Outlet />
           </div>
           <Toaster />
