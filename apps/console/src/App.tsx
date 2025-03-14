@@ -65,7 +65,6 @@ function App() {
                 <Routes>
                   {/* Authentication Routes - Accessible without login */}
                   <Route
-                    path="/login"
                     element={
                       <ErrorBoundaryWithLocation>
                         <AuthLayout />
@@ -73,7 +72,7 @@ function App() {
                     }
                   >
                     <Route
-                      index
+                      path="login"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -82,18 +81,8 @@ function App() {
                         </Suspense>
                       }
                     />
-                  </Route>
-
-                  <Route
-                    path="/register"
-                    element={
-                      <ErrorBoundaryWithLocation>
-                        <AuthLayout />
-                      </ErrorBoundaryWithLocation>
-                    }
-                  >
                     <Route
-                      index
+                      path="register"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -102,18 +91,8 @@ function App() {
                         </Suspense>
                       }
                     />
-                  </Route>
-
-                  <Route
-                    path="/confirm-email"
-                    element={
-                      <ErrorBoundaryWithLocation>
-                        <AuthLayout />
-                      </ErrorBoundaryWithLocation>
-                    }
-                  >
                     <Route
-                      index
+                      path="confirm-email"
                       element={
                         <Suspense>
                           <ErrorBoundaryWithLocation>
@@ -136,7 +115,6 @@ function App() {
                   />
 
                   <Route
-                    path="/organizations/create"
                     element={
                       <Suspense>
                         <ErrorBoundaryWithLocation>
@@ -145,218 +123,203 @@ function App() {
                       </Suspense>
                     }
                   >
-                    <Route
-                      index
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <CreateOrganizationPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
+                    <Route path="organizations">
+                      <Route
+                        path="create"
+                        element={
+                          <Suspense>
+                            <ErrorBoundaryWithLocation>
+                              <CreateOrganizationPage />
+                            </ErrorBoundaryWithLocation>
+                          </Suspense>
+                        }
+                      />
+                      <Route path=":organizationId">
+                        <Route
+                          index
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <HomePage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="peoples"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <PeopleListPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="peoples/create"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <CreatePeoplePage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="peoples/:peopleId"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <PeopleOverviewPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="vendors"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <VendorListPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="frameworks"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <FrameworkListPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="frameworks/create"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <CreateFrameworkPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="frameworks/:frameworkId"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <FrameworkOverviewPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="frameworks/:frameworkId/update"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <UpdateFrameworkPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="frameworks/:frameworkId/controls/create"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <CreateControlPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="frameworks/:frameworkId/controls/:controlId"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <ControlOverviewPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="frameworks/:frameworkId/controls/:controlId/update"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <UpdateControlPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="vendors/:vendorId"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <VendorOverviewPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        {/* Policy Routes */}
+                        <Route
+                          path="policies"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <PolicyListPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="policies/create"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <CreatePolicyPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="policies/:policyId"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <PolicyOverviewPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="policies/:policyId/update"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <UpdatePolicyPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="settings"
+                          element={
+                            <Suspense>
+                              <ErrorBoundaryWithLocation>
+                                <SettingsPage />
+                              </ErrorBoundaryWithLocation>
+                            </Suspense>
+                          }
+                        />
+                      </Route>
+                    </Route>
                   </Route>
 
-                  <Route
-                    path="/organizations/:organizationId/*"
-                    element={
-                      <ErrorBoundaryWithLocation>
-                        <ConsoleLayout />
-                      </ErrorBoundaryWithLocation>
-                    }
-                  >
-                    <Route
-                      index
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <HomePage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="create"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <CreateOrganizationPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="peoples"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <PeopleListPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="peoples/create"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <CreatePeoplePage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="peoples/:peopleId"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <PeopleOverviewPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="vendors"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <VendorListPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="frameworks"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <FrameworkListPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="frameworks/create"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <CreateFrameworkPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="frameworks/:frameworkId"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <FrameworkOverviewPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="frameworks/:frameworkId/update"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <UpdateFrameworkPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="frameworks/:frameworkId/controls/create"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <CreateControlPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="frameworks/:frameworkId/controls/:controlId"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <ControlOverviewPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="frameworks/:frameworkId/controls/:controlId/update"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <UpdateControlPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="vendors/:vendorId"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <VendorOverviewPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    {/* Policy Routes */}
-                    <Route
-                      path="policies"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <PolicyListPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="policies/create"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <CreatePolicyPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="policies/:policyId"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <PolicyOverviewPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="policies/:policyId/update"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <UpdatePolicyPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="settings"
-                      element={
-                        <Suspense>
-                          <ErrorBoundaryWithLocation>
-                            <SettingsPage />
-                          </ErrorBoundaryWithLocation>
-                        </Suspense>
-                      }
-                    />
-                  </Route>
                   <Route
                     path="*"
                     element={
