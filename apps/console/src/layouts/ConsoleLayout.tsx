@@ -368,7 +368,9 @@ function BreadcrumbUpdatePolicy() {
 export default function ConsoleLayout() {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <Suspense>
+        <AppSidebar />
+      </Suspense>
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
@@ -467,6 +469,7 @@ export default function ConsoleLayout() {
                     }
                   />
                 </Route>
+
                 <Route path="*" element={<BreadcrumbHome />}>
                   <Route
                     path="create"
