@@ -119,7 +119,7 @@ function CreatePeoplePageContent() {
           variant: "default",
         });
         navigate(
-          `/organizations/${organizationId}/peoples/${response.createPeople.peopleEdge.node.id}`
+          `/organizations/${organizationId}/people/${response.createPeople.peopleEdge.node.id}`
         );
       },
       onError: (error) => {

@@ -184,7 +184,7 @@ function PeopleListContent({
           style={{ borderRadius: "0.5rem" }}
           className="gap-2"
         >
-          <Link to={`/organizations/${organizationId}/peoples/create`}>
+          <Link to={`/organizations/${organizationId}/people/create`}>
             <UserPlus className="h-4 w-4" />
             Add a people
           </Link>
@@ -195,7 +195,7 @@ function PeopleListContent({
         {peoples.map((person) => (
           <Link
             key={person?.id}
-            to={`/organizations/${organizationId}/peoples/${person?.id}`}
+            to={`/organizations/${organizationId}/people/${person?.id}`}
             className="block"
           >
             <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">

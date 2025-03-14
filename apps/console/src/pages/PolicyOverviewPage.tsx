@@ -172,7 +172,7 @@ function PolicyOverviewPageContent({
                   <div className="flex items-center gap-1">
                     <User className="h-3 w-3" />
                     <Link
-                      to={`/organizations/${organizationId}/peoples/${policy.owner.id}`}
+                      to={`/organizations/${organizationId}/people/${policy.owner.id}`}
                       className="hover:underline"
                     >
                       {policy.owner.fullName}
@@ -358,7 +358,7 @@ function PolicyOverviewPageContent({
                       <span className="text-sm">Owner</span>
                     </div>
                     <Link
-                      to={`/organizations/${organizationId}/peoples/${policy.owner?.id}`}
+                      to={`/organizations/${organizationId}/people/${policy.owner?.id}`}
                       className="hover:underline"
                     >
                       <p className="font-medium">

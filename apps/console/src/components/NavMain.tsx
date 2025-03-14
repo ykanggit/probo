@@ -151,13 +151,13 @@ function getNavItems(organizationId?: string): NavItem[] {
       title: "Organizations",
       icon: Building,
       url: organizationId
-        ? `/organizations/${organizationId}/peoples`
+        ? `/organizations/${organizationId}/people`
         : undefined,
       items: organizationId
         ? [
             {
               title: "Peoples",
-              url: `/organizations/${organizationId}/peoples`,
+              url: `/organizations/${organizationId}/people`,
               icon: Users,
             },
             {

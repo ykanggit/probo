@@ -101,7 +101,7 @@ function App() {
                         }
                       />
                       <Route
-                        path="peoples"
+                        path="people"
                         element={
                           <Suspense>
                             <ErrorBoundaryWithLocation>
@@ -111,7 +111,7 @@ function App() {
                         }
                       />
                       <Route
-                        path="peoples/create"
+                        path="people/create"
                         element={
                           <Suspense>
                             <ErrorBoundaryWithLocation>
@@ -121,7 +121,7 @@ function App() {
                         }
                       />
                       <Route
-                        path="peoples/:peopleId"
+                        path="people/:peopleId"
                         element={
                           <Suspense>
                             <ErrorBoundaryWithLocation>

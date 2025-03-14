@@ -200,7 +200,7 @@ function BreadcrumbPeopleList() {
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
-          <Link to={`/organizations/${organizationId}/peoples`}>People</Link>
+          <Link to={`/organizations/${organizationId}/people`}>People</Link>
         </BreadcrumbLink>
       </BreadcrumbItem>
       <Outlet />
@@ -242,7 +242,7 @@ function BreadcrumbPeopleOverview() {
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
           <Link
-            to={`/organizations/${organizationId}/peoples/${data.people.id}`}
+            to={`/organizations/${organizationId}/people/${data.people.id}`}
           >
             {data.people.fullName}
           </Link>
@@ -416,7 +416,7 @@ export default function ConsoleLayout() {
                     element={<BreadcrumbCreateFramework />}
                   />
                 </Route>
-                <Route path="peoples" element={<BreadcrumbPeopleList />}>
+                <Route path="people" element={<BreadcrumbPeopleList />}>
                   <Route
                     path=":peopleId"
                     element={
