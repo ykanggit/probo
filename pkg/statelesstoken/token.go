@@ -68,9 +68,11 @@ func (e ErrExpiredToken) Error() string {
 
 // NewToken creates a new token with the specified type, data, and expiration time
 func NewToken[T any](secret string, tokenType string, expirationTime time.Duration, data T) (string, error) {
+	now := time.Now()
+
 	payload := Payload[T]{
-		ExpiresAt: time.Now().Add(expirationTime),
-		IssuedAt:  time.Now(),
+		ExpiresAt: now.Add(expirationTime),
+		IssuedAt:  now,
 		Type:      tokenType,
 		Data:      data,
 	}
