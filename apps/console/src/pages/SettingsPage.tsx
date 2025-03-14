@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__/SettingsPageQuery.graphql";
 import type { SettingsPageUpdateOrganizationMutation as SettingsPageUpdateOrganizationMutationType } from "./__generated__/SettingsPageUpdateOrganizationMutation.graphql";
+import type { SettingsPageInviteUserMutation as SettingsPageInviteUserMutationType } from "./__generated__/SettingsPageInviteUserMutation.graphql";
 
 const settingsPageQuery = graphql`
   query SettingsPageQuery($organizationID: ID!) {
@@ -74,6 +75,14 @@ const updateOrganizationMutation = graphql`
   }
 `;
 
+const inviteUserMutation = graphql`
+  mutation SettingsPageInviteUserMutation($input: InviteUserInput!) {
+    inviteUser(input: $input) {
+      success
+    }
+  }
+`;
+
 function SettingsPageContent({
   queryRef,
 }: {
@@ -88,7 +97,9 @@ function SettingsPageContent({
   const [isEditNameOpen, setIsEditNameOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteFullName, setInviteFullName] = useState("");
   const [inviteRole, setInviteRole] = useState("Member");
+  const [isInviting, setIsInviting] = useState(false);
   const [organizationName, setOrganizationName] = useState(
     organization.name || ""
   );
@@ -98,6 +109,9 @@ function SettingsPageContent({
     useMutation<SettingsPageUpdateOrganizationMutationType>(
       updateOrganizationMutation
     );
+
+  const [inviteUser] =
+    useMutation<SettingsPageInviteUserMutationType>(inviteUserMutation);
 
   const handleUpdateName = () => {
     updateOrganization({
@@ -169,16 +183,54 @@ function SettingsPageContent({
   };
 
   const handleInviteMember = () => {
-    // This is a placeholder for the actual invite functionality
-    // In a real implementation, we would use a GraphQL mutation to invite the user
-    // For now, we just show a toast message and close the dialog
-    toast({
-      title: "Invitation sent",
-      description: `An invitation has been sent to ${inviteEmail}`,
-      variant: "default",
+    if (!inviteEmail || !inviteFullName) {
+      toast({
+        title: "Missing information",
+        description:
+          "Please provide both email and full name for the invitation",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsInviting(true);
+
+    inviteUser({
+      variables: {
+        input: {
+          organizationId: organization.id,
+          email: inviteEmail,
+          fullName: inviteFullName,
+        },
+      },
+      onCompleted: (response) => {
+        setIsInviting(false);
+        if (response.inviteUser?.success) {
+          toast({
+            title: "Invitation sent",
+            description: `An invitation has been sent to ${inviteEmail}`,
+            variant: "default",
+          });
+          setIsInviteOpen(false);
+          setInviteEmail("");
+          setInviteFullName("");
+        } else {
+          toast({
+            title: "Error sending invitation",
+            description: "The invitation could not be sent. Please try again.",
+            variant: "destructive",
+          });
+        }
+      },
+      onError: (error) => {
+        setIsInviting(false);
+        toast({
+          title: "Error sending invitation",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
     });
-    setIsInviteOpen(false);
-    setInviteEmail("");
   };
 
   return (
@@ -388,24 +440,23 @@ function SettingsPageContent({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <select
-                id="role"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                value={inviteRole}
-                onChange={(e) => setInviteRole(e.target.value)}
-              >
-                <option value="Admin">Admin</option>
-                <option value="Member">Member</option>
-                <option value="Viewer">Viewer</option>
-              </select>
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                type="text"
+                value={inviteFullName}
+                onChange={(e) => setInviteFullName(e.target.value)}
+                placeholder="Enter full name"
+              />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsInviteOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleInviteMember}>Send Invitation</Button>
+            <Button onClick={handleInviteMember} disabled={isInviting}>
+              {isInviting ? "Sending..." : "Send Invitation"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

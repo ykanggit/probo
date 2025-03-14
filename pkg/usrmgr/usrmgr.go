@@ -74,12 +74,18 @@ type (
 		UserID gid.GID `json:"uid"`
 		Email  string  `json:"email"`
 	}
+
+	InvitationData struct {
+		OrganizationID gid.GID `json:"organization_id"`
+		Email          string  `json:"email"`
+		FullName       string  `json:"full_name"`
+	}
 )
 
 // Token types
 const (
-	TokenTypeEmailConfirmation = "email_confirmation"
-	TokenTypePasswordReset     = "password_reset"
+	TokenTypeEmailConfirmation      = "email_confirmation"
+	TokenTypeOrganizationInvitation = "organization_invitation"
 )
 
 var (
@@ -87,6 +93,14 @@ var (
 	signupEmailTemplate = `
 	Thanks joining Probo!
 	Please confirm your email address by clicking the link below[1]
+
+	[1] %s
+	`
+
+	invitationEmailSubject  = "Join Probo"
+	invitationEmailTemplate = `
+	You have been invited to join Probo!
+	Please click the link below to sign up[1]
 
 	[1] %s
 	`
@@ -513,4 +527,116 @@ func (s Service) ListUsersForTenant(
 	}
 
 	return page.NewPage(users, cursor), nil
+}
+
+func (s Service) InviteUser(
+	ctx context.Context,
+	organizationID gid.GID,
+	fullName string,
+	emailAddress string,
+) error {
+	if !strings.Contains(emailAddress, "@") {
+		return &ErrInvalidEmail{emailAddress}
+	}
+	if fullName == "" {
+		return &ErrInvalidFullName{fullName}
+	}
+
+	confirmationToken, err := statelesstoken.NewToken(
+		s.tokenSecret,
+		TokenTypeOrganizationInvitation,
+		1*time.Hour,
+		InvitationData{OrganizationID: organizationID, Email: emailAddress, FullName: fullName},
+	)
+	if err != nil {
+		return fmt.Errorf("cannot generate confirmation token: %w", err)
+	}
+
+	confirmationInvitationUrl := url.URL{
+		Scheme: "https",
+		Host:   s.hostname,
+		Path:   "/confirm-invitation",
+		RawQuery: url.Values{
+			"token": []string{confirmationToken},
+		}.Encode(),
+	}
+
+	confirmationEmail := coredata.NewEmail(
+		fullName,
+		emailAddress,
+		invitationEmailSubject,
+		fmt.Sprintf(invitationEmailTemplate, confirmationInvitationUrl.String()),
+	)
+
+	return s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := confirmationEmail.Insert(ctx, conn); err != nil {
+				return fmt.Errorf("cannot insert email: %w", err)
+			}
+
+			return nil
+		},
+	)
+}
+
+func (s Service) ConfirmInvitation(ctx context.Context, tokenString string, password string) error {
+	token, err := statelesstoken.ValidateToken[InvitationData](
+		s.tokenSecret,
+		TokenTypeOrganizationInvitation,
+		tokenString,
+	)
+	if err != nil {
+		return fmt.Errorf("cannot validate organization invitation token: %w", err)
+	}
+
+	if len(password) < 8 {
+		return &ErrInvalidPassword{len(password)}
+	}
+
+	now := time.Now()
+
+	hashedPassword, err := s.hp.HashPassword([]byte(password))
+	if err != nil {
+		return fmt.Errorf("cannot hash password: %w", err)
+	}
+
+	return s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			user := &coredata.User{}
+
+			if err := user.LoadByEmail(ctx, tx, token.Data.Email); err != nil {
+				var errUserNotFound *coredata.ErrUserNotFound
+
+				if errors.As(err, &errUserNotFound) {
+					user = &coredata.User{
+						ID:                   gid.New(gid.NilTenant, coredata.UserEntityType),
+						EmailAddress:         token.Data.Email,
+						HashedPassword:       hashedPassword,
+						EmailAddressVerified: true,
+						FullName:             token.Data.FullName,
+						CreatedAt:            now,
+						UpdatedAt:            now,
+					}
+
+					if err := user.Insert(ctx, tx); err != nil {
+						return fmt.Errorf("cannot insert user: %w", err)
+					}
+				}
+			}
+
+			uo := coredata.UserOrganization{
+				UserID:         user.ID,
+				OrganizationID: token.Data.OrganizationID,
+				CreatedAt:      now,
+			}
+
+			if err := uo.Insert(ctx, tx); err != nil {
+				return fmt.Errorf("cannot insert user organization: %w", err)
+			}
+
+			return nil
+		},
+	)
 }

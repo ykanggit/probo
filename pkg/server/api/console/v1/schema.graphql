@@ -386,6 +386,8 @@ type Mutation {
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
 
   confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
+  inviteUser(input: InviteUserInput!): InviteUserPayload!
+  confirmInvitation(input: ConfirmInvitationInput!): ConfirmInvitationPayload!
 }
 
 input CreateVendorInput {
@@ -711,4 +713,23 @@ input UnassignTaskInput {
 
 type UnassignTaskPayload {
   task: Task!
+}
+
+input InviteUserInput {
+  organizationId: ID!
+  email: String!
+  fullName: String!
+}
+
+type InviteUserPayload {
+  success: Boolean!
+}
+
+input ConfirmInvitationInput {
+  token: String!
+  password: String!
+}
+
+type ConfirmInvitationPayload {
+  success: Boolean!
 }

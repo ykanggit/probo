@@ -510,6 +510,39 @@ func (r *mutationResolver) ConfirmEmail(ctx context.Context, input types.Confirm
 	return &types.ConfirmEmailPayload{Success: true}, nil
 }
 
+// InviteUser is the resolver for the inviteUser field.
+func (r *mutationResolver) InviteUser(ctx context.Context, input types.InviteUserInput) (*types.InviteUserPayload, error) {
+	user := UserFromContext(ctx)
+
+	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to list organizations for user: %w", err))
+	}
+
+	for _, organization := range organizations {
+		if organization.ID == input.OrganizationID {
+			err := r.usrmgrSvc.InviteUser(ctx, input.OrganizationID, input.FullName, input.Email)
+			if err != nil {
+				return nil, err
+			}
+
+			return &types.InviteUserPayload{Success: true}, nil
+		}
+	}
+
+	return nil, fmt.Errorf("organization not found")
+}
+
+// ConfirmInvitation is the resolver for the confirmInvitation field.
+func (r *mutationResolver) ConfirmInvitation(ctx context.Context, input types.ConfirmInvitationInput) (*types.ConfirmInvitationPayload, error) {
+	err := r.usrmgrSvc.ConfirmInvitation(ctx, input.Token, input.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.ConfirmInvitationPayload{Success: true}, nil
+}
+
 // LogoURL is the resolver for the logoUrl field.
 func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organization) (*string, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())

@@ -33,6 +33,15 @@ type ConfirmEmailPayload struct {
 	Success bool `json:"success"`
 }
 
+type ConfirmInvitationInput struct {
+	Token    string `json:"token"`
+	Password string `json:"password"`
+}
+
+type ConfirmInvitationPayload struct {
+	Success bool `json:"success"`
+}
+
 type Control struct {
 	ID          gid.GID                    `json:"id"`
 	Version     int                        `json:"version"`
@@ -245,6 +254,16 @@ type ImportFrameworkInput struct {
 
 type ImportFrameworkPayload struct {
 	FrameworkEdge *FrameworkEdge `json:"frameworkEdge"`
+}
+
+type InviteUserInput struct {
+	OrganizationID gid.GID `json:"organizationId"`
+	Email          string  `json:"email"`
+	FullName       string  `json:"fullName"`
+}
+
+type InviteUserPayload struct {
+	Success bool `json:"success"`
 }
 
 type Mutation struct {

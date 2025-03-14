@@ -42,6 +42,9 @@ const PeopleOverviewPage = lazy(() => import("./pages/PeopleOverviewPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const ConfirmEmailPage = lazy(() => import("./pages/ConfirmEmailPage"));
+const ConfirmInvitationPage = lazy(
+  () => import("./pages/ConfirmInvitationPage")
+);
 const CreateOrganizationPage = lazy(
   () => import("./pages/CreateOrganizationPage")
 );
@@ -299,6 +302,16 @@ function App() {
                         <Suspense>
                           <VisitorErrorBoundaryWithLocation>
                             <ConfirmEmailPage />
+                          </VisitorErrorBoundaryWithLocation>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="confirm-invitation"
+                      element={
+                        <Suspense>
+                          <VisitorErrorBoundaryWithLocation>
+                            <ConfirmInvitationPage />
                           </VisitorErrorBoundaryWithLocation>
                         </Suspense>
                       }
