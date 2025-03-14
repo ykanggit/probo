@@ -20,7 +20,7 @@ export function AppSidebarShell({
   ...props
 }: AppSidebarShellProps) {
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar variant="sidebar" {...props}>
       <SidebarHeader>{organizationSwitcher}</SidebarHeader>
       <SidebarContent>
         {navMain}
