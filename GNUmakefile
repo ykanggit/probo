@@ -16,8 +16,6 @@ GCFLAGS=	-gcflags="-e"
 GO_BUILD=	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) $(GO) build $(LDFLAGS) $(GCFLAGS)
 GO_GENERATE=	$(GO) generate
 
-CONTROL_SRC:=	$(shell find ./controls -type f -name "*.md")
-
 DOCKER_IMAGE_NAME=	ghcr.io/getprobo/probo
 DOCKER_TAG_NAME?=	latest
 
@@ -57,19 +55,11 @@ pkg/server/api/console/v1/v1_resolver.go: pkg/server/api/console/v1/gqlgen.yaml 
 	$(GO_GENERATE) ./pkg/server/api/console/v1
 
 .PHONY: fmt
-fmt: fmt-markdown fmt-go
+fmt: fmt-go
 
 .PHONY: fmt-go
 fmt-go:
 	go fmt ./...
-
-.PHONY: fmt-markdown
-fmt-markdown:
-	$(PRETTIER) --write --prose-wrap always $(CONTROL_SRC)
-
-.PHONY: fmt-check
-fmt-check:
-	$(PRETTIER) --check --prose-wrap always $(CONTROL_SRC)
 
 .PHONY: clean
 clean:
