@@ -377,112 +377,104 @@ export default function ConsoleLayout() {
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Routes>
-              <Route path="organizations">
-                <Route
-                  path=":organizationsId"
-                  element={
-                    <Suspense>
-                      <BreadCrumbOrganization />
-                    </Suspense>
-                  }
-                >
+              <Route
+                path=":organizationsId"
+                element={
+                  <Suspense>
+                    <BreadCrumbOrganization />
+                  </Suspense>
+                }
+              >
+                <Route path="frameworks" element={<BreadcrumbFrameworkList />}>
                   <Route
-                    path="frameworks"
-                    element={<BreadcrumbFrameworkList />}
+                    path=":frameworkId"
+                    element={
+                      <Suspense>
+                        <BreadcrumbFrameworkOverview />
+                      </Suspense>
+                    }
                   >
                     <Route
-                      path=":frameworkId"
-                      element={
-                        <Suspense>
-                          <BreadcrumbFrameworkOverview />
-                        </Suspense>
-                      }
-                    >
-                      <Route
-                        path="controls/create"
-                        element={<BreadcrumbCreateControl />}
-                      />
-                      <Route
-                        path="controls/:controlId"
-                        element={
-                          <Suspense>
-                            <BreadcrumbControlOverview />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="update"
-                        element={<BreadcrumbUpdateFramework />}
-                      />
-                    </Route>
-                    <Route
-                      path="create"
-                      element={<BreadcrumbCreateFramework />}
+                      path="controls/create"
+                      element={<BreadcrumbCreateControl />}
                     />
-                  </Route>
-                  <Route path="peoples" element={<BreadcrumbPeopleList />}>
                     <Route
-                      path=":peopleId"
+                      path="controls/:controlId"
                       element={
                         <Suspense>
-                          <BreadcrumbPeopleOverview />
+                          <BreadcrumbControlOverview />
                         </Suspense>
                       }
                     />
-                    <Route path="create" element={<BreadcrumbCreatePeople />} />
-                  </Route>
-                  <Route path="vendors" element={<BreadcrumbVendorList />}>
                     <Route
-                      path=":vendorId"
-                      element={
-                        <Suspense>
-                          <BreadcrumbVendorOverview />
-                        </Suspense>
-                      }
+                      path="update"
+                      element={<BreadcrumbUpdateFramework />}
                     />
                   </Route>
-                  <Route path="policies" element={<BreadcrumbPolicyList />}>
-                    <Route
-                      path=":policyId"
-                      element={
-                        <Suspense>
-                          <BreadcrumbPolicyOverview />
-                        </Suspense>
-                      }
-                    >
-                      <Route
-                        path="update"
-                        element={<BreadcrumbUpdatePolicy />}
-                      />
-                    </Route>
-                    <Route path="create" element={<BreadcrumbCreatePolicy />} />
-                  </Route>
-                  <Route
-                    path="settings"
-                    element={
-                      <>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                          <BreadcrumbPage>Settings</BreadcrumbPage>
-                        </BreadcrumbItem>
-                      </>
-                    }
-                  />
-                </Route>
-
-                <Route path="*" element={<BreadcrumbHome />}>
                   <Route
                     path="create"
+                    element={<BreadcrumbCreateFramework />}
+                  />
+                </Route>
+                <Route path="peoples" element={<BreadcrumbPeopleList />}>
+                  <Route
+                    path=":peopleId"
                     element={
-                      <>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                          <BreadcrumbPage>Create Organization</BreadcrumbPage>
-                        </BreadcrumbItem>
-                      </>
+                      <Suspense>
+                        <BreadcrumbPeopleOverview />
+                      </Suspense>
+                    }
+                  />
+                  <Route path="create" element={<BreadcrumbCreatePeople />} />
+                </Route>
+                <Route path="vendors" element={<BreadcrumbVendorList />}>
+                  <Route
+                    path=":vendorId"
+                    element={
+                      <Suspense>
+                        <BreadcrumbVendorOverview />
+                      </Suspense>
                     }
                   />
                 </Route>
+                <Route path="policies" element={<BreadcrumbPolicyList />}>
+                  <Route
+                    path=":policyId"
+                    element={
+                      <Suspense>
+                        <BreadcrumbPolicyOverview />
+                      </Suspense>
+                    }
+                  >
+                    <Route path="update" element={<BreadcrumbUpdatePolicy />} />
+                  </Route>
+                  <Route path="create" element={<BreadcrumbCreatePolicy />} />
+                </Route>
+                <Route
+                  path="settings"
+                  element={
+                    <>
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
+                        <BreadcrumbPage>Settings</BreadcrumbPage>
+                      </BreadcrumbItem>
+                    </>
+                  }
+                />
+              </Route>
+
+              <Route path="*" element={<BreadcrumbHome />}>
+                <Route
+                  path="create"
+                  element={
+                    <>
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
+                        <BreadcrumbPage>Create Organization</BreadcrumbPage>
+                      </BreadcrumbItem>
+                    </>
+                  }
+                />
               </Route>
             </Routes>
           </div>

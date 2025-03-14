@@ -78,7 +78,7 @@ function App() {
                     }
                   />
 
-                  <Route path="organizations" element={<ConsoleLayout />}>
+                  <Route path="organizations/*" element={<ConsoleLayout />}>
                     <Route
                       path="create"
                       element={
