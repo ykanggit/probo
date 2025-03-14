@@ -246,9 +246,7 @@ function CreateControlPageContent() {
                 variant="outline"
                 onClick={() =>
                   navigate(
-                    `/organizations/${
-                      frameworkId?.split(":")[1]
-                    }/frameworks/${frameworkId}`
+                    `/organizations/${organizationId}/frameworks/${frameworkId}`
                   )
                 }
               >
