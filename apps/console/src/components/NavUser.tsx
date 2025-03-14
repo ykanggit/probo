@@ -2,7 +2,6 @@
 
 import { ChevronsUpDown, LogOut } from "lucide-react";
 import { graphql, useFragment } from "react-relay";
-import { useParams } from "react-router";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -20,7 +19,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { NavUser_viewer$key } from "./__generated__/NavUser_viewer.graphql";
-import { NavUserSkeleton } from "./NavUserSkeleton";
 import { buildEndpoint } from "@/utils";
 
 export const navUserFragment = graphql`
@@ -34,7 +32,6 @@ export const navUserFragment = graphql`
 export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
   const { isMobile } = useSidebar();
   const currentUser = useFragment(navUserFragment, viewer);
-  const { organizationId } = useParams();
 
   const handleLogout = async () => {
     fetch(buildEndpoint("/api/console/v1/auth/logout"), {
@@ -44,10 +41,6 @@ export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
       window.location.href = "https://www.getprobo.com";
     });
   };
-
-  if (!organizationId) {
-    return <NavUserSkeleton />;
-  }
 
   return (
     <SidebarMenu>

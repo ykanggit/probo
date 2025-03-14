@@ -25,7 +25,6 @@ import {
   OrganizationSwitcher_organizations$data,
 } from "./__generated__/OrganizationSwitcher_organizations.graphql";
 import { cn } from "@/lib/utils";
-import { OrganizationSwitcherSkeleton } from "./OrganizationSwitcherSkeleton";
 
 export const organizationSwitcherFragment = graphql`
   fragment OrganizationSwitcher_organizations on User {
@@ -94,10 +93,6 @@ export function OrganizationSwitcher({
   const handleOrganizationSwitch = (org: Organization) => {
     navigate(`/organizations/${org.id}`);
   };
-
-  if (!hasOrganizations) {
-    return <OrganizationSwitcherSkeleton />;
-  }
 
   return (
     <SidebarMenu>

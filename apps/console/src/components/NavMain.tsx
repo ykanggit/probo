@@ -27,7 +27,6 @@ import {
   ToyBrick,
   Users,
 } from "lucide-react";
-import { NavMainSkeleton } from "./NavMainSkeleton";
 
 interface NavItem {
   title: string;
@@ -47,7 +46,7 @@ export function NavMain() {
   const items: NavItem[] = getNavItems(organizationId);
 
   if (!organizationId) {
-    return <NavMainSkeleton />;
+    return null;
   }
 
   const isItemActive = (item: { url?: string; items?: { url: string }[] }) => {
