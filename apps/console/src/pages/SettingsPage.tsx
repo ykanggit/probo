@@ -98,7 +98,6 @@ function SettingsPageContent({
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteFullName, setInviteFullName] = useState("");
-  const [inviteRole, setInviteRole] = useState("Member");
   const [isInviting, setIsInviting] = useState(false);
   const [organizationName, setOrganizationName] = useState(
     organization.name || ""
