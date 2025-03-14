@@ -1,6 +1,6 @@
-import { Link, Outlet, Route, Routes, useParams } from "react-router";
+import { NavLink, Outlet, Route, Routes, To, useParams } from "react-router";
 import { AppSidebar } from "@/components/AppSidebar";
-import React, { Suspense } from "react";
+import { ReactNode, Suspense } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -23,15 +23,42 @@ import { ConsoleLayoutBreadcrumbVendorOverviewQuery } from "./__generated__/Cons
 import { ConsoleLayoutBreadcrumbControlOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbControlOverviewQuery.graphql";
 import { ConsoleLayoutOrganizationQuery } from "./__generated__/ConsoleLayoutOrganizationQuery.graphql";
 import { ConsoleLayoutBreadcrumbPolicyOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbPolicyOverviewQuery.graphql";
+import { cn } from "@/lib/utils";
+
+const BreadCrumbNavLink = ({
+  to,
+  children,
+  className,
+}: {
+  to: To;
+  children?: ReactNode;
+  className?: string;
+}) => {
+  return (
+    <BreadcrumbLink asChild>
+      <NavLink to={to} end>
+        {({ isActive }) => (
+          <BreadcrumbPage
+            className={cn(
+              "text-gray-300",
+              isActive && "text-gray-700",
+              className
+            )}
+          >
+            {children}
+          </BreadcrumbPage>
+        )}
+      </NavLink>
+    </BreadcrumbLink>
+  );
+};
 
 function BreadcrumbHome() {
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink asChild>
-            <Link to="/">Home</Link>
-          </BreadcrumbLink>
+          <BreadCrumbNavLink to="/">Home</BreadCrumbNavLink>
         </BreadcrumbItem>
         <Outlet />
       </BreadcrumbList>
@@ -57,14 +84,12 @@ function BreadCrumbOrganization() {
   );
 
   return (
-    <Breadcrumb>
+    <Breadcrumb className="select-none">
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink asChild>
-            <Link to={`/organizations/${organizationId}`}>
-              {data.organization?.name || "Home"}
-            </Link>
-          </BreadcrumbLink>
+          <BreadCrumbNavLink to={`/organizations/${organizationId}`}>
+            {data.organization?.name || "Home"}
+          </BreadCrumbNavLink>
         </BreadcrumbItem>
         <Outlet />
       </BreadcrumbList>
@@ -78,11 +103,9 @@ function BreadcrumbFrameworkList() {
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link to={`/organizations/${organizationId}/frameworks`}>
-            Frameworks
-          </Link>
-        </BreadcrumbLink>
+        <BreadCrumbNavLink to={`/organizations/${organizationId}/frameworks`}>
+          Frameworks
+        </BreadCrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
     </>
@@ -120,13 +143,11 @@ function BreadcrumbFrameworkOverview() {
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link
-            to={`/organizations/${organizationId}/frameworks/${frameworkId}`}
-          >
-            {data.framework?.name}
-          </Link>
-        </BreadcrumbLink>
+        <BreadCrumbNavLink
+          to={`/organizations/${organizationId}/frameworks/${frameworkId}`}
+        >
+          {data.framework?.name}
+        </BreadCrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
     </>
@@ -150,9 +171,9 @@ function BreadcrumbVendorList() {
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link to={`/organizations/${organizationId}/vendors`}>Vendors</Link>
-        </BreadcrumbLink>
+        <BreadCrumbNavLink to={`/organizations/${organizationId}/vendors`}>
+          Vendors
+        </BreadCrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
     </>
@@ -180,13 +201,11 @@ function BreadcrumbVendorOverview() {
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link
-            to={`/organizations/${organizationId}/vendors/${data.vendor.id}`}
-          >
-            {data.vendor.name}
-          </Link>
-        </BreadcrumbLink>
+        <BreadCrumbNavLink
+          to={`/organizations/${organizationId}/vendors/${data.vendor.id}`}
+        >
+          {data.vendor.name}
+        </BreadCrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
     </>
@@ -199,9 +218,9 @@ function BreadcrumbPeopleList() {
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link to={`/organizations/${organizationId}/people`}>People</Link>
-        </BreadcrumbLink>
+        <BreadCrumbNavLink to={`/organizations/${organizationId}/people`}>
+          People
+        </BreadCrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
     </>
@@ -240,13 +259,11 @@ function BreadcrumbPeopleOverview() {
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link
-            to={`/organizations/${organizationId}/people/${data.people.id}`}
-          >
-            {data.people.fullName}
-          </Link>
-        </BreadcrumbLink>
+        <BreadCrumbNavLink
+          to={`/organizations/${organizationId}/people/${data.people.id}`}
+        >
+          {data.people.fullName}
+        </BreadCrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
     </>
@@ -273,13 +290,11 @@ function BreadcrumbControlOverview() {
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link
-            to={`/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`}
-          >
-            {data.control?.name}
-          </Link>
-        </BreadcrumbLink>
+        <BreadCrumbNavLink
+          to={`/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`}
+        >
+          {data.control?.name}
+        </BreadCrumbNavLink>
       </BreadcrumbItem>
     </>
   );
@@ -302,9 +317,9 @@ function BreadcrumbPolicyList() {
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link to={`/organizations/${organizationId}/policies`}>Policies</Link>
-        </BreadcrumbLink>
+        <BreadCrumbNavLink to={`/organizations/${organizationId}/policies`}>
+          Policies
+        </BreadCrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
     </>
@@ -343,11 +358,11 @@ function BreadcrumbPolicyOverview() {
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild>
-          <Link to={`/organizations/${organizationId}/policies/${policyId}`}>
-            {data.policy?.name}
-          </Link>
-        </BreadcrumbLink>
+        <BreadCrumbNavLink
+          to={`/organizations/${organizationId}/policies/${policyId}`}
+        >
+          {data.policy?.name}
+        </BreadCrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
     </>
