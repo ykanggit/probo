@@ -189,8 +189,9 @@ func (s Service) SignUp(
 	}
 
 	confirmationEmailUrl := url.URL{
-		Host: s.hostname,
-		Path: "/confirm-email",
+		Scheme: "https",
+		Host:   s.hostname,
+		Path:   "/confirm-email",
 		RawQuery: url.Values{
 			"token": []string{confirmationToken},
 		}.Encode(),
