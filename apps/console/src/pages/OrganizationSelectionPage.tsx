@@ -16,7 +16,6 @@ import { OrganizationSelectionPageQuery } from "./__generated__/OrganizationSele
 const organizationSelectionQuery = graphql`
   query OrganizationSelectionPageQuery {
     viewer {
-      id
       organizations(first: 25) {
         edges {
           node {
@@ -34,11 +33,11 @@ export default function OrganizationSelectionPage() {
   const navigate = useNavigate();
   const data = useLazyLoadQuery<OrganizationSelectionPageQuery>(
     organizationSelectionQuery,
-    {},
+    {}
   );
 
   const organizations = data.viewer.organizations.edges.map(
-    (edge) => edge.node,
+    (edge) => edge.node
   );
 
   useEffect(() => {

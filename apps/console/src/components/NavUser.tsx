@@ -22,16 +22,18 @@ import { NavUser_viewer$key } from "./__generated__/NavUser_viewer.graphql";
 import { buildEndpoint } from "@/utils";
 
 export const navUserFragment = graphql`
-  fragment NavUser_viewer on User {
-    id
-    fullName
-    email
+  fragment NavUser_viewer on Viewer {
+    user {
+      id
+      fullName
+      email
+    }
   }
 `;
 
 export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
   const { isMobile } = useSidebar();
-  const currentUser = useFragment(navUserFragment, viewer);
+  const currentUser = useFragment(navUserFragment, viewer).user;
 
   const handleLogout = async () => {
     fetch(buildEndpoint("/api/console/v1/auth/logout"), {

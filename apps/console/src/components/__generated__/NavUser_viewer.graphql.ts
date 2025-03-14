@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0965f25c8dedb59a9316e4df4d773af6>>
+ * @generated SignedSource<<0d5ada0f912fcf3a8f2f3328b0943b28>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,9 +11,11 @@
 import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type NavUser_viewer$data = {
-  readonly email: string;
-  readonly fullName: string;
-  readonly id: string;
+  readonly user: {
+    readonly email: string;
+    readonly fullName: string;
+    readonly id: string;
+  };
   readonly " $fragmentType": "NavUser_viewer";
 };
 export type NavUser_viewer$key = {
@@ -30,29 +32,40 @@ const node: ReaderFragment = {
     {
       "alias": null,
       "args": null,
-      "kind": "ScalarField",
-      "name": "id",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "fullName",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "email",
+      "concreteType": "User",
+      "kind": "LinkedField",
+      "name": "user",
+      "plural": false,
+      "selections": [
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "id",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "fullName",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "email",
+          "storageKey": null
+        }
+      ],
       "storageKey": null
     }
   ],
-  "type": "User",
+  "type": "Viewer",
   "abstractKey": null
 };
 
-(node as any).hash = "7ee85a272f543b514c5a6a3148fd1613";
+(node as any).hash = "05e26e238976738b4cff26f37c5f29e7";
 
 export default node;

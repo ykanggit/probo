@@ -27,7 +27,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export const organizationSwitcherFragment = graphql`
-  fragment OrganizationSwitcher_organizations on User {
+  fragment OrganizationSwitcher_organizations on Viewer {
     organizations(first: 25)
       @connection(key: "OrganizationSwitcher_organizations") {
       __id

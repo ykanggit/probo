@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<eb02c3812f7904bcf7d937d1c29d9905>>
+ * @generated SignedSource<<7fcee268b2974653bc3734b49b4082a4>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,6 +17,16 @@ export type SettingsPageQuery$data = {
     readonly id: string;
     readonly logoUrl?: string | null | undefined;
     readonly name?: string;
+    readonly users?: {
+      readonly edges: ReadonlyArray<{
+        readonly node: {
+          readonly createdAt: string;
+          readonly email: string;
+          readonly fullName: string;
+          readonly id: string;
+        };
+      }>;
+    };
   };
 };
 export type SettingsPageQuery = {
@@ -62,6 +72,67 @@ v3 = {
       "kind": "ScalarField",
       "name": "logoUrl",
       "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": [
+        {
+          "kind": "Literal",
+          "name": "first",
+          "value": 100
+        }
+      ],
+      "concreteType": "UserConnection",
+      "kind": "LinkedField",
+      "name": "users",
+      "plural": false,
+      "selections": [
+        {
+          "alias": null,
+          "args": null,
+          "concreteType": "UserEdge",
+          "kind": "LinkedField",
+          "name": "edges",
+          "plural": true,
+          "selections": [
+            {
+              "alias": null,
+              "args": null,
+              "concreteType": "User",
+              "kind": "LinkedField",
+              "name": "node",
+              "plural": false,
+              "selections": [
+                (v2/*: any*/),
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "fullName",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "email",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "createdAt",
+                  "storageKey": null
+                }
+              ],
+              "storageKey": null
+            }
+          ],
+          "storageKey": null
+        }
+      ],
+      "storageKey": "users(first:100)"
     }
   ],
   "type": "Organization",
@@ -120,16 +191,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "1ff42392cdd403c92101dc9c5fb7ceda",
+    "cacheID": "de417aa8583ad2d1cc7ef18223a4dc2d",
     "id": null,
     "metadata": {},
     "name": "SettingsPageQuery",
     "operationKind": "query",
-    "text": "query SettingsPageQuery(\n  $organizationID: ID!\n) {\n  organization: node(id: $organizationID) {\n    __typename\n    id\n    ... on Organization {\n      name\n      logoUrl\n    }\n  }\n}\n"
+    "text": "query SettingsPageQuery(\n  $organizationID: ID!\n) {\n  organization: node(id: $organizationID) {\n    __typename\n    id\n    ... on Organization {\n      name\n      logoUrl\n      users(first: 100) {\n        edges {\n          node {\n            id\n            fullName\n            email\n            createdAt\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "60cdb8a35f7e5f58536101243b57e57c";
+(node as any).hash = "1d9482689dd9f305ca7a45fdf4ab088c";
 
 export default node;

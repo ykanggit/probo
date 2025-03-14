@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<91e1415ad0a7d8ee0ae2a8e212f42f19>>
+ * @generated SignedSource<<371bd1a7433b281f20dd8925915a7ff2>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -25,7 +25,7 @@ var v0 = [
   {
     "alias": null,
     "args": null,
-    "concreteType": "User",
+    "concreteType": "Viewer",
     "kind": "LinkedField",
     "name": "viewer",
     "plural": false,

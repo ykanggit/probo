@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d4b79299641fcf7b2547eec4064af57a>>
+ * @generated SignedSource<<72d01b98680bc82c2d5bdc8c2fa2d49d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -47,7 +47,7 @@ return {
       {
         "alias": null,
         "args": null,
-        "concreteType": "User",
+        "concreteType": "Viewer",
         "kind": "LinkedField",
         "name": "viewer",
         "plural": false,
@@ -79,7 +79,7 @@ return {
       {
         "alias": null,
         "args": null,
-        "concreteType": "User",
+        "concreteType": "Viewer",
         "kind": "LinkedField",
         "name": "viewer",
         "plural": false,
@@ -196,15 +196,27 @@ return {
           {
             "alias": null,
             "args": null,
-            "kind": "ScalarField",
-            "name": "fullName",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "email",
+            "concreteType": "User",
+            "kind": "LinkedField",
+            "name": "user",
+            "plural": false,
+            "selections": [
+              (v0/*: any*/),
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "fullName",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "email",
+                "storageKey": null
+              }
+            ],
             "storageKey": null
           }
         ],
@@ -213,12 +225,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d92e5e742128d82b461ab1b6d52cd2a6",
+    "cacheID": "51c72d5d6b9e1d4e5e7f45e7280a0534",
     "id": null,
     "metadata": {},
     "name": "AppSidebarQuery",
     "operationKind": "query",
-    "text": "query AppSidebarQuery {\n  viewer {\n    id\n    ...OrganizationSwitcher_organizations\n    ...NavUser_viewer\n  }\n}\n\nfragment NavUser_viewer on User {\n  id\n  fullName\n  email\n}\n\nfragment OrganizationSwitcher_organizations on User {\n  organizations(first: 25) {\n    edges {\n      node {\n        id\n        name\n        logoUrl\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query AppSidebarQuery {\n  viewer {\n    id\n    ...OrganizationSwitcher_organizations\n    ...NavUser_viewer\n  }\n}\n\nfragment NavUser_viewer on Viewer {\n  user {\n    id\n    fullName\n    email\n  }\n}\n\nfragment OrganizationSwitcher_organizations on Viewer {\n  organizations(first: 25) {\n    edges {\n      node {\n        id\n        name\n        logoUrl\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();

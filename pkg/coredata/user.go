@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"strings"
 	"time"
 
@@ -39,6 +40,8 @@ type (
 		UpdatedAt            time.Time `db:"updated_at"`
 	}
 
+	Users []*User
+
 	ErrUserNotFound struct {
 		Identifier string
 	}
@@ -58,6 +61,50 @@ func (e ErrUserAlreadyExists) Error() string {
 
 func (u User) CursorKey() page.CursorKey {
 	return page.NewCursorKey(u.ID, u.CreatedAt)
+}
+
+func (u *Users) LoadByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	organizationID gid.GID,
+	cursor *page.Cursor,
+) error {
+	q := `
+SELECT
+    id,
+    email_address,
+    hashed_password,
+    email_address_verified,
+    fullname,
+	created_at,
+	updated_at
+FROM
+	users
+WHERE
+	id IN (
+		SELECT user_id FROM users_organizations WHERE organization_id = @organization_id
+	)
+	AND %s
+`
+
+	q = fmt.Sprintf(q, cursor.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query users: %w", err)
+	}
+
+	users, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[User])
+	if err != nil {
+		return fmt.Errorf("cannot collect users: %w", err)
+	}
+
+	*u = users
+
+	return nil
 }
 
 func (u *User) LoadByEmail(

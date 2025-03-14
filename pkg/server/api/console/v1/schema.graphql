@@ -109,6 +109,13 @@ type Organization implements Node {
   name: String!
   logoUrl: String @goField(forceResolver: true)
 
+  users(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): UserConnection! @goField(forceResolver: true)
+
   frameworks(
     first: Int
     after: CursorKey
@@ -298,18 +305,20 @@ type Evidence implements Node {
   updatedAt: Datetime!
 }
 
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+}
+
+type UserEdge {
+  cursor: CursorKey!
+  node: User!
+}
+
 type User implements Node {
   id: ID!
   fullName: String!
   email: String!
-
-  organizations(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-  ): OrganizationConnection! @goField(forceResolver: true)
-
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -321,7 +330,20 @@ type Session {
 
 type Query {
   node(id: ID!): Node!
-  viewer: User!
+  viewer: Viewer!
+}
+
+type Viewer {
+  id: ID!
+
+  user: User!
+
+  organizations(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): OrganizationConnection! @goField(forceResolver: true)
 }
 
 type Mutation {

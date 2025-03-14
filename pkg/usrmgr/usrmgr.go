@@ -25,6 +25,7 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/crypto/passwdhash"
 	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/statelesstoken"
 	"go.gearno.de/kit/pg"
 )
@@ -490,4 +491,25 @@ func (s Service) ConfirmEmail(ctx context.Context, tokenString string) error {
 			return nil
 		},
 	)
+}
+
+func (s Service) ListUsersForTenant(
+	ctx context.Context,
+	organizationID gid.GID,
+	cursor *page.Cursor,
+) (*page.Page[*coredata.User], error) {
+	users := coredata.Users{}
+
+	err := s.pg.WithConn(
+		ctx,
+		func(tx pg.Conn) error {
+			return users.LoadByOrganizationID(ctx, tx, organizationID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(users, cursor), nil
 }

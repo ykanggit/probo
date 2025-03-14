@@ -16,7 +16,27 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/page"
 )
+
+func NewUserConnection(p *page.Page[*coredata.User]) *UserConnection {
+	var edges = make([]*UserEdge, len(p.Data))
+
+	for i := range edges {
+		edges[i] = NewUserEdge(p.Data[i])
+	}
+
+	return &UserConnection{
+		Edges:    edges,
+		PageInfo: NewPageInfo(p),
+	}
+}
+
+func NewUserEdge(user *coredata.User) *UserEdge {
+	return &UserEdge{
+		Node: NewUser(user),
+	}
+}
 
 func NewUser(u *coredata.User) *User {
 	return &User{

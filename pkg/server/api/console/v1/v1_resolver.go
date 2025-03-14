@@ -517,6 +517,18 @@ func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organizat
 	return svc.Organizations.GenerateLogoURL(ctx, obj.ID, 1*time.Hour)
 }
 
+// Users is the resolver for the users field.
+func (r *organizationResolver) Users(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.UserConnection, error) {
+	cursor := types.NewCursor(first, after, last, before)
+
+	page, err := r.usrmgrSvc.ListUsersForTenant(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list users: %w", err)
+	}
+
+	return types.NewUserConnection(page), nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
@@ -657,9 +669,14 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 }
 
 // Viewer is the resolver for the viewer field.
-func (r *queryResolver) Viewer(ctx context.Context) (*types.User, error) {
+func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
 	user := UserFromContext(ctx)
-	return types.NewUser(user), nil
+	session := SessionFromContext(ctx)
+
+	return &types.Viewer{
+		ID:   session.ID,
+		User: types.NewUser(user),
+	}, nil
 }
 
 // AssignedTo is the resolver for the assignedTo field.
@@ -697,8 +714,10 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 }
 
 // Organizations is the resolver for the organizations field.
-func (r *userResolver) Organizations(ctx context.Context, obj *types.User, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.OrganizationConnection, error) {
-	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, obj.ID)
+func (r *viewerResolver) Organizations(ctx context.Context, obj *types.Viewer, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.OrganizationConnection, error) {
+	user := UserFromContext(ctx)
+
+	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, user.ID)
 	if err != nil {
 		panic(fmt.Errorf("failed to list organizations for user: %w", err))
 	}
@@ -738,8 +757,8 @@ func (r *Resolver) Query() schema.QueryResolver { return &queryResolver{r} }
 // Task returns schema.TaskResolver implementation.
 func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 
-// User returns schema.UserResolver implementation.
-func (r *Resolver) User() schema.UserResolver { return &userResolver{r} }
+// Viewer returns schema.ViewerResolver implementation.
+func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
 
 type controlResolver struct{ *Resolver }
 type evidenceResolver struct{ *Resolver }
@@ -749,4 +768,4 @@ type organizationResolver struct{ *Resolver }
 type policyResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
-type userResolver struct{ *Resolver }
+type viewerResolver struct{ *Resolver }

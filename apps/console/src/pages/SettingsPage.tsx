@@ -45,6 +45,16 @@ const settingsPageQuery = graphql`
       ... on Organization {
         name
         logoUrl
+        users(first: 100) {
+          edges {
+            node {
+              id
+              fullName
+              email
+              createdAt
+            }
+          }
+        }
       }
     }
   }
@@ -64,13 +74,6 @@ const updateOrganizationMutation = graphql`
   }
 `;
 
-interface Member {
-  id: string;
-  fullName: string;
-  primaryEmailAddress: string;
-  role: string;
-}
-
 function SettingsPageContent({
   queryRef,
 }: {
@@ -78,11 +81,14 @@ function SettingsPageContent({
 }) {
   const data = usePreloadedQuery(settingsPageQuery, queryRef);
   const organization = data.organization;
-  const members: Member[] = [];
+  const users = organization.users?.edges.map((edge) => edge.node) || [];
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isEditNameOpen, setIsEditNameOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("Member");
   const [organizationName, setOrganizationName] = useState(
     organization.name || ""
   );
@@ -160,6 +166,19 @@ function SettingsPageContent({
       });
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleInviteMember = () => {
+    // This is a placeholder for the actual invite functionality
+    // In a real implementation, we would use a GraphQL mutation to invite the user
+    // For now, we just show a toast message and close the dialog
+    toast({
+      title: "Invitation sent",
+      description: `An invitation has been sent to ${inviteEmail}`,
+      variant: "default",
+    });
+    setIsInviteOpen(false);
+    setInviteEmail("");
   };
 
   return (
@@ -245,56 +264,77 @@ function SettingsPageContent({
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Workspace members</CardTitle>
-            <CardDescription>
-              Manage who has privileged access to your workspace and their
-              permissions.
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Workspace members</CardTitle>
+              <CardDescription>
+                Manage who has privileged access to your workspace and their
+                permissions.
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsInviteOpen(true)}
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Invite member
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {members.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between rounded-lg border p-3 shadow-xs"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>
-                        {member.fullName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">
-                        {member.fullName}
-                      </span>
+              {users.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-8 text-center">
+                  <div className="rounded-full bg-muted p-3">
+                    <Building2 className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-medium">No members found</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    You haven&apos;t added any members to your workspace yet.
+                  </p>
+                </div>
+              ) : (
+                users.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between rounded-lg border p-3 shadow-xs"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarFallback>
+                          {user.fullName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">
+                          {user.fullName}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {user.email}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <span className="text-sm text-muted-foreground">
-                        {member.primaryEmailAddress}
+                        Owner
                       </span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem className="text-red-600">
+                            Remove member
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">
-                      {member.role}
-                    </span>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Change role</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          Remove member
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
@@ -324,6 +364,48 @@ function SettingsPageContent({
               Cancel
             </Button>
             <Button onClick={handleUpdateName}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Invite Team Member</DialogTitle>
+            <DialogDescription>
+              Send an invitation to join your workspace.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                placeholder="Enter email address"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <select
+                id="role"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={inviteRole}
+                onChange={(e) => setInviteRole(e.target.value)}
+              >
+                <option value="Admin">Admin</option>
+                <option value="Member">Member</option>
+                <option value="Viewer">Viewer</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsInviteOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleInviteMember}>Send Invitation</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

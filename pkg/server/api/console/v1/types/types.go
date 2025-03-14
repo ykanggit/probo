@@ -254,6 +254,7 @@ type Organization struct {
 	ID         gid.GID              `json:"id"`
 	Name       string               `json:"name"`
 	LogoURL    *string              `json:"logoUrl,omitempty"`
+	Users      *UserConnection      `json:"users"`
 	Frameworks *FrameworkConnection `json:"frameworks"`
 	Vendors    *VendorConnection    `json:"vendors"`
 	Peoples    *PeopleConnection    `json:"peoples"`
@@ -477,16 +478,25 @@ type UploadEvidencePayload struct {
 }
 
 type User struct {
-	ID            gid.GID                 `json:"id"`
-	FullName      string                  `json:"fullName"`
-	Email         string                  `json:"email"`
-	Organizations *OrganizationConnection `json:"organizations"`
-	CreatedAt     time.Time               `json:"createdAt"`
-	UpdatedAt     time.Time               `json:"updatedAt"`
+	ID        gid.GID   `json:"id"`
+	FullName  string    `json:"fullName"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (User) IsNode()             {}
 func (this User) GetID() gid.GID { return this.ID }
+
+type UserConnection struct {
+	Edges    []*UserEdge `json:"edges"`
+	PageInfo *PageInfo   `json:"pageInfo"`
+}
+
+type UserEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *User          `json:"node"`
+}
 
 type Vendor struct {
 	ID                   gid.GID                     `json:"id"`
@@ -515,4 +525,10 @@ type VendorConnection struct {
 type VendorEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Vendor        `json:"node"`
+}
+
+type Viewer struct {
+	ID            gid.GID                 `json:"id"`
+	User          *User                   `json:"user"`
+	Organizations *OrganizationConnection `json:"organizations"`
 }
