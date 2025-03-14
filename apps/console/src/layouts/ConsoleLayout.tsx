@@ -455,6 +455,17 @@ export default function ConsoleLayout() {
                     </Route>
                     <Route path="create" element={<BreadcrumbCreatePolicy />} />
                   </Route>
+                  <Route
+                    path="settings"
+                    element={
+                      <>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                          <BreadcrumbPage>Settings</BreadcrumbPage>
+                        </BreadcrumbItem>
+                      </>
+                    }
+                  />
                 </Route>
                 <Route path="*" element={<BreadcrumbHome />}>
                   <Route
