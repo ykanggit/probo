@@ -21,14 +21,12 @@ export function AppSidebarShell({
 }: AppSidebarShellProps) {
   return (
     <Sidebar variant="sidebar" {...props}>
-      <div className="p-4">
-        <SidebarHeader>{organizationSwitcher}</SidebarHeader>
-        <SidebarContent>
-          {navMain}
-          <NavSecondary className="mt-auto" />
-        </SidebarContent>
-        <SidebarFooter>{navUser}</SidebarFooter>
-      </div>
+      <SidebarHeader>{organizationSwitcher}</SidebarHeader>
+      <SidebarContent>
+        {navMain}
+        <NavSecondary className="mt-auto" />
+      </SidebarContent>
+      <SidebarFooter>{navUser}</SidebarFooter>
     </Sidebar>
   );
 }

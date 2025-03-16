@@ -9,11 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { ConsoleLayoutBreadcrumbFrameworkOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbFrameworkOverviewQuery.graphql";
@@ -383,11 +379,10 @@ export default function ConsoleLayout() {
   return (
     <SidebarProvider>
       <Suspense>
-        <AppSidebar />
+        <AppSidebar className="p-4" />
       </Suspense>
-      <SidebarInset className="relative">
-        <SidebarTrigger className="absolute top-7 left-1" />
-        <div className="mx-auto w-lg md:w-xl lg:w-3xl xl:w-4xl 2xl:w-5xl py-8 px-10">
+      <SidebarInset>
+        <div className="mx-auto w-lg md:w-xl lg:w-3xl xl:w-4xl 2xl:w-5xl p-8">
           <header className="flex shrink-0 items-center gap-2">
             <Routes>
               <Route

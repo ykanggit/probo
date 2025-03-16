@@ -201,7 +201,7 @@ function FrameworkListPageContent({
                 <DialogTrigger asChild>
                   <Button variant="outline">
                     <Upload className="mr-2 h-4 w-4" />
-                    Import
+                    Import Framework
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
@@ -231,7 +231,7 @@ function FrameworkListPageContent({
               <Button asChild>
                 <Link to={`/organizations/${organizationId}/frameworks/create`}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Create
+                  Create Framework
                 </Link>
               </Button>
             </div>
