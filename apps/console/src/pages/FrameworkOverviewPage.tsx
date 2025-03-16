@@ -129,7 +129,7 @@ function FrameworkOverviewPageContent({
                 </div>
               </div>
               <div className="mt-4 space-y-2">
-                <div className="flex gap-1">
+                <div className="flex flex-wrap gap-1">
                   {Array(card.total)
                     .fill(0)
                     .map((_, i) => {
