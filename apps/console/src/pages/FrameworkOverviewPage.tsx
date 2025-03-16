@@ -121,63 +121,67 @@ function FrameworkOverviewPageContent({
             key={index}
             className="rounded-xl border border-gray-200 relative"
           >
-            <div className="p-4 rounded-xl">
-              <div className="flex items-center justify-between">
+            <div className="p-4 rounded-xl h-full flex flex-col">
+              <div className="flex items-center h-8">
                 <div className="flex items-center gap-2">
                   <Shield className="w-4 h-4 text-muted-foreground" />
                   <span className="text-sm font-medium">{card.title}</span>
                 </div>
               </div>
-              <div className="mt-4 space-y-2">
-                <div className="flex flex-wrap gap-1">
-                  {Array(card.total)
-                    .fill(0)
-                    .map((_, i) => {
-                      const control = card.controls[i];
-                      return (
-                        <div
-                          key={i}
-                          className={`h-4 w-4 ${
-                            control?.state === "IMPLEMENTED"
-                              ? "bg-[#D1FA84]"
-                              : "bg-[#E5E7EB]"
-                          } rounded-md hover:scale-110 hover:shadow-md transition-all duration-200 cursor-pointer`}
-                          onMouseEnter={(e) => {
-                            setHoveredCard(index);
-                            setHoveredControl(i);
-                            const rect =
-                              e.currentTarget.getBoundingClientRect();
+              <div className="mt-4 flex-1 flex flex-col justify-between">
+                <div className="min-h-[40px]">
+                  <div className="flex flex-wrap gap-1">
+                    {Array(card.total)
+                      .fill(0)
+                      .map((_, i) => {
+                        const control = card.controls[i];
+                        return (
+                          <div
+                            key={i}
+                            className={`h-4 w-4 ${
+                              control?.state === "IMPLEMENTED"
+                                ? "bg-[#D1FA84]"
+                                : "bg-[#E5E7EB]"
+                            } rounded-md hover:scale-110 hover:shadow-md transition-all duration-200 cursor-pointer`}
+                            onMouseEnter={(e) => {
+                              setHoveredCard(index);
+                              setHoveredControl(i);
+                              const rect =
+                                e.currentTarget.getBoundingClientRect();
 
-                            setTooltipPosition({
-                              x: rect.left,
-                              y: rect.top - 10,
-                              width: 400,
-                            });
-                          }}
-                          onClick={() => {
-                            if (control?.id) {
-                              navigate(
-                                `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
-                              );
-                            }
-                          }}
-                          onMouseLeave={() => {
-                            setTimeout(() => {
-                              if (!isTooltipHovered) {
-                                setHoveredCard(null);
-                                setHoveredControl(null);
-                                setTooltipPosition(null);
+                              setTooltipPosition({
+                                x: rect.left,
+                                y: rect.top - 10,
+                                width: 400,
+                              });
+                            }}
+                            onClick={() => {
+                              if (control?.id) {
+                                navigate(
+                                  `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
+                                );
                               }
-                            }, 500);
-                          }}
-                          title={control?.name}
-                        />
-                      );
-                    })}
+                            }}
+                            onMouseLeave={() => {
+                              setTimeout(() => {
+                                if (!isTooltipHovered) {
+                                  setHoveredCard(null);
+                                  setHoveredControl(null);
+                                  setTooltipPosition(null);
+                                }
+                              }, 500);
+                            }}
+                            title={control?.name}
+                          />
+                        );
+                      })}
+                  </div>
                 </div>
-                <span className="text-sm text-muted-foreground">
-                  {card.completed}/{card.total} Controls validated
-                </span>
+                <div className="mt-2">
+                  <span className="text-sm text-muted-foreground">
+                    {card.completed}/{card.total} Controls validated
+                  </span>
+                </div>
               </div>
             </div>
           </div>
