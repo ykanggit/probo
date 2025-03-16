@@ -303,68 +303,12 @@ func (t *Task) Delete(
 	conn pg.Conn,
 	scope Scoper,
 ) error {
-	q := `
-WITH control_count AS (
-    SELECT COUNT(*) AS count FROM controls_tasks WHERE task_id = @task_id
-),
-delete_link AS (
-    DELETE FROM controls_tasks 
-    WHERE task_id = @task_id AND control_id = @control_id
-    RETURNING task_id
-),
-delete_transitions AS (
-    DELETE FROM task_state_transitions 
-    WHERE %s AND task_id = @task_id AND (SELECT count FROM control_count) <= 1
-    RETURNING task_id
-),
-delete_all_links AS (
-    DELETE FROM controls_tasks 
-    WHERE task_id = @task_id AND (SELECT count FROM control_count) <= 1
-    RETURNING task_id
-),
-delete_task AS (
-    DELETE FROM tasks 
-    WHERE %s AND id = @task_id AND (SELECT count FROM control_count) <= 1
-    RETURNING id
-)
-SELECT 
-    (SELECT count FROM control_count) AS control_count,
-    (SELECT COUNT(*) FROM delete_link) AS deleted_links,
-    (SELECT COUNT(*) FROM delete_transitions) AS deleted_transitions,
-    (SELECT COUNT(*) FROM delete_all_links) AS deleted_all_links,
-    (SELECT COUNT(*) FROM delete_task) AS deleted_tasks;
-`
-	q = fmt.Sprintf(q, scope.SQLFragment(), scope.SQLFragment())
+	q := `DELETE FROM tasks WHERE %s AND id = @task_id`
+	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{
-		"task_id":    t.ID,
-		"control_id": t.ControlID,
-	}
+	args := pgx.StrictNamedArgs{"task_id": t.ID}
 	maps.Copy(args, scope.SQLArguments())
 
-	var controlCount, deletedLinks, deletedTransitions, deletedAllLinks, deletedTasks int
-	err := conn.QueryRow(ctx, q, args).Scan(
-		&controlCount,
-		&deletedLinks,
-		&deletedTransitions,
-		&deletedAllLinks,
-		&deletedTasks,
-	)
-
-	if err != nil {
-		return fmt.Errorf("cannot execute delete operation: %w", err)
-	}
-
-	if controlCount <= 1 {
-		if deletedTransitions == 0 || deletedAllLinks == 0 || deletedTasks == 0 {
-			return fmt.Errorf("failed to delete task completely: transitions=%d, links=%d, tasks=%d",
-				deletedTransitions, deletedAllLinks, deletedTasks)
-		}
-	} else {
-		if deletedLinks == 0 {
-			return fmt.Errorf("failed to delete control-task link")
-		}
-	}
-
-	return nil
+	_, err := conn.Exec(ctx, q, args)
+	return err
 }
