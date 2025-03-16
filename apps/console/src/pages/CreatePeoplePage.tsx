@@ -75,7 +75,7 @@ function CreatePeoplePageContent() {
     fullName: "",
     primaryEmailAddress: "",
     additionalEmailAddresses: [] as string[],
-    kind: "EMPLOYEE" as "EMPLOYEE" | "CONTRACTOR",
+    kind: "EMPLOYEE" as "EMPLOYEE" | "CONTRACTOR" | "SERVICE_ACCOUNT",
   });
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
@@ -254,6 +254,20 @@ function CreatePeoplePageContent() {
                         )}
                       >
                         Contractor
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleFieldChange("kind", "SERVICE_ACCOUNT")
+                        }
+                        className={cn(
+                          "rounded-full px-4 py-1 text-sm transition-colors",
+                          formData.kind === "SERVICE_ACCOUNT"
+                            ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        )}
+                      >
+                        Service Account
                       </button>
                     </div>
                   </div>

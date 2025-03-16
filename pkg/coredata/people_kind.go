@@ -26,6 +26,7 @@ type (
 const (
 	PeopleKindEmployee PeopleKind = iota
 	PeopleKindContractor
+	PeopleKindServiceAccount
 )
 
 func (ps PeopleKind) MarshalText() ([]byte, error) {
@@ -40,6 +41,8 @@ func (ps *PeopleKind) UnmarshalText(data []byte) error {
 		*ps = PeopleKindEmployee
 	case PeopleKindContractor.String():
 		*ps = PeopleKindContractor
+	case PeopleKindServiceAccount.String():
+		*ps = PeopleKindServiceAccount
 	default:
 		return fmt.Errorf("invalid PeopleKind value: %q", val)
 	}
@@ -55,6 +58,8 @@ func (ts PeopleKind) String() string {
 		val = "EMPLOYEE"
 	case PeopleKindContractor:
 		val = "CONTRACTOR"
+	case PeopleKindServiceAccount:
+		val = "SERVICE_ACCOUNT"
 	}
 
 	return val

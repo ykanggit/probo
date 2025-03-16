@@ -69,6 +69,10 @@ enum PeopleKind
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PeopleKindContractor"
     )
+  SERVICE_ACCOUNT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleKindServiceAccount"
+    )
 }
 
 enum ControlImportance

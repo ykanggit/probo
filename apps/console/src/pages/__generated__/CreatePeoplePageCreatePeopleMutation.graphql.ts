@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e7e22eec683ab324fcd1cfe498845353>>
+ * @generated SignedSource<<6c8122e298c594879d1cd54bf297c11b>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type PeopleKind = "CONTRACTOR" | "EMPLOYEE";
+export type PeopleKind = "CONTRACTOR" | "EMPLOYEE" | "SERVICE_ACCOUNT";
 export type CreatePeopleInput = {
   additionalEmailAddresses?: ReadonlyArray<string> | null | undefined;
   fullName: string;

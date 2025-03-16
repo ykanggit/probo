@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f4f654235ec0210a616d4e317c3273bc>>
+ * @generated SignedSource<<876cec536b2a9c33f73956901b0b5b1b>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,7 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
-export type PeopleKind = "CONTRACTOR" | "EMPLOYEE";
+export type PeopleKind = "CONTRACTOR" | "EMPLOYEE" | "SERVICE_ACCOUNT";
 import { FragmentRefs } from "relay-runtime";
 export type PeopleListPage_peoples$data = {
   readonly id: string;

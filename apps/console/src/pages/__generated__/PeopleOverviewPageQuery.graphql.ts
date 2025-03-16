@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<12b9bffcb7d1b32602592f77810dd9cb>>
+ * @generated SignedSource<<4ff94d3e8f2e4c6c0d8c3ad43abee2d6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type PeopleKind = "CONTRACTOR" | "EMPLOYEE";
+export type PeopleKind = "CONTRACTOR" | "EMPLOYEE" | "SERVICE_ACCOUNT";
 export type PeopleOverviewPageQuery$variables = {
   peopleId: string;
 };

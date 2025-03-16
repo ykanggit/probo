@@ -2151,6 +2151,10 @@ enum PeopleKind
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PeopleKindContractor"
     )
+  SERVICE_ACCOUNT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleKindServiceAccount"
+    )
 }
 
 enum ControlImportance
@@ -19793,12 +19797,14 @@ func (ec *executionContext) marshalNPeopleKind2githubᚗcomᚋgetproboᚋprobo�
 
 var (
 	unmarshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind = map[string]coredata.PeopleKind{
-		"EMPLOYEE":   coredata.PeopleKindEmployee,
-		"CONTRACTOR": coredata.PeopleKindContractor,
+		"EMPLOYEE":        coredata.PeopleKindEmployee,
+		"CONTRACTOR":      coredata.PeopleKindContractor,
+		"SERVICE_ACCOUNT": coredata.PeopleKindServiceAccount,
 	}
 	marshalNPeopleKind2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind = map[coredata.PeopleKind]string{
-		coredata.PeopleKindEmployee:   "EMPLOYEE",
-		coredata.PeopleKindContractor: "CONTRACTOR",
+		coredata.PeopleKindEmployee:       "EMPLOYEE",
+		coredata.PeopleKindContractor:     "CONTRACTOR",
+		coredata.PeopleKindServiceAccount: "SERVICE_ACCOUNT",
 	}
 )
 
@@ -20891,12 +20897,14 @@ func (ec *executionContext) marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋprob
 
 var (
 	unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind = map[string]coredata.PeopleKind{
-		"EMPLOYEE":   coredata.PeopleKindEmployee,
-		"CONTRACTOR": coredata.PeopleKindContractor,
+		"EMPLOYEE":        coredata.PeopleKindEmployee,
+		"CONTRACTOR":      coredata.PeopleKindContractor,
+		"SERVICE_ACCOUNT": coredata.PeopleKindServiceAccount,
 	}
 	marshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind = map[coredata.PeopleKind]string{
-		coredata.PeopleKindEmployee:   "EMPLOYEE",
-		coredata.PeopleKindContractor: "CONTRACTOR",
+		coredata.PeopleKindEmployee:       "EMPLOYEE",
+		coredata.PeopleKindContractor:     "CONTRACTOR",
+		coredata.PeopleKindServiceAccount: "SERVICE_ACCOUNT",
 	}
 )
 

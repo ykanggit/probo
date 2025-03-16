@@ -227,6 +227,8 @@ function PeopleListContent({
                       ? "Employee"
                       : person?.kind === "CONTRACTOR"
                       ? "Contractor"
+                      : person?.kind === "SERVICE_ACCOUNT"
+                      ? "Service Account"
                       : "Vendor"}
                   </Badge>
                   <Button
