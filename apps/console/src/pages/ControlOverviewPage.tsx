@@ -48,7 +48,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -218,6 +217,7 @@ const uploadEvidenceMutation = graphql`
       evidenceEdge @appendEdge(connections: $connections) {
         node {
           id
+          filename
           fileUrl
           mimeType
           size
@@ -450,13 +450,11 @@ function ControlOverviewPageContent({
     name: string;
   } | null>(null);
 
-  const [isUploadEvidenceOpen, setIsUploadEvidenceOpen] = useState(false);
   const [taskForEvidence, setTaskForEvidence] = useState<{
     id: string;
     name: string;
   } | null>(null);
-  const [evidenceName, setEvidenceName] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
   const [draggedOverTaskId, setDraggedOverTaskId] = useState<string | null>(
     null
@@ -702,15 +700,24 @@ function ControlOverviewPageContent({
 
   const handleUploadEvidence = (taskId: string, taskName: string) => {
     setTaskForEvidence({ id: taskId, name: taskName });
-    setIsUploadEvidenceOpen(true);
+    // Instead of opening a modal, directly trigger the file input click
+    if (hiddenFileInputRef.current) {
+      hiddenFileInputRef.current.click();
+    }
   };
 
-  const confirmUploadEvidence = (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0 || !taskForEvidence)
+      return;
 
-    if (!taskForEvidence || !fileInputRef.current?.files?.[0]) return;
+    const file = e.target.files[0];
 
-    const file = fileInputRef.current.files[0];
+    // Show toast for upload started
+    toast({
+      title: "Upload started",
+      description: `Uploading ${file.name}...`,
+      variant: "default",
+    });
 
     // Get the evidence connection ID for this task
     const evidenceConnectionId = getEvidenceConnectionId(taskForEvidence.id);
@@ -719,7 +726,7 @@ function ControlOverviewPageContent({
       variables: {
         input: {
           taskId: taskForEvidence.id,
-          name: evidenceName || file.name,
+          name: file.name,
           file: null,
         },
         connections: evidenceConnectionId ? [evidenceConnectionId] : [],
@@ -733,11 +740,10 @@ function ControlOverviewPageContent({
           description: "Evidence has been uploaded successfully.",
           variant: "default",
         });
-        setIsUploadEvidenceOpen(false);
         setTaskForEvidence(null);
-        setEvidenceName("");
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
+        // Reset the file input
+        if (hiddenFileInputRef.current) {
+          hiddenFileInputRef.current.value = "";
         }
       },
       onError: (error) => {
@@ -1625,6 +1631,15 @@ function ControlOverviewPageContent({
           </div>
         </div>
 
+        {/* Hidden file input for direct uploads */}
+        <input
+          type="file"
+          ref={hiddenFileInputRef}
+          onChange={handleFileSelected}
+          style={{ display: "none" }}
+          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+        />
+
         {/* Delete Task Confirmation Dialog */}
         <Dialog open={isDeleteTaskOpen} onOpenChange={setIsDeleteTaskOpen}>
           <DialogContent>
@@ -1646,71 +1661,6 @@ function ControlOverviewPageContent({
                 Delete
               </Button>
             </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Upload Evidence Dialog */}
-        <Dialog
-          open={isUploadEvidenceOpen}
-          onOpenChange={setIsUploadEvidenceOpen}
-        >
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Upload Evidence</DialogTitle>
-              <DialogDescription>
-                Upload evidence for the task &quot;{taskForEvidence?.name}
-                &quot;.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={confirmUploadEvidence}>
-              <div className="space-y-6 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="evidence-name">
-                    Evidence Name (Optional)
-                  </Label>
-                  <Input
-                    id="evidence-name"
-                    placeholder="Enter a name for this evidence"
-                    value={evidenceName}
-                    onChange={(e) => setEvidenceName(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <Label htmlFor="evidence-file">File</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 transition-colors hover:border-blue-400 bg-gray-50">
-                    <div className="flex flex-col items-center justify-center gap-3">
-                      <Upload className="w-10 h-10 text-blue-500" />
-                      <div className="text-center">
-                        <p className="text-sm font-medium text-gray-700">
-                          Drag and drop your file here, or click to browse
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Supported file types: PDF, images, documents
-                        </p>
-                      </div>
-                      <Input
-                        id="evidence-file"
-                        type="file"
-                        ref={fileInputRef}
-                        required
-                        className="w-full opacity-0 absolute inset-0 cursor-pointer"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  type="button"
-                  onClick={() => setIsUploadEvidenceOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">Upload</Button>
-              </DialogFooter>
-            </form>
           </DialogContent>
         </Dialog>
 

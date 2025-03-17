@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f1cdd20d14ca9fefe868019e5aa43741>>
+ * @generated SignedSource<<313084c3c2422d51df42fe4d6b848d49>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -25,6 +25,7 @@ export type ControlOverviewPageUploadEvidenceMutation$data = {
       readonly node: {
         readonly createdAt: string;
         readonly fileUrl: string;
+        readonly filename: string;
         readonly id: string;
         readonly mimeType: string;
         readonly size: number;
@@ -77,6 +78,13 @@ v3 = {
           "args": null,
           "kind": "ScalarField",
           "name": "id",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "filename",
           "storageKey": null
         },
         {
@@ -186,16 +194,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "76c2ba38a9ba243840027c997b01b51b",
+    "cacheID": "5edaf64bde176530d9952e3e8aeb15af",
     "id": null,
     "metadata": {},
     "name": "ControlOverviewPageUploadEvidenceMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlOverviewPageUploadEvidenceMutation(\n  $input: UploadEvidenceInput!\n) {\n  uploadEvidence(input: $input) {\n    evidenceEdge {\n      node {\n        id\n        fileUrl\n        mimeType\n        size\n        state\n        createdAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation ControlOverviewPageUploadEvidenceMutation(\n  $input: UploadEvidenceInput!\n) {\n  uploadEvidence(input: $input) {\n    evidenceEdge {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        size\n        state\n        createdAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "b43bb6fc3d2a70fd8f81ccfb2532f067";
+(node as any).hash = "51f35fe735a747ddaeb0f0cfa298f7e2";
 
 export default node;
