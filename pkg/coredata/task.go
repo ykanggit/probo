@@ -227,6 +227,7 @@ WHERE
     AND id = @task_id
     AND version = @expected_version
 RETURNING
+	state,
     version;
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
@@ -242,7 +243,7 @@ RETURNING
 	}
 	maps.Copy(args, scope.SQLArguments())
 
-	err := conn.QueryRow(ctx, q, args).Scan(&t.Version)
+	err := conn.QueryRow(ctx, q, args).Scan(&t.State, &t.Version)
 	return err
 }
 
