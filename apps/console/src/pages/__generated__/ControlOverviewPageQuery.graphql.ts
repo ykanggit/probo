@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8f9fcd90d577e5e9f1b7ac31bbc1a14c>>
+ * @generated SignedSource<<84b34aa7e582728a8386d1fe1ef3fb58>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -55,6 +55,7 @@ export type ControlOverviewPageQuery$data = {
         };
       }>;
     };
+    readonly version?: number;
   };
 };
 export type ControlOverviewPageQuery = {
@@ -123,14 +124,14 @@ v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "timeEstimate",
+  "name": "version",
   "storageKey": null
 },
 v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "version",
+  "name": "timeEstimate",
   "storageKey": null
 },
 v10 = {
@@ -306,6 +307,7 @@ return {
               (v5/*: any*/),
               (v6/*: any*/),
               (v7/*: any*/),
+              (v8/*: any*/),
               {
                 "alias": "tasks",
                 "args": null,
@@ -334,8 +336,8 @@ return {
                           (v3/*: any*/),
                           (v4/*: any*/),
                           (v5/*: any*/),
-                          (v8/*: any*/),
                           (v9/*: any*/),
+                          (v8/*: any*/),
                           (v10/*: any*/),
                           {
                             "alias": "evidences",
@@ -395,6 +397,7 @@ return {
               (v5/*: any*/),
               (v6/*: any*/),
               (v7/*: any*/),
+              (v8/*: any*/),
               {
                 "alias": null,
                 "args": (v16/*: any*/),
@@ -423,8 +426,8 @@ return {
                           (v3/*: any*/),
                           (v4/*: any*/),
                           (v5/*: any*/),
-                          (v8/*: any*/),
                           (v9/*: any*/),
+                          (v8/*: any*/),
                           (v10/*: any*/),
                           {
                             "alias": null,
@@ -477,7 +480,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "1d26d59ea2232a213d01636e8d388919",
+    "cacheID": "4bcea497959829f998cdab71797c8675",
     "id": null,
     "metadata": {
       "connection": [
@@ -500,11 +503,11 @@ return {
     },
     "name": "ControlOverviewPageQuery",
     "operationKind": "query",
-    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      importance\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            version\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOverviewPageQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      importance\n      category\n      version\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            version\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "e48b75fde2fcff42e868a0e68abd5809";
+(node as any).hash = "4710a9799b3daf286afdd430f026e6c2";
 
 export default node;

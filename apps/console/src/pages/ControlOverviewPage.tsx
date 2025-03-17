@@ -54,6 +54,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 import ReactMarkdown from "react-markdown";
 
 import { Helmet } from "react-helmet-async";
@@ -66,6 +72,7 @@ import type { ControlOverviewPageDeleteEvidenceMutation as ControlOverviewPageDe
 import type { ControlOverviewPageAssignTaskMutation as ControlOverviewPageAssignTaskMutationType } from "./__generated__/ControlOverviewPageAssignTaskMutation.graphql";
 import type { ControlOverviewPageUnassignTaskMutation as ControlOverviewPageUnassignTaskMutationType } from "./__generated__/ControlOverviewPageUnassignTaskMutation.graphql";
 import type { ControlOverviewPageOrganizationQuery$data } from "./__generated__/ControlOverviewPageOrganizationQuery.graphql";
+import type { ControlOverviewPageUpdateControlStateMutation as ControlOverviewPageUpdateControlStateMutationType } from "./__generated__/ControlOverviewPageUpdateControlStateMutation.graphql";
 import { Textarea } from "@/components/ui/textarea";
 
 // Function to format ISO8601 duration to human-readable format
@@ -115,6 +122,7 @@ const controlOverviewPageQuery = graphql`
         state
         importance
         category
+        version
         tasks(first: 100) @connection(key: "ControlOverviewPage_tasks") {
           __id
           edges {
@@ -276,6 +284,20 @@ const unassignTaskMutation = graphql`
   }
 `;
 
+const updateControlStateMutation = graphql`
+  mutation ControlOverviewPageUpdateControlStateMutation(
+    $input: UpdateControlInput!
+  ) {
+    updateControl(input: $input) {
+      control {
+        id
+        state
+        version
+      }
+    }
+  }
+`;
+
 const organizationQuery = graphql`
   query ControlOverviewPageOrganizationQuery($organizationId: ID!) {
     organization: node(id: $organizationId) {
@@ -408,6 +430,11 @@ function ControlOverviewPageContent({
   const [unassignTask] =
     useMutation<ControlOverviewPageUnassignTaskMutationType>(
       unassignTaskMutation
+    );
+
+  const [updateControlState] =
+    useMutation<ControlOverviewPageUpdateControlStateMutationType>(
+      updateControlStateMutation
     );
 
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
@@ -965,6 +992,38 @@ function ControlOverviewPageContent({
     });
   };
 
+  // Function to handle control state change
+  const handleControlStateChange = (newState: string) => {
+    updateControlState({
+      variables: {
+        input: {
+          id: data.control.id,
+          state: newState as
+            | "NOT_STARTED"
+            | "IN_PROGRESS"
+            | "IMPLEMENTED"
+            | "NOT_APPLICABLE",
+          expectedVersion: data.control.version!,
+        },
+      },
+      onCompleted: () => {
+        toast({
+          title: "Control state updated",
+          description: `Control state has been updated to ${formatState(
+            newState
+          )}.`,
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Error updating control state",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
   return (
     <>
       <Helmet>
@@ -978,13 +1037,26 @@ function ControlOverviewPageContent({
               <Button variant="outline" size="sm" onClick={handleEditControl}>
                 Edit Control
               </Button>
-              <div
-                className={`${getStateColor(
-                  data.control.state
-                )} px-3 py-1 rounded-full text-sm`}
+              <Select
+                defaultValue={data.control.state}
+                onValueChange={handleControlStateChange}
               >
-                {formatState(data.control.state)}
-              </div>
+                <SelectTrigger className="w-[160px] h-8 text-sm">
+                  <div
+                    className={`${getStateColor(
+                      data.control.state
+                    )} px-2 py-0.5 rounded-full text-sm w-full text-center`}
+                  >
+                    {formatState(data.control.state)}
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NOT_STARTED">Not Started</SelectItem>
+                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                  <SelectItem value="IMPLEMENTED">Implemented</SelectItem>
+                  <SelectItem value="NOT_APPLICABLE">Not Applicable</SelectItem>
+                </SelectContent>
+              </Select>
               <div
                 className={`${getImportanceColor(
                   data.control.importance
