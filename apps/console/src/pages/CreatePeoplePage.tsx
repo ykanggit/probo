@@ -112,15 +112,13 @@ function CreatePeoplePageContent() {
           kind: formData.kind,
         },
       },
-      onCompleted: (response) => {
+      onCompleted: () => {
         toast({
           title: "Success",
           description: "Person created successfully",
           variant: "default",
         });
-        navigate(
-          `/organizations/${organizationId}/people/${response.createPeople.peopleEdge.node.id}`
-        );
+        navigate(`/organizations/${organizationId}/people`);
       },
       onError: (error) => {
         toast({
