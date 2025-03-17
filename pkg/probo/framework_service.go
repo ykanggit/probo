@@ -58,6 +58,11 @@ type (
 					Standards   []string                   `json:"standards"`
 					Name        string                     `json:"name"`
 					Description string                     `json:"description"`
+					Tasks       []struct {
+						Name         string `json:"name"`
+						Description  string `json:"description"`
+						TimeEstimate int    `json:"time-estimate"`
+					} `json:"tasks"`
 				} `json:"controls"`
 			} `json:"framework"`
 		}
@@ -207,6 +212,7 @@ func (s FrameworkService) Import(
 	}
 
 	importedControls := coredata.Controls{}
+	importedTasks := coredata.Tasks{}
 	for _, control := range req.Data.Framework.Controls {
 		controlID, err := gid.NewGID(organizationID.TenantID(), coredata.ControlEntityType)
 		if err != nil {
@@ -228,6 +234,25 @@ func (s FrameworkService) Import(
 		}
 
 		importedControls = append(importedControls, importedControl)
+
+		for _, task := range control.Tasks {
+			taskID, err := gid.NewGID(organizationID.TenantID(), coredata.TaskEntityType)
+			if err != nil {
+				return nil, fmt.Errorf("cannot create global id: %w", err)
+			}
+
+			importedTasks = append(importedTasks, &coredata.Task{
+				ID:           taskID,
+				ControlID:    controlID,
+				Name:         task.Name,
+				TimeEstimate: time.Duration(task.TimeEstimate) * time.Second,
+				State:        coredata.TaskStateTodo,
+				Description:  task.Description,
+				ContentRef:   "",
+				CreatedAt:    now,
+				UpdatedAt:    now,
+			})
+		}
 	}
 
 	err = s.svc.pg.WithTx(
@@ -242,6 +267,12 @@ func (s FrameworkService) Import(
 			for _, importedControl := range importedControls {
 				if err := importedControl.Insert(ctx, tx, s.svc.scope); err != nil {
 					return fmt.Errorf("cannot insert control: %w", err)
+				}
+			}
+
+			for _, importedTask := range importedTasks {
+				if err := importedTask.Insert(ctx, tx, s.svc.scope); err != nil {
+					return fmt.Errorf("cannot insert task: %w", err)
 				}
 			}
 
