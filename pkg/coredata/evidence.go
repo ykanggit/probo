@@ -42,7 +42,7 @@ type (
 	Evidences []*Evidence
 )
 
-func (e Evidence) CursorKey() page.CursorKey {
+func (e Evidence) CursorKey(orderBy page.OrderField) page.CursorKey {
 	return page.NewCursorKey(e.ID, e.CreatedAt)
 }
 

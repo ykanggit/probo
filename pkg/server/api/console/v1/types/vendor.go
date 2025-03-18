@@ -23,7 +23,7 @@ func NewVendorConnection(p *page.Page[*coredata.Vendor]) *VendorConnection {
 	var edges = make([]*VendorEdge, len(p.Data))
 
 	for i := range edges {
-		edges[i] = NewVendorEdge(p.Data[i])
+		edges[i] = NewVendorEdge(p.Data[i], p.Cursor.OrderBy.Field)
 	}
 
 	return &VendorConnection{
@@ -32,9 +32,9 @@ func NewVendorConnection(p *page.Page[*coredata.Vendor]) *VendorConnection {
 	}
 }
 
-func NewVendorEdge(v *coredata.Vendor) *VendorEdge {
+func NewVendorEdge(v *coredata.Vendor, orderBy page.OrderField) *VendorEdge {
 	return &VendorEdge{
-		Cursor: v.CursorKey(),
+		Cursor: v.CursorKey(orderBy),
 		Node:   NewVendor(v),
 	}
 }

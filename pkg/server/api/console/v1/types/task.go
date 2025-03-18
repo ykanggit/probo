@@ -23,7 +23,7 @@ func NewTaskConnection(p *page.Page[*coredata.Task]) *TaskConnection {
 	var edges = make([]*TaskEdge, len(p.Data))
 
 	for i := range edges {
-		edges[i] = NewTaskEdge(p.Data[i])
+		edges[i] = NewTaskEdge(p.Data[i], p.Cursor.OrderBy.Field)
 	}
 
 	return &TaskConnection{
@@ -32,9 +32,9 @@ func NewTaskConnection(p *page.Page[*coredata.Task]) *TaskConnection {
 	}
 }
 
-func NewTaskEdge(t *coredata.Task) *TaskEdge {
+func NewTaskEdge(t *coredata.Task, orderBy page.OrderField) *TaskEdge {
 	return &TaskEdge{
-		Cursor: t.CursorKey(),
+		Cursor: t.CursorKey(orderBy),
 		Node:   NewTask(t),
 	}
 }

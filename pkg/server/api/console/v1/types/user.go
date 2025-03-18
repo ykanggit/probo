@@ -23,7 +23,7 @@ func NewUserConnection(p *page.Page[*coredata.User]) *UserConnection {
 	var edges = make([]*UserEdge, len(p.Data))
 
 	for i := range edges {
-		edges[i] = NewUserEdge(p.Data[i])
+		edges[i] = NewUserEdge(p.Data[i], p.Cursor.OrderBy.Field)
 	}
 
 	return &UserConnection{
@@ -32,9 +32,10 @@ func NewUserConnection(p *page.Page[*coredata.User]) *UserConnection {
 	}
 }
 
-func NewUserEdge(user *coredata.User) *UserEdge {
+func NewUserEdge(user *coredata.User, orderBy page.OrderField) *UserEdge {
 	return &UserEdge{
-		Node: NewUser(user),
+		Cursor: user.CursorKey(orderBy),
+		Node:   NewUser(user),
 	}
 }
 

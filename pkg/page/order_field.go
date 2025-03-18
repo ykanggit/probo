@@ -23,20 +23,20 @@ type (
 		Column() string
 	}
 
-	BaseOrderField string
+	GenericOrderField string
 )
 
 const (
-	OrderFieldCreatedAt BaseOrderField = "CREATED_AT"
-	OrderFieldUpdatedAt BaseOrderField = "UPDATED_AT"
-	OrderFieldName      BaseOrderField = "NAME"
+	OrderFieldCreatedAt GenericOrderField = "CREATED_AT"
+	OrderFieldUpdatedAt GenericOrderField = "UPDATED_AT"
+	OrderFieldName      GenericOrderField = "NAME"
 )
 
-func (of BaseOrderField) String() string {
+func (of GenericOrderField) String() string {
 	return string(of)
 }
 
-func (of BaseOrderField) Column() string {
+func (of GenericOrderField) Column() string {
 	switch of {
 	case OrderFieldCreatedAt:
 		return "created_at"
@@ -49,11 +49,11 @@ func (of BaseOrderField) Column() string {
 	}
 }
 
-func (of BaseOrderField) MarshalText() ([]byte, error) {
+func (of GenericOrderField) MarshalText() ([]byte, error) {
 	return []byte(of.String()), nil
 }
 
-func (of *BaseOrderField) UnmarshalText(data []byte) error {
+func (of *GenericOrderField) UnmarshalText(data []byte) error {
 	val := string(data)
 
 	switch val {
@@ -64,7 +64,7 @@ func (of *BaseOrderField) UnmarshalText(data []byte) error {
 	case OrderFieldName.String():
 		*of = OrderFieldName
 	default:
-		return fmt.Errorf("invalid BaseOrderField value: %q", val)
+		return fmt.Errorf("invalid GenericOrderField value: %q", val)
 	}
 
 	return nil

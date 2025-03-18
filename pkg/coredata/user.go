@@ -59,7 +59,7 @@ func (e ErrUserAlreadyExists) Error() string {
 	return e.message
 }
 
-func (u User) CursorKey() page.CursorKey {
+func (u User) CursorKey(orderBy page.OrderField) page.CursorKey {
 	return page.NewCursorKey(u.ID, u.CreatedAt)
 }
 

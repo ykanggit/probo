@@ -26,8 +26,8 @@ func NewPageInfo[T page.Paginable](p *page.Page[T]) *PageInfo {
 	)
 
 	if len(p.Data) > 0 {
-		startCursor = ref.Ref(p.First().CursorKey())
-		endCursor = ref.Ref(p.Last().CursorKey())
+		startCursor = ref.Ref(p.First().CursorKey(p.Cursor.OrderBy.Field))
+		endCursor = ref.Ref(p.Last().CursorKey(p.Cursor.OrderBy.Field))
 	}
 
 	return &PageInfo{

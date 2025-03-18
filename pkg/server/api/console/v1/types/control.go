@@ -23,7 +23,7 @@ func NewControlConnection(p *page.Page[*coredata.Control]) *ControlConnection {
 	var edges = make([]*ControlEdge, len(p.Data))
 
 	for i := range edges {
-		edges[i] = NewControlEdge(p.Data[i])
+		edges[i] = NewControlEdge(p.Data[i], p.Cursor.OrderBy.Field)
 	}
 
 	return &ControlConnection{
@@ -32,9 +32,9 @@ func NewControlConnection(p *page.Page[*coredata.Control]) *ControlConnection {
 	}
 }
 
-func NewControlEdge(c *coredata.Control) *ControlEdge {
+func NewControlEdge(c *coredata.Control, orderBy page.OrderField) *ControlEdge {
 	return &ControlEdge{
-		Cursor: c.CursorKey(),
+		Cursor: c.CursorKey(orderBy),
 		Node:   NewControl(c),
 	}
 }

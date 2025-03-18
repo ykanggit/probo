@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/page"
 	"github.com/jackc/pgx/v5"
 	"go.gearno.de/kit/pg"
 )
@@ -37,6 +38,10 @@ type (
 
 	Organizations []*Organization
 )
+
+func (o Organization) CursorKey(orderBy page.OrderField) page.CursorKey {
+	return page.NewCursorKey(o.ID, o.CreatedAt)
+}
 
 func (o *Organization) LoadByID(
 	ctx context.Context,

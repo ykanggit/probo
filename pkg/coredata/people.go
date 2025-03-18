@@ -50,7 +50,7 @@ type (
 	}
 )
 
-func (p People) CursorKey() page.CursorKey {
+func (p People) CursorKey(orderBy page.OrderField) page.CursorKey {
 	return page.NewCursorKey(p.ID, p.CreatedAt)
 }
 

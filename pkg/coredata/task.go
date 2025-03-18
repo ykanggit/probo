@@ -53,7 +53,7 @@ type (
 	}
 )
 
-func (t Task) CursorKey() page.CursorKey {
+func (t Task) CursorKey(orderBy page.OrderField) page.CursorKey {
 	return page.NewCursorKey(t.ID, t.CreatedAt)
 }
 

@@ -38,7 +38,7 @@ type (
 	SessionData struct{}
 )
 
-func (s Session) CursorKey() page.CursorKey {
+func (s Session) CursorKey(orderBy page.OrderField) page.CursorKey {
 	return page.NewCursorKey(s.ID, s.CreatedAt)
 }
 

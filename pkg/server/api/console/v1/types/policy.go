@@ -19,6 +19,25 @@ import (
 	"github.com/getprobo/probo/pkg/page"
 )
 
+func NewPolicyConnection(page *page.Page[*coredata.Policy]) *PolicyConnection {
+	edges := make([]*PolicyEdge, len(page.Data))
+	for i, policy := range page.Data {
+		edges[i] = NewPolicyEdge(policy, page.Cursor.OrderBy.Field)
+	}
+
+	return &PolicyConnection{
+		Edges:    edges,
+		PageInfo: NewPageInfo(page),
+	}
+}
+
+func NewPolicyEdge(policy *coredata.Policy, orderBy page.OrderField) *PolicyEdge {
+	return &PolicyEdge{
+		Cursor: policy.CursorKey(orderBy),
+		Node:   NewPolicy(policy),
+	}
+}
+
 func NewPolicy(policy *coredata.Policy) *Policy {
 	return &Policy{
 		ID:         policy.ID,
@@ -29,24 +48,5 @@ func NewPolicy(policy *coredata.Policy) *Policy {
 		UpdatedAt:  policy.UpdatedAt,
 		Status:     policy.Status,
 		ReviewDate: policy.ReviewDate,
-	}
-}
-
-func NewPolicyEdge(policy *coredata.Policy) *PolicyEdge {
-	return &PolicyEdge{
-		Cursor: policy.CursorKey(),
-		Node:   NewPolicy(policy),
-	}
-}
-
-func NewPolicyConnection(page *page.Page[*coredata.Policy]) *PolicyConnection {
-	edges := make([]*PolicyEdge, len(page.Data))
-	for i, policy := range page.Data {
-		edges[i] = NewPolicyEdge(policy)
-	}
-
-	return &PolicyConnection{
-		Edges:    edges,
-		PageInfo: NewPageInfo(page),
 	}
 }

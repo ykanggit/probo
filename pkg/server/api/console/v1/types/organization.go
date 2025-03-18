@@ -16,7 +16,28 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/page"
 )
+
+func NewOrganizationConnection(page *page.Page[*coredata.Organization]) *OrganizationConnection {
+	var edges = make([]*OrganizationEdge, len(page.Data))
+
+	for i := range edges {
+		edges[i] = NewOrganizationEdge(page.Data[i], page.Cursor.OrderBy.Field)
+	}
+
+	return &OrganizationConnection{
+		Edges:    edges,
+		PageInfo: NewPageInfo(page),
+	}
+}
+
+func NewOrganizationEdge(o *coredata.Organization, orderBy page.OrderField) *OrganizationEdge {
+	return &OrganizationEdge{
+		Cursor: o.CursorKey(orderBy),
+		Node:   NewOrganization(o),
+	}
+}
 
 func NewOrganization(o *coredata.Organization) *Organization {
 	return &Organization{
@@ -24,11 +45,5 @@ func NewOrganization(o *coredata.Organization) *Organization {
 		Name:      o.Name,
 		CreatedAt: o.CreatedAt,
 		UpdatedAt: o.UpdatedAt,
-	}
-}
-
-func NewOrganizationEdge(o *coredata.Organization) *OrganizationEdge {
-	return &OrganizationEdge{
-		Node: NewOrganization(o),
 	}
 }

@@ -38,7 +38,7 @@ type (
 	}
 )
 
-func (p Policy) CursorKey() page.CursorKey {
+func (p Policy) CursorKey(orderBy page.OrderField) page.CursorKey {
 	return page.NewCursorKey(p.ID, p.CreatedAt)
 }
 

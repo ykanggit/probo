@@ -23,7 +23,7 @@ func NewEvidenceConnection(p *page.Page[*coredata.Evidence]) *EvidenceConnection
 	var edges = make([]*EvidenceEdge, len(p.Data))
 
 	for i := range edges {
-		edges[i] = NewEvidenceEdge(p.Data[i])
+		edges[i] = NewEvidenceEdge(p.Data[i], p.Cursor.OrderBy.Field)
 	}
 
 	return &EvidenceConnection{
@@ -32,9 +32,9 @@ func NewEvidenceConnection(p *page.Page[*coredata.Evidence]) *EvidenceConnection
 	}
 }
 
-func NewEvidenceEdge(e *coredata.Evidence) *EvidenceEdge {
+func NewEvidenceEdge(e *coredata.Evidence, orderBy page.OrderField) *EvidenceEdge {
 	return &EvidenceEdge{
-		Cursor: e.CursorKey(),
+		Cursor: e.CursorKey(orderBy),
 		Node:   NewEvidence(e),
 	}
 }

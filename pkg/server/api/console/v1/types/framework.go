@@ -23,7 +23,7 @@ func NewFrameworkConnection(p *page.Page[*coredata.Framework]) *FrameworkConnect
 	var edges = make([]*FrameworkEdge, len(p.Data))
 
 	for i := range edges {
-		edges[i] = NewFrameworkEdge(p.Data[i])
+		edges[i] = NewFrameworkEdge(p.Data[i], p.Cursor.OrderBy.Field)
 	}
 
 	return &FrameworkConnection{
@@ -32,9 +32,9 @@ func NewFrameworkConnection(p *page.Page[*coredata.Framework]) *FrameworkConnect
 	}
 }
 
-func NewFrameworkEdge(f *coredata.Framework) *FrameworkEdge {
+func NewFrameworkEdge(f *coredata.Framework, orderBy page.OrderField) *FrameworkEdge {
 	return &FrameworkEdge{
-		Cursor: f.CursorKey(),
+		Cursor: f.CursorKey(orderBy),
 		Node:   NewFramework(f),
 	}
 }

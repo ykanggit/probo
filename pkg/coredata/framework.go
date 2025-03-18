@@ -47,7 +47,7 @@ type (
 	}
 )
 
-func (f Framework) CursorKey() page.CursorKey {
+func (f Framework) CursorKey(orderBy page.OrderField) page.CursorKey {
 	return page.NewCursorKey(f.ID, f.CreatedAt)
 }
 
@@ -78,7 +78,7 @@ WHERE
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	args := pgx.NamedArgs{"organization_id": organizationID}
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 

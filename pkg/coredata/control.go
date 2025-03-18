@@ -55,7 +55,7 @@ type (
 	}
 )
 
-func (c Control) CursorKey() page.CursorKey {
+func (c Control) CursorKey(orderBy page.OrderField) page.CursorKey {
 	return page.NewCursorKey(c.ID, c.CreatedAt)
 }
 

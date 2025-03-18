@@ -45,7 +45,33 @@ func NewCursor(
 		from = before
 	}
 
-	return page.NewCursor(size, from, direction)
+	return page.NewCursor(size, from, direction, nil)
+}
+
+func NewCursorWithOrder(
+	first *int,
+	after *page.CursorKey,
+	last *int,
+	before *page.CursorKey,
+	orderBy *page.OrderBy,
+) *page.Cursor {
+	var (
+		size      int
+		from      *page.CursorKey
+		direction = page.Head
+	)
+
+	if first != nil {
+		size = *first
+		direction = page.Head
+		from = after
+	} else if last != nil {
+		size = *last
+		direction = page.Tail
+		from = before
+	}
+
+	return page.NewCursor(size, from, direction, orderBy)
 }
 
 func MarshalCursorKeyScalar(ck page.CursorKey) graphql.Marshaler {

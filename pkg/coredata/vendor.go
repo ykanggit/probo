@@ -63,8 +63,17 @@ type (
 	}
 )
 
-func (v Vendor) CursorKey() page.CursorKey {
-	return page.NewCursorKey(v.ID, v.CreatedAt)
+func (v Vendor) CursorKey(orderBy page.OrderField) page.CursorKey {
+	switch orderBy {
+	case page.OrderFieldCreatedAt:
+		return page.NewCursorKey(v.ID, v.CreatedAt)
+	case page.OrderFieldUpdatedAt:
+		return page.NewCursorKey(v.ID, v.UpdatedAt)
+	case page.OrderFieldName:
+		return page.NewCursorKey(v.ID, v.Name)
+	}
+
+	panic(fmt.Sprintf("unknown order by: %s", orderBy))
 }
 
 func (v *Vendor) LoadByID(
@@ -229,7 +238,6 @@ WHERE
     AND organization_id = @organization_id
     AND %s
 `
-
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.StrictNamedArgs{"organization_id": organizationID}

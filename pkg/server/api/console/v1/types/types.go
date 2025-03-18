@@ -3,6 +3,9 @@
 package types
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -57,6 +60,11 @@ type ControlConnection struct {
 type ControlEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Control       `json:"node"`
+}
+
+type ControlOrder struct {
+	Direction page.OrderDirection    `json:"direction"`
+	Field     page.GenericOrderField `json:"field"`
 }
 
 type CreateControlInput struct {
@@ -215,6 +223,11 @@ type EvidenceEdge struct {
 	Node   *Evidence      `json:"node"`
 }
 
+type EvidenceOrder struct {
+	Direction page.OrderDirection    `json:"direction"`
+	Field     page.GenericOrderField `json:"field"`
+}
+
 type Framework struct {
 	ID          gid.GID            `json:"id"`
 	Version     int                `json:"version"`
@@ -236,6 +249,11 @@ type FrameworkConnection struct {
 type FrameworkEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Framework     `json:"node"`
+}
+
+type FrameworkOrder struct {
+	Direction page.OrderDirection    `json:"direction"`
+	Field     page.GenericOrderField `json:"field"`
 }
 
 type ImportFrameworkInput struct {
@@ -284,6 +302,11 @@ type OrganizationConnection struct {
 type OrganizationEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Organization  `json:"node"`
+}
+
+type OrganizationOrder struct {
+	Direction page.OrderDirection    `json:"direction"`
+	Field     OrganizationOrderField `json:"field"`
 }
 
 type PageInfo struct {
@@ -342,6 +365,11 @@ type PolicyEdge struct {
 	Node   *Policy        `json:"node"`
 }
 
+type PolicyOrder struct {
+	Direction page.OrderDirection    `json:"direction"`
+	Field     page.GenericOrderField `json:"field"`
+}
+
 type Query struct {
 }
 
@@ -383,6 +411,11 @@ type TaskConnection struct {
 type TaskEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Task          `json:"node"`
+}
+
+type TaskOrder struct {
+	Direction page.OrderDirection    `json:"direction"`
+	Field     page.GenericOrderField `json:"field"`
 }
 
 type UnassignTaskInput struct {
@@ -517,6 +550,11 @@ type UserEdge struct {
 	Node   *User          `json:"node"`
 }
 
+type UserOrder struct {
+	Direction page.OrderDirection `json:"direction"`
+	Field     UserOrderField      `json:"field"`
+}
+
 type Vendor struct {
 	ID                   gid.GID                     `json:"id"`
 	Name                 string                      `json:"name"`
@@ -550,4 +588,92 @@ type Viewer struct {
 	ID            gid.GID                 `json:"id"`
 	User          *User                   `json:"user"`
 	Organizations *OrganizationConnection `json:"organizations"`
+}
+
+type OrganizationOrderField string
+
+const (
+	OrganizationOrderFieldName      OrganizationOrderField = "NAME"
+	OrganizationOrderFieldCreatedAt OrganizationOrderField = "CREATED_AT"
+	OrganizationOrderFieldUpdatedAt OrganizationOrderField = "UPDATED_AT"
+)
+
+var AllOrganizationOrderField = []OrganizationOrderField{
+	OrganizationOrderFieldName,
+	OrganizationOrderFieldCreatedAt,
+	OrganizationOrderFieldUpdatedAt,
+}
+
+func (e OrganizationOrderField) IsValid() bool {
+	switch e {
+	case OrganizationOrderFieldName, OrganizationOrderFieldCreatedAt, OrganizationOrderFieldUpdatedAt:
+		return true
+	}
+	return false
+}
+
+func (e OrganizationOrderField) String() string {
+	return string(e)
+}
+
+func (e *OrganizationOrderField) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = OrganizationOrderField(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid OrganizationOrderField", str)
+	}
+	return nil
+}
+
+func (e OrganizationOrderField) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type UserOrderField string
+
+const (
+	UserOrderFieldFullName  UserOrderField = "FULL_NAME"
+	UserOrderFieldEmail     UserOrderField = "EMAIL"
+	UserOrderFieldCreatedAt UserOrderField = "CREATED_AT"
+	UserOrderFieldUpdatedAt UserOrderField = "UPDATED_AT"
+)
+
+var AllUserOrderField = []UserOrderField{
+	UserOrderFieldFullName,
+	UserOrderFieldEmail,
+	UserOrderFieldCreatedAt,
+	UserOrderFieldUpdatedAt,
+}
+
+func (e UserOrderField) IsValid() bool {
+	switch e {
+	case UserOrderFieldFullName, UserOrderFieldEmail, UserOrderFieldCreatedAt, UserOrderFieldUpdatedAt:
+		return true
+	}
+	return false
+}
+
+func (e UserOrderField) String() string {
+	return string(e)
+}
+
+func (e *UserOrderField) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserOrderField(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserOrderField", str)
+	}
+	return nil
+}
+
+func (e UserOrderField) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
