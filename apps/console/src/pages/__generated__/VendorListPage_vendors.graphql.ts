@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<154771eb64f67988863d8cda0ece1d86>>
+ * @generated SignedSource<<07023a3f17c448fc24762c05b3a7ff87>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -109,7 +109,16 @@ return {
   "selections": [
     {
       "alias": "vendors",
-      "args": null,
+      "args": [
+        {
+          "kind": "Literal",
+          "name": "orderBy",
+          "value": {
+            "direction": "ASC",
+            "field": "NAME"
+          }
+        }
+      ],
       "concreteType": "VendorConnection",
       "kind": "LinkedField",
       "name": "__VendorListPage_vendors_connection",
@@ -239,7 +248,7 @@ return {
           ]
         }
       ],
-      "storageKey": null
+      "storageKey": "__VendorListPage_vendors_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"NAME\"})"
     },
     (v1/*: any*/)
   ],
@@ -248,6 +257,6 @@ return {
 };
 })();
 
-(node as any).hash = "7b7bdfacd87b8fa297e905e56cc44423";
+(node as any).hash = "beaab1664bed1fa776659595b1ef3c30";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4061e153ecdb5d4c746bf6e5dd33537a>>
+ * @generated SignedSource<<167c602f1fa3a3720523424c44c8b734>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -60,42 +60,54 @@ v5 = [
     "variableName": "id"
   }
 ],
-v6 = [
-  {
-    "kind": "Variable",
-    "name": "after",
-    "variableName": "after"
-  },
-  {
-    "kind": "Variable",
-    "name": "before",
-    "variableName": "before"
-  },
-  {
-    "kind": "Variable",
-    "name": "first",
-    "variableName": "first"
-  },
-  {
-    "kind": "Variable",
-    "name": "last",
-    "variableName": "last"
-  }
-],
+v6 = {
+  "kind": "Variable",
+  "name": "after",
+  "variableName": "after"
+},
 v7 = {
+  "kind": "Variable",
+  "name": "before",
+  "variableName": "before"
+},
+v8 = {
+  "kind": "Variable",
+  "name": "first",
+  "variableName": "first"
+},
+v9 = {
+  "kind": "Variable",
+  "name": "last",
+  "variableName": "last"
+},
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v8 = {
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
-};
+},
+v12 = [
+  (v6/*: any*/),
+  (v7/*: any*/),
+  (v8/*: any*/),
+  (v9/*: any*/),
+  {
+    "kind": "Literal",
+    "name": "orderBy",
+    "value": {
+      "direction": "ASC",
+      "field": "NAME"
+    }
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": [
@@ -118,7 +130,12 @@ return {
         "plural": false,
         "selections": [
           {
-            "args": (v6/*: any*/),
+            "args": [
+              (v6/*: any*/),
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/)
+            ],
             "kind": "FragmentSpread",
             "name": "VendorListPage_vendors"
           }
@@ -149,14 +166,14 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v7/*: any*/),
-          (v8/*: any*/),
+          (v10/*: any*/),
+          (v11/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v6/*: any*/),
+                "args": (v12/*: any*/),
                 "concreteType": "VendorConnection",
                 "kind": "LinkedField",
                 "name": "vendors",
@@ -178,7 +195,7 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v8/*: any*/),
+                          (v11/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -214,7 +231,7 @@ return {
                             "name": "riskTier",
                             "storageKey": null
                           },
-                          (v7/*: any*/)
+                          (v10/*: any*/)
                         ],
                         "storageKey": null
                       },
@@ -284,8 +301,10 @@ return {
               },
               {
                 "alias": null,
-                "args": (v6/*: any*/),
-                "filters": null,
+                "args": (v12/*: any*/),
+                "filters": [
+                  "orderBy"
+                ],
                 "handle": "connection",
                 "key": "VendorListPage_vendors",
                 "kind": "LinkedHandle",
@@ -301,16 +320,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "36b6d950eacaed69ecef277f51ce7b2f",
+    "cacheID": "72074f9c6435d35453cfd0effbbd6add",
     "id": null,
     "metadata": {},
     "name": "VendorListPagePaginationQuery",
     "operationKind": "query",
-    "text": "query VendorListPagePaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...VendorListPage_vendors_pbnwq\n    id\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query VendorListPagePaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...VendorListPage_vendors_pbnwq\n    id\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "7b7bdfacd87b8fa297e905e56cc44423";
+(node as any).hash = "beaab1664bed1fa776659595b1ef3c30";
 
 export default node;

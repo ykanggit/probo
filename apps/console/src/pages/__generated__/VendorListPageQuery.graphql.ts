@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5b261d2af4d8fef41cbe574d9b08ef28>>
+ * @generated SignedSource<<3e49ccb0b233e4d7495387ecf23f2316>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -68,35 +68,47 @@ v6 = {
   "name": "id",
   "storageKey": null
 },
-v7 = [
-  {
-    "kind": "Variable",
-    "name": "after",
-    "variableName": "after"
-  },
-  {
-    "kind": "Variable",
-    "name": "before",
-    "variableName": "before"
-  },
-  {
-    "kind": "Variable",
-    "name": "first",
-    "variableName": "first"
-  },
-  {
-    "kind": "Variable",
-    "name": "last",
-    "variableName": "last"
-  }
-],
+v7 = {
+  "kind": "Variable",
+  "name": "after",
+  "variableName": "after"
+},
 v8 = {
+  "kind": "Variable",
+  "name": "before",
+  "variableName": "before"
+},
+v9 = {
+  "kind": "Variable",
+  "name": "first",
+  "variableName": "first"
+},
+v10 = {
+  "kind": "Variable",
+  "name": "last",
+  "variableName": "last"
+},
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
-};
+},
+v12 = [
+  (v7/*: any*/),
+  (v8/*: any*/),
+  (v9/*: any*/),
+  (v10/*: any*/),
+  {
+    "kind": "Literal",
+    "name": "orderBy",
+    "value": {
+      "direction": "ASC",
+      "field": "NAME"
+    }
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": [
@@ -120,7 +132,12 @@ return {
         "selections": [
           (v6/*: any*/),
           {
-            "args": (v7/*: any*/),
+            "args": [
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/),
+              (v10/*: any*/)
+            ],
             "kind": "FragmentSpread",
             "name": "VendorListPage_vendors"
           }
@@ -151,14 +168,14 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v8/*: any*/),
+          (v11/*: any*/),
           (v6/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v7/*: any*/),
+                "args": (v12/*: any*/),
                 "concreteType": "VendorConnection",
                 "kind": "LinkedField",
                 "name": "vendors",
@@ -216,7 +233,7 @@ return {
                             "name": "riskTier",
                             "storageKey": null
                           },
-                          (v8/*: any*/)
+                          (v11/*: any*/)
                         ],
                         "storageKey": null
                       },
@@ -286,8 +303,10 @@ return {
               },
               {
                 "alias": null,
-                "args": (v7/*: any*/),
-                "filters": null,
+                "args": (v12/*: any*/),
+                "filters": [
+                  "orderBy"
+                ],
                 "handle": "connection",
                 "key": "VendorListPage_vendors",
                 "kind": "LinkedHandle",
@@ -303,12 +322,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "c898734b8c7718e6374ac856827fa4f6",
+    "cacheID": "c2e401b2e573156b913d60ade59ea4ff",
     "id": null,
     "metadata": {},
     "name": "VendorListPageQuery",
     "operationKind": "query",
-    "text": "query VendorListPageQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...VendorListPage_vendors_pbnwq\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query VendorListPageQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...VendorListPage_vendors_pbnwq\n  }\n}\n\nfragment VendorListPage_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();

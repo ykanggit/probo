@@ -52,8 +52,13 @@ const vendorListFragment = graphql`
     last: { type: "Int" }
     before: { type: "CursorKey" }
   ) {
-    vendors(first: $first, after: $after, last: $last, before: $before)
-      @connection(key: "VendorListPage_vendors") {
+    vendors(
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+      orderBy: { direction: ASC, field: NAME }
+    ) @connection(key: "VendorListPage_vendors") {
       __id
       edges {
         node {
@@ -503,7 +508,7 @@ export default function VendorListPage() {
       last: before ? ITEMS_PER_PAGE : undefined,
       before: before || undefined,
     });
-  }, [loadQuery, organizationId, searchParams]);
+  }, [loadQuery, organizationId]);
 
   if (!queryRef) {
     return <VendorListFallback />;
