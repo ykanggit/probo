@@ -15,80 +15,80 @@
 package page
 
 import (
-	"fmt"
-
 	"github.com/jackc/pgx/v5"
 )
 
 type (
 	Cursor struct {
 		Size     int
-		Key      *CursorKey
 		Position Position
+		Key      *CursorKey
+		OrderBy  OrderBy
 	}
 
-	Position int8
+	Position string
+
+	OrderBy struct {
+		Field     OrderField
+		Direction OrderDirection
+	}
 )
 
 const (
 	DefaultCursorSize = 25
 
-	Tail Position = iota
-	Head
+	Tail Position = "TAIL"
+	Head Position = "HEAD"
 )
 
-func (p Position) ToDirection() string {
-	switch p {
-	case Tail:
-		return "ASC"
-	case Head:
-		return "DESC"
-	default:
-		panic(fmt.Errorf("unknown direction: %d", p))
-	}
-}
-
-func NewCursor(size int, from *CursorKey, pos Position) *Cursor {
+func NewCursor(size int, from *CursorKey, pos Position, orderBy *OrderBy) *Cursor {
 	if size == 0 {
 		size = DefaultCursorSize
+	}
+
+	if orderBy == nil {
+		orderBy = &OrderBy{
+			Field:     OrderFieldCreatedAt,
+			Direction: OrderDirectionDesc,
+		}
 	}
 
 	return &Cursor{
 		Size:     size,
 		Key:      from,
 		Position: pos,
+		OrderBy:  *orderBy,
 	}
 }
 
 func (c *Cursor) SQLFragment() string {
-	return `
-  CASE
-    WHEN @cursor_order = 'DESC' AND @cursor_from_id::TEXT IS NOT NULL THEN (
-      (created_at <= @cursor_from_ts) AND NOT (created_at = @cursor_from_ts AND id > @cursor_from_id)
-    )
-    WHEN @cursor_order = 'ASC' AND @cursor_from_id::TEXT IS NOT NULL THEN (
-      (created_at >= @cursor_from_ts) AND NOT (created_at = @cursor_from_ts AND id < @cursor_from_id)
-    )
-    ELSE TRUE
-  END
-ORDER BY
-  CASE
-    WHEN @cursor_order = 'ASC' THEN created_at
-  END ASC,
-  CASE
-    WHEN @cursor_order = 'ASC' THEN id
-  END ASC,
-  CASE
-    WHEN @cursor_order = 'DESC' THEN created_at
-  END DESC,
-  CASE
-    WHEN @cursor_order = 'DESC' THEN id
-  END DESC
-LIMIT @cursor_limit
-`
+	fieldName := c.OrderBy.Field.Column()
+
+	var orderDirection string
+	switch {
+	case c.OrderBy.Direction == OrderDirectionAsc && c.Position == Head:
+		orderDirection = "ASC"
+	case c.OrderBy.Direction == OrderDirectionDesc && c.Position == Head:
+		orderDirection = "DESC"
+	case c.OrderBy.Direction == OrderDirectionAsc && c.Position == Tail:
+		orderDirection = "DESC"
+	case c.OrderBy.Direction == OrderDirectionDesc && c.Position == Tail:
+		orderDirection = "ASC"
+	}
+
+	whereClause := "TRUE"
+	if c.Key != nil && orderDirection == "DESC" {
+		whereClause = "(" + fieldName + " <= @cursor_field_value) AND NOT (" + fieldName + " = @cursor_field_value AND id > @cursor_id)"
+	} else if c.Key != nil && orderDirection == "ASC" {
+		whereClause = "(" + fieldName + " >= @cursor_field_value) AND NOT (" + fieldName + " = @cursor_field_value AND id < @cursor_id)"
+	}
+
+	orderByClause := fieldName + " " + orderDirection + ", id " + orderDirection
+
+	return whereClause + " ORDER BY " + orderByClause + " LIMIT @cursor_limit"
 }
 
-func (c *Cursor) SQLArguments() pgx.StrictNamedArgs {
+func (c *Cursor) SQLArguments() pgx.NamedArgs {
 	var size = c.Size
 	if c.Key == nil {
 		size += 1
@@ -96,16 +96,13 @@ func (c *Cursor) SQLArguments() pgx.StrictNamedArgs {
 		size += 2
 	}
 
-	arguments := pgx.StrictNamedArgs{
-		"cursor_order":   c.Position.ToDirection(),
-		"cursor_limit":   size,
-		"cursor_from_id": nil,
-		"cursor_from_ts": nil,
+	arguments := pgx.NamedArgs{
+		"cursor_limit": size,
 	}
 
 	if c.Key != nil {
-		arguments["cursor_from_id"] = c.Key.ID()
-		arguments["cursor_from_ts"] = c.Key.Timestamp()
+		arguments["cursor_id"] = c.Key.ID
+		arguments["cursor_field_value"] = c.Key.Value
 	}
 
 	return arguments

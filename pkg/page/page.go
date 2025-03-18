@@ -16,7 +16,7 @@ package page
 
 type (
 	Paginable interface {
-		CursorKey() CursorKey
+		CursorKey(orderBy OrderField) CursorKey
 	}
 
 	PageInfo struct {
@@ -25,8 +25,9 @@ type (
 	}
 
 	Page[T Paginable] struct {
-		Info *PageInfo
-		Data []T
+		Info   *PageInfo
+		Cursor *Cursor
+		Data   []T
 	}
 )
 
@@ -73,7 +74,7 @@ func NewPage[T Paginable](data []T, c *Cursor) *Page[T] {
 			edges = edges[0 : len(edges)-1]
 		}
 
-		if c.Key != nil && *c.Key == firstFromData.CursorKey() {
+		if c.Key != nil && c.Key.String() == firstFromData.CursorKey(c.OrderBy.Field).String() {
 			pi.HasPrev = true
 		}
 
@@ -97,7 +98,7 @@ func NewPage[T Paginable](data []T, c *Cursor) *Page[T] {
 			edges = edges[1:]
 		}
 
-		if c.Key != nil && *c.Key == firstFromData.CursorKey() {
+		if c.Key != nil && c.Key.String() == firstFromData.CursorKey(c.OrderBy.Field).String() {
 			pi.HasNext = true
 		}
 
@@ -109,7 +110,8 @@ func NewPage[T Paginable](data []T, c *Cursor) *Page[T] {
 	}
 
 	return &Page[T]{
-		Info: pi,
-		Data: edges,
+		Info:   pi,
+		Cursor: c,
+		Data:   edges,
 	}
 }

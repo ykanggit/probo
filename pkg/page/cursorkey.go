@@ -16,16 +16,16 @@ package page
 
 import (
 	"encoding/base64"
-	"encoding/binary"
+	"encoding/json"
 	"errors"
-	"time"
 
 	"github.com/getprobo/probo/pkg/gid"
 )
 
-type (
-	CursorKey [byteLength]byte
-)
+type CursorKey struct {
+	ID    gid.GID
+	Value any
+}
 
 var (
 	CursorKeyNil CursorKey
@@ -33,63 +33,64 @@ var (
 	ErrInvalidFormat = errors.New("invalid format")
 )
 
-const (
-	byteLength = 24
-)
-
 func ParseCursorKey(s string) (CursorKey, error) {
-	b, err := base64.RawURLEncoding.DecodeString(s)
+	data, err := base64.RawURLEncoding.DecodeString(s)
 	if err != nil {
 		return CursorKeyNil, ErrInvalidFormat
 	}
 
-	ck, err := CursorKeyFromBytes(b)
+	var arr []json.RawMessage
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return CursorKeyNil, ErrInvalidFormat
+	}
+
+	if len(arr) != 2 {
+		return CursorKeyNil, ErrInvalidFormat
+	}
+
+	var idStr string
+	if err := json.Unmarshal(arr[0], &idStr); err != nil {
+		return CursorKeyNil, ErrInvalidFormat
+	}
+
+	id, err := gid.ParseGID(idStr)
 	if err != nil {
 		return CursorKeyNil, ErrInvalidFormat
 	}
 
-	return ck, nil
-}
-
-func CursorKeyFromBytes(b []byte) (CursorKey, error) {
-	var ck CursorKey
-
-	if len(b) != byteLength {
+	var value any
+	if err := json.Unmarshal(arr[1], &value); err != nil {
 		return CursorKeyNil, ErrInvalidFormat
 	}
 
-	copy(ck[:], b)
-
-	return ck, nil
+	return CursorKey{
+		ID:    id,
+		Value: value,
+	}, nil
 }
 
-func NewCursorKey(id gid.GID, t time.Time) CursorKey {
-	var cursorKey CursorKey
-	copy(cursorKey[:16], id[:])
-	_ = binary.PutVarint(cursorKey[16:], t.UnixMicro())
-
-	return cursorKey
+func NewCursorKey(id gid.GID, value any) CursorKey {
+	return CursorKey{
+		ID:    id,
+		Value: value,
+	}
 }
 
 func (ck CursorKey) Bytes() []byte {
-	return ck[:]
+	data, _ := ck.MarshalBinary()
+	return data
 }
 
 func (ck CursorKey) String() string {
-	return base64.RawURLEncoding.EncodeToString(ck.Bytes())
+	data, err := ck.MarshalBinary()
+	if err != nil {
+		return ""
+	}
+	return base64.RawURLEncoding.EncodeToString(data)
 }
 
-func (ck CursorKey) Timestamp() time.Time {
-	unixMicro, _ := binary.Varint(ck[16:])
-
-	seconds := unixMicro / 1e6
-	nanoseconds := (unixMicro % 1e6) * 1e3
-
-	return time.Unix(seconds, nanoseconds)
-}
-
-func (ck CursorKey) ID() gid.GID {
-	return gid.GID(ck[:16])
+func (ck CursorKey) FieldValue() any {
+	return ck.Value
 }
 
 func (ck CursorKey) MarshalText() ([]byte, error) {
@@ -97,27 +98,92 @@ func (ck CursorKey) MarshalText() ([]byte, error) {
 }
 
 func (ck *CursorKey) UnmarshalText(data []byte) error {
-	ck2, err := ParseCursorKey(string(data))
+	newCk, err := ParseCursorKey(string(data))
 	if err != nil {
 		return err
 	}
-
-	*ck = ck2
-
+	*ck = newCk
 	return nil
 }
 
 func (ck CursorKey) MarshalBinary() ([]byte, error) {
-	return ck.Bytes(), nil
+	arr := []any{ck.ID.String(), ck.Value}
+	return json.Marshal(arr)
 }
 
-func (ck *CursorKey) UnmarshalBinary(b []byte) error {
-	ck2, err := CursorKeyFromBytes(b)
-	if err != nil {
+func (ck *CursorKey) UnmarshalBinary(data []byte) error {
+	var arr []json.RawMessage
+	if err := json.Unmarshal(data, &arr); err != nil {
 		return err
 	}
 
-	*ck = ck2
+	if len(arr) != 2 {
+		return ErrInvalidFormat
+	}
 
+	// Parse the ID
+	var idStr string
+	if err := json.Unmarshal(arr[0], &idStr); err != nil {
+		return ErrInvalidFormat
+	}
+
+	id, err := gid.ParseGID(idStr)
+	if err != nil {
+		return ErrInvalidFormat
+	}
+
+	var value any
+	if err := json.Unmarshal(arr[1], &value); err != nil {
+		return ErrInvalidFormat
+	}
+
+	ck.ID = id
+	ck.Value = value
+	return nil
+}
+
+func (ck CursorKey) MarshalJSON() ([]byte, error) {
+	arr := []any{ck.ID.String(), ck.Value}
+	return json.Marshal(arr)
+}
+
+func (ck *CursorKey) UnmarshalJSON(data []byte) error {
+	var arr []json.RawMessage
+	if err := json.Unmarshal(data, &arr); err != nil {
+		var s string
+		if err := json.Unmarshal(data, &s); err != nil {
+			return err
+		}
+
+		parsed, err := ParseCursorKey(s)
+		if err != nil {
+			return err
+		}
+
+		*ck = parsed
+		return nil
+	}
+
+	if len(arr) != 2 {
+		return ErrInvalidFormat
+	}
+
+	var idStr string
+	if err := json.Unmarshal(arr[0], &idStr); err != nil {
+		return ErrInvalidFormat
+	}
+
+	id, err := gid.ParseGID(idStr)
+	if err != nil {
+		return ErrInvalidFormat
+	}
+
+	var value any
+	if err := json.Unmarshal(arr[1], &value); err != nil {
+		return ErrInvalidFormat
+	}
+
+	ck.ID = id
+	ck.Value = value
 	return nil
 }
