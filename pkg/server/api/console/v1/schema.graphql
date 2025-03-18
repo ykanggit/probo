@@ -118,6 +118,7 @@ type Organization implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: UserOrder
   ): UserConnection! @goField(forceResolver: true)
 
   frameworks(
@@ -125,6 +126,7 @@ type Organization implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: FrameworkOrder
   ): FrameworkConnection! @goField(forceResolver: true)
 
   vendors(
@@ -132,6 +134,7 @@ type Organization implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: VendorOrder
   ): VendorConnection! @goField(forceResolver: true)
 
   peoples(
@@ -139,6 +142,7 @@ type Organization implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: PeopleOrder
   ): PeopleConnection! @goField(forceResolver: true)
 
   policies(
@@ -146,10 +150,117 @@ type Organization implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: PolicyOrder
   ): PolicyConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
+}
+
+enum OrderDirection
+  @goModel(model: "github.com/getprobo/probo/pkg/page.OrderDirection") {
+  ASC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionAsc")
+  DESC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionDesc")
+}
+
+enum PeopleOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PeopleOrderField") {
+  FULL_NAME
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldFullName"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldCreatedAt"
+    )
+}
+
+enum VendorOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorOrderField") {
+  NAME
+}
+
+enum FrameworkOrderField
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.FrameworkOrderField"
+  ) {
+  NAME
+}
+
+enum ControlOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ControlOrderField") {
+  NAME
+}
+
+enum TaskOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.TaskOrderField") {
+  CREATED_AT
+}
+
+enum PolicyOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyOrderField") {
+  NAME
+}
+
+enum EvidenceOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceOrderField") {
+  CREATED_AT
+}
+
+input PeopleOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.PeopleOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: PeopleOrderField!
+}
+
+input VendorOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.VendorOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: VendorOrderField!
+}
+
+input FrameworkOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.FrameworkOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: FrameworkOrderField!
+}
+
+input ControlOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.ControlOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: ControlOrderField!
+}
+
+input TaskOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.TaskOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: TaskOrderField!
+}
+
+input PolicyOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.PolicyOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: PolicyOrderField!
+}
+
+input EvidenceOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.EvidenceOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: EvidenceOrderField!
 }
 
 type PeopleConnection {
@@ -221,6 +332,7 @@ type Framework implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: ControlOrder
   ): ControlConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -251,6 +363,7 @@ type Control implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: TaskOrder
   ): TaskConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -281,6 +394,7 @@ type Task implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: EvidenceOrder
   ): EvidenceConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -347,6 +461,7 @@ type Viewer {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: OrganizationOrder
   ): OrganizationConnection! @goField(forceResolver: true)
 }
 
@@ -736,4 +851,31 @@ input RemoveUserInput {
 
 type RemoveUserPayload {
   success: Boolean!
+}
+
+enum OrganizationOrderField {
+  NAME
+  CREATED_AT
+  UPDATED_AT
+}
+
+input OrganizationOrder {
+  direction: OrderDirection!
+  field: OrganizationOrderField!
+}
+
+enum UserOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.UserOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.UserOrderFieldCreatedAt"
+    )
+}
+
+input UserOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.UserOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: UserOrderField!
 }

@@ -19,7 +19,11 @@ import (
 	"github.com/getprobo/probo/pkg/page"
 )
 
-func NewFrameworkConnection(p *page.Page[*coredata.Framework]) *FrameworkConnection {
+type (
+	FrameworkOrderBy OrderBy[coredata.FrameworkOrderField]
+)
+
+func NewFrameworkConnection(p *page.Page[*coredata.Framework, coredata.FrameworkOrderField]) *FrameworkConnection {
 	var edges = make([]*FrameworkEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +36,7 @@ func NewFrameworkConnection(p *page.Page[*coredata.Framework]) *FrameworkConnect
 	}
 }
 
-func NewFrameworkEdge(f *coredata.Framework, orderBy page.OrderField) *FrameworkEdge {
+func NewFrameworkEdge(f *coredata.Framework, orderBy coredata.FrameworkOrderField) *FrameworkEdge {
 	return &FrameworkEdge{
 		Cursor: f.CursorKey(orderBy),
 		Node:   NewFramework(f),

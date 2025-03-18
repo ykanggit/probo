@@ -19,7 +19,11 @@ import (
 	"github.com/getprobo/probo/pkg/page"
 )
 
-func NewControlConnection(p *page.Page[*coredata.Control]) *ControlConnection {
+type (
+	ControlOrderBy OrderBy[coredata.ControlOrderField]
+)
+
+func NewControlConnection(p *page.Page[*coredata.Control, coredata.ControlOrderField]) *ControlConnection {
 	var edges = make([]*ControlEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +36,7 @@ func NewControlConnection(p *page.Page[*coredata.Control]) *ControlConnection {
 	}
 }
 
-func NewControlEdge(c *coredata.Control, orderBy page.OrderField) *ControlEdge {
+func NewControlEdge(c *coredata.Control, orderBy coredata.ControlOrderField) *ControlEdge {
 	return &ControlEdge{
 		Cursor: c.CursorKey(orderBy),
 		Node:   NewControl(c),

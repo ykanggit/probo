@@ -14,41 +14,11 @@
 
 package types
 
-import (
-	"github.com/getprobo/probo/pkg/coredata"
-	"github.com/getprobo/probo/pkg/page"
-)
+import "github.com/getprobo/probo/pkg/page"
 
 type (
-	UserOrderBy OrderBy[coredata.UserOrderField]
+	OrderBy[T page.OrderField] struct {
+		Field     T
+		Direction page.OrderDirection
+	}
 )
-
-func NewUserConnection(p *page.Page[*coredata.User, coredata.UserOrderField]) *UserConnection {
-	var edges = make([]*UserEdge, len(p.Data))
-
-	for i := range edges {
-		edges[i] = NewUserEdge(p.Data[i], p.Cursor.OrderBy.Field)
-	}
-
-	return &UserConnection{
-		Edges:    edges,
-		PageInfo: NewPageInfo(p),
-	}
-}
-
-func NewUserEdge(user *coredata.User, orderBy coredata.UserOrderField) *UserEdge {
-	return &UserEdge{
-		Cursor: user.CursorKey(orderBy),
-		Node:   NewUser(user),
-	}
-}
-
-func NewUser(u *coredata.User) *User {
-	return &User{
-		ID:        u.ID,
-		Email:     u.EmailAddress,
-		FullName:  u.FullName,
-		CreatedAt: u.CreatedAt,
-		UpdatedAt: u.UpdatedAt,
-	}
-}

@@ -19,7 +19,11 @@ import (
 	"github.com/getprobo/probo/pkg/page"
 )
 
-func NewPeopleConnection(p *page.Page[*coredata.People]) *PeopleConnection {
+type (
+	PeopleOrderBy OrderBy[coredata.PeopleOrderField]
+)
+
+func NewPeopleConnection(p *page.Page[*coredata.People, coredata.PeopleOrderField]) *PeopleConnection {
 	var edges = make([]*PeopleEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +36,7 @@ func NewPeopleConnection(p *page.Page[*coredata.People]) *PeopleConnection {
 	}
 }
 
-func NewPeopleEdge(p *coredata.People, orderBy page.OrderField) *PeopleEdge {
+func NewPeopleEdge(p *coredata.People, orderBy coredata.PeopleOrderField) *PeopleEdge {
 	return &PeopleEdge{
 		Cursor: p.CursorKey(orderBy),
 		Node:   NewPeople(p),

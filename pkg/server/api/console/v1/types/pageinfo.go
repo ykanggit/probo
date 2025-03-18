@@ -19,7 +19,7 @@ import (
 	"github.com/getprobo/probo/pkg/page"
 )
 
-func NewPageInfo[T page.Paginable](p *page.Page[T]) *PageInfo {
+func NewPageInfo[T page.Paginable[O], O page.OrderField](p *page.Page[T, O]) *PageInfo {
 	var (
 		startCursor *page.CursorKey
 		endCursor   *page.CursorKey

@@ -19,7 +19,11 @@ import (
 	"github.com/getprobo/probo/pkg/page"
 )
 
-func NewTaskConnection(p *page.Page[*coredata.Task]) *TaskConnection {
+type (
+	TaskOrderBy OrderBy[coredata.TaskOrderField]
+)
+
+func NewTaskConnection(p *page.Page[*coredata.Task, coredata.TaskOrderField]) *TaskConnection {
 	var edges = make([]*TaskEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +36,7 @@ func NewTaskConnection(p *page.Page[*coredata.Task]) *TaskConnection {
 	}
 }
 
-func NewTaskEdge(t *coredata.Task, orderBy page.OrderField) *TaskEdge {
+func NewTaskEdge(t *coredata.Task, orderBy coredata.TaskOrderField) *TaskEdge {
 	return &TaskEdge{
 		Cursor: t.CursorKey(orderBy),
 		Node:   NewTask(t),

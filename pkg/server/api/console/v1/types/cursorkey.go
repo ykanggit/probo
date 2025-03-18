@@ -23,38 +23,13 @@ import (
 	"github.com/getprobo/probo/pkg/page"
 )
 
-func NewCursor(
+func NewCursor[O page.OrderField](
 	first *int,
 	after *page.CursorKey,
 	last *int,
 	before *page.CursorKey,
-) *page.Cursor {
-	var (
-		size      int
-		from      *page.CursorKey
-		direction = page.Head
-	)
-
-	if first != nil {
-		size = *first
-		direction = page.Head
-		from = after
-	} else if last != nil {
-		size = *last
-		direction = page.Tail
-		from = before
-	}
-
-	return page.NewCursor(size, from, direction, nil)
-}
-
-func NewCursorWithOrder(
-	first *int,
-	after *page.CursorKey,
-	last *int,
-	before *page.CursorKey,
-	orderBy *page.OrderBy,
-) *page.Cursor {
+	orderBy page.OrderBy[O],
+) *page.Cursor[O] {
 	var (
 		size      int
 		from      *page.CursorKey

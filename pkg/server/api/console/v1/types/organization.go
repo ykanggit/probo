@@ -19,7 +19,11 @@ import (
 	"github.com/getprobo/probo/pkg/page"
 )
 
-func NewOrganizationConnection(page *page.Page[*coredata.Organization]) *OrganizationConnection {
+type (
+	OrganizationOrderBy OrderBy[coredata.OrganizationOrderField]
+)
+
+func NewOrganizationConnection(page *page.Page[*coredata.Organization, coredata.OrganizationOrderField]) *OrganizationConnection {
 	var edges = make([]*OrganizationEdge, len(page.Data))
 
 	for i := range edges {
@@ -32,7 +36,7 @@ func NewOrganizationConnection(page *page.Page[*coredata.Organization]) *Organiz
 	}
 }
 
-func NewOrganizationEdge(o *coredata.Organization, orderBy page.OrderField) *OrganizationEdge {
+func NewOrganizationEdge(o *coredata.Organization, orderBy coredata.OrganizationOrderField) *OrganizationEdge {
 	return &OrganizationEdge{
 		Cursor: o.CursorKey(orderBy),
 		Node:   NewOrganization(o),

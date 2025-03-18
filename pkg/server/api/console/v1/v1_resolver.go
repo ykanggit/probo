@@ -20,9 +20,21 @@ import (
 )
 
 // Tasks is the resolver for the tasks field.
-func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrder) (*types.TaskConnection, error) {
+func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
-	cursor := types.NewCursor(first, after, last, before)
+
+	pageOrderBy := page.OrderBy[coredata.TaskOrderField]{
+		Field:     coredata.TaskOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.TaskOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
 	page, err := svc.Tasks.ListForControlID(ctx, obj.ID, cursor)
 	if err != nil {
@@ -45,9 +57,21 @@ func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (st
 }
 
 // Controls is the resolver for the controls field.
-func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrder) (*types.ControlConnection, error) {
+func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
-	cursor := types.NewCursor(first, after, last, before)
+
+	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
+		Field:     coredata.ControlOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ControlOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
 	page, err := svc.Controls.ListForFrameworkID(ctx, obj.ID, cursor)
 	if err != nil {
@@ -77,7 +101,7 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 		return nil, fmt.Errorf("cannot create vendor: %w", err)
 	}
 	return &types.CreateVendorPayload{
-		VendorEdge: types.NewVendorEdge(vendor, nil),
+		VendorEdge: types.NewVendorEdge(vendor, coredata.VendorOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -138,7 +162,7 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 	}
 
 	return &types.CreatePeoplePayload{
-		PeopleEdge: types.NewPeopleEdge(people, nil),
+		PeopleEdge: types.NewPeopleEdge(people, coredata.PeopleOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -197,7 +221,7 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.C
 	*tenantIDs = append(*tenantIDs, organization.ID.TenantID())
 
 	return &types.CreateOrganizationPayload{
-		OrganizationEdge: types.NewOrganizationEdge(organization, nil),
+		OrganizationEdge: types.NewOrganizationEdge(organization, coredata.OrganizationOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -244,7 +268,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 	}
 
 	return &types.CreateTaskPayload{
-		TaskEdge: types.NewTaskEdge(task, nil),
+		TaskEdge: types.NewTaskEdge(task, coredata.TaskOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -324,7 +348,7 @@ func (r *mutationResolver) CreateFramework(ctx context.Context, input types.Crea
 	}
 
 	return &types.CreateFrameworkPayload{
-		FrameworkEdge: types.NewFrameworkEdge(framework, nil),
+		FrameworkEdge: types.NewFrameworkEdge(framework, coredata.FrameworkOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -362,7 +386,7 @@ func (r *mutationResolver) ImportFramework(ctx context.Context, input types.Impo
 	}
 
 	return &types.ImportFrameworkPayload{
-		FrameworkEdge: types.NewFrameworkEdge(framework, nil),
+		FrameworkEdge: types.NewFrameworkEdge(framework, coredata.FrameworkOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -382,7 +406,7 @@ func (r *mutationResolver) CreateControl(ctx context.Context, input types.Create
 	}
 
 	return &types.CreateControlPayload{
-		ControlEdge: types.NewControlEdge(control, nil),
+		ControlEdge: types.NewControlEdge(control, coredata.ControlOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -424,7 +448,7 @@ func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.Uploa
 	}
 
 	return &types.UploadEvidencePayload{
-		EvidenceEdge: types.NewEvidenceEdge(evidence, nil),
+		EvidenceEdge: types.NewEvidenceEdge(evidence, coredata.EvidenceOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -459,7 +483,7 @@ func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreateP
 	}
 
 	return &types.CreatePolicyPayload{
-		PolicyEdge: types.NewPolicyEdge(policy, nil),
+		PolicyEdge: types.NewPolicyEdge(policy, coredata.PolicyOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -564,8 +588,19 @@ func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organizat
 }
 
 // Users is the resolver for the users field.
-func (r *organizationResolver) Users(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrder) (*types.UserConnection, error) {
-	cursor := types.NewCursor(first, after, last, before)
+func (r *organizationResolver) Users(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrderBy) (*types.UserConnection, error) {
+	pageOrderBy := page.OrderBy[coredata.UserOrderField]{
+		Field:     coredata.UserOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.UserOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
 	page, err := r.usrmgrSvc.ListUsersForTenant(ctx, obj.ID, cursor)
 	if err != nil {
@@ -576,10 +611,21 @@ func (r *organizationResolver) Users(ctx context.Context, obj *types.Organizatio
 }
 
 // Frameworks is the resolver for the frameworks field.
-func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrder) (*types.FrameworkConnection, error) {
+func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) (*types.FrameworkConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
-	cursor := types.NewCursor(first, after, last, before)
+	pageOrderBy := page.OrderBy[coredata.FrameworkOrderField]{
+		Field:     coredata.FrameworkOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.FrameworkOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
 	page, err := svc.Frameworks.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
@@ -590,10 +636,21 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 }
 
 // Vendors is the resolver for the vendors field.
-func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *page.OrderBy) (*types.VendorConnection, error) {
+func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
-	cursor := types.NewCursorWithOrder(first, after, last, before, orderBy)
+	pageOrderBy := page.OrderBy[coredata.VendorOrderField]{
+		Field:     coredata.VendorOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.VendorOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
 	page, err := svc.Vendors.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
@@ -604,10 +661,22 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 }
 
 // Peoples is the resolver for the peoples field.
-func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *page.OrderBy) (*types.PeopleConnection, error) {
+func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) (*types.PeopleConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
-	cursor := types.NewCursorWithOrder(first, after, last, before, orderBy)
+	pageOrderBy := page.OrderBy[coredata.PeopleOrderField]{
+		Field:     coredata.PeopleOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.PeopleOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
 	page, err := svc.Peoples.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list organization peoples: %w", err)
@@ -617,10 +686,21 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 }
 
 // Policies is the resolver for the policies field.
-func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrder) (*types.PolicyConnection, error) {
+func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
-	cursor := types.NewCursor(first, after, last, before)
+	pageOrderBy := page.OrderBy[coredata.PolicyOrderField]{
+		Field:     coredata.PolicyOrderFieldName,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.PolicyOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
 	page, err := svc.Policies.ListByOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
@@ -747,10 +827,21 @@ func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.
 }
 
 // Evidences is the resolver for the evidences field.
-func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrder) (*types.EvidenceConnection, error) {
+func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
-	cursor := types.NewCursor(first, after, last, before)
 
+	pageOrderBy := page.OrderBy[coredata.EvidenceOrderField]{
+		Field:     coredata.EvidenceOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.EvidenceOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 	page, err := svc.Evidences.ListForTaskID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("failed to list task evidences: %w", err))
@@ -771,7 +862,7 @@ func (r *viewerResolver) Organizations(ctx context.Context, obj *types.Viewer, f
 
 	var edges []*types.OrganizationEdge
 	for _, organization := range organizations {
-		edges = append(edges, types.NewOrganizationEdge(organization, nil))
+		edges = append(edges, types.NewOrganizationEdge(organization, coredata.OrganizationOrderFieldCreatedAt))
 	}
 
 	// The simple implementation doesn't handle pagination yet
@@ -820,23 +911,3 @@ type policyResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
 type viewerResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *peopleOrderResolver) Field(ctx context.Context, obj *page.OrderBy, data page.GenericOrderField) error {
-	panic(fmt.Errorf("not implemented: Field - field"))
-}
-func (r *vendorOrderResolver) Field(ctx context.Context, obj *page.OrderBy, data page.GenericOrderField) error {
-	obj.Field = data
-	return nil
-}
-func (r *Resolver) PeopleOrder() schema.PeopleOrderResolver { return &peopleOrderResolver{r} }
-func (r *Resolver) VendorOrder() schema.VendorOrderResolver { return &vendorOrderResolver{r} }
-type peopleOrderResolver struct{ *Resolver }
-type vendorOrderResolver struct{ *Resolver }
-*/

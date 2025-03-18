@@ -19,7 +19,11 @@ import (
 	"github.com/getprobo/probo/pkg/page"
 )
 
-func NewEvidenceConnection(p *page.Page[*coredata.Evidence]) *EvidenceConnection {
+type (
+	EvidenceOrderBy OrderBy[coredata.EvidenceOrderField]
+)
+
+func NewEvidenceConnection(p *page.Page[*coredata.Evidence, coredata.EvidenceOrderField]) *EvidenceConnection {
 	var edges = make([]*EvidenceEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +36,7 @@ func NewEvidenceConnection(p *page.Page[*coredata.Evidence]) *EvidenceConnection
 	}
 }
 
-func NewEvidenceEdge(e *coredata.Evidence, orderBy page.OrderField) *EvidenceEdge {
+func NewEvidenceEdge(e *coredata.Evidence, orderBy coredata.EvidenceOrderField) *EvidenceEdge {
 	return &EvidenceEdge{
 		Cursor: e.CursorKey(orderBy),
 		Node:   NewEvidence(e),

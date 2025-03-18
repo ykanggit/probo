@@ -73,7 +73,7 @@ type ComplexityRoot struct {
 		Importance  func(childComplexity int) int
 		Name        func(childComplexity int) int
 		State       func(childComplexity int) int
-		Tasks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		Tasks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) int
 		UpdatedAt   func(childComplexity int) int
 		Version     func(childComplexity int) int
 	}
@@ -162,7 +162,7 @@ type ComplexityRoot struct {
 	}
 
 	Framework struct {
-		Controls    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		Controls    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) int
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -221,15 +221,15 @@ type ComplexityRoot struct {
 
 	Organization struct {
 		CreatedAt  func(childComplexity int) int
-		Frameworks func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		Frameworks func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) int
 		ID         func(childComplexity int) int
 		LogoURL    func(childComplexity int) int
 		Name       func(childComplexity int) int
-		Peoples    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
-		Policies   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		Peoples    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) int
+		Policies   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) int
 		UpdatedAt  func(childComplexity int) int
-		Users      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
-		Vendors    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		Users      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrderBy) int
+		Vendors    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) int
 	}
 
 	OrganizationConnection struct {
@@ -310,7 +310,7 @@ type ComplexityRoot struct {
 		AssignedTo   func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
 		Description  func(childComplexity int) int
-		Evidences    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		Evidences    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) int
 		ID           func(childComplexity int) int
 		Name         func(childComplexity int) int
 		State        func(childComplexity int) int
@@ -411,19 +411,19 @@ type ComplexityRoot struct {
 
 	Viewer struct {
 		ID            func(childComplexity int) int
-		Organizations func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
+		Organizations func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder) int
 		User          func(childComplexity int) int
 	}
 }
 
 type ControlResolver interface {
-	Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.TaskConnection, error)
+	Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
 }
 type EvidenceResolver interface {
 	FileURL(ctx context.Context, obj *types.Evidence) (string, error)
 }
 type FrameworkResolver interface {
-	Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.ControlConnection, error)
+	Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
 }
 type MutationResolver interface {
 	CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error)
@@ -456,11 +456,11 @@ type MutationResolver interface {
 }
 type OrganizationResolver interface {
 	LogoURL(ctx context.Context, obj *types.Organization) (*string, error)
-	Users(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.UserConnection, error)
-	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.FrameworkConnection, error)
-	Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.VendorConnection, error)
-	Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PeopleConnection, error)
-	Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.PolicyConnection, error)
+	Users(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrderBy) (*types.UserConnection, error)
+	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) (*types.FrameworkConnection, error)
+	Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error)
+	Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) (*types.PeopleConnection, error)
+	Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error)
 }
 type PolicyResolver interface {
 	Owner(ctx context.Context, obj *types.Policy) (*types.People, error)
@@ -471,10 +471,10 @@ type QueryResolver interface {
 }
 type TaskResolver interface {
 	AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error)
-	Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.EvidenceConnection, error)
+	Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error)
 }
 type ViewerResolver interface {
-	Organizations(ctx context.Context, obj *types.Viewer, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.OrganizationConnection, error)
+	Organizations(ctx context.Context, obj *types.Viewer, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder) (*types.OrganizationConnection, error)
 }
 
 type executableSchema struct {
@@ -569,7 +569,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Control.Tasks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+		return e.complexity.Control.Tasks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.TaskOrderBy)), true
 
 	case "Control.updatedAt":
 		if e.complexity.Control.UpdatedAt == nil {
@@ -798,7 +798,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Framework.Controls(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+		return e.complexity.Framework.Controls(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.ControlOrderBy)), true
 
 	case "Framework.createdAt":
 		if e.complexity.Framework.CreatedAt == nil {
@@ -1225,7 +1225,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Organization.Frameworks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+		return e.complexity.Organization.Frameworks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.FrameworkOrderBy)), true
 
 	case "Organization.id":
 		if e.complexity.Organization.ID == nil {
@@ -1258,7 +1258,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Organization.Peoples(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+		return e.complexity.Organization.Peoples(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.PeopleOrderBy)), true
 
 	case "Organization.policies":
 		if e.complexity.Organization.Policies == nil {
@@ -1270,7 +1270,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Organization.Policies(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+		return e.complexity.Organization.Policies(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.PolicyOrderBy)), true
 
 	case "Organization.updatedAt":
 		if e.complexity.Organization.UpdatedAt == nil {
@@ -1289,7 +1289,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Organization.Users(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+		return e.complexity.Organization.Users(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.UserOrderBy)), true
 
 	case "Organization.vendors":
 		if e.complexity.Organization.Vendors == nil {
@@ -1301,7 +1301,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Organization.Vendors(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+		return e.complexity.Organization.Vendors(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.VendorOrderBy)), true
 
 	case "OrganizationConnection.edges":
 		if e.complexity.OrganizationConnection.Edges == nil {
@@ -1605,7 +1605,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Task.Evidences(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+		return e.complexity.Task.Evidences(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.EvidenceOrderBy)), true
 
 	case "Task.id":
 		if e.complexity.Task.ID == nil {
@@ -1939,7 +1939,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Viewer.Organizations(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
+		return e.complexity.Viewer.Organizations(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.OrganizationOrder)), true
 
 	case "Viewer.user":
 		if e.complexity.Viewer.User == nil {
@@ -1958,6 +1958,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAssignTaskInput,
 		ec.unmarshalInputConfirmEmailInput,
+		ec.unmarshalInputControlOrder,
 		ec.unmarshalInputCreateControlInput,
 		ec.unmarshalInputCreateFrameworkInput,
 		ec.unmarshalInputCreateOrganizationInput,
@@ -1971,9 +1972,15 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeletePolicyInput,
 		ec.unmarshalInputDeleteTaskInput,
 		ec.unmarshalInputDeleteVendorInput,
+		ec.unmarshalInputEvidenceOrder,
+		ec.unmarshalInputFrameworkOrder,
 		ec.unmarshalInputImportFrameworkInput,
 		ec.unmarshalInputInviteUserInput,
+		ec.unmarshalInputOrganizationOrder,
+		ec.unmarshalInputPeopleOrder,
+		ec.unmarshalInputPolicyOrder,
 		ec.unmarshalInputRemoveUserInput,
+		ec.unmarshalInputTaskOrder,
 		ec.unmarshalInputUnassignTaskInput,
 		ec.unmarshalInputUpdateControlInput,
 		ec.unmarshalInputUpdateFrameworkInput,
@@ -1983,6 +1990,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateTaskInput,
 		ec.unmarshalInputUpdateVendorInput,
 		ec.unmarshalInputUploadEvidenceInput,
+		ec.unmarshalInputUserOrder,
+		ec.unmarshalInputVendorOrder,
 	)
 	first := true
 
@@ -2200,6 +2209,7 @@ type Organization implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: UserOrder
   ): UserConnection! @goField(forceResolver: true)
 
   frameworks(
@@ -2207,6 +2217,7 @@ type Organization implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: FrameworkOrder
   ): FrameworkConnection! @goField(forceResolver: true)
 
   vendors(
@@ -2214,6 +2225,7 @@ type Organization implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: VendorOrder
   ): VendorConnection! @goField(forceResolver: true)
 
   peoples(
@@ -2221,6 +2233,7 @@ type Organization implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: PeopleOrder
   ): PeopleConnection! @goField(forceResolver: true)
 
   policies(
@@ -2228,10 +2241,117 @@ type Organization implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: PolicyOrder
   ): PolicyConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
+}
+
+enum OrderDirection
+  @goModel(model: "github.com/getprobo/probo/pkg/page.OrderDirection") {
+  ASC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionAsc")
+  DESC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionDesc")
+}
+
+enum PeopleOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PeopleOrderField") {
+  FULL_NAME
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldFullName"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldCreatedAt"
+    )
+}
+
+enum VendorOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorOrderField") {
+  NAME
+}
+
+enum FrameworkOrderField
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.FrameworkOrderField"
+  ) {
+  NAME
+}
+
+enum ControlOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ControlOrderField") {
+  NAME
+}
+
+enum TaskOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.TaskOrderField") {
+  CREATED_AT
+}
+
+enum PolicyOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyOrderField") {
+  NAME
+}
+
+enum EvidenceOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceOrderField") {
+  CREATED_AT
+}
+
+input PeopleOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.PeopleOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: PeopleOrderField!
+}
+
+input VendorOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.VendorOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: VendorOrderField!
+}
+
+input FrameworkOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.FrameworkOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: FrameworkOrderField!
+}
+
+input ControlOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.ControlOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: ControlOrderField!
+}
+
+input TaskOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.TaskOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: TaskOrderField!
+}
+
+input PolicyOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.PolicyOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: PolicyOrderField!
+}
+
+input EvidenceOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.EvidenceOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: EvidenceOrderField!
 }
 
 type PeopleConnection {
@@ -2303,6 +2423,7 @@ type Framework implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: ControlOrder
   ): ControlConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -2333,6 +2454,7 @@ type Control implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: TaskOrder
   ): TaskConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -2363,6 +2485,7 @@ type Task implements Node {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: EvidenceOrder
   ): EvidenceConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -2429,6 +2552,7 @@ type Viewer {
     after: CursorKey
     last: Int
     before: CursorKey
+    orderBy: OrganizationOrder
   ): OrganizationConnection! @goField(forceResolver: true)
 }
 
@@ -2819,6 +2943,33 @@ input RemoveUserInput {
 type RemoveUserPayload {
   success: Boolean!
 }
+
+enum OrganizationOrderField {
+  NAME
+  CREATED_AT
+  UPDATED_AT
+}
+
+input OrganizationOrder {
+  direction: OrderDirection!
+  field: OrganizationOrderField!
+}
+
+enum UserOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.UserOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.UserOrderFieldCreatedAt"
+    )
+}
+
+input UserOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.UserOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: UserOrderField!
+}
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -2850,6 +3001,11 @@ func (ec *executionContext) field_Control_tasks_args(ctx context.Context, rawArg
 		return nil, err
 	}
 	args["before"] = arg3
+	arg4, err := ec.field_Control_tasks_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Control_tasks_argsFirst(
@@ -2904,6 +3060,19 @@ func (ec *executionContext) field_Control_tasks_argsBefore(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Control_tasks_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.TaskOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOTaskOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.TaskOrderBy
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Framework_controls_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -2927,6 +3096,11 @@ func (ec *executionContext) field_Framework_controls_args(ctx context.Context, r
 		return nil, err
 	}
 	args["before"] = arg3
+	arg4, err := ec.field_Framework_controls_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Framework_controls_argsFirst(
@@ -2978,6 +3152,19 @@ func (ec *executionContext) field_Framework_controls_argsBefore(
 	}
 
 	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Framework_controls_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.ControlOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOControlOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.ControlOrderBy
 	return zeroVal, nil
 }
 
@@ -3625,6 +3812,11 @@ func (ec *executionContext) field_Organization_frameworks_args(ctx context.Conte
 		return nil, err
 	}
 	args["before"] = arg3
+	arg4, err := ec.field_Organization_frameworks_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Organization_frameworks_argsFirst(
@@ -3679,6 +3871,19 @@ func (ec *executionContext) field_Organization_frameworks_argsBefore(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Organization_frameworks_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.FrameworkOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOFrameworkOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐFrameworkOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.FrameworkOrderBy
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Organization_peoples_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3702,6 +3907,11 @@ func (ec *executionContext) field_Organization_peoples_args(ctx context.Context,
 		return nil, err
 	}
 	args["before"] = arg3
+	arg4, err := ec.field_Organization_peoples_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Organization_peoples_argsFirst(
@@ -3756,6 +3966,19 @@ func (ec *executionContext) field_Organization_peoples_argsBefore(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Organization_peoples_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.PeopleOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOPeopleOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.PeopleOrderBy
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Organization_policies_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3779,6 +4002,11 @@ func (ec *executionContext) field_Organization_policies_args(ctx context.Context
 		return nil, err
 	}
 	args["before"] = arg3
+	arg4, err := ec.field_Organization_policies_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Organization_policies_argsFirst(
@@ -3833,6 +4061,19 @@ func (ec *executionContext) field_Organization_policies_argsBefore(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Organization_policies_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.PolicyOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOPolicyOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.PolicyOrderBy
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Organization_users_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3856,6 +4097,11 @@ func (ec *executionContext) field_Organization_users_args(ctx context.Context, r
 		return nil, err
 	}
 	args["before"] = arg3
+	arg4, err := ec.field_Organization_users_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Organization_users_argsFirst(
@@ -3910,6 +4156,19 @@ func (ec *executionContext) field_Organization_users_argsBefore(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Organization_users_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.UserOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOUserOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUserOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.UserOrderBy
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Organization_vendors_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3933,6 +4192,11 @@ func (ec *executionContext) field_Organization_vendors_args(ctx context.Context,
 		return nil, err
 	}
 	args["before"] = arg3
+	arg4, err := ec.field_Organization_vendors_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Organization_vendors_argsFirst(
@@ -3984,6 +4248,19 @@ func (ec *executionContext) field_Organization_vendors_argsBefore(
 	}
 
 	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_vendors_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.VendorOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOVendorOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.VendorOrderBy
 	return zeroVal, nil
 }
 
@@ -4056,6 +4333,11 @@ func (ec *executionContext) field_Task_evidences_args(ctx context.Context, rawAr
 		return nil, err
 	}
 	args["before"] = arg3
+	arg4, err := ec.field_Task_evidences_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Task_evidences_argsFirst(
@@ -4110,6 +4392,19 @@ func (ec *executionContext) field_Task_evidences_argsBefore(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Task_evidences_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.EvidenceOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOEvidenceOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.EvidenceOrderBy
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Viewer_organizations_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -4133,6 +4428,11 @@ func (ec *executionContext) field_Viewer_organizations_args(ctx context.Context,
 		return nil, err
 	}
 	args["before"] = arg3
+	arg4, err := ec.field_Viewer_organizations_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Viewer_organizations_argsFirst(
@@ -4184,6 +4484,19 @@ func (ec *executionContext) field_Viewer_organizations_argsBefore(
 	}
 
 	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Viewer_organizations_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.OrganizationOrder, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOOrganizationOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationOrder(ctx, tmp)
+	}
+
+	var zeroVal *types.OrganizationOrder
 	return zeroVal, nil
 }
 
@@ -4659,7 +4972,7 @@ func (ec *executionContext) _Control_tasks(ctx context.Context, field graphql.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Control().Tasks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+		return ec.resolvers.Control().Tasks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.TaskOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6152,7 +6465,7 @@ func (ec *executionContext) _Framework_controls(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Framework().Controls(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+		return ec.resolvers.Framework().Controls(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.ControlOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7923,7 +8236,7 @@ func (ec *executionContext) _Organization_users(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Users(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+		return ec.resolvers.Organization().Users(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.UserOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7972,7 +8285,7 @@ func (ec *executionContext) _Organization_frameworks(ctx context.Context, field 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Frameworks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+		return ec.resolvers.Organization().Frameworks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.FrameworkOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8021,7 +8334,7 @@ func (ec *executionContext) _Organization_vendors(ctx context.Context, field gra
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Vendors(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+		return ec.resolvers.Organization().Vendors(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.VendorOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8070,7 +8383,7 @@ func (ec *executionContext) _Organization_peoples(ctx context.Context, field gra
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Peoples(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+		return ec.resolvers.Organization().Peoples(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.PeopleOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8119,7 +8432,7 @@ func (ec *executionContext) _Organization_policies(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Policies(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+		return ec.resolvers.Organization().Policies(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.PolicyOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10212,7 +10525,7 @@ func (ec *executionContext) _Task_evidences(ctx context.Context, field graphql.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Task().Evidences(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+		return ec.resolvers.Task().Evidences(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.EvidenceOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12181,7 +12494,7 @@ func (ec *executionContext) _Viewer_organizations(ctx context.Context, field gra
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Viewer().Organizations(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
+		return ec.resolvers.Viewer().Organizations(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.OrganizationOrder))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13982,6 +14295,40 @@ func (ec *executionContext) unmarshalInputConfirmEmailInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputControlOrder(ctx context.Context, obj any) (types.ControlOrderBy, error) {
+	var it types.ControlOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNControlOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateControlInput(ctx context.Context, obj any) (types.CreateControlInput, error) {
 	var it types.CreateControlInput
 	asMap := map[string]any{}
@@ -14529,6 +14876,74 @@ func (ec *executionContext) unmarshalInputDeleteVendorInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputEvidenceOrder(ctx context.Context, obj any) (types.EvidenceOrderBy, error) {
+	var it types.EvidenceOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNEvidenceOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputFrameworkOrder(ctx context.Context, obj any) (types.FrameworkOrderBy, error) {
+	var it types.FrameworkOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNFrameworkOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐFrameworkOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputImportFrameworkInput(ctx context.Context, obj any) (types.ImportFrameworkInput, error) {
 	var it types.ImportFrameworkInput
 	asMap := map[string]any{}
@@ -14604,6 +15019,108 @@ func (ec *executionContext) unmarshalInputInviteUserInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputOrganizationOrder(ctx context.Context, obj any) (types.OrganizationOrder, error) {
+	var it types.OrganizationOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNOrganizationOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPeopleOrder(ctx context.Context, obj any) (types.PeopleOrderBy, error) {
+	var it types.PeopleOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPolicyOrder(ctx context.Context, obj any) (types.PolicyOrderBy, error) {
+	var it types.PolicyOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNPolicyOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRemoveUserInput(ctx context.Context, obj any) (types.RemoveUserInput, error) {
 	var it types.RemoveUserInput
 	asMap := map[string]any{}
@@ -14632,6 +15149,40 @@ func (ec *executionContext) unmarshalInputRemoveUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.UserID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputTaskOrder(ctx context.Context, obj any) (types.TaskOrderBy, error) {
+	var it types.TaskOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNTaskOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
 		}
 	}
 
@@ -15148,6 +15699,74 @@ func (ec *executionContext) unmarshalInputUploadEvidenceInput(ctx context.Contex
 				return it, err
 			}
 			it.File = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserOrder(ctx context.Context, obj any) (types.UserOrderBy, error) {
+	var it types.UserOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNUserOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐUserOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputVendorOrder(ctx context.Context, obj any) (types.VendorOrderBy, error) {
+	var it types.VendorOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNVendorOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
 		}
 	}
 
@@ -19047,6 +19666,22 @@ var (
 	}
 )
 
+func (ec *executionContext) unmarshalNControlOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlOrderField(ctx context.Context, v any) (coredata.ControlOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := coredata.ControlOrderField(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNControlOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.ControlOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState(ctx context.Context, v any) (coredata.ControlState, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := unmarshalNControlState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState[tmp]
@@ -19442,6 +20077,22 @@ func (ec *executionContext) marshalNEvidenceEdge2ᚖgithubᚗcomᚋgetproboᚋpr
 	return ec._EvidenceEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNEvidenceOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceOrderField(ctx context.Context, v any) (coredata.EvidenceOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := coredata.EvidenceOrderField(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNEvidenceOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.EvidenceOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceState(ctx context.Context, v any) (coredata.EvidenceState, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := unmarshalNEvidenceState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceState[tmp]
@@ -19543,6 +20194,22 @@ func (ec *executionContext) marshalNFrameworkEdge2ᚖgithubᚗcomᚋgetproboᚋp
 	return ec._FrameworkEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNFrameworkOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐFrameworkOrderField(ctx context.Context, v any) (coredata.FrameworkOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := coredata.FrameworkOrderField(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFrameworkOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐFrameworkOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.FrameworkOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, v any) (gid.GID, error) {
 	res, err := types.UnmarshalGIDScalar(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -19621,6 +20288,33 @@ func (ec *executionContext) marshalNNode2githubᚗcomᚋgetproboᚋproboᚋpkg�
 	return ec._Node(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx context.Context, v any) (page.OrderDirection, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx context.Context, sel ast.SelectionSet, v page.OrderDirection) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection = map[string]page.OrderDirection{
+		"ASC":  page.OrderDirectionAsc,
+		"DESC": page.OrderDirectionDesc,
+	}
+	marshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection = map[page.OrderDirection]string{
+		page.OrderDirectionAsc:  "ASC",
+		page.OrderDirectionDesc: "DESC",
+	}
+)
+
 func (ec *executionContext) marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx context.Context, sel ast.SelectionSet, v *types.Organization) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -19691,6 +20385,16 @@ func (ec *executionContext) marshalNOrganizationEdge2ᚖgithubᚗcomᚋgetprobo�
 		return graphql.Null
 	}
 	return ec._OrganizationEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNOrganizationOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationOrderField(ctx context.Context, v any) (types.OrganizationOrderField, error) {
+	var res types.OrganizationOrderField
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNOrganizationOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationOrderField(ctx context.Context, sel ast.SelectionSet, v types.OrganizationOrderField) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *types.PageInfo) graphql.Marshaler {
@@ -19808,6 +20512,33 @@ var (
 	}
 )
 
+func (ec *executionContext) unmarshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField(ctx context.Context, v any) (coredata.PeopleOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.PeopleOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField = map[string]coredata.PeopleOrderField{
+		"FULL_NAME":  coredata.PeopleOrderFieldFullName,
+		"CREATED_AT": coredata.PeopleOrderFieldCreatedAt,
+	}
+	marshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField = map[coredata.PeopleOrderField]string{
+		coredata.PeopleOrderFieldFullName:  "FULL_NAME",
+		coredata.PeopleOrderFieldCreatedAt: "CREATED_AT",
+	}
+)
+
 func (ec *executionContext) marshalNPolicy2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicy(ctx context.Context, sel ast.SelectionSet, v *types.Policy) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -19878,6 +20609,22 @@ func (ec *executionContext) marshalNPolicyEdge2ᚖgithubᚗcomᚋgetproboᚋprob
 		return graphql.Null
 	}
 	return ec._PolicyEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPolicyOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyOrderField(ctx context.Context, v any) (coredata.PolicyOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := coredata.PolicyOrderField(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPolicyOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.PolicyOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx context.Context, v any) (coredata.PolicyStatus, error) {
@@ -20101,6 +20848,22 @@ func (ec *executionContext) marshalNTaskEdge2ᚖgithubᚗcomᚋgetproboᚋprobo�
 		return graphql.Null
 	}
 	return ec._TaskEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNTaskOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskOrderField(ctx context.Context, v any) (coredata.TaskOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := coredata.TaskOrderField(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTaskOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.TaskOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNTaskState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState(ctx context.Context, v any) (coredata.TaskState, error) {
@@ -20388,6 +21151,31 @@ func (ec *executionContext) marshalNUserEdge2ᚖgithubᚗcomᚋgetproboᚋprobo�
 	return ec._UserEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNUserOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐUserOrderField(ctx context.Context, v any) (coredata.UserOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNUserOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐUserOrderField[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUserOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐUserOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.UserOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNUserOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐUserOrderField[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNUserOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐUserOrderField = map[string]coredata.UserOrderField{
+		"CREATED_AT": coredata.UserOrderFieldCreatedAt,
+	}
+	marshalNUserOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐUserOrderField = map[coredata.UserOrderField]string{
+		coredata.UserOrderFieldCreatedAt: "CREATED_AT",
+	}
+)
+
 func (ec *executionContext) marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx context.Context, sel ast.SelectionSet, v *types.Vendor) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -20458,6 +21246,22 @@ func (ec *executionContext) marshalNVendorEdge2ᚖgithubᚗcomᚋgetproboᚋprob
 		return graphql.Null
 	}
 	return ec._VendorEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNVendorOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorOrderField(ctx context.Context, v any) (coredata.VendorOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := coredata.VendorOrderField(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNVendorOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.VendorOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNViewer2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐViewer(ctx context.Context, sel ast.SelectionSet, v types.Viewer) graphql.Marshaler {
@@ -20759,6 +21563,14 @@ var (
 	}
 )
 
+func (ec *executionContext) unmarshalOControlOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlOrderBy(ctx context.Context, v any) (*types.ControlOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputControlOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOControlState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlState(ctx context.Context, v any) (*coredata.ControlState, error) {
 	if v == nil {
 		return nil, nil
@@ -20839,6 +21651,22 @@ func (ec *executionContext) marshalODuration2ᚖtimeᚐDuration(ctx context.Cont
 	return res
 }
 
+func (ec *executionContext) unmarshalOEvidenceOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceOrderBy(ctx context.Context, v any) (*types.EvidenceOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEvidenceOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOFrameworkOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐFrameworkOrderBy(ctx context.Context, v any) (*types.FrameworkOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputFrameworkOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, v any) (*gid.GID, error) {
 	if v == nil {
 		return nil, nil
@@ -20869,6 +21697,14 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	}
 	res := graphql.MarshalInt(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOOrganizationOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationOrder(ctx context.Context, v any) (*types.OrganizationOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputOrganizationOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx context.Context, sel ast.SelectionSet, v *types.People) graphql.Marshaler {
@@ -20907,6 +21743,22 @@ var (
 		coredata.PeopleKindServiceAccount: "SERVICE_ACCOUNT",
 	}
 )
+
+func (ec *executionContext) unmarshalOPeopleOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleOrderBy(ctx context.Context, v any) (*types.PeopleOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPeopleOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOPolicyOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyOrderBy(ctx context.Context, v any) (*types.PolicyOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPolicyOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
 
 func (ec *executionContext) unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx context.Context, v any) (*coredata.PolicyStatus, error) {
 	if v == nil {
@@ -21050,6 +21902,14 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
+func (ec *executionContext) unmarshalOTaskOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskOrderBy(ctx context.Context, v any) (*types.TaskOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputTaskOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOTaskState2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTaskState(ctx context.Context, v any) (*coredata.TaskState, error) {
 	if v == nil {
 		return nil, nil
@@ -21092,6 +21952,22 @@ func (ec *executionContext) marshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 	}
 	res := graphql.MarshalUpload(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOUserOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUserOrderBy(ctx context.Context, v any) (*types.UserOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUserOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOVendorOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorOrderBy(ctx context.Context, v any) (*types.VendorOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputVendorOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

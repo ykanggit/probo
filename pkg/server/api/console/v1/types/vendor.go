@@ -19,7 +19,11 @@ import (
 	"github.com/getprobo/probo/pkg/page"
 )
 
-func NewVendorConnection(p *page.Page[*coredata.Vendor]) *VendorConnection {
+type (
+	VendorOrderBy OrderBy[coredata.VendorOrderField]
+)
+
+func NewVendorConnection(p *page.Page[*coredata.Vendor, coredata.VendorOrderField]) *VendorConnection {
 	var edges = make([]*VendorEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +36,7 @@ func NewVendorConnection(p *page.Page[*coredata.Vendor]) *VendorConnection {
 	}
 }
 
-func NewVendorEdge(v *coredata.Vendor, orderBy page.OrderField) *VendorEdge {
+func NewVendorEdge(v *coredata.Vendor, orderBy coredata.VendorOrderField) *VendorEdge {
 	return &VendorEdge{
 		Cursor: v.CursorKey(orderBy),
 		Node:   NewVendor(v),
