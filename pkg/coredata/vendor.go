@@ -63,17 +63,15 @@ type (
 	}
 )
 
-func (v Vendor) CursorKey(orderBy page.OrderField) page.CursorKey {
+func (v Vendor) CursorKey(orderBy VendorOrderField) page.CursorKey {
 	switch orderBy {
-	case page.OrderFieldCreatedAt:
+	case VendorOrderFieldCreatedAt:
 		return page.NewCursorKey(v.ID, v.CreatedAt)
-	case page.OrderFieldUpdatedAt:
-		return page.NewCursorKey(v.ID, v.UpdatedAt)
-	case page.OrderFieldName:
+	case VendorOrderFieldName:
 		return page.NewCursorKey(v.ID, v.Name)
 	}
 
-	panic(fmt.Sprintf("unknown order by: %s", orderBy))
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
 func (v *Vendor) LoadByID(
@@ -213,7 +211,7 @@ func (v *Vendors) LoadByOrganizationID(
 	conn pg.Conn,
 	scope Scoper,
 	organizationID gid.GID,
-	cursor *page.Cursor,
+	cursor *page.Cursor[VendorOrderField],
 ) error {
 	q := `
 SELECT

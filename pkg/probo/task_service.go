@@ -185,8 +185,8 @@ func (s TaskService) Update(
 func (s TaskService) ListForControlID(
 	ctx context.Context,
 	controlID gid.GID,
-	cursor *page.Cursor,
-) (*page.Page[*coredata.Task], error) {
+	cursor *page.Cursor[coredata.TaskOrderField],
+) (*page.Page[*coredata.Task, coredata.TaskOrderField], error) {
 	var tasks coredata.Tasks
 
 	err := s.svc.pg.WithConn(

@@ -71,8 +71,8 @@ func (s PeopleService) Get(
 func (s PeopleService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
-	cursor *page.Cursor,
-) (*page.Page[*coredata.People], error) {
+	cursor *page.Cursor[coredata.PeopleOrderField],
+) (*page.Page[*coredata.People, coredata.PeopleOrderField], error) {
 	var peoples coredata.Peoples
 
 	err := s.svc.pg.WithConn(

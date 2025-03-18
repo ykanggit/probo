@@ -100,8 +100,8 @@ func (s ControlService) Update(
 func (s ControlService) ListForFrameworkID(
 	ctx context.Context,
 	frameworkID gid.GID,
-	cursor *page.Cursor,
-) (*page.Page[*coredata.Control], error) {
+	cursor *page.Cursor[coredata.ControlOrderField],
+) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
 
 	err := s.svc.pg.WithConn(

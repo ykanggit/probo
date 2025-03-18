@@ -38,8 +38,15 @@ type (
 	}
 )
 
-func (p Policy) CursorKey(orderBy page.OrderField) page.CursorKey {
-	return page.NewCursorKey(p.ID, p.CreatedAt)
+func (p Policy) CursorKey(orderBy PolicyOrderField) page.CursorKey {
+	switch orderBy {
+	case PolicyOrderFieldCreatedAt:
+		return page.NewCursorKey(p.ID, p.CreatedAt)
+	case PolicyOrderFieldName:
+		return page.NewCursorKey(p.ID, p.Name)
+	}
+
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
 func (p *Policy) LoadByID(
@@ -93,7 +100,7 @@ func (p *Policies) LoadByOrganizationID(
 	conn pg.Conn,
 	scope Scoper,
 	organizationID gid.GID,
-	cursor *page.Cursor,
+	cursor *page.Cursor[PolicyOrderField],
 ) error {
 	q := `
 SELECT

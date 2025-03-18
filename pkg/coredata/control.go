@@ -55,8 +55,13 @@ type (
 	}
 )
 
-func (c Control) CursorKey(orderBy page.OrderField) page.CursorKey {
-	return page.NewCursorKey(c.ID, c.CreatedAt)
+func (c Control) CursorKey(orderBy ControlOrderField) page.CursorKey {
+	switch orderBy {
+	case ControlOrderFieldCreatedAt:
+		return page.NewCursorKey(c.ID, c.CreatedAt)
+	}
+
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
 func (c *Control) LoadByID(
@@ -170,7 +175,7 @@ func (c *Controls) LoadByFrameworkID(
 	conn pg.Conn,
 	scope Scoper,
 	frameworkID gid.GID,
-	cursor *page.Cursor,
+	cursor *page.Cursor[ControlOrderField],
 ) error {
 	q := `
 SELECT

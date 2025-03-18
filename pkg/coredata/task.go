@@ -53,8 +53,13 @@ type (
 	}
 )
 
-func (t Task) CursorKey(orderBy page.OrderField) page.CursorKey {
-	return page.NewCursorKey(t.ID, t.CreatedAt)
+func (t Task) CursorKey(orderBy TaskOrderField) page.CursorKey {
+	switch orderBy {
+	case TaskOrderFieldCreatedAt:
+		return page.NewCursorKey(t.ID, t.CreatedAt)
+	}
+
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
 func (t *Task) LoadByID(
@@ -163,7 +168,7 @@ func (t *Tasks) LoadByControlID(
 	conn pg.Conn,
 	scope Scoper,
 	controlID gid.GID,
-	cursor *page.Cursor,
+	cursor *page.Cursor[TaskOrderField],
 ) error {
 	q := `
 SELECT

@@ -59,15 +59,20 @@ func (e ErrUserAlreadyExists) Error() string {
 	return e.message
 }
 
-func (u User) CursorKey(orderBy page.OrderField) page.CursorKey {
-	return page.NewCursorKey(u.ID, u.CreatedAt)
+func (u User) CursorKey(orderBy UserOrderField) page.CursorKey {
+	switch orderBy {
+	case UserOrderFieldCreatedAt:
+		return page.NewCursorKey(u.ID, u.CreatedAt)
+	}
+
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
 func (u *Users) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
 	organizationID gid.GID,
-	cursor *page.Cursor,
+	cursor *page.Cursor[UserOrderField],
 ) error {
 	q := `
 SELECT

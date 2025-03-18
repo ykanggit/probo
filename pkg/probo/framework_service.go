@@ -106,8 +106,8 @@ func (s FrameworkService) Create(
 func (s FrameworkService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
-	cursor *page.Cursor,
-) (*page.Page[*coredata.Framework], error) {
+	cursor *page.Cursor[coredata.FrameworkOrderField],
+) (*page.Page[*coredata.Framework, coredata.FrameworkOrderField], error) {
 	var frameworks coredata.Frameworks
 
 	err := s.svc.pg.WithConn(

@@ -15,8 +15,8 @@
 package page
 
 type (
-	Paginable interface {
-		CursorKey(orderBy OrderField) CursorKey
+	Paginable[T OrderField] interface {
+		CursorKey(orderBy T) CursorKey
 	}
 
 	PageInfo struct {
@@ -24,14 +24,14 @@ type (
 		HasPrev bool
 	}
 
-	Page[T Paginable] struct {
+	Page[T Paginable[U], U OrderField] struct {
 		Info   *PageInfo
-		Cursor *Cursor
+		Cursor *Cursor[U]
 		Data   []T
 	}
 )
 
-func (p *Page[T]) First() T {
+func (p *Page[T, U]) First() T {
 	if len(p.Data) == 0 {
 		var zero T
 		return zero
@@ -40,7 +40,7 @@ func (p *Page[T]) First() T {
 	return p.Data[0]
 }
 
-func (p *Page[T]) Last() T {
+func (p *Page[T, U]) Last() T {
 	if len(p.Data) == 0 {
 		var zero T
 		return zero
@@ -49,11 +49,11 @@ func (p *Page[T]) Last() T {
 	return p.Data[len(p.Data)-1]
 }
 
-func NewPage[T Paginable](data []T, c *Cursor) *Page[T] {
+func NewPage[T Paginable[U], U OrderField](data []T, c *Cursor[U]) *Page[T, U] {
 	pi := &PageInfo{}
 
 	if len(data) == 0 {
-		return &Page[T]{
+		return &Page[T, U]{
 			Info: pi,
 			Data: data,
 		}
@@ -109,7 +109,7 @@ func NewPage[T Paginable](data []T, c *Cursor) *Page[T] {
 		}
 	}
 
-	return &Page[T]{
+	return &Page[T, U]{
 		Info:   pi,
 		Cursor: c,
 		Data:   edges,

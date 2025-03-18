@@ -47,8 +47,13 @@ type (
 	}
 )
 
-func (f Framework) CursorKey(orderBy page.OrderField) page.CursorKey {
-	return page.NewCursorKey(f.ID, f.CreatedAt)
+func (f Framework) CursorKey(orderBy FrameworkOrderField) page.CursorKey {
+	switch orderBy {
+	case FrameworkOrderFieldCreatedAt:
+		return page.NewCursorKey(f.ID, f.CreatedAt)
+	}
+
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
 func (f *Frameworks) LoadByOrganizationID(
@@ -56,7 +61,7 @@ func (f *Frameworks) LoadByOrganizationID(
 	conn pg.Conn,
 	scope Scoper,
 	organizationID gid.GID,
-	cursor *page.Cursor,
+	cursor *page.Cursor[FrameworkOrderField],
 ) error {
 	q := `
 SELECT

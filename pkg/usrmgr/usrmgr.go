@@ -511,8 +511,8 @@ func (s Service) ConfirmEmail(ctx context.Context, tokenString string) error {
 func (s Service) ListUsersForTenant(
 	ctx context.Context,
 	organizationID gid.GID,
-	cursor *page.Cursor,
-) (*page.Page[*coredata.User], error) {
+	cursor *page.Cursor[coredata.UserOrderField],
+) (*page.Page[*coredata.User, coredata.UserOrderField], error) {
 	users := coredata.Users{}
 
 	err := s.pg.WithConn(

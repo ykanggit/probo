@@ -42,8 +42,13 @@ type (
 	Evidences []*Evidence
 )
 
-func (e Evidence) CursorKey(orderBy page.OrderField) page.CursorKey {
-	return page.NewCursorKey(e.ID, e.CreatedAt)
+func (e Evidence) CursorKey(orderBy EvidenceOrderField) page.CursorKey {
+	switch orderBy {
+	case EvidenceOrderFieldCreatedAt:
+		return page.NewCursorKey(e.ID, e.CreatedAt)
+	}
+
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
 func (e Evidence) Insert(
@@ -145,7 +150,7 @@ func (e *Evidences) LoadByTaskID(
 	conn pg.Conn,
 	scope Scoper,
 	taskID gid.GID,
-	cursor *page.Cursor,
+	cursor *page.Cursor[EvidenceOrderField],
 ) error {
 	q := `
 SELECT

@@ -145,8 +145,8 @@ func (s *PolicyService) Delete(
 func (s *PolicyService) ListByOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
-	cursor *page.Cursor,
-) (*page.Page[*coredata.Policy], error) {
+	cursor *page.Cursor[coredata.PolicyOrderField],
+) (*page.Page[*coredata.Policy, coredata.PolicyOrderField], error) {
 	var policies coredata.Policies
 
 	err := s.svc.pg.WithConn(

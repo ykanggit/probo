@@ -12,15 +12,29 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package page
-
-import (
-	"fmt"
-)
+package coredata
 
 type (
-	OrderField interface {
-		Column() string
-		fmt.Stringer
-	}
+	TaskOrderField string
 )
+
+const (
+	TaskOrderFieldCreatedAt TaskOrderField = "CREATED_AT"
+)
+
+func (p TaskOrderField) Column() string {
+	return string(p)
+}
+
+func (p TaskOrderField) String() string {
+	return string(p)
+}
+
+func (p TaskOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *TaskOrderField) UnmarshalText(text []byte) error {
+	*p = TaskOrderField(text)
+	return nil
+}

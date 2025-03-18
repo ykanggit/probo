@@ -50,8 +50,15 @@ type (
 	}
 )
 
-func (p People) CursorKey(orderBy page.OrderField) page.CursorKey {
-	return page.NewCursorKey(p.ID, p.CreatedAt)
+func (p People) CursorKey(orderBy PeopleOrderField) page.CursorKey {
+	switch orderBy {
+	case PeopleOrderFieldCreatedAt:
+		return page.NewCursorKey(p.ID, p.CreatedAt)
+	case PeopleOrderFieldFullName:
+		return page.NewCursorKey(p.ID, p.FullName)
+	}
+
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
 func (p *People) LoadByID(
@@ -171,8 +178,9 @@ func (p *Peoples) LoadByOrganizationID(
 	conn pg.Conn,
 	scope Scoper,
 	organizationID gid.GID,
-	cursor *page.Cursor,
+	cursor *page.Cursor[PeopleOrderField],
 ) error {
+	// Base query
 	q := `
 SELECT
     id,

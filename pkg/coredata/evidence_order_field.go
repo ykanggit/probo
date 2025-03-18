@@ -12,15 +12,29 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package page
-
-import (
-	"fmt"
-)
+package coredata
 
 type (
-	OrderField interface {
-		Column() string
-		fmt.Stringer
-	}
+	EvidenceOrderField string
 )
+
+const (
+	EvidenceOrderFieldCreatedAt EvidenceOrderField = "CREATED_AT"
+)
+
+func (p EvidenceOrderField) Column() string {
+	return string(p)
+}
+
+func (p EvidenceOrderField) String() string {
+	return string(p)
+}
+
+func (p EvidenceOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *EvidenceOrderField) UnmarshalText(text []byte) error {
+	*p = EvidenceOrderField(text)
+	return nil
+}

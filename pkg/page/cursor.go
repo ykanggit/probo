@@ -19,17 +19,17 @@ import (
 )
 
 type (
-	Cursor struct {
+	Cursor[T OrderField] struct {
 		Size     int
 		Position Position
 		Key      *CursorKey
-		OrderBy  OrderBy
+		OrderBy  OrderBy[T]
 	}
 
 	Position string
 
-	OrderBy struct {
-		Field     OrderField
+	OrderBy[T OrderField] struct {
+		Field     T
 		Direction OrderDirection
 	}
 )
@@ -41,27 +41,20 @@ const (
 	Head Position = "HEAD"
 )
 
-func NewCursor(size int, from *CursorKey, pos Position, orderBy *OrderBy) *Cursor {
+func NewCursor[T OrderField](size int, from *CursorKey, pos Position, orderBy OrderBy[T]) *Cursor[T] {
 	if size == 0 {
 		size = DefaultCursorSize
 	}
 
-	if orderBy == nil {
-		orderBy = &OrderBy{
-			Field:     OrderFieldCreatedAt,
-			Direction: OrderDirectionDesc,
-		}
-	}
-
-	return &Cursor{
+	return &Cursor[T]{
 		Size:     size,
 		Key:      from,
 		Position: pos,
-		OrderBy:  *orderBy,
+		OrderBy:  orderBy,
 	}
 }
 
-func (c *Cursor) SQLFragment() string {
+func (c *Cursor[T]) SQLFragment() string {
 	fieldName := c.OrderBy.Field.Column()
 
 	var orderDirection string
@@ -88,7 +81,7 @@ func (c *Cursor) SQLFragment() string {
 	return whereClause + " ORDER BY " + orderByClause + " LIMIT @cursor_limit"
 }
 
-func (c *Cursor) SQLArguments() pgx.NamedArgs {
+func (c *Cursor[T]) SQLArguments() pgx.NamedArgs {
 	var size = c.Size
 	if c.Key == nil {
 		size += 1

@@ -171,8 +171,8 @@ func (s EvidenceService) GenerateFileURL(
 func (s EvidenceService) ListForTaskID(
 	ctx context.Context,
 	taskID gid.GID,
-	cursor *page.Cursor,
-) (*page.Page[*coredata.Evidence], error) {
+	cursor *page.Cursor[coredata.EvidenceOrderField],
+) (*page.Page[*coredata.Evidence, coredata.EvidenceOrderField], error) {
 	var evidences coredata.Evidences
 
 	err := s.svc.pg.WithConn(

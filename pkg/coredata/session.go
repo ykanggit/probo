@@ -38,8 +38,13 @@ type (
 	SessionData struct{}
 )
 
-func (s Session) CursorKey(orderBy page.OrderField) page.CursorKey {
-	return page.NewCursorKey(s.ID, s.CreatedAt)
+func (s Session) CursorKey(orderBy SessionOrderField) page.CursorKey {
+	switch orderBy {
+	case SessionOrderFieldCreatedAt:
+		return page.NewCursorKey(s.ID, s.CreatedAt)
+	}
+
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
 func (s *Session) LoadByID(

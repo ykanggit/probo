@@ -61,8 +61,8 @@ type (
 func (s VendorService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
-	cursor *page.Cursor,
-) (*page.Page[*coredata.Vendor], error) {
+	cursor *page.Cursor[coredata.VendorOrderField],
+) (*page.Page[*coredata.Vendor, coredata.VendorOrderField], error) {
 	var vendors coredata.Vendors
 
 	err := s.svc.pg.WithConn(
