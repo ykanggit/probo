@@ -144,6 +144,7 @@ func (s ControlService) Create(
 		State:       coredata.ControlStateNotStarted,
 		Importance:  req.Importance,
 		ContentRef:  req.ContentRef,
+		Standards:   []string{},
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
