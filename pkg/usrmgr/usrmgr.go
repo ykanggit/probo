@@ -32,10 +32,11 @@ import (
 
 type (
 	Service struct {
-		pg          *pg.Client
-		hp          *passwdhash.Profile
-		hostname    string
-		tokenSecret string
+		pg            *pg.Client
+		hp            *passwdhash.Profile
+		hostname      string
+		tokenSecret   string
+		disableSignup bool
 	}
 
 	ErrInvalidCredentials struct {
@@ -69,6 +70,8 @@ type (
 	ErrInvalidTokenType struct {
 		message string
 	}
+
+	ErrSignupDisabled struct{}
 
 	EmailConfirmationData struct {
 		UserID gid.GID `json:"uid"`
@@ -138,18 +141,24 @@ func (e ErrInvalidTokenType) Error() string {
 	return e.message
 }
 
+func (e ErrSignupDisabled) Error() string {
+	return "signup is disabled, contact the owner of the Probo instance"
+}
+
 func NewService(
 	ctx context.Context,
 	pgClient *pg.Client,
 	hp *passwdhash.Profile,
 	tokenSecret string,
 	hostname string,
+	disableSignup bool,
 ) (*Service, error) {
 	return &Service{
-		pg:          pgClient,
-		hp:          hp,
-		hostname:    hostname,
-		tokenSecret: tokenSecret,
+		pg:            pgClient,
+		hp:            hp,
+		hostname:      hostname,
+		tokenSecret:   tokenSecret,
+		disableSignup: disableSignup,
 	}, nil
 }
 
@@ -157,6 +166,10 @@ func (s Service) SignUp(
 	ctx context.Context,
 	email, password, fullName string,
 ) (*coredata.User, *coredata.Session, error) {
+	if s.disableSignup {
+		return nil, nil, &ErrSignupDisabled{}
+	}
+
 	if !strings.Contains(email, "@") {
 		return nil, nil, &ErrInvalidEmail{email}
 	}

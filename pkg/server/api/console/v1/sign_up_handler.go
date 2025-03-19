@@ -59,6 +59,12 @@ func SignUpHandler(usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.HandlerFu
 				return
 			}
 
+			var errSignupDisabled *usrmgr.ErrSignupDisabled
+			if errors.As(err, &errSignupDisabled) {
+				httpserver.RenderError(w, http.StatusBadRequest, fmt.Errorf("cannot register user: %w", err))
+				return
+			}
+
 			panic(fmt.Errorf("cannot register user: %w", err))
 		}
 

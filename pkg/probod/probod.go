@@ -87,6 +87,7 @@ func New() *Implm {
 					Duration: 24,
 					Domain:   "localhost",
 				},
+				DisableSignup: false,
 			},
 			AWS: awsConfig{
 				Region: "us-east-1",
@@ -172,6 +173,7 @@ func (impl *Implm) Run(
 		hp,
 		impl.cfg.Auth.Cookie.Secret,
 		impl.cfg.Hostname,
+		impl.cfg.Auth.DisableSignup,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot create usrmgr service: %w", err)
