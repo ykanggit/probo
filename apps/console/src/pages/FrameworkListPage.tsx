@@ -5,6 +5,7 @@ import {
   usePreloadedQuery,
   useQueryLoader,
   useMutation,
+  ConnectionHandler,
 } from "react-relay";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useParams } from "react-router";
@@ -57,9 +58,10 @@ const FrameworkListPageQuery = graphql`
 const FrameworkListPageImportFrameworkMutation = graphql`
   mutation FrameworkListPageImportFrameworkMutation(
     $input: ImportFrameworkInput!
+    $connections: [ID!]!
   ) {
     importFramework(input: $input) {
-      frameworkEdge {
+      frameworkEdge @prependEdge(connections: $connections) {
         node {
           id
           name
@@ -151,6 +153,12 @@ function FrameworkListPageContent({
 
     importFramework({
       variables: {
+        connections: [
+          ConnectionHandler.getConnectionID(
+            organizationId!,
+            "FrameworkListPage_frameworks"
+          ),
+        ],
         input: {
           organizationId: organizationId!,
           file: null,
