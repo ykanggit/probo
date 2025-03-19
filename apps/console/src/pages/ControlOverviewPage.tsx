@@ -186,6 +186,7 @@ const createTaskMutation = graphql`
           description
           timeEstimate
           state
+          version
           assignedTo {
             id
             fullName
