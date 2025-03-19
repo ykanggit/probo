@@ -74,6 +74,7 @@ export default function ConfirmInvitationPage() {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({
             token: token.trim(),
             password: password,
