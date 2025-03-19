@@ -625,7 +625,6 @@ function ControlOverviewPageContent({
       });
       return;
     }
-
     // Convert the time estimate components to ISO 8601 format
     const isoTimeEstimate = convertToISODuration();
 
@@ -636,7 +635,7 @@ function ControlOverviewPageContent({
           controlId: data.control.id,
           name: newTaskName,
           description: newTaskDescription,
-          timeEstimate: isoTimeEstimate,
+          timeEstimate: isoTimeEstimate === "" ? null : isoTimeEstimate,
         },
       },
       onCompleted: () => {

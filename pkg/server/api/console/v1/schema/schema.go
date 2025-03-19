@@ -2477,7 +2477,7 @@ type Task implements Node {
   name: String!
   description: String!
   state: TaskState!
-  timeEstimate: Duration!
+  timeEstimate: Duration
   assignedTo: People @goField(forceResolver: true)
 
   evidences(
@@ -2724,7 +2724,7 @@ input CreateTaskInput {
   controlId: ID!
   name: String!
   description: String!
-  timeEstimate: Duration!
+  timeEstimate: Duration
   assignedToId: ID
 }
 
@@ -10441,14 +10441,11 @@ func (ec *executionContext) _Task_timeEstimate(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(time.Duration)
+	res := resTmp.(*time.Duration)
 	fc.Result = res
-	return ec.marshalNDuration2timeᚐDuration(ctx, field.Selections, res)
+	return ec.marshalODuration2ᚖtimeᚐDuration(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Task_timeEstimate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14606,7 +14603,7 @@ func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, o
 			it.Description = data
 		case "timeEstimate":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timeEstimate"))
-			data, err := ec.unmarshalNDuration2timeᚐDuration(ctx, v)
+			data, err := ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18246,9 +18243,6 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "timeEstimate":
 			out.Values[i] = ec._Task_timeEstimate(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "assignedTo":
 			field := field
 
@@ -19988,21 +19982,6 @@ func (ec *executionContext) marshalNDeleteVendorPayload2ᚖgithubᚗcomᚋgetpro
 		return graphql.Null
 	}
 	return ec._DeleteVendorPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNDuration2timeᚐDuration(ctx context.Context, v any) (time.Duration, error) {
-	res, err := graphql.UnmarshalDuration(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNDuration2timeᚐDuration(ctx context.Context, sel ast.SelectionSet, v time.Duration) graphql.Marshaler {
-	res := graphql.MarshalDuration(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
 }
 
 func (ec *executionContext) marshalNEvidence2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidence(ctx context.Context, sel ast.SelectionSet, v *types.Evidence) graphql.Marshaler {

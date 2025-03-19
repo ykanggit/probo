@@ -35,7 +35,7 @@ type (
 		Name         string
 		ContentRef   string
 		Description  string
-		TimeEstimate time.Duration
+		TimeEstimate *time.Duration
 		AssignedTo   *gid.GID
 	}
 

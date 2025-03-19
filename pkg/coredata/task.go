@@ -29,17 +29,17 @@ import (
 
 type (
 	Task struct {
-		ID           gid.GID       `db:"id"`
-		ControlID    gid.GID       `db:"control_id"`
-		Name         string        `db:"name"`
-		Description  string        `db:"description"`
-		State        TaskState     `db:"state"`
-		ContentRef   string        `db:"content_ref"`
-		CreatedAt    time.Time     `db:"created_at"`
-		UpdatedAt    time.Time     `db:"updated_at"`
-		Version      int           `db:"version"`
-		AssignedTo   *gid.GID      `db:"assigned_to"`
-		TimeEstimate time.Duration `db:"time_estimate"`
+		ID           gid.GID        `db:"id"`
+		ControlID    gid.GID        `db:"control_id"`
+		Name         string         `db:"name"`
+		Description  string         `db:"description"`
+		State        TaskState      `db:"state"`
+		ContentRef   string         `db:"content_ref"`
+		CreatedAt    time.Time      `db:"created_at"`
+		UpdatedAt    time.Time      `db:"updated_at"`
+		Version      int            `db:"version"`
+		AssignedTo   *gid.GID       `db:"assigned_to"`
+		TimeEstimate *time.Duration `db:"time_estimate"`
 	}
 
 	Tasks []*Task

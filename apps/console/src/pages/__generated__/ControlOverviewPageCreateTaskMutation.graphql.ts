@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f972be1746bd5bb9d5100845096188f8>>
+ * @generated SignedSource<<318d80720efe2f6e610353e3a640d786>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,7 +15,7 @@ export type CreateTaskInput = {
   controlId: string;
   description: string;
   name: string;
-  timeEstimate: any;
+  timeEstimate?: any | null | undefined;
 };
 export type ControlOverviewPageCreateTaskMutation$variables = {
   connections: ReadonlyArray<string>;
@@ -34,7 +34,7 @@ export type ControlOverviewPageCreateTaskMutation$data = {
         readonly id: string;
         readonly name: string;
         readonly state: TaskState;
-        readonly timeEstimate: any;
+        readonly timeEstimate: any | null | undefined;
         readonly version: number;
       };
     };

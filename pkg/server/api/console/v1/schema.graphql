@@ -386,7 +386,7 @@ type Task implements Node {
   name: String!
   description: String!
   state: TaskState!
-  timeEstimate: Duration!
+  timeEstimate: Duration
   assignedTo: People @goField(forceResolver: true)
 
   evidences(
@@ -633,7 +633,7 @@ input CreateTaskInput {
   controlId: ID!
   name: String!
   description: String!
-  timeEstimate: Duration!
+  timeEstimate: Duration
   assignedToId: ID
 }
 

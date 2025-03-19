@@ -118,11 +118,11 @@ type CreatePolicyPayload struct {
 }
 
 type CreateTaskInput struct {
-	ControlID    gid.GID       `json:"controlId"`
-	Name         string        `json:"name"`
-	Description  string        `json:"description"`
-	TimeEstimate time.Duration `json:"timeEstimate"`
-	AssignedToID *gid.GID      `json:"assignedToId,omitempty"`
+	ControlID    gid.GID        `json:"controlId"`
+	Name         string         `json:"name"`
+	Description  string         `json:"description"`
+	TimeEstimate *time.Duration `json:"timeEstimate,omitempty"`
+	AssignedToID *gid.GID       `json:"assignedToId,omitempty"`
 }
 
 type CreateTaskPayload struct {
@@ -373,7 +373,7 @@ type Task struct {
 	Name         string              `json:"name"`
 	Description  string              `json:"description"`
 	State        coredata.TaskState  `json:"state"`
-	TimeEstimate time.Duration       `json:"timeEstimate"`
+	TimeEstimate *time.Duration      `json:"timeEstimate,omitempty"`
 	AssignedTo   *People             `json:"assignedTo,omitempty"`
 	Evidences    *EvidenceConnection `json:"evidences"`
 	CreatedAt    time.Time           `json:"createdAt"`

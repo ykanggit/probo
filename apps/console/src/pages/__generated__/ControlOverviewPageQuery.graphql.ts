@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<84b34aa7e582728a8386d1fe1ef3fb58>>
+ * @generated SignedSource<<084485ae03f7089bfdee310d631b01eb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -50,7 +50,7 @@ export type ControlOverviewPageQuery$data = {
           readonly id: string;
           readonly name: string;
           readonly state: TaskState;
-          readonly timeEstimate: any;
+          readonly timeEstimate: any | null | undefined;
           readonly version: number;
         };
       }>;

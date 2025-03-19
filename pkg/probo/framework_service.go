@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"time"
 
+	"gearno.de/ref"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
@@ -241,16 +242,21 @@ func (s FrameworkService) Import(
 				return nil, fmt.Errorf("cannot create global id: %w", err)
 			}
 
+			var timeEstimate *time.Duration
+			if task.TimeEstimate > 0 {
+				timeEstimate = ref.Ref(time.Duration(task.TimeEstimate) * time.Second)
+			}
+
 			importedTasks = append(importedTasks, &coredata.Task{
 				ID:           taskID,
 				ControlID:    controlID,
 				Name:         task.Name,
-				TimeEstimate: time.Duration(task.TimeEstimate) * time.Second,
 				State:        coredata.TaskStateTodo,
 				Description:  task.Description,
 				ContentRef:   "",
 				CreatedAt:    now,
 				UpdatedAt:    now,
+				TimeEstimate: timeEstimate,
 			})
 		}
 	}
