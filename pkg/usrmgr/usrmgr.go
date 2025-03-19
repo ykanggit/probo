@@ -585,7 +585,7 @@ func (s Service) InviteUser(
 	confirmationToken, err := statelesstoken.NewToken(
 		s.tokenSecret,
 		TokenTypeOrganizationInvitation,
-		1*time.Hour,
+		12*time.Hour,
 		InvitationData{OrganizationID: organizationID, Email: emailAddress, FullName: fullName},
 	)
 	if err != nil {
