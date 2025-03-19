@@ -36,6 +36,7 @@ export default function LoginPage() {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({ email, password }),
         }
       );
@@ -44,6 +45,8 @@ export default function LoginPage() {
         const error = await response.json();
         throw new Error(error.message || "Failed to login");
       }
+
+      navigate("/", { replace: true });
     } catch (error: unknown) {
       toast({
         title: "Error",
@@ -53,8 +56,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-
-    navigate("/");
   };
 
   return (
