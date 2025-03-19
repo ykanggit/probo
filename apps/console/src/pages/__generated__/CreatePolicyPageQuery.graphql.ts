@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8bfccae4e1629a74d3651300b7f45768>>
+ * @generated SignedSource<<21831aed35a902922b54a96fcb5c8272>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -57,6 +57,14 @@ v4 = [
     "kind": "Literal",
     "name": "first",
     "value": 100
+  },
+  {
+    "kind": "Literal",
+    "name": "orderBy",
+    "value": {
+      "direction": "ASC",
+      "field": "FULL_NAME"
+    }
   }
 ];
 return {
@@ -184,12 +192,14 @@ return {
                     "storageKey": null
                   }
                 ],
-                "storageKey": "peoples(first:100)"
+                "storageKey": "peoples(first:100,orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
               },
               {
                 "alias": null,
                 "args": (v4/*: any*/),
-                "filters": null,
+                "filters": [
+                  "orderBy"
+                ],
                 "handle": "connection",
                 "key": "PeopleSelector_organization_peoples",
                 "kind": "LinkedHandle",
@@ -205,12 +215,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "cb5621c91f5548cd81c31d40b51ac894",
+    "cacheID": "e9d10cdbee082ff5e5f311b547bbc73d",
     "id": null,
     "metadata": {},
     "name": "CreatePolicyPageQuery",
     "operationKind": "query",
-    "text": "query CreatePolicyPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query CreatePolicyPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();

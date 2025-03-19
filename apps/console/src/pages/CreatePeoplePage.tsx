@@ -93,15 +93,33 @@ function CreatePeoplePageContent() {
         connections: [
           ConnectionHandler.getConnectionID(
             organizationId!,
-            "PeopleListPage_peoples"
+            "PeopleListPage_peoples",
+            {
+              orderBy: {
+                direction: "ASC",
+                field: "FULL_NAME",
+              },
+            }
           ),
           ConnectionHandler.getConnectionID(
             organizationId!,
-            "PeopleSelector_organization_peoples"
+            "PeopleSelector_organization_peoples",
+            {
+              orderBy: {
+                direction: "ASC",
+                field: "FULL_NAME",
+              },
+            }
           ),
           ConnectionHandler.getConnectionID(
             organizationId!,
-            "ControlOverviewPage_peoples"
+            "ControlOverviewPage_peoples",
+            {
+              orderBy: {
+                direction: "ASC",
+                field: "FULL_NAME",
+              },
+            }
           ),
         ],
         input: {

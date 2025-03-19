@@ -47,8 +47,13 @@ const peopleListFragment = graphql`
     before: { type: "CursorKey" }
   ) {
     id
-    peoples(first: $first, after: $after, last: $last, before: $before)
-      @connection(key: "PeopleListPage_peoples") {
+    peoples(
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+      orderBy: { direction: ASC, field: FULL_NAME }
+    ) @connection(key: "PeopleListPage_peoples") {
       __id
       edges {
         node {

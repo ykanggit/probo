@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<50244c085e737eefef310f74fe8808a3>>
+ * @generated SignedSource<<b005acefd80f6091d29b4e095f4d271c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -54,13 +54,21 @@ v2 = {
   "storageKey": null
 },
 v3 = {
+  "kind": "Literal",
+  "name": "orderBy",
+  "value": {
+    "direction": "ASC",
+    "field": "FULL_NAME"
+  }
+},
+v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v4 = [
+v5 = [
   {
     "alias": null,
     "args": null,
@@ -92,7 +100,7 @@ v4 = [
             "name": "primaryEmailAddress",
             "storageKey": null
           },
-          (v3/*: any*/)
+          (v4/*: any*/)
         ],
         "storageKey": null
       },
@@ -132,12 +140,13 @@ v4 = [
     "storageKey": null
   }
 ],
-v5 = [
+v6 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 100
-  }
+  },
+  (v3/*: any*/)
 ];
 return {
   "fragment": {
@@ -160,13 +169,15 @@ return {
             "selections": [
               {
                 "alias": "peoples",
-                "args": null,
+                "args": [
+                  (v3/*: any*/)
+                ],
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
                 "name": "__ControlOverviewPage_peoples_connection",
                 "plural": false,
-                "selections": (v4/*: any*/),
-                "storageKey": null
+                "selections": (v5/*: any*/),
+                "storageKey": "__ControlOverviewPage_peoples_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
               }
             ],
             "type": "Organization",
@@ -193,25 +204,27 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v3/*: any*/),
+          (v4/*: any*/),
           (v2/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v5/*: any*/),
+                "args": (v6/*: any*/),
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
                 "name": "peoples",
                 "plural": false,
-                "selections": (v4/*: any*/),
-                "storageKey": "peoples(first:100)"
+                "selections": (v5/*: any*/),
+                "storageKey": "peoples(first:100,orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
               },
               {
                 "alias": null,
-                "args": (v5/*: any*/),
-                "filters": null,
+                "args": (v6/*: any*/),
+                "filters": [
+                  "orderBy"
+                ],
                 "handle": "connection",
                 "key": "ControlOverviewPage_peoples",
                 "kind": "LinkedHandle",
@@ -227,7 +240,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "2a407ffb628c6c0465efe741ba990440",
+    "cacheID": "b92e9c3fbb4dcdb62652d4f9dd9f3712",
     "id": null,
     "metadata": {
       "connection": [
@@ -244,11 +257,11 @@ return {
     },
     "name": "ControlOverviewPageOrganizationQuery",
     "operationKind": "query",
-    "text": "query ControlOverviewPageOrganizationQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      peoples(first: 100) {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOverviewPageOrganizationQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ba314af121e5a3d44f9001a7ada7a89a";
+(node as any).hash = "215186695662d7c8344e35b1f053ee5f";
 
 export default node;

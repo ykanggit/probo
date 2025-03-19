@@ -12,7 +12,7 @@ import { PeopleSelector_organization$key } from "./__generated__/PeopleSelector_
 const peopleSelectorFragment = graphql`
   fragment PeopleSelector_organization on Organization {
     id
-    peoples(first: 100)
+    peoples(first: 100, orderBy: { direction: ASC, field: FULL_NAME })
       @connection(key: "PeopleSelector_organization_peoples") {
       edges {
         node {

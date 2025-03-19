@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<78caa409132a5db72b83629bdcd023d5>>
+ * @generated SignedSource<<a048edd52203c53c6736b800456816b0>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -56,7 +56,16 @@ return {
     (v0/*: any*/),
     {
       "alias": "peoples",
-      "args": null,
+      "args": [
+        {
+          "kind": "Literal",
+          "name": "orderBy",
+          "value": {
+            "direction": "ASC",
+            "field": "FULL_NAME"
+          }
+        }
+      ],
       "concreteType": "PeopleConnection",
       "kind": "LinkedField",
       "name": "__PeopleSelector_organization_peoples_connection",
@@ -139,7 +148,7 @@ return {
           "storageKey": null
         }
       ],
-      "storageKey": null
+      "storageKey": "__PeopleSelector_organization_peoples_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
     }
   ],
   "type": "Organization",
@@ -147,6 +156,6 @@ return {
 };
 })();
 
-(node as any).hash = "ed86f67795b049ec359cb7e5e55500a0";
+(node as any).hash = "77094e387ff3e5dca822fc2360094744";
 
 export default node;

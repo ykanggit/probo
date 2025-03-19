@@ -101,7 +101,7 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 		return nil, fmt.Errorf("cannot create vendor: %w", err)
 	}
 	return &types.CreateVendorPayload{
-		VendorEdge: types.NewVendorEdge(vendor, coredata.VendorOrderFieldCreatedAt),
+		VendorEdge: types.NewVendorEdge(vendor, coredata.VendorOrderFieldName),
 	}, nil
 }
 
@@ -162,7 +162,7 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 	}
 
 	return &types.CreatePeoplePayload{
-		PeopleEdge: types.NewPeopleEdge(people, coredata.PeopleOrderFieldCreatedAt),
+		PeopleEdge: types.NewPeopleEdge(people, coredata.PeopleOrderFieldFullName),
 	}, nil
 }
 

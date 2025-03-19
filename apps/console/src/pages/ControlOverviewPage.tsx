@@ -303,7 +303,8 @@ const organizationQuery = graphql`
     organization: node(id: $organizationId) {
       id
       ... on Organization {
-        peoples(first: 100) @connection(key: "ControlOverviewPage_peoples") {
+        peoples(first: 100, orderBy: { direction: ASC, field: FULL_NAME })
+          @connection(key: "ControlOverviewPage_peoples") {
           edges {
             node {
               id

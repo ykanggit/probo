@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7b013568b7e507b2394323b6cdc4d8ba>>
+ * @generated SignedSource<<0ee0955e5b5136c90cd3230dd2f10163>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -143,6 +143,14 @@ v8 = [
     "kind": "Literal",
     "name": "first",
     "value": 100
+  },
+  {
+    "kind": "Literal",
+    "name": "orderBy",
+    "value": {
+      "direction": "ASC",
+      "field": "FULL_NAME"
+    }
   }
 ];
 return {
@@ -297,12 +305,14 @@ return {
                     "storageKey": null
                   }
                 ],
-                "storageKey": "peoples(first:100)"
+                "storageKey": "peoples(first:100,orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
               },
               {
                 "alias": null,
                 "args": (v8/*: any*/),
-                "filters": null,
+                "filters": [
+                  "orderBy"
+                ],
                 "handle": "connection",
                 "key": "PeopleSelector_organization_peoples",
                 "kind": "LinkedHandle",
@@ -318,12 +328,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "48cf7497849c327c91bff96c755645eb",
+    "cacheID": "09418de2f0938515d2f5f67876a1cfaf",
     "id": null,
     "metadata": {},
     "name": "UpdatePolicyPageQuery",
     "operationKind": "query",
-    "text": "query UpdatePolicyPageQuery(\n  $policyId: ID!\n  $organizationId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      status\n      version\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query UpdatePolicyPageQuery(\n  $policyId: ID!\n  $organizationId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      status\n      version\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3ec4010fd3555afec49db0fa22557dd8>>
+ * @generated SignedSource<<0e769620c683a087fc071d47649f3ed3>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -60,42 +60,54 @@ v5 = [
     "variableName": "organizationId"
   }
 ],
-v6 = [
-  {
-    "kind": "Variable",
-    "name": "after",
-    "variableName": "after"
-  },
-  {
-    "kind": "Variable",
-    "name": "before",
-    "variableName": "before"
-  },
-  {
-    "kind": "Variable",
-    "name": "first",
-    "variableName": "first"
-  },
-  {
-    "kind": "Variable",
-    "name": "last",
-    "variableName": "last"
-  }
-],
+v6 = {
+  "kind": "Variable",
+  "name": "after",
+  "variableName": "after"
+},
 v7 = {
+  "kind": "Variable",
+  "name": "before",
+  "variableName": "before"
+},
+v8 = {
+  "kind": "Variable",
+  "name": "first",
+  "variableName": "first"
+},
+v9 = {
+  "kind": "Variable",
+  "name": "last",
+  "variableName": "last"
+},
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v8 = {
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
-};
+},
+v12 = [
+  (v6/*: any*/),
+  (v7/*: any*/),
+  (v8/*: any*/),
+  (v9/*: any*/),
+  {
+    "kind": "Literal",
+    "name": "orderBy",
+    "value": {
+      "direction": "ASC",
+      "field": "FULL_NAME"
+    }
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": [
@@ -118,7 +130,12 @@ return {
         "plural": false,
         "selections": [
           {
-            "args": (v6/*: any*/),
+            "args": [
+              (v6/*: any*/),
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/)
+            ],
             "kind": "FragmentSpread",
             "name": "PeopleListPage_peoples"
           }
@@ -149,14 +166,14 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v7/*: any*/),
-          (v8/*: any*/),
+          (v10/*: any*/),
+          (v11/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v6/*: any*/),
+                "args": (v12/*: any*/),
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
                 "name": "peoples",
@@ -178,7 +195,7 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v8/*: any*/),
+                          (v11/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -221,7 +238,7 @@ return {
                             "name": "updatedAt",
                             "storageKey": null
                           },
-                          (v7/*: any*/)
+                          (v10/*: any*/)
                         ],
                         "storageKey": null
                       },
@@ -291,8 +308,10 @@ return {
               },
               {
                 "alias": null,
-                "args": (v6/*: any*/),
-                "filters": null,
+                "args": (v12/*: any*/),
+                "filters": [
+                  "orderBy"
+                ],
                 "handle": "connection",
                 "key": "PeopleListPage_peoples",
                 "kind": "LinkedHandle",
@@ -308,12 +327,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ceb15735cc88f1993e35ac9a539a7ad0",
+    "cacheID": "b289901944c533975a18564d5af6cd02",
     "id": null,
     "metadata": {},
     "name": "PeopleListPageQuery",
     "operationKind": "query",
-    "text": "query PeopleListPageQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleListPage_peoples_pbnwq\n    id\n  }\n}\n\nfragment PeopleListPage_peoples_pbnwq on Organization {\n  id\n  peoples(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        additionalEmailAddresses\n        kind\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
+    "text": "query PeopleListPageQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleListPage_peoples_pbnwq\n    id\n  }\n}\n\nfragment PeopleListPage_peoples_pbnwq on Organization {\n  id\n  peoples(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        additionalEmailAddresses\n        kind\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
   }
 };
 })();
