@@ -154,12 +154,21 @@ function FrameworkOverviewPageContent({
 
   const controlCards = Object.entries(controlsByCategory)
     .sort(([categoryA], [categoryB]) => categoryA.localeCompare(categoryB))
-    .map(([category, controls]) => ({
-      title: category,
-      controls,
-      completed: controls.filter((c) => c?.state === "IMPLEMENTED").length,
-      total: controls.length,
-    }));
+    .map(([category, controls]) => {
+      const sortedControls = [...controls].sort((a, b) => {
+        if (a?.state === "IMPLEMENTED" && b?.state !== "IMPLEMENTED") return -1;
+        if (a?.state !== "IMPLEMENTED" && b?.state === "IMPLEMENTED") return 1;
+
+        return (a?.name || "").localeCompare(b?.name || "");
+      });
+
+      return {
+        title: category,
+        controls: sortedControls,
+        completed: controls.filter((c) => c?.state === "IMPLEMENTED").length,
+        total: controls.length,
+      };
+    });
 
   const totalImplemented = controls.filter(
     (c) => c?.state === "IMPLEMENTED"
