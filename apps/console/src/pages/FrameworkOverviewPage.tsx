@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import {
   graphql,
@@ -11,7 +11,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
-import { createPortal } from "react-dom";
 import { PageHeader } from "./PageHeader";
 
 const FrameworkOverviewPageQuery = graphql`
@@ -39,6 +38,100 @@ const FrameworkOverviewPageQuery = graphql`
   }
 `;
 
+function ControlSquare({
+  control,
+  onClick,
+}: {
+  control: {
+    id?: string;
+    name?: string;
+    description?: string;
+    state?: string;
+    category?: string;
+    importance?: string;
+  };
+  onClick: () => void;
+}) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const squareRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  const truncateDescription = (text?: string, maxLength = 100) => {
+    if (!text) return "";
+    return text.length > maxLength
+      ? `${text.substring(0, maxLength)}...`
+      : text;
+  };
+
+  // Calculate tooltip position when it becomes visible
+  useEffect(() => {
+    if (showTooltip && squareRef.current && tooltipRef.current) {
+      const squareRect = squareRef.current.getBoundingClientRect();
+      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+
+      // Position tooltip above the square
+      const top = squareRect.top - tooltipRect.height - 10;
+      const left =
+        squareRect.left + squareRect.width / 2 - tooltipRect.width / 2;
+
+      // Adjust if tooltip would go off screen
+      const adjustedLeft = Math.max(
+        10,
+        Math.min(left, window.innerWidth - tooltipRect.width - 10)
+      );
+
+      tooltipRef.current.style.top = `${top}px`;
+      tooltipRef.current.style.left = `${adjustedLeft}px`;
+    }
+  }, [showTooltip]);
+
+  return (
+    <div className="relative">
+      <div
+        ref={squareRef}
+        className={`h-4 w-4 ${
+          control?.state === "IMPLEMENTED" ? "bg-[#D1FA84]" : "bg-[#E5E7EB]"
+        } rounded-md hover:scale-110 hover:shadow-md transition-all duration-200 cursor-pointer`}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        onClick={onClick}
+      />
+
+      {showTooltip && (
+        <div
+          ref={tooltipRef}
+          className="fixed z-50 bg-[#1C1C1C] text-white p-4 rounded-xl shadow-lg space-y-2"
+          style={{ visibility: "visible", maxWidth: "300px" }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="bg-[#A3E635] text-[#1C1C1C] px-2 py-1 rounded-full text-xs">
+                30 min
+              </div>
+              <div className="bg-[#2A2A2A] text-white px-2 py-1 rounded-full text-xs">
+                {control?.importance}
+              </div>
+            </div>
+            <MoveUpRight className="w-4 h-4 cursor-pointer hover:text-[#A3E635] transition-colors" />
+          </div>
+          <div className="text-sm font-medium mb-2">{control?.name}</div>
+          <div className="text-sm text-gray-400 mb-4">
+            {truncateDescription(control?.description)}
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full bg-[#2A2A2A] flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-[#A3E635]" />
+            </div>
+            <span className="text-sm text-gray-400">
+              {control?.state === "IMPLEMENTED" ? "Validated" : "Not validated"}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function FrameworkOverviewPageContent({
   queryRef,
 }: {
@@ -47,18 +140,9 @@ function FrameworkOverviewPageContent({
   const data = usePreloadedQuery(FrameworkOverviewPageQuery, queryRef);
   const framework = data.node;
   const controls = framework.controls?.edges.map((edge) => edge?.node) ?? [];
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [hoveredControl, setHoveredControl] = useState<number | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState<{
-    x: number;
-    y: number;
-    width: number;
-  } | null>(null);
-  const [isTooltipHovered, setIsTooltipHovered] = useState(false);
   const navigate = useNavigate();
   const { organizationId } = useParams();
 
-  // Group controls by their category
   const controlsByCategory = controls.reduce((acc, control) => {
     if (!control?.category) return acc;
     if (!acc[control.category]) {
@@ -136,25 +220,9 @@ function FrameworkOverviewPageContent({
                       .map((_, i) => {
                         const control = card.controls[i];
                         return (
-                          <div
+                          <ControlSquare
                             key={i}
-                            className={`h-4 w-4 ${
-                              control?.state === "IMPLEMENTED"
-                                ? "bg-[#D1FA84]"
-                                : "bg-[#E5E7EB]"
-                            } rounded-md hover:scale-110 hover:shadow-md transition-all duration-200 cursor-pointer`}
-                            onMouseEnter={(e) => {
-                              setHoveredCard(index);
-                              setHoveredControl(i);
-                              const rect =
-                                e.currentTarget.getBoundingClientRect();
-
-                              setTooltipPosition({
-                                x: rect.left,
-                                y: rect.top - 10,
-                                width: 400,
-                              });
-                            }}
+                            control={control}
                             onClick={() => {
                               if (control?.id) {
                                 navigate(
@@ -162,16 +230,6 @@ function FrameworkOverviewPageContent({
                                 );
                               }
                             }}
-                            onMouseLeave={() => {
-                              setTimeout(() => {
-                                if (!isTooltipHovered) {
-                                  setHoveredCard(null);
-                                  setHoveredControl(null);
-                                  setTooltipPosition(null);
-                                }
-                              }, 500);
-                            }}
-                            title={control?.name}
                           />
                         );
                       })}
@@ -187,66 +245,6 @@ function FrameworkOverviewPageContent({
           </div>
         ))}
       </div>
-
-      {hoveredCard !== null &&
-        hoveredControl !== null &&
-        tooltipPosition &&
-        createPortal(
-          <div
-            className="fixed z-50"
-            onMouseEnter={() => setIsTooltipHovered(true)}
-            onMouseLeave={() => {
-              setIsTooltipHovered(false);
-              setHoveredCard(null);
-              setHoveredControl(null);
-              setTooltipPosition(null);
-            }}
-            style={{
-              left: tooltipPosition.x,
-              transform: `translate(-50%, -100%)`,
-              top: tooltipPosition.y - 20,
-              width: tooltipPosition.width + "px",
-            }}
-          >
-            <div className="bg-[#1C1C1C] text-white p-4 rounded-xl shadow-lg space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="bg-[#A3E635] text-[#1C1C1C] px-2 py-1 rounded-full text-xs">
-                    30 min
-                  </div>
-                  <div className="bg-[#2A2A2A] text-white px-2 py-1 rounded-full text-xs">
-                    {
-                      controlCards[hoveredCard]?.controls[hoveredControl]
-                        ?.importance
-                    }
-                  </div>
-                </div>
-                <MoveUpRight className="w-4 h-4 cursor-pointer hover:text-[#A3E635] transition-colors" />
-              </div>
-              <div className="text-sm font-medium mb-2">
-                {controlCards[hoveredCard]?.controls[hoveredControl]?.name}
-              </div>
-              <div className="text-sm text-gray-400 mb-4">
-                {
-                  controlCards[hoveredCard]?.controls[hoveredControl]
-                    ?.description
-                }
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-[#2A2A2A] flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-[#A3E635]" />
-                </div>
-                <span className="text-sm text-gray-400">
-                  {controlCards[hoveredCard]?.controls[hoveredControl]
-                    ?.state === "IMPLEMENTED"
-                    ? "Validated"
-                    : "Not validated"}
-                </span>
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
     </div>
   );
 }
