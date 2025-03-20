@@ -273,3 +273,36 @@ WHERE
 
 	return nil
 }
+
+func (u *User) UpdatePassword(
+	ctx context.Context,
+	conn pg.Conn,
+	hashedPassword []byte,
+) error {
+	q := `
+UPDATE
+    users
+SET
+    hashed_password = @hashed_password,
+    updated_at = @updated_at
+WHERE
+    id = @user_id
+`
+
+	now := time.Now()
+	args := pgx.StrictNamedArgs{
+		"user_id":         u.ID,
+		"hashed_password": hashedPassword,
+		"updated_at":      now,
+	}
+
+	_, err := conn.Exec(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot update user password: %w", err)
+	}
+
+	u.HashedPassword = hashedPassword
+	u.UpdatedAt = now
+
+	return nil
+}

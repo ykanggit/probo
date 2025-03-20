@@ -83,12 +83,17 @@ type (
 		Email          string  `json:"email"`
 		FullName       string  `json:"full_name"`
 	}
+
+	PasswordResetData struct {
+		Email string `json:"email"`
+	}
 )
 
 // Token types
 const (
 	TokenTypeEmailConfirmation      = "email_confirmation"
 	TokenTypeOrganizationInvitation = "organization_invitation"
+	TokenTypePasswordReset          = "password_reset"
 )
 
 var (
@@ -104,6 +109,16 @@ var (
 	invitationEmailTemplate = `
 	You have been invited to join Probo!
 	Please click the link below to sign up[1]
+
+	[1] %s
+	`
+
+	passwordResetEmailSubject  = "Reset your password"
+	passwordResetEmailTemplate = `
+	You have requested a password reset for your Probo account.
+	Please click the link below to reset your password[1]
+
+	If you did not request this password reset, please ignore this email.
 
 	[1] %s
 	`
@@ -160,6 +175,68 @@ func NewService(
 		tokenSecret:   tokenSecret,
 		disableSignup: disableSignup,
 	}, nil
+}
+
+func (s Service) ForgetPassword(
+	ctx context.Context,
+	email string,
+) error {
+	// Always generate a new token to avoid timing attacks and leaking information
+	// about existing emails
+	passwordResetToken, err := statelesstoken.NewToken(
+		s.tokenSecret,
+		TokenTypePasswordReset,
+		1*time.Hour,
+		PasswordResetData{Email: email},
+	)
+	if err != nil {
+		return fmt.Errorf("cannot generate password reset token: %w", err)
+	}
+
+	resetPasswordUrl := url.URL{
+		Scheme: "https",
+		Host:   s.hostname,
+		Path:   "/reset-password",
+		RawQuery: url.Values{
+			"token": []string{passwordResetToken},
+		}.Encode(),
+	}
+
+	user := &coredata.User{}
+
+	err = s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			if err := user.LoadByEmail(ctx, tx, email); err != nil {
+				var errUserNotFound *coredata.ErrUserNotFound
+
+				if errors.As(err, &errUserNotFound) {
+					// We don't want to leak information about existing emails
+					// Return success even if the email doesn't exist
+					return nil
+				}
+				return fmt.Errorf("cannot load user by %q email: %w", email, err)
+			}
+
+			resetPasswordEmail := coredata.NewEmail(
+				user.FullName,
+				user.EmailAddress,
+				passwordResetEmailSubject,
+				fmt.Sprintf(passwordResetEmailTemplate, resetPasswordUrl.String()),
+			)
+
+			if err := resetPasswordEmail.Insert(ctx, tx); err != nil {
+				return fmt.Errorf("cannot insert email: %w", err)
+			}
+
+			return nil
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s Service) SignUp(
@@ -705,6 +782,49 @@ func (s Service) RemoveUser(ctx context.Context, organizationID gid.GID, userID 
 
 			if err := uo.Delete(ctx, tx); err != nil {
 				return fmt.Errorf("cannot delete user organization: %w", err)
+			}
+
+			return nil
+		},
+	)
+}
+
+func (s Service) ResetPassword(ctx context.Context, tokenString string, newPassword string) error {
+	token, err := statelesstoken.ValidateToken[PasswordResetData](
+		s.tokenSecret,
+		TokenTypePasswordReset,
+		tokenString,
+	)
+	if err != nil {
+		return fmt.Errorf("cannot validate password reset token: %w", err)
+	}
+
+	if len(newPassword) < 8 {
+		return &ErrInvalidPassword{length: 8}
+	}
+
+	hashedPassword, err := s.hp.HashPassword([]byte(newPassword))
+	if err != nil {
+		return fmt.Errorf("cannot hash password: %w", err)
+	}
+
+	return s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			user := &coredata.User{}
+
+			if err := user.LoadByEmail(ctx, tx, token.Data.Email); err != nil {
+				var errUserNotFound *coredata.ErrUserNotFound
+
+				if errors.As(err, &errUserNotFound) {
+					return fmt.Errorf("user not found: %w", err)
+				}
+
+				return fmt.Errorf("cannot load user by email: %w", err)
+			}
+
+			if err := user.UpdatePassword(ctx, tx, hashedPassword); err != nil {
+				return fmt.Errorf("cannot update user password: %w", err)
 			}
 
 			return nil

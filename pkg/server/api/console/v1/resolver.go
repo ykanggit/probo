@@ -78,6 +78,8 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 	r.Post("/auth/login", SignInHandler(usrmgrSvc, authCfg))
 	r.Delete("/auth/logout", SignOutHandler(usrmgrSvc, authCfg))
 	r.Post("/auth/invitation", InvitationConfirmationHandler(usrmgrSvc, authCfg))
+	r.Post("/auth/forget-password", ForgetPasswordHandler(usrmgrSvc, authCfg))
+	r.Post("/auth/reset-password", ResetPasswordHandler(usrmgrSvc, authCfg))
 
 	r.Get("/", playground.Handler("GraphQL", "/api/console/v1/query"))
 	r.Post("/query", graphqlHandler(proboSvc, usrmgrSvc, authCfg))

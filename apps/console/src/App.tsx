@@ -52,6 +52,8 @@ const CreateFrameworkPage = lazy(() => import("./pages/CreateFrameworkPage"));
 const CreateControlPage = lazy(() => import("./pages/CreateControlPage"));
 const UpdateFrameworkPage = lazy(() => import("./pages/UpdateFrameworkPage"));
 const UpdateControlPage = lazy(() => import("./pages/UpdateControlPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 // Policy pages
 const PolicyListPage = lazy(() => import("./pages/PolicyListPage"));
 const PolicyOverviewPage = lazy(() => import("./pages/PolicyOverviewPage"));
@@ -292,6 +294,26 @@ function App() {
                         <Suspense>
                           <VisitorErrorBoundaryWithLocation>
                             <RegisterPage />
+                          </VisitorErrorBoundaryWithLocation>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="forgot-password"
+                      element={
+                        <Suspense>
+                          <VisitorErrorBoundaryWithLocation>
+                            <ForgotPasswordPage />
+                          </VisitorErrorBoundaryWithLocation>
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="reset-password"
+                      element={
+                        <Suspense>
+                          <VisitorErrorBoundaryWithLocation>
+                            <ResetPasswordPage />
                           </VisitorErrorBoundaryWithLocation>
                         </Suspense>
                       }
