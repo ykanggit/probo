@@ -195,14 +195,17 @@ type DeleteVendorPayload struct {
 }
 
 type Evidence struct {
-	ID        gid.GID                `json:"id"`
-	FileURL   string                 `json:"fileUrl"`
-	MimeType  string                 `json:"mimeType"`
-	Size      int                    `json:"size"`
-	State     coredata.EvidenceState `json:"state"`
-	Filename  string                 `json:"filename"`
-	CreatedAt time.Time              `json:"createdAt"`
-	UpdatedAt time.Time              `json:"updatedAt"`
+	ID          gid.GID                `json:"id"`
+	FileURL     *string                `json:"fileUrl,omitempty"`
+	MimeType    string                 `json:"mimeType"`
+	Size        int                    `json:"size"`
+	State       coredata.EvidenceState `json:"state"`
+	Type        coredata.EvidenceType  `json:"type"`
+	Filename    string                 `json:"filename"`
+	URL         *string                `json:"url,omitempty"`
+	Description string                 `json:"description"`
+	CreatedAt   time.Time              `json:"createdAt"`
+	UpdatedAt   time.Time              `json:"updatedAt"`
 }
 
 func (Evidence) IsNode()             {}
@@ -495,9 +498,12 @@ type UpdateVendorPayload struct {
 }
 
 type UploadEvidenceInput struct {
-	TaskID gid.GID        `json:"taskId"`
-	Name   string         `json:"name"`
-	File   graphql.Upload `json:"file"`
+	TaskID      gid.GID               `json:"taskId"`
+	Name        string                `json:"name"`
+	File        *graphql.Upload       `json:"file,omitempty"`
+	Type        coredata.EvidenceType `json:"type"`
+	URL         *string               `json:"url,omitempty"`
+	Description string                `json:"description"`
 }
 
 type UploadEvidencePayload struct {

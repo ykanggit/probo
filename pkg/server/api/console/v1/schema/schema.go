@@ -141,14 +141,17 @@ type ComplexityRoot struct {
 	}
 
 	Evidence struct {
-		CreatedAt func(childComplexity int) int
-		FileURL   func(childComplexity int) int
-		Filename  func(childComplexity int) int
-		ID        func(childComplexity int) int
-		MimeType  func(childComplexity int) int
-		Size      func(childComplexity int) int
-		State     func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		Description func(childComplexity int) int
+		FileURL     func(childComplexity int) int
+		Filename    func(childComplexity int) int
+		ID          func(childComplexity int) int
+		MimeType    func(childComplexity int) int
+		Size        func(childComplexity int) int
+		State       func(childComplexity int) int
+		Type        func(childComplexity int) int
+		URL         func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
 	}
 
 	EvidenceConnection struct {
@@ -420,7 +423,7 @@ type ControlResolver interface {
 	Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
 }
 type EvidenceResolver interface {
-	FileURL(ctx context.Context, obj *types.Evidence) (string, error)
+	FileURL(ctx context.Context, obj *types.Evidence) (*string, error)
 }
 type FrameworkResolver interface {
 	Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
@@ -711,6 +714,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Evidence.CreatedAt(childComplexity), true
 
+	case "Evidence.description":
+		if e.complexity.Evidence.Description == nil {
+			break
+		}
+
+		return e.complexity.Evidence.Description(childComplexity), true
+
 	case "Evidence.fileUrl":
 		if e.complexity.Evidence.FileURL == nil {
 			break
@@ -752,6 +762,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Evidence.State(childComplexity), true
+
+	case "Evidence.type":
+		if e.complexity.Evidence.Type == nil {
+			break
+		}
+
+		return e.complexity.Evidence.Type(childComplexity), true
+
+	case "Evidence.url":
+		if e.complexity.Evidence.URL == nil {
+			break
+		}
+
+		return e.complexity.Evidence.URL(childComplexity), true
 
 	case "Evidence.updatedAt":
 		if e.complexity.Evidence.UpdatedAt == nil {
@@ -2502,13 +2526,22 @@ type EvidenceEdge {
   node: Evidence!
 }
 
+enum EvidenceType
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceType") {
+  FILE @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeFile")
+  LINK @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeLink")
+}
+
 type Evidence implements Node {
   id: ID!
-  fileUrl: String! @goField(forceResolver: true)
+  fileUrl: String @goField(forceResolver: true)
   mimeType: String!
   size: Int!
   state: EvidenceState!
+  type: EvidenceType!
   filename: String!
+  url: String
+  description: String!
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -2798,7 +2831,10 @@ type UpdateControlPayload {
 input UploadEvidenceInput {
   taskId: ID!
   name: String!
-  file: Upload!
+  file: Upload
+  type: EvidenceType!
+  url: String
+  description: String!
 }
 
 type UploadEvidencePayload {
@@ -5868,14 +5904,11 @@ func (ec *executionContext) _Evidence_fileUrl(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Evidence_fileUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6005,6 +6038,44 @@ func (ec *executionContext) fieldContext_Evidence_state(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Evidence_type(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_type(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.EvidenceType)
+	fc.Result = res
+	return ec.marshalNEvidenceType2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type EvidenceType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Evidence_filename(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Evidence_filename(ctx, field)
 	if err != nil {
@@ -6031,6 +6102,79 @@ func (ec *executionContext) _Evidence_filename(ctx context.Context, field graphq
 }
 
 func (ec *executionContext) fieldContext_Evidence_filename(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Evidence_url(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_url(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Evidence_description(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Evidence",
 		Field:      field,
@@ -6292,8 +6436,14 @@ func (ec *executionContext) fieldContext_EvidenceEdge_node(_ context.Context, fi
 				return ec.fieldContext_Evidence_size(ctx, field)
 			case "state":
 				return ec.fieldContext_Evidence_state(ctx, field)
+			case "type":
+				return ec.fieldContext_Evidence_type(ctx, field)
 			case "filename":
 				return ec.fieldContext_Evidence_filename(ctx, field)
+			case "url":
+				return ec.fieldContext_Evidence_url(ctx, field)
+			case "description":
+				return ec.fieldContext_Evidence_description(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Evidence_createdAt(ctx, field)
 			case "updatedAt":
@@ -15668,7 +15818,7 @@ func (ec *executionContext) unmarshalInputUploadEvidenceInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"taskId", "name", "file"}
+	fieldsInOrder := [...]string{"taskId", "name", "file", "type", "url", "description"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15691,11 +15841,32 @@ func (ec *executionContext) unmarshalInputUploadEvidenceInput(ctx context.Contex
 			it.Name = data
 		case "file":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
-			data, err := ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			data, err := ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.File = data
+		case "type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			data, err := ec.unmarshalNEvidenceType2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
+		case "url":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.URL = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
 		}
 	}
 
@@ -16652,11 +16823,8 @@ func (ec *executionContext) _Evidence(ctx context.Context, sel ast.SelectionSet,
 		case "fileUrl":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				res = ec._Evidence_fileUrl(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
 				return res
 			}
 
@@ -16695,8 +16863,20 @@ func (ec *executionContext) _Evidence(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "type":
+			out.Values[i] = ec._Evidence_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "filename":
 			out.Values[i] = ec._Evidence_filename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "url":
+			out.Values[i] = ec._Evidence_url(ctx, field, obj)
+		case "description":
+			out.Values[i] = ec._Evidence_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -20098,6 +20278,33 @@ var (
 		coredata.EvidenceStateValid:   "VALID",
 		coredata.EvidenceStateInvalid: "INVALID",
 		coredata.EvidenceStateExpired: "EXPIRED",
+	}
+)
+
+func (ec *executionContext) unmarshalNEvidenceType2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceType(ctx context.Context, v any) (coredata.EvidenceType, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNEvidenceType2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceType[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNEvidenceType2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceType(ctx context.Context, sel ast.SelectionSet, v coredata.EvidenceType) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNEvidenceType2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceType[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNEvidenceType2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceType = map[string]coredata.EvidenceType{
+		"FILE": coredata.EvidenceTypeFile,
+		"LINK": coredata.EvidenceTypeLink,
+	}
+	marshalNEvidenceType2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐEvidenceType = map[coredata.EvidenceType]string{
+		coredata.EvidenceTypeFile: "FILE",
+		coredata.EvidenceTypeLink: "LINK",
 	}
 )
 

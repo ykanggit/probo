@@ -37,9 +37,12 @@ type (
 	}
 
 	CreateEvidenceRequest struct {
-		TaskID gid.GID
-		Name   string
-		File   io.Reader
+		TaskID      gid.GID
+		Name        string
+		Type        coredata.EvidenceType
+		File        io.Reader
+		URL         string
+		Description string
 	}
 )
 
@@ -73,50 +76,61 @@ func (s EvidenceService) Create(
 		return nil, fmt.Errorf("cannot create evidence global id: %w", err)
 	}
 
-	contentType := "application/octet-stream"
-	if req.Name != "" {
-		if detectedType := mime.TypeByExtension(filepath.Ext(req.Name)); detectedType != "" {
-			contentType = detectedType
+	evidence := &coredata.Evidence{
+		ID:          evidenceID,
+		TaskID:      req.TaskID,
+		State:       coredata.EvidenceStateValid,
+		Type:        req.Type,
+		Filename:    req.Name,
+		URL:         req.URL,
+		Description: req.Description,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
+
+	if req.Type == coredata.EvidenceTypeFile {
+		contentType := "application/octet-stream"
+		if req.Name != "" {
+			if detectedType := mime.TypeByExtension(filepath.Ext(req.Name)); detectedType != "" {
+				contentType = detectedType
+			}
 		}
-	}
 
-	objectKey, err := uuid.NewV7()
-	if err != nil {
-		return nil, fmt.Errorf("cannot generate object key: %w", err)
-	}
+		objectKey, err := uuid.NewV7()
+		if err != nil {
+			return nil, fmt.Errorf("cannot generate object key: %w", err)
+		}
 
-	putObjectOutput, err := s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(s.svc.bucket),
-		Key:         aws.String(objectKey.String()),
-		Body:        req.File,
-		ContentType: aws.String(contentType),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cannot upload file to S3: %w", err)
-	}
+		putObjectOutput, err := s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
+			Bucket:      aws.String(s.svc.bucket),
+			Key:         aws.String(objectKey.String()),
+			Body:        req.File,
+			ContentType: aws.String(contentType),
+		})
+		if err != nil {
+			return nil, fmt.Errorf("cannot upload file to S3: %w", err)
+		}
 
-	headOutput, err := s.svc.s3.HeadObject(ctx, &s3.HeadObjectInput{
-		Bucket: aws.String(s.svc.bucket),
-		Key:    aws.String(objectKey.String()),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cannot get object metadata: %w", err)
-	}
+		headOutput, err := s.svc.s3.HeadObject(ctx, &s3.HeadObjectInput{
+			Bucket: aws.String(s.svc.bucket),
+			Key:    aws.String(objectKey.String()),
+		})
+		if err != nil {
+			return nil, fmt.Errorf("cannot get object metadata: %w", err)
+		}
 
-	fmt.Println("putObjectOutput", putObjectOutput)
+		fmt.Println("putObjectOutput", putObjectOutput)
+
+		evidence.ObjectKey = objectKey.String()
+		evidence.MimeType = contentType
+		evidence.Size = uint64(*headOutput.ContentLength)
+	} else if req.Type == coredata.EvidenceTypeLink {
+		evidence.MimeType = "text/uri-list"
+		evidence.Size = uint64(len(req.URL))
+		evidence.ObjectKey = ""
+	}
 
 	task := &coredata.Task{}
-	evidence := &coredata.Evidence{
-		ID:        evidenceID,
-		TaskID:    req.TaskID,
-		State:     coredata.EvidenceStateValid,
-		ObjectKey: objectKey.String(),
-		MimeType:  contentType,
-		Size:      uint64(*headOutput.ContentLength),
-		Filename:  req.Name,
-		CreatedAt: now,
-		UpdatedAt: now,
-	}
 
 	err = s.svc.pg.WithTx(
 		ctx,
@@ -134,7 +148,7 @@ func (s EvidenceService) Create(
 	)
 
 	if err != nil {
-		// TODO try do delete file from s3
+		// TODO try do delete file from s3 if it's a file type
 		return nil, err
 	}
 
@@ -149,6 +163,10 @@ func (s EvidenceService) GenerateFileURL(
 	evidence, err := s.Get(ctx, evidenceID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get evidence: %w", err)
+	}
+
+	if evidence.Type == coredata.EvidenceTypeLink {
+		return nil, fmt.Errorf("cannot generate file URL for link type evidence")
 	}
 
 	presignClient := s3.NewPresignClient(s.svc.s3)

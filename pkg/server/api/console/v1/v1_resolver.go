@@ -45,15 +45,20 @@ func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *
 }
 
 // FileURL is the resolver for the fileUrl field.
-func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (string, error) {
+func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*string, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	if obj.Type == coredata.EvidenceTypeLink {
+		return obj.URL, nil
+	}
 
 	fileURL, err := svc.Evidences.GenerateFileURL(ctx, obj.ID, 15*time.Minute)
 	if err != nil {
-		return "", fmt.Errorf("cannot generate file URL: %w", err)
+		return nil, fmt.Errorf("cannot generate file URL: %w", err)
 	}
 
-	return *fileURL, nil
+	result := *fileURL
+	return &result, nil
 }
 
 // Controls is the resolver for the controls field.
@@ -436,10 +441,28 @@ func (r *mutationResolver) UpdateControl(ctx context.Context, input types.Update
 func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
 
+	var url string
+	if input.URL != nil {
+		url = *input.URL
+	}
+
 	req := probo.CreateEvidenceRequest{
-		TaskID: input.TaskID,
-		Name:   input.Name,
-		File:   input.File.File,
+		TaskID:      input.TaskID,
+		Name:        input.Name,
+		Type:        input.Type,
+		URL:         url,
+		Description: input.Description,
+	}
+
+	if input.Type == coredata.EvidenceTypeFile {
+		if input.File == nil {
+			return nil, fmt.Errorf("file is required for FILE type evidence")
+		}
+		req.File = input.File.File
+	} else if input.Type == coredata.EvidenceTypeLink {
+		if input.URL == nil || *input.URL == "" {
+			return nil, fmt.Errorf("URL is required for LINK type evidence")
+		}
 	}
 
 	evidence, err := svc.Evidences.Create(ctx, req)

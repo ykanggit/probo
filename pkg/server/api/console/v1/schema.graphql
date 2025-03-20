@@ -411,13 +411,22 @@ type EvidenceEdge {
   node: Evidence!
 }
 
+enum EvidenceType
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceType") {
+  FILE @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeFile")
+  LINK @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeLink")
+}
+
 type Evidence implements Node {
   id: ID!
-  fileUrl: String! @goField(forceResolver: true)
+  fileUrl: String @goField(forceResolver: true)
   mimeType: String!
   size: Int!
   state: EvidenceState!
+  type: EvidenceType!
   filename: String!
+  url: String
+  description: String!
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -707,7 +716,10 @@ type UpdateControlPayload {
 input UploadEvidenceInput {
   taskId: ID!
   name: String!
-  file: Upload!
+  file: Upload
+  type: EvidenceType!
+  url: String
+  description: String!
 }
 
 type UploadEvidencePayload {

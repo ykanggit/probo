@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4cf4f895bdcd936c74cb70f562210df7>>
+ * @generated SignedSource<<5fff8009247229346c3cda94359f2129>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,7 +14,7 @@ export type ControlOverviewPageGetEvidenceFileUrlQuery$variables = {
 };
 export type ControlOverviewPageGetEvidenceFileUrlQuery$data = {
   readonly node: {
-    readonly fileUrl?: string;
+    readonly fileUrl?: string | null | undefined;
     readonly id?: string;
   };
 };

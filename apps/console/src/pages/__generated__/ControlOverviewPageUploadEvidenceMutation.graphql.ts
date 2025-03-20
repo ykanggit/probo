@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<313084c3c2422d51df42fe4d6b848d49>>
+ * @generated SignedSource<<6726ce2446381674b1992ece913fd680>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,10 +10,14 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type EvidenceState = "EXPIRED" | "INVALID" | "VALID";
+export type EvidenceType = "FILE" | "LINK";
 export type UploadEvidenceInput = {
-  file: any;
+  description: string;
+  file?: any | null | undefined;
   name: string;
   taskId: string;
+  type: EvidenceType;
+  url?: string | null | undefined;
 };
 export type ControlOverviewPageUploadEvidenceMutation$variables = {
   connections: ReadonlyArray<string>;
@@ -24,12 +28,14 @@ export type ControlOverviewPageUploadEvidenceMutation$data = {
     readonly evidenceEdge: {
       readonly node: {
         readonly createdAt: string;
-        readonly fileUrl: string;
+        readonly fileUrl: string | null | undefined;
         readonly filename: string;
         readonly id: string;
         readonly mimeType: string;
         readonly size: number;
         readonly state: EvidenceState;
+        readonly type: EvidenceType;
+        readonly url: string | null | undefined;
       };
     };
   };
@@ -99,6 +105,20 @@ v3 = {
           "args": null,
           "kind": "ScalarField",
           "name": "mimeType",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "type",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "url",
           "storageKey": null
         },
         {
@@ -194,16 +214,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "5edaf64bde176530d9952e3e8aeb15af",
+    "cacheID": "de3681706266cd453ddccb5fe2900ea8",
     "id": null,
     "metadata": {},
     "name": "ControlOverviewPageUploadEvidenceMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlOverviewPageUploadEvidenceMutation(\n  $input: UploadEvidenceInput!\n) {\n  uploadEvidence(input: $input) {\n    evidenceEdge {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        size\n        state\n        createdAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation ControlOverviewPageUploadEvidenceMutation(\n  $input: UploadEvidenceInput!\n) {\n  uploadEvidence(input: $input) {\n    evidenceEdge {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        type\n        url\n        size\n        state\n        createdAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "51f35fe735a747ddaeb0f0cfa298f7e2";
+(node as any).hash = "396146017c07e06dc709199a0b5ad012";
 
 export default node;

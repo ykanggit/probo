@@ -20,7 +20,6 @@ import {
   CheckCircle2,
   Plus,
   Trash2,
-  Upload,
   FileIcon,
   Loader2,
   ChevronDown,
@@ -34,6 +33,7 @@ import {
   UserPlus,
   UserMinus,
   User,
+  Link2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -60,6 +60,9 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import ReactMarkdown from "react-markdown";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
 
 import { Helmet } from "react-helmet-async";
 import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from "./__generated__/ControlOverviewPageQuery.graphql";
@@ -72,7 +75,6 @@ import type { ControlOverviewPageAssignTaskMutation as ControlOverviewPageAssign
 import type { ControlOverviewPageUnassignTaskMutation as ControlOverviewPageUnassignTaskMutationType } from "./__generated__/ControlOverviewPageUnassignTaskMutation.graphql";
 import type { ControlOverviewPageOrganizationQuery$data } from "./__generated__/ControlOverviewPageOrganizationQuery.graphql";
 import type { ControlOverviewPageUpdateControlStateMutation as ControlOverviewPageUpdateControlStateMutationType } from "./__generated__/ControlOverviewPageUpdateControlStateMutation.graphql";
-import { Textarea } from "@/components/ui/textarea";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -147,6 +149,8 @@ const controlOverviewPageQuery = graphql`
                     filename
                     size
                     state
+                    type
+                    url
                     createdAt
                   }
                 }
@@ -221,6 +225,8 @@ const uploadEvidenceMutation = graphql`
           filename
           fileUrl
           mimeType
+          type
+          url
           size
           state
           createdAt
@@ -496,6 +502,13 @@ function ControlOverviewPageContent({
     [key: string]: string;
   }>({});
 
+  // Add state variables for the evidence dialog and link evidence
+  const [evidenceDialogOpen, setEvidenceDialogOpen] = useState(false);
+  const [linkEvidenceName, setLinkEvidenceName] = useState("");
+  const [linkEvidenceUrl, setLinkEvidenceUrl] = useState("");
+  const [linkEvidenceDescription, setLinkEvidenceDescription] = useState("");
+  const [activeTab, setActiveTab] = useState<"file" | "link">("file");
+
   const tasks = data.control.tasks?.edges.map((edge) => edge.node) || [];
 
   const getEvidenceConnectionId = useCallback(
@@ -701,10 +714,12 @@ function ControlOverviewPageContent({
 
   const handleUploadEvidence = (taskId: string, taskName: string) => {
     setTaskForEvidence({ id: taskId, name: taskName });
-    // Instead of opening a modal, directly trigger the file input click
-    if (hiddenFileInputRef.current) {
-      hiddenFileInputRef.current.click();
-    }
+    setEvidenceDialogOpen(true);
+    // Reset form fields
+    setLinkEvidenceName("");
+    setLinkEvidenceUrl("");
+    setLinkEvidenceDescription("");
+    setActiveTab("file");
   };
 
   const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -713,10 +728,10 @@ function ControlOverviewPageContent({
 
     const file = e.target.files[0];
 
-    // Show toast for upload started
+    // Show toast for add started
     toast({
-      title: "Upload started",
-      description: `Uploading ${file.name}...`,
+      title: "Adding document",
+      description: `Adding ${file.name}...`,
       variant: "default",
     });
 
@@ -728,7 +743,9 @@ function ControlOverviewPageContent({
         input: {
           taskId: taskForEvidence.id,
           name: file.name,
+          type: "FILE",
           file: null,
+          description: "Document evidence",
         },
         connections: evidenceConnectionId ? [evidenceConnectionId] : [],
       },
@@ -737,8 +754,8 @@ function ControlOverviewPageContent({
       },
       onCompleted: () => {
         toast({
-          title: "Evidence uploaded",
-          description: "Evidence has been uploaded successfully.",
+          title: "Document added",
+          description: "Document evidence has been added successfully.",
           variant: "default",
         });
         setTaskForEvidence(null);
@@ -749,7 +766,81 @@ function ControlOverviewPageContent({
       },
       onError: (error) => {
         toast({
-          title: "Error uploading evidence",
+          title: "Error adding document",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const handleLinkEvidenceSubmit = () => {
+    if (!taskForEvidence) return;
+
+    // Validate form
+    if (!linkEvidenceName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please provide a name for the evidence",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!linkEvidenceUrl.trim()) {
+      toast({
+        title: "Error",
+        description: "Please provide a URL for the evidence",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Description is now optional for link evidence
+    // Remove the validation check for empty description
+
+    // Show toast for add started
+    toast({
+      title: "Adding link evidence",
+      description: `Adding ${linkEvidenceName}...`,
+      variant: "default",
+    });
+
+    // Get the evidence connection ID for this task
+    const evidenceConnectionId = getEvidenceConnectionId(taskForEvidence.id);
+
+    // Use a default description if none is provided
+    const description =
+      linkEvidenceDescription.trim() || `Link to ${linkEvidenceUrl}`;
+
+    uploadEvidence({
+      variables: {
+        input: {
+          taskId: taskForEvidence.id,
+          name: linkEvidenceName,
+          type: "LINK",
+          url: linkEvidenceUrl,
+          description: description,
+          file: null,
+        },
+        connections: evidenceConnectionId ? [evidenceConnectionId] : [],
+      },
+      onCompleted: () => {
+        toast({
+          title: "Link evidence added",
+          description: "Link evidence has been added successfully.",
+          variant: "default",
+        });
+        setTaskForEvidence(null);
+        setEvidenceDialogOpen(false);
+        // Reset form fields
+        setLinkEvidenceName("");
+        setLinkEvidenceUrl("");
+        setLinkEvidenceDescription("");
+      },
+      onError: (error) => {
+        toast({
+          title: "Error adding link evidence",
           description: error.message,
           variant: "destructive",
         });
@@ -783,10 +874,10 @@ function ControlOverviewPageContent({
     const file = files[0];
     setUploadingTaskId(taskId);
 
-    // Show toast for upload started
+    // Show toast for add started
     toast({
-      title: "Upload started",
-      description: `Uploading ${file.name}...`,
+      title: "Adding document",
+      description: `Adding ${file.name}...`,
       variant: "default",
     });
 
@@ -798,7 +889,9 @@ function ControlOverviewPageContent({
         input: {
           taskId: taskId,
           name: file.name,
+          type: "FILE",
           file: null,
+          description: "Document evidence",
         },
         connections: evidenceConnectionId ? [evidenceConnectionId] : [],
       },
@@ -808,15 +901,15 @@ function ControlOverviewPageContent({
       onCompleted: () => {
         setUploadingTaskId(null);
         toast({
-          title: "Evidence uploaded",
-          description: "Evidence has been uploaded successfully.",
+          title: "Document added",
+          description: "Document evidence has been added successfully.",
           variant: "default",
         });
       },
       onError: (error) => {
         setUploadingTaskId(null);
         toast({
-          title: "Error uploading evidence",
+          title: "Error adding document",
           description: error.message,
           variant: "destructive",
         });
@@ -850,9 +943,11 @@ function ControlOverviewPageContent({
     }
   };
 
-  // Function to get file icon based on mime type
-  const getFileIcon = (mimeType: string) => {
-    if (mimeType.startsWith("image/")) {
+  // Function to get file icon based on mime type and evidence type
+  const getFileIcon = (mimeType: string, evidenceType: string) => {
+    if (evidenceType === "LINK") {
+      return <Link2 className="w-4 h-4 text-blue-600" />;
+    } else if (mimeType.startsWith("image/")) {
       return <Image className="w-4 h-4 text-blue-500" />;
     } else if (mimeType.includes("pdf")) {
       return <FileText className="w-4 h-4 text-red-500" />;
@@ -1088,7 +1183,7 @@ function ControlOverviewPageContent({
             <div className="flex items-center gap-3">
               <div className="text-sm text-gray-500 flex items-center bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
                 <FileIcon className="w-4 h-4 mr-2 text-blue-500" />
-                <span>Drag & drop files onto tasks to upload evidence</span>
+                <span>Drag & drop files onto tasks to add evidence</span>
               </div>
               <Dialog
                 open={isCreateTaskOpen}
@@ -1246,9 +1341,9 @@ function ControlOverviewPageContent({
                   {draggedOverTaskId === task?.id && (
                     <div className="absolute inset-0 flex items-center justify-center rounded-md z-10 bg-blue-50 bg-opacity-90 backdrop-blur-sm border-2 border-dashed border-blue-400">
                       <div className="flex items-center gap-2 text-blue-600 bg-white p-5 rounded-lg shadow-md">
-                        <Upload className="w-4 h-4 text-blue-500" />
+                        <FileText className="w-4 h-4 text-blue-500" />
                         <p className="text-sm font-medium text-center">
-                          Drop file to upload evidence
+                          Drop file to add as evidence
                         </p>
                       </div>
                     </div>
@@ -1258,7 +1353,7 @@ function ControlOverviewPageContent({
                     <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-95 rounded-md z-10 backdrop-blur-sm">
                       <div className="flex flex-col items-center gap-3 text-blue-600">
                         <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
-                        <p className="font-medium">Uploading evidence...</p>
+                        <p className="font-medium">Adding document...</p>
                         <p className="text-sm text-gray-500">Please wait</p>
                       </div>
                     </div>
@@ -1491,8 +1586,9 @@ function ControlOverviewPageContent({
                             handleUploadEvidence(task.id, task.name);
                           }
                         }}
+                        title="Add Evidence"
                       >
-                        <Upload className="w-4 h-4" />
+                        <FileText className="w-4 h-4" />
                       </button>
                       <button
                         type="button"
@@ -1547,17 +1643,31 @@ function ControlOverviewPageContent({
                             >
                               <div className="flex items-center gap-3">
                                 <div className="bg-white p-2 rounded-md border border-gray-200">
-                                  {getFileIcon(evidence.mimeType)}
+                                  {getFileIcon(
+                                    evidence.mimeType,
+                                    evidence.type
+                                  )}
                                 </div>
                                 <div>
                                   <div className="text-sm font-medium text-gray-800">
                                     {evidence.filename}
                                   </div>
                                   <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
-                                    <span className="font-medium text-gray-600">
-                                      {formatFileSize(evidence.size)}
-                                    </span>
-                                    <span>•</span>
+                                    {evidence.type === "FILE" ? (
+                                      <>
+                                        <span className="font-medium text-gray-600">
+                                          {formatFileSize(evidence.size)}
+                                        </span>
+                                        <span>•</span>
+                                      </>
+                                    ) : evidence.url ? (
+                                      <>
+                                        <span className="font-medium text-blue-600 truncate max-w-[200px]">
+                                          {evidence.url}
+                                        </span>
+                                        <span>•</span>
+                                      </>
+                                    ) : null}
                                     <span>
                                       {formatDate(evidence.createdAt)}
                                     </span>
@@ -1565,38 +1675,45 @@ function ControlOverviewPageContent({
                                 </div>
                               </div>
                               <div className="flex items-center gap-1">
-                                {evidence.mimeType.startsWith("image/") ? (
-                                  <button
-                                    onClick={() =>
-                                      handlePreviewEvidence(evidence)
-                                    }
-                                    className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                    title="Preview Image"
-                                  >
-                                    <Eye className="w-4 h-4 text-blue-600" />
-                                  </button>
-                                ) : (
+                                {evidence.type === "FILE" ? (
+                                  <>
+                                    {evidence.mimeType.startsWith("image/") ? (
+                                      <button
+                                        onClick={() =>
+                                          handlePreviewEvidence(evidence)
+                                        }
+                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                        title="Preview Image"
+                                      >
+                                        <Eye className="w-4 h-4 text-blue-600" />
+                                      </button>
+                                    ) : (
+                                      <button
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          handlePreviewEvidence(evidence);
+                                        }}
+                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                        title="Download"
+                                      >
+                                        <Download className="w-4 h-4 text-blue-600" />
+                                      </button>
+                                    )}
+                                  </>
+                                ) : evidence.url ? (
                                   <button
                                     onClick={(e) => {
                                       e.preventDefault();
-                                      handlePreviewEvidence(evidence);
+                                      if (evidence.url) {
+                                        window.open(evidence.url, "_blank");
+                                      }
                                     }}
                                     className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                    title="Download"
+                                    title="Open Link"
                                   >
-                                    <Download className="w-4 h-4 text-blue-600" />
+                                    <Link2 className="w-4 h-4 text-blue-600" />
                                   </button>
-                                )}
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    handlePreviewEvidence(evidence);
-                                  }}
-                                  className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                  title="Download"
-                                >
-                                  <Download className="w-4 h-4 text-blue-600" />
-                                </button>
+                                ) : null}
                                 <button
                                   onClick={(e) => {
                                     e.preventDefault();
@@ -1631,6 +1748,99 @@ function ControlOverviewPageContent({
             )}
           </div>
         </div>
+
+        {/* Evidence Add Dialog */}
+        <Dialog open={evidenceDialogOpen} onOpenChange={setEvidenceDialogOpen}>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>Add Evidence</DialogTitle>
+              <DialogDescription>
+                Choose the type of evidence you want to add to this task.
+              </DialogDescription>
+            </DialogHeader>
+
+            <Tabs
+              value={activeTab}
+              onValueChange={(value: string) =>
+                setActiveTab(value as "file" | "link")
+              }
+            >
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="file">Document</TabsTrigger>
+                <TabsTrigger value="link">Link</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="file" className="space-y-4">
+                <div className="space-y-4 pt-4">
+                  <p>Select a document to add as evidence.</p>
+                  <Button
+                    onClick={() => {
+                      if (hiddenFileInputRef.current) {
+                        hiddenFileInputRef.current.click();
+                        setEvidenceDialogOpen(false);
+                      }
+                    }}
+                    className="w-full"
+                  >
+                    Select Document
+                  </Button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="link" className="space-y-4 pt-4">
+                <div className="space-y-4">
+                  <div className="grid w-full items-center gap-1.5">
+                    <Label htmlFor="evidence-name">Name</Label>
+                    <Input
+                      id="evidence-name"
+                      value={linkEvidenceName}
+                      onChange={(e) => setLinkEvidenceName(e.target.value)}
+                      placeholder="Name for this evidence"
+                    />
+                  </div>
+
+                  <div className="grid w-full items-center gap-1.5">
+                    <Label htmlFor="evidence-url">URL</Label>
+                    <Input
+                      id="evidence-url"
+                      value={linkEvidenceUrl}
+                      onChange={(e) => setLinkEvidenceUrl(e.target.value)}
+                      placeholder="https://example.com"
+                      type="url"
+                    />
+                  </div>
+
+                  <div className="grid w-full items-center gap-1.5">
+                    <Label htmlFor="evidence-description">
+                      Description (optional)
+                    </Label>
+                    <Textarea
+                      id="evidence-description"
+                      value={linkEvidenceDescription}
+                      onChange={(e) =>
+                        setLinkEvidenceDescription(e.target.value)
+                      }
+                      placeholder="Describe this evidence (optional)"
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setEvidenceDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              {activeTab === "link" && (
+                <Button onClick={handleLinkEvidenceSubmit}>Add Link</Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Hidden file input for direct uploads */}
         <input

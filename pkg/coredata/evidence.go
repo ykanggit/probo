@@ -28,15 +28,18 @@ import (
 
 type (
 	Evidence struct {
-		ID        gid.GID       `db:"id"`
-		TaskID    gid.GID       `db:"task_id"`
-		State     EvidenceState `db:"state"`
-		ObjectKey string        `db:"object_key"`
-		MimeType  string        `db:"mime_type"`
-		Size      uint64        `db:"size"`
-		Filename  string        `db:"filename"`
-		CreatedAt time.Time     `db:"created_at"`
-		UpdatedAt time.Time     `db:"updated_at"`
+		ID          gid.GID       `db:"id"`
+		TaskID      gid.GID       `db:"task_id"`
+		State       EvidenceState `db:"state"`
+		Type        EvidenceType  `db:"type"`
+		ObjectKey   string        `db:"object_key"`
+		MimeType    string        `db:"mime_type"`
+		Size        uint64        `db:"size"`
+		Filename    string        `db:"filename"`
+		URL         string        `db:"url"`
+		Description string        `db:"description"`
+		CreatedAt   time.Time     `db:"created_at"`
+		UpdatedAt   time.Time     `db:"updated_at"`
 	}
 
 	Evidences []*Evidence
@@ -66,7 +69,10 @@ INSERT INTO
         mime_type,
         size,
         state,
+        type,
         filename,
+        url,
+        description,
         created_at,
         updated_at
     )
@@ -78,7 +84,10 @@ VALUES (
     @mime_type,
     @size,
     @state,
+    @type,
     @filename,
+    @url,
+    @description,
     @created_at,
     @updated_at
 )
@@ -95,6 +104,9 @@ VALUES (
 		"created_at":  e.CreatedAt,
 		"updated_at":  e.UpdatedAt,
 		"state":       e.State,
+		"type":        e.Type,
+		"url":         e.URL,
+		"description": e.Description,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -111,10 +123,13 @@ SELECT
     id,
     task_id,
     state,
+    type,
     object_key,
     mime_type,
     size,
     filename,
+    url,
+    description,
     created_at,
     updated_at
 FROM
@@ -157,10 +172,13 @@ SELECT
     id,
     task_id,
     state,
+    type,
     object_key,
     mime_type,
     size,
     filename,
+    url,
+    description,
     created_at,
     updated_at
 FROM

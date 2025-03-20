@@ -44,14 +44,25 @@ func NewEvidenceEdge(e *coredata.Evidence, orderBy coredata.EvidenceOrderField) 
 }
 
 func NewEvidence(e *coredata.Evidence) *Evidence {
+	var fileURL *string = nil
+
+	var urlPtr *string = nil
+	if e.URL != "" {
+		urlCopy := e.URL
+		urlPtr = &urlCopy
+	}
+
 	return &Evidence{
-		ID:        e.ID,
-		State:     e.State,
-		FileURL:   "",
-		Filename:  e.Filename,
-		MimeType:  e.MimeType,
-		Size:      int(e.Size),
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		ID:          e.ID,
+		State:       e.State,
+		Type:        e.Type,
+		FileURL:     fileURL,
+		Filename:    e.Filename,
+		MimeType:    e.MimeType,
+		Size:        int(e.Size),
+		URL:         urlPtr,
+		Description: e.Description,
+		CreatedAt:   e.CreatedAt,
+		UpdatedAt:   e.UpdatedAt,
 	}
 }
