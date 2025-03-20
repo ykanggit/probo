@@ -196,6 +196,10 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 func (r *Resolver) GetTenantServiceIfAuthorized(ctx context.Context, tenantID gid.TenantID) *probo.TenantService {
 	tenantIDs, _ := ctx.Value(userTenantContextKey).(*[]gid.TenantID)
 
+	if tenantIDs == nil {
+		panic(fmt.Errorf("tenant not found"))
+	}
+
 	for _, id := range *tenantIDs {
 		if id == tenantID {
 			return r.proboSvc.WithTenant(tenantID)
