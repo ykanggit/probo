@@ -12,13 +12,13 @@ import {
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { graphql, useLazyLoadQuery } from "react-relay";
-import { ConsoleLayoutBreadcrumbFrameworkOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbFrameworkOverviewQuery.graphql";
-import { ConsoleLayoutBreadcrumbPeopleOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbPeopleOverviewQuery.graphql";
-import { ConsoleLayoutBreadcrumbVendorOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbVendorOverviewQuery.graphql";
-import { ConsoleLayoutBreadcrumbControlOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbControlOverviewQuery.graphql";
-import { ConsoleLayoutOrganizationQuery } from "./__generated__/ConsoleLayoutOrganizationQuery.graphql";
-import { ConsoleLayoutBreadcrumbPolicyOverviewQuery } from "./__generated__/ConsoleLayoutBreadcrumbPolicyOverviewQuery.graphql";
 import { cn } from "@/lib/utils";
+import { OrganizationLayoutOrganizationQuery } from "./__generated__/OrganizationLayoutOrganizationQuery.graphql";
+import { OrganizationLayoutBreadcrumbControlOverviewQuery } from "./__generated__/OrganizationLayoutBreadcrumbControlOverviewQuery.graphql";
+import { OrganizationLayoutBreadcrumbFrameworkOverviewQuery } from "./__generated__/OrganizationLayoutBreadcrumbFrameworkOverviewQuery.graphql";
+import { OrganizationLayoutBreadcrumbPeopleOverviewQuery } from "./__generated__/OrganizationLayoutBreadcrumbPeopleOverviewQuery.graphql";
+import { OrganizationLayoutBreadcrumbPolicyOverviewQuery } from "./__generated__/OrganizationLayoutBreadcrumbPolicyOverviewQuery.graphql";
+import { OrganizationLayoutBreadcrumbVendorOverviewQuery } from "./__generated__/OrganizationLayoutBreadcrumbVendorOverviewQuery.graphql";
 
 const BreadCrumbNavLink = ({
   to,
@@ -64,9 +64,9 @@ function BreadcrumbHome() {
 function BreadCrumbOrganization() {
   const { organizationId } = useParams();
 
-  const data = useLazyLoadQuery<ConsoleLayoutOrganizationQuery>(
+  const data = useLazyLoadQuery<OrganizationLayoutOrganizationQuery>(
     graphql`
-      query ConsoleLayoutOrganizationQuery($organizationId: ID!) {
+      query OrganizationLayoutOrganizationQuery($organizationId: ID!) {
         organization: node(id: $organizationId) {
           ... on Organization {
             name
@@ -120,19 +120,22 @@ function BreadcrumbCreateFramework() {
 
 function BreadcrumbFrameworkOverview() {
   const { organizationId, frameworkId } = useParams();
-  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbFrameworkOverviewQuery>(
-    graphql`
-      query ConsoleLayoutBreadcrumbFrameworkOverviewQuery($frameworkId: ID!) {
-        framework: node(id: $frameworkId) {
-          id
-          ... on Framework {
-            name
+  const data =
+    useLazyLoadQuery<OrganizationLayoutBreadcrumbFrameworkOverviewQuery>(
+      graphql`
+        query OrganizationLayoutBreadcrumbFrameworkOverviewQuery(
+          $frameworkId: ID!
+        ) {
+          framework: node(id: $frameworkId) {
+            id
+            ... on Framework {
+              name
+            }
           }
         }
-      }
-    `,
-    { frameworkId: frameworkId! }
-  );
+      `,
+      { frameworkId: frameworkId! }
+    );
 
   return (
     <>
@@ -177,20 +180,21 @@ function BreadcrumbVendorList() {
 
 function BreadcrumbVendorOverview() {
   const { organizationId, vendorId } = useParams();
-  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbVendorOverviewQuery>(
-    graphql`
-      query ConsoleLayoutBreadcrumbVendorOverviewQuery($vendorId: ID!) {
-        vendor: node(id: $vendorId) {
-          id
-          ... on Vendor {
-            name
+  const data =
+    useLazyLoadQuery<OrganizationLayoutBreadcrumbVendorOverviewQuery>(
+      graphql`
+        query OrganizationLayoutBreadcrumbVendorOverviewQuery($vendorId: ID!) {
+          vendor: node(id: $vendorId) {
+            id
+            ... on Vendor {
+              name
+            }
           }
         }
-      }
-    `,
-    { vendorId: vendorId! },
-    { fetchPolicy: "store-or-network" }
-  );
+      `,
+      { vendorId: vendorId! },
+      { fetchPolicy: "store-or-network" }
+    );
 
   return (
     <>
@@ -235,20 +239,21 @@ function BreadcrumbCreatePeople() {
 
 function BreadcrumbPeopleOverview() {
   const { organizationId, peopleId } = useParams();
-  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbPeopleOverviewQuery>(
-    graphql`
-      query ConsoleLayoutBreadcrumbPeopleOverviewQuery($peopleId: ID!) {
-        people: node(id: $peopleId) {
-          id
-          ... on People {
-            fullName
+  const data =
+    useLazyLoadQuery<OrganizationLayoutBreadcrumbPeopleOverviewQuery>(
+      graphql`
+        query OrganizationLayoutBreadcrumbPeopleOverviewQuery($peopleId: ID!) {
+          people: node(id: $peopleId) {
+            id
+            ... on People {
+              fullName
+            }
           }
         }
-      }
-    `,
-    { peopleId: peopleId! },
-    { fetchPolicy: "store-or-network" }
-  );
+      `,
+      { peopleId: peopleId! },
+      { fetchPolicy: "store-or-network" }
+    );
 
   return (
     <>
@@ -267,19 +272,22 @@ function BreadcrumbPeopleOverview() {
 
 function BreadcrumbControlOverview() {
   const { organizationId, frameworkId, controlId } = useParams();
-  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbControlOverviewQuery>(
-    graphql`
-      query ConsoleLayoutBreadcrumbControlOverviewQuery($controlId: ID!) {
-        control: node(id: $controlId) {
-          id
-          ... on Control {
-            name
+  const data =
+    useLazyLoadQuery<OrganizationLayoutBreadcrumbControlOverviewQuery>(
+      graphql`
+        query OrganizationLayoutBreadcrumbControlOverviewQuery(
+          $controlId: ID!
+        ) {
+          control: node(id: $controlId) {
+            id
+            ... on Control {
+              name
+            }
           }
         }
-      }
-    `,
-    { controlId: controlId! }
-  );
+      `,
+      { controlId: controlId! }
+    );
 
   return (
     <>
@@ -346,20 +354,21 @@ function BreadcrumbCreatePolicy() {
 
 function BreadcrumbPolicyOverview() {
   const { organizationId, policyId } = useParams();
-  const data = useLazyLoadQuery<ConsoleLayoutBreadcrumbPolicyOverviewQuery>(
-    graphql`
-      query ConsoleLayoutBreadcrumbPolicyOverviewQuery($policyId: ID!) {
-        policy: node(id: $policyId) {
-          id
-          ... on Policy {
-            name
+  const data =
+    useLazyLoadQuery<OrganizationLayoutBreadcrumbPolicyOverviewQuery>(
+      graphql`
+        query OrganizationLayoutBreadcrumbPolicyOverviewQuery($policyId: ID!) {
+          policy: node(id: $policyId) {
+            id
+            ... on Policy {
+              name
+            }
           }
         }
-      }
-    `,
-    { policyId: policyId! },
-    { fetchPolicy: "store-or-network" }
-  );
+      `,
+      { policyId: policyId! },
+      { fetchPolicy: "store-or-network" }
+    );
 
   return (
     <>
@@ -387,7 +396,7 @@ function BreadcrumbUpdatePolicy() {
   );
 }
 
-export default function ConsoleLayout() {
+export default function OrganizationLayout() {
   return (
     <SidebarProvider>
       <Suspense>
@@ -398,7 +407,6 @@ export default function ConsoleLayout() {
           <header className="flex shrink-0 items-center gap-2">
             <Routes>
               <Route
-                path=":organizationsId"
                 element={
                   <Suspense>
                     <BreadCrumbOrganization />

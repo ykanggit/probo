@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1706f11580339ff248a8fa9b53862829>>
+ * @generated SignedSource<<c8aadda28109f223c394a98b8ac9c14e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,18 +9,17 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ConsoleLayoutBreadcrumbFrameworkOverviewQuery$variables = {
-  frameworkId: string;
+export type OrganizationLayoutOrganizationQuery$variables = {
+  organizationId: string;
 };
-export type ConsoleLayoutBreadcrumbFrameworkOverviewQuery$data = {
-  readonly framework: {
-    readonly id: string;
+export type OrganizationLayoutOrganizationQuery$data = {
+  readonly organization: {
     readonly name?: string;
   };
 };
-export type ConsoleLayoutBreadcrumbFrameworkOverviewQuery = {
-  response: ConsoleLayoutBreadcrumbFrameworkOverviewQuery$data;
-  variables: ConsoleLayoutBreadcrumbFrameworkOverviewQuery$variables;
+export type OrganizationLayoutOrganizationQuery = {
+  response: OrganizationLayoutOrganizationQuery$data;
+  variables: OrganizationLayoutOrganizationQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -28,24 +27,17 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "frameworkId"
+    "name": "organizationId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "frameworkId"
+    "variableName": "organizationId"
   }
 ],
 v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
-},
-v3 = {
   "kind": "InlineFragment",
   "selections": [
     {
@@ -56,7 +48,7 @@ v3 = {
       "storageKey": null
     }
   ],
-  "type": "Framework",
+  "type": "Organization",
   "abstractKey": null
 };
 return {
@@ -64,18 +56,17 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ConsoleLayoutBreadcrumbFrameworkOverviewQuery",
+    "name": "OrganizationLayoutOrganizationQuery",
     "selections": [
       {
-        "alias": "framework",
+        "alias": "organization",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/),
-          (v3/*: any*/)
+          (v2/*: any*/)
         ],
         "storageKey": null
       }
@@ -87,10 +78,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ConsoleLayoutBreadcrumbFrameworkOverviewQuery",
+    "name": "OrganizationLayoutOrganizationQuery",
     "selections": [
       {
-        "alias": "framework",
+        "alias": "organization",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -105,23 +96,29 @@ return {
             "storageKey": null
           },
           (v2/*: any*/),
-          (v3/*: any*/)
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "id",
+            "storageKey": null
+          }
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "287decd67859fe4c2248b6d6b0a3d56d",
+    "cacheID": "f4716079c4ca6a1012c7044a3328af01",
     "id": null,
     "metadata": {},
-    "name": "ConsoleLayoutBreadcrumbFrameworkOverviewQuery",
+    "name": "OrganizationLayoutOrganizationQuery",
     "operationKind": "query",
-    "text": "query ConsoleLayoutBreadcrumbFrameworkOverviewQuery(\n  $frameworkId: ID!\n) {\n  framework: node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n    }\n  }\n}\n"
+    "text": "query OrganizationLayoutOrganizationQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      name\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a4c4f857eb13cf154a01f70874f0fd58";
+(node as any).hash = "878d0ca4790ce128c108f29135074919";
 
 export default node;

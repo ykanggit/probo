@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6f086aeafe55fd91abdf75b5832f76e8>>
+ * @generated SignedSource<<ebdda8f7be44df65a5ba836693e48bea>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,18 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ConsoleLayoutBreadcrumbPeopleOverviewQuery$variables = {
-  peopleId: string;
+export type OrganizationLayoutBreadcrumbControlOverviewQuery$variables = {
+  controlId: string;
 };
-export type ConsoleLayoutBreadcrumbPeopleOverviewQuery$data = {
-  readonly people: {
-    readonly fullName?: string;
+export type OrganizationLayoutBreadcrumbControlOverviewQuery$data = {
+  readonly control: {
     readonly id: string;
+    readonly name?: string;
   };
 };
-export type ConsoleLayoutBreadcrumbPeopleOverviewQuery = {
-  response: ConsoleLayoutBreadcrumbPeopleOverviewQuery$data;
-  variables: ConsoleLayoutBreadcrumbPeopleOverviewQuery$variables;
+export type OrganizationLayoutBreadcrumbControlOverviewQuery = {
+  response: OrganizationLayoutBreadcrumbControlOverviewQuery$data;
+  variables: OrganizationLayoutBreadcrumbControlOverviewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -28,14 +28,14 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "peopleId"
+    "name": "controlId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "peopleId"
+    "variableName": "controlId"
   }
 ],
 v2 = {
@@ -52,11 +52,11 @@ v3 = {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
-      "name": "fullName",
+      "name": "name",
       "storageKey": null
     }
   ],
-  "type": "People",
+  "type": "Control",
   "abstractKey": null
 };
 return {
@@ -64,10 +64,10 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ConsoleLayoutBreadcrumbPeopleOverviewQuery",
+    "name": "OrganizationLayoutBreadcrumbControlOverviewQuery",
     "selections": [
       {
-        "alias": "people",
+        "alias": "control",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -87,10 +87,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ConsoleLayoutBreadcrumbPeopleOverviewQuery",
+    "name": "OrganizationLayoutBreadcrumbControlOverviewQuery",
     "selections": [
       {
-        "alias": "people",
+        "alias": "control",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -112,16 +112,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ae4480910071c40c530fabf42d140afd",
+    "cacheID": "2fa16d62f29015853c425704e3de3fd4",
     "id": null,
     "metadata": {},
-    "name": "ConsoleLayoutBreadcrumbPeopleOverviewQuery",
+    "name": "OrganizationLayoutBreadcrumbControlOverviewQuery",
     "operationKind": "query",
-    "text": "query ConsoleLayoutBreadcrumbPeopleOverviewQuery(\n  $peopleId: ID!\n) {\n  people: node(id: $peopleId) {\n    __typename\n    id\n    ... on People {\n      fullName\n    }\n  }\n}\n"
+    "text": "query OrganizationLayoutBreadcrumbControlOverviewQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ffd8d5be8b9b8a930c956c8d292715d8";
+(node as any).hash = "202e114f9b94e9c0bf805b0ae8f69fcd";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<266ca8730d2832be4d4c96d325c3e4ab>>
+ * @generated SignedSource<<2a843b85994d7b675c2e0504ea8c687e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,18 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ConsoleLayoutBreadcrumbVendorOverviewQuery$variables = {
-  vendorId: string;
+export type OrganizationLayoutBreadcrumbPeopleOverviewQuery$variables = {
+  peopleId: string;
 };
-export type ConsoleLayoutBreadcrumbVendorOverviewQuery$data = {
-  readonly vendor: {
+export type OrganizationLayoutBreadcrumbPeopleOverviewQuery$data = {
+  readonly people: {
+    readonly fullName?: string;
     readonly id: string;
-    readonly name?: string;
   };
 };
-export type ConsoleLayoutBreadcrumbVendorOverviewQuery = {
-  response: ConsoleLayoutBreadcrumbVendorOverviewQuery$data;
-  variables: ConsoleLayoutBreadcrumbVendorOverviewQuery$variables;
+export type OrganizationLayoutBreadcrumbPeopleOverviewQuery = {
+  response: OrganizationLayoutBreadcrumbPeopleOverviewQuery$data;
+  variables: OrganizationLayoutBreadcrumbPeopleOverviewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -28,14 +28,14 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "vendorId"
+    "name": "peopleId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "vendorId"
+    "variableName": "peopleId"
   }
 ],
 v2 = {
@@ -52,11 +52,11 @@ v3 = {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
-      "name": "name",
+      "name": "fullName",
       "storageKey": null
     }
   ],
-  "type": "Vendor",
+  "type": "People",
   "abstractKey": null
 };
 return {
@@ -64,10 +64,10 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ConsoleLayoutBreadcrumbVendorOverviewQuery",
+    "name": "OrganizationLayoutBreadcrumbPeopleOverviewQuery",
     "selections": [
       {
-        "alias": "vendor",
+        "alias": "people",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -87,10 +87,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ConsoleLayoutBreadcrumbVendorOverviewQuery",
+    "name": "OrganizationLayoutBreadcrumbPeopleOverviewQuery",
     "selections": [
       {
-        "alias": "vendor",
+        "alias": "people",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -112,16 +112,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d0b39b21eec610e1162705b7e2799468",
+    "cacheID": "3f43dd20847240f85b9e4f7e1d2ae1e6",
     "id": null,
     "metadata": {},
-    "name": "ConsoleLayoutBreadcrumbVendorOverviewQuery",
+    "name": "OrganizationLayoutBreadcrumbPeopleOverviewQuery",
     "operationKind": "query",
-    "text": "query ConsoleLayoutBreadcrumbVendorOverviewQuery(\n  $vendorId: ID!\n) {\n  vendor: node(id: $vendorId) {\n    __typename\n    id\n    ... on Vendor {\n      name\n    }\n  }\n}\n"
+    "text": "query OrganizationLayoutBreadcrumbPeopleOverviewQuery(\n  $peopleId: ID!\n) {\n  people: node(id: $peopleId) {\n    __typename\n    id\n    ... on People {\n      fullName\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "20bb1420f2d13cf7974591da5e6b654f";
+(node as any).hash = "715ffb6eaef0bdeec2c1a42e17d37ba9";
 
 export default node;

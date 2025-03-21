@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<93800eee21fa3f30cc45da37370359fd>>
+ * @generated SignedSource<<02beff12353573ba1a8701513b4e9a7e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,17 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ConsoleLayoutOrganizationQuery$variables = {
-  organizationId: string;
+export type OrganizationLayoutBreadcrumbPolicyOverviewQuery$variables = {
+  policyId: string;
 };
-export type ConsoleLayoutOrganizationQuery$data = {
-  readonly organization: {
+export type OrganizationLayoutBreadcrumbPolicyOverviewQuery$data = {
+  readonly policy: {
+    readonly id: string;
     readonly name?: string;
   };
 };
-export type ConsoleLayoutOrganizationQuery = {
-  response: ConsoleLayoutOrganizationQuery$data;
-  variables: ConsoleLayoutOrganizationQuery$variables;
+export type OrganizationLayoutBreadcrumbPolicyOverviewQuery = {
+  response: OrganizationLayoutBreadcrumbPolicyOverviewQuery$data;
+  variables: OrganizationLayoutBreadcrumbPolicyOverviewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -27,17 +28,24 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "organizationId"
+    "name": "policyId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "organizationId"
+    "variableName": "policyId"
   }
 ],
 v2 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v3 = {
   "kind": "InlineFragment",
   "selections": [
     {
@@ -48,7 +56,7 @@ v2 = {
       "storageKey": null
     }
   ],
-  "type": "Organization",
+  "type": "Policy",
   "abstractKey": null
 };
 return {
@@ -56,17 +64,18 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ConsoleLayoutOrganizationQuery",
+    "name": "OrganizationLayoutBreadcrumbPolicyOverviewQuery",
     "selections": [
       {
-        "alias": "organization",
+        "alias": "policy",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/)
+          (v2/*: any*/),
+          (v3/*: any*/)
         ],
         "storageKey": null
       }
@@ -78,10 +87,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ConsoleLayoutOrganizationQuery",
+    "name": "OrganizationLayoutBreadcrumbPolicyOverviewQuery",
     "selections": [
       {
-        "alias": "organization",
+        "alias": "policy",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -96,29 +105,23 @@ return {
             "storageKey": null
           },
           (v2/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "id",
-            "storageKey": null
-          }
+          (v3/*: any*/)
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "e275faa366380b1b423251e6a06ab743",
+    "cacheID": "a7bbb574545c752bde0eba468ec494d7",
     "id": null,
     "metadata": {},
-    "name": "ConsoleLayoutOrganizationQuery",
+    "name": "OrganizationLayoutBreadcrumbPolicyOverviewQuery",
     "operationKind": "query",
-    "text": "query ConsoleLayoutOrganizationQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      name\n    }\n    id\n  }\n}\n"
+    "text": "query OrganizationLayoutBreadcrumbPolicyOverviewQuery(\n  $policyId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3310c40eb8f1e3874139c934fb08cbb1";
+(node as any).hash = "90b9df71a590d79f4e083aa117ad7302";
 
 export default node;

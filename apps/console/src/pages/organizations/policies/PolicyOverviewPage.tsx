@@ -15,7 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PolicyOverviewPageQuery as PolicyOverviewPageQueryType } from "./__generated__/PolicyOverviewPageQuery.graphql";
 import type { PolicyOverviewPageDeleteMutation } from "./__generated__/PolicyOverviewPageDeleteMutation.graphql";
-import "../styles/policy-content.css";
 import { useToast } from "@/hooks/use-toast";
 import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 

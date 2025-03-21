@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./styles/colors.css";
+@import "./styles/policy-content.css";
 
 @plugin 'tailwindcss-animate';
 @plugin "@tailwindcss/typography";
