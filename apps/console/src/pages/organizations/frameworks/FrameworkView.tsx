@@ -18,7 +18,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import type { FrameworkViewQuery as FrameworkViewQueryType } from "./__generated__/FrameworkViewQuery.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
 import { FrameworkViewSkeleton } from "./FrameworkPage";
@@ -47,7 +46,6 @@ const FrameworkViewQuery = graphql`
   }
 `;
 
-// Define control type for better type safety
 interface Control {
   id?: string;
   name?: string;
@@ -64,6 +62,8 @@ interface Category {
   description: string;
   progress: number;
   controls: Control[];
+  doneCount: number;
+  totalCount: number;
 }
 
 function FrameworkViewContent({
@@ -94,20 +94,44 @@ function FrameworkViewContent({
     }
   };
 
+  const processedControls = controls.map((control) => ({
+    ...control,
+    status: mapStateToStatus(control.state),
+  }));
+
+  // Calculate global progress
+  const implementedCount = processedControls.filter(
+    (control) => control.status === "complete"
+  ).length;
+  const notApplicableCount = processedControls.filter(
+    (control) => control.status === "not-applicable"
+  ).length;
+  const totalControls = processedControls.length;
+
+  // Include not-applicable as effectively "complete" for progress percentage
+  const effectiveCompletedCount = implementedCount + notApplicableCount;
+  const globalProgress = totalControls
+    ? Math.round((effectiveCompletedCount / totalControls) * 100)
+    : 0;
+
+  // Get global status counts
+  const globalStatusCounts = processedControls.reduce((acc, control) => {
+    if (control.status) {
+      acc[control.status] = (acc[control.status] || 0) + 1;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
   // Group controls by category
-  const controlsByCategory = controls.reduce((acc, control) => {
+  const controlsByCategory = processedControls.reduce((acc, control) => {
     if (!control?.category) return acc;
     if (!acc[control.category]) {
       acc[control.category] = [];
     }
-    acc[control.category].push({
-      ...control,
-      status: mapStateToStatus(control.state),
-    });
+    acc[control.category].push(control);
     return acc;
   }, {} as Record<string, Control[]>);
 
-  // Toggle category expansion
   const toggleCategory = (categoryId: string) => {
     setExpandedCategories((prev) =>
       prev.includes(categoryId)
@@ -116,18 +140,19 @@ function FrameworkViewContent({
     );
   };
 
-  // Process categories with their controls
   const categories: Category[] = Object.entries(controlsByCategory)
     .map(([categoryName, categoryControls]) => {
-      // Calculate progress
-      const implementedCount = categoryControls.filter(
+      const catImplementedCount = categoryControls.filter(
         (control) => control.status === "complete"
       ).length;
-      const applicableCount = categoryControls.filter(
-        (control) => control.status !== "not-applicable"
+      const catNotApplicableCount = categoryControls.filter(
+        (control) => control.status === "not-applicable"
       ).length;
-      const progress = applicableCount
-        ? Math.round((implementedCount / applicableCount) * 100)
+      // Consider both "complete" and "not-applicable" as done for category progress
+      const catDoneCount = catImplementedCount + catNotApplicableCount;
+      const catTotalCount = categoryControls.length;
+      const progress = catTotalCount
+        ? Math.round((catDoneCount / catTotalCount) * 100)
         : 0;
 
       return {
@@ -136,6 +161,8 @@ function FrameworkViewContent({
         description: `Controls related to ${categoryName.toLowerCase()}`,
         progress: progress,
         controls: categoryControls,
+        doneCount: catDoneCount,
+        totalCount: catTotalCount,
       };
     })
     .filter((category) => category.controls.length > 0)
@@ -146,25 +173,16 @@ function FrameworkViewContent({
       case "complete":
         return <CheckCircle2 className="h-5 w-5 text-green-500" />;
       case "in-progress":
-        return <Clock className="h-5 w-5 text-amber-500" />;
+        return <Clock className="h-5 w-5 text-blue-500" />;
       case "not-started":
-        return <AlertCircle className="h-5 w-5 text-blue-500" />;
+        return <AlertCircle className="h-5 w-5 text-gray-200" />;
       case "incomplete":
         return <AlertCircle className="h-5 w-5 text-red-500" />;
       case "not-applicable":
-        return <ShieldCheck className="h-5 w-5 text-gray-400" />;
+        return <ShieldCheck className="h-5 w-5 text-gray-600" />;
       default:
         return null;
     }
-  };
-
-  const getStatusCounts = (controls: Control[]) => {
-    return controls.reduce((acc, control) => {
-      if (control.status) {
-        acc[control.status] = (acc[control.status] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
   };
 
   return (
@@ -191,10 +209,117 @@ function FrameworkViewContent({
         </div>
       }
     >
+      {/* Global Progress Summary */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-lg font-medium">Framework Implementation</h3>
+          <span className="text-sm text-muted-foreground">
+            {globalProgress}% complete
+          </span>
+        </div>
+
+        {/* Progress bar container */}
+        <div className="w-full h-5 rounded-full overflow-hidden bg-muted mb-2">
+          {/* Segmented progress bar */}
+          <div className="flex h-full">
+            {/* Complete segment */}
+            {globalStatusCounts.complete > 0 && (
+              <div
+                className="bg-green-500 h-full"
+                style={{
+                  width: `${
+                    (globalStatusCounts.complete / totalControls) * 100
+                  }%`,
+                }}
+              />
+            )}
+            {/* In-progress segment */}
+            {globalStatusCounts["in-progress"] > 0 && (
+              <div
+                className="bg-blue-500 h-full"
+                style={{
+                  width: `${
+                    (globalStatusCounts["in-progress"] / totalControls) * 100
+                  }%`,
+                }}
+              />
+            )}
+            {/* Incomplete segment */}
+            {globalStatusCounts.incomplete > 0 && (
+              <div
+                className="bg-red-500 h-full"
+                style={{
+                  width: `${
+                    (globalStatusCounts.incomplete / totalControls) * 100
+                  }%`,
+                }}
+              />
+            )}
+            {/* Not applicable segment */}
+            {globalStatusCounts["not-applicable"] > 0 && (
+              <div
+                className="bg-gray-600 h-full"
+                style={{
+                  width: `${
+                    (globalStatusCounts["not-applicable"] / totalControls) * 100
+                  }%`,
+                }}
+              />
+            )}
+            {/* Not started segment */}
+            {globalStatusCounts["not-started"] > 0 && (
+              <div
+                className="bg-gray-200 h-full"
+                style={{
+                  width: `${
+                    (globalStatusCounts["not-started"] / totalControls) * 100
+                  }%`,
+                }}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Status legend - reorder to match progress bar */}
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          {globalStatusCounts.complete > 0 && (
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span>Complete ({globalStatusCounts.complete})</span>
+            </div>
+          )}
+          {globalStatusCounts["in-progress"] > 0 && (
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+              <span>In Progress ({globalStatusCounts["in-progress"]})</span>
+            </div>
+          )}
+          {globalStatusCounts.incomplete > 0 && (
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <span>Incomplete ({globalStatusCounts.incomplete})</span>
+            </div>
+          )}
+          {globalStatusCounts["not-applicable"] > 0 && (
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <div className="w-3 h-3 rounded-full bg-gray-600"></div>
+              <span>
+                Not Applicable ({globalStatusCounts["not-applicable"]})
+              </span>
+            </div>
+          )}
+          {globalStatusCounts["not-started"] > 0 && (
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <div className="w-3 h-3 rounded-full bg-gray-200"></div>
+              <span>Not Started ({globalStatusCounts["not-started"]})</span>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="grid gap-6">
         {categories.map((category) => {
           const isExpanded = expandedCategories.includes(category.id);
-          const statusCounts = getStatusCounts(category.controls);
 
           return (
             <div
@@ -207,33 +332,11 @@ function FrameworkViewContent({
                     <div className="flex items-center gap-2">
                       <CardTitle>{category.name}</CardTitle>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className="bg-green-500/10 text-green-500"
-                      >
-                        {statusCounts.complete || 0} Complete
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className="bg-amber-500/10 text-amber-500"
-                      >
-                        {statusCounts["in-progress"] || 0} In Progress
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className="bg-red-500/10 text-red-500"
-                      >
-                        {statusCounts.incomplete || 0} Incomplete
-                      </Badge>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <span>
+                        {category.doneCount} / {category.totalCount}
+                      </span>
                     </div>
-                  </div>
-                  <div className="mt-2">
-                    <div className="mb-1 flex items-center justify-between text-sm">
-                      <span>Implementation progress</span>
-                      <span className="font-medium">{category.progress}%</span>
-                    </div>
-                    <Progress value={category.progress} className="h-2" />
                   </div>
 
                   <Button
