@@ -8,7 +8,14 @@ const FrameworkView = lazy(() => import("./FrameworkView"));
 
 export function FrameworkViewSkeleton() {
   return (
-    <PageTemplateSkeleton>
+    <PageTemplateSkeleton
+      actions={
+        <div className="flex gap-4 w-1/3">
+          <div className="bg-muted animate-pulse h-9 w-1/2 rounded-lg" />
+          <div className="bg-muted animate-pulse h-9 w-1/2 rounded-lg" />
+        </div>
+      }
+    >
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3].map((i) => (
           <Card key={i}>
