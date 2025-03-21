@@ -245,47 +245,86 @@ function VendorListContent({
       description="Vendors are third-party services that your company uses. Add them to
       keep track of their risk and compliance status."
     >
-      <div className="rounded-xl border bg-card p-4">
-        <div className="flex items-center gap-2 mb-4">
-          <Store className="h-5 w-5" />
-          <h3 className="font-medium">Add a vendor</h3>
-        </div>
-        <div className="flex gap-2 relative">
-          <Input
-            type="text"
-            placeholder="Type vendor's name"
-            value={searchTerm}
-            style={{ borderRadius: "0.3rem" }}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSearchTerm(value);
-              if (value.trim() === "") {
-                setFilteredVendors([]);
-              } else {
-                const results = fuse.search(value).map((result) => result.item);
-                setFilteredVendors(results);
-              }
-            }}
-          />
+      <div className="space-y-6">
+        <div className="rounded-xl border bg-card p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Store className="h-5 w-5" />
+            <h3 className="font-medium">Add a vendor</h3>
+          </div>
+          <div className="flex gap-2 relative">
+            <Input
+              type="text"
+              placeholder="Type vendor's name"
+              value={searchTerm}
+              style={{ borderRadius: "0.3rem" }}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearchTerm(value);
+                if (value.trim() === "") {
+                  setFilteredVendors([]);
+                } else {
+                  const results = fuse
+                    .search(value)
+                    .map((result) => result.item);
+                  setFilteredVendors(results);
+                }
+              }}
+            />
 
-          {searchTerm.trim() !== "" && (
-            <>
-              {filteredVendors.length > 0 ? (
-                <div
-                  style={{ borderRadius: "0.3rem" }}
-                  className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-popover shadow-md z-10"
-                >
-                  {filteredVendors.map((vendor: VendorItem) => (
+            {searchTerm.trim() !== "" && (
+              <>
+                {filteredVendors.length > 0 ? (
+                  <div
+                    style={{ borderRadius: "0.3rem" }}
+                    className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-popover shadow-md z-10"
+                  >
+                    {filteredVendors.map((vendor: VendorItem) => (
+                      <button
+                        key={vendor.id}
+                        className="w-full px-3 py-2 text-left hover:bg-accent"
+                        onClick={() => {
+                          createVendor({
+                            variables: {
+                              connections: [vendorsConnection.vendors.__id],
+                              input: {
+                                organizationId: data.organization.id,
+                                name: vendor.name,
+                                description: "",
+                                serviceStartAt: new Date().toISOString(),
+                                serviceCriticality: "LOW",
+                                riskTier: "GENERAL",
+                              },
+                            },
+                            onCompleted() {
+                              setSearchTerm("");
+                              setFilteredVendors([]);
+                              toast({
+                                title: "Vendor added",
+                                description:
+                                  "The vendor has been added successfully",
+                              });
+                            },
+                          });
+                        }}
+                      >
+                        {vendor.name}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    style={{ borderRadius: "0.3rem" }}
+                    className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] border bg-popover shadow-md z-10"
+                  >
                     <button
-                      key={vendor.id}
-                      className="w-full px-3 py-2 text-left hover:bg-accent"
+                      className="w-full px-3 py-2 text-left hover:bg-accent flex items-center gap-2"
                       onClick={() => {
                         createVendor({
                           variables: {
                             connections: [vendorsConnection.vendors.__id],
                             input: {
                               organizationId: data.organization.id,
-                              name: vendor.name,
+                              name: searchTerm.trim(),
                               description: "",
                               serviceStartAt: new Date().toISOString(),
                               serviceCriticality: "LOW",
@@ -296,133 +335,98 @@ function VendorListContent({
                             setSearchTerm("");
                             setFilteredVendors([]);
                             toast({
-                              title: "Vendor added",
+                              title: "Vendor created",
                               description:
-                                "The vendor has been added successfully",
+                                "The new vendor has been created successfully",
                             });
                           },
                         });
                       }}
                     >
-                      {vendor.name}
+                      <span className="font-medium">Create new vendor:</span>{" "}
+                      {searchTerm}
                     </button>
-                  ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {vendors.map((vendor) => (
+            <Link
+              key={vendor?.id}
+              to={`/organizations/${organizationId}/vendors/${vendor?.id}`}
+              className="block"
+            >
+              <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">{vendor?.name}</p>
+                    {vendor?.description && (
+                      <>
+                        <span className="text-muted-foreground">•</span>
+                        <p className="text-sm text-muted-foreground">
+                          {vendor.description}
+                        </p>
+                      </>
+                    )}
+                  </div>
                 </div>
-              ) : (
-                <div
-                  style={{ borderRadius: "0.3rem" }}
-                  className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] border bg-popover shadow-md z-10"
-                >
-                  <button
-                    className="w-full px-3 py-2 text-left hover:bg-accent flex items-center gap-2"
-                    onClick={() => {
-                      createVendor({
-                        variables: {
-                          connections: [vendorsConnection.vendors.__id],
-                          input: {
-                            organizationId: data.organization.id,
-                            name: searchTerm.trim(),
-                            description: "",
-                            serviceStartAt: new Date().toISOString(),
-                            serviceCriticality: "LOW",
-                            riskTier: "GENERAL",
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="secondary"
+                    className={
+                      vendor.riskTier === "CRITICAL"
+                        ? "bg-red-100 text-red-900 rounded-full px-3 py-0.5 text-xs font-medium"
+                        : vendor?.riskTier === "SIGNIFICANT"
+                        ? "bg-yellow-100 text-yellow-900 rounded-full px-3 py-0.5 text-xs font-medium"
+                        : "bg-green-100 text-green-900 rounded-full px-3 py-0.5 text-xs font-medium"
+                    }
+                  >
+                    {vendor.riskTier}
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:bg-transparent hover:[&>svg]:text-destructive"
+                    onClick={(e) => {
+                      e.preventDefault(); // Prevent navigation
+                      if (
+                        window.confirm(
+                          "Are you sure you want to delete this vendor?"
+                        )
+                      ) {
+                        deleteVendor({
+                          variables: {
+                            connections: [vendorsConnection.vendors.__id],
+                            input: {
+                              vendorId: vendor.id,
+                            },
                           },
-                        },
-                        onCompleted() {
-                          setSearchTerm("");
-                          setFilteredVendors([]);
-                          toast({
-                            title: "Vendor created",
-                            description:
-                              "The new vendor has been created successfully",
-                          });
-                        },
-                      });
+                          onCompleted() {
+                            toast({
+                              title: "Vendor deleted",
+                              description:
+                                "The vendor has been deleted successfully",
+                            });
+                          },
+                        });
+                      }
                     }}
                   >
-                    <span className="font-medium">Create new vendor:</span>{" "}
-                    {searchTerm}
-                  </button>
+                    <Trash2 className="h-4 w-4 transition-colors" />
+                  </Button>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </div>
-              )}
-            </>
-          )}
+              </div>
+            </Link>
+          ))}
         </div>
-      </div>
-
-      <div className="space-y-2">
-        {vendors.map((vendor) => (
-          <Link
-            key={vendor?.id}
-            to={`/organizations/${organizationId}/vendors/${vendor?.id}`}
-            className="block"
-          >
-            <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex items-center gap-2">
-                  <p className="font-medium">{vendor?.name}</p>
-                  {vendor?.description && (
-                    <>
-                      <span className="text-muted-foreground">•</span>
-                      <p className="text-sm text-muted-foreground">
-                        {vendor.description}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant="secondary"
-                  className={
-                    vendor.riskTier === "CRITICAL"
-                      ? "bg-red-100 text-red-900 rounded-full px-3 py-0.5 text-xs font-medium"
-                      : vendor?.riskTier === "SIGNIFICANT"
-                      ? "bg-yellow-100 text-yellow-900 rounded-full px-3 py-0.5 text-xs font-medium"
-                      : "bg-green-100 text-green-900 rounded-full px-3 py-0.5 text-xs font-medium"
-                  }
-                >
-                  {vendor.riskTier}
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:bg-transparent hover:[&>svg]:text-destructive"
-                  onClick={(e) => {
-                    e.preventDefault(); // Prevent navigation
-                    if (
-                      window.confirm(
-                        "Are you sure you want to delete this vendor?"
-                      )
-                    ) {
-                      deleteVendor({
-                        variables: {
-                          connections: [vendorsConnection.vendors.__id],
-                          input: {
-                            vendorId: vendor.id,
-                          },
-                        },
-                        onCompleted() {
-                          toast({
-                            title: "Vendor deleted",
-                            description:
-                              "The vendor has been deleted successfully",
-                          });
-                        },
-                      });
-                    }
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 transition-colors" />
-                </Button>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </div>
-          </Link>
-        ))}
       </div>
 
       <LoadAboveButton

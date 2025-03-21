@@ -12,10 +12,6 @@ export function SettingsViewSkeleton() {
       description="Manage your details and personal preferences here"
     >
       <div className="space-y-6">
-        <div className="space-y-1">
-          <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-          <div className="h-4 w-96 bg-muted animate-pulse rounded" />
-        </div>
         <div className="space-y-2">
           {[1, 2].map((i) => (
             <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />

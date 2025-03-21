@@ -12,21 +12,22 @@ export function VendorListViewSkeleton() {
       description="Vendors are third-party services that your company uses. Add them to
       keep track of their risk and compliance status."
     >
-      <div>
-        <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-        <div className="h-4 w-96 bg-muted animate-pulse rounded mt-1" />
-      </div>
-      <div className="rounded-xl border bg-card p-4 space-y-4">
-        <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-        <div className="flex gap-2">
-          <div className="h-10 flex-1 bg-muted animate-pulse rounded" />
-          <div className="h-10 w-32 bg-muted animate-pulse rounded" />
+      <div className="space-y-6">
+        <div className="rounded-xl border bg-card p-4 space-y-4">
+          <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+          <div className="flex gap-2">
+            <div className="h-10 flex-1 bg-muted animate-pulse rounded" />
+            <div className="h-10 w-32 bg-muted animate-pulse rounded" />
+          </div>
         </div>
-      </div>
-      <div className="space-y-2">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-[72px] bg-muted animate-pulse rounded-xl" />
-        ))}
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-[72px] bg-muted animate-pulse rounded-xl"
+            />
+          ))}
+        </div>
       </div>
     </PageTemplateSkeleton>
   );
