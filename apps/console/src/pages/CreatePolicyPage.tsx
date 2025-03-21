@@ -14,13 +14,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Calendar, User } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PolicyEditor from "@/components/PolicyEditor";
 import PeopleSelector from "@/components/PeopleSelector";
 import { Suspense } from "react";
 import type { CreatePolicyPageMutation } from "./__generated__/CreatePolicyPageMutation.graphql";
 import type { CreatePolicyPageQuery as CreatePolicyPageQueryType } from "./__generated__/CreatePolicyPageQuery.graphql";
+import { PageHeader } from "./PageHeader";
 
 const CreatePolicyQuery = graphql`
   query CreatePolicyPageQuery($organizationId: ID!) {
@@ -159,20 +160,12 @@ function CreatePolicyForm({
       <Helmet>
         <title>Create Policy - Probo Console</title>
       </Helmet>
-      <div className="container mx-auto py-6">
-        <div className="flex items-center mb-6">
-          <div className="mr-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-              <FileText className="h-6 w-6 text-primary" />
-            </div>
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Create Policy</h1>
-            <p className="text-muted-foreground">
-              Create a new policy for your organization
-            </p>
-          </div>
-        </div>
+      <div className="container">
+        <PageHeader
+          className="mb-17"
+          title="Create Policy"
+          description="Create a new policy for your organization"
+        />
 
         <form onSubmit={handleSubmit}>
           <div className="grid gap-6">

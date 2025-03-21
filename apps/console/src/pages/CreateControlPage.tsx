@@ -21,6 +21,7 @@ import {
   CreateControlPageCreateControlMutation,
   ControlImportance,
 } from "./__generated__/CreateControlPageCreateControlMutation.graphql";
+import { PageHeader } from "./PageHeader";
 
 const createControlMutation = graphql`
   mutation CreateControlPageCreateControlMutation(
@@ -185,13 +186,12 @@ function CreateControlPageContent() {
       <Helmet>
         <title>Create Control - Probo</title>
       </Helmet>
-      <div className="container mx-auto py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">Create Control</h1>
-          <p className="text-muted-foreground">
-            Create a new control for your framework
-          </p>
-        </div>
+      <div className="container">
+        <PageHeader
+          className="mb-17"
+          title="Create Control"
+          description="Create a new control for your framework"
+        />
 
         <Card className="max-w-2xl">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">

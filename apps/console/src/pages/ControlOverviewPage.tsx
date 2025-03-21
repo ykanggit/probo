@@ -75,6 +75,7 @@ import type { ControlOverviewPageAssignTaskMutation as ControlOverviewPageAssign
 import type { ControlOverviewPageUnassignTaskMutation as ControlOverviewPageUnassignTaskMutationType } from "./__generated__/ControlOverviewPageUnassignTaskMutation.graphql";
 import type { ControlOverviewPageOrganizationQuery$data } from "./__generated__/ControlOverviewPageOrganizationQuery.graphql";
 import type { ControlOverviewPageUpdateControlStateMutation as ControlOverviewPageUpdateControlStateMutationType } from "./__generated__/ControlOverviewPageUpdateControlStateMutation.graphql";
+import { PageHeader } from "./PageHeader";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -1131,10 +1132,11 @@ function ControlOverviewPageContent({
       <Helmet>
         <title>{data.control.name || "Control"} - Probo</title>
       </Helmet>
-      <div className="min-h-screen bg-white p-6 space-y-6">
-        <div className="space-y-4 mb-8">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">{data.control.name}</h1>
+      <div className="container">
+        <PageHeader
+          className="mb-17"
+          title={data.control.name ?? ""}
+          actions={
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleEditControl}>
                 Edit Control
@@ -1167,7 +1169,9 @@ function ControlOverviewPageContent({
                 {formatImportance(data.control.importance)}
               </div>
             </div>
-          </div>
+          }
+        />
+        <div className="space-y-4 mb-8">
           <Card className="mt-4">
             <CardContent className="pt-6">
               <div className="prose prose-gray prose-sm md:prose-base text-gray-600 max-w-3xl">

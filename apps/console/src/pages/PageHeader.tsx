@@ -3,14 +3,16 @@ import { ReactNode } from "react";
 
 export function PageHeader({
   className,
+  children,
   title,
   actions,
   description,
 }: {
   className?: string;
+  children?: ReactNode;
   title: string;
   actions?: ReactNode;
-  description: string;
+  description?: string;
 }) {
   return (
     <div className={cn("space-y-6", className)}>
@@ -22,7 +24,8 @@ export function PageHeader({
       ) : (
         <PageHeading title={title} />
       )}
-      <PageDescription>{description}</PageDescription>
+      {description && <PageDescription>{description}</PageDescription>}
+      {children}
     </div>
   );
 }

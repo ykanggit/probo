@@ -291,6 +291,7 @@ function BreadcrumbControlOverview() {
           {data.control?.name}
         </BreadCrumbNavLink>
       </BreadcrumbItem>
+      <Outlet />
     </>
   );
 }
@@ -301,6 +302,17 @@ function BreadcrumbCreateControl() {
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbPage>Create Control</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbUpdateControl() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Update Control</BreadcrumbPage>
       </BreadcrumbItem>
     </>
   );
@@ -413,7 +425,12 @@ export default function ConsoleLayout() {
                           <BreadcrumbControlOverview />
                         </Suspense>
                       }
-                    />
+                    >
+                      <Route
+                        path="update"
+                        element={<BreadcrumbUpdateControl />}
+                      />
+                    </Route>
                     <Route
                       path="update"
                       element={<BreadcrumbUpdateFramework />}

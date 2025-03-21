@@ -18,6 +18,7 @@ import type { VendorOverviewPageQuery as VendorOverviewPageQueryType } from "./_
 import { useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "./PageHeader";
 
 const vendorOverviewPageQuery = graphql`
   query VendorOverviewPageQuery($vendorId: ID!) {
@@ -205,8 +206,12 @@ function VendorOverviewPageContent({
 
   return (
     <>
-      <div className="space-y-6 p-4 md:p-6 lg:p-8">
-        <div className="mx-auto max-w-4xl space-y-6">
+      <Helmet>
+        <title>Vendor - Probo</title>
+      </Helmet>
+      <div className="container">
+        <PageHeader className="mb-17" title={formData.name} />
+        <div className="max-w-4xl space-y-6">
           <EditableField
             label="Name"
             value={formData.name}

@@ -13,13 +13,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { FileText, Calendar, User } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Suspense } from "react";
 import PolicyEditor from "@/components/PolicyEditor";
 import PeopleSelector from "@/components/PeopleSelector";
 import type { UpdatePolicyPageQuery as UpdatePolicyPageQueryType } from "./__generated__/UpdatePolicyPageQuery.graphql";
 import type { UpdatePolicyPageMutation as UpdatePolicyPageMutationType } from "./__generated__/UpdatePolicyPageMutation.graphql";
+import { PageHeader } from "./PageHeader";
 
 const UpdatePolicyPageQuery = graphql`
   query UpdatePolicyPageQuery($policyId: ID!, $organizationId: ID!) {
@@ -151,18 +152,12 @@ function UpdatePolicyPageContent({
       <Helmet>
         <title>Update Policy - Probo Console</title>
       </Helmet>
-      <div className="container mx-auto py-6">
-        <div className="flex items-center mb-6">
-          <div className="mr-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-              <FileText className="h-6 w-6 text-primary" />
-            </div>
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Update Policy</h1>
-            <p className="text-muted-foreground">Update an existing policy</p>
-          </div>
-        </div>
+      <div className="container">
+        <PageHeader
+          className="mb-17"
+          title="Update Policy"
+          description="Update an existing policy"
+        />
 
         <form onSubmit={handleSubmit}>
           <div className="grid gap-6">

@@ -18,6 +18,7 @@ import type { PeopleOverviewPageQuery as PeopleOverviewPageQueryType } from "./_
 import { useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "./PageHeader";
 
 const peopleOverviewPageQuery = graphql`
   query PeopleOverviewPageQuery($peopleId: ID!) {
@@ -161,140 +162,156 @@ function PeopleOverviewPageContent({
 
   return (
     <>
-      <div className="space-y-6 p-4 md:p-6 lg:p-8">
-        <div className="mx-auto max-w-4xl space-y-6">
-          <EditableField
-            label="Full Name"
-            value={formData.fullName}
-            onChange={(value) => handleFieldChange("fullName", value)}
-          />
+      <Helmet>
+        <title>Person - Probo</title>
+      </Helmet>
+      <div className="container">
+        <PageHeader className="mb-17" title={formData.fullName} />
+        <div className="space-y-6">
+          <div className="mx-auto max-w-4xl space-y-6">
+            <EditableField
+              label="Full Name"
+              value={formData.fullName}
+              onChange={(value) => handleFieldChange("fullName", value)}
+            />
 
-          <EditableField
-            label="Primary Email"
-            value={formData.primaryEmailAddress}
-            type="email"
-            onChange={(value) =>
-              handleFieldChange("primaryEmailAddress", value)
-            }
-          />
+            <EditableField
+              label="Primary Email"
+              value={formData.primaryEmailAddress}
+              type="email"
+              onChange={(value) =>
+                handleFieldChange("primaryEmailAddress", value)
+              }
+            />
 
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <HelpCircle className="h-4 w-4 text-gray-400" />
-              <Label className="text-sm">Additional Email Addresses</Label>
-            </div>
             <div className="space-y-2">
-              {formData.additionalEmailAddresses.map((email, index) => (
-                <div key={index} className="flex gap-2">
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => {
-                      const newEmails = [...formData.additionalEmailAddresses];
-                      newEmails[index] = e.target.value;
-                      handleFieldChange("additionalEmailAddresses", newEmails);
-                    }}
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      const newEmails =
-                        formData.additionalEmailAddresses.filter(
-                          (_, i) => i !== index
-                        );
-                      handleFieldChange("additionalEmailAddresses", newEmails);
-                    }}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
-              <Button
-                variant="outline"
-                onClick={() => {
-                  handleFieldChange("additionalEmailAddresses", [
-                    ...formData.additionalEmailAddresses,
-                    "",
-                  ]);
-                }}
-              >
-                Add Email
-              </Button>
-            </div>
-          </div>
-
-          <Card className="p-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <h2 className="text-lg font-medium">Additional Information</h2>
-                <p className="text-sm text-gray-500">
-                  Additional details about the person
-                </p>
+              <div className="flex items-center gap-2">
+                <HelpCircle className="h-4 w-4 text-gray-400" />
+                <Label className="text-sm">Additional Email Addresses</Label>
               </div>
+              <div className="space-y-2">
+                {formData.additionalEmailAddresses.map((email, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => {
+                        const newEmails = [
+                          ...formData.additionalEmailAddresses,
+                        ];
+                        newEmails[index] = e.target.value;
+                        handleFieldChange(
+                          "additionalEmailAddresses",
+                          newEmails
+                        );
+                      }}
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        const newEmails =
+                          formData.additionalEmailAddresses.filter(
+                            (_, i) => i !== index
+                          );
+                        handleFieldChange(
+                          "additionalEmailAddresses",
+                          newEmails
+                        );
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    handleFieldChange("additionalEmailAddresses", [
+                      ...formData.additionalEmailAddresses,
+                      "",
+                    ]);
+                  }}
+                >
+                  Add Email
+                </Button>
+              </div>
+            </div>
 
+            <Card className="p-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <HelpCircle className="h-4 w-4 text-gray-400" />
-                    <Label className="text-sm">Kind</Label>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleFieldChange("kind", "EMPLOYEE")}
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.kind === "EMPLOYEE"
-                          ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      Employee
-                    </button>
-                    <button
-                      onClick={() => handleFieldChange("kind", "CONTRACTOR")}
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.kind === "CONTRACTOR"
-                          ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      Contractor
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleFieldChange("kind", "SERVICE_ACCOUNT")
-                      }
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.kind === "SERVICE_ACCOUNT"
-                          ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      Service Account
-                    </button>
+                  <h2 className="text-lg font-medium">
+                    Additional Information
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    Additional details about the person
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <HelpCircle className="h-4 w-4 text-gray-400" />
+                      <Label className="text-sm">Kind</Label>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleFieldChange("kind", "EMPLOYEE")}
+                        className={cn(
+                          "rounded-full px-4 py-1 text-sm transition-colors",
+                          formData.kind === "EMPLOYEE"
+                            ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        )}
+                      >
+                        Employee
+                      </button>
+                      <button
+                        onClick={() => handleFieldChange("kind", "CONTRACTOR")}
+                        className={cn(
+                          "rounded-full px-4 py-1 text-sm transition-colors",
+                          formData.kind === "CONTRACTOR"
+                            ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        )}
+                      >
+                        Contractor
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleFieldChange("kind", "SERVICE_ACCOUNT")
+                        }
+                        className={cn(
+                          "rounded-full px-4 py-1 text-sm transition-colors",
+                          formData.kind === "SERVICE_ACCOUNT"
+                            ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        )}
+                      >
+                        Service Account
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
         </div>
-      </div>
 
-      {hasChanges && (
-        <div className="fixed bottom-6 right-6 flex gap-2">
-          <Button variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            Save Changes
-          </Button>
-        </div>
-      )}
+        {hasChanges && (
+          <div className="fixed bottom-6 right-6 flex gap-2">
+            <Button variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Save Changes
+            </Button>
+          </div>
+        )}
+      </div>
     </>
   );
 }

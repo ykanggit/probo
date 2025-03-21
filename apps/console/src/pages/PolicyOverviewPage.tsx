@@ -18,6 +18,7 @@ import type { PolicyOverviewPageDeleteMutation } from "./__generated__/PolicyOve
 import { Helmet } from "react-helmet-async";
 import "../styles/policy-content.css";
 import { useToast } from "@/hooks/use-toast";
+import { PageHeader } from "./PageHeader";
 
 const PolicyOverviewPageQuery = graphql`
   query PolicyOverviewPageQuery($policyId: ID!) {
@@ -152,72 +153,65 @@ function PolicyOverviewPageContent({
       <Helmet>
         <title>{policy.name} - Probo Console</title>
       </Helmet>
-      <div className="container mx-auto py-6">
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex items-center">
-            <div className="mr-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <FileText className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">{policy.name}</h1>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Badge
-                  variant={policy.status === "ACTIVE" ? "default" : "outline"}
+      <div className="container">
+        <PageHeader
+          className="mb-17"
+          title={policy.name ?? ""}
+          actions={
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <Link
+                  to={`/organizations/${organizationId}/policies/${policy.id}/update`}
                 >
-                  {policy.status === "ACTIVE" ? "Active" : "Draft"}
-                </Badge>
-                {policy.owner && (
-                  <div className="flex items-center gap-1">
-                    <User className="h-3 w-3" />
-                    <Link
-                      to={`/organizations/${organizationId}/people/${policy.owner.id}`}
-                      className="hover:underline"
-                    >
-                      {policy.owner.fullName}
-                    </Link>
-                  </div>
-                )}
-                {policy.reviewDate && (
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>Review: {formatDate(policy.reviewDate)}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link
-                to={`/organizations/${organizationId}/policies/${policy.id}/update`}
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Logic to download policy content as PDF or text
+                  const element = document.createElement("a");
+                  const file = new Blob([policy.content || ""], {
+                    type: "text/plain",
+                  });
+                  element.href = URL.createObjectURL(file);
+                  element.download = `${policy.name}.txt`;
+                  document.body.appendChild(element);
+                  element.click();
+                  document.body.removeChild(element);
+                }}
               >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Link>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // Logic to download policy content as PDF or text
-                const element = document.createElement("a");
-                const file = new Blob([policy.content || ""], {
-                  type: "text/plain",
-                });
-                element.href = URL.createObjectURL(file);
-                element.download = `${policy.name}.txt`;
-                document.body.appendChild(element);
-                element.click();
-                document.body.removeChild(element);
-              }}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Download
-            </Button>
+                <Download className="h-4 w-4 mr-2" />
+                Download
+              </Button>
+            </div>
+          }
+        >
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Badge variant={policy.status === "ACTIVE" ? "default" : "outline"}>
+              {policy.status === "ACTIVE" ? "Active" : "Draft"}
+            </Badge>
+            {policy.owner && (
+              <div className="flex items-center gap-1">
+                <User className="h-3 w-3" />
+                <Link
+                  to={`/organizations/${organizationId}/people/${policy.owner.id}`}
+                  className="hover:underline"
+                >
+                  {policy.owner.fullName}
+                </Link>
+              </div>
+            )}
+            {policy.reviewDate && (
+              <div className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                <span>Review: {formatDate(policy.reviewDate)}</span>
+              </div>
+            )}
           </div>
-        </div>
+        </PageHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">

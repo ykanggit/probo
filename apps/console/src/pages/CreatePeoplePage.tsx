@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CreatePeoplePageCreatePeopleMutation } from "./__generated__/CreatePeoplePageCreatePeopleMutation.graphql";
+import { PageHeader } from "./PageHeader";
 
 const createPeopleMutation = graphql`
   mutation CreatePeoplePageCreatePeopleMutation(
@@ -153,10 +154,15 @@ function CreatePeoplePageContent() {
       <Helmet>
         <title>Create Person - Probo Console</title>
       </Helmet>
+      <div className="container">
+        <PageHeader
+          className="mb-17"
+          title="Add a Person"
+          description="Add a new person interacting with organization"
+        />
 
-      <form onSubmit={handleSubmit}>
-        <div className="space-y-6 p-4 md:p-6 lg:p-8">
-          <div className="mx-auto max-w-4xl space-y-6">
+        <form onSubmit={handleSubmit}>
+          <div className="max-w-4xl space-y-6">
             <EditableField
               label="Full Name"
               value={formData.fullName}
@@ -291,19 +297,23 @@ function CreatePeoplePageContent() {
               </div>
             </Card>
           </div>
-        </div>
-        <div className="fixed bottom-6 right-6 flex gap-2">
-          <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            Create Person
-          </Button>
-        </div>
-      </form>
+          <div className="fixed bottom-6 right-6 flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate(-1)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Create Person
+            </Button>
+          </div>
+        </form>
+      </div>
     </>
   );
 }

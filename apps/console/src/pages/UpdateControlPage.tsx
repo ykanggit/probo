@@ -28,6 +28,7 @@ import type {
   ControlState,
   ControlImportance,
 } from "./__generated__/UpdateControlPageUpdateControlMutation.graphql";
+import { PageHeader } from "./PageHeader";
 
 const updateControlMutation = graphql`
   mutation UpdateControlPageUpdateControlMutation($input: UpdateControlInput!) {
@@ -253,11 +254,12 @@ function UpdateControlPageContent({
       <Helmet>
         <title>Update Control - Probo</title>
       </Helmet>
-      <div className="container mx-auto py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">Update Control</h1>
-          <p className="text-muted-foreground">Update the control details</p>
-        </div>
+      <div className="container">
+        <PageHeader
+          className="mb-17"
+          title="Update Control"
+          description="Update the control details"
+        />
 
         <Card className="max-w-2xl">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">

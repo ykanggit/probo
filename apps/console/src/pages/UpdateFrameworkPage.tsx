@@ -18,6 +18,7 @@ import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UpdateFrameworkPageUpdateFrameworkMutation } from "./__generated__/UpdateFrameworkPageUpdateFrameworkMutation.graphql";
 import { UpdateFrameworkPageQuery as UpdateFrameworkPageQueryType } from "./__generated__/UpdateFrameworkPageQuery.graphql";
+import { PageHeader } from "./PageHeader";
 
 const updateFrameworkMutation = graphql`
   mutation UpdateFrameworkPageUpdateFrameworkMutation(
@@ -87,7 +88,7 @@ function EditableField({
           }
           className={cn(
             "w-full resize-none",
-            required && !value && "border-red-500",
+            required && !value && "border-red-500"
           )}
           placeholder={`Enter ${label.toLowerCase()}`}
           rows={4}
@@ -134,7 +135,7 @@ function UpdateFrameworkPageContent({
 
   const [commit, isInFlight] =
     useMutation<UpdateFrameworkPageUpdateFrameworkMutation>(
-      updateFrameworkMutation,
+      updateFrameworkMutation
     );
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
@@ -202,11 +203,12 @@ function UpdateFrameworkPageContent({
       <Helmet>
         <title>Update Framework - Probo</title>
       </Helmet>
-      <div className="container mx-auto py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">Update Framework</h1>
-          <p className="text-muted-foreground">Update the framework details</p>
-        </div>
+      <div className="container">
+        <PageHeader
+          className="mb-17"
+          title="Update Framework"
+          description="Update the framework details"
+        />
 
         <Card className="max-w-2xl">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
