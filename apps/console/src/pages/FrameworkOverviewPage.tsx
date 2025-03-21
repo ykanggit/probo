@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const FrameworkOverviewPageQuery = graphql`
   query FrameworkOverviewPageQuery($frameworkId: ID!) {

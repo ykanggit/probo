@@ -75,7 +75,7 @@ import type { ControlOverviewPageAssignTaskMutation as ControlOverviewPageAssign
 import type { ControlOverviewPageUnassignTaskMutation as ControlOverviewPageUnassignTaskMutationType } from "./__generated__/ControlOverviewPageUnassignTaskMutation.graphql";
 import type { ControlOverviewPageOrganizationQuery$data } from "./__generated__/ControlOverviewPageOrganizationQuery.graphql";
 import type { ControlOverviewPageUpdateControlStateMutation as ControlOverviewPageUpdateControlStateMutationType } from "./__generated__/ControlOverviewPageUpdateControlStateMutation.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {

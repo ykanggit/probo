@@ -21,7 +21,7 @@ import PeopleSelector from "@/components/PeopleSelector";
 import { Suspense } from "react";
 import type { CreatePolicyPageMutation } from "./__generated__/CreatePolicyPageMutation.graphql";
 import type { CreatePolicyPageQuery as CreatePolicyPageQueryType } from "./__generated__/CreatePolicyPageQuery.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const CreatePolicyQuery = graphql`
   query CreatePolicyPageQuery($organizationId: ID!) {

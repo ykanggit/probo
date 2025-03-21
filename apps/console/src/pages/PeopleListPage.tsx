@@ -18,7 +18,7 @@ import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generat
 import type { PeopleListPageDeletePeopleMutation } from "./__generated__/PeopleListPageDeletePeopleMutation.graphql";
 import { PeopleListPagePaginationQuery } from "./__generated__/PeopleListPagePaginationQuery.graphql";
 import { PeopleListPage_peoples$key } from "./__generated__/PeopleListPage_peoples.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const ITEMS_PER_PAGE = 25;
 

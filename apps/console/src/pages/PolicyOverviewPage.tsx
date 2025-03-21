@@ -18,7 +18,7 @@ import type { PolicyOverviewPageDeleteMutation } from "./__generated__/PolicyOve
 import { Helmet } from "react-helmet-async";
 import "../styles/policy-content.css";
 import { useToast } from "@/hooks/use-toast";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const PolicyOverviewPageQuery = graphql`
   query PolicyOverviewPageQuery($policyId: ID!) {
@@ -157,6 +157,32 @@ function PolicyOverviewPageContent({
         <PageHeader
           className="mb-17"
           title={policy.name ?? ""}
+          description={
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Badge
+                variant={policy.status === "ACTIVE" ? "default" : "outline"}
+              >
+                {policy.status === "ACTIVE" ? "Active" : "Draft"}
+              </Badge>
+              {policy.owner && (
+                <div className="flex items-center gap-1">
+                  <User className="h-3 w-3" />
+                  <Link
+                    to={`/organizations/${organizationId}/people/${policy.owner.id}`}
+                    className="hover:underline"
+                  >
+                    {policy.owner.fullName}
+                  </Link>
+                </div>
+              )}
+              {policy.reviewDate && (
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  <span>Review: {formatDate(policy.reviewDate)}</span>
+                </div>
+              )}
+            </div>
+          }
           actions={
             <div className="flex gap-2">
               <Button variant="outline" size="sm" asChild>
@@ -188,30 +214,7 @@ function PolicyOverviewPageContent({
               </Button>
             </div>
           }
-        >
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Badge variant={policy.status === "ACTIVE" ? "default" : "outline"}>
-              {policy.status === "ACTIVE" ? "Active" : "Draft"}
-            </Badge>
-            {policy.owner && (
-              <div className="flex items-center gap-1">
-                <User className="h-3 w-3" />
-                <Link
-                  to={`/organizations/${organizationId}/people/${policy.owner.id}`}
-                  className="hover:underline"
-                >
-                  {policy.owner.fullName}
-                </Link>
-              </div>
-            )}
-            {policy.reviewDate && (
-              <div className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                <span>Review: {formatDate(policy.reviewDate)}</span>
-              </div>
-            )}
-          </div>
-        </PageHeader>
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">

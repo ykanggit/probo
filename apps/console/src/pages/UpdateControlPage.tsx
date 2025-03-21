@@ -28,7 +28,7 @@ import type {
   ControlState,
   ControlImportance,
 } from "./__generated__/UpdateControlPageUpdateControlMutation.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const updateControlMutation = graphql`
   mutation UpdateControlPageUpdateControlMutation($input: UpdateControlInput!) {

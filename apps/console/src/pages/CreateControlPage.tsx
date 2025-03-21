@@ -21,7 +21,7 @@ import {
   CreateControlPageCreateControlMutation,
   ControlImportance,
 } from "./__generated__/CreateControlPageCreateControlMutation.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const createControlMutation = graphql`
   mutation CreateControlPageCreateControlMutation(

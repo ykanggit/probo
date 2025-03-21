@@ -18,7 +18,7 @@ import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UpdateFrameworkPageUpdateFrameworkMutation } from "./__generated__/UpdateFrameworkPageUpdateFrameworkMutation.graphql";
 import { UpdateFrameworkPageQuery as UpdateFrameworkPageQueryType } from "./__generated__/UpdateFrameworkPageQuery.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const updateFrameworkMutation = graphql`
   mutation UpdateFrameworkPageUpdateFrameworkMutation(

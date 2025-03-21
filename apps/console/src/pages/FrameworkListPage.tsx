@@ -10,7 +10,6 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useParams } from "react-router";
 import type { FrameworkListPageQuery as FrameworkListPageQueryType } from "./__generated__/FrameworkListPageQuery.graphql";
-import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Plus, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -24,7 +23,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FrameworkListPageImportFrameworkMutation as FrameworkListPageImportFrameworkMutationType } from "./__generated__/FrameworkListPageImportFrameworkMutation.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const FrameworkListPageQuery = graphql`
   query FrameworkListPageQuery($organizationId: ID!) {
@@ -191,111 +190,107 @@ function FrameworkListPageContent({
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Frameworks - Probo</title>
-      </Helmet>
-      <div className="container">
-        <PageHeader
-          className="mb-17"
-          title="Frameworks"
-          description="Manage your compliance frameworks"
-          actions={
-            <div className="flex gap-4">
-              <Dialog
-                open={isImportDialogOpen}
-                onOpenChange={setIsImportDialogOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button variant="outline">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Import Framework
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Import Framework</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="framework-file">
-                        Upload Framework File
-                      </Label>
-                      <Input
-                        id="framework-file"
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        disabled={isUploading}
-                        accept=".json"
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        Upload a JSON file containing your framework definition.
-                      </p>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-              <Button asChild>
-                <Link to={`/organizations/${organizationId}/frameworks/create`}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Framework
-                </Link>
+    <PageTemplate
+      title="Frameworks"
+      description="Manage your compliance frameworks"
+      actions={
+        <div className="flex gap-4">
+          <Dialog
+            open={isImportDialogOpen}
+            onOpenChange={setIsImportDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Upload className="mr-2 h-4 w-4" />
+                Import Framework
               </Button>
-            </div>
-          }
-        />
-        <div className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-            {frameworks.map((framework) => {
-              const validatedControls = framework.controls.edges.filter(
-                (edge) => edge?.node?.state === "IMPLEMENTED"
-              ).length;
-              const totalControls = framework.controls.edges.length;
-
-              return (
-                <Link
-                  key={framework.id}
-                  to={`/organizations/${organizationId}/frameworks/${framework.id}`}
-                >
-                  <FrameworkCard
-                    title={framework.name}
-                    description={framework.description}
-                    icon={
-                      <div className="flex size-full items-center justify-center rounded-full bg-blue-100">
-                        <span className="text-lg font-semibold text-blue-900">
-                          {framework.name.split(" ")[0]}
-                        </span>
-                      </div>
-                    }
-                    status={
-                      validatedControls === totalControls
-                        ? "Compliant"
-                        : undefined
-                    }
-                    progress={
-                      validatedControls === totalControls
-                        ? "All controls validated"
-                        : `${validatedControls}/${totalControls} Controls validated`
-                    }
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Import Framework</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="framework-file">Upload Framework File</Label>
+                  <Input
+                    id="framework-file"
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    disabled={isUploading}
+                    accept=".json"
                   />
-                </Link>
-              );
-            })}
-          </div>
+                  <p className="text-sm text-muted-foreground">
+                    Upload a JSON file containing your framework definition.
+                  </p>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <Button asChild>
+            <Link to={`/organizations/${organizationId}/frameworks/create`}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Framework
+            </Link>
+          </Button>
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+          {frameworks.map((framework) => {
+            const validatedControls = framework.controls.edges.filter(
+              (edge) => edge?.node?.state === "IMPLEMENTED"
+            ).length;
+            const totalControls = framework.controls.edges.length;
+
+            return (
+              <Link
+                key={framework.id}
+                to={`/organizations/${organizationId}/frameworks/${framework.id}`}
+              >
+                <FrameworkCard
+                  title={framework.name}
+                  description={framework.description}
+                  icon={
+                    <div className="flex size-full items-center justify-center rounded-full bg-blue-100">
+                      <span className="text-lg font-semibold text-blue-900">
+                        {framework.name.split(" ")[0]}
+                      </span>
+                    </div>
+                  }
+                  status={
+                    validatedControls === totalControls
+                      ? "Compliant"
+                      : undefined
+                  }
+                  progress={
+                    validatedControls === totalControls
+                      ? "All controls validated"
+                      : `${validatedControls}/${totalControls} Controls validated`
+                  }
+                />
+              </Link>
+            );
+          })}
         </div>
       </div>
-    </>
+    </PageTemplate>
   );
 }
 
-function FrameworkListPageFallback() {
+export function FrameworkListPageSkeleton() {
   return (
-    <div className="space-y-6">
-      <div>
-        <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-        <div className="h-4 w-96 bg-muted animate-pulse rounded mt-1" />
-      </div>
+    <PageTemplateSkeleton
+      title="Frameworks"
+      description="Manage your compliance frameworks"
+      actions={
+        <div className="flex gap-4 w-1/3">
+          <div className="bg-muted animate-pulse h-9 w-1/2 rounded-lg" />
+          <div className="bg-muted animate-pulse h-9 w-1/2 rounded-lg" />
+        </div>
+      }
+    >
       <div className="grid gap-6 md:grid-cols-2">
         {[1, 2].map((i) => (
           <Card key={i} className="bg-card/50">
@@ -310,7 +305,7 @@ function FrameworkListPageFallback() {
           </Card>
         ))}
       </div>
-    </div>
+    </PageTemplateSkeleton>
   );
 }
 
@@ -326,13 +321,8 @@ export default function FrameworkListPage() {
   }, [loadQuery, organizationId]);
 
   return (
-    <>
-      <Helmet>
-        <title>Frameworks - Probo Console</title>
-      </Helmet>
-      <Suspense fallback={<FrameworkListPageFallback />}>
-        {queryRef && <FrameworkListPageContent queryRef={queryRef} />}
-      </Suspense>
-    </>
+    <Suspense fallback={<FrameworkListPageSkeleton />}>
+      {queryRef && <FrameworkListPageContent queryRef={queryRef} />}
+    </Suspense>
   );
 }

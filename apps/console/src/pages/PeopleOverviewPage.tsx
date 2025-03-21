@@ -18,7 +18,7 @@ import type { PeopleOverviewPageQuery as PeopleOverviewPageQueryType } from "./_
 import { useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { cn } from "@/lib/utils";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const peopleOverviewPageQuery = graphql`
   query PeopleOverviewPageQuery($peopleId: ID!) {

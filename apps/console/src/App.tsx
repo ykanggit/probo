@@ -12,6 +12,7 @@ import ConsoleLayout from "./layouts/ConsoleLayout";
 import AuthLayout from "./layouts/AuthLayout";
 import { RelayEnvironment } from "./RelayEnvironment";
 import VisitorErrorBoundary from "./components/VisitorErrorBoundary";
+import { FrameworkListPageSkeleton } from "./pages/FrameworkListPage";
 
 posthog.init(process.env.POSTHOG_KEY!, {
   api_host: process.env.POSTHOG_HOST,
@@ -145,7 +146,7 @@ function App() {
                       <Route
                         path="frameworks"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<FrameworkListPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <FrameworkListPage />
                             </ErrorBoundaryWithLocation>

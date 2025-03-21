@@ -39,7 +39,7 @@ import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__
 import type { SettingsPageUpdateOrganizationMutation as SettingsPageUpdateOrganizationMutationType } from "./__generated__/SettingsPageUpdateOrganizationMutation.graphql";
 import type { SettingsPageInviteUserMutation as SettingsPageInviteUserMutationType } from "./__generated__/SettingsPageInviteUserMutation.graphql";
 import type { SettingsPageRemoveUserMutation as SettingsPageRemoveUserMutationType } from "./__generated__/SettingsPageRemoveUserMutation.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const settingsPageQuery = graphql`
   query SettingsPageQuery($organizationID: ID!) {

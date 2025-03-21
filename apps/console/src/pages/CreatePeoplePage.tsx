@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CreatePeoplePageCreatePeopleMutation } from "./__generated__/CreatePeoplePageCreatePeopleMutation.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const createPeopleMutation = graphql`
   mutation CreatePeoplePageCreatePeopleMutation(

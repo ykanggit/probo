@@ -34,7 +34,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import type { PolicyListPageQuery as PolicyListPageQueryType } from "./__generated__/PolicyListPageQuery.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const PolicyListPageQuery = graphql`
   query PolicyListPageQuery($organizationId: ID!) {

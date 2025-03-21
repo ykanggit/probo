@@ -22,7 +22,7 @@ import { VendorListPageDeleteVendorMutation } from "./__generated__/VendorListPa
 import { VendorListPagePaginationQuery } from "./__generated__/VendorListPagePaginationQuery.graphql";
 import { VendorListPage_vendors$key } from "./__generated__/VendorListPage_vendors.graphql";
 import { useToast } from "@/hooks/use-toast";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const ITEMS_PER_PAGE = 25;
 

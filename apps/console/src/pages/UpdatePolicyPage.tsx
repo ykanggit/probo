@@ -20,7 +20,7 @@ import PolicyEditor from "@/components/PolicyEditor";
 import PeopleSelector from "@/components/PeopleSelector";
 import type { UpdatePolicyPageQuery as UpdatePolicyPageQueryType } from "./__generated__/UpdatePolicyPageQuery.graphql";
 import type { UpdatePolicyPageMutation as UpdatePolicyPageMutationType } from "./__generated__/UpdatePolicyPageMutation.graphql";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/PageHeader";
 
 const UpdatePolicyPageQuery = graphql`
   query UpdatePolicyPageQuery($policyId: ID!, $organizationId: ID!) {
