@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f8b972f4147ecb52da49f44ef9c62df1>>
+ * @generated SignedSource<<0d36f3f459adaca2f0abab59d9208bf9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,11 +14,11 @@ export type ImportFrameworkInput = {
   file: any;
   organizationId: string;
 };
-export type FrameworkListPageImportFrameworkMutation$variables = {
+export type FrameworkListViewImportFrameworkMutation$variables = {
   connections: ReadonlyArray<string>;
   input: ImportFrameworkInput;
 };
-export type FrameworkListPageImportFrameworkMutation$data = {
+export type FrameworkListViewImportFrameworkMutation$data = {
   readonly importFramework: {
     readonly frameworkEdge: {
       readonly node: {
@@ -39,9 +39,9 @@ export type FrameworkListPageImportFrameworkMutation$data = {
     };
   };
 };
-export type FrameworkListPageImportFrameworkMutation = {
-  response: FrameworkListPageImportFrameworkMutation$data;
-  variables: FrameworkListPageImportFrameworkMutation$variables;
+export type FrameworkListViewImportFrameworkMutation = {
+  response: FrameworkListViewImportFrameworkMutation$data;
+  variables: FrameworkListViewImportFrameworkMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -175,7 +175,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "FrameworkListPageImportFrameworkMutation",
+    "name": "FrameworkListViewImportFrameworkMutation",
     "selections": [
       {
         "alias": null,
@@ -200,7 +200,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "FrameworkListPageImportFrameworkMutation",
+    "name": "FrameworkListViewImportFrameworkMutation",
     "selections": [
       {
         "alias": null,
@@ -233,16 +233,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "946e840d5f7bb3a33e7ee1d0e2180bb5",
+    "cacheID": "b225cace8b9956333d0175a7e0a4c04d",
     "id": null,
     "metadata": {},
-    "name": "FrameworkListPageImportFrameworkMutation",
+    "name": "FrameworkListViewImportFrameworkMutation",
     "operationKind": "mutation",
-    "text": "mutation FrameworkListPageImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n        controls(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation FrameworkListViewImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n        controls(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "76c55c89cce3718241b2ee63f026197b";
+(node as any).hash = "fa1a8aa9d16bc50eac99392d3de59f6c";
 
 export default node;

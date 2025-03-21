@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<25802163c3ca6cc24524ebbc1388cd95>>
+ * @generated SignedSource<<c2ec2b3948d67ed6b924494adcae63aa>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,10 +10,10 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type FrameworkListPageQuery$variables = {
+export type FrameworkListViewQuery$variables = {
   organizationId: string;
 };
-export type FrameworkListPageQuery$data = {
+export type FrameworkListViewQuery$data = {
   readonly organization: {
     readonly frameworks?: {
       readonly edges: ReadonlyArray<{
@@ -36,9 +36,9 @@ export type FrameworkListPageQuery$data = {
     };
   };
 };
-export type FrameworkListPageQuery = {
-  response: FrameworkListPageQuery$data;
-  variables: FrameworkListPageQuery$variables;
+export type FrameworkListViewQuery = {
+  response: FrameworkListViewQuery$data;
+  variables: FrameworkListViewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -209,7 +209,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "FrameworkListPageQuery",
+    "name": "FrameworkListViewQuery",
     "selections": [
       {
         "alias": "organization",
@@ -227,7 +227,7 @@ return {
                 "args": null,
                 "concreteType": "FrameworkConnection",
                 "kind": "LinkedField",
-                "name": "__FrameworkListPage_frameworks_connection",
+                "name": "__FrameworkListView_frameworks_connection",
                 "plural": false,
                 "selections": (v5/*: any*/),
                 "storageKey": null
@@ -247,7 +247,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "FrameworkListPageQuery",
+    "name": "FrameworkListViewQuery",
     "selections": [
       {
         "alias": "organization",
@@ -276,7 +276,7 @@ return {
                 "args": (v3/*: any*/),
                 "filters": null,
                 "handle": "connection",
-                "key": "FrameworkListPage_frameworks",
+                "key": "FrameworkListView_frameworks",
                 "kind": "LinkedHandle",
                 "name": "frameworks"
               }
@@ -291,7 +291,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b55da571816341f2576684823b6d67d0",
+    "cacheID": "88bb77e2d10398380353d5a90ba5d6d6",
     "id": null,
     "metadata": {
       "connection": [
@@ -306,13 +306,13 @@ return {
         }
       ]
     },
-    "name": "FrameworkListPageQuery",
+    "name": "FrameworkListViewQuery",
     "operationKind": "query",
-    "text": "query FrameworkListPageQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            controls(first: 100) {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query FrameworkListViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            controls(first: 100) {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "2070e0cdfaf5b1e5b4dfbb262127218b";
+(node as any).hash = "e5d315fb00e4fee74b53685b6441ed54";
 
 export default node;

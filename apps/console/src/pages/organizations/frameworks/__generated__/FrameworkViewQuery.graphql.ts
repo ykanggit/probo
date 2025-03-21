@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d673a8265dbda865ed008ca8d8d91c38>>
+ * @generated SignedSource<<c36de2ad1593c2dfefe28d7d3bbbddba>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,10 +11,10 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type ControlImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type FrameworkOverviewPageQuery$variables = {
+export type FrameworkViewQuery$variables = {
   frameworkId: string;
 };
-export type FrameworkOverviewPageQuery$data = {
+export type FrameworkViewQuery$data = {
   readonly node: {
     readonly controls?: {
       readonly edges: ReadonlyArray<{
@@ -33,9 +33,9 @@ export type FrameworkOverviewPageQuery$data = {
     readonly name?: string;
   };
 };
-export type FrameworkOverviewPageQuery = {
-  response: FrameworkOverviewPageQuery$data;
-  variables: FrameworkOverviewPageQuery$variables;
+export type FrameworkViewQuery = {
+  response: FrameworkViewQuery$data;
+  variables: FrameworkViewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -174,7 +174,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "FrameworkOverviewPageQuery",
+    "name": "FrameworkViewQuery",
     "selections": [
       {
         "alias": null,
@@ -195,7 +195,7 @@ return {
                 "args": null,
                 "concreteType": "ControlConnection",
                 "kind": "LinkedField",
-                "name": "__FrameworkOverviewPage_controls_connection",
+                "name": "__FrameworkView_controls_connection",
                 "plural": false,
                 "selections": (v6/*: any*/),
                 "storageKey": null
@@ -215,7 +215,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "FrameworkOverviewPageQuery",
+    "name": "FrameworkViewQuery",
     "selections": [
       {
         "alias": null,
@@ -247,7 +247,7 @@ return {
                 "args": (v7/*: any*/),
                 "filters": null,
                 "handle": "connection",
-                "key": "FrameworkOverviewPage_controls",
+                "key": "FrameworkView_controls",
                 "kind": "LinkedHandle",
                 "name": "controls"
               }
@@ -261,7 +261,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d1033e296ed81f7dd74c61e04dbc7d1f",
+    "cacheID": "f8edefde219c5fa1a5c7c85e287d846a",
     "id": null,
     "metadata": {
       "connection": [
@@ -276,13 +276,13 @@ return {
         }
       ]
     },
-    "name": "FrameworkOverviewPageQuery",
+    "name": "FrameworkViewQuery",
     "operationKind": "query",
-    "text": "query FrameworkOverviewPageQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            category\n            importance\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query FrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            category\n            importance\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "0f64849d3b9455a880811d65870243e0";
+(node as any).hash = "9e8a9b37d956ec4c9dfba88e7b1120f3";
 
 export default node;

@@ -19,18 +19,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
-import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
+import type { FrameworkViewQuery as FrameworkViewQueryType } from "./__generated__/FrameworkViewQuery.graphql";
+import { PageTemplate } from "@/components/PageTemplate";
+import { FrameworkViewSkeleton } from "./FrameworkPage";
 
-const FrameworkOverviewPageQuery = graphql`
-  query FrameworkOverviewPageQuery($frameworkId: ID!) {
+const FrameworkViewQuery = graphql`
+  query FrameworkViewQuery($frameworkId: ID!) {
     node(id: $frameworkId) {
       id
       ... on Framework {
         name
         description
-        controls(first: 100)
-          @connection(key: "FrameworkOverviewPage_controls") {
+        controls(first: 100) @connection(key: "FrameworkView_controls") {
           edges {
             node {
               id
@@ -66,12 +66,12 @@ interface Category {
   controls: Control[];
 }
 
-function FrameworkOverviewPageContent({
+function FrameworkViewContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<FrameworkOverviewPageQueryType>;
+  queryRef: PreloadedQuery<FrameworkViewQueryType>;
 }) {
-  const data = usePreloadedQuery(FrameworkOverviewPageQuery, queryRef);
+  const data = usePreloadedQuery(FrameworkViewQuery, queryRef);
   const framework = data.node;
   const controls = framework.controls?.edges.map((edge) => edge?.node) ?? [];
   const navigate = useNavigate();
@@ -326,44 +326,22 @@ function FrameworkOverviewPageContent({
   );
 }
 
-export function FrameworkOverviewPageSkeleton() {
-  return (
-    <PageTemplateSkeleton>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <Card key={i}>
-            <CardContent className="p-6">
-              <div className="relative mb-6">
-                <div className="bg-muted w-24 h-24 rounded-full animate-pulse mb-4" />
-                <div className="h-6 w-48 bg-muted animate-pulse rounded mb-2" />
-                <div className="h-20 w-full bg-muted animate-pulse rounded" />
-              </div>
-              <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </PageTemplateSkeleton>
-  );
-}
-
-export default function FrameworkOverviewPage() {
+export default function FrameworkView() {
   const { frameworkId } = useParams();
-  const [queryRef, loadQuery] = useQueryLoader<FrameworkOverviewPageQueryType>(
-    FrameworkOverviewPageQuery
-  );
+  const [queryRef, loadQuery] =
+    useQueryLoader<FrameworkViewQueryType>(FrameworkViewQuery);
 
   useEffect(() => {
     loadQuery({ frameworkId: frameworkId! });
   }, [loadQuery, frameworkId]);
 
   if (!queryRef) {
-    return <FrameworkOverviewPageSkeleton />;
+    return <FrameworkViewSkeleton />;
   }
 
   return (
-    <Suspense fallback={<FrameworkOverviewPageSkeleton />}>
-      {queryRef && <FrameworkOverviewPageContent queryRef={queryRef} />}
+    <Suspense fallback={<FrameworkViewSkeleton />}>
+      {queryRef && <FrameworkViewContent queryRef={queryRef} />}
     </Suspense>
   );
 }

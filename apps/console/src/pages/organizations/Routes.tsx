@@ -5,8 +5,6 @@ import { ControlOverviewPageSkeleton } from "./frameworks/controls/ControlOvervi
 import { CreateControlPageSkeleton } from "./frameworks/controls/CreateControlPage";
 import { UpdateControlPageSkeleton } from "./frameworks/controls/UpdateControlPage";
 import { CreateFrameworkPageSkeleton } from "./frameworks/CreateFrameworkPage";
-import { FrameworkListPageSkeleton } from "./frameworks/FrameworkListPage";
-import { FrameworkOverviewPageSkeleton } from "./frameworks/FrameworkOverviewPage";
 import { UpdateFrameworkPageSkeleton } from "./frameworks/UpdateFrameworkPage";
 import "./HomePage";
 import { CreatePeoplePageSkeleton } from "./people/CreatePeoplePage";
@@ -17,11 +15,13 @@ import { PolicyListPageSkeleton } from "./policies/PolicyListPage";
 import { PolicyOverviewPageSkeleton } from "./policies/PolicyOverviewPage";
 import { UpdatePolicyPageSkeleton } from "./policies/UpdatePolicyPage";
 import { SettingsPageSkeleton } from "./SettingsPage";
-import { VendorListPageSkeleton } from "./vendors/VendorListPage";
+import { VendorListPage } from "./vendors/VendorListPage";
 import { VendorOverviewPageSkeleton } from "./vendors/VendorOverviewPage";
 import { ErrorBoundaryWithLocation } from "./ErrorBoundary";
 import OrganizationLayout from "./OrganizationLayout";
 import NoOrganizationLayout from "./NoOrganizationLayout";
+import { FrameworkListPage } from "./frameworks/FrameworkListPage";
+import { FrameworkPage } from "./frameworks/FrameworkPage";
 
 const CreateOrganizationPage = lazy(() => import("./CreateOrganizationPage"));
 const ControlOverviewPage = lazy(
@@ -36,10 +36,6 @@ const UpdateControlPage = lazy(
 const CreateFrameworkPage = lazy(
   () => import("./frameworks/CreateFrameworkPage")
 );
-const FrameworkListPage = lazy(() => import("./frameworks/FrameworkListPage"));
-const FrameworkOverviewPage = lazy(
-  () => import("./frameworks/FrameworkOverviewPage")
-);
 const UpdateFrameworkPage = lazy(
   () => import("./frameworks/UpdateFrameworkPage")
 );
@@ -52,7 +48,7 @@ const PolicyListPage = lazy(() => import("./policies/PolicyListPage"));
 const PolicyOverviewPage = lazy(() => import("./policies/PolicyOverviewPage"));
 const UpdatePolicyPage = lazy(() => import("./policies/UpdatePolicyPage"));
 const SettingsPage = lazy(() => import("./SettingsPage"));
-const VendorListPage = lazy(() => import("./vendors/VendorListPage"));
+
 const VendorOverviewPage = lazy(() => import("./vendors/VendorOverviewPage"));
 
 export function OrganizationsRoutes() {
@@ -99,26 +95,8 @@ export function OrganizationsRoutes() {
             </Suspense>
           }
         />
-        <Route
-          path="vendors"
-          element={
-            <Suspense fallback={<VendorListPageSkeleton />}>
-              <ErrorBoundaryWithLocation>
-                <VendorListPage />
-              </ErrorBoundaryWithLocation>
-            </Suspense>
-          }
-        />
-        <Route
-          path="frameworks"
-          element={
-            <Suspense fallback={<FrameworkListPageSkeleton />}>
-              <ErrorBoundaryWithLocation>
-                <FrameworkListPage />
-              </ErrorBoundaryWithLocation>
-            </Suspense>
-          }
-        />
+        <Route path="vendors" element={<VendorListPage />} />
+        <Route path="frameworks" element={<FrameworkListPage />} />
         <Route
           path="frameworks/create"
           element={
@@ -129,16 +107,7 @@ export function OrganizationsRoutes() {
             </Suspense>
           }
         />
-        <Route
-          path="frameworks/:frameworkId"
-          element={
-            <Suspense fallback={<FrameworkOverviewPageSkeleton />}>
-              <ErrorBoundaryWithLocation>
-                <FrameworkOverviewPage />
-              </ErrorBoundaryWithLocation>
-            </Suspense>
-          }
-        />
+        <Route path="frameworks/:frameworkId" element={<FrameworkPage />} />
         <Route
           path="frameworks/:frameworkId/update"
           element={
