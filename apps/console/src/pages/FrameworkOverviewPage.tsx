@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState, useRef } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import {
   graphql,
@@ -6,9 +6,19 @@ import {
   usePreloadedQuery,
   useQueryLoader,
 } from "react-relay";
-import { Shield, MoveUpRight, Plus } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  AlertCircle,
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Plus,
+  ShieldCheck,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
 import { Helmet } from "react-helmet-async";
 import { PageHeader } from "@/components/PageHeader";
@@ -38,98 +48,23 @@ const FrameworkOverviewPageQuery = graphql`
   }
 `;
 
-function ControlSquare({
-  control,
-  onClick,
-}: {
-  control: {
-    id?: string;
-    name?: string;
-    description?: string;
-    state?: string;
-    category?: string;
-    importance?: string;
-  };
-  onClick: () => void;
-}) {
-  const [showTooltip, setShowTooltip] = useState(false);
-  const squareRef = useRef<HTMLDivElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
+// Define control type for better type safety
+interface Control {
+  id?: string;
+  name?: string;
+  description?: string;
+  state?: string;
+  category?: string;
+  importance?: string;
+  status?: string;
+}
 
-  const truncateDescription = (text?: string, maxLength = 100) => {
-    if (!text) return "";
-    return text.length > maxLength
-      ? `${text.substring(0, maxLength)}...`
-      : text;
-  };
-
-  // Calculate tooltip position when it becomes visible
-  useEffect(() => {
-    if (showTooltip && squareRef.current && tooltipRef.current) {
-      const squareRect = squareRef.current.getBoundingClientRect();
-      const tooltipRect = tooltipRef.current.getBoundingClientRect();
-
-      // Position tooltip above the square
-      const top = squareRect.top - tooltipRect.height - 10;
-      const left =
-        squareRect.left + squareRect.width / 2 - tooltipRect.width / 2;
-
-      // Adjust if tooltip would go off screen
-      const adjustedLeft = Math.max(
-        10,
-        Math.min(left, window.innerWidth - tooltipRect.width - 10)
-      );
-
-      tooltipRef.current.style.top = `${top}px`;
-      tooltipRef.current.style.left = `${adjustedLeft}px`;
-    }
-  }, [showTooltip]);
-
-  return (
-    <div className="relative">
-      <div
-        ref={squareRef}
-        className={`h-4 w-4 ${
-          control?.state === "IMPLEMENTED" ? "bg-[#D1FA84]" : "bg-[#E5E7EB]"
-        } rounded-md hover:scale-110 hover:shadow-md transition-all duration-200 cursor-pointer`}
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-        onClick={onClick}
-      />
-
-      {showTooltip && (
-        <div
-          ref={tooltipRef}
-          className="fixed z-50 bg-[#1C1C1C] text-white p-4 rounded-xl shadow-lg space-y-2"
-          style={{ visibility: "visible", maxWidth: "300px" }}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="bg-[#A3E635] text-[#1C1C1C] px-2 py-1 rounded-full text-xs">
-                30 min
-              </div>
-              <div className="bg-[#2A2A2A] text-white px-2 py-1 rounded-full text-xs">
-                {control?.importance}
-              </div>
-            </div>
-            <MoveUpRight className="w-4 h-4 cursor-pointer hover:text-[#A3E635] transition-colors" />
-          </div>
-          <div className="text-sm font-medium mb-2">{control?.name}</div>
-          <div className="text-sm text-gray-400 mb-4">
-            {truncateDescription(control?.description)}
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-[#2A2A2A] flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-[#A3E635]" />
-            </div>
-            <span className="text-sm text-gray-400">
-              {control?.state === "IMPLEMENTED" ? "Validated" : "Not validated"}
-            </span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+  progress: number;
+  controls: Control[];
 }
 
 function FrameworkOverviewPageContent({
@@ -143,41 +78,100 @@ function FrameworkOverviewPageContent({
   const navigate = useNavigate();
   const { organizationId } = useParams();
 
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+
+  // Map control state to status for the new design
+  const mapStateToStatus = (state?: string): string => {
+    if (!state) return "incomplete";
+    switch (state) {
+      case "IMPLEMENTED":
+        return "complete";
+      case "NOT_APPLICABLE":
+        return "not-applicable";
+      case "NOT_STARTED":
+        return "not-started";
+      default:
+        return "in-progress";
+    }
+  };
+
+  // Group controls by category
   const controlsByCategory = controls.reduce((acc, control) => {
     if (!control?.category) return acc;
     if (!acc[control.category]) {
       acc[control.category] = [];
     }
-    acc[control.category].push(control);
+    acc[control.category].push({
+      ...control,
+      status: mapStateToStatus(control.state),
+    });
     return acc;
-  }, {} as Record<string, typeof controls>);
+  }, {} as Record<string, Control[]>);
 
-  const controlCards = Object.entries(controlsByCategory)
-    .sort(([categoryA], [categoryB]) => categoryA.localeCompare(categoryB))
-    .map(([category, controls]) => {
-      const sortedControls = [...controls].sort((a, b) => {
-        if (a?.state === "IMPLEMENTED" && b?.state !== "IMPLEMENTED") return -1;
-        if (a?.state !== "IMPLEMENTED" && b?.state === "IMPLEMENTED") return 1;
+  // Toggle category expansion
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
 
-        return (a?.name || "").localeCompare(b?.name || "");
-      });
+  // Process categories with their controls
+  const categories: Category[] = Object.entries(controlsByCategory)
+    .map(([categoryName, categoryControls]) => {
+      // Calculate progress
+      const implementedCount = categoryControls.filter(
+        (control) => control.status === "complete"
+      ).length;
+      const applicableCount = categoryControls.filter(
+        (control) => control.status !== "not-applicable"
+      ).length;
+      const progress = applicableCount
+        ? Math.round((implementedCount / applicableCount) * 100)
+        : 0;
 
       return {
-        title: category,
-        controls: sortedControls,
-        completed: controls.filter((c) => c?.state === "IMPLEMENTED").length,
-        total: controls.length,
+        id: categoryName,
+        name: categoryName,
+        description: `Controls related to ${categoryName.toLowerCase()}`,
+        progress: progress,
+        controls: categoryControls,
       };
-    });
+    })
+    .filter((category) => category.controls.length > 0)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
-  const totalImplemented = controls.filter(
-    (c) => c?.state === "IMPLEMENTED"
-  ).length;
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "complete":
+        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+      case "in-progress":
+        return <Clock className="h-5 w-5 text-amber-500" />;
+      case "not-started":
+        return <AlertCircle className="h-5 w-5 text-blue-500" />;
+      case "incomplete":
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
+      case "not-applicable":
+        return <ShieldCheck className="h-5 w-5 text-gray-400" />;
+      default:
+        return null;
+    }
+  };
+
+  const getStatusCounts = (controls: Control[]) => {
+    return controls.reduce((acc, control) => {
+      if (control.status) {
+        acc[control.status] = (acc[control.status] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+  };
 
   return (
     <div className="container space-y-6">
       <PageHeader
-        className="mb-17"
+        className="mb-10"
         title={framework.name ?? ""}
         description={framework.description ?? ""}
         actions={
@@ -201,58 +195,136 @@ function FrameworkOverviewPageContent({
         }
       />
 
-      <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Controls</h2>
-        <div className="text-primary">
-          {totalImplemented} out of {controls.length} validated
-        </div>
-      </div>
+      <div className="grid gap-6">
+        {categories.map((category) => {
+          const isExpanded = expandedCategories.includes(category.id);
+          const statusCounts = getStatusCounts(category.controls);
 
-      <div className="grid grid-cols-3 gap-2">
-        {controlCards.map((card, index) => (
-          <div
-            key={index}
-            className="rounded-xl border border-gray-200 relative"
-          >
-            <div className="p-4 rounded-xl h-full flex flex-col">
-              <div className="flex items-center h-8">
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">{card.title}</span>
-                </div>
-              </div>
-              <div className="mt-4 flex-1 flex flex-col justify-between">
-                <div className="min-h-[40px]">
-                  <div className="flex flex-wrap gap-1">
-                    {Array(card.total)
-                      .fill(0)
-                      .map((_, i) => {
-                        const control = card.controls[i];
-                        return (
-                          <ControlSquare
-                            key={i}
-                            control={control}
-                            onClick={() => {
-                              if (control?.id) {
-                                navigate(
-                                  `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
-                                );
-                              }
-                            }}
-                          />
-                        );
-                      })}
+          return (
+            <div
+              key={category.id}
+              className="border rounded-lg overflow-hidden"
+            >
+              <Card className="border-0 shadow-none">
+                <CardHeader className="bg-muted/50 pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CardTitle>{category.name}</CardTitle>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="bg-green-500/10 text-green-500"
+                      >
+                        {statusCounts.complete || 0} Complete
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="bg-amber-500/10 text-amber-500"
+                      >
+                        {statusCounts["in-progress"] || 0} In Progress
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="bg-red-500/10 text-red-500"
+                      >
+                        {statusCounts.incomplete || 0} Incomplete
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-                <div className="mt-2">
-                  <span className="text-sm text-muted-foreground">
-                    {card.completed}/{card.total} Controls validated
-                  </span>
-                </div>
-              </div>
+                  <div className="mt-2">
+                    <div className="mb-1 flex items-center justify-between text-sm">
+                      <span>Implementation progress</span>
+                      <span className="font-medium">{category.progress}%</span>
+                    </div>
+                    <Progress value={category.progress} className="h-2" />
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-4 w-full flex items-center justify-center gap-2"
+                    onClick={() => toggleCategory(category.id)}
+                  >
+                    {isExpanded ? (
+                      <>
+                        <ChevronDown className="h-4 w-4" />
+                        Hide Controls
+                      </>
+                    ) : (
+                      <>
+                        <ChevronRight className="h-4 w-4" />
+                        View Controls ({category.controls.length})
+                      </>
+                    )}
+                  </Button>
+                </CardHeader>
+
+                {isExpanded && (
+                  <CardContent className="p-0">
+                    {category.controls.length > 0 ? (
+                      <div className="w-full">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="bg-muted/30 text-sm font-medium text-muted-foreground">
+                              <th className="w-24 px-4 py-2 text-left">
+                                Importance
+                              </th>
+                              <th className="w-24 px-4 py-2 text-left">
+                                Status
+                              </th>
+                              <th className="px-4 py-2 text-left">Control</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y">
+                            {category.controls.map((control) => (
+                              <tr
+                                key={control.id || Math.random().toString()}
+                                className="hover:bg-muted/50 cursor-pointer"
+                                onClick={() => {
+                                  if (control?.id) {
+                                    navigate(
+                                      `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
+                                    );
+                                  }
+                                }}
+                              >
+                                <td className="w-24 px-4 py-3 align-middle">
+                                  <Badge variant="outline" className="text-xs">
+                                    {control.importance}
+                                  </Badge>
+                                </td>
+                                <td className="w-24 px-4 py-3 align-middle">
+                                  <div className="flex items-center justify-center">
+                                    {control.status
+                                      ? getStatusIcon(control.status)
+                                      : null}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 align-middle">
+                                  <div className="font-medium">
+                                    {control.name}
+                                  </div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {control.description}
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center p-6 text-center text-muted-foreground">
+                        No controls in this category
+                      </div>
+                    )}
+                  </CardContent>
+                )}
+              </Card>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
