@@ -160,7 +160,9 @@ function FrameworkViewContent({
         name: categoryName,
         description: `Controls related to ${categoryName.toLowerCase()}`,
         progress: progress,
-        controls: categoryControls,
+        controls: categoryControls.sort((a, b) =>
+          (a.name || "").localeCompare(b.name || "")
+        ),
         doneCount: catDoneCount,
         totalCount: catTotalCount,
       };
@@ -188,7 +190,6 @@ function FrameworkViewContent({
   return (
     <PageTemplate
       title={framework.name ?? ""}
-      description={framework.description ?? ""}
       actions={
         <div className="flex gap-4">
           <Button variant="outline" asChild>
@@ -327,36 +328,25 @@ function FrameworkViewContent({
               className="border rounded-lg overflow-hidden"
             >
               <Card className="border-0 shadow-none">
-                <CardHeader className="bg-muted/50 pb-4">
+                <CardHeader
+                  className="bg-muted/50 cursor-pointer"
+                  onClick={() => toggleCategory(category.id)}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <CardTitle>{category.name}</CardTitle>
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span>
                         {category.doneCount} / {category.totalCount}
                       </span>
+                      {isExpanded ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
                     </div>
                   </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-4 w-full flex items-center justify-center gap-2"
-                    onClick={() => toggleCategory(category.id)}
-                  >
-                    {isExpanded ? (
-                      <>
-                        <ChevronDown className="h-4 w-4" />
-                        Hide Controls
-                      </>
-                    ) : (
-                      <>
-                        <ChevronRight className="h-4 w-4" />
-                        View Controls ({category.controls.length})
-                      </>
-                    )}
-                  </Button>
                 </CardHeader>
 
                 {isExpanded && (
@@ -403,9 +393,6 @@ function FrameworkViewContent({
                                 <td className="px-4 py-3 align-middle">
                                   <div className="font-medium">
                                     {control.name}
-                                  </div>
-                                  <div className="text-sm text-muted-foreground">
-                                    {control.description}
                                   </div>
                                 </td>
                               </tr>
