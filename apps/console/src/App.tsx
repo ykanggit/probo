@@ -13,6 +13,23 @@ import AuthLayout from "./layouts/AuthLayout";
 import { RelayEnvironment } from "./RelayEnvironment";
 import VisitorErrorBoundary from "./components/VisitorErrorBoundary";
 import { FrameworkListPageSkeleton } from "./pages/FrameworkListPage";
+import { ControlOverviewPageSkeleton } from "./pages/ControlOverviewPage";
+import { CreateControlPageSkeleton } from "./pages/CreateControlPage";
+import { UpdateFrameworkPageSkeleton } from "./pages/UpdateFrameworkPage";
+import { UpdateControlPageSkeleton } from "./pages/UpdateControlPage";
+import { CreateFrameworkPageSkeleton } from "./pages/CreateFrameworkPage";
+import { CreateOrganizationPageSkeleton } from "./pages/CreateOrganizationPage";
+import { CreatePeoplePageSkeleton } from "./pages/CreatePeoplePage";
+import { CreatePolicyPageSkeleton } from "./pages/CreatePolicyPage";
+import { FrameworkOverviewPageSkeleton } from "./pages/FrameworkOverviewPage";
+import { PeopleListPageSkeleton } from "./pages/PeopleListPage";
+import { PeopleOverviewPageSkeleton } from "./pages/PeopleOverviewPage";
+import { PolicyListPageSkeleton } from "./pages/PolicyListPage";
+import { PolicyOverviewPageSkeleton } from "./pages/PolicyOverviewPage";
+import { UpdatePolicyPageSkeleton } from "./pages/UpdatePolicyPage";
+import { VendorListPageSkeleton } from "./pages/VendorListPage";
+import { VendorOverviewPageSkeleton } from "./pages/VendorOverviewPage";
+import { SettingsPageSkeleton } from "./pages/SettingsPage";
 
 posthog.init(process.env.POSTHOG_KEY!, {
   api_host: process.env.POSTHOG_HOST,
@@ -85,7 +102,7 @@ function App() {
                     <Route
                       path="create"
                       element={
-                        <Suspense>
+                        <Suspense fallback={<CreateOrganizationPageSkeleton />}>
                           <ErrorBoundaryWithLocation>
                             <CreateOrganizationPage />
                           </ErrorBoundaryWithLocation>
@@ -106,7 +123,7 @@ function App() {
                       <Route
                         path="people"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<PeopleListPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <PeopleListPage />
                             </ErrorBoundaryWithLocation>
@@ -116,7 +133,7 @@ function App() {
                       <Route
                         path="people/create"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<CreatePeoplePageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <CreatePeoplePage />
                             </ErrorBoundaryWithLocation>
@@ -126,7 +143,7 @@ function App() {
                       <Route
                         path="people/:peopleId"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<PeopleOverviewPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <PeopleOverviewPage />
                             </ErrorBoundaryWithLocation>
@@ -136,7 +153,7 @@ function App() {
                       <Route
                         path="vendors"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<VendorListPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <VendorListPage />
                             </ErrorBoundaryWithLocation>
@@ -156,7 +173,7 @@ function App() {
                       <Route
                         path="frameworks/create"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<CreateFrameworkPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <CreateFrameworkPage />
                             </ErrorBoundaryWithLocation>
@@ -166,7 +183,9 @@ function App() {
                       <Route
                         path="frameworks/:frameworkId"
                         element={
-                          <Suspense>
+                          <Suspense
+                            fallback={<FrameworkOverviewPageSkeleton />}
+                          >
                             <ErrorBoundaryWithLocation>
                               <FrameworkOverviewPage />
                             </ErrorBoundaryWithLocation>
@@ -176,7 +195,7 @@ function App() {
                       <Route
                         path="frameworks/:frameworkId/update"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<UpdateFrameworkPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <UpdateFrameworkPage />
                             </ErrorBoundaryWithLocation>
@@ -186,7 +205,7 @@ function App() {
                       <Route
                         path="frameworks/:frameworkId/controls/create"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<CreateControlPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <CreateControlPage />
                             </ErrorBoundaryWithLocation>
@@ -196,7 +215,7 @@ function App() {
                       <Route
                         path="frameworks/:frameworkId/controls/:controlId"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<ControlOverviewPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <ControlOverviewPage />
                             </ErrorBoundaryWithLocation>
@@ -206,7 +225,7 @@ function App() {
                       <Route
                         path="frameworks/:frameworkId/controls/:controlId/update"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<UpdateControlPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <UpdateControlPage />
                             </ErrorBoundaryWithLocation>
@@ -216,7 +235,7 @@ function App() {
                       <Route
                         path="vendors/:vendorId"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<VendorOverviewPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <VendorOverviewPage />
                             </ErrorBoundaryWithLocation>
@@ -227,7 +246,7 @@ function App() {
                       <Route
                         path="policies"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<PolicyListPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <PolicyListPage />
                             </ErrorBoundaryWithLocation>
@@ -237,7 +256,7 @@ function App() {
                       <Route
                         path="policies/create"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<CreatePolicyPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <CreatePolicyPage />
                             </ErrorBoundaryWithLocation>
@@ -247,7 +266,7 @@ function App() {
                       <Route
                         path="policies/:policyId"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<PolicyOverviewPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <PolicyOverviewPage />
                             </ErrorBoundaryWithLocation>
@@ -257,7 +276,7 @@ function App() {
                       <Route
                         path="policies/:policyId/update"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<UpdatePolicyPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <UpdatePolicyPage />
                             </ErrorBoundaryWithLocation>
@@ -267,7 +286,7 @@ function App() {
                       <Route
                         path="settings"
                         element={
-                          <Suspense>
+                          <Suspense fallback={<SettingsPageSkeleton />}>
                             <ErrorBoundaryWithLocation>
                               <SettingsPage />
                             </ErrorBoundaryWithLocation>

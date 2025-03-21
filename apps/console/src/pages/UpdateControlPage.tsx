@@ -7,7 +7,6 @@ import {
   PreloadedQuery,
   useQueryLoader,
 } from "react-relay";
-import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,7 +27,7 @@ import type {
   ControlState,
   ControlImportance,
 } from "./__generated__/UpdateControlPageUpdateControlMutation.graphql";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const updateControlMutation = graphql`
   mutation UpdateControlPageUpdateControlMutation($input: UpdateControlInput!) {
@@ -250,100 +249,97 @@ function UpdateControlPageContent({
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Update Control - Probo</title>
-      </Helmet>
-      <div className="container">
-        <PageHeader
-          className="mb-17"
-          title="Update Control"
-          description="Update the control details"
-        />
+    <PageTemplate
+      title="Update Control"
+      description="Update the control details"
+    >
+      <Card className="max-w-2xl">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <EditableField
+            label="Name"
+            value={formData.name}
+            onChange={(value) => handleFieldChange("name", value)}
+            required
+          />
 
-        <Card className="max-w-2xl">
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <EditableField
-              label="Name"
-              value={formData.name}
-              onChange={(value) => handleFieldChange("name", value)}
-              required
-            />
+          <EditableField
+            label="Description"
+            value={formData.description}
+            onChange={(value) => handleFieldChange("description", value)}
+            required
+            multiline
+            helpText="Provide a detailed description of the control"
+          />
 
-            <EditableField
-              label="Description"
-              value={formData.description}
-              onChange={(value) => handleFieldChange("description", value)}
-              required
-              multiline
-              helpText="Provide a detailed description of the control"
-            />
+          <EditableField
+            label="Category"
+            value={formData.category}
+            onChange={(value) => handleFieldChange("category", value)}
+            required
+          />
 
-            <EditableField
-              label="Category"
-              value={formData.category}
-              onChange={(value) => handleFieldChange("category", value)}
-              required
-            />
+          <div className="space-y-2">
+            <Label htmlFor="importance" className="text-sm font-medium">
+              Importance
+            </Label>
+            <Select
+              value={formData.importance}
+              onValueChange={(value) => handleFieldChange("importance", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select importance" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="MANDATORY">Mandatory</SelectItem>
+                <SelectItem value="PREFERRED">Preferred</SelectItem>
+                <SelectItem value="ADVANCED">Advanced</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="importance" className="text-sm font-medium">
-                Importance
-              </Label>
-              <Select
-                value={formData.importance}
-                onValueChange={(value) =>
-                  handleFieldChange("importance", value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select importance" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="MANDATORY">Mandatory</SelectItem>
-                  <SelectItem value="PREFERRED">Preferred</SelectItem>
-                  <SelectItem value="ADVANCED">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="state" className="text-sm font-medium">
+              State
+            </Label>
+            <Select
+              value={formData.state}
+              onValueChange={(value) => handleFieldChange("state", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select state" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="NOT_STARTED">Not Started</SelectItem>
+                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                <SelectItem value="NOT_APPLICABLE">Not Applicable</SelectItem>
+                <SelectItem value="IMPLEMENTED">Implemented</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="state" className="text-sm font-medium">
-                State
-              </Label>
-              <Select
-                value={formData.state}
-                onValueChange={(value) => handleFieldChange("state", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select state" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="NOT_STARTED">Not Started</SelectItem>
-                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                  <SelectItem value="NOT_APPLICABLE">Not Applicable</SelectItem>
-                  <SelectItem value="IMPLEMENTED">Implemented</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <Button type="button" variant="outline" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isInFlight || !hasChanges}>
-                {isInFlight ? "Updating..." : "Update Control"}
-              </Button>
-            </div>
-          </form>
-        </Card>
-      </div>
-    </>
+          <div className="flex justify-end gap-3">
+            <Button type="button" variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isInFlight || !hasChanges}>
+              {isInFlight ? "Updating..." : "Update Control"}
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </PageTemplate>
   );
 }
 
-function UpdateControlPageFallback() {
-  return <div>Loading...</div>;
+export function UpdateControlPageSkeleton() {
+  return (
+    <PageTemplateSkeleton
+      title="Update Control"
+      description="Update the control details"
+    >
+      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+    </PageTemplateSkeleton>
+  );
 }
 
 export default function UpdateControlPage() {
@@ -358,11 +354,11 @@ export default function UpdateControlPage() {
   }, [controlId, loadQuery]);
 
   if (!queryRef) {
-    return <UpdateControlPageFallback />;
+    return <UpdateControlPageSkeleton />;
   }
 
   return (
-    <Suspense fallback={<UpdateControlPageFallback />}>
+    <Suspense fallback={<UpdateControlPageSkeleton />}>
       <UpdateControlPageContent queryRef={queryRef} />
     </Suspense>
   );

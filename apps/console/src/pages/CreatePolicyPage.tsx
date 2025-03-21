@@ -8,7 +8,6 @@ import {
   usePreloadedQuery,
   PreloadedQuery,
 } from "react-relay";
-import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +20,7 @@ import PeopleSelector from "@/components/PeopleSelector";
 import { Suspense } from "react";
 import type { CreatePolicyPageMutation } from "./__generated__/CreatePolicyPageMutation.graphql";
 import type { CreatePolicyPageQuery as CreatePolicyPageQueryType } from "./__generated__/CreatePolicyPageQuery.graphql";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const CreatePolicyQuery = graphql`
   query CreatePolicyPageQuery($organizationId: ID!) {
@@ -156,136 +155,119 @@ function CreatePolicyForm({
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Create Policy - Probo Console</title>
-      </Helmet>
-      <div className="container">
-        <PageHeader
-          className="mb-17"
-          title="Create Policy"
-          description="Create a new policy for your organization"
-        />
+    <PageTemplate
+      title="Create Policy"
+      description="Create a new policy for your organization"
+    >
+      <form onSubmit={handleSubmit}>
+        <div className="grid gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Policy Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Policy Name</Label>
+                <Input
+                  id="name"
+                  placeholder="Enter policy name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Policy Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Policy Name</Label>
-                  <Input
-                    id="name"
-                    placeholder="Enter policy name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
+              <div className="space-y-2">
+                <Label htmlFor="content">Policy Content</Label>
+                <div className="min-h-[300px]">
+                  <PolicyEditor
+                    initialContent={content}
+                    onChange={(html) => setContent(html)}
                   />
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="content">Policy Content</Label>
-                  <div className="min-h-[300px]">
-                    <PolicyEditor
-                      initialContent={content}
-                      onChange={(html) => setContent(html)}
-                    />
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <RadioGroup
+                  value={status}
+                  onValueChange={(value: "DRAFT" | "ACTIVE") =>
+                    setStatus(value)
+                  }
+                  className="flex space-x-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="DRAFT" id="draft" />
+                    <Label htmlFor="draft" className="cursor-pointer">
+                      Draft
+                    </Label>
                   </div>
-                </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="ACTIVE" id="active" />
+                    <Label htmlFor="active" className="cursor-pointer">
+                      Active
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
 
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <RadioGroup
-                    value={status}
-                    onValueChange={(value: "DRAFT" | "ACTIVE") =>
-                      setStatus(value)
-                    }
-                    className="flex space-x-4"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="DRAFT" id="draft" />
-                      <Label htmlFor="draft" className="cursor-pointer">
-                        Draft
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="ACTIVE" id="active" />
-                      <Label htmlFor="active" className="cursor-pointer">
-                        Active
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="owner" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Policy Owner
+                </Label>
+                <PeopleSelector
+                  organizationRef={data.organization}
+                  selectedPersonId={ownerId}
+                  onSelect={setOwnerId}
+                  placeholder="Select policy owner"
+                  required
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="owner" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Policy Owner
-                  </Label>
-                  <PeopleSelector
-                    organizationRef={data.organization}
-                    selectedPersonId={ownerId}
-                    onSelect={setOwnerId}
-                    placeholder="Select policy owner"
-                    required
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="reviewDate" className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Review Date
+                </Label>
+                <Input
+                  id="reviewDate"
+                  type="date"
+                  value={reviewDate}
+                  onChange={(e) => setReviewDate(e.target.value)}
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="reviewDate"
-                    className="flex items-center gap-2"
-                  >
-                    <Calendar className="h-4 w-4" />
-                    Review Date
-                  </Label>
-                  <Input
-                    id="reviewDate"
-                    type="date"
-                    value={reviewDate}
-                    onChange={(e) => setReviewDate(e.target.value)}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="flex justify-end gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  navigate(`/organizations/${organizationId}/policies`)
-                }
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create Policy"}
-              </Button>
-            </div>
+          <div className="flex justify-end gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                navigate(`/organizations/${organizationId}/policies`)
+              }
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create Policy"}
+            </Button>
           </div>
-        </form>
-      </div>
-    </>
+        </div>
+      </form>
+    </PageTemplate>
   );
 }
 
-function CreatePolicyPageFallback() {
+export function CreatePolicyPageSkeleton() {
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex items-center mb-6">
-        <div className="mr-4">
-          <div className="h-12 w-12 bg-muted animate-pulse rounded-lg" />
-        </div>
-        <div>
-          <div className="h-8 w-48 bg-muted animate-pulse rounded mb-2" />
-          <div className="h-4 w-64 bg-muted animate-pulse rounded" />
-        </div>
-      </div>
+    <PageTemplateSkeleton
+      title="Create Policy"
+      description="Create a new policy for your organization"
+    >
       <div className="bg-muted animate-pulse rounded-lg h-[600px]" />
-    </div>
+    </PageTemplateSkeleton>
   );
 }
 
@@ -300,9 +282,13 @@ export default function CreatePolicyPage() {
     }
   }, [organizationId, loadQuery]);
 
+  if (!queryRef) {
+    return <CreatePolicyPageSkeleton />;
+  }
+
   return (
-    <Suspense fallback={<CreatePolicyPageFallback />}>
-      {queryRef && <CreatePolicyForm queryRef={queryRef} />}
+    <Suspense fallback={<CreatePolicyPageSkeleton />}>
+      {<CreatePolicyForm queryRef={queryRef} />}
     </Suspense>
   );
 }

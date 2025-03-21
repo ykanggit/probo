@@ -7,7 +7,6 @@ import {
   PreloadedQuery,
   useQueryLoader,
 } from "react-relay";
-import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,7 +17,7 @@ import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UpdateFrameworkPageUpdateFrameworkMutation } from "./__generated__/UpdateFrameworkPageUpdateFrameworkMutation.graphql";
 import { UpdateFrameworkPageQuery as UpdateFrameworkPageQueryType } from "./__generated__/UpdateFrameworkPageQuery.graphql";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const updateFrameworkMutation = graphql`
   mutation UpdateFrameworkPageUpdateFrameworkMutation(
@@ -199,52 +198,51 @@ function UpdateFrameworkPageContent({
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Update Framework - Probo</title>
-      </Helmet>
-      <div className="container">
-        <PageHeader
-          className="mb-17"
-          title="Update Framework"
-          description="Update the framework details"
-        />
+    <PageTemplate
+      title="Update Framework"
+      description="Update the framework details"
+    >
+      <Card className="max-w-2xl">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <EditableField
+            label="Name"
+            value={formData.name}
+            onChange={(value) => handleFieldChange("name", value)}
+            required
+          />
 
-        <Card className="max-w-2xl">
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <EditableField
-              label="Name"
-              value={formData.name}
-              onChange={(value) => handleFieldChange("name", value)}
-              required
-            />
+          <EditableField
+            label="Description"
+            value={formData.description}
+            onChange={(value) => handleFieldChange("description", value)}
+            required
+            multiline
+            helpText="Provide a detailed description of the framework"
+          />
 
-            <EditableField
-              label="Description"
-              value={formData.description}
-              onChange={(value) => handleFieldChange("description", value)}
-              required
-              multiline
-              helpText="Provide a detailed description of the framework"
-            />
-
-            <div className="flex justify-end gap-3">
-              <Button type="button" variant="outline" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isInFlight}>
-                {isInFlight ? "Updating..." : "Update Framework"}
-              </Button>
-            </div>
-          </form>
-        </Card>
-      </div>
-    </>
+          <div className="flex justify-end gap-3">
+            <Button type="button" variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isInFlight}>
+              {isInFlight ? "Updating..." : "Update Framework"}
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </PageTemplate>
   );
 }
 
-function UpdateFrameworkPageFallback() {
-  return <div>Loading...</div>;
+export function UpdateFrameworkPageSkeleton() {
+  return (
+    <PageTemplateSkeleton
+      title="Update Framework"
+      description="Update the framework details"
+    >
+      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+    </PageTemplateSkeleton>
+  );
 }
 
 export default function UpdateFrameworkPage() {
@@ -259,11 +257,11 @@ export default function UpdateFrameworkPage() {
   }, [frameworkId, loadQuery]);
 
   if (!queryRef) {
-    return <UpdateFrameworkPageFallback />;
+    return <UpdateFrameworkPageSkeleton />;
   }
 
   return (
-    <Suspense fallback={<UpdateFrameworkPageFallback />}>
+    <Suspense fallback={<UpdateFrameworkPageSkeleton />}>
       <UpdateFrameworkPageContent queryRef={queryRef} />
     </Suspense>
   );

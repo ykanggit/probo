@@ -1,7 +1,6 @@
 import { Suspense, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { graphql, useMutation, ConnectionHandler } from "react-relay";
-import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,7 +20,7 @@ import {
   CreateControlPageCreateControlMutation,
   ControlImportance,
 } from "./__generated__/CreateControlPageCreateControlMutation.graphql";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const createControlMutation = graphql`
   mutation CreateControlPageCreateControlMutation(
@@ -182,90 +181,93 @@ function CreateControlPageContent() {
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Create Control - Probo</title>
-      </Helmet>
-      <div className="container">
-        <PageHeader
-          className="mb-17"
-          title="Create Control"
-          description="Create a new control for your framework"
-        />
+    <PageTemplate
+      title="Create Control"
+      description="Create a new control for your framework"
+    >
+      <Card className="max-w-2xl">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <EditableField
+            label="Name"
+            value={formData.name}
+            onChange={(value) => handleFieldChange("name", value)}
+            required
+          />
 
-        <Card className="max-w-2xl">
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <EditableField
-              label="Name"
-              value={formData.name}
-              onChange={(value) => handleFieldChange("name", value)}
-              required
-            />
+          <EditableField
+            label="Category"
+            value={formData.category}
+            onChange={(value) => handleFieldChange("category", value)}
+            required
+            helpText="The category this control belongs to"
+          />
 
-            <EditableField
-              label="Category"
-              value={formData.category}
-              onChange={(value) => handleFieldChange("category", value)}
-              required
-              helpText="The category this control belongs to"
-            />
+          <EditableField
+            label="Description"
+            value={formData.description}
+            onChange={(value) => handleFieldChange("description", value)}
+            required
+            multiline
+            helpText="Provide a detailed description of the control"
+          />
 
-            <EditableField
-              label="Description"
-              value={formData.description}
-              onChange={(value) => handleFieldChange("description", value)}
-              required
-              multiline
-              helpText="Provide a detailed description of the control"
-            />
+          <div className="space-y-2">
+            <Label htmlFor="importance" className="text-sm font-medium">
+              Importance
+            </Label>
+            <Select
+              value={formData.importance}
+              onValueChange={(value) =>
+                handleFieldChange("importance", value as ControlImportance)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select importance" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="MANDATORY">Mandatory</SelectItem>
+                <SelectItem value="PREFERRED">Preferred</SelectItem>
+                <SelectItem value="ADVANCED">Advanced</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="importance" className="text-sm font-medium">
-                Importance
-              </Label>
-              <Select
-                value={formData.importance}
-                onValueChange={(value) =>
-                  handleFieldChange("importance", value as ControlImportance)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select importance" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="MANDATORY">Mandatory</SelectItem>
-                  <SelectItem value="PREFERRED">Preferred</SelectItem>
-                  <SelectItem value="ADVANCED">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                navigate(
+                  `/organizations/${organizationId}/frameworks/${frameworkId}`
+                )
+              }
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isInFlight}>
+              {isInFlight ? "Creating..." : "Create Control"}
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </PageTemplate>
+  );
+}
 
-            <div className="flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  navigate(
-                    `/organizations/${organizationId}/frameworks/${frameworkId}`
-                  )
-                }
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isInFlight}>
-                {isInFlight ? "Creating..." : "Create Control"}
-              </Button>
-            </div>
-          </form>
-        </Card>
-      </div>
-    </>
+export function CreateControlPageSkeleton() {
+  return (
+    <PageTemplateSkeleton
+      title="Create Control"
+      description="Create a new control for your framework"
+    >
+      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+    </PageTemplateSkeleton>
   );
 }
 
 export default function CreateControlPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<CreateControlPageSkeleton />}>
       <CreateControlPageContent />
     </Suspense>
   );

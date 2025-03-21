@@ -6,7 +6,6 @@ import {
   useMutation,
   useLazyLoadQuery,
 } from "react-relay";
-import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { CreateOrganizationPageCreateOrganizationMutation } from "./__generated__/CreateOrganizationPageCreateOrganizationMutation.graphql";
 import { CreateOrganizationPageViewerQuery } from "./__generated__/CreateOrganizationPageViewerQuery.graphql";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const createOrganizationMutation = graphql`
   mutation CreateOrganizationPageCreateOrganizationMutation(
@@ -81,16 +81,27 @@ function EditableField({
   );
 }
 
+export function CreateOrganizationPageSkeleton() {
+  return (
+    <PageTemplateSkeleton
+      title="Create Organization"
+      description="Create a new organization to manage your compliance and security needs."
+    >
+      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+    </PageTemplateSkeleton>
+  );
+}
+
 export default function CreateOrganizationPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const data = useLazyLoadQuery<CreateOrganizationPageViewerQuery>(
     viewerQuery,
-    {},
+    {}
   );
   const [createOrganization] =
     useMutation<CreateOrganizationPageCreateOrganizationMutation>(
-      createOrganizationMutation,
+      createOrganizationMutation
     );
   const [formData, setFormData] = useState({
     name: "",
@@ -114,7 +125,7 @@ export default function CreateOrganizationPage() {
         connections: [
           ConnectionHandler.getConnectionID(
             data.viewer.id,
-            "OrganizationSwitcher_organizations",
+            "OrganizationSwitcher_organizations"
           ),
         ],
       },
@@ -138,46 +149,33 @@ export default function CreateOrganizationPage() {
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Create Organization - Probo</title>
-      </Helmet>
+    <PageTemplate
+      title="Create Organization"
+      description="Create a new organization to manage your compliance and security needs."
+    >
+      <form onSubmit={handleSubmit}>
+        <Card className="max-w-2xl">
+          <CardHeader>
+            <CardTitle>Organization Details</CardTitle>
+            <CardDescription>
+              Enter the basic information about your organization.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <EditableField
+              label="Organization Name"
+              value={formData.name}
+              onChange={(value) => handleFieldChange("name", value)}
+              helpText="The name of your organization as it will appear throughout the platform."
+              required
+            />
 
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Create Organization
-          </h1>
-          <p className="text-muted-foreground">
-            Create a new organization to manage your compliance and security
-            needs.
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Organization Details</CardTitle>
-              <CardDescription>
-                Enter the basic information about your organization.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <EditableField
-                label="Organization Name"
-                value={formData.name}
-                onChange={(value) => handleFieldChange("name", value)}
-                helpText="The name of your organization as it will appear throughout the platform."
-                required
-              />
-
-              <Button type="submit" className="w-full">
-                Create Organization
-              </Button>
-            </CardContent>
-          </Card>
-        </form>
-      </div>
-    </>
+            <Button type="submit" className="w-full">
+              Create Organization
+            </Button>
+          </CardContent>
+        </Card>
+      </form>
+    </PageTemplate>
   );
 }

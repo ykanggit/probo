@@ -7,7 +7,6 @@ import {
 } from "react-relay";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Link, useParams } from "react-router";
-import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,7 +33,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import type { PolicyListPageQuery as PolicyListPageQueryType } from "./__generated__/PolicyListPageQuery.graphql";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const PolicyListPageQuery = graphql`
   query PolicyListPageQuery($organizationId: ID!) {
@@ -220,153 +219,141 @@ function PolicyListPageContent({
     });
 
   return (
-    <>
-      <Helmet>
-        <title>Policies - Probo</title>
-      </Helmet>
-      <div className="container space-y-6">
-        <PageHeader
-          className="mb-17"
-          title="Policies"
-          description="Manage your organization's policies"
-          actions={
-            <Button asChild>
-              <Link to={`/organizations/${organizationId}/policies/create`}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Policy
-              </Link>
-            </Button>
-          }
-        />
-
-        {/* Search and filter controls */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search policies..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  <SelectValue placeholder="Filter by status" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Statuses</SelectItem>
-                <SelectItem value="ACTIVE">Active</SelectItem>
-                <SelectItem value="DRAFT">Draft</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <ArrowUpDown className="h-4 w-4" />
-                  Sort
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setSortBy("name-asc")}>
-                  Name (A-Z)
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy("name-desc")}>
-                  Name (Z-A)
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy("updated-desc")}>
-                  Recently Updated
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy("updated-asc")}>
-                  Oldest Updated
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy("created-desc")}>
-                  Recently Created
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy("created-asc")}>
-                  Oldest Created
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+    <PageTemplate
+      title="Policies"
+      description="Manage your organization's policies"
+      actions={
+        <Button asChild>
+          <Link to={`/organizations/${organizationId}/policies/create`}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Policy
+          </Link>
+        </Button>
+      }
+    >
+      {/* Search and filter controls */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search policies..."
+            className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
 
-        {/* Results summary */}
-        <div className="mb-4 text-sm text-muted-foreground">
-          Showing {filteredPolicies.length} of {policies.length} policies
-        </div>
+        <div className="flex gap-2">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[180px]">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                <SelectValue placeholder="Filter by status" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Statuses</SelectItem>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="DRAFT">Draft</SelectItem>
+            </SelectContent>
+          </Select>
 
-        {/* Policy grid */}
-        <div className="space-y-6">
-          {filteredPolicies.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPolicies.map((policy) => (
-                <Link
-                  key={policy.id}
-                  to={`/organizations/${organizationId}/policies/${policy.id}`}
-                  className="group"
-                >
-                  <PolicyCard
-                    title={policy.name}
-                    content={policy.content}
-                    status={policy.status}
-                    updatedAt={policy.updatedAt}
-                  />
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 border rounded-lg bg-muted/20">
-              <FileText className="mx-auto h-8 w-8 text-muted-foreground mb-3" />
-              <h3 className="text-lg font-medium">No policies found</h3>
-              <p className="text-muted-foreground mb-4">
-                {searchQuery || statusFilter !== "ALL"
-                  ? "Try adjusting your search or filters"
-                  : "Create your first policy to get started"}
-              </p>
-              {searchQuery || statusFilter !== "ALL" ? (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setStatusFilter("ALL");
-                  }}
-                >
-                  Clear filters
-                </Button>
-              ) : (
-                <Button asChild>
-                  <Link to={`/organizations/${organizationId}/policies/create`}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Policy
-                  </Link>
-                </Button>
-              )}
-            </div>
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <ArrowUpDown className="h-4 w-4" />
+                Sort
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setSortBy("name-asc")}>
+                Name (A-Z)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("name-desc")}>
+                Name (Z-A)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("updated-desc")}>
+                Recently Updated
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("updated-asc")}>
+                Oldest Updated
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("created-desc")}>
+                Recently Created
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("created-asc")}>
+                Oldest Created
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
-    </>
+
+      {/* Results summary */}
+      <div className="mb-4 text-sm text-muted-foreground">
+        Showing {filteredPolicies.length} of {policies.length} policies
+      </div>
+
+      {/* Policy grid */}
+      <div className="space-y-6">
+        {filteredPolicies.length > 0 ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredPolicies.map((policy) => (
+              <Link
+                key={policy.id}
+                to={`/organizations/${organizationId}/policies/${policy.id}`}
+                className="group"
+              >
+                <PolicyCard
+                  title={policy.name}
+                  content={policy.content}
+                  status={policy.status}
+                  updatedAt={policy.updatedAt}
+                />
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 border rounded-lg bg-muted/20">
+            <FileText className="mx-auto h-8 w-8 text-muted-foreground mb-3" />
+            <h3 className="text-lg font-medium">No policies found</h3>
+            <p className="text-muted-foreground mb-4">
+              {searchQuery || statusFilter !== "ALL"
+                ? "Try adjusting your search or filters"
+                : "Create your first policy to get started"}
+            </p>
+            {searchQuery || statusFilter !== "ALL" ? (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery("");
+                  setStatusFilter("ALL");
+                }}
+              >
+                Clear filters
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link to={`/organizations/${organizationId}/policies/create`}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Policy
+                </Link>
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </PageTemplate>
   );
 }
 
-function PolicyListPageFallback() {
+export function PolicyListPageSkeleton() {
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-          <div className="h-4 w-96 bg-muted animate-pulse rounded mt-1" />
-        </div>
-        <div className="h-10 w-36 bg-muted animate-pulse rounded" />
-      </div>
-
+    <PageTemplateSkeleton
+      title="Policies"
+      description="Manage your organization's policies"
+      actions={<div className="bg-muted animate-pulse h-9 w-1/6 rounded-lg" />}
+    >
       {/* Search and filter controls skeleton */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex-1 h-10 bg-muted animate-pulse rounded" />
@@ -407,7 +394,7 @@ function PolicyListPageFallback() {
           </Card>
         ))}
       </div>
-    </div>
+    </PageTemplateSkeleton>
   );
 }
 
@@ -421,14 +408,13 @@ export default function PolicyListPage() {
     loadQuery({ organizationId: organizationId! });
   }, [loadQuery, organizationId]);
 
+  if (!queryRef) {
+    return <PolicyListPageSkeleton />;
+  }
+
   return (
-    <>
-      <Helmet>
-        <title>Policies - Probo Console</title>
-      </Helmet>
-      <Suspense fallback={<PolicyListPageFallback />}>
-        {queryRef && <PolicyListPageContent queryRef={queryRef} />}
-      </Suspense>
-    </>
+    <Suspense fallback={<PolicyListPageSkeleton />}>
+      {<PolicyListPageContent queryRef={queryRef} />}
+    </Suspense>
   );
 }

@@ -14,7 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Helmet } from "react-helmet-async";
 import { Suspense, useEffect, useState, useRef } from "react";
 import {
   graphql,
@@ -39,7 +38,7 @@ import type { SettingsPageQuery as SettingsPageQueryType } from "./__generated__
 import type { SettingsPageUpdateOrganizationMutation as SettingsPageUpdateOrganizationMutationType } from "./__generated__/SettingsPageUpdateOrganizationMutation.graphql";
 import type { SettingsPageInviteUserMutation as SettingsPageInviteUserMutationType } from "./__generated__/SettingsPageInviteUserMutation.graphql";
 import type { SettingsPageRemoveUserMutation as SettingsPageRemoveUserMutationType } from "./__generated__/SettingsPageRemoveUserMutation.graphql";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const settingsPageQuery = graphql`
   query SettingsPageQuery($organizationID: ID!) {
@@ -290,14 +289,11 @@ function SettingsPageContent({
   };
 
   return (
-    <>
-      <div className="container space-y-6">
-        <PageHeader
-          className="mb-17"
-          title="Settings"
-          description="Manage your details and personal preferences here"
-        />
-
+    <PageTemplate
+      title="Settings"
+      description="Manage your details and personal preferences here"
+    >
+      <div className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Organization information</CardTitle>
@@ -519,23 +515,28 @@ function SettingsPageContent({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </PageTemplate>
   );
 }
 
-function SettingsPageFallback() {
+export function SettingsPageSkeleton() {
   return (
-    <div className="p-6 space-y-6">
-      <div className="space-y-1">
-        <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-        <div className="h-4 w-96 bg-muted animate-pulse rounded" />
+    <PageTemplateSkeleton
+      title="Settings"
+      description="Manage your details and personal preferences here"
+    >
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <div className="h-8 w-48 bg-muted animate-pulse rounded" />
+          <div className="h-4 w-96 bg-muted animate-pulse rounded" />
+        </div>
+        <div className="space-y-2">
+          {[1, 2].map((i) => (
+            <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
       </div>
-      <div className="space-y-2">
-        {[1, 2].map((i) => (
-          <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
-        ))}
-      </div>
-    </div>
+    </PageTemplateSkeleton>
   );
 }
 
@@ -550,17 +551,12 @@ export default function SettingsPage() {
   }, [loadQuery, organizationId]);
 
   if (!queryRef) {
-    return <SettingsPageFallback />;
+    return <SettingsPageSkeleton />;
   }
 
   return (
-    <>
-      <Helmet>
-        <title>Settings - Probo Console</title>
-      </Helmet>
-      <Suspense fallback={<SettingsPageFallback />}>
-        <SettingsPageContent queryRef={queryRef} />
-      </Suspense>
-    </>
+    <Suspense fallback={<SettingsPageSkeleton />}>
+      <SettingsPageContent queryRef={queryRef} />
+    </Suspense>
   );
 }

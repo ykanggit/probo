@@ -13,12 +13,11 @@ import { Badge } from "@/components/ui/badge";
 import { UserPlus, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
-import { Helmet } from "react-helmet-async";
 import type { PeopleListPageQuery as PeopleListPageQueryType } from "./__generated__/PeopleListPageQuery.graphql";
 import type { PeopleListPageDeletePeopleMutation } from "./__generated__/PeopleListPageDeletePeopleMutation.graphql";
 import { PeopleListPagePaginationQuery } from "./__generated__/PeopleListPagePaginationQuery.graphql";
 import { PeopleListPage_peoples$key } from "./__generated__/PeopleListPage_peoples.graphql";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const ITEMS_PER_PAGE = 25;
 
@@ -174,31 +173,25 @@ function PeopleListContent({
   const pageInfo = peoplesConnection.peoples.pageInfo;
 
   return (
-    <>
-      <Helmet>
-        <title>People - Probo</title>
-      </Helmet>
-      <div className="container space-y-6">
-        <PageHeader
-          className="mb-17"
-          title="Employees"
-          description="Keep track of your company's workforce and their progress
-            towards completing tasks assigned to them."
-          actions={
-            <Button
-              asChild
-              variant="outline"
-              style={{ borderRadius: "0.5rem" }}
-              className="gap-2"
-            >
-              <Link to={`/organizations/${organizationId}/people/create`}>
-                <UserPlus className="h-4 w-4" />
-                Add a person
-              </Link>
-            </Button>
-          }
-        />
-
+    <PageTemplate
+      title="People"
+      description="Keep track of your company's workforce and their progress
+      towards completing tasks assigned to them."
+      actions={
+        <Button
+          asChild
+          variant="outline"
+          style={{ borderRadius: "0.5rem" }}
+          className="gap-2"
+        >
+          <Link to={`/organizations/${organizationId}/people/create`}>
+            <UserPlus className="h-4 w-4" />
+            Add a person
+          </Link>
+        </Button>
+      }
+    >
+      <div className="space-y-6">
         <div className="space-y-2">
           {peoples.map((person) => (
             <Link
@@ -296,27 +289,32 @@ function PeopleListContent({
           }}
         />
       </div>
-    </>
+    </PageTemplate>
   );
 }
 
-function PeopleListPageFallback() {
+export function PeopleListPageSkeleton() {
   return (
-    <div className="space-y-6">
-      <div>
-        <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-        <div className="h-4 w-96 bg-muted animate-pulse rounded mt-1" />
+    <PageTemplateSkeleton
+      title="People"
+      description="Keep track of your company's workforce and their progress towards completing tasks assigned to them."
+      actions={<div className="bg-muted animate-pulse h-9 w-1/6 rounded-lg" />}
+    >
+      <div className="space-y-6">
+        <div className="rounded-xl border bg-card p-4 space-y-2">
+          <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+          <div className="h-10 w-full bg-muted animate-pulse rounded" />
+        </div>
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-[72px] bg-muted animate-pulse rounded-xl"
+            />
+          ))}
+        </div>
       </div>
-      <div className="rounded-xl border bg-card p-4 space-y-4">
-        <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-        <div className="h-10 w-full bg-muted animate-pulse rounded" />
-      </div>
-      <div className="space-y-2">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-[72px] bg-muted animate-pulse rounded-xl" />
-        ))}
-      </div>
-    </div>
+    </PageTemplateSkeleton>
   );
 }
 
@@ -341,17 +339,12 @@ export default function PeopleListPage() {
   }, [loadQuery, organizationId, searchParams]);
 
   if (!queryRef) {
-    return <PeopleListPageFallback />;
+    return <PeopleListPageSkeleton />;
   }
 
   return (
-    <>
-      <Helmet>
-        <title>People - Probo Console</title>
-      </Helmet>
-      <Suspense fallback={<PeopleListPageFallback />}>
-        <PeopleListContent queryRef={queryRef} />
-      </Suspense>
-    </>
+    <Suspense fallback={<PeopleListPageSkeleton />}>
+      <PeopleListContent queryRef={queryRef} />
+    </Suspense>
   );
 }

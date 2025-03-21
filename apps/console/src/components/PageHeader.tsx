@@ -56,8 +56,8 @@ export function PageHeading({
 
 const PageHeadingSkeleton: FC = () => {
   return (
-    <div className="py-[3px]">
-      <div className="bg-muted animate rounded-lg w-60 h-7.5" />
+    <div className="py-[3px] w-2/5">
+      <div className="bg-muted animate rounded-lg h-7.5" />
     </div>
   );
 };

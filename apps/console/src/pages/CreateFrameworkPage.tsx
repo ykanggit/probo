@@ -1,7 +1,6 @@
 import { Suspense, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { graphql, useMutation, ConnectionHandler } from "react-relay";
-import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CreateFrameworkPageCreateFrameworkMutation } from "./__generated__/CreateFrameworkPageCreateFrameworkMutation.graphql";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const createFrameworkMutation = graphql`
   mutation CreateFrameworkPageCreateFrameworkMutation(
@@ -69,7 +69,7 @@ function EditableField({
           }
           className={cn(
             "w-full resize-none",
-            required && !value && "border-red-500",
+            required && !value && "border-red-500"
           )}
           placeholder={`Enter ${label.toLowerCase()}`}
           rows={4}
@@ -101,7 +101,7 @@ function CreateFrameworkPageContent() {
 
   const [commit, isInFlight] =
     useMutation<CreateFrameworkPageCreateFrameworkMutation>(
-      createFrameworkMutation,
+      createFrameworkMutation
     );
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
@@ -125,7 +125,7 @@ function CreateFrameworkPageContent() {
 
     const connectionId = ConnectionHandler.getConnectionID(
       organizationId!,
-      "FrameworkListPage_frameworks",
+      "FrameworkListPage_frameworks"
     );
 
     commit({
@@ -153,7 +153,7 @@ function CreateFrameworkPageContent() {
         });
 
         navigate(
-          `/organizations/${organizationId}/frameworks/${data.createFramework.frameworkEdge.node.id}`,
+          `/organizations/${organizationId}/frameworks/${data.createFramework.frameworkEdge.node.id}`
         );
       },
       onError(error) {
@@ -167,60 +167,62 @@ function CreateFrameworkPageContent() {
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Create Framework - Probo</title>
-      </Helmet>
-      <div className="container mx-auto py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">Create Framework</h1>
-          <p className="text-muted-foreground">
-            Create a new framework to organize your controls
-          </p>
-        </div>
+    <PageTemplate
+      title="Create Framework"
+      description="Create a new framework to organize your controls"
+    >
+      <Card className="max-w-2xl">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <EditableField
+            label="Name"
+            value={formData.name}
+            onChange={(value) => handleFieldChange("name", value)}
+            required
+          />
 
-        <Card className="max-w-2xl">
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <EditableField
-              label="Name"
-              value={formData.name}
-              onChange={(value) => handleFieldChange("name", value)}
-              required
-            />
+          <EditableField
+            label="Description"
+            value={formData.description}
+            onChange={(value) => handleFieldChange("description", value)}
+            required
+            multiline
+            helpText="Provide a detailed description of the framework"
+          />
 
-            <EditableField
-              label="Description"
-              value={formData.description}
-              onChange={(value) => handleFieldChange("description", value)}
-              required
-              multiline
-              helpText="Provide a detailed description of the framework"
-            />
+          <div className="flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                navigate(`/organizations/${organizationId}/frameworks`)
+              }
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isInFlight}>
+              {isInFlight ? "Creating..." : "Create Framework"}
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </PageTemplate>
+  );
+}
 
-            <div className="flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  navigate(`/organizations/${organizationId}/frameworks`)
-                }
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isInFlight}>
-                {isInFlight ? "Creating..." : "Create Framework"}
-              </Button>
-            </div>
-          </form>
-        </Card>
-      </div>
-    </>
+export function CreateFrameworkPageSkeleton() {
+  return (
+    <PageTemplateSkeleton
+      title="Create Framework"
+      description="Create a new framework to organize your controls"
+    >
+      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+    </PageTemplateSkeleton>
   );
 }
 
 export default function CreateFrameworkPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<CreateFrameworkPageSkeleton />}>
       <CreateFrameworkPageContent />
     </Suspense>
   );

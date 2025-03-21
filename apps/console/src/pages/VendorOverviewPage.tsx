@@ -16,9 +16,8 @@ import {
 import { Suspense, useEffect, useState, useCallback } from "react";
 import type { VendorOverviewPageQuery as VendorOverviewPageQueryType } from "./__generated__/VendorOverviewPageQuery.graphql";
 import { useParams } from "react-router";
-import { Helmet } from "react-helmet-async";
 import { cn } from "@/lib/utils";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const vendorOverviewPageQuery = graphql`
   query VendorOverviewPageQuery($vendorId: ID!) {
@@ -205,188 +204,176 @@ function VendorOverviewPageContent({
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Vendor - Probo</title>
-      </Helmet>
-      <div className="container">
-        <PageHeader className="mb-17" title={formData.name} />
-        <div className="max-w-4xl space-y-6">
-          <EditableField
-            label="Name"
-            value={formData.name}
-            onChange={(value) => handleFieldChange("name", value)}
-          />
+    <PageTemplate title={formData.name}>
+      <div className="max-w-2xl space-y-6">
+        <EditableField
+          label="Name"
+          value={formData.name}
+          onChange={(value) => handleFieldChange("name", value)}
+        />
 
-          <EditableField
-            label="Description"
-            value={formData.description}
-            onChange={(value) => handleFieldChange("description", value)}
-          />
+        <EditableField
+          label="Description"
+          value={formData.description}
+          onChange={(value) => handleFieldChange("description", value)}
+        />
 
-          <Card className="p-6">
+        <Card className="p-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-lg font-medium">Service Information</h2>
+              <p className="text-sm text-gray-500">
+                Basic information about the vendor service
+              </p>
+            </div>
+
             <div className="space-y-4">
+              <EditableField
+                label="Service Start At"
+                value={formData.serviceStartAt}
+                type="datetime-local"
+                onChange={(value) => handleFieldChange("serviceStartAt", value)}
+              />
+
+              <EditableField
+                label="Service Termination At"
+                value={formData.serviceTerminationAt}
+                type="datetime-local"
+                onChange={(value) =>
+                  handleFieldChange("serviceTerminationAt", value)
+                }
+              />
+
               <div className="space-y-2">
-                <h2 className="text-lg font-medium">Service Information</h2>
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="h-4 w-4 text-gray-400" />
+                  <Label className="text-sm">Service Criticality</Label>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() =>
+                      handleFieldChange("serviceCriticality", "LOW")
+                    }
+                    className={cn(
+                      "rounded-full px-4 py-1 text-sm transition-colors",
+                      formData.serviceCriticality === "LOW"
+                        ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
+                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                    )}
+                  >
+                    Low
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleFieldChange("serviceCriticality", "MEDIUM")
+                    }
+                    className={cn(
+                      "rounded-full px-4 py-1 text-sm transition-colors",
+                      formData.serviceCriticality === "MEDIUM"
+                        ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
+                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                    )}
+                  >
+                    Medium
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleFieldChange("serviceCriticality", "HIGH")
+                    }
+                    className={cn(
+                      "rounded-full px-4 py-1 text-sm transition-colors",
+                      formData.serviceCriticality === "HIGH"
+                        ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
+                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                    )}
+                  >
+                    High
+                  </button>
+                </div>
                 <p className="text-sm text-gray-500">
-                  Basic information about the vendor service
+                  {formData.serviceCriticality === "HIGH" &&
+                    "Critical service - downtime severely impacts end-users"}
+                  {formData.serviceCriticality === "MEDIUM" &&
+                    "Important service - downtime moderately affects end-users"}
+                  {formData.serviceCriticality === "LOW" &&
+                    "Non-critical service - minimal end-user impact if down"}
                 </p>
               </div>
 
-              <div className="space-y-4">
-                <EditableField
-                  label="Service Start At"
-                  value={formData.serviceStartAt}
-                  type="datetime-local"
-                  onChange={(value) =>
-                    handleFieldChange("serviceStartAt", value)
-                  }
-                />
-
-                <EditableField
-                  label="Service Termination At"
-                  value={formData.serviceTerminationAt}
-                  type="datetime-local"
-                  onChange={(value) =>
-                    handleFieldChange("serviceTerminationAt", value)
-                  }
-                />
-
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <HelpCircle className="h-4 w-4 text-gray-400" />
-                    <Label className="text-sm">Service Criticality</Label>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() =>
-                        handleFieldChange("serviceCriticality", "LOW")
-                      }
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.serviceCriticality === "LOW"
-                          ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      Low
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleFieldChange("serviceCriticality", "MEDIUM")
-                      }
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.serviceCriticality === "MEDIUM"
-                          ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      Medium
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleFieldChange("serviceCriticality", "HIGH")
-                      }
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.serviceCriticality === "HIGH"
-                          ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      High
-                    </button>
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    {formData.serviceCriticality === "HIGH" &&
-                      "Critical service - downtime severely impacts end-users"}
-                    {formData.serviceCriticality === "MEDIUM" &&
-                      "Important service - downtime moderately affects end-users"}
-                    {formData.serviceCriticality === "LOW" &&
-                      "Non-critical service - minimal end-user impact if down"}
-                  </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="h-4 w-4 text-gray-400" />
+                  <Label className="text-sm">Risk Tier</Label>
                 </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <HelpCircle className="h-4 w-4 text-gray-400" />
-                    <Label className="text-sm">Risk Tier</Label>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleFieldChange("riskTier", "CRITICAL")}
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.riskTier === "CRITICAL"
-                          ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      Critical
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleFieldChange("riskTier", "SIGNIFICANT")
-                      }
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.riskTier === "SIGNIFICANT"
-                          ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      Significant
-                    </button>
-                    <button
-                      onClick={() => handleFieldChange("riskTier", "GENERAL")}
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.riskTier === "GENERAL"
-                          ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      General
-                    </button>
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    {formData.riskTier === "CRITICAL" &&
-                      "Handles sensitive data, critical for platform operation"}
-                    {formData.riskTier === "SIGNIFICANT" &&
-                      "No user data access, but important for platform management"}
-                    {formData.riskTier === "GENERAL" &&
-                      "General vendor with minimal risk"}
-                  </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleFieldChange("riskTier", "CRITICAL")}
+                    className={cn(
+                      "rounded-full px-4 py-1 text-sm transition-colors",
+                      formData.riskTier === "CRITICAL"
+                        ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
+                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                    )}
+                  >
+                    Critical
+                  </button>
+                  <button
+                    onClick={() => handleFieldChange("riskTier", "SIGNIFICANT")}
+                    className={cn(
+                      "rounded-full px-4 py-1 text-sm transition-colors",
+                      formData.riskTier === "SIGNIFICANT"
+                        ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
+                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                    )}
+                  >
+                    Significant
+                  </button>
+                  <button
+                    onClick={() => handleFieldChange("riskTier", "GENERAL")}
+                    className={cn(
+                      "rounded-full px-4 py-1 text-sm transition-colors",
+                      formData.riskTier === "GENERAL"
+                        ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
+                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                    )}
+                  >
+                    General
+                  </button>
                 </div>
-
-                <EditableField
-                  label="Status Page URL"
-                  value={formData.statusPageUrl || ""}
-                  onChange={(value) =>
-                    handleFieldChange("statusPageUrl", value)
-                  }
-                />
-
-                <EditableField
-                  label="Terms of Service URL"
-                  value={formData.termsOfServiceUrl || ""}
-                  onChange={(value) =>
-                    handleFieldChange("termsOfServiceUrl", value)
-                  }
-                />
-
-                <EditableField
-                  label="Privacy Policy URL"
-                  value={formData.privacyPolicyUrl || ""}
-                  onChange={(value) =>
-                    handleFieldChange("privacyPolicyUrl", value)
-                  }
-                />
+                <p className="text-sm text-gray-500">
+                  {formData.riskTier === "CRITICAL" &&
+                    "Handles sensitive data, critical for platform operation"}
+                  {formData.riskTier === "SIGNIFICANT" &&
+                    "No user data access, but important for platform management"}
+                  {formData.riskTier === "GENERAL" &&
+                    "General vendor with minimal risk"}
+                </p>
               </div>
+
+              <EditableField
+                label="Status Page URL"
+                value={formData.statusPageUrl || ""}
+                onChange={(value) => handleFieldChange("statusPageUrl", value)}
+              />
+
+              <EditableField
+                label="Terms of Service URL"
+                value={formData.termsOfServiceUrl || ""}
+                onChange={(value) =>
+                  handleFieldChange("termsOfServiceUrl", value)
+                }
+              />
+
+              <EditableField
+                label="Privacy Policy URL"
+                value={formData.privacyPolicyUrl || ""}
+                onChange={(value) =>
+                  handleFieldChange("privacyPolicyUrl", value)
+                }
+              />
             </div>
-          </Card>
-        </div>
+          </div>
+        </Card>
       </div>
 
       {hasChanges && (
@@ -402,13 +389,13 @@ function VendorOverviewPageContent({
           </Button>
         </div>
       )}
-    </>
+    </PageTemplate>
   );
 }
 
-function VendorOverviewPageFallback() {
+export function VendorOverviewPageSkeleton() {
   return (
-    <div className="p-6 space-y-6">
+    <PageTemplateSkeleton>
       <div className="space-y-1">
         <div className="h-8 w-48 bg-muted animate-pulse rounded" />
         <div className="h-4 w-96 bg-muted animate-pulse rounded" />
@@ -418,7 +405,7 @@ function VendorOverviewPageFallback() {
           <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
         ))}
       </div>
-    </div>
+    </PageTemplateSkeleton>
   );
 }
 
@@ -433,17 +420,12 @@ export default function VendorOverviewPage() {
   }, [loadQuery, vendorId]);
 
   if (!queryRef) {
-    return <VendorOverviewPageFallback />;
+    return <VendorOverviewPageSkeleton />;
   }
 
   return (
-    <>
-      <Helmet>
-        <title>Vendor Overview - Probo Console</title>
-      </Helmet>
-      <Suspense fallback={<VendorOverviewPageFallback />}>
-        <VendorOverviewPageContent queryRef={queryRef} />
-      </Suspense>
-    </>
+    <Suspense fallback={<VendorOverviewPageSkeleton />}>
+      <VendorOverviewPageContent queryRef={queryRef} />
+    </Suspense>
   );
 }

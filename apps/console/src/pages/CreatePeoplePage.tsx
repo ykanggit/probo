@@ -1,7 +1,6 @@
 import { Suspense, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { graphql, useMutation, ConnectionHandler } from "react-relay";
-import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CreatePeoplePageCreatePeopleMutation } from "./__generated__/CreatePeoplePageCreatePeopleMutation.graphql";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const createPeopleMutation = graphql`
   mutation CreatePeoplePageCreatePeopleMutation(
@@ -150,177 +149,166 @@ function CreatePeoplePageContent() {
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Create Person - Probo Console</title>
-      </Helmet>
-      <div className="container">
-        <PageHeader
-          className="mb-17"
-          title="Add a Person"
-          description="Add a new person interacting with organization"
-        />
+    <PageTemplate
+      title="Create Person"
+      description="Add a new person interacting with organization"
+    >
+      <form onSubmit={handleSubmit}>
+        <div className="max-w-2xl space-y-6">
+          <EditableField
+            label="Full Name"
+            value={formData.fullName}
+            onChange={(value) => handleFieldChange("fullName", value)}
+            required
+          />
 
-        <form onSubmit={handleSubmit}>
-          <div className="max-w-4xl space-y-6">
-            <EditableField
-              label="Full Name"
-              value={formData.fullName}
-              onChange={(value) => handleFieldChange("fullName", value)}
-              required
-            />
+          <EditableField
+            label="Primary Email"
+            value={formData.primaryEmailAddress}
+            type="email"
+            onChange={(value) =>
+              handleFieldChange("primaryEmailAddress", value)
+            }
+            required
+          />
 
-            <EditableField
-              label="Primary Email"
-              value={formData.primaryEmailAddress}
-              type="email"
-              onChange={(value) =>
-                handleFieldChange("primaryEmailAddress", value)
-              }
-              required
-            />
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <HelpCircle className="h-4 w-4 text-gray-400" />
-                <Label className="text-sm">Additional Email Addresses</Label>
-              </div>
-              <div className="space-y-2">
-                {formData.additionalEmailAddresses.map((email, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      type="email"
-                      value={email}
-                      onChange={(e) => {
-                        const newEmails = [
-                          ...formData.additionalEmailAddresses,
-                        ];
-                        newEmails[index] = e.target.value;
-                        handleFieldChange(
-                          "additionalEmailAddresses",
-                          newEmails
-                        );
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        const newEmails =
-                          formData.additionalEmailAddresses.filter(
-                            (_, i) => i !== index
-                          );
-                        handleFieldChange(
-                          "additionalEmailAddresses",
-                          newEmails
-                        );
-                      }}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    handleFieldChange("additionalEmailAddresses", [
-                      ...formData.additionalEmailAddresses,
-                      "",
-                    ]);
-                  }}
-                >
-                  Add Email
-                </Button>
-              </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <HelpCircle className="h-4 w-4 text-gray-400" />
+              <Label className="text-sm">Additional Email Addresses</Label>
             </div>
+            <div className="space-y-2">
+              {formData.additionalEmailAddresses.map((email, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      const newEmails = [...formData.additionalEmailAddresses];
+                      newEmails[index] = e.target.value;
+                      handleFieldChange("additionalEmailAddresses", newEmails);
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      const newEmails =
+                        formData.additionalEmailAddresses.filter(
+                          (_, i) => i !== index
+                        );
+                      handleFieldChange("additionalEmailAddresses", newEmails);
+                    }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  handleFieldChange("additionalEmailAddresses", [
+                    ...formData.additionalEmailAddresses,
+                    "",
+                  ]);
+                }}
+              >
+                Add Email
+              </Button>
+            </div>
+          </div>
 
-            <Card className="p-6">
+          <Card className="p-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h2 className="text-lg font-medium">Additional Information</h2>
+                <p className="text-sm text-gray-500">
+                  Additional details about the person
+                </p>
+              </div>
+
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <h2 className="text-lg font-medium">
-                    Additional Information
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Additional details about the person
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <HelpCircle className="h-4 w-4 text-gray-400" />
-                      <Label className="text-sm">Kind</Label>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleFieldChange("kind", "EMPLOYEE")}
-                        className={cn(
-                          "rounded-full px-4 py-1 text-sm transition-colors",
-                          formData.kind === "EMPLOYEE"
-                            ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                        )}
-                      >
-                        Employee
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleFieldChange("kind", "CONTRACTOR")}
-                        className={cn(
-                          "rounded-full px-4 py-1 text-sm transition-colors",
-                          formData.kind === "CONTRACTOR"
-                            ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                        )}
-                      >
-                        Contractor
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleFieldChange("kind", "SERVICE_ACCOUNT")
-                        }
-                        className={cn(
-                          "rounded-full px-4 py-1 text-sm transition-colors",
-                          formData.kind === "SERVICE_ACCOUNT"
-                            ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                        )}
-                      >
-                        Service Account
-                      </button>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <HelpCircle className="h-4 w-4 text-gray-400" />
+                    <Label className="text-sm">Kind</Label>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleFieldChange("kind", "EMPLOYEE")}
+                      className={cn(
+                        "rounded-full px-4 py-1 text-sm transition-colors",
+                        formData.kind === "EMPLOYEE"
+                          ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                      )}
+                    >
+                      Employee
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleFieldChange("kind", "CONTRACTOR")}
+                      className={cn(
+                        "rounded-full px-4 py-1 text-sm transition-colors",
+                        formData.kind === "CONTRACTOR"
+                          ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                      )}
+                    >
+                      Contractor
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleFieldChange("kind", "SERVICE_ACCOUNT")
+                      }
+                      className={cn(
+                        "rounded-full px-4 py-1 text-sm transition-colors",
+                        formData.kind === "SERVICE_ACCOUNT"
+                          ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
+                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                      )}
+                    >
+                      Service Account
+                    </button>
                   </div>
                 </div>
               </div>
-            </Card>
-          </div>
-          <div className="fixed bottom-6 right-6 flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate(-1)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              Create Person
-            </Button>
-          </div>
-        </form>
-      </div>
-    </>
+            </div>
+          </Card>
+        </div>
+        <div className="fixed bottom-6 right-6 flex gap-2">
+          <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            Create Person
+          </Button>
+        </div>
+      </form>
+    </PageTemplate>
+  );
+}
+
+export function CreatePeoplePageSkeleton() {
+  return (
+    <PageTemplateSkeleton
+      title="Create Person"
+      description="Add a new person interacting with organization"
+    >
+      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+    </PageTemplateSkeleton>
   );
 }
 
 export default function CreatePeoplePage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<CreatePeoplePageSkeleton />}>
       <CreatePeoplePageContent />
     </Suspense>
   );

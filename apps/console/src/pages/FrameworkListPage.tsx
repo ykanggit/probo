@@ -320,6 +320,10 @@ export default function FrameworkListPage() {
     loadQuery({ organizationId: organizationId! });
   }, [loadQuery, organizationId]);
 
+  if (!queryRef) {
+    return <FrameworkListPageSkeleton />;
+  }
+
   return (
     <Suspense fallback={<FrameworkListPageSkeleton />}>
       {queryRef && <FrameworkListPageContent queryRef={queryRef} />}

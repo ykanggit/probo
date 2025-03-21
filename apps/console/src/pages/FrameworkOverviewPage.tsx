@@ -20,8 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import type { FrameworkOverviewPageQuery as FrameworkOverviewPageQueryType } from "./__generated__/FrameworkOverviewPageQuery.graphql";
-import { Helmet } from "react-helmet-async";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 const FrameworkOverviewPageQuery = graphql`
   query FrameworkOverviewPageQuery($frameworkId: ID!) {
@@ -169,32 +168,29 @@ function FrameworkOverviewPageContent({
   };
 
   return (
-    <div className="container space-y-6">
-      <PageHeader
-        className="mb-10"
-        title={framework.name ?? ""}
-        description={framework.description ?? ""}
-        actions={
-          <div className="flex gap-4">
-            <Button variant="outline" asChild>
-              <Link
-                to={`/organizations/${organizationId}/frameworks/${framework.id}/update`}
-              >
-                Edit Framework
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link
-                to={`/organizations/${organizationId}/frameworks/${framework.id}/controls/create`}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create Control
-              </Link>
-            </Button>
-          </div>
-        }
-      />
-
+    <PageTemplate
+      title={framework.name ?? ""}
+      description={framework.description ?? ""}
+      actions={
+        <div className="flex gap-4">
+          <Button variant="outline" asChild>
+            <Link
+              to={`/organizations/${organizationId}/frameworks/${framework.id}/update`}
+            >
+              Edit Framework
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link
+              to={`/organizations/${organizationId}/frameworks/${framework.id}/controls/create`}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Create Control
+            </Link>
+          </Button>
+        </div>
+      }
+    >
       <div className="grid gap-6">
         {categories.map((category) => {
           const isExpanded = expandedCategories.includes(category.id);
@@ -326,17 +322,13 @@ function FrameworkOverviewPageContent({
           );
         })}
       </div>
-    </div>
+    </PageTemplate>
   );
 }
 
-function FrameworkOverviewPageFallback() {
+export function FrameworkOverviewPageSkeleton() {
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="mb-8">
-        <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-        <div className="h-4 w-96 bg-muted animate-pulse rounded mt-2" />
-      </div>
+    <PageTemplateSkeleton>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3].map((i) => (
           <Card key={i}>
@@ -351,7 +343,7 @@ function FrameworkOverviewPageFallback() {
           </Card>
         ))}
       </div>
-    </div>
+    </PageTemplateSkeleton>
   );
 }
 
@@ -365,14 +357,13 @@ export default function FrameworkOverviewPage() {
     loadQuery({ frameworkId: frameworkId! });
   }, [loadQuery, frameworkId]);
 
+  if (!queryRef) {
+    return <FrameworkOverviewPageSkeleton />;
+  }
+
   return (
-    <>
-      <Helmet>
-        <title>Framework Overview - Probo Console</title>
-      </Helmet>
-      <Suspense fallback={<FrameworkOverviewPageFallback />}>
-        {queryRef && <FrameworkOverviewPageContent queryRef={queryRef} />}
-      </Suspense>
-    </>
+    <Suspense fallback={<FrameworkOverviewPageSkeleton />}>
+      {queryRef && <FrameworkOverviewPageContent queryRef={queryRef} />}
+    </Suspense>
   );
 }

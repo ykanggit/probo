@@ -64,7 +64,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 
-import { Helmet } from "react-helmet-async";
 import type { ControlOverviewPageQuery as ControlOverviewPageQueryType } from "./__generated__/ControlOverviewPageQuery.graphql";
 import type { ControlOverviewPageUpdateTaskStateMutation as ControlOverviewPageUpdateTaskStateMutationType } from "./__generated__/ControlOverviewPageUpdateTaskStateMutation.graphql";
 import type { ControlOverviewPageCreateTaskMutation as ControlOverviewPageCreateTaskMutationType } from "./__generated__/ControlOverviewPageCreateTaskMutation.graphql";
@@ -75,7 +74,7 @@ import type { ControlOverviewPageAssignTaskMutation as ControlOverviewPageAssign
 import type { ControlOverviewPageUnassignTaskMutation as ControlOverviewPageUnassignTaskMutationType } from "./__generated__/ControlOverviewPageUnassignTaskMutation.graphql";
 import type { ControlOverviewPageOrganizationQuery$data } from "./__generated__/ControlOverviewPageOrganizationQuery.graphql";
 import type { ControlOverviewPageUpdateControlStateMutation as ControlOverviewPageUpdateControlStateMutationType } from "./__generated__/ControlOverviewPageUpdateControlStateMutation.graphql";
-import { PageHeader } from "@/components/PageHeader";
+import { PageTemplate, PageTemplateSkeleton } from "@/components/PageTemplate";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -1128,890 +1127,872 @@ function ControlOverviewPageContent({
   };
 
   return (
-    <>
-      <Helmet>
-        <title>{data.control.name || "Control"} - Probo</title>
-      </Helmet>
-      <div className="container">
-        <PageHeader
-          className="mb-17"
-          title={data.control.name ?? ""}
-          actions={
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleEditControl}>
-                Edit Control
-              </Button>
-              <Select
-                defaultValue={data.control.state}
-                onValueChange={handleControlStateChange}
-              >
-                <SelectTrigger className="w-[160px] h-8 text-sm">
-                  <div
-                    className={`${getStateColor(
-                      data.control.state
-                    )} px-2 py-0.5 rounded-full text-sm w-full text-center`}
-                  >
-                    {formatState(data.control.state)}
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="NOT_STARTED">Not Started</SelectItem>
-                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                  <SelectItem value="IMPLEMENTED">Implemented</SelectItem>
-                  <SelectItem value="NOT_APPLICABLE">Not Applicable</SelectItem>
-                </SelectContent>
-              </Select>
+    <PageTemplate
+      title={data.control.name ?? ""}
+      actions={
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleEditControl}>
+            Edit Control
+          </Button>
+          <Select
+            defaultValue={data.control.state}
+            onValueChange={handleControlStateChange}
+          >
+            <SelectTrigger className="w-[160px] h-8 text-sm">
               <div
-                className={`${getImportanceColor(
-                  data.control.importance
-                )} px-3 py-1 rounded-full text-sm`}
+                className={`${getStateColor(
+                  data.control.state
+                )} px-2 py-0.5 rounded-full text-sm w-full text-center`}
               >
-                {formatImportance(data.control.importance)}
+                {formatState(data.control.state)}
               </div>
-            </div>
-          }
-        />
-        <div className="space-y-4 mb-8">
-          <Card className="mt-4">
-            <CardContent className="pt-6">
-              <div className="prose prose-gray prose-sm md:prose-base text-gray-600 max-w-3xl">
-                <ReactMarkdown>{data.control.description}</ReactMarkdown>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">Tasks</h2>
-            <div className="flex items-center gap-3">
-              <div className="text-sm text-gray-500 flex items-center bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
-                <FileIcon className="w-4 h-4 mr-2 text-blue-500" />
-                <span>Drag & drop files onto tasks to add evidence</span>
-              </div>
-              <Dialog
-                open={isCreateTaskOpen}
-                onOpenChange={setIsCreateTaskOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button size="sm" className="flex items-center gap-1">
-                    <Plus className="w-4 h-4" />
-                    <span>Add Task</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Create New Task</DialogTitle>
-                    <DialogDescription>
-                      Add a new task to this control. Click save when
-                      you&apos;re done.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <label htmlFor="name" className="text-sm font-medium">
-                        Task Name
-                      </label>
-                      <Input
-                        id="name"
-                        value={newTaskName}
-                        onChange={(e) => setNewTaskName(e.target.value)}
-                        placeholder="Enter task name"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="description"
-                        className="text-sm font-medium"
-                      >
-                        Description (optional)
-                      </label>
-                      <Textarea
-                        id="description"
-                        value={newTaskDescription}
-                        onChange={(e) => setNewTaskDescription(e.target.value)}
-                        placeholder="Enter task description"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="timeEstimate"
-                        className="text-sm font-medium"
-                      >
-                        Time Estimate (optional)
-                      </label>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <label
-                            htmlFor="days"
-                            className="text-xs text-gray-500 block mb-1"
-                          >
-                            Days
-                          </label>
-                          <Input
-                            id="days"
-                            type="number"
-                            min="0"
-                            value={timeEstimateDays}
-                            onChange={(e) =>
-                              setTimeEstimateDays(e.target.value)
-                            }
-                            placeholder="0"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="hours"
-                            className="text-xs text-gray-500 block mb-1"
-                          >
-                            Hours
-                          </label>
-                          <Input
-                            id="hours"
-                            type="number"
-                            min="0"
-                            max="23"
-                            value={timeEstimateHours}
-                            onChange={(e) =>
-                              setTimeEstimateHours(e.target.value)
-                            }
-                            placeholder="0"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="minutes"
-                            className="text-xs text-gray-500 block mb-1"
-                          >
-                            Minutes
-                          </label>
-                          <Input
-                            id="minutes"
-                            type="number"
-                            min="0"
-                            max="59"
-                            value={timeEstimateMinutes}
-                            onChange={(e) =>
-                              setTimeEstimateMinutes(e.target.value)
-                            }
-                            placeholder="0"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsCreateTaskOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button onClick={handleCreateTask}>Create Task</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-          <div className={`space-y-2 ${isDraggingFile ? "space-y-4" : ""}`}>
-            {tasks.map((task) => (
-              <div
-                key={task?.id}
-                className="rounded-md overflow-hidden border border-gray-200"
-              >
-                <div
-                  className={`flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group relative transition-all duration-200 ${
-                    isDraggingFile && draggedOverTaskId !== task?.id
-                      ? "border-dashed border-blue-300 bg-blue-50 bg-opacity-30"
-                      : ""
-                  } ${
-                    draggedOverTaskId === task?.id
-                      ? "bg-blue-50 border-2 border-blue-400 shadow-md"
-                      : ""
-                  }`}
-                  onDragOver={(e) => task?.id && handleDragOver(e, task.id)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => task?.id && handleDrop(e, task.id)}
-                >
-                  {isDraggingFile && draggedOverTaskId !== task?.id && (
-                    <div className="absolute inset-0 flex items-center justify-center rounded-md z-10">
-                      <div className="flex items-center gap-2 text-blue-600 bg-white px-3 py-1.5 rounded-lg shadow-xs">
-                        <FileIcon className="w-4 h-4" />
-                        <p className="text-sm font-medium">Drop file here</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {draggedOverTaskId === task?.id && (
-                    <div className="absolute inset-0 flex items-center justify-center rounded-md z-10 bg-blue-50 bg-opacity-90 backdrop-blur-sm border-2 border-dashed border-blue-400">
-                      <div className="flex items-center gap-2 text-blue-600 bg-white p-5 rounded-lg shadow-md">
-                        <FileText className="w-4 h-4 text-blue-500" />
-                        <p className="text-sm font-medium text-center">
-                          Drop file to add as evidence
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {uploadingTaskId === task?.id && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-95 rounded-md z-10 backdrop-blur-sm">
-                      <div className="flex flex-col items-center gap-3 text-blue-600">
-                        <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
-                        <p className="font-medium">Adding document...</p>
-                        <p className="text-sm text-gray-500">Please wait</p>
-                      </div>
-                    </div>
-                  )}
-
-                  <div
-                    className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer ${
-                      task?.state === "DONE"
-                        ? "border-gray-400 bg-gray-100"
-                        : "border-gray-300"
-                    } ${isDraggingFile ? "opacity-50" : ""}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (task?.id && task?.state) {
-                        handleTaskClick(task.id, task.state, task.version);
-                      }
-                    }}
-                  >
-                    {task?.state === "DONE" && (
-                      <CheckCircle2 className="w-4 h-4 text-gray-500" />
-                    )}
-                  </div>
-                  <div
-                    className={`flex-1 flex items-center justify-between ${
-                      isDraggingFile ? "opacity-50" : ""
-                    }`}
-                  >
-                    <div>
-                      <h3
-                        className={`text-sm ${
-                          task?.state === "DONE"
-                            ? "text-gray-500 line-through"
-                            : "text-gray-900"
-                        }`}
-                      >
-                        {task?.name}
-                      </h3>
-                      {task?.timeEstimate && (
-                        <p
-                          className={`text-xs mt-1 flex items-center ${
-                            task?.state === "DONE"
-                              ? "text-gray-400 line-through"
-                              : "text-blue-500"
-                          }`}
-                        >
-                          <span className="inline-block w-4 h-4 mr-1">⏱️</span>
-                          <span>{formatDuration(task.timeEstimate)}</span>
-                        </p>
-                      )}
-                      {task?.assignedTo && (
-                        <p className="text-xs mt-1 flex items-center text-gray-600">
-                          <User className="w-3 h-3 mr-1" />
-                          <span>{task.assignedTo.fullName}</span>
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {/* People Selector */}
-                      <Popover
-                        open={peoplePopoverOpen[task?.id || ""]}
-                        onOpenChange={(open: boolean) => {
-                          if (task?.id) {
-                            setPeoplePopoverOpen((prev) => ({
-                              ...prev,
-                              [task.id]: open,
-                            }));
-                          }
-                        }}
-                      >
-                        <PopoverTrigger asChild>
-                          <button
-                            type="button"
-                            className="text-gray-400 hover:text-blue-600"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (task?.id) {
-                                setPeoplePopoverOpen((prev) => ({
-                                  ...prev,
-                                  [task.id]: !prev[task.id],
-                                }));
-                              }
-                            }}
-                          >
-                            {task?.assignedTo ? (
-                              <UserMinus className="w-4 h-4" />
-                            ) : (
-                              <UserPlus className="w-4 h-4" />
-                            )}
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[250px] p-0" align="end">
-                          {task?.assignedTo ? (
-                            <div className="p-4 space-y-4">
-                              <div className="flex items-center gap-2">
-                                <User className="w-4 h-4 text-gray-500" />
-                                <div className="text-sm">
-                                  <p className="font-medium">
-                                    {task.assignedTo.fullName}
-                                  </p>
-                                  <p className="text-xs text-gray-500">
-                                    {task.assignedTo.primaryEmailAddress}
-                                  </p>
-                                </div>
-                              </div>
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                className="w-full"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (task?.id) {
-                                    handleUnassignPerson(task.id);
-                                  }
-                                }}
-                              >
-                                <UserMinus className="w-4 h-4 mr-2" />
-                                Unassign
-                              </Button>
-                            </div>
-                          ) : (
-                            <div className="max-h-[300px] overflow-y-auto">
-                              <div className="p-2 border-b">
-                                <input
-                                  type="text"
-                                  placeholder="Search people to assign..."
-                                  className="w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  value={peopleSearch[task?.id || ""] || ""}
-                                  onChange={(e) => {
-                                    if (task?.id) {
-                                      setPeopleSearch((prev) => ({
-                                        ...prev,
-                                        [task.id]: e.target.value,
-                                      }));
-                                    }
-                                  }}
-                                />
-                              </div>
-                              <div className="px-3 py-2 text-xs text-gray-500">
-                                Click on a person to assign them to this task
-                              </div>
-                              <div className="py-1">
-                                {!organizationData?.organization?.peoples?.edges?.some(
-                                  (edge) => {
-                                    if (!edge?.node) return false;
-                                    const searchTerm = (
-                                      peopleSearch[task?.id || ""] || ""
-                                    ).toLowerCase();
-                                    return (
-                                      !searchTerm ||
-                                      edge.node.fullName
-                                        .toLowerCase()
-                                        .includes(searchTerm) ||
-                                      edge.node.primaryEmailAddress
-                                        .toLowerCase()
-                                        .includes(searchTerm)
-                                    );
-                                  }
-                                ) && (
-                                  <div className="py-6 text-center text-sm">
-                                    No people found.
-                                  </div>
-                                )}
-                                {organizationData?.organization?.peoples?.edges?.map(
-                                  (edge) => {
-                                    if (!edge?.node) return null;
-
-                                    const searchTerm = (
-                                      peopleSearch[task?.id || ""] || ""
-                                    ).toLowerCase();
-                                    if (
-                                      searchTerm &&
-                                      !edge.node.fullName
-                                        .toLowerCase()
-                                        .includes(searchTerm) &&
-                                      !edge.node.primaryEmailAddress
-                                        .toLowerCase()
-                                        .includes(searchTerm)
-                                    ) {
-                                      return null;
-                                    }
-
-                                    return (
-                                      <div
-                                        key={edge.node.id}
-                                        className="px-2 py-1 hover:bg-blue-50 cursor-pointer"
-                                      >
-                                        <button
-                                          type="button"
-                                          className="flex items-center w-full text-left"
-                                          onClick={() => {
-                                            if (task?.id) {
-                                              handleAssignPerson(
-                                                task.id,
-                                                edge.node.id
-                                              );
-                                              setPeoplePopoverOpen((prev) => ({
-                                                ...prev,
-                                                [task.id]: false,
-                                              }));
-                                            }
-                                          }}
-                                        >
-                                          <User className="mr-2 h-4 w-4 text-blue-500 flex-shrink-0" />
-                                          <div>
-                                            <p className="font-medium">
-                                              {edge.node.fullName}
-                                            </p>
-                                            <p className="text-xs text-gray-500">
-                                              {edge.node.primaryEmailAddress}
-                                            </p>
-                                          </div>
-                                        </button>
-                                      </div>
-                                    );
-                                  }
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </PopoverContent>
-                      </Popover>
-
-                      <button
-                        type="button"
-                        className="text-gray-400 hover:text-blue-600"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (task?.id && task?.name) {
-                            handleUploadEvidence(task.id, task.name);
-                          }
-                        }}
-                        title="Add Evidence"
-                      >
-                        <FileText className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        className="text-gray-400 hover:text-red-600"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (task?.id && task?.name) {
-                            handleDeleteTask(task.id, task.name);
-                          }
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Evidence section */}
-                {task?.evidences?.edges && task.evidences.edges.length > 0 && (
-                  <>
-                    <div
-                      className="bg-gray-50 border-t border-gray-200 px-4 py-2.5 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors"
-                      onClick={() => task.id && toggleEvidenceList(task.id)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <FileIcon className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-700">
-                          {task.evidences.edges.length}{" "}
-                          {task.evidences.edges.length === 1
-                            ? "Evidence"
-                            : "Evidences"}
-                        </span>
-                      </div>
-                      {expandedEvidenceTaskId === task.id ? (
-                        <ChevronUp className="w-4 h-4 text-gray-500" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-gray-500" />
-                      )}
-                    </div>
-
-                    {expandedEvidenceTaskId === task.id && (
-                      <div className="bg-white border-t border-gray-200 p-3 space-y-2.5">
-                        {task.evidences.edges.map((edge) => {
-                          if (!edge) return null;
-                          const evidence = edge.node;
-                          if (!evidence) return null;
-
-                          return (
-                            <div
-                              key={evidence.id}
-                              className="flex items-center justify-between p-3 rounded-md border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all bg-gray-50"
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className="bg-white p-2 rounded-md border border-gray-200">
-                                  {getFileIcon(
-                                    evidence.mimeType,
-                                    evidence.type
-                                  )}
-                                </div>
-                                <div>
-                                  <div className="text-sm font-medium text-gray-800">
-                                    {evidence.filename}
-                                  </div>
-                                  <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
-                                    {evidence.type === "FILE" ? (
-                                      <>
-                                        <span className="font-medium text-gray-600">
-                                          {formatFileSize(evidence.size)}
-                                        </span>
-                                        <span>•</span>
-                                      </>
-                                    ) : evidence.url ? (
-                                      <>
-                                        <span className="font-medium text-blue-600 truncate max-w-[200px]">
-                                          {evidence.url}
-                                        </span>
-                                        <span>•</span>
-                                      </>
-                                    ) : null}
-                                    <span>
-                                      {formatDate(evidence.createdAt)}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                {evidence.type === "FILE" ? (
-                                  <>
-                                    {evidence.mimeType.startsWith("image/") ? (
-                                      <button
-                                        onClick={() =>
-                                          handlePreviewEvidence(evidence)
-                                        }
-                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                        title="Preview Image"
-                                      >
-                                        <Eye className="w-4 h-4 text-blue-600" />
-                                      </button>
-                                    ) : (
-                                      <button
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          handlePreviewEvidence(evidence);
-                                        }}
-                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                        title="Download"
-                                      >
-                                        <Download className="w-4 h-4 text-blue-600" />
-                                      </button>
-                                    )}
-                                  </>
-                                ) : evidence.url ? (
-                                  <button
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      if (evidence.url) {
-                                        window.open(evidence.url, "_blank");
-                                      }
-                                    }}
-                                    className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                    title="Open Link"
-                                  >
-                                    <Link2 className="w-4 h-4 text-blue-600" />
-                                  </button>
-                                ) : null}
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    if (task?.id) {
-                                      handleDeleteEvidence(
-                                        evidence.id,
-                                        evidence.filename,
-                                        task.id
-                                      );
-                                    }
-                                  }}
-                                  className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
-                                  title="Delete"
-                                >
-                                  <Trash2 className="w-4 h-4 text-red-500" />
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            ))}
-
-            {tasks.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                <p>No tasks yet. Click &quot;Add Task&quot; to create one.</p>
-              </div>
-            )}
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="NOT_STARTED">Not Started</SelectItem>
+              <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+              <SelectItem value="IMPLEMENTED">Implemented</SelectItem>
+              <SelectItem value="NOT_APPLICABLE">Not Applicable</SelectItem>
+            </SelectContent>
+          </Select>
+          <div
+            className={`${getImportanceColor(
+              data.control.importance
+            )} px-3 py-1 rounded-full text-sm`}
+          >
+            {formatImportance(data.control.importance)}
           </div>
         </div>
+      }
+    >
+      <div className="space-y-4 mb-8">
+        <Card className="mt-4">
+          <CardContent className="pt-6">
+            <div className="prose prose-gray prose-sm md:prose-base text-gray-600 max-w-3xl">
+              <ReactMarkdown>{data.control.description}</ReactMarkdown>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* Evidence Add Dialog */}
-        <Dialog open={evidenceDialogOpen} onOpenChange={setEvidenceDialogOpen}>
-          <DialogContent className="sm:max-w-[525px]">
-            <DialogHeader>
-              <DialogTitle>Add Evidence</DialogTitle>
-              <DialogDescription>
-                Choose the type of evidence you want to add to this task.
-              </DialogDescription>
-            </DialogHeader>
-
-            <Tabs
-              value={activeTab}
-              onValueChange={(value: string) =>
-                setActiveTab(value as "file" | "link")
-              }
-            >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="file">Document</TabsTrigger>
-                <TabsTrigger value="link">Link</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="file" className="space-y-4">
-                <div className="space-y-4 pt-4">
-                  <p>Select a document to add as evidence.</p>
-                  <Button
-                    onClick={() => {
-                      if (hiddenFileInputRef.current) {
-                        hiddenFileInputRef.current.click();
-                        setEvidenceDialogOpen(false);
-                      }
-                    }}
-                    className="w-full"
-                  >
-                    Select Document
-                  </Button>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="link" className="space-y-4 pt-4">
-                <div className="space-y-4">
-                  <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="evidence-name">Name</Label>
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold">Tasks</h2>
+          <div className="flex items-center gap-3">
+            <div className="text-sm text-gray-500 flex items-center bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
+              <FileIcon className="w-4 h-4 mr-2 text-blue-500" />
+              <span>Drag & drop files onto tasks to add evidence</span>
+            </div>
+            <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="flex items-center gap-1">
+                  <Plus className="w-4 h-4" />
+                  <span>Add Task</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Task</DialogTitle>
+                  <DialogDescription>
+                    Add a new task to this control. Click save when you&apos;re
+                    done.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="text-sm font-medium">
+                      Task Name
+                    </label>
                     <Input
-                      id="evidence-name"
-                      value={linkEvidenceName}
-                      onChange={(e) => setLinkEvidenceName(e.target.value)}
-                      placeholder="Name for this evidence"
+                      id="name"
+                      value={newTaskName}
+                      onChange={(e) => setNewTaskName(e.target.value)}
+                      placeholder="Enter task name"
                     />
                   </div>
-
-                  <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="evidence-url">URL</Label>
-                    <Input
-                      id="evidence-url"
-                      value={linkEvidenceUrl}
-                      onChange={(e) => setLinkEvidenceUrl(e.target.value)}
-                      placeholder="https://example.com"
-                      type="url"
-                    />
-                  </div>
-
-                  <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="evidence-description">
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="description"
+                      className="text-sm font-medium"
+                    >
                       Description (optional)
-                    </Label>
+                    </label>
                     <Textarea
-                      id="evidence-description"
-                      value={linkEvidenceDescription}
-                      onChange={(e) =>
-                        setLinkEvidenceDescription(e.target.value)
-                      }
-                      placeholder="Describe this evidence (optional)"
-                      className="min-h-[100px]"
+                      id="description"
+                      value={newTaskDescription}
+                      onChange={(e) => setNewTaskDescription(e.target.value)}
+                      placeholder="Enter task description"
                     />
                   </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setEvidenceDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              {activeTab === "link" && (
-                <Button onClick={handleLinkEvidenceSubmit}>Add Link</Button>
-              )}
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Hidden file input for direct uploads */}
-        <input
-          type="file"
-          ref={hiddenFileInputRef}
-          onChange={handleFileSelected}
-          style={{ display: "none" }}
-          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
-        />
-
-        {/* Delete Task Confirmation Dialog */}
-        <Dialog open={isDeleteTaskOpen} onOpenChange={setIsDeleteTaskOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete Task</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete the task &quot;
-                {taskToDelete?.name}&quot;? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsDeleteTaskOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={confirmDeleteTask}>
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Add the Preview Modal */}
-        <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
-          <DialogContent className="sm:max-w-4xl">
-            <DialogHeader>
-              <DialogTitle className="flex items-center justify-between">
-                <span>{previewEvidence?.filename}</span>
-                <button
-                  onClick={() => setIsPreviewModalOpen(false)}
-                  className="rounded-full p-1 hover:bg-gray-100"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </DialogTitle>
-              <DialogDescription>
-                Preview of the evidence file. You can view or download the file
-                from here.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex flex-col items-center justify-center min-h-[300px] bg-gray-50 rounded-md p-4">
-              {isLoadingFileUrl ? (
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                  <p className="text-gray-500">Loading preview...</p>
-                </div>
-              ) : previewEvidence?.fileUrl ? (
-                previewEvidence.mimeType.startsWith("image/") ? (
-                  <img
-                    src={previewEvidence.fileUrl}
-                    alt={previewEvidence.filename}
-                    className="max-h-[70vh] object-contain"
-                  />
-                ) : previewEvidence.mimeType.includes("pdf") ? (
-                  <iframe
-                    src={previewEvidence.fileUrl}
-                    className="w-full h-[70vh]"
-                    title={previewEvidence.filename}
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-4">
-                    <FileGeneric className="w-16 h-16 text-gray-400" />
-                    <p className="text-gray-600">
-                      Preview not available for this file type
-                    </p>
-                    <Button
-                      onClick={() => {
-                        if (previewEvidence?.fileUrl) {
-                          window.open(previewEvidence.fileUrl, "_blank");
-                        }
-                      }}
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="timeEstimate"
+                      className="text-sm font-medium"
                     >
-                      Download File
-                    </Button>
+                      Time Estimate (optional)
+                    </label>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <label
+                          htmlFor="days"
+                          className="text-xs text-gray-500 block mb-1"
+                        >
+                          Days
+                        </label>
+                        <Input
+                          id="days"
+                          type="number"
+                          min="0"
+                          value={timeEstimateDays}
+                          onChange={(e) => setTimeEstimateDays(e.target.value)}
+                          placeholder="0"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="hours"
+                          className="text-xs text-gray-500 block mb-1"
+                        >
+                          Hours
+                        </label>
+                        <Input
+                          id="hours"
+                          type="number"
+                          min="0"
+                          max="23"
+                          value={timeEstimateHours}
+                          onChange={(e) => setTimeEstimateHours(e.target.value)}
+                          placeholder="0"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="minutes"
+                          className="text-xs text-gray-500 block mb-1"
+                        >
+                          Minutes
+                        </label>
+                        <Input
+                          id="minutes"
+                          type="number"
+                          min="0"
+                          max="59"
+                          value={timeEstimateMinutes}
+                          onChange={(e) =>
+                            setTimeEstimateMinutes(e.target.value)
+                          }
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
                   </div>
-                )
-              ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <FileGeneric className="w-12 h-12 text-gray-400" />
-                  <p className="text-gray-500">Failed to load preview</p>
                 </div>
-              )}
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsPreviewModalOpen(false)}
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsCreateTaskOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleCreateTask}>Create Task</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+        <div className={`space-y-2 ${isDraggingFile ? "space-y-4" : ""}`}>
+          {tasks.map((task) => (
+            <div
+              key={task?.id}
+              className="rounded-md overflow-hidden border border-gray-200"
+            >
+              <div
+                className={`flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group relative transition-all duration-200 ${
+                  isDraggingFile && draggedOverTaskId !== task?.id
+                    ? "border-dashed border-blue-300 bg-blue-50 bg-opacity-30"
+                    : ""
+                } ${
+                  draggedOverTaskId === task?.id
+                    ? "bg-blue-50 border-2 border-blue-400 shadow-md"
+                    : ""
+                }`}
+                onDragOver={(e) => task?.id && handleDragOver(e, task.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => task?.id && handleDrop(e, task.id)}
               >
-                Close
-              </Button>
-              {previewEvidence?.fileUrl && (
-                <Button
-                  onClick={() => {
-                    if (previewEvidence?.fileUrl) {
-                      window.open(previewEvidence.fileUrl, "_blank");
+                {isDraggingFile && draggedOverTaskId !== task?.id && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-md z-10">
+                    <div className="flex items-center gap-2 text-blue-600 bg-white px-3 py-1.5 rounded-lg shadow-xs">
+                      <FileIcon className="w-4 h-4" />
+                      <p className="text-sm font-medium">Drop file here</p>
+                    </div>
+                  </div>
+                )}
+
+                {draggedOverTaskId === task?.id && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-md z-10 bg-blue-50 bg-opacity-90 backdrop-blur-sm border-2 border-dashed border-blue-400">
+                    <div className="flex items-center gap-2 text-blue-600 bg-white p-5 rounded-lg shadow-md">
+                      <FileText className="w-4 h-4 text-blue-500" />
+                      <p className="text-sm font-medium text-center">
+                        Drop file to add as evidence
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {uploadingTaskId === task?.id && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-95 rounded-md z-10 backdrop-blur-sm">
+                    <div className="flex flex-col items-center gap-3 text-blue-600">
+                      <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+                      <p className="font-medium">Adding document...</p>
+                      <p className="text-sm text-gray-500">Please wait</p>
+                    </div>
+                  </div>
+                )}
+
+                <div
+                  className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer ${
+                    task?.state === "DONE"
+                      ? "border-gray-400 bg-gray-100"
+                      : "border-gray-300"
+                  } ${isDraggingFile ? "opacity-50" : ""}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (task?.id && task?.state) {
+                      handleTaskClick(task.id, task.state, task.version);
                     }
                   }}
                 >
-                  Download
-                </Button>
-              )}
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+                  {task?.state === "DONE" && (
+                    <CheckCircle2 className="w-4 h-4 text-gray-500" />
+                  )}
+                </div>
+                <div
+                  className={`flex-1 flex items-center justify-between ${
+                    isDraggingFile ? "opacity-50" : ""
+                  }`}
+                >
+                  <div>
+                    <h3
+                      className={`text-sm ${
+                        task?.state === "DONE"
+                          ? "text-gray-500 line-through"
+                          : "text-gray-900"
+                      }`}
+                    >
+                      {task?.name}
+                    </h3>
+                    {task?.timeEstimate && (
+                      <p
+                        className={`text-xs mt-1 flex items-center ${
+                          task?.state === "DONE"
+                            ? "text-gray-400 line-through"
+                            : "text-blue-500"
+                        }`}
+                      >
+                        <span className="inline-block w-4 h-4 mr-1">⏱️</span>
+                        <span>{formatDuration(task.timeEstimate)}</span>
+                      </p>
+                    )}
+                    {task?.assignedTo && (
+                      <p className="text-xs mt-1 flex items-center text-gray-600">
+                        <User className="w-3 h-3 mr-1" />
+                        <span>{task.assignedTo.fullName}</span>
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* People Selector */}
+                    <Popover
+                      open={peoplePopoverOpen[task?.id || ""]}
+                      onOpenChange={(open: boolean) => {
+                        if (task?.id) {
+                          setPeoplePopoverOpen((prev) => ({
+                            ...prev,
+                            [task.id]: open,
+                          }));
+                        }
+                      }}
+                    >
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          className="text-gray-400 hover:text-blue-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (task?.id) {
+                              setPeoplePopoverOpen((prev) => ({
+                                ...prev,
+                                [task.id]: !prev[task.id],
+                              }));
+                            }
+                          }}
+                        >
+                          {task?.assignedTo ? (
+                            <UserMinus className="w-4 h-4" />
+                          ) : (
+                            <UserPlus className="w-4 h-4" />
+                          )}
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[250px] p-0" align="end">
+                        {task?.assignedTo ? (
+                          <div className="p-4 space-y-4">
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-gray-500" />
+                              <div className="text-sm">
+                                <p className="font-medium">
+                                  {task.assignedTo.fullName}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {task.assignedTo.primaryEmailAddress}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="w-full"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (task?.id) {
+                                  handleUnassignPerson(task.id);
+                                }
+                              }}
+                            >
+                              <UserMinus className="w-4 h-4 mr-2" />
+                              Unassign
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="max-h-[300px] overflow-y-auto">
+                            <div className="p-2 border-b">
+                              <input
+                                type="text"
+                                placeholder="Search people to assign..."
+                                className="w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value={peopleSearch[task?.id || ""] || ""}
+                                onChange={(e) => {
+                                  if (task?.id) {
+                                    setPeopleSearch((prev) => ({
+                                      ...prev,
+                                      [task.id]: e.target.value,
+                                    }));
+                                  }
+                                }}
+                              />
+                            </div>
+                            <div className="px-3 py-2 text-xs text-gray-500">
+                              Click on a person to assign them to this task
+                            </div>
+                            <div className="py-1">
+                              {!organizationData?.organization?.peoples?.edges?.some(
+                                (edge) => {
+                                  if (!edge?.node) return false;
+                                  const searchTerm = (
+                                    peopleSearch[task?.id || ""] || ""
+                                  ).toLowerCase();
+                                  return (
+                                    !searchTerm ||
+                                    edge.node.fullName
+                                      .toLowerCase()
+                                      .includes(searchTerm) ||
+                                    edge.node.primaryEmailAddress
+                                      .toLowerCase()
+                                      .includes(searchTerm)
+                                  );
+                                }
+                              ) && (
+                                <div className="py-6 text-center text-sm">
+                                  No people found.
+                                </div>
+                              )}
+                              {organizationData?.organization?.peoples?.edges?.map(
+                                (edge) => {
+                                  if (!edge?.node) return null;
 
-        {/* Add Delete Evidence Confirmation Dialog */}
-        <Dialog
-          open={isDeleteEvidenceOpen}
-          onOpenChange={setIsDeleteEvidenceOpen}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete Evidence</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete the evidence &quot;
-                {evidenceToDelete?.filename}&quot;? This action cannot be
-                undone.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsDeleteEvidenceOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={confirmDeleteEvidence}>
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+                                  const searchTerm = (
+                                    peopleSearch[task?.id || ""] || ""
+                                  ).toLowerCase();
+                                  if (
+                                    searchTerm &&
+                                    !edge.node.fullName
+                                      .toLowerCase()
+                                      .includes(searchTerm) &&
+                                    !edge.node.primaryEmailAddress
+                                      .toLowerCase()
+                                      .includes(searchTerm)
+                                  ) {
+                                    return null;
+                                  }
+
+                                  return (
+                                    <div
+                                      key={edge.node.id}
+                                      className="px-2 py-1 hover:bg-blue-50 cursor-pointer"
+                                    >
+                                      <button
+                                        type="button"
+                                        className="flex items-center w-full text-left"
+                                        onClick={() => {
+                                          if (task?.id) {
+                                            handleAssignPerson(
+                                              task.id,
+                                              edge.node.id
+                                            );
+                                            setPeoplePopoverOpen((prev) => ({
+                                              ...prev,
+                                              [task.id]: false,
+                                            }));
+                                          }
+                                        }}
+                                      >
+                                        <User className="mr-2 h-4 w-4 text-blue-500 flex-shrink-0" />
+                                        <div>
+                                          <p className="font-medium">
+                                            {edge.node.fullName}
+                                          </p>
+                                          <p className="text-xs text-gray-500">
+                                            {edge.node.primaryEmailAddress}
+                                          </p>
+                                        </div>
+                                      </button>
+                                    </div>
+                                  );
+                                }
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </PopoverContent>
+                    </Popover>
+
+                    <button
+                      type="button"
+                      className="text-gray-400 hover:text-blue-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (task?.id && task?.name) {
+                          handleUploadEvidence(task.id, task.name);
+                        }
+                      }}
+                      title="Add Evidence"
+                    >
+                      <FileText className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      className="text-gray-400 hover:text-red-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (task?.id && task?.name) {
+                          handleDeleteTask(task.id, task.name);
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Evidence section */}
+              {task?.evidences?.edges && task.evidences.edges.length > 0 && (
+                <>
+                  <div
+                    className="bg-gray-50 border-t border-gray-200 px-4 py-2.5 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => task.id && toggleEvidenceList(task.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <FileIcon className="w-4 h-4 text-blue-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        {task.evidences.edges.length}{" "}
+                        {task.evidences.edges.length === 1
+                          ? "Evidence"
+                          : "Evidences"}
+                      </span>
+                    </div>
+                    {expandedEvidenceTaskId === task.id ? (
+                      <ChevronUp className="w-4 h-4 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    )}
+                  </div>
+
+                  {expandedEvidenceTaskId === task.id && (
+                    <div className="bg-white border-t border-gray-200 p-3 space-y-2.5">
+                      {task.evidences.edges.map((edge) => {
+                        if (!edge) return null;
+                        const evidence = edge.node;
+                        if (!evidence) return null;
+
+                        return (
+                          <div
+                            key={evidence.id}
+                            className="flex items-center justify-between p-3 rounded-md border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all bg-gray-50"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="bg-white p-2 rounded-md border border-gray-200">
+                                {getFileIcon(evidence.mimeType, evidence.type)}
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-800">
+                                  {evidence.filename}
+                                </div>
+                                <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
+                                  {evidence.type === "FILE" ? (
+                                    <>
+                                      <span className="font-medium text-gray-600">
+                                        {formatFileSize(evidence.size)}
+                                      </span>
+                                      <span>•</span>
+                                    </>
+                                  ) : evidence.url ? (
+                                    <>
+                                      <span className="font-medium text-blue-600 truncate max-w-[200px]">
+                                        {evidence.url}
+                                      </span>
+                                      <span>•</span>
+                                    </>
+                                  ) : null}
+                                  <span>{formatDate(evidence.createdAt)}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {evidence.type === "FILE" ? (
+                                <>
+                                  {evidence.mimeType.startsWith("image/") ? (
+                                    <button
+                                      onClick={() =>
+                                        handlePreviewEvidence(evidence)
+                                      }
+                                      className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                      title="Preview Image"
+                                    >
+                                      <Eye className="w-4 h-4 text-blue-600" />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handlePreviewEvidence(evidence);
+                                      }}
+                                      className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                      title="Download"
+                                    >
+                                      <Download className="w-4 h-4 text-blue-600" />
+                                    </button>
+                                  )}
+                                </>
+                              ) : evidence.url ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (evidence.url) {
+                                      window.open(evidence.url, "_blank");
+                                    }
+                                  }}
+                                  className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                  title="Open Link"
+                                >
+                                  <Link2 className="w-4 h-4 text-blue-600" />
+                                </button>
+                              ) : null}
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (task?.id) {
+                                    handleDeleteEvidence(
+                                      evidence.id,
+                                      evidence.filename,
+                                      task.id
+                                    );
+                                  }
+                                }}
+                                className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
+                                title="Delete"
+                              >
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+
+          {tasks.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <p>No tasks yet. Click &quot;Add Task&quot; to create one.</p>
+            </div>
+          )}
+        </div>
       </div>
-    </>
+
+      {/* Evidence Add Dialog */}
+      <Dialog open={evidenceDialogOpen} onOpenChange={setEvidenceDialogOpen}>
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>Add Evidence</DialogTitle>
+            <DialogDescription>
+              Choose the type of evidence you want to add to this task.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Tabs
+            value={activeTab}
+            onValueChange={(value: string) =>
+              setActiveTab(value as "file" | "link")
+            }
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="file">Document</TabsTrigger>
+              <TabsTrigger value="link">Link</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="file" className="space-y-4">
+              <div className="space-y-4 pt-4">
+                <p>Select a document to add as evidence.</p>
+                <Button
+                  onClick={() => {
+                    if (hiddenFileInputRef.current) {
+                      hiddenFileInputRef.current.click();
+                      setEvidenceDialogOpen(false);
+                    }
+                  }}
+                  className="w-full"
+                >
+                  Select Document
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="link" className="space-y-4 pt-4">
+              <div className="space-y-4">
+                <div className="grid w-full items-center gap-1.5">
+                  <Label htmlFor="evidence-name">Name</Label>
+                  <Input
+                    id="evidence-name"
+                    value={linkEvidenceName}
+                    onChange={(e) => setLinkEvidenceName(e.target.value)}
+                    placeholder="Name for this evidence"
+                  />
+                </div>
+
+                <div className="grid w-full items-center gap-1.5">
+                  <Label htmlFor="evidence-url">URL</Label>
+                  <Input
+                    id="evidence-url"
+                    value={linkEvidenceUrl}
+                    onChange={(e) => setLinkEvidenceUrl(e.target.value)}
+                    placeholder="https://example.com"
+                    type="url"
+                  />
+                </div>
+
+                <div className="grid w-full items-center gap-1.5">
+                  <Label htmlFor="evidence-description">
+                    Description (optional)
+                  </Label>
+                  <Textarea
+                    id="evidence-description"
+                    value={linkEvidenceDescription}
+                    onChange={(e) => setLinkEvidenceDescription(e.target.value)}
+                    placeholder="Describe this evidence (optional)"
+                    className="min-h-[100px]"
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEvidenceDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            {activeTab === "link" && (
+              <Button onClick={handleLinkEvidenceSubmit}>Add Link</Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Hidden file input for direct uploads */}
+      <input
+        type="file"
+        ref={hiddenFileInputRef}
+        onChange={handleFileSelected}
+        style={{ display: "none" }}
+        accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+      />
+
+      {/* Delete Task Confirmation Dialog */}
+      <Dialog open={isDeleteTaskOpen} onOpenChange={setIsDeleteTaskOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Task</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the task &quot;
+              {taskToDelete?.name}&quot;? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteTaskOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteTask}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add the Preview Modal */}
+      <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
+        <DialogContent className="sm:max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>{previewEvidence?.filename}</span>
+              <button
+                onClick={() => setIsPreviewModalOpen(false)}
+                className="rounded-full p-1 hover:bg-gray-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </DialogTitle>
+            <DialogDescription>
+              Preview of the evidence file. You can view or download the file
+              from here.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center min-h-[300px] bg-gray-50 rounded-md p-4">
+            {isLoadingFileUrl ? (
+              <div className="flex flex-col items-center gap-2">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                <p className="text-gray-500">Loading preview...</p>
+              </div>
+            ) : previewEvidence?.fileUrl ? (
+              previewEvidence.mimeType.startsWith("image/") ? (
+                <img
+                  src={previewEvidence.fileUrl}
+                  alt={previewEvidence.filename}
+                  className="max-h-[70vh] object-contain"
+                />
+              ) : previewEvidence.mimeType.includes("pdf") ? (
+                <iframe
+                  src={previewEvidence.fileUrl}
+                  className="w-full h-[70vh]"
+                  title={previewEvidence.filename}
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-4">
+                  <FileGeneric className="w-16 h-16 text-gray-400" />
+                  <p className="text-gray-600">
+                    Preview not available for this file type
+                  </p>
+                  <Button
+                    onClick={() => {
+                      if (previewEvidence?.fileUrl) {
+                        window.open(previewEvidence.fileUrl, "_blank");
+                      }
+                    }}
+                  >
+                    Download File
+                  </Button>
+                </div>
+              )
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                <FileGeneric className="w-12 h-12 text-gray-400" />
+                <p className="text-gray-500">Failed to load preview</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsPreviewModalOpen(false)}
+            >
+              Close
+            </Button>
+            {previewEvidence?.fileUrl && (
+              <Button
+                onClick={() => {
+                  if (previewEvidence?.fileUrl) {
+                    window.open(previewEvidence.fileUrl, "_blank");
+                  }
+                }}
+              >
+                Download
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Delete Evidence Confirmation Dialog */}
+      <Dialog
+        open={isDeleteEvidenceOpen}
+        onOpenChange={setIsDeleteEvidenceOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Evidence</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the evidence &quot;
+              {evidenceToDelete?.filename}&quot;? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteEvidenceOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteEvidence}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </PageTemplate>
   );
 }
 
-function ControlOverviewPageFallback() {
+export function ControlOverviewPageSkeleton() {
   return (
-    <div className="min-h-screen bg-white p-6">
-      <div className="mb-8">
-        <div className="h-8 w-48 bg-gray-100 animate-pulse rounded" />
-        <div className="h-4 w-96 bg-gray-100 animate-pulse rounded mt-2" />
-      </div>
+    <PageTemplateSkeleton
+      actions={
+        <div className="flex items-center gap-2 w-1/3">
+          <div className="bg-muted animate-pulse h-8 w-1/3 rounded-lg" />
+          <div className="bg-muted animate-pulse h-8 w-1/3 rounded-lg" />
+          <div className="bg-muted animate-pulse h-8 w-1/3 rounded-full" />
+        </div>
+      }
+    >
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
           <Card key={i}>
             <CardContent className="p-6">
-              <div className="h-6 w-48 bg-gray-100 animate-pulse rounded mb-2" />
-              <div className="h-4 w-full bg-gray-100 animate-pulse rounded" />
+              <div className="h-6 w-48 bg-muted animate-pulse rounded mb-2" />
+              <div className="h-4 w-full bg-muted animate-pulse rounded" />
             </CardContent>
           </Card>
         ))}
       </div>
-    </div>
+    </PageTemplateSkeleton>
   );
 }
 
@@ -2028,11 +2009,11 @@ export default function ControlOverviewPage() {
   }, [controlId, loadQuery]);
 
   if (!queryRef) {
-    return <ControlOverviewPageFallback />;
+    return <ControlOverviewPageSkeleton />;
   }
 
   return (
-    <Suspense fallback={<ControlOverviewPageFallback />}>
+    <Suspense fallback={<ControlOverviewPageSkeleton />}>
       <ControlOverviewPageContent queryRef={queryRef} />
     </Suspense>
   );
