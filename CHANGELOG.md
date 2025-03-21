@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - Order vendor by name.
 - Allow to edit control state without going to edit page.
 - Redirect on people list after people creation.
+- New UI for the framework overview page.
 
 ### Fixed
 
