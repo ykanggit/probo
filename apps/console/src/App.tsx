@@ -54,6 +54,7 @@ function App() {
                   />
 
                   <Route
+                    path="*"
                     element={
                       <AuthLayout>
                         <AuthenticationRoutes />
