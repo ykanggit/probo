@@ -17,7 +17,7 @@ import { Link } from "react-router";
 import Fuse from "fuse.js";
 import { useToast } from "@/hooks/use-toast";
 import { PageTemplate } from "@/components/PageTemplate";
-import { VendorListSkeleton } from "./VendorListPage";
+import { VendorListViewSkeleton } from "./VendorListPage";
 import { VendorListViewQuery as VendorListViewQueryType } from "./__generated__/VendorListViewQuery.graphql";
 import { VendorListViewCreateVendorMutation } from "./__generated__/VendorListViewCreateVendorMutation.graphql";
 import { VendorListViewDeleteVendorMutation } from "./__generated__/VendorListViewDeleteVendorMutation.graphql";
@@ -478,11 +478,11 @@ export default function VendorListView() {
   }, [loadQuery, organizationId]);
 
   if (!queryRef) {
-    return <VendorListSkeleton />;
+    return <VendorListViewSkeleton />;
   }
 
   return (
-    <Suspense fallback={<VendorListSkeleton />}>
+    <Suspense fallback={<VendorListViewSkeleton />}>
       <VendorListContent queryRef={queryRef} />
     </Suspense>
   );

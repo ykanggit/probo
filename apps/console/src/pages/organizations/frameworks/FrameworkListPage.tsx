@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const FrameworkListView = lazy(() => import("./FrameworkListView"));
 
-export function FrameworkListSkeleton() {
+export function FrameworkListViewSkeleton() {
   return (
     <PageTemplateSkeleton
       title="Frameworks"
@@ -40,7 +40,7 @@ export function FrameworkListPage() {
   const location = useLocation();
 
   return (
-    <Suspense key={location.pathname} fallback={<FrameworkListSkeleton />}>
+    <Suspense key={location.pathname} fallback={<FrameworkListViewSkeleton />}>
       <ErrorBoundaryWithLocation>
         <FrameworkListView />
       </ErrorBoundaryWithLocation>

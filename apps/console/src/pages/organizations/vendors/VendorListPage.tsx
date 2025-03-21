@@ -5,7 +5,7 @@ import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
 
 const VendorListView = lazy(() => import("./VendorListView"));
 
-export function VendorListSkeleton() {
+export function VendorListViewSkeleton() {
   return (
     <PageTemplateSkeleton
       title="Vendors"
@@ -36,7 +36,7 @@ export function VendorListPage() {
   const location = useLocation();
 
   return (
-    <Suspense key={location.pathname} fallback={<VendorListSkeleton />}>
+    <Suspense key={location.pathname} fallback={<VendorListViewSkeleton />}>
       <ErrorBoundaryWithLocation>
         <VendorListView />
       </ErrorBoundaryWithLocation>

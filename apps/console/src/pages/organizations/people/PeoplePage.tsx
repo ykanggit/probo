@@ -1,16 +1,13 @@
 import { PageTemplateSkeleton } from "@/components/PageTemplate";
 import { lazy, Suspense } from "react";
 import { useLocation } from "react-router";
-import { ErrorBoundaryWithLocation } from "./ErrorBoundary";
+import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
 
-const SettingsView = lazy(() => import("./SettingsView"));
+const PeopleView = lazy(() => import("./PeopleView"));
 
-export function SettingsViewSkeleton() {
+export function PeopleViewSkeleton() {
   return (
-    <PageTemplateSkeleton
-      title="Settings"
-      description="Manage your details and personal preferences here"
-    >
+    <PageTemplateSkeleton>
       <div className="space-y-6">
         <div className="space-y-1">
           <div className="h-8 w-48 bg-muted animate-pulse rounded" />
@@ -18,7 +15,7 @@ export function SettingsViewSkeleton() {
         </div>
         <div className="space-y-2">
           {[1, 2].map((i) => (
-            <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
+            <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
           ))}
         </div>
       </div>
@@ -26,13 +23,13 @@ export function SettingsViewSkeleton() {
   );
 }
 
-export function SettingsPage() {
+export function PeoplePage() {
   const location = useLocation();
 
   return (
-    <Suspense key={location.pathname} fallback={<SettingsViewSkeleton />}>
+    <Suspense key={location.pathname} fallback={<PeopleViewSkeleton />}>
       <ErrorBoundaryWithLocation>
-        <SettingsView />
+        <PeopleView />
       </ErrorBoundaryWithLocation>
     </Suspense>
   );

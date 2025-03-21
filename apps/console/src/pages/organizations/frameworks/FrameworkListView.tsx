@@ -24,7 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FrameworkListViewImportFrameworkMutation as FrameworkListViewImportFrameworkMutationType } from "./__generated__/FrameworkListViewImportFrameworkMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
-import { FrameworkListSkeleton } from "./FrameworkListPage";
+import { FrameworkListViewSkeleton } from "./FrameworkListPage";
 
 const FrameworkListViewQuery = graphql`
   query FrameworkListViewQuery($organizationId: ID!) {
@@ -292,11 +292,11 @@ export default function FrameworkListView() {
   }, [loadQuery, organizationId]);
 
   if (!queryRef) {
-    return <FrameworkListSkeleton />;
+    return <FrameworkListViewSkeleton />;
   }
 
   return (
-    <Suspense fallback={<FrameworkListSkeleton />}>
+    <Suspense fallback={<FrameworkListViewSkeleton />}>
       {queryRef && <FrameworkListViewContent queryRef={queryRef} />}
     </Suspense>
   );
