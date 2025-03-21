@@ -70,7 +70,9 @@ export function PageDescription({
   children: ReactNode;
 }) {
   return (
-    <p className={cn("text-md text-muted-foreground", className)}>{children}</p>
+    <div className={cn("text-md text-muted-foreground", className)}>
+      {children}
+    </div>
   );
 }
 
