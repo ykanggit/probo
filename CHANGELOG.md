@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - Fix change task state not visible on UI.
 - Fix control card items alignement.
 - Fix cannot delete task.
+- Fix password managers misidentifying token fields as usernames in reset password and invitation confirmation forms.
 
 ## [0.1.0] - 2025-03-14
 
