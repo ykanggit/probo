@@ -149,6 +149,7 @@ export default function ConfirmInvitationPage() {
                     placeholder="Enter your invitation token"
                     disabled={isLoading}
                     required
+                    autoComplete="off"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     The token has been automatically filled from the URL if
@@ -166,6 +167,7 @@ export default function ConfirmInvitationPage() {
                     placeholder="Create a password"
                     disabled={isLoading}
                     required
+                    autoComplete="new-password"
                   />
                 </div>
 
@@ -179,6 +181,7 @@ export default function ConfirmInvitationPage() {
                     placeholder="Confirm your password"
                     disabled={isLoading}
                     required
+                    autoComplete="new-password"
                   />
                 </div>
 

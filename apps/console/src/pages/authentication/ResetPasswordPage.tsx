@@ -148,6 +148,7 @@ export default function ResetPasswordPage() {
                     placeholder="Enter your reset token"
                     disabled={isLoading}
                     required
+                    autoComplete="off"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     The token has been automatically filled from the URL if
@@ -165,6 +166,7 @@ export default function ResetPasswordPage() {
                     placeholder="Enter new password"
                     disabled={isLoading}
                     required
+                    autoComplete="new-password"
                   />
                 </div>
 
@@ -178,6 +180,7 @@ export default function ResetPasswordPage() {
                     placeholder="Confirm your new password"
                     disabled={isLoading}
                     required
+                    autoComplete="new-password"
                   />
                 </div>
 
