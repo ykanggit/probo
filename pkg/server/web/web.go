@@ -16,7 +16,6 @@ package web
 
 import (
 	"io/fs"
-	"log"
 	"net/http"
 
 	"github.com/getprobo/probo/apps/console"
@@ -32,7 +31,6 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
-	log.Printf("Using embedded SPA")
 	return &Server{
 		spaFS: http.FS(subFS),
 	}, nil
