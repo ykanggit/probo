@@ -15,7 +15,7 @@ resolver:
   filename_template: "v1_resolver.go"
 
 autobind: []
-omit_panic_handler: true
+# omit_panic_handler: true
 call_argument_directives_with_null: true
 
 models:

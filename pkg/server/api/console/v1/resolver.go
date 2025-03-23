@@ -101,32 +101,41 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 	)
 	srv := handler.New(es)
 	srv.AddTransport(transport.POST{})
-	srv.AddTransport(transport.MultipartForm{
-		MaxMemory:     32 * mb,
-		MaxUploadSize: 50 * mb,
-	})
+	srv.AddTransport(
+		transport.MultipartForm{
+			MaxMemory:     32 * mb,
+			MaxUploadSize: 50 * mb,
+		},
+	)
 	srv.Use(extension.Introspection{})
+	srv.SetRecoverFunc(
+		func(ctx context.Context, err any) error {
+			panic(fmt.Errorf("graphql resolver panic: %v", err))
+		},
+	)
 
-	srv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
-		user := UserFromContext(ctx)
+	srv.AroundOperations(
+		func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
+			user := UserFromContext(ctx)
 
-		if user == nil {
-			return func(ctx context.Context) *graphql.Response {
-				return &graphql.Response{
-					Errors: gqlerror.List{
-						&gqlerror.Error{
-							Message: "authentication required",
-							Extensions: map[string]any{
-								"code": "UNAUTHENTICATED",
+			if user == nil {
+				return func(ctx context.Context) *graphql.Response {
+					return &graphql.Response{
+						Errors: gqlerror.List{
+							&gqlerror.Error{
+								Message: "authentication required",
+								Extensions: map[string]any{
+									"code": "UNAUTHENTICATED",
+								},
 							},
 						},
-					},
+					}
 				}
 			}
-		}
 
-		return next(ctx)
-	})
+			return next(ctx)
+		},
+	)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
