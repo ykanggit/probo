@@ -15,6 +15,13 @@ export class UnAuthenticatedError extends Error {
   }
 }
 
+export class InternalServerError extends Error {
+  constructor() {
+    super("INTERNAL_SERVER_ERROR");
+    this.name = "InternalServerError";
+  }
+}
+
 const hasUnauthenticatedError = (error: GraphQLError) =>
   error.extensions?.code == "UNAUTHENTICATED";
 
@@ -74,6 +81,10 @@ const fetchRelay: FetchFunction = async (
     buildEndpoint("/api/console/v1/query"),
     requestInit
   );
+
+  if (response.status === 500) {
+    throw new InternalServerError();
+  }
 
   const json = await response.json();
 
