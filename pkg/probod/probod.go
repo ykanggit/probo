@@ -114,8 +114,12 @@ func (impl *Implm) Run(
 	r prometheus.Registerer,
 	tp trace.TracerProvider,
 ) error {
+	tracer := tp.Tracer("probod")
+	ctx, rootSpan := tracer.Start(parentCtx, "probod.Run")
+	defer rootSpan.End()
+
 	wg := sync.WaitGroup{}
-	ctx, cancel := context.WithCancelCause(parentCtx)
+	ctx, cancel := context.WithCancelCause(ctx)
 	defer cancel(context.Canceled)
 
 	pgClient, err := pg.NewClient(
@@ -126,17 +130,20 @@ func (impl *Implm) Run(
 		)...,
 	)
 	if err != nil {
+		rootSpan.RecordError(err)
 		return fmt.Errorf("cannot create pg client: %w", err)
 	}
 
 	pepper, err := impl.cfg.Auth.GetPepperBytes()
 	if err != nil {
+		rootSpan.RecordError(err)
 		return fmt.Errorf("cannot get pepper bytes: %w", err)
 	}
 
 	// Validate cookie secret
 	_, err = impl.cfg.Auth.GetCookieSecretBytes()
 	if err != nil {
+		rootSpan.RecordError(err)
 		return fmt.Errorf("cannot get cookie secret bytes: %w", err)
 	}
 
@@ -246,6 +253,10 @@ func (impl *Implm) runApiServer(
 	tp trace.TracerProvider,
 	handler http.Handler,
 ) error {
+	tracer := tp.Tracer("github.com/getprobo/probo/pkg/probod")
+	ctx, span := tracer.Start(ctx, "probod.runApiServer")
+	defer span.End()
+
 	apiServer := httpserver.NewServer(
 		impl.cfg.Api.Addr,
 		handler,
@@ -255,9 +266,11 @@ func (impl *Implm) runApiServer(
 	)
 
 	l.Info("starting api server", log.String("addr", apiServer.Addr))
+	span.AddEvent("API server starting")
 
 	listener, err := net.Listen("tcp", apiServer.Addr)
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("cannot listen on %q: %w", apiServer.Addr, err)
 	}
 	defer listener.Close()
@@ -272,21 +285,28 @@ func (impl *Implm) runApiServer(
 	}()
 
 	l.Info("api server started")
+	span.AddEvent("API server started")
 
 	select {
 	case err := <-serverErrCh:
+		if err != nil {
+			span.RecordError(err)
+		}
 		return err
 	case <-ctx.Done():
 	}
 
 	l.InfoCtx(ctx, "shutting down api server")
+	span.AddEvent("API server shutting down")
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	if err := apiServer.Shutdown(shutdownCtx); err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("cannot shutdown api server: %w", err)
 	}
 
+	span.AddEvent("API server shutdown complete")
 	return ctx.Err()
 }
