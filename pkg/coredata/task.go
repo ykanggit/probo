@@ -233,6 +233,8 @@ WHERE
     AND version = @expected_version
 RETURNING
 	state,
+	time_estimate,
+	updated_at,
     version;
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
@@ -248,7 +250,7 @@ RETURNING
 	}
 	maps.Copy(args, scope.SQLArguments())
 
-	err := conn.QueryRow(ctx, q, args).Scan(&t.State, &t.Version)
+	err := conn.QueryRow(ctx, q, args).Scan(&t.State, &t.TimeEstimate, &t.UpdatedAt, &t.Version)
 	return err
 }
 

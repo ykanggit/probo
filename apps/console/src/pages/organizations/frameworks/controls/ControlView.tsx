@@ -176,6 +176,7 @@ const updateTaskStateMutation = graphql`
       task {
         id
         state
+        timeEstimate
         version
       }
     }
@@ -1178,6 +1179,124 @@ function ControlViewContent({
     setSearchParams(searchParams);
   };
 
+  // Add state variables for tracking edit mode and duration components
+  const [isEditingDuration, setIsEditingDuration] = useState(false);
+  const [editTimeEstimateDays, setEditTimeEstimateDays] = useState("");
+  const [editTimeEstimateHours, setEditTimeEstimateHours] = useState("");
+  const [editTimeEstimateMinutes, setEditTimeEstimateMinutes] = useState("");
+
+  // Function to parse ISO duration string into components for editing
+  const parseISODuration = useCallback(
+    (duration: string | null | undefined) => {
+      if (!duration || !duration.startsWith("P")) {
+        return { days: "", hours: "", minutes: "" };
+      }
+
+      try {
+        const durationRegex =
+          /P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?/;
+        const matches = duration.match(durationRegex);
+
+        if (!matches) return { days: "", hours: "", minutes: "" };
+
+        // We only care about days, hours, and minutes
+        const days = matches[3] ? matches[3] : "";
+        const hours = matches[4] ? matches[4] : "";
+        const minutes = matches[5] ? matches[5] : "";
+
+        return { days, hours, minutes };
+      } catch (error) {
+        console.error("Error parsing duration:", error);
+        return { days: "", hours: "", minutes: "" };
+      }
+    },
+    []
+  );
+
+  // Function to handle saving the updated duration
+  const handleSaveDuration = useCallback(
+    (taskId: string, version: number) => {
+      // Convert to ISO duration format
+      let duration = "P";
+
+      if (editTimeEstimateDays && parseInt(editTimeEstimateDays) > 0) {
+        duration += `${parseInt(editTimeEstimateDays)}D`;
+      }
+
+      if (
+        (editTimeEstimateHours && parseInt(editTimeEstimateHours) > 0) ||
+        (editTimeEstimateMinutes && parseInt(editTimeEstimateMinutes) > 0)
+      ) {
+        duration += "T";
+
+        if (editTimeEstimateHours && parseInt(editTimeEstimateHours) > 0) {
+          duration += `${parseInt(editTimeEstimateHours)}H`;
+        }
+
+        if (editTimeEstimateMinutes && parseInt(editTimeEstimateMinutes) > 0) {
+          duration += `${parseInt(editTimeEstimateMinutes)}M`;
+        }
+      }
+
+      // If no valid time components were provided, use null (remove the time estimate)
+      const timeEstimate = duration === "P" ? null : duration;
+
+      updateTask({
+        variables: {
+          input: {
+            taskId,
+            timeEstimate,
+            expectedVersion: version,
+          },
+        },
+        onCompleted: () => {
+          toast({
+            title: "Task updated",
+            description: "Time estimate has been updated successfully.",
+          });
+          setIsEditingDuration(false);
+
+          // Update the selected task state if it's the current task
+          if (selectedTask && selectedTask.id === taskId) {
+            setSelectedTask({
+              ...selectedTask,
+              timeEstimate,
+              version: version + 1,
+            });
+          }
+        },
+        onError: (error) => {
+          toast({
+            title: "Error updating task",
+            description: error.message,
+            variant: "destructive",
+          });
+        },
+      });
+    },
+    [
+      editTimeEstimateDays,
+      editTimeEstimateHours,
+      editTimeEstimateMinutes,
+      updateTask,
+      toast,
+      selectedTask,
+      setSelectedTask,
+    ]
+  );
+
+  // Function to start editing duration
+  const startEditingDuration = useCallback(
+    (duration: string | null | undefined) => {
+      const { days, hours, minutes } = parseISODuration(duration);
+      setEditTimeEstimateDays(days);
+      setEditTimeEstimateHours(hours);
+      setEditTimeEstimateMinutes(minutes);
+      setIsEditingDuration(true);
+    },
+    [parseISODuration]
+  );
+
   return (
     <PageTemplate
       title={data.control.name ?? ""}
@@ -1824,10 +1943,80 @@ function ControlViewContent({
                         ? "Completed"
                         : "In Progress"}
                     </div>
-                    {selectedTask.timeEstimate && (
-                      <div className="text-sm text-gray-500 flex items-center">
+                    {!isEditingDuration ? (
+                      <div
+                        className="text-sm text-gray-500 flex items-center hover:bg-gray-100 px-2 py-1 rounded-md cursor-pointer"
+                        onClick={() =>
+                          startEditingDuration(selectedTask.timeEstimate)
+                        }
+                      >
                         <span className="inline-block w-4 h-4 mr-1">⏱️</span>
-                        <span>{formatDuration(selectedTask.timeEstimate)}</span>
+                        <span>
+                          {selectedTask.timeEstimate
+                            ? formatDuration(selectedTask.timeEstimate)
+                            : "Add time estimate"}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min="0"
+                            value={editTimeEstimateDays}
+                            onChange={(e) =>
+                              setEditTimeEstimateDays(e.target.value)
+                            }
+                            className="w-12 p-1 text-xs border rounded"
+                            placeholder="0"
+                          />
+                          <span className="text-xs text-gray-500">d</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={editTimeEstimateHours}
+                            onChange={(e) =>
+                              setEditTimeEstimateHours(e.target.value)
+                            }
+                            className="w-12 p-1 text-xs border rounded"
+                            placeholder="0"
+                          />
+                          <span className="text-xs text-gray-500">h</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={editTimeEstimateMinutes}
+                            onChange={(e) =>
+                              setEditTimeEstimateMinutes(e.target.value)
+                            }
+                            className="w-12 p-1 text-xs border rounded"
+                            placeholder="0"
+                          />
+                          <span className="text-xs text-gray-500">m</span>
+                        </div>
+                        <button
+                          className="p-1 text-sm text-blue-600 hover:text-blue-800"
+                          onClick={() =>
+                            handleSaveDuration(
+                              selectedTask.id,
+                              selectedTask.version
+                            )
+                          }
+                        >
+                          Save
+                        </button>
+                        <button
+                          className="p-1 text-sm text-gray-500 hover:text-gray-700"
+                          onClick={() => setIsEditingDuration(false)}
+                        >
+                          Cancel
+                        </button>
                       </div>
                     )}
                   </div>

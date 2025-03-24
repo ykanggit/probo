@@ -287,6 +287,7 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTas
 		Name:            input.Name,
 		Description:     input.Description,
 		State:           input.State,
+		TimeEstimate:    input.TimeEstimate,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update task: %w", err)

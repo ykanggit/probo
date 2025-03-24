@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<70ae17b69b366175da4d00bfae78ae7f>>
+ * @generated SignedSource<<f0b91a291608cee99d4b22fb2d19e847>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -26,6 +26,7 @@ export type ControlViewUpdateTaskStateMutation$data = {
     readonly task: {
       readonly id: string;
       readonly state: TaskState;
+      readonly timeEstimate: any | null | undefined;
       readonly version: number;
     };
   };
@@ -84,6 +85,13 @@ v1 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
+            "name": "timeEstimate",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
             "name": "version",
             "storageKey": null
           }
@@ -112,16 +120,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "1b9a74365007e7c46668815c9e37cd0a",
+    "cacheID": "f8f00bd63de4f5eac131954a8039b40e",
     "id": null,
     "metadata": {},
     "name": "ControlViewUpdateTaskStateMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlViewUpdateTaskStateMutation(\n  $input: UpdateTaskInput!\n) {\n  updateTask(input: $input) {\n    task {\n      id\n      state\n      version\n    }\n  }\n}\n"
+    "text": "mutation ControlViewUpdateTaskStateMutation(\n  $input: UpdateTaskInput!\n) {\n  updateTask(input: $input) {\n    task {\n      id\n      state\n      timeEstimate\n      version\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "7cb2f42aadcc5f709377d2bf9dfea2da";
+(node as any).hash = "f53df99b24c2f5f233f8d865885718ea";
 
 export default node;
