@@ -108,6 +108,9 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		},
 	)
 	srv.Use(extension.Introspection{})
+
+	srv.Use(tracingExtension{})
+
 	srv.SetRecoverFunc(
 		func(ctx context.Context, err any) error {
 			panic(fmt.Errorf("graphql resolver panic: %v", err))
