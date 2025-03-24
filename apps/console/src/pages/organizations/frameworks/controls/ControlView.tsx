@@ -1801,7 +1801,7 @@ function ControlViewContent({
               <SheetHeader className="px-6 py-4 border-b sticky top-0 bg-white z-10">
                 <div className="flex items-center justify-between">
                   <SheetTitle className="text-xl font-semibold">
-                    Task Details
+                    {selectedTask.name}
                   </SheetTitle>
                   <SheetClose className="rounded-full p-1 hover:bg-gray-100">
                     <X className="h-5 w-5" />
@@ -1812,7 +1812,6 @@ function ControlViewContent({
               <div className="flex-1 overflow-auto p-6 space-y-6">
                 {/* Task name and state */}
                 <div className="space-y-2">
-                  <h2 className="text-xl font-semibold">{selectedTask.name}</h2>
                   <div className="flex items-center gap-3">
                     <div
                       className={`px-2.5 py-1 rounded-full text-xs font-medium ${
