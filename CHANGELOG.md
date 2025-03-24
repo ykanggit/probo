@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Add sidebar to show a task.
+
+## [0.2.0] - 2025-03-24
+
+### Added
+
 - Add forget password.
 - Allow evidence to be a link.
 - Add task import support.
