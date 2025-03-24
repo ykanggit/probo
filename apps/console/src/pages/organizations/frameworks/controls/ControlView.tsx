@@ -1591,17 +1591,16 @@ function ControlViewContent({
                                       <button
                                         type="button"
                                         className="flex items-center w-full text-left"
-                                        onClick={() => {
-                                          if (task?.id) {
-                                            handleAssignPerson(
-                                              task.id,
-                                              edge.node.id
-                                            );
-                                            setPeoplePopoverOpen((prev) => ({
-                                              ...prev,
-                                              [task.id]: false,
-                                            }));
-                                          }
+                                        onClick={(e) => {
+                                          e.stopPropagation(); // Add this line to prevent event bubbling
+                                          handleAssignPerson(
+                                            task.id,
+                                            edge.node.id
+                                          );
+                                          setPeoplePopoverOpen((prev) => ({
+                                            ...prev,
+                                            [task.id]: false,
+                                          }));
                                         }}
                                       >
                                         <User className="mr-2 h-4 w-4 text-blue-500 flex-shrink-0" />
@@ -1936,7 +1935,8 @@ function ControlViewContent({
                                     <button
                                       type="button"
                                       className="flex items-center w-full text-left"
-                                      onClick={() => {
+                                      onClick={(e) => {
+                                        e.stopPropagation(); // Add this line to prevent event bubbling
                                         handleAssignPerson(
                                           selectedTask.id,
                                           edge.node.id
