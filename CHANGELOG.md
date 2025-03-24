@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Add sidebar to show a task.
+- Add task estimate edition.
 
 ## [0.2.0] - 2025-03-24
 
