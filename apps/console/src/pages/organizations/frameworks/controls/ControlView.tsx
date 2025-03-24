@@ -6,7 +6,7 @@ import {
   DragEvent,
   useCallback,
 } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, useSearchParams } from "react-router";
 import {
   graphql,
   PreloadedQuery,
@@ -63,6 +63,13 @@ import ReactMarkdown from "react-markdown";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 import type { ControlViewQuery as ControlViewQueryType } from "./__generated__/ControlViewQuery.graphql";
 import type { ControlViewUpdateTaskStateMutation as ControlViewUpdateTaskStateMutationType } from "./__generated__/ControlViewUpdateTaskStateMutation.graphql";
@@ -335,6 +342,10 @@ function ControlViewContent({
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
 
+  // Add URLSearchParams handling for task persistence
+  const [searchParams, setSearchParams] = useSearchParams();
+  const taskIdFromUrl = searchParams.get("taskId");
+
   // Load organization data for people selector
   const [organizationData, setOrganizationData] =
     useState<ControlViewOrganizationQuery$data | null>(null);
@@ -498,7 +509,31 @@ function ControlViewContent({
   const [linkEvidenceDescription, setLinkEvidenceDescription] = useState("");
   const [activeTab, setActiveTab] = useState<"file" | "link">("file");
 
+  // Add state for selected task panel
+  const [selectedTask, setSelectedTask] = useState<(typeof tasks)[0] | null>(
+    null
+  );
+
+  // Track if task panel is open
+  const [isTaskPanelOpen, setIsTaskPanelOpen] = useState(false);
+
   const tasks = data.control.tasks?.edges.map((edge) => edge.node) || [];
+
+  // Add useEffect to handle URL parameters for task selection
+  useEffect(() => {
+    // If there's a taskId in the URL, find that task and select it
+    if (taskIdFromUrl && tasks.length > 0) {
+      const taskFromUrl = tasks.find((task) => task.id === taskIdFromUrl);
+      if (taskFromUrl) {
+        setSelectedTask(taskFromUrl);
+        setIsTaskPanelOpen(true);
+      } else {
+        // If task ID is invalid, remove it from URL
+        searchParams.delete("taskId");
+        setSearchParams(searchParams);
+      }
+    }
+  }, [taskIdFromUrl, tasks, searchParams, setSearchParams]);
 
   const getEvidenceConnectionId = useCallback(
     (taskId: string) => {
@@ -576,7 +611,17 @@ function ControlViewContent({
     };
   }, []);
 
-  const handleTaskClick = (
+  const handleTaskClick = (task: (typeof tasks)[0]) => {
+    if (!task) return;
+    setSelectedTask(task);
+    setIsTaskPanelOpen(true);
+
+    // Add the task ID to URL parameters
+    searchParams.set("taskId", task.id);
+    setSearchParams(searchParams);
+  };
+
+  const handleToggleTaskState = (
     taskId: string,
     currentState: string,
     version: number
@@ -598,6 +643,15 @@ function ControlViewContent({
             newState === "DONE" ? "completed" : "reopened"
           }.`,
         });
+
+        // Update the selected task state if it's the current task
+        if (selectedTask && selectedTask.id === taskId) {
+          setSelectedTask({
+            ...selectedTask,
+            state: newState,
+            version: version + 1,
+          });
+        }
       },
       onError: (error) => {
         toast({
@@ -1115,6 +1169,15 @@ function ControlViewContent({
     });
   };
 
+  // Update SheetContent to handle closing
+  const handleCloseTaskPanel = () => {
+    setIsTaskPanelOpen(false);
+
+    // Remove the task ID from URL parameters when closing
+    searchParams.delete("taskId");
+    setSearchParams(searchParams);
+  };
+
   return (
     <PageTemplate
       title={data.control.name ?? ""}
@@ -1303,7 +1366,12 @@ function ControlViewContent({
                   draggedOverTaskId === task?.id
                     ? "bg-blue-50 border-2 border-blue-400 shadow-md"
                     : ""
+                } ${
+                  selectedTask?.id === task?.id
+                    ? "bg-blue-50 border-blue-200"
+                    : ""
                 }`}
+                onClick={() => task && handleTaskClick(task)}
                 onDragOver={(e) => task?.id && handleDragOver(e, task.id)}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => task?.id && handleDrop(e, task.id)}
@@ -1345,9 +1413,9 @@ function ControlViewContent({
                       : "border-gray-300"
                   } ${isDraggingFile ? "opacity-50" : ""}`}
                   onClick={(e) => {
-                    e.stopPropagation();
+                    e.stopPropagation(); // Prevent task selection when checkbox is clicked
                     if (task?.id && task?.state) {
-                      handleTaskClick(task.id, task.state, task.version);
+                      handleToggleTaskState(task.id, task.state, task.version);
                     }
                   }}
                 >
@@ -1722,6 +1790,364 @@ function ControlViewContent({
           )}
         </div>
       </div>
+
+      {/* Right task panel */}
+      <Sheet open={isTaskPanelOpen} onOpenChange={handleCloseTaskPanel}>
+        <SheetContent
+          side="right"
+          className="!max-w-[50vw] !w-[50vw] p-0 overflow-y-auto"
+        >
+          {selectedTask && (
+            <div className="flex flex-col h-full">
+              <SheetHeader className="px-6 py-4 border-b sticky top-0 bg-white z-10">
+                <div className="flex items-center justify-between">
+                  <SheetTitle className="text-xl font-semibold">
+                    Task Details
+                  </SheetTitle>
+                  <SheetClose className="rounded-full p-1 hover:bg-gray-100">
+                    <X className="h-5 w-5" />
+                  </SheetClose>
+                </div>
+              </SheetHeader>
+
+              <div className="flex-1 overflow-auto p-6 space-y-6">
+                {/* Task name and state */}
+                <div className="space-y-2">
+                  <h2 className="text-xl font-semibold">{selectedTask.name}</h2>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                        selectedTask.state === "DONE"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {selectedTask.state === "DONE"
+                        ? "Completed"
+                        : "In Progress"}
+                    </div>
+                    {selectedTask.timeEstimate && (
+                      <div className="text-sm text-gray-500 flex items-center">
+                        <span className="inline-block w-4 h-4 mr-1">⏱️</span>
+                        <span>{formatDuration(selectedTask.timeEstimate)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Task description */}
+                {selectedTask.description && (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-gray-600">
+                      Description
+                    </h3>
+                    <div className="prose prose-sm max-w-none p-3 bg-gray-50 rounded-md border border-gray-100">
+                      <ReactMarkdown>{selectedTask.description}</ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+
+                {/* Assigned person */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-gray-600">
+                    Assignment
+                  </h3>
+                  {selectedTask.assignedTo ? (
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md border border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 text-blue-700 rounded-full p-2">
+                          <User className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium">
+                            {selectedTask.assignedTo.fullName}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {selectedTask.assignedTo.primaryEmailAddress}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUnassignPerson(selectedTask.id)}
+                        className="flex items-center gap-1"
+                      >
+                        <UserMinus className="w-3.5 h-3.5" />
+                        <span>Unassign</span>
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md border border-gray-100">
+                      <p className="text-gray-500">
+                        No one is assigned to this task
+                      </p>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center gap-1"
+                          >
+                            <UserPlus className="w-3.5 h-3.5" />
+                            <span>Assign</span>
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[250px] p-0">
+                          <div className="p-2 border-b">
+                            <input
+                              type="text"
+                              placeholder="Search people..."
+                              className="w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              value={peopleSearch[selectedTask.id || ""] || ""}
+                              onChange={(e) => {
+                                setPeopleSearch((prev) => ({
+                                  ...prev,
+                                  [selectedTask.id]: e.target.value,
+                                }));
+                              }}
+                            />
+                          </div>
+                          <div className="py-1 max-h-[200px] overflow-y-auto">
+                            {organizationData?.organization?.peoples?.edges?.map(
+                              (edge) => {
+                                if (!edge?.node) return null;
+
+                                const searchTerm = (
+                                  peopleSearch[selectedTask.id || ""] || ""
+                                ).toLowerCase();
+                                if (
+                                  searchTerm &&
+                                  !edge.node.fullName
+                                    .toLowerCase()
+                                    .includes(searchTerm) &&
+                                  !edge.node.primaryEmailAddress
+                                    .toLowerCase()
+                                    .includes(searchTerm)
+                                ) {
+                                  return null;
+                                }
+
+                                return (
+                                  <div
+                                    key={edge.node.id}
+                                    className="px-2 py-1 hover:bg-blue-50 cursor-pointer"
+                                  >
+                                    <button
+                                      type="button"
+                                      className="flex items-center w-full text-left"
+                                      onClick={() => {
+                                        handleAssignPerson(
+                                          selectedTask.id,
+                                          edge.node.id
+                                        );
+                                      }}
+                                    >
+                                      <User className="mr-2 h-4 w-4 text-blue-500 flex-shrink-0" />
+                                      <div>
+                                        <p className="font-medium">
+                                          {edge.node.fullName}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                          {edge.node.primaryEmailAddress}
+                                        </p>
+                                      </div>
+                                    </button>
+                                  </div>
+                                );
+                              }
+                            )}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  )}
+                </div>
+
+                {/* Evidence section */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-gray-600">
+                      Evidence
+                    </h3>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        handleUploadEvidence(selectedTask.id, selectedTask.name)
+                      }
+                      className="flex items-center gap-1 text-xs"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Evidence</span>
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2">
+                    {selectedTask.evidences?.edges &&
+                    selectedTask.evidences.edges.length > 0 ? (
+                      selectedTask.evidences.edges.map((edge) => {
+                        if (!edge) return null;
+                        const evidence = edge.node;
+                        if (!evidence) return null;
+
+                        return (
+                          <div
+                            key={evidence.id}
+                            className="flex items-center justify-between p-3 rounded-md border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all bg-gray-50"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="bg-white p-2 rounded-md border border-gray-200">
+                                {getFileIcon(evidence.mimeType, evidence.type)}
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-800">
+                                  {evidence.filename}
+                                </div>
+                                <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
+                                  {evidence.type === "FILE" ? (
+                                    <>
+                                      <span className="font-medium text-gray-600">
+                                        {formatFileSize(evidence.size)}
+                                      </span>
+                                      <span>•</span>
+                                    </>
+                                  ) : evidence.url ? (
+                                    <>
+                                      <span className="font-medium text-blue-600 truncate max-w-[200px]">
+                                        {evidence.url}
+                                      </span>
+                                      <span>•</span>
+                                    </>
+                                  ) : null}
+                                  <span>{formatDate(evidence.createdAt)}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {evidence.type === "FILE" ? (
+                                <>
+                                  {evidence.mimeType.startsWith("image/") ? (
+                                    <button
+                                      onClick={() =>
+                                        handlePreviewEvidence(evidence)
+                                      }
+                                      className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                      title="Preview Image"
+                                    >
+                                      <Eye className="w-4 h-4 text-blue-600" />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handlePreviewEvidence(evidence);
+                                      }}
+                                      className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                      title="Download"
+                                    >
+                                      <Download className="w-4 h-4 text-blue-600" />
+                                    </button>
+                                  )}
+                                </>
+                              ) : evidence.url ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (evidence.url) {
+                                      window.open(evidence.url, "_blank");
+                                    }
+                                  }}
+                                  className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                  title="Open Link"
+                                >
+                                  <Link2 className="w-4 h-4 text-blue-600" />
+                                </button>
+                              ) : null}
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleDeleteEvidence(
+                                    evidence.id,
+                                    evidence.filename,
+                                    selectedTask.id
+                                  );
+                                }}
+                                className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
+                                title="Delete"
+                              >
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-center py-6 bg-gray-50 rounded-md border border-dashed border-gray-200">
+                        <FileIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">
+                          No evidence attached yet
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Upload files or add links to provide evidence
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Task actions */}
+              <div className="border-t p-4 sticky bottom-0 bg-white">
+                <div className="flex gap-3 justify-end">
+                  {selectedTask.state !== "DONE" ? (
+                    <Button
+                      variant="default"
+                      className="flex items-center gap-1"
+                      onClick={() =>
+                        handleToggleTaskState(
+                          selectedTask.id,
+                          selectedTask.state || "TODO",
+                          selectedTask.version
+                        )
+                      }
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Mark Complete</span>
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-1"
+                      onClick={() =>
+                        handleToggleTaskState(
+                          selectedTask.id,
+                          selectedTask.state || "DONE",
+                          selectedTask.version
+                        )
+                      }
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Reopen Task</span>
+                    </Button>
+                  )}
+                  <Button
+                    variant="destructive"
+                    className="flex items-center gap-1"
+                    onClick={() => {
+                      handleDeleteTask(selectedTask.id, selectedTask.name);
+                      handleCloseTaskPanel();
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete Task</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
 
       {/* Evidence Add Dialog */}
       <Dialog open={evidenceDialogOpen} onOpenChange={setEvidenceDialogOpen}>
