@@ -1,7 +1,8 @@
-import { lazy, Suspense } from "react";
+import { PageTemplateSkeleton } from "@/components/PageTemplate";
+import { Suspense } from "react";
+import { lazy } from "@probo/react-lazy";
 import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
 import { useLocation } from "react-router";
-import { PageTemplateSkeleton } from "@/components/PageTemplate";
 import { Card, CardContent } from "@/components/ui/card";
 
 const FrameworkListView = lazy(() => import("./FrameworkListView"));

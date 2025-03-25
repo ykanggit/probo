@@ -1,7 +1,8 @@
 import { PageTemplateSkeleton } from "@/components/PageTemplate";
 import { ErrorBoundaryWithLocation } from "../../ErrorBoundary";
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { useLocation } from "react-router";
+import { lazy } from "@probo/react-lazy";
 
 const CreateControlView = lazy(() => import("./CreateControlView"));
 

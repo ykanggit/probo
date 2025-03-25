@@ -1,6 +1,7 @@
 import { PageTemplateSkeleton } from "@/components/PageTemplate";
 import { Card, CardContent } from "@/components/ui/card";
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
+import { lazy } from "@probo/react-lazy";
 import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../../ErrorBoundary";
 

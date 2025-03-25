@@ -1,6 +1,7 @@
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
-import { lazy, StrictMode, Suspense } from "react";
+import { lazy } from "@probo/react-lazy";
+import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { RelayEnvironmentProvider } from "react-relay";

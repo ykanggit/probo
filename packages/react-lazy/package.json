@@ -1,0 +1,14 @@
+{
+  "name": "@probo/react-lazy",
+  "version": "0.1.0",
+  "description": "Enhanced React lazy loading with retries and error handling",
+  "private": true,
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  }
+}

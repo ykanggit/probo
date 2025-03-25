@@ -1,8 +1,9 @@
 import { PageTemplateSkeleton } from "@/components/PageTemplate";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
+import { lazy } from "@probo/react-lazy";
 
 const PolicyListView = lazy(() => import("./PolicyListView"));
 

@@ -1,7 +1,8 @@
 import { PageTemplateSkeleton } from "@/components/PageTemplate";
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
+import { lazy } from "@probo/react-lazy";
 
 const CreatePolicyView = lazy(() => import("./CreatePolicyView"));
 
