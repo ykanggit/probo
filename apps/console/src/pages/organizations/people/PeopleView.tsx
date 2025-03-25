@@ -16,9 +16,15 @@ import {
 import { Suspense, useEffect, useState, useCallback } from "react";
 import type { PeopleViewQuery as PeopleViewQueryType } from "./__generated__/PeopleViewQuery.graphql";
 import { useParams } from "react-router";
-import { cn } from "@/lib/utils";
 import { PageTemplate } from "@/components/PageTemplate";
 import { PeopleViewSkeleton } from "./PeoplePage";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const peopleViewQuery = graphql`
   query PeopleViewQuery($peopleId: ID!) {
@@ -237,63 +243,40 @@ function PeopleViewContent({
                     <HelpCircle className="h-4 w-4 text-gray-400" />
                     <Label className="text-sm">Kind</Label>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleFieldChange("kind", "EMPLOYEE")}
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.kind === "EMPLOYEE"
-                          ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      Employee
-                    </button>
-                    <button
-                      onClick={() => handleFieldChange("kind", "CONTRACTOR")}
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.kind === "CONTRACTOR"
-                          ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      Contractor
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleFieldChange("kind", "SERVICE_ACCOUNT")
-                      }
-                      className={cn(
-                        "rounded-full px-4 py-1 text-sm transition-colors",
-                        formData.kind === "SERVICE_ACCOUNT"
-                          ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                      )}
-                    >
-                      Service Account
-                    </button>
-                  </div>
+                  <Select
+                    value={formData.kind}
+                    onValueChange={(value) => handleFieldChange("kind", value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select kind" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="EMPLOYEE">Employee</SelectItem>
+                      <SelectItem value="CONTRACTOR">Contractor</SelectItem>
+                      <SelectItem value="SERVICE_ACCOUNT">
+                        Service Account
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
           </Card>
+
+          <div className="mt-6 flex justify-end gap-2">
+            <Button variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              disabled={!hasChanges}
+            >
+              Save Changes
+            </Button>
+          </div>
         </div>
       </div>
-
-      {hasChanges && (
-        <div className="fixed bottom-6 right-6 flex gap-2">
-          <Button variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            Save Changes
-          </Button>
-        </div>
-      )}
     </PageTemplate>
   );
 }

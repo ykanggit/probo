@@ -638,14 +638,6 @@ function ControlViewContent({
         },
       },
       onCompleted: () => {
-        toast({
-          title: "Task updated",
-          description: `Task has been ${
-            newState === "DONE" ? "completed" : "reopened"
-          }.`,
-        });
-
-        // Update the selected task state if it's the current task
         if (selectedTask && selectedTask.id === taskId) {
           setSelectedTask({
             ...selectedTask,
@@ -797,11 +789,6 @@ function ControlViewContent({
         "input.file": file,
       },
       onCompleted: () => {
-        toast({
-          title: "Document added",
-          description: "Document evidence has been added successfully.",
-          variant: "default",
-        });
         setTaskForEvidence(null);
         // Reset the file input
         if (hiddenFileInputRef.current) {
@@ -843,13 +830,6 @@ function ControlViewContent({
     // Description is now optional for link evidence
     // Remove the validation check for empty description
 
-    // Show toast for add started
-    toast({
-      title: "Adding link evidence",
-      description: `Adding ${linkEvidenceName}...`,
-      variant: "default",
-    });
-
     // Get the evidence connection ID for this task
     const evidenceConnectionId = getEvidenceConnectionId(taskForEvidence.id);
 
@@ -870,11 +850,6 @@ function ControlViewContent({
         connections: evidenceConnectionId ? [evidenceConnectionId] : [],
       },
       onCompleted: () => {
-        toast({
-          title: "Link evidence added",
-          description: "Link evidence has been added successfully.",
-          variant: "default",
-        });
         setTaskForEvidence(null);
         setEvidenceDialogOpen(false);
         // Reset form fields
@@ -1070,10 +1045,6 @@ function ControlViewContent({
         connections: evidenceConnectionId ? [evidenceConnectionId] : [],
       },
       onCompleted: () => {
-        toast({
-          title: "Evidence deleted",
-          description: "Evidence has been deleted successfully.",
-        });
         setIsDeleteEvidenceOpen(false);
         setEvidenceToDelete(null);
       },
@@ -1097,11 +1068,6 @@ function ControlViewContent({
         },
       },
       onCompleted: () => {
-        toast({
-          title: "Task assigned",
-          description: "Task has been assigned successfully.",
-        });
-        // Close the popover
         setPeoplePopoverOpen((prev) => ({ ...prev, [taskId]: false }));
       },
       onError: (error) => {
@@ -1121,12 +1087,6 @@ function ControlViewContent({
         input: {
           taskId,
         },
-      },
-      onCompleted: () => {
-        toast({
-          title: "Task unassigned",
-          description: "Task has been unassigned successfully.",
-        });
       },
       onError: (error) => {
         toast({
@@ -1250,10 +1210,6 @@ function ControlViewContent({
           },
         },
         onCompleted: () => {
-          toast({
-            title: "Task updated",
-            description: "Time estimate has been updated successfully.",
-          });
           setIsEditingDuration(false);
 
           // Update the selected task state if it's the current task

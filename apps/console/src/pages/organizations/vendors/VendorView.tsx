@@ -373,21 +373,19 @@ function VendorViewContent({
             </div>
           </div>
         </Card>
-      </div>
-
-      {hasChanges && (
-        <div className="fixed bottom-6 right-6 flex gap-2">
+        <div className="mt-6 flex justify-end gap-2">
           <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             className="bg-primary text-primary-foreground hover:bg-primary/90"
+            disabled={!hasChanges}
           >
             Save Changes
           </Button>
         </div>
-      )}
+      </div>
     </PageTemplate>
   );
 }
