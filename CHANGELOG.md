@@ -9,6 +9,11 @@ All notable changes to this project will be documented in this file.
 - Add sidebar to show a task.
 - Add task estimate edition.
 
+### Fixed
+
+- Fix panic in GraphQL resolver are not reported.
+- Fix otal trace never started.
+
 ## [0.2.0] - 2025-03-24
 
 ### Added
