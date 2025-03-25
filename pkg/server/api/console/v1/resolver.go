@@ -59,6 +59,7 @@ var (
 	sessionContextKey    = &ctxKey{name: "session"}
 	userContextKey       = &ctxKey{name: "user"}
 	userTenantContextKey = &ctxKey{name: "user_tenants"}
+	panicValueContextKey = &ctxKey{name: "panic_value"}
 )
 
 func SessionFromContext(ctx context.Context) *coredata.Session {
@@ -108,14 +109,12 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		},
 	)
 	srv.Use(extension.Introspection{})
-
 	srv.Use(tracingExtension{})
-
-	srv.SetRecoverFunc(
-		func(ctx context.Context, err any) error {
-			panic(fmt.Errorf("graphql resolver panic: %v", err))
-		},
-	)
+	srv.SetRecoverFunc(func(ctx context.Context, err any) error {
+		panicValue := ctx.Value(panicValueContextKey).(*any)
+		*panicValue = err
+		return fmt.Errorf("resolver panic: %v", err)
+	})
 
 	srv.AroundOperations(
 		func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
@@ -142,6 +141,11 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+
+		// Hack to capture the panic value, because gqlgen execute resolver in a different goroutine.
+		// And I want use the go.gearno.de/kit/httpserver built in panic recovery.
+		var panicValue any
+		ctx = context.WithValue(ctx, panicValueContextKey, &panicValue)
 
 		cookieValue, err := securecookie.Get(r, securecookie.DefaultConfig(
 			authCfg.CookieName,
@@ -199,6 +203,10 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		ctx = context.WithValue(ctx, userTenantContextKey, &tenantIDs)
 
 		srv.ServeHTTP(w, r.WithContext(ctx))
+
+		if panicValue != nil {
+			panic(panicValue)
+		}
 
 		if err := usrmgrSvc.UpdateSession(r.Context(), session); err != nil {
 			panic(fmt.Errorf("failed to update session: %w", err))
