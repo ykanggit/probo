@@ -77,7 +77,38 @@ function FrameworkViewContent({
   const navigate = useNavigate();
   const { organizationId } = useParams();
 
-  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  // Monitor URL hash for changes and update state accordingly
+  const [hashValue, setHashValue] = useState(window.location.hash);
+
+  // Get the active category from the hash (used when returning from a control)
+  const hashCategory = hashValue.substring(1)
+    ? decodeURIComponent(hashValue.substring(1))
+    : "";
+
+  // Keep track of manually expanded categories
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(() => {
+    return hashCategory ? [hashCategory] : [];
+  });
+
+  // When hash changes, update expanded categories to include the hash category
+  useEffect(() => {
+    if (hashCategory && !expandedCategories.includes(hashCategory)) {
+      setExpandedCategories((prev) => [...prev, hashCategory]);
+    }
+  }, [hashCategory, expandedCategories]);
+
+  // Listen for hash changes (like when using back button)
+  useEffect(() => {
+    const handleHashChange = () => {
+      setHashValue(window.location.hash);
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, []);
 
   // Map control state to status for the new design
   const mapStateToStatus = (state?: string): string => {
@@ -132,12 +163,15 @@ function FrameworkViewContent({
     return acc;
   }, {} as Record<string, Control[]>);
 
+  // Function to toggle a category's expanded state - now supports multiple expanded categories
   const toggleCategory = (categoryId: string) => {
-    setExpandedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
+    setExpandedCategories((prev) => {
+      if (prev.includes(categoryId)) {
+        return prev.filter((id) => id !== categoryId);
+      } else {
+        return [...prev, categoryId];
+      }
+    });
   };
 
   const categories: Category[] = Object.entries(controlsByCategory)
@@ -372,9 +406,30 @@ function FrameworkViewContent({
                                 className="hover:bg-muted/50 cursor-pointer"
                                 onClick={() => {
                                   if (control?.id) {
-                                    navigate(
-                                      `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
+                                    // Always store just this category in the hash
+                                    // This is what will be expanded when returning
+                                    const encoded = encodeURIComponent(
+                                      category.id
                                     );
+                                    window.location.hash = encoded;
+                                    setHashValue("#" + encoded);
+
+                                    // Make sure this category is expanded in the local state as well
+                                    if (
+                                      !expandedCategories.includes(category.id)
+                                    ) {
+                                      setExpandedCategories((prev) => [
+                                        ...prev,
+                                        category.id,
+                                      ]);
+                                    }
+
+                                    // Use a small timeout to ensure the hash change is processed by the browser
+                                    setTimeout(() => {
+                                      navigate(
+                                        `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
+                                      );
+                                    }, 100);
                                   }
                                 }}
                               >
