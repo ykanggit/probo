@@ -45,7 +45,7 @@
     "relay-runtime": "^18.2.0",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
-    "@probo/react-lazy": "workspace:*"
+    "@probo/react-lazy": "^0.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.26.7",
