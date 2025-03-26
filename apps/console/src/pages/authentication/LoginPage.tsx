@@ -46,7 +46,7 @@ export default function LoginPage() {
         throw new Error(error.message || "Failed to login");
       }
 
-      navigate("/", { replace: true });
+      window.location.href = "/";
     } catch (error: unknown) {
       toast({
         title: "Error",
