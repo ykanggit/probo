@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Fix panic in GraphQL resolver are not reported.
 - Fix otal trace never started.
 - Fix React.lazy chunck error.
+- Fix login page show `unauthorized` error.
 
 ## [0.2.0] - 2025-03-24
 
