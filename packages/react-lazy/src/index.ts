@@ -156,12 +156,11 @@ export function createLazy<P = {}>(config: LazyConfigInit = {}) {
   return enhancedLazy;
 }
 
-export const lazy = createLazy();
-
-export function createRetryLazy(retries = 3, delay = 300) {
-  return createLazy({
-    forceReload: false,
-    importRetries: retries,
-    retryDelay: delay,
-  });
-}
+export const lazy = createLazy({
+  forceReload: {
+    maxRetries: 3,
+    storageKey: DEFAULT_STORAGE_KEY,
+  },
+  importRetries: 3,
+  retryDelay: 300,
+});
