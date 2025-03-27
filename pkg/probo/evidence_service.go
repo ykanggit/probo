@@ -79,7 +79,7 @@ func (s EvidenceService) Create(
 
 	evidence := &coredata.Evidence{
 		ID:          evidenceID,
-		TaskID:      req.TaskID,
+		TaskID:      &req.TaskID,
 		State:       coredata.EvidenceStateValid,
 		Type:        req.Type,
 		Filename:    req.Name,

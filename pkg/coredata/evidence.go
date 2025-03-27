@@ -29,7 +29,7 @@ import (
 type (
 	Evidence struct {
 		ID          gid.GID       `db:"id"`
-		TaskID      gid.GID       `db:"task_id"`
+		TaskID      *gid.GID      `db:"task_id"`
 		State       EvidenceState `db:"state"`
 		Type        EvidenceType  `db:"type"`
 		ObjectKey   string        `db:"object_key"`
