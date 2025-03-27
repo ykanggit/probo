@@ -13,7 +13,7 @@ import {
   ChevronRight,
   Clock,
   Plus,
-  ShieldCheck,
+  X,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -215,7 +215,7 @@ function FrameworkViewContent({
       case "incomplete":
         return <AlertCircle className="h-5 w-5 text-red-500" />;
       case "not-applicable":
-        return <ShieldCheck className="h-5 w-5 text-gray-600" />;
+        return <X className="h-5 w-5 text-gray-300" />;
       default:
         return null;
     }
