@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c1a3bc146c71229f94ea60f820bb43eb>>
+ * @generated SignedSource<<c9bf877d405180bb5fe0211022bd846f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -21,11 +21,8 @@ export type FrameworkListViewImportFrameworkMutation$data = {
   readonly importFramework: {
     readonly frameworkEdge: {
       readonly node: {
-        readonly createdAt: string;
-        readonly description: string;
         readonly id: string;
         readonly name: string;
-        readonly updatedAt: string;
       };
     };
   };
@@ -81,27 +78,6 @@ v3 = {
           "args": null,
           "kind": "ScalarField",
           "name": "name",
-          "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "description",
-          "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "createdAt",
-          "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "updatedAt",
           "storageKey": null
         }
       ],
@@ -176,16 +152,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "0d952e4f9f3e106ea7a30d69f7268385",
+    "cacheID": "04a42349410d12247fcbf3bd99b0b625",
     "id": null,
     "metadata": {},
     "name": "FrameworkListViewImportFrameworkMutation",
     "operationKind": "mutation",
-    "text": "mutation FrameworkListViewImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation FrameworkListViewImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "8be3328101831be07eeea8670d47debd";
+(node as any).hash = "9fb0921f16ca755b8130fcd8603e8933";
 
 export default node;

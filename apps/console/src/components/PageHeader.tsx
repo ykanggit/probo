@@ -70,7 +70,12 @@ export function PageDescription({
   children: ReactNode;
 }) {
   return (
-    <div className={cn("text-md text-muted-foreground", className)}>
+    <div
+      className={cn(
+        "text-md text-muted-foreground whitespace-pre-wrap",
+        className
+      )}
+    >
       {children}
     </div>
   );

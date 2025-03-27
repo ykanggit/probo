@@ -36,9 +36,6 @@ const FrameworkListViewQuery = graphql`
             node {
               id
               name
-              description
-              createdAt
-              updatedAt
             }
           }
         }
@@ -57,44 +54,11 @@ const FrameworkListViewImportFrameworkMutation = graphql`
         node {
           id
           name
-          description
-          createdAt
-          updatedAt
         }
       }
     }
   }
 `;
-
-function FrameworkCard({
-  title,
-  description,
-  icon,
-}: {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <Card className="relative overflow-hidden border bg-card p-6">
-      <div className="flex flex-col gap-4">
-        <div className="size-16">{icon}</div>
-
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold">{title}</h3>
-            {status && (
-              <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">
-                {status}
-              </span>
-            )}
-          </div>
-          <p className="text-sm text-muted-foreground">{description}</p>
-        </div>
-      </div>
-    </Card>
-  );
-}
 
 function FrameworkListViewContent({
   queryRef,
@@ -211,28 +175,47 @@ function FrameworkListViewContent({
       }
     >
       <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-          {frameworks.map((framework) => {
-            return (
-              <Link
-                key={framework.id}
-                to={`/organizations/${organizationId}/frameworks/${framework.id}`}
-              >
-                <FrameworkCard
-                  title={framework.name}
-                  description={framework.description}
-                  icon={
-                    <div className="flex size-full items-center justify-center rounded-full bg-blue-100">
-                      <span className="text-lg font-semibold text-blue-900">
-                        {framework.name.split(" ")[0]}
-                      </span>
-                    </div>
-                  }
-                />
-              </Link>
-            );
-          })}
-        </div>
+        <Card>
+          <div className="w-full overflow-auto">
+            <table className="w-full caption-bottom text-sm">
+              <thead className="[&_tr]:border-b">
+                <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Name
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="[&_tr:last-child]:border-0">
+                {frameworks.length === 0 ? (
+                  <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                    <td
+                      colSpan={4}
+                      className="text-center p-4 align-middle text-muted-foreground"
+                    >
+                      No frameworks found. Create or import one to get started.
+                    </td>
+                  </tr>
+                ) : (
+                  frameworks.map((framework) => (
+                    <tr
+                      key={framework.id}
+                      className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted cursor-pointer"
+                    >
+                      <td className="p-4 align-middle">
+                        <Link
+                          to={`/organizations/${organizationId}/frameworks/${framework.id}`}
+                          className="font-medium underline-offset-4 hover:underline"
+                        >
+                          {framework.name}
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       </div>
     </PageTemplate>
   );

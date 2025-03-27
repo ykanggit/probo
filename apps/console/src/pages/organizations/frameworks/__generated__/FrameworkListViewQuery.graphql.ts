@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1d45b549aa04b80f7e0a2951d7910a3f>>
+ * @generated SignedSource<<6aa35f3abf36b1b8660942a354a882fb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,11 +17,8 @@ export type FrameworkListViewQuery$data = {
     readonly frameworks?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
-          readonly createdAt: string;
-          readonly description: string;
           readonly id: string;
           readonly name: string;
-          readonly updatedAt: string;
         };
       }>;
     };
@@ -84,27 +81,6 @@ v4 = [
             "args": null,
             "kind": "ScalarField",
             "name": "name",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "description",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "createdAt",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "updatedAt",
             "storageKey": null
           },
           (v3/*: any*/)
@@ -241,7 +217,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ad629b287bbe0482ef250bae68c4018c",
+    "cacheID": "f06159f3fa9c1667819b8663219ad4e9",
     "id": null,
     "metadata": {
       "connection": [
@@ -258,11 +234,11 @@ return {
     },
     "name": "FrameworkListViewQuery",
     "operationKind": "query",
-    "text": "query FrameworkListViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query FrameworkListViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "27aa68a4b7303c125c427acdf6aa9dc4";
+(node as any).hash = "c2bf8dc4215c53e7d63f2027893a20cf";
 
 export default node;

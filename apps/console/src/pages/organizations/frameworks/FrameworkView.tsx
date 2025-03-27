@@ -169,7 +169,7 @@ function FrameworkViewContent({
                   </span>
                   <CardTitle>{control.name}</CardTitle>
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">
+                <div className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
                   {control.description}
                 </div>
               </CardHeader>
