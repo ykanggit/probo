@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 - Fix otal trace never started.
 - Fix React.lazy chunck error.
 - Fix login page show `unauthorized` error.
+- Fix cannot delete task with evidences.
+- Fix cannot download file with non-ASCII filename.
 
 ## [0.2.0] - 2025-03-24
 
