@@ -3,8 +3,7 @@
 import {
   ChevronRight,
   ClipboardList,
-  ListCheck,
-  NotebookTabs,
+  Shield,
   type LucideIcon,
 } from "lucide-react";
 import { Link, useLocation, useParams } from "react-router";
@@ -153,6 +152,11 @@ function getNavItems(organizationId?: string): NavItem[] {
         : undefined,
     },
     {
+      title: "Risk",
+      icon: Shield,
+      url: organizationId ? `/organizations/${organizationId}/risk` : undefined,
+    },
+    {
       title: "Frameworks",
       url: organizationId
         ? `/organizations/${organizationId}/frameworks`
@@ -160,25 +164,14 @@ function getNavItems(organizationId?: string): NavItem[] {
       icon: BookOpen,
     },
     {
-      title: "Organizations",
-      icon: Building,
-      url: organizationId
-        ? `/organizations/${organizationId}/people`
-        : undefined,
-      items: organizationId
-        ? [
-            {
-              title: "Peoples",
-              url: `/organizations/${organizationId}/people`,
-              icon: Users,
-            },
-            {
-              title: "Vendors",
-              url: `/organizations/${organizationId}/vendors`,
-              icon: ToyBrick,
-            },
-          ]
-        : [],
+      title: "Peoples",
+      url: `/organizations/${organizationId}/people`,
+      icon: Users,
+    },
+    {
+      title: "Vendors",
+      url: `/organizations/${organizationId}/vendors`,
+      icon: ToyBrick,
     },
     {
       title: "Policies",
