@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<dd3ffb0b93fc3b99db6d95ae1074922b>>
+ * @generated SignedSource<<61507551e23b8cc70b401cab8ae4e575>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -28,7 +28,6 @@ export type VendorViewQuery$data = {
     readonly statusPageUrl?: string | null | undefined;
     readonly termsOfServiceUrl?: string | null | undefined;
     readonly updatedAt?: string;
-    readonly version?: number;
   };
 };
 export type VendorViewQuery = {
@@ -134,13 +133,6 @@ v13 = {
   "kind": "ScalarField",
   "name": "updatedAt",
   "storageKey": null
-},
-v14 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "version",
-  "storageKey": null
 };
 return {
   "fragment": {
@@ -171,8 +163,7 @@ return {
               (v10/*: any*/),
               (v11/*: any*/),
               (v12/*: any*/),
-              (v13/*: any*/),
-              (v14/*: any*/)
+              (v13/*: any*/)
             ],
             "type": "Vendor",
             "abstractKey": null
@@ -219,8 +210,7 @@ return {
               (v10/*: any*/),
               (v11/*: any*/),
               (v12/*: any*/),
-              (v13/*: any*/),
-              (v14/*: any*/)
+              (v13/*: any*/)
             ],
             "type": "Vendor",
             "abstractKey": null
@@ -231,16 +221,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "3569222e84bb1fa070b4ce2145d677ac",
+    "cacheID": "40428ff15eb094ffe4cb5ffb5d135cc1",
     "id": null,
     "metadata": {},
     "name": "VendorViewQuery",
     "operationKind": "query",
-    "text": "query VendorViewQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      createdAt\n      updatedAt\n      version\n    }\n    id\n  }\n}\n"
+    "text": "query VendorViewQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "9cdc25f48997786054c22246fb417db8";
+(node as any).hash = "dbef9acdc02dd7e8cd546c0bb8793b9a";
 
 export default node;

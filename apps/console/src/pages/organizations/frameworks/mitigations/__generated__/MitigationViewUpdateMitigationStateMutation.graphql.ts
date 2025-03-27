@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3aa56a1042b1f9492cfc5bd5d5f55d9d>>
+ * @generated SignedSource<<1d924bb487fd93636fa7207c5aa08cdc>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,7 +14,6 @@ export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" |
 export type UpdateMitigationInput = {
   category?: string | null | undefined;
   description?: string | null | undefined;
-  expectedVersion: number;
   id: string;
   importance?: MitigationImportance | null | undefined;
   name?: string | null | undefined;
@@ -28,7 +27,6 @@ export type MitigationViewUpdateMitigationStateMutation$data = {
     readonly mitigation: {
       readonly id: string;
       readonly state: MitigationState;
-      readonly version: number;
     };
   };
 };
@@ -81,13 +79,6 @@ v1 = [
             "kind": "ScalarField",
             "name": "state",
             "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "version",
-            "storageKey": null
           }
         ],
         "storageKey": null
@@ -114,16 +105,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "4a85c6e15d6ff91ccaa7976f9b0a0c6f",
+    "cacheID": "7e4a92a089fa5927b0239004c3fb5f47",
     "id": null,
     "metadata": {},
     "name": "MitigationViewUpdateMitigationStateMutation",
     "operationKind": "mutation",
-    "text": "mutation MitigationViewUpdateMitigationStateMutation(\n  $input: UpdateMitigationInput!\n) {\n  updateMitigation(input: $input) {\n    mitigation {\n      id\n      state\n      version\n    }\n  }\n}\n"
+    "text": "mutation MitigationViewUpdateMitigationStateMutation(\n  $input: UpdateMitigationInput!\n) {\n  updateMitigation(input: $input) {\n    mitigation {\n      id\n      state\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "2eb2c1f791262f502df22ca0c16682a7";
+(node as any).hash = "e985902d55a537a08b8a2d4482abe0b3";
 
 export default node;

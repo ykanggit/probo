@@ -20,36 +20,36 @@ import (
 )
 
 type (
-	PolicyOrderBy OrderBy[coredata.PolicyOrderField]
+	ControlOrderBy OrderBy[coredata.ControlOrderField]
 )
 
-func NewPolicyConnection(page *page.Page[*coredata.Policy, coredata.PolicyOrderField]) *PolicyConnection {
-	edges := make([]*PolicyEdge, len(page.Data))
-	for i, policy := range page.Data {
-		edges[i] = NewPolicyEdge(policy, page.Cursor.OrderBy.Field)
+func NewControlConnection(p *page.Page[*coredata.Control, coredata.ControlOrderField]) *ControlConnection {
+	var edges = make([]*ControlEdge, len(p.Data))
+
+	for i := range edges {
+		edges[i] = NewControlEdge(p.Data[i], p.Cursor.OrderBy.Field)
 	}
 
-	return &PolicyConnection{
+	return &ControlConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(page),
+		PageInfo: NewPageInfo(p),
 	}
 }
 
-func NewPolicyEdge(policy *coredata.Policy, orderBy coredata.PolicyOrderField) *PolicyEdge {
-	return &PolicyEdge{
-		Cursor: policy.CursorKey(orderBy),
-		Node:   NewPolicy(policy),
+func NewControlEdge(c *coredata.Control, orderBy coredata.ControlOrderField) *ControlEdge {
+	return &ControlEdge{
+		Cursor: c.CursorKey(orderBy),
+		Node:   NewControl(c),
 	}
 }
 
-func NewPolicy(policy *coredata.Policy) *Policy {
-	return &Policy{
-		ID:         policy.ID,
-		Name:       policy.Name,
-		Content:    policy.Content,
-		CreatedAt:  policy.CreatedAt,
-		UpdatedAt:  policy.UpdatedAt,
-		Status:     policy.Status,
-		ReviewDate: policy.ReviewDate,
+func NewControl(c *coredata.Control) *Control {
+	return &Control{
+		ID:          c.ID,
+		ReferenceID: c.ReferenceID,
+		Name:        c.Name,
+		Description: c.Description,
+		CreatedAt:   c.CreatedAt,
+		UpdatedAt:   c.UpdatedAt,
 	}
 }

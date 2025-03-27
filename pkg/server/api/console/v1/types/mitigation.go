@@ -46,7 +46,6 @@ func NewMitigationEdge(c *coredata.Mitigation, orderBy coredata.MitigationOrderF
 func NewMitigation(c *coredata.Mitigation) *Mitigation {
 	return &Mitigation{
 		ID:          c.ID,
-		Version:     c.Version,
 		Category:    c.Category,
 		Name:        c.Name,
 		Description: c.Description,

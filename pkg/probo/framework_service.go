@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	"gearno.de/ref"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
@@ -34,38 +33,22 @@ type (
 	CreateFrameworkRequest struct {
 		OrganizationID gid.GID
 		Name           string
-		Description    string
-		ContentRef     string
 	}
 
 	UpdateFrameworkRequest struct {
-		ID              gid.GID
-		ExpectedVersion int
-		Name            *string
-		Description     *string
+		ID          gid.GID
+		Name        *string
+		Description *string
 	}
 
 	ImportFrameworkRequest struct {
-		Data struct {
-			Framework struct {
+		Framework struct {
+			Name     string `json:"name"`
+			Controls []struct {
+				ID          string `json:"id"`
 				Name        string `json:"name"`
-				ContentRef  string `json:"content-ref"`
 				Description string `json:"description"`
-				Version     string `json:"version"`
-				Controls    []struct {
-					ContentRef  string                        `json:"content-ref"`
-					Category    string                        `json:"category"`
-					Importance  coredata.MitigationImportance `json:"importance"`
-					Standards   []string                      `json:"standards"`
-					Name        string                        `json:"name"`
-					Description string                        `json:"description"`
-					Tasks       []struct {
-						Name         string `json:"name"`
-						Description  string `json:"description"`
-						TimeEstimate int    `json:"time-estimate"`
-					} `json:"tasks"`
-				} `json:"controls"`
-			} `json:"framework"`
+			} `json:"controls"`
 		}
 	}
 )
@@ -84,8 +67,6 @@ func (s FrameworkService) Create(
 		ID:             frameworkID,
 		OrganizationID: req.OrganizationID,
 		Name:           req.Name,
-		Description:    req.Description,
-		ContentRef:     req.ContentRef,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
@@ -155,19 +136,26 @@ func (s FrameworkService) Update(
 	ctx context.Context,
 	req UpdateFrameworkRequest,
 ) (*coredata.Framework, error) {
-	params := coredata.UpdateFrameworkParams{
-		ExpectedVersion: req.ExpectedVersion,
-		Name:            req.Name,
-		Description:     req.Description,
-	}
-
 	framework := &coredata.Framework{ID: req.ID}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return framework.Update(ctx, conn, s.svc.scope, params)
-		})
+			if err := framework.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
+				return fmt.Errorf("cannot load framework: %w", err)
+			}
+
+			if req.Name != nil {
+				framework.Name = *req.Name
+			}
+
+			if req.Description != nil {
+				framework.Description = *req.Description
+			}
+
+			return framework.Update(ctx, conn, s.svc.scope)
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -194,70 +182,41 @@ func (s FrameworkService) Import(
 	organizationID gid.GID,
 	req ImportFrameworkRequest,
 ) (*coredata.Framework, error) {
-
-	now := time.Now()
-
 	frameworkID, err := gid.NewGID(organizationID.TenantID(), coredata.FrameworkEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global id: %w", err)
 	}
 
+	now := time.Now()
 	framework := &coredata.Framework{
 		ID:             frameworkID,
 		OrganizationID: organizationID,
-		Name:           req.Data.Framework.Name,
-		Description:    req.Data.Framework.Description,
-		ContentRef:     req.Data.Framework.ContentRef,
+		ReferenceID:    req.Framework.Name,
+		Name:           req.Framework.Name,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
 
-	importedMitigations := coredata.Mitigations{}
-	importedTasks := coredata.Tasks{}
-	for _, mitigation := range req.Data.Framework.Controls {
-		controlID, err := gid.NewGID(organizationID.TenantID(), coredata.MitigationEntityType)
+	importedControls := coredata.Controls{}
+	for _, control := range req.Framework.Controls {
+		controlID, err := gid.NewGID(organizationID.TenantID(), coredata.ControlEntityType)
 		if err != nil {
 			return nil, fmt.Errorf("cannot create global id: %w", err)
 		}
 
-		importedControl := &coredata.Mitigation{
+		now := time.Now()
+		control := &coredata.Control{
 			ID:          controlID,
+			TenantID:    organizationID.TenantID(),
 			FrameworkID: frameworkID,
-			Category:    mitigation.Category,
-			Importance:  coredata.MitigationImportance(mitigation.Importance),
-			Name:        mitigation.Name,
-			Description: mitigation.Description,
-			State:       coredata.MitigationStateNotStarted,
-			ContentRef:  mitigation.ContentRef,
+			ReferenceID: control.ID,
+			Name:        control.Name,
+			Description: control.Description,
 			CreatedAt:   now,
 			UpdatedAt:   now,
-			Standards:   mitigation.Standards,
 		}
 
-		importedMitigations = append(importedMitigations, importedControl)
-
-		for _, task := range mitigation.Tasks {
-			taskID, err := gid.NewGID(organizationID.TenantID(), coredata.TaskEntityType)
-			if err != nil {
-				return nil, fmt.Errorf("cannot create global id: %w", err)
-			}
-
-			var timeEstimate *time.Duration
-			if task.TimeEstimate > 0 {
-				timeEstimate = ref.Ref(time.Duration(task.TimeEstimate) * time.Second)
-			}
-
-			importedTasks = append(importedTasks, &coredata.Task{
-				ID:           taskID,
-				MitigationID: controlID,
-				Name:         task.Name,
-				State:        coredata.TaskStateTodo,
-				Description:  task.Description,
-				CreatedAt:    now,
-				UpdatedAt:    now,
-				TimeEstimate: timeEstimate,
-			})
-		}
+		importedControls = append(importedControls, control)
 	}
 
 	err = s.svc.pg.WithTx(
@@ -269,15 +228,9 @@ func (s FrameworkService) Import(
 				return fmt.Errorf("cannot insert framework: %w", err)
 			}
 
-			for _, importedMitigation := range importedMitigations {
-				if err := importedMitigation.Insert(ctx, tx, s.svc.scope); err != nil {
-					return fmt.Errorf("cannot insert mitigation: %w", err)
-				}
-			}
-
-			for _, importedTask := range importedTasks {
-				if err := importedTask.Insert(ctx, tx, s.svc.scope); err != nil {
-					return fmt.Errorf("cannot insert task: %w", err)
+			for _, importedControl := range importedControls {
+				if err := importedControl.Insert(ctx, tx, s.svc.scope); err != nil {
+					return fmt.Errorf("cannot insert control: %w", err)
 				}
 			}
 

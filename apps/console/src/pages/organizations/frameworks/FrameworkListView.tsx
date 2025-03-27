@@ -37,14 +37,6 @@ const FrameworkListViewQuery = graphql`
               id
               name
               description
-              mitigations(first: 100) {
-                edges {
-                  node {
-                    id
-                    state
-                  }
-                }
-              }
               createdAt
               updatedAt
             }
@@ -66,14 +58,6 @@ const FrameworkListViewImportFrameworkMutation = graphql`
           id
           name
           description
-          mitigations(first: 100) {
-            edges {
-              node {
-                id
-                state
-              }
-            }
-          }
           createdAt
           updatedAt
         }
@@ -86,14 +70,10 @@ function FrameworkCard({
   title,
   description,
   icon,
-  status,
-  progress,
 }: {
   title: string;
   description: string;
   icon: React.ReactNode;
-  status?: string;
-  progress?: string;
 }) {
   return (
     <Card className="relative overflow-hidden border bg-card p-6">
@@ -111,13 +91,6 @@ function FrameworkCard({
           </div>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
-
-        {progress && (
-          <div className="flex items-center gap-2 text-sm">
-            <span className="size-2 rounded-full bg-yellow-400" />
-            {progress}
-          </div>
-        )}
       </div>
     </Card>
   );
@@ -240,11 +213,6 @@ function FrameworkListViewContent({
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
           {frameworks.map((framework) => {
-            const validatedControls = framework.mitigations.edges.filter(
-              (edge) => edge?.node?.state === "IMPLEMENTED"
-            ).length;
-            const totalControls = framework.mitigations.edges.length;
-
             return (
               <Link
                 key={framework.id}
@@ -259,16 +227,6 @@ function FrameworkListViewContent({
                         {framework.name.split(" ")[0]}
                       </span>
                     </div>
-                  }
-                  status={
-                    validatedControls === totalControls
-                      ? "Compliant"
-                      : undefined
-                  }
-                  progress={
-                    validatedControls === totalControls
-                      ? "All mitigations validated"
-                      : `${validatedControls}/${totalControls} Controls validated`
                   }
                 />
               </Link>

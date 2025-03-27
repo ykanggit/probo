@@ -131,7 +131,6 @@ const mitigationViewQuery = graphql`
         state
         importance
         category
-        version
         tasks(first: 100) @connection(key: "MitigationView_tasks") {
           __id
           edges {
@@ -141,7 +140,6 @@ const mitigationViewQuery = graphql`
               description
               state
               timeEstimate
-              version
               assignedTo {
                 id
                 fullName
@@ -178,7 +176,6 @@ const updateTaskStateMutation = graphql`
         id
         state
         timeEstimate
-        version
       }
     }
   }
@@ -197,7 +194,6 @@ const createTaskMutation = graphql`
           description
           timeEstimate
           state
-          version
           assignedTo {
             id
             fullName
@@ -271,7 +267,6 @@ const assignTaskMutation = graphql`
     assignTask(input: $input) {
       task {
         id
-        version
         assignedTo {
           id
           fullName
@@ -287,7 +282,6 @@ const unassignTaskMutation = graphql`
     unassignTask(input: $input) {
       task {
         id
-        version
         assignedTo {
           id
           fullName
@@ -306,7 +300,6 @@ const updateMitigationStateMutation = graphql`
       mitigation {
         id
         state
-        version
       }
     }
   }
@@ -627,11 +620,7 @@ function MitigationViewContent({
     setSearchParams(searchParams);
   };
 
-  const handleToggleTaskState = (
-    taskId: string,
-    currentState: string,
-    version: number
-  ) => {
+  const handleToggleTaskState = (taskId: string, currentState: string) => {
     const newState = currentState === "DONE" ? "TODO" : "DONE";
 
     updateTask({
@@ -639,7 +628,6 @@ function MitigationViewContent({
         input: {
           taskId,
           state: newState,
-          expectedVersion: version,
         },
       },
       onCompleted: () => {
@@ -647,7 +635,6 @@ function MitigationViewContent({
           setSelectedTask({
             ...selectedTask,
             state: newState,
-            version: version + 1,
           });
         }
       },
@@ -1114,7 +1101,6 @@ function MitigationViewContent({
             | "IN_PROGRESS"
             | "IMPLEMENTED"
             | "NOT_APPLICABLE",
-          expectedVersion: data.mitigation.version!,
         },
       },
       onCompleted: () => {
@@ -1180,7 +1166,7 @@ function MitigationViewContent({
 
   // Function to handle saving the updated duration
   const handleSaveDuration = useCallback(
-    (taskId: string, version: number) => {
+    (taskId: string) => {
       // Convert to ISO duration format
       let duration = "P";
 
@@ -1211,7 +1197,6 @@ function MitigationViewContent({
           input: {
             taskId,
             timeEstimate,
-            expectedVersion: version,
           },
         },
         onCompleted: () => {
@@ -1222,7 +1207,6 @@ function MitigationViewContent({
             setSelectedTask({
               ...selectedTask,
               timeEstimate,
-              version: version + 1,
             });
           }
         },
@@ -1495,7 +1479,7 @@ function MitigationViewContent({
                   onClick={(e) => {
                     e.stopPropagation(); // Prevent task selection when checkbox is clicked
                     if (task?.id && task?.state) {
-                      handleToggleTaskState(task.id, task.state, task.version);
+                      handleToggleTaskState(task.id, task.state);
                     }
                   }}
                 >
@@ -1963,12 +1947,7 @@ function MitigationViewContent({
                         </div>
                         <button
                           className="p-1 text-sm text-blue-600 hover:text-blue-800"
-                          onClick={() =>
-                            handleSaveDuration(
-                              selectedTask.id,
-                              selectedTask.version
-                            )
-                          }
+                          onClick={() => handleSaveDuration(selectedTask.id)}
                         >
                           Save
                         </button>
@@ -2256,8 +2235,7 @@ function MitigationViewContent({
                       onClick={() =>
                         handleToggleTaskState(
                           selectedTask.id,
-                          selectedTask.state || "TODO",
-                          selectedTask.version
+                          selectedTask.state || "TODO"
                         )
                       }
                     >
@@ -2271,8 +2249,7 @@ function MitigationViewContent({
                       onClick={() =>
                         handleToggleTaskState(
                           selectedTask.id,
-                          selectedTask.state || "DONE",
-                          selectedTask.version
+                          selectedTask.state || "DONE"
                         )
                       }
                     >

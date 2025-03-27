@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6b6bb27f3ae9e9cf720be1c3655c595e>>
+ * @generated SignedSource<<1d45b549aa04b80f7e0a2951d7910a3f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type FrameworkListViewQuery$variables = {
   organizationId: string;
 };
@@ -21,14 +20,6 @@ export type FrameworkListViewQuery$data = {
           readonly createdAt: string;
           readonly description: string;
           readonly id: string;
-          readonly mitigations: {
-            readonly edges: ReadonlyArray<{
-              readonly node: {
-                readonly id: string;
-                readonly state: MitigationState;
-              };
-            }>;
-          };
           readonly name: string;
           readonly updatedAt: string;
         };
@@ -63,21 +54,14 @@ v2 = {
   "name": "id",
   "storageKey": null
 },
-v3 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 100
-  }
-],
-v4 = {
+v3 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v5 = [
+v4 = [
   {
     "alias": null,
     "args": null,
@@ -111,47 +95,6 @@ v5 = [
           },
           {
             "alias": null,
-            "args": (v3/*: any*/),
-            "concreteType": "MitigationConnection",
-            "kind": "LinkedField",
-            "name": "mitigations",
-            "plural": false,
-            "selections": [
-              {
-                "alias": null,
-                "args": null,
-                "concreteType": "MitigationEdge",
-                "kind": "LinkedField",
-                "name": "edges",
-                "plural": true,
-                "selections": [
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "Mitigation",
-                    "kind": "LinkedField",
-                    "name": "node",
-                    "plural": false,
-                    "selections": [
-                      (v2/*: any*/),
-                      {
-                        "alias": null,
-                        "args": null,
-                        "kind": "ScalarField",
-                        "name": "state",
-                        "storageKey": null
-                      }
-                    ],
-                    "storageKey": null
-                  }
-                ],
-                "storageKey": null
-              }
-            ],
-            "storageKey": "mitigations(first:100)"
-          },
-          {
-            "alias": null,
             "args": null,
             "kind": "ScalarField",
             "name": "createdAt",
@@ -164,7 +107,7 @@ v5 = [
             "name": "updatedAt",
             "storageKey": null
           },
-          (v4/*: any*/)
+          (v3/*: any*/)
         ],
         "storageKey": null
       },
@@ -203,6 +146,13 @@ v5 = [
     ],
     "storageKey": null
   }
+],
+v5 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 100
+  }
 ];
 return {
   "fragment": {
@@ -229,7 +179,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__FrameworkListView_frameworks_connection",
                 "plural": false,
-                "selections": (v5/*: any*/),
+                "selections": (v4/*: any*/),
                 "storageKey": null
               }
             ],
@@ -257,23 +207,23 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v4/*: any*/),
+          (v3/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v3/*: any*/),
+                "args": (v5/*: any*/),
                 "concreteType": "FrameworkConnection",
                 "kind": "LinkedField",
                 "name": "frameworks",
                 "plural": false,
-                "selections": (v5/*: any*/),
+                "selections": (v4/*: any*/),
                 "storageKey": "frameworks(first:100)"
               },
               {
                 "alias": null,
-                "args": (v3/*: any*/),
+                "args": (v5/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "FrameworkListView_frameworks",
@@ -291,7 +241,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "e5d4da21773770d146fb7d91e435caef",
+    "cacheID": "ad629b287bbe0482ef250bae68c4018c",
     "id": null,
     "metadata": {
       "connection": [
@@ -308,11 +258,11 @@ return {
     },
     "name": "FrameworkListViewQuery",
     "operationKind": "query",
-    "text": "query FrameworkListViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            mitigations(first: 100) {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query FrameworkListViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "8da147529de5e229e38b836bd584e484";
+(node as any).hash = "27aa68a4b7303c125c427acdf6aa9dc4";
 
 export default node;

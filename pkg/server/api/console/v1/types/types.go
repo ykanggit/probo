@@ -36,6 +36,28 @@ type ConfirmEmailPayload struct {
 	Success bool `json:"success"`
 }
 
+type Control struct {
+	ID          gid.GID   `json:"id"`
+	ReferenceID string    `json:"referenceId"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
+func (Control) IsNode()             {}
+func (this Control) GetID() gid.GID { return this.ID }
+
+type ControlConnection struct {
+	Edges    []*ControlEdge `json:"edges"`
+	PageInfo *PageInfo      `json:"pageInfo"`
+}
+
+type ControlEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Control       `json:"node"`
+}
+
 type CreateFrameworkInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 	Name           string  `json:"name"`
@@ -47,11 +69,11 @@ type CreateFrameworkPayload struct {
 }
 
 type CreateMitigationInput struct {
-	FrameworkID gid.GID                       `json:"frameworkId"`
-	Name        string                        `json:"name"`
-	Description string                        `json:"description"`
-	Category    string                        `json:"category"`
-	Importance  coredata.MitigationImportance `json:"importance"`
+	OrganizationID gid.GID                       `json:"organizationId"`
+	Name           string                        `json:"name"`
+	Description    string                        `json:"description"`
+	Category       string                        `json:"category"`
+	Importance     coredata.MitigationImportance `json:"importance"`
 }
 
 type CreateMitigationPayload struct {
@@ -128,6 +150,14 @@ type DeleteEvidencePayload struct {
 	DeletedEvidenceID gid.GID `json:"deletedEvidenceId"`
 }
 
+type DeleteFrameworkInput struct {
+	FrameworkID gid.GID `json:"frameworkId"`
+}
+
+type DeleteFrameworkPayload struct {
+	DeletedFrameworkID gid.GID `json:"deletedFrameworkId"`
+}
+
 type DeleteOrganizationInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 }
@@ -196,13 +226,12 @@ type EvidenceEdge struct {
 }
 
 type Framework struct {
-	ID          gid.GID               `json:"id"`
-	Version     int                   `json:"version"`
-	Name        string                `json:"name"`
-	Description string                `json:"description"`
-	Mitigations *MitigationConnection `json:"mitigations"`
-	CreatedAt   time.Time             `json:"createdAt"`
-	UpdatedAt   time.Time             `json:"updatedAt"`
+	ID          gid.GID            `json:"id"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	Controls    *ControlConnection `json:"controls"`
+	CreatedAt   time.Time          `json:"createdAt"`
+	UpdatedAt   time.Time          `json:"updatedAt"`
 }
 
 func (Framework) IsNode()             {}
@@ -239,7 +268,6 @@ type InviteUserPayload struct {
 
 type Mitigation struct {
 	ID          gid.GID                       `json:"id"`
-	Version     int                           `json:"version"`
 	Category    string                        `json:"category"`
 	Name        string                        `json:"name"`
 	Description string                        `json:"description"`
@@ -267,16 +295,17 @@ type Mutation struct {
 }
 
 type Organization struct {
-	ID         gid.GID              `json:"id"`
-	Name       string               `json:"name"`
-	LogoURL    *string              `json:"logoUrl,omitempty"`
-	Users      *UserConnection      `json:"users"`
-	Frameworks *FrameworkConnection `json:"frameworks"`
-	Vendors    *VendorConnection    `json:"vendors"`
-	Peoples    *PeopleConnection    `json:"peoples"`
-	Policies   *PolicyConnection    `json:"policies"`
-	CreatedAt  time.Time            `json:"createdAt"`
-	UpdatedAt  time.Time            `json:"updatedAt"`
+	ID          gid.GID               `json:"id"`
+	Name        string                `json:"name"`
+	LogoURL     *string               `json:"logoUrl,omitempty"`
+	Users       *UserConnection       `json:"users"`
+	Frameworks  *FrameworkConnection  `json:"frameworks"`
+	Vendors     *VendorConnection     `json:"vendors"`
+	Peoples     *PeopleConnection     `json:"peoples"`
+	Policies    *PolicyConnection     `json:"policies"`
+	Mitigations *MitigationConnection `json:"mitigations"`
+	CreatedAt   time.Time             `json:"createdAt"`
+	UpdatedAt   time.Time             `json:"updatedAt"`
 }
 
 func (Organization) IsNode()             {}
@@ -312,7 +341,6 @@ type People struct {
 	Kind                     coredata.PeopleKind `json:"kind"`
 	CreatedAt                time.Time           `json:"createdAt"`
 	UpdatedAt                time.Time           `json:"updatedAt"`
-	Version                  int                 `json:"version"`
 }
 
 func (People) IsNode()             {}
@@ -330,7 +358,6 @@ type PeopleEdge struct {
 
 type Policy struct {
 	ID         gid.GID               `json:"id"`
-	Version    int                   `json:"version"`
 	Name       string                `json:"name"`
 	Status     coredata.PolicyStatus `json:"status"`
 	Content    string                `json:"content"`
@@ -372,7 +399,6 @@ type Session struct {
 
 type Task struct {
 	ID           gid.GID             `json:"id"`
-	Version      int                 `json:"version"`
 	Name         string              `json:"name"`
 	Description  string              `json:"description"`
 	State        coredata.TaskState  `json:"state"`
@@ -405,10 +431,9 @@ type UnassignTaskPayload struct {
 }
 
 type UpdateFrameworkInput struct {
-	ID              gid.GID `json:"id"`
-	ExpectedVersion int     `json:"expectedVersion"`
-	Name            *string `json:"name,omitempty"`
-	Description     *string `json:"description,omitempty"`
+	ID          gid.GID `json:"id"`
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
 }
 
 type UpdateFrameworkPayload struct {
@@ -416,13 +441,12 @@ type UpdateFrameworkPayload struct {
 }
 
 type UpdateMitigationInput struct {
-	ID              gid.GID                        `json:"id"`
-	ExpectedVersion int                            `json:"expectedVersion"`
-	Name            *string                        `json:"name,omitempty"`
-	Description     *string                        `json:"description,omitempty"`
-	Category        *string                        `json:"category,omitempty"`
-	State           *coredata.MitigationState      `json:"state,omitempty"`
-	Importance      *coredata.MitigationImportance `json:"importance,omitempty"`
+	ID          gid.GID                        `json:"id"`
+	Name        *string                        `json:"name,omitempty"`
+	Description *string                        `json:"description,omitempty"`
+	Category    *string                        `json:"category,omitempty"`
+	State       *coredata.MitigationState      `json:"state,omitempty"`
+	Importance  *coredata.MitigationImportance `json:"importance,omitempty"`
 }
 
 type UpdateMitigationPayload struct {
@@ -441,7 +465,6 @@ type UpdateOrganizationPayload struct {
 
 type UpdatePeopleInput struct {
 	ID                       gid.GID              `json:"id"`
-	ExpectedVersion          int                  `json:"expectedVersion"`
 	FullName                 *string              `json:"fullName,omitempty"`
 	PrimaryEmailAddress      *string              `json:"primaryEmailAddress,omitempty"`
 	AdditionalEmailAddresses []string             `json:"additionalEmailAddresses,omitempty"`
@@ -453,13 +476,12 @@ type UpdatePeoplePayload struct {
 }
 
 type UpdatePolicyInput struct {
-	ID              gid.GID                `json:"id"`
-	ExpectedVersion int                    `json:"expectedVersion"`
-	Name            *string                `json:"name,omitempty"`
-	Content         *string                `json:"content,omitempty"`
-	Status          *coredata.PolicyStatus `json:"status,omitempty"`
-	ReviewDate      *time.Time             `json:"reviewDate,omitempty"`
-	OwnerID         *gid.GID               `json:"ownerId,omitempty"`
+	ID         gid.GID                `json:"id"`
+	Name       *string                `json:"name,omitempty"`
+	Content    *string                `json:"content,omitempty"`
+	Status     *coredata.PolicyStatus `json:"status,omitempty"`
+	ReviewDate *time.Time             `json:"reviewDate,omitempty"`
+	OwnerID    *gid.GID               `json:"ownerId,omitempty"`
 }
 
 type UpdatePolicyPayload struct {
@@ -467,12 +489,11 @@ type UpdatePolicyPayload struct {
 }
 
 type UpdateTaskInput struct {
-	TaskID          gid.GID             `json:"taskId"`
-	ExpectedVersion int                 `json:"expectedVersion"`
-	Name            *string             `json:"name,omitempty"`
-	Description     *string             `json:"description,omitempty"`
-	State           *coredata.TaskState `json:"state,omitempty"`
-	TimeEstimate    *time.Duration      `json:"timeEstimate,omitempty"`
+	TaskID       gid.GID             `json:"taskId"`
+	Name         *string             `json:"name,omitempty"`
+	Description  *string             `json:"description,omitempty"`
+	State        *coredata.TaskState `json:"state,omitempty"`
+	TimeEstimate *time.Duration      `json:"timeEstimate,omitempty"`
 }
 
 type UpdateTaskPayload struct {
@@ -481,7 +502,6 @@ type UpdateTaskPayload struct {
 
 type UpdateVendorInput struct {
 	ID                   gid.GID                      `json:"id"`
-	ExpectedVersion      int                          `json:"expectedVersion"`
 	Name                 *string                      `json:"name,omitempty"`
 	Description          *string                      `json:"description,omitempty"`
 	ServiceStartAt       *time.Time                   `json:"serviceStartAt,omitempty"`
@@ -544,7 +564,6 @@ type Vendor struct {
 	PrivacyPolicyURL     *string                     `json:"privacyPolicyUrl,omitempty"`
 	CreatedAt            time.Time                   `json:"createdAt"`
 	UpdatedAt            time.Time                   `json:"updatedAt"`
-	Version              int                         `json:"version"`
 }
 
 func (Vendor) IsNode()             {}

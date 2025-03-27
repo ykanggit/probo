@@ -29,18 +29,18 @@ import (
 
 type (
 	Mitigation struct {
-		ID          gid.GID              `db:"id"`
-		FrameworkID gid.GID              `db:"framework_id"`
-		Category    string               `db:"category"`
-		Name        string               `db:"name"`
-		Description string               `db:"description"`
-		Importance  MitigationImportance `db:"importance"`
-		State       MitigationState      `db:"state"`
-		ContentRef  string               `db:"content_ref"`
-		CreatedAt   time.Time            `db:"created_at"`
-		UpdatedAt   time.Time            `db:"updated_at"`
-		Version     int                  `db:"version"`
-		Standards   []string             `db:"standards"`
+		ID             gid.GID              `db:"id"`
+		OrganizationID gid.GID              `db:"organization_id"`
+		Category       string               `db:"category"`
+		Name           string               `db:"name"`
+		Description    string               `db:"description"`
+		Importance     MitigationImportance `db:"importance"`
+		State          MitigationState      `db:"state"`
+		ContentRef     string               `db:"content_ref"`
+		CreatedAt      time.Time            `db:"created_at"`
+		UpdatedAt      time.Time            `db:"updated_at"`
+		Version        int                  `db:"version"`
+		Standards      []string             `db:"standards"`
 	}
 
 	Mitigations []*Mitigation
@@ -73,7 +73,7 @@ func (c *Mitigation) LoadByID(
 	q := `
 SELECT
     id,
-    framework_id,
+    organization_id,
     category,
     name,
     description,
@@ -122,7 +122,7 @@ INSERT INTO
     mitigations (
         tenant_id,
         id,
-        framework_id,
+        organization_id,
 		category,
         name,
 		importance,
@@ -137,7 +137,7 @@ INSERT INTO
 VALUES (
     @tenant_id,
     @mitigation_id,
-    @framework_id,
+    @organization_id,
 	@category,
     @name,
 	@importance,
@@ -152,35 +152,35 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
-		"tenant_id":     scope.GetTenantID(),
-		"mitigation_id": c.ID,
-		"framework_id":  c.FrameworkID,
-		"category":      c.Category,
-		"name":          c.Name,
-		"version":       0,
-		"description":   c.Description,
-		"content_ref":   c.ContentRef,
-		"created_at":    c.CreatedAt,
-		"updated_at":    c.UpdatedAt,
-		"state":         c.State,
-		"importance":    c.Importance,
-		"standards":     c.Standards,
+		"tenant_id":       scope.GetTenantID(),
+		"mitigation_id":   c.ID,
+		"organization_id": c.OrganizationID,
+		"category":        c.Category,
+		"name":            c.Name,
+		"version":         0,
+		"description":     c.Description,
+		"content_ref":     c.ContentRef,
+		"created_at":      c.CreatedAt,
+		"updated_at":      c.UpdatedAt,
+		"state":           c.State,
+		"importance":      c.Importance,
+		"standards":       c.Standards,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
 }
 
-func (c *Mitigations) LoadByFrameworkID(
+func (c *Mitigations) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	frameworkID gid.GID,
+	organizationID gid.GID,
 	cursor *page.Cursor[MitigationOrderField],
 ) error {
 	q := `
 SELECT
     id,
-    framework_id,
+    organization_id,
 	category,
     name,
     description,
@@ -195,12 +195,12 @@ FROM
     mitigations
 WHERE
     %s
-    AND framework_id = @framework_id
+    AND organization_id = @organization_id
     AND %s
 `
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"framework_id": frameworkID}
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
@@ -239,7 +239,7 @@ WHERE %s
     AND version = @expected_version
 RETURNING 
     id,
-    framework_id,
+    organization_id,
     category,
     name,
     description,
@@ -248,8 +248,8 @@ RETURNING
     content_ref,
     created_at,
     updated_at,
-    version,
-	standards
+	standards,
+	version
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 

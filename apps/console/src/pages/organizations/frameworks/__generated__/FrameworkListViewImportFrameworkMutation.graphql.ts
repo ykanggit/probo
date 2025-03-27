@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<11936aad3da2565a509b1566774e0ecf>>
+ * @generated SignedSource<<c1a3bc146c71229f94ea60f820bb43eb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type ImportFrameworkInput = {
   file: any;
   organizationId: string;
@@ -25,14 +24,6 @@ export type FrameworkListViewImportFrameworkMutation$data = {
         readonly createdAt: string;
         readonly description: string;
         readonly id: string;
-        readonly mitigations: {
-          readonly edges: ReadonlyArray<{
-            readonly node: {
-              readonly id: string;
-              readonly state: MitigationState;
-            };
-          }>;
-        };
         readonly name: string;
         readonly updatedAt: string;
       };
@@ -65,13 +56,6 @@ v2 = [
 v3 = {
   "alias": null,
   "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
-},
-v4 = {
-  "alias": null,
-  "args": null,
   "concreteType": "FrameworkEdge",
   "kind": "LinkedField",
   "name": "frameworkEdge",
@@ -85,7 +69,13 @@ v4 = {
       "name": "node",
       "plural": false,
       "selections": [
-        (v3/*: any*/),
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "id",
+          "storageKey": null
+        },
         {
           "alias": null,
           "args": null,
@@ -99,53 +89,6 @@ v4 = {
           "kind": "ScalarField",
           "name": "description",
           "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": [
-            {
-              "kind": "Literal",
-              "name": "first",
-              "value": 100
-            }
-          ],
-          "concreteType": "MitigationConnection",
-          "kind": "LinkedField",
-          "name": "mitigations",
-          "plural": false,
-          "selections": [
-            {
-              "alias": null,
-              "args": null,
-              "concreteType": "MitigationEdge",
-              "kind": "LinkedField",
-              "name": "edges",
-              "plural": true,
-              "selections": [
-                {
-                  "alias": null,
-                  "args": null,
-                  "concreteType": "Mitigation",
-                  "kind": "LinkedField",
-                  "name": "node",
-                  "plural": false,
-                  "selections": [
-                    (v3/*: any*/),
-                    {
-                      "alias": null,
-                      "args": null,
-                      "kind": "ScalarField",
-                      "name": "state",
-                      "storageKey": null
-                    }
-                  ],
-                  "storageKey": null
-                }
-              ],
-              "storageKey": null
-            }
-          ],
-          "storageKey": "mitigations(first:100)"
         },
         {
           "alias": null,
@@ -185,7 +128,7 @@ return {
         "name": "importFramework",
         "plural": false,
         "selections": [
-          (v4/*: any*/)
+          (v3/*: any*/)
         ],
         "storageKey": null
       }
@@ -210,7 +153,7 @@ return {
         "name": "importFramework",
         "plural": false,
         "selections": [
-          (v4/*: any*/),
+          (v3/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -233,16 +176,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d2d34f8e054d753d956120ea14791f79",
+    "cacheID": "0d952e4f9f3e106ea7a30d69f7268385",
     "id": null,
     "metadata": {},
     "name": "FrameworkListViewImportFrameworkMutation",
     "operationKind": "mutation",
-    "text": "mutation FrameworkListViewImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n        mitigations(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation FrameworkListViewImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a812db41b10d16c25959a5a733fe6088";
+(node as any).hash = "8be3328101831be07eeea8670d47debd";
 
 export default node;

@@ -31,11 +31,11 @@ type (
 	}
 
 	CreateMitigationRequest struct {
-		FrameworkID gid.GID
-		Name        string
-		Description string
-		Category    string
-		Importance  coredata.MitigationImportance
+		OrganizationID gid.GID
+		Name           string
+		Description    string
+		Category       string
+		Importance     coredata.MitigationImportance
 	}
 
 	UpdateMitigationRequest struct {
@@ -96,9 +96,9 @@ func (s MitigationService) Update(
 	return mitigation, nil
 }
 
-func (s MitigationService) ListForFrameworkID(
+func (s MitigationService) ListForOrganizationID(
 	ctx context.Context,
-	frameworkID gid.GID,
+	organizationID gid.GID,
 	cursor *page.Cursor[coredata.MitigationOrderField],
 ) (*page.Page[*coredata.Mitigation, coredata.MitigationOrderField], error) {
 	var mitigations coredata.Mitigations
@@ -106,11 +106,11 @@ func (s MitigationService) ListForFrameworkID(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return mitigations.LoadByFrameworkID(
+			return mitigations.LoadByOrganizationID(
 				ctx,
 				conn,
 				s.svc.scope,
-				frameworkID,
+				organizationID,
 				cursor,
 			)
 		},
@@ -133,27 +133,22 @@ func (s MitigationService) Create(
 		return nil, fmt.Errorf("cannot create mitigation global id: %w", err)
 	}
 
-	framework := &coredata.Framework{}
 	mitigation := &coredata.Mitigation{
-		ID:          mitigationID,
-		FrameworkID: req.FrameworkID,
-		Name:        req.Name,
-		Description: req.Description,
-		Category:    req.Category,
-		State:       coredata.MitigationStateNotStarted,
-		Standards:   []string{},
-		Importance:  req.Importance,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		ID:             mitigationID,
+		OrganizationID: req.OrganizationID,
+		Name:           req.Name,
+		Description:    req.Description,
+		Category:       req.Category,
+		State:          coredata.MitigationStateNotStarted,
+		Standards:      []string{},
+		Importance:     req.Importance,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
 
 	err = s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			if err := framework.LoadByID(ctx, conn, s.svc.scope, req.FrameworkID); err != nil {
-				return fmt.Errorf("cannot load framework %q: %w", req.FrameworkID, err)
-			}
-
 			if err := mitigation.Insert(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert mitigation: %w", err)
 			}

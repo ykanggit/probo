@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b3ede0dedb94e95e89f0d67715a536b3>>
+ * @generated SignedSource<<e3772627b3bf7e5938d48808edd9fcb8>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -29,7 +29,6 @@ export type UpdatePolicyViewQuery$data = {
     };
     readonly reviewDate?: string | null | undefined;
     readonly status?: PolicyStatus;
-    readonly version?: number;
   };
 };
 export type UpdatePolicyViewQuery = {
@@ -91,13 +90,6 @@ v5 = {
       "args": null,
       "kind": "ScalarField",
       "name": "status",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "version",
       "storageKey": null
     },
     {
@@ -328,16 +320,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "16bd0bbc57d75f5c4d40eccd560b3da5",
+    "cacheID": "b7958bceabdd33c39fb403bdc6dbd85e",
     "id": null,
     "metadata": {},
     "name": "UpdatePolicyViewQuery",
     "operationKind": "query",
-    "text": "query UpdatePolicyViewQuery(\n  $policyId: ID!\n  $organizationId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      status\n      version\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query UpdatePolicyViewQuery(\n  $policyId: ID!\n  $organizationId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      status\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "1494ae295ead283c9784cc748c5536f7";
+(node as any).hash = "d29279c14662125a7fb14fa4da857f2b";
 
 export default node;

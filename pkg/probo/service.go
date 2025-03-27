@@ -32,18 +32,21 @@ type (
 	}
 
 	TenantService struct {
-		pg            *pg.Client
-		s3            *s3.Client
-		bucket        string
-		scope         coredata.Scoper
+		pg     *pg.Client
+		s3     *s3.Client
+		bucket string
+
+		scope coredata.Scoper
+
 		Frameworks    *FrameworkService
 		Mitigations   *MitigationService
 		Tasks         *TaskService
 		Evidences     *EvidenceService
-		Peoples       *PeopleService
-		Vendors       *VendorService
-		Policies      *PolicyService
 		Organizations *OrganizationService
+		Vendors       *VendorService
+		Peoples       *PeopleService
+		Policies      *PolicyService
+		Controls      *ControlService
 	}
 )
 
@@ -82,5 +85,7 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.Vendors = &VendorService{svc: tenantService}
 	tenantService.Policies = &PolicyService{svc: tenantService}
 	tenantService.Organizations = &OrganizationService{svc: tenantService}
+	tenantService.Controls = &ControlService{svc: tenantService}
+
 	return tenantService
 }

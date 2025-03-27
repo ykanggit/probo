@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<115402b83869511df5e91ab206ae99e3>>
+ * @generated SignedSource<<9c98acb5c320005e303cd815550c0d74>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,7 +11,6 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type UpdateFrameworkInput = {
   description?: string | null | undefined;
-  expectedVersion: number;
   id: string;
   name?: string | null | undefined;
 };
@@ -24,7 +23,6 @@ export type UpdateFrameworkViewUpdateFrameworkMutation$data = {
       readonly description: string;
       readonly id: string;
       readonly name: string;
-      readonly version: number;
     };
   };
 };
@@ -84,13 +82,6 @@ v1 = [
             "kind": "ScalarField",
             "name": "description",
             "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "version",
-            "storageKey": null
           }
         ],
         "storageKey": null
@@ -117,16 +108,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "08fc83afdc1227aa23cac0778cdd2cc0",
+    "cacheID": "8a41e224572c2419fc49c7fef6908d63",
     "id": null,
     "metadata": {},
     "name": "UpdateFrameworkViewUpdateFrameworkMutation",
     "operationKind": "mutation",
-    "text": "mutation UpdateFrameworkViewUpdateFrameworkMutation(\n  $input: UpdateFrameworkInput!\n) {\n  updateFramework(input: $input) {\n    framework {\n      id\n      name\n      description\n      version\n    }\n  }\n}\n"
+    "text": "mutation UpdateFrameworkViewUpdateFrameworkMutation(\n  $input: UpdateFrameworkInput!\n) {\n  updateFramework(input: $input) {\n    framework {\n      id\n      name\n      description\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "6dfde24d73c2cbc0c5ca147d076fbd26";
+(node as any).hash = "9b201a966e844a77d3d920a7e0165d15";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<338c4c7afa073c41eacac21a2996d1f9>>
+ * @generated SignedSource<<c4f9f399e7a3d6c0e0482af3eccc8492>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -22,7 +22,6 @@ export type UpdateMitigationViewQuery$data = {
     readonly importance?: MitigationImportance;
     readonly name?: string;
     readonly state?: MitigationState;
-    readonly version?: number;
   };
 };
 export type UpdateMitigationViewQuery = {
@@ -86,13 +85,6 @@ v7 = {
   "kind": "ScalarField",
   "name": "state",
   "storageKey": null
-},
-v8 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "version",
-  "storageKey": null
 };
 return {
   "fragment": {
@@ -117,8 +109,7 @@ return {
               (v4/*: any*/),
               (v5/*: any*/),
               (v6/*: any*/),
-              (v7/*: any*/),
-              (v8/*: any*/)
+              (v7/*: any*/)
             ],
             "type": "Mitigation",
             "abstractKey": null
@@ -159,8 +150,7 @@ return {
               (v4/*: any*/),
               (v5/*: any*/),
               (v6/*: any*/),
-              (v7/*: any*/),
-              (v8/*: any*/)
+              (v7/*: any*/)
             ],
             "type": "Mitigation",
             "abstractKey": null
@@ -171,16 +161,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "c2e9133d77f3e090267b19f4ab270c72",
+    "cacheID": "81b47701802e110078ee303a83c19d88",
     "id": null,
     "metadata": {},
     "name": "UpdateMitigationViewQuery",
     "operationKind": "query",
-    "text": "query UpdateMitigationViewQuery(\n  $mitigationId: ID!\n) {\n  node(id: $mitigationId) {\n    __typename\n    ... on Mitigation {\n      id\n      name\n      description\n      category\n      importance\n      state\n      version\n    }\n    id\n  }\n}\n"
+    "text": "query UpdateMitigationViewQuery(\n  $mitigationId: ID!\n) {\n  node(id: $mitigationId) {\n    __typename\n    ... on Mitigation {\n      id\n      name\n      description\n      category\n      importance\n      state\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3e977744beb9c403aa8be232c8112a9b";
+(node as any).hash = "126fe89ef3da933cfb7847ff05179832";
 
 export default node;

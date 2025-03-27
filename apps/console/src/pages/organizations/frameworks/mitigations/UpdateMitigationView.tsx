@@ -42,7 +42,6 @@ const updateMitigationMutation = graphql`
         category
         importance
         state
-        version
       }
     }
   }
@@ -58,7 +57,6 @@ const updateMitigationQuery = graphql`
         category
         importance
         state
-        version
       }
     }
   }
@@ -191,7 +189,6 @@ function UpdateMitigationViewContent({
 
     const input: {
       id: string;
-      expectedVersion: number;
       name?: string;
       description?: string;
       category?: string;
@@ -199,7 +196,6 @@ function UpdateMitigationViewContent({
       importance?: MitigationImportance;
     } = {
       id: mitigationId!,
-      expectedVersion: data.node.version,
     };
 
     if (editedFields.has("name")) {

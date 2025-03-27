@@ -29,7 +29,6 @@ const updateFrameworkMutation = graphql`
         id
         name
         description
-        version
       }
     }
   }
@@ -42,7 +41,6 @@ const updateFrameworkQuery = graphql`
         id
         name
         description
-        version
       }
     }
   }
@@ -166,7 +164,6 @@ function UpdateFrameworkViewContent({
       variables: {
         input: {
           id: frameworkId!,
-          expectedVersion: data.node.version!,
           name: formData.name,
           description: formData.description,
         },

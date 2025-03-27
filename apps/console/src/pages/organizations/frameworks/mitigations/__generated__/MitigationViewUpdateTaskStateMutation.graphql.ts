@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4aed09b28d5d1ec083abfeeb874b9ce3>>
+ * @generated SignedSource<<a68054962a4ec7ae205dc2976fe8d2bf>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,7 +12,6 @@ import { ConcreteRequest } from 'relay-runtime';
 export type TaskState = "DONE" | "TODO";
 export type UpdateTaskInput = {
   description?: string | null | undefined;
-  expectedVersion: number;
   name?: string | null | undefined;
   state?: TaskState | null | undefined;
   taskId: string;
@@ -27,7 +26,6 @@ export type MitigationViewUpdateTaskStateMutation$data = {
       readonly id: string;
       readonly state: TaskState;
       readonly timeEstimate: any | null | undefined;
-      readonly version: number;
     };
   };
 };
@@ -87,13 +85,6 @@ v1 = [
             "kind": "ScalarField",
             "name": "timeEstimate",
             "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "version",
-            "storageKey": null
           }
         ],
         "storageKey": null
@@ -120,16 +111,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "8de0d061237d4ebcbb366b8eefff6d94",
+    "cacheID": "f8d2ca86f8e7856b3d24bcd810490a6a",
     "id": null,
     "metadata": {},
     "name": "MitigationViewUpdateTaskStateMutation",
     "operationKind": "mutation",
-    "text": "mutation MitigationViewUpdateTaskStateMutation(\n  $input: UpdateTaskInput!\n) {\n  updateTask(input: $input) {\n    task {\n      id\n      state\n      timeEstimate\n      version\n    }\n  }\n}\n"
+    "text": "mutation MitigationViewUpdateTaskStateMutation(\n  $input: UpdateTaskInput!\n) {\n  updateTask(input: $input) {\n    task {\n      id\n      state\n      timeEstimate\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "81dca6c475859526370ef60b4757428b";
+(node as any).hash = "7ab07c94be8f56a93d39178828d85823";
 
 export default node;

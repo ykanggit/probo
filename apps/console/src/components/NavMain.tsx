@@ -1,6 +1,12 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import {
+  ChevronRight,
+  ClipboardList,
+  ListCheck,
+  NotebookTabs,
+  type LucideIcon,
+} from "lucide-react";
 import { Link, useLocation, useParams } from "react-router";
 
 import {
@@ -138,8 +144,14 @@ export function NavMain() {
 }
 
 function getNavItems(organizationId?: string): NavItem[] {
-  // Always return the same structure, but with or without URLs depending on whether an organization is selected
   return [
+    {
+      title: "Mitigations",
+      icon: ClipboardList,
+      url: organizationId
+        ? `/organizations/${organizationId}/mitigations`
+        : undefined,
+    },
     {
       title: "Frameworks",
       url: organizationId

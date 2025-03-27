@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<acf83fd1c5826a38f85912ed91e79422>>
+ * @generated SignedSource<<c176425ad01ae9a330d0b8217a54841f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -25,7 +25,6 @@ export type MitigationViewAssignTaskMutation$data = {
         readonly primaryEmailAddress: string;
       } | null | undefined;
       readonly id: string;
-      readonly version: number;
     };
   };
 };
@@ -73,13 +72,6 @@ v2 = [
         "plural": false,
         "selections": [
           (v1/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "version",
-            "storageKey": null
-          },
           {
             "alias": null,
             "args": null,
@@ -131,16 +123,16 @@ return {
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "b336b45b0dad20968af93b52cd0aac48",
+    "cacheID": "c01a2f758aea8268b73365c426b7c08a",
     "id": null,
     "metadata": {},
     "name": "MitigationViewAssignTaskMutation",
     "operationKind": "mutation",
-    "text": "mutation MitigationViewAssignTaskMutation(\n  $input: AssignTaskInput!\n) {\n  assignTask(input: $input) {\n    task {\n      id\n      version\n      assignedTo {\n        id\n        fullName\n        primaryEmailAddress\n      }\n    }\n  }\n}\n"
+    "text": "mutation MitigationViewAssignTaskMutation(\n  $input: AssignTaskInput!\n) {\n  assignTask(input: $input) {\n    task {\n      id\n      assignedTo {\n        id\n        fullName\n        primaryEmailAddress\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "6446830361465b47f185c50b2886a422";
+(node as any).hash = "2b01502cb830a0d914553e01ceb2445f";
 
 export default node;

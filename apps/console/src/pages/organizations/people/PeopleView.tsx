@@ -37,7 +37,6 @@ const peopleViewQuery = graphql`
         kind
         createdAt
         updatedAt
-        version
       }
     }
   }
@@ -53,7 +52,6 @@ const updatePeopleMutation = graphql`
         additionalEmailAddresses
         kind
         updatedAt
-        version
       }
     }
   }
@@ -114,7 +112,6 @@ function PeopleViewContent({
       variables: {
         input: {
           id: data.node.id,
-          expectedVersion: data.node.version,
           ...formData,
         },
       },
@@ -144,7 +141,7 @@ function PeopleViewContent({
         }
       },
     });
-  }, [commit, data.node.id, data.node.version, formData, loadQuery, toast]);
+  }, [commit, data.node.id, formData, loadQuery, toast]);
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
     setFormData((prev) => ({

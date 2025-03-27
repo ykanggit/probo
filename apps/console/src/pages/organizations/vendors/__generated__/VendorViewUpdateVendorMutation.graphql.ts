@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8799e334baf7ee70b0a03519f6da8f97>>
+ * @generated SignedSource<<7568e87d53b6e76d1db4e3029430f118>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,7 +13,6 @@ export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
 export type ServiceCriticality = "HIGH" | "LOW" | "MEDIUM";
 export type UpdateVendorInput = {
   description?: string | null | undefined;
-  expectedVersion: number;
   id: string;
   name?: string | null | undefined;
   privacyPolicyUrl?: string | null | undefined;
@@ -41,7 +40,6 @@ export type VendorViewUpdateVendorMutation$data = {
       readonly statusPageUrl: string | null | undefined;
       readonly termsOfServiceUrl: string | null | undefined;
       readonly updatedAt: string;
-      readonly version: number;
     };
   };
 };
@@ -157,13 +155,6 @@ v1 = [
             "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "version",
-            "storageKey": null
           }
         ],
         "storageKey": null
@@ -190,16 +181,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "d6de753f4ecc8f59921e246e178bf8a0",
+    "cacheID": "1a49efe0fe5e3da519e1b15a8f81cc1e",
     "id": null,
     "metadata": {},
     "name": "VendorViewUpdateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      updatedAt\n      version\n    }\n  }\n}\n"
+    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "836cf8657449473503596456b8deb873";
+(node as any).hash = "15ffa38b13259f9c7c6511aa72d07247";
 
 export default node;

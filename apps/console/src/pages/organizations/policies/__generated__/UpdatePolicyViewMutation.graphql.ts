@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9a97197f1f0eec8c00d0a58e0b07e8bc>>
+ * @generated SignedSource<<efc33f8979f142c09b65b2bd1d6e06be>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,7 +12,6 @@ import { ConcreteRequest } from 'relay-runtime';
 export type PolicyStatus = "ACTIVE" | "DRAFT";
 export type UpdatePolicyInput = {
   content?: string | null | undefined;
-  expectedVersion: number;
   id: string;
   name?: string | null | undefined;
   ownerId?: string | null | undefined;
@@ -34,7 +33,6 @@ export type UpdatePolicyViewMutation$data = {
       };
       readonly reviewDate: string | null | undefined;
       readonly status: PolicyStatus;
-      readonly version: number;
     };
   };
 };
@@ -107,13 +105,6 @@ v2 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "version",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
             "name": "reviewDate",
             "storageKey": null
           },
@@ -161,16 +152,16 @@ return {
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "1ba586009eaf6e79dd2ab5862856cc63",
+    "cacheID": "aae664c7d961ad4e17c8e37464a34865",
     "id": null,
     "metadata": {},
     "name": "UpdatePolicyViewMutation",
     "operationKind": "mutation",
-    "text": "mutation UpdatePolicyViewMutation(\n  $input: UpdatePolicyInput!\n) {\n  updatePolicy(input: $input) {\n    policy {\n      id\n      name\n      content\n      status\n      version\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
+    "text": "mutation UpdatePolicyViewMutation(\n  $input: UpdatePolicyInput!\n) {\n  updatePolicy(input: $input) {\n    policy {\n      id\n      name\n      content\n      status\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "47570dfcceba283c51a4ef2f88143d39";
+(node as any).hash = "d0f7b9d21b450416900ccb46439e2894";
 
 export default node;

@@ -52,6 +52,5 @@ func NewTask(t *coredata.Task) *Task {
 		TimeEstimate: t.TimeEstimate,
 		CreatedAt:    t.CreatedAt,
 		UpdatedAt:    t.UpdatedAt,
-		Version:      t.Version,
 	}
 }

@@ -52,6 +52,5 @@ func NewPeople(p *coredata.People) *People {
 		Kind:                     p.Kind,
 		CreatedAt:                p.CreatedAt,
 		UpdatedAt:                p.UpdatedAt,
-		Version:                  p.Version,
 	}
 }

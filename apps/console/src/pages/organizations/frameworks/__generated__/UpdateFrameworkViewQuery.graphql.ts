@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<08d71ea16ac38e11d5b1ce3fb11bcaf3>>
+ * @generated SignedSource<<f6c5cb8b7001a4cee689302191d06ad9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,7 +17,6 @@ export type UpdateFrameworkViewQuery$data = {
     readonly description?: string;
     readonly id?: string;
     readonly name?: string;
-    readonly version?: number;
   };
 };
 export type UpdateFrameworkViewQuery = {
@@ -60,13 +59,6 @@ v4 = {
   "kind": "ScalarField",
   "name": "description",
   "storageKey": null
-},
-v5 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "version",
-  "storageKey": null
 };
 return {
   "fragment": {
@@ -88,8 +80,7 @@ return {
             "selections": [
               (v2/*: any*/),
               (v3/*: any*/),
-              (v4/*: any*/),
-              (v5/*: any*/)
+              (v4/*: any*/)
             ],
             "type": "Framework",
             "abstractKey": null
@@ -127,8 +118,7 @@ return {
             "kind": "InlineFragment",
             "selections": [
               (v3/*: any*/),
-              (v4/*: any*/),
-              (v5/*: any*/)
+              (v4/*: any*/)
             ],
             "type": "Framework",
             "abstractKey": null
@@ -139,16 +129,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "180cbef2756c525af017ca6996a7c2d6",
+    "cacheID": "5c423e61373989c4576989cb6c732547",
     "id": null,
     "metadata": {},
     "name": "UpdateFrameworkViewQuery",
     "operationKind": "query",
-    "text": "query UpdateFrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    ... on Framework {\n      id\n      name\n      description\n      version\n    }\n    id\n  }\n}\n"
+    "text": "query UpdateFrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    ... on Framework {\n      id\n      name\n      description\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d644d01f1d8a31b6c87c7f6360996796";
+(node as any).hash = "416b7f0dbf33cbfe39578fc3243bf423";
 
 export default node;

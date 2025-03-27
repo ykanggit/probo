@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<207a779cf8cbf3e42191be9825d4b653>>
+ * @generated SignedSource<<e7d3adf5f8472b181a64cfa98964984c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -22,7 +22,6 @@ export type PeopleViewQuery$data = {
     readonly kind?: PeopleKind;
     readonly primaryEmailAddress?: string;
     readonly updatedAt?: string;
-    readonly version?: number;
   };
 };
 export type PeopleViewQuery = {
@@ -93,13 +92,6 @@ v8 = {
   "kind": "ScalarField",
   "name": "updatedAt",
   "storageKey": null
-},
-v9 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "version",
-  "storageKey": null
 };
 return {
   "fragment": {
@@ -125,8 +117,7 @@ return {
               (v5/*: any*/),
               (v6/*: any*/),
               (v7/*: any*/),
-              (v8/*: any*/),
-              (v9/*: any*/)
+              (v8/*: any*/)
             ],
             "type": "People",
             "abstractKey": null
@@ -168,8 +159,7 @@ return {
               (v5/*: any*/),
               (v6/*: any*/),
               (v7/*: any*/),
-              (v8/*: any*/),
-              (v9/*: any*/)
+              (v8/*: any*/)
             ],
             "type": "People",
             "abstractKey": null
@@ -180,16 +170,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "c392876240212ba16428ae5edb843d47",
+    "cacheID": "fba00a5764659b366e4e11829d75854d",
     "id": null,
     "metadata": {},
     "name": "PeopleViewQuery",
     "operationKind": "query",
-    "text": "query PeopleViewQuery(\n  $peopleId: ID!\n) {\n  node(id: $peopleId) {\n    __typename\n    ... on People {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      createdAt\n      updatedAt\n      version\n    }\n    id\n  }\n}\n"
+    "text": "query PeopleViewQuery(\n  $peopleId: ID!\n) {\n  node(id: $peopleId) {\n    __typename\n    ... on People {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "4fc97d6cd7fc4590b7be7b5a79ae7ab0";
+(node as any).hash = "b7652de1ad8de6028f493255221f6ce5";
 
 export default node;

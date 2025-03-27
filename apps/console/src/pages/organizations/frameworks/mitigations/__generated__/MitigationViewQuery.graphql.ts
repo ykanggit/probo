@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d54298db57548f693ed2ca2418c9128c>>
+ * @generated SignedSource<<5baf9229b2f520bcfa43960bd6af05e0>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -54,11 +54,9 @@ export type MitigationViewQuery$data = {
           readonly name: string;
           readonly state: TaskState;
           readonly timeEstimate: any | null | undefined;
-          readonly version: number;
         };
       }>;
     };
-    readonly version?: number;
   };
 };
 export type MitigationViewQuery = {
@@ -127,17 +125,10 @@ v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "version",
-  "storageKey": null
-},
-v9 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
   "name": "timeEstimate",
   "storageKey": null
 },
-v10 = {
+v9 = {
   "alias": null,
   "args": null,
   "concreteType": "People",
@@ -163,21 +154,21 @@ v10 = {
   ],
   "storageKey": null
 },
-v11 = {
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v12 = {
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "cursor",
   "storageKey": null
 },
-v13 = {
+v12 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -202,7 +193,7 @@ v13 = {
   ],
   "storageKey": null
 },
-v14 = {
+v13 = {
   "kind": "ClientExtension",
   "selections": [
     {
@@ -214,7 +205,7 @@ v14 = {
     }
   ]
 },
-v15 = [
+v14 = [
   {
     "alias": null,
     "args": null,
@@ -275,25 +266,25 @@ v15 = [
             "name": "createdAt",
             "storageKey": null
           },
-          (v11/*: any*/)
+          (v10/*: any*/)
         ],
         "storageKey": null
       },
-      (v12/*: any*/)
+      (v11/*: any*/)
     ],
     "storageKey": null
   },
-  (v13/*: any*/),
-  (v14/*: any*/)
+  (v12/*: any*/),
+  (v13/*: any*/)
 ],
-v16 = [
+v15 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 100
   }
 ],
-v17 = [
+v16 = [
   {
     "kind": "Literal",
     "name": "first",
@@ -324,7 +315,6 @@ return {
               (v5/*: any*/),
               (v6/*: any*/),
               (v7/*: any*/),
-              (v8/*: any*/),
               {
                 "alias": "tasks",
                 "args": null,
@@ -353,9 +343,8 @@ return {
                           (v3/*: any*/),
                           (v4/*: any*/),
                           (v5/*: any*/),
-                          (v9/*: any*/),
                           (v8/*: any*/),
-                          (v10/*: any*/),
+                          (v9/*: any*/),
                           {
                             "alias": "evidences",
                             "args": null,
@@ -363,19 +352,19 @@ return {
                             "kind": "LinkedField",
                             "name": "__MitigationView_evidences_connection",
                             "plural": false,
-                            "selections": (v15/*: any*/),
+                            "selections": (v14/*: any*/),
                             "storageKey": null
                           },
-                          (v11/*: any*/)
+                          (v10/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v12/*: any*/)
+                      (v11/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v13/*: any*/),
-                  (v14/*: any*/)
+                  (v12/*: any*/),
+                  (v13/*: any*/)
                 ],
                 "storageKey": null
               }
@@ -404,7 +393,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v11/*: any*/),
+          (v10/*: any*/),
           (v2/*: any*/),
           {
             "kind": "InlineFragment",
@@ -414,10 +403,9 @@ return {
               (v5/*: any*/),
               (v6/*: any*/),
               (v7/*: any*/),
-              (v8/*: any*/),
               {
                 "alias": null,
-                "args": (v16/*: any*/),
+                "args": (v15/*: any*/),
                 "concreteType": "TaskConnection",
                 "kind": "LinkedField",
                 "name": "tasks",
@@ -443,44 +431,43 @@ return {
                           (v3/*: any*/),
                           (v4/*: any*/),
                           (v5/*: any*/),
-                          (v9/*: any*/),
                           (v8/*: any*/),
-                          (v10/*: any*/),
+                          (v9/*: any*/),
                           {
                             "alias": null,
-                            "args": (v17/*: any*/),
+                            "args": (v16/*: any*/),
                             "concreteType": "EvidenceConnection",
                             "kind": "LinkedField",
                             "name": "evidences",
                             "plural": false,
-                            "selections": (v15/*: any*/),
+                            "selections": (v14/*: any*/),
                             "storageKey": "evidences(first:50)"
                           },
                           {
                             "alias": null,
-                            "args": (v17/*: any*/),
+                            "args": (v16/*: any*/),
                             "filters": null,
                             "handle": "connection",
                             "key": "MitigationView_evidences",
                             "kind": "LinkedHandle",
                             "name": "evidences"
                           },
-                          (v11/*: any*/)
+                          (v10/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v12/*: any*/)
+                      (v11/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v13/*: any*/),
-                  (v14/*: any*/)
+                  (v12/*: any*/),
+                  (v13/*: any*/)
                 ],
                 "storageKey": "tasks(first:100)"
               },
               {
                 "alias": null,
-                "args": (v16/*: any*/),
+                "args": (v15/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "MitigationView_tasks",
@@ -497,7 +484,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "8e9c3cef43daff0bdbfff4e33d7c70ad",
+    "cacheID": "27e466aa3f7c929738fc108627fd5aa8",
     "id": null,
     "metadata": {
       "connection": [
@@ -520,11 +507,11 @@ return {
     },
     "name": "MitigationViewQuery",
     "operationKind": "query",
-    "text": "query MitigationViewQuery(\n  $mitigationId: ID!\n) {\n  mitigation: node(id: $mitigationId) {\n    __typename\n    id\n    ... on Mitigation {\n      name\n      description\n      state\n      importance\n      category\n      version\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            version\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  type\n                  url\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query MitigationViewQuery(\n  $mitigationId: ID!\n) {\n  mitigation: node(id: $mitigationId) {\n    __typename\n    id\n    ... on Mitigation {\n      name\n      description\n      state\n      importance\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  type\n                  url\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "f0baeab367be46290f2f15df836ed153";
+(node as any).hash = "c26df14ee0f01a46868fdd73baa76638";
 
 export default node;

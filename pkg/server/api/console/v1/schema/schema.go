@@ -65,6 +65,25 @@ type ComplexityRoot struct {
 		Success func(childComplexity int) int
 	}
 
+	Control struct {
+		CreatedAt   func(childComplexity int) int
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Name        func(childComplexity int) int
+		ReferenceID func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
+	}
+
+	ControlConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	ControlEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	CreateFrameworkPayload struct {
 		FrameworkEdge func(childComplexity int) int
 	}
@@ -95,6 +114,10 @@ type ComplexityRoot struct {
 
 	DeleteEvidencePayload struct {
 		DeletedEvidenceID func(childComplexity int) int
+	}
+
+	DeleteFrameworkPayload struct {
+		DeletedFrameworkID func(childComplexity int) int
 	}
 
 	DeleteOrganizationPayload struct {
@@ -142,13 +165,12 @@ type ComplexityRoot struct {
 	}
 
 	Framework struct {
+		Controls    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) int
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
-		Mitigations func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) int
 		Name        func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
-		Version     func(childComplexity int) int
 	}
 
 	FrameworkConnection struct {
@@ -179,7 +201,6 @@ type ComplexityRoot struct {
 		State       func(childComplexity int) int
 		Tasks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) int
 		UpdatedAt   func(childComplexity int) int
-		Version     func(childComplexity int) int
 	}
 
 	MitigationConnection struct {
@@ -203,6 +224,7 @@ type ComplexityRoot struct {
 		CreateTask         func(childComplexity int, input types.CreateTaskInput) int
 		CreateVendor       func(childComplexity int, input types.CreateVendorInput) int
 		DeleteEvidence     func(childComplexity int, input types.DeleteEvidenceInput) int
+		DeleteFramework    func(childComplexity int, input types.DeleteFrameworkInput) int
 		DeleteOrganization func(childComplexity int, input types.DeleteOrganizationInput) int
 		DeletePeople       func(childComplexity int, input types.DeletePeopleInput) int
 		DeletePolicy       func(childComplexity int, input types.DeletePolicyInput) int
@@ -223,16 +245,17 @@ type ComplexityRoot struct {
 	}
 
 	Organization struct {
-		CreatedAt  func(childComplexity int) int
-		Frameworks func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) int
-		ID         func(childComplexity int) int
-		LogoURL    func(childComplexity int) int
-		Name       func(childComplexity int) int
-		Peoples    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) int
-		Policies   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) int
-		UpdatedAt  func(childComplexity int) int
-		Users      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrderBy) int
-		Vendors    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) int
+		CreatedAt   func(childComplexity int) int
+		Frameworks  func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) int
+		ID          func(childComplexity int) int
+		LogoURL     func(childComplexity int) int
+		Mitigations func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) int
+		Name        func(childComplexity int) int
+		Peoples     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) int
+		Policies    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) int
+		UpdatedAt   func(childComplexity int) int
+		Users       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrderBy) int
+		Vendors     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) int
 	}
 
 	OrganizationConnection struct {
@@ -260,7 +283,6 @@ type ComplexityRoot struct {
 		Kind                     func(childComplexity int) int
 		PrimaryEmailAddress      func(childComplexity int) int
 		UpdatedAt                func(childComplexity int) int
-		Version                  func(childComplexity int) int
 	}
 
 	PeopleConnection struct {
@@ -282,7 +304,6 @@ type ComplexityRoot struct {
 		ReviewDate func(childComplexity int) int
 		Status     func(childComplexity int) int
 		UpdatedAt  func(childComplexity int) int
-		Version    func(childComplexity int) int
 	}
 
 	PolicyConnection struct {
@@ -319,7 +340,6 @@ type ComplexityRoot struct {
 		State        func(childComplexity int) int
 		TimeEstimate func(childComplexity int) int
 		UpdatedAt    func(childComplexity int) int
-		Version      func(childComplexity int) int
 	}
 
 	TaskConnection struct {
@@ -399,7 +419,6 @@ type ComplexityRoot struct {
 		StatusPageURL        func(childComplexity int) int
 		TermsOfServiceURL    func(childComplexity int) int
 		UpdatedAt            func(childComplexity int) int
-		Version              func(childComplexity int) int
 	}
 
 	VendorConnection struct {
@@ -423,7 +442,7 @@ type EvidenceResolver interface {
 	FileURL(ctx context.Context, obj *types.Evidence) (*string, error)
 }
 type FrameworkResolver interface {
-	Mitigations(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error)
+	Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
 }
 type MitigationResolver interface {
 	Tasks(ctx context.Context, obj *types.Mitigation, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
@@ -446,6 +465,7 @@ type MutationResolver interface {
 	CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error)
 	UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error)
 	ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error)
+	DeleteFramework(ctx context.Context, input types.DeleteFrameworkInput) (*types.DeleteFrameworkPayload, error)
 	CreateMitigation(ctx context.Context, input types.CreateMitigationInput) (*types.CreateMitigationPayload, error)
 	UpdateMitigation(ctx context.Context, input types.UpdateMitigationInput) (*types.UpdateMitigationPayload, error)
 	UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error)
@@ -464,6 +484,7 @@ type OrganizationResolver interface {
 	Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error)
 	Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) (*types.PeopleConnection, error)
 	Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error)
+	Mitigations(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error)
 }
 type PolicyResolver interface {
 	Owner(ctx context.Context, obj *types.Policy) (*types.People, error)
@@ -512,6 +533,76 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ConfirmEmailPayload.Success(childComplexity), true
+
+	case "Control.createdAt":
+		if e.complexity.Control.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Control.CreatedAt(childComplexity), true
+
+	case "Control.description":
+		if e.complexity.Control.Description == nil {
+			break
+		}
+
+		return e.complexity.Control.Description(childComplexity), true
+
+	case "Control.id":
+		if e.complexity.Control.ID == nil {
+			break
+		}
+
+		return e.complexity.Control.ID(childComplexity), true
+
+	case "Control.name":
+		if e.complexity.Control.Name == nil {
+			break
+		}
+
+		return e.complexity.Control.Name(childComplexity), true
+
+	case "Control.referenceId":
+		if e.complexity.Control.ReferenceID == nil {
+			break
+		}
+
+		return e.complexity.Control.ReferenceID(childComplexity), true
+
+	case "Control.updatedAt":
+		if e.complexity.Control.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Control.UpdatedAt(childComplexity), true
+
+	case "ControlConnection.edges":
+		if e.complexity.ControlConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.ControlConnection.Edges(childComplexity), true
+
+	case "ControlConnection.pageInfo":
+		if e.complexity.ControlConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.ControlConnection.PageInfo(childComplexity), true
+
+	case "ControlEdge.cursor":
+		if e.complexity.ControlEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.ControlEdge.Cursor(childComplexity), true
+
+	case "ControlEdge.node":
+		if e.complexity.ControlEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.ControlEdge.Node(childComplexity), true
 
 	case "CreateFrameworkPayload.frameworkEdge":
 		if e.complexity.CreateFrameworkPayload.FrameworkEdge == nil {
@@ -568,6 +659,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeleteEvidencePayload.DeletedEvidenceID(childComplexity), true
+
+	case "DeleteFrameworkPayload.deletedFrameworkId":
+		if e.complexity.DeleteFrameworkPayload.DeletedFrameworkID == nil {
+			break
+		}
+
+		return e.complexity.DeleteFrameworkPayload.DeletedFrameworkID(childComplexity), true
 
 	case "DeleteOrganizationPayload.deletedOrganizationId":
 		if e.complexity.DeleteOrganizationPayload.DeletedOrganizationID == nil {
@@ -709,6 +807,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.EvidenceEdge.Node(childComplexity), true
 
+	case "Framework.controls":
+		if e.complexity.Framework.Controls == nil {
+			break
+		}
+
+		args, err := ec.field_Framework_controls_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Framework.Controls(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.ControlOrderBy)), true
+
 	case "Framework.createdAt":
 		if e.complexity.Framework.CreatedAt == nil {
 			break
@@ -730,18 +840,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Framework.ID(childComplexity), true
 
-	case "Framework.mitigations":
-		if e.complexity.Framework.Mitigations == nil {
-			break
-		}
-
-		args, err := ec.field_Framework_mitigations_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Framework.Mitigations(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.MitigationOrderBy)), true
-
 	case "Framework.name":
 		if e.complexity.Framework.Name == nil {
 			break
@@ -755,13 +853,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Framework.UpdatedAt(childComplexity), true
-
-	case "Framework.version":
-		if e.complexity.Framework.Version == nil {
-			break
-		}
-
-		return e.complexity.Framework.Version(childComplexity), true
 
 	case "FrameworkConnection.edges":
 		if e.complexity.FrameworkConnection.Edges == nil {
@@ -872,13 +963,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mitigation.UpdatedAt(childComplexity), true
-
-	case "Mitigation.version":
-		if e.complexity.Mitigation.Version == nil {
-			break
-		}
-
-		return e.complexity.Mitigation.Version(childComplexity), true
 
 	case "MitigationConnection.edges":
 		if e.complexity.MitigationConnection.Edges == nil {
@@ -1027,6 +1111,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteEvidence(childComplexity, args["input"].(types.DeleteEvidenceInput)), true
+
+	case "Mutation.deleteFramework":
+		if e.complexity.Mutation.DeleteFramework == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteFramework_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteFramework(childComplexity, args["input"].(types.DeleteFrameworkInput)), true
 
 	case "Mutation.deleteOrganization":
 		if e.complexity.Mutation.DeleteOrganization == nil {
@@ -1265,6 +1361,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Organization.LogoURL(childComplexity), true
 
+	case "Organization.mitigations":
+		if e.complexity.Organization.Mitigations == nil {
+			break
+		}
+
+		args, err := ec.field_Organization_mitigations_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Organization.Mitigations(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.MitigationOrderBy)), true
+
 	case "Organization.name":
 		if e.complexity.Organization.Name == nil {
 			break
@@ -1432,13 +1540,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.People.UpdatedAt(childComplexity), true
 
-	case "People.version":
-		if e.complexity.People.Version == nil {
-			break
-		}
-
-		return e.complexity.People.Version(childComplexity), true
-
 	case "PeopleConnection.edges":
 		if e.complexity.PeopleConnection.Edges == nil {
 			break
@@ -1522,13 +1623,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Policy.UpdatedAt(childComplexity), true
-
-	case "Policy.version":
-		if e.complexity.Policy.Version == nil {
-			break
-		}
-
-		return e.complexity.Policy.Version(childComplexity), true
 
 	case "PolicyConnection.edges":
 		if e.complexity.PolicyConnection.Edges == nil {
@@ -1665,13 +1759,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Task.UpdatedAt(childComplexity), true
-
-	case "Task.version":
-		if e.complexity.Task.Version == nil {
-			break
-		}
-
-		return e.complexity.Task.Version(childComplexity), true
 
 	case "TaskConnection.edges":
 		if e.complexity.TaskConnection.Edges == nil {
@@ -1911,13 +1998,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Vendor.UpdatedAt(childComplexity), true
 
-	case "Vendor.version":
-		if e.complexity.Vendor.Version == nil {
-			break
-		}
-
-		return e.complexity.Vendor.Version(childComplexity), true
-
 	case "VendorConnection.edges":
 		if e.complexity.VendorConnection.Edges == nil {
 			break
@@ -1982,6 +2062,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAssignTaskInput,
 		ec.unmarshalInputConfirmEmailInput,
+		ec.unmarshalInputControlOrder,
 		ec.unmarshalInputCreateFrameworkInput,
 		ec.unmarshalInputCreateMitigationInput,
 		ec.unmarshalInputCreateOrganizationInput,
@@ -1990,6 +2071,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateTaskInput,
 		ec.unmarshalInputCreateVendorInput,
 		ec.unmarshalInputDeleteEvidenceInput,
+		ec.unmarshalInputDeleteFrameworkInput,
 		ec.unmarshalInputDeleteOrganizationInput,
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeletePolicyInput,
@@ -2270,6 +2352,14 @@ type Organization implements Node {
     orderBy: PolicyOrder
   ): PolicyConnection! @goField(forceResolver: true)
 
+  mitigations(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: MitigationOrder
+  ): MitigationConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -2301,7 +2391,18 @@ enum FrameworkOrderField
   @goModel(
     model: "github.com/getprobo/probo/pkg/coredata.FrameworkOrderField"
   ) {
-  NAME
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.FrameworkOrderFieldCreatedAt"
+    )
+}
+
+enum ControlOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ControlOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ControlOrderFieldCreatedAt"
+    )
 }
 
 enum MitigationOrderField
@@ -2348,6 +2449,14 @@ input FrameworkOrder
   ) {
   direction: OrderDirection!
   field: FrameworkOrderField!
+}
+
+input ControlOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.ControlOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: ControlOrderField!
 }
 
 input MitigationOrder
@@ -2400,7 +2509,6 @@ type People implements Node {
   kind: PeopleKind!
   createdAt: Datetime!
   updatedAt: Datetime!
-  version: Int!
 }
 
 type VendorConnection {
@@ -2426,7 +2534,6 @@ type Vendor implements Node {
   privacyPolicyUrl: String
   createdAt: Datetime!
   updatedAt: Datetime!
-  version: Int!
 }
 
 type FrameworkConnection {
@@ -2441,19 +2548,36 @@ type FrameworkEdge {
 
 type Framework implements Node {
   id: ID!
-  version: Int!
-
   name: String!
   description: String!
 
-  mitigations(
+  controls(
     first: Int
     after: CursorKey
     last: Int
     before: CursorKey
-    orderBy: MitigationOrder
-  ): MitigationConnection! @goField(forceResolver: true)
+    orderBy: ControlOrder
+  ): ControlConnection! @goField(forceResolver: true)
 
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type ControlConnection {
+  edges: [ControlEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ControlEdge {
+  cursor: CursorKey!
+  node: Control!
+}
+
+type Control implements Node {
+  id: ID!
+  referenceId: String!
+  name: String!
+  description: String!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -2470,7 +2594,6 @@ type MitigationEdge {
 
 type Mitigation implements Node {
   id: ID!
-  version: Int!
   category: String!
   name: String!
   description: String!
@@ -2501,7 +2624,6 @@ type TaskEdge {
 
 type Task implements Node {
   id: ID!
-  version: Int!
   name: String!
   description: String!
   state: TaskState!
@@ -2621,6 +2743,7 @@ type Mutation {
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
   importFramework(input: ImportFrameworkInput!): ImportFrameworkPayload!
+  deleteFramework(input: DeleteFrameworkInput!): DeleteFrameworkPayload!
 
   createMitigation(input: CreateMitigationInput!): CreateMitigationPayload!
   updateMitigation(input: UpdateMitigationInput!): UpdateMitigationPayload!
@@ -2668,7 +2791,6 @@ input CreatePeopleInput {
 
 input UpdatePeopleInput {
   id: ID!
-  expectedVersion: Int!
   fullName: String
   primaryEmailAddress: String
   additionalEmailAddresses: [String!]
@@ -2703,7 +2825,6 @@ enum RiskTier
 
 input UpdateVendorInput {
   id: ID!
-  expectedVersion: Int!
   name: String
   description: String
   serviceStartAt: Datetime
@@ -2777,6 +2898,14 @@ type DeleteTaskPayload {
   deletedTaskId: ID!
 }
 
+input DeleteFrameworkInput {
+  frameworkId: ID!
+}
+
+type DeleteFrameworkPayload {
+  deletedFrameworkId: ID!
+}
+
 input CreateFrameworkInput {
   organizationId: ID!
   name: String!
@@ -2785,7 +2914,6 @@ input CreateFrameworkInput {
 
 input UpdateFrameworkInput {
   id: ID!
-  expectedVersion: Int!
   name: String
   description: String
 }
@@ -2795,7 +2923,7 @@ type CreateFrameworkPayload {
 }
 
 input CreateMitigationInput {
-  frameworkId: ID!
+  organizationId: ID!
   name: String!
   description: String!
   category: String!
@@ -2820,7 +2948,6 @@ type UpdatePeoplePayload {
 
 input UpdateMitigationInput {
   id: ID!
-  expectedVersion: Int!
   name: String
   description: String
   category: String
@@ -2872,7 +2999,6 @@ input CreatePolicyInput {
 
 input UpdatePolicyInput {
   id: ID!
-  expectedVersion: Int!
   name: String
   content: String
   status: PolicyStatus
@@ -2898,7 +3024,6 @@ type DeletePolicyPayload {
 
 type Policy implements Node {
   id: ID!
-  version: Int!
   name: String!
   status: PolicyStatus!
   content: String!
@@ -2920,7 +3045,6 @@ type PolicyEdge {
 
 input UpdateTaskInput {
   taskId: ID!
-  expectedVersion: Int!
   name: String
   description: String
   state: TaskState
@@ -3018,37 +3142,37 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Framework_mitigations_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Framework_controls_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Framework_mitigations_argsFirst(ctx, rawArgs)
+	arg0, err := ec.field_Framework_controls_argsFirst(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["first"] = arg0
-	arg1, err := ec.field_Framework_mitigations_argsAfter(ctx, rawArgs)
+	arg1, err := ec.field_Framework_controls_argsAfter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["after"] = arg1
-	arg2, err := ec.field_Framework_mitigations_argsLast(ctx, rawArgs)
+	arg2, err := ec.field_Framework_controls_argsLast(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["last"] = arg2
-	arg3, err := ec.field_Framework_mitigations_argsBefore(ctx, rawArgs)
+	arg3, err := ec.field_Framework_controls_argsBefore(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["before"] = arg3
-	arg4, err := ec.field_Framework_mitigations_argsOrderBy(ctx, rawArgs)
+	arg4, err := ec.field_Framework_controls_argsOrderBy(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["orderBy"] = arg4
 	return args, nil
 }
-func (ec *executionContext) field_Framework_mitigations_argsFirst(
+func (ec *executionContext) field_Framework_controls_argsFirst(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*int, error) {
@@ -3061,7 +3185,7 @@ func (ec *executionContext) field_Framework_mitigations_argsFirst(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Framework_mitigations_argsAfter(
+func (ec *executionContext) field_Framework_controls_argsAfter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*page.CursorKey, error) {
@@ -3074,7 +3198,7 @@ func (ec *executionContext) field_Framework_mitigations_argsAfter(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Framework_mitigations_argsLast(
+func (ec *executionContext) field_Framework_controls_argsLast(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*int, error) {
@@ -3087,7 +3211,7 @@ func (ec *executionContext) field_Framework_mitigations_argsLast(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Framework_mitigations_argsBefore(
+func (ec *executionContext) field_Framework_controls_argsBefore(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*page.CursorKey, error) {
@@ -3100,16 +3224,16 @@ func (ec *executionContext) field_Framework_mitigations_argsBefore(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Framework_mitigations_argsOrderBy(
+func (ec *executionContext) field_Framework_controls_argsOrderBy(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*types.MitigationOrderBy, error) {
+) (*types.ControlOrderBy, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
 	if tmp, ok := rawArgs["orderBy"]; ok {
-		return ec.unmarshalOMitigationOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMitigationOrderBy(ctx, tmp)
+		return ec.unmarshalOControlOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlOrderBy(ctx, tmp)
 	}
 
-	var zeroVal *types.MitigationOrderBy
+	var zeroVal *types.ControlOrderBy
 	return zeroVal, nil
 }
 
@@ -3435,6 +3559,29 @@ func (ec *executionContext) field_Mutation_deleteEvidence_argsInput(
 	}
 
 	var zeroVal types.DeleteEvidenceInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteFramework_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteFramework_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteFramework_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteFrameworkInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteFrameworkInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteFrameworkInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteFrameworkInput
 	return zeroVal, nil
 }
 
@@ -3921,6 +4068,101 @@ func (ec *executionContext) field_Organization_frameworks_argsOrderBy(
 	}
 
 	var zeroVal *types.FrameworkOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_mitigations_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Organization_mitigations_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Organization_mitigations_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Organization_mitigations_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Organization_mitigations_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Organization_mitigations_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_Organization_mitigations_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_mitigations_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_mitigations_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_mitigations_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_mitigations_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.MitigationOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOMitigationOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMitigationOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.MitigationOrderBy
 	return zeroVal, nil
 }
 
@@ -4681,8 +4923,6 @@ func (ec *executionContext) fieldContext_AssignTaskPayload_task(_ context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Task_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Task_version(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
@@ -4745,6 +4985,476 @@ func (ec *executionContext) fieldContext_ConfirmEmailPayload_success(_ context.C
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Control_id(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Control_referenceId(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_referenceId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReferenceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_referenceId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Control_name(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Control_description(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Control_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Control_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.ControlConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.ControlEdge)
+	fc.Result = res
+	return ec.marshalNControlEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_ControlEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_ControlEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.ControlConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.ControlEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ControlEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.ControlEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Control)
+	fc.Result = res
+	return ec.marshalNControl2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControl(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Control_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Control_referenceId(ctx, field)
+			case "name":
+				return ec.fieldContext_Control_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Control_description(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Control_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Control_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Control", field.Name)
 		},
 	}
 	return fc, nil
@@ -5134,6 +5844,50 @@ func (ec *executionContext) _DeleteEvidencePayload_deletedEvidenceId(ctx context
 func (ec *executionContext) fieldContext_DeleteEvidencePayload_deletedEvidenceId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteEvidencePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteFrameworkPayload_deletedFrameworkId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteFrameworkPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteFrameworkPayload_deletedFrameworkId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedFrameworkID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteFrameworkPayload_deletedFrameworkId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteFrameworkPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -6102,50 +6856,6 @@ func (ec *executionContext) fieldContext_Framework_id(_ context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Framework_version(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Framework_version(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Version, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Framework_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Framework",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Framework_name(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Framework_name(ctx, field)
 	if err != nil {
@@ -6234,8 +6944,8 @@ func (ec *executionContext) fieldContext_Framework_description(_ context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Framework_mitigations(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Framework_mitigations(ctx, field)
+func (ec *executionContext) _Framework_controls(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Framework_controls(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6248,7 +6958,7 @@ func (ec *executionContext) _Framework_mitigations(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Framework().Mitigations(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.MitigationOrderBy))
+		return ec.resolvers.Framework().Controls(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.ControlOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6260,12 +6970,12 @@ func (ec *executionContext) _Framework_mitigations(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.MitigationConnection)
+	res := resTmp.(*types.ControlConnection)
 	fc.Result = res
-	return ec.marshalNMitigationConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMitigationConnection(ctx, field.Selections, res)
+	return ec.marshalNControlConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Framework_mitigations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Framework_controls(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Framework",
 		Field:      field,
@@ -6274,11 +6984,11 @@ func (ec *executionContext) fieldContext_Framework_mitigations(ctx context.Conte
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "edges":
-				return ec.fieldContext_MitigationConnection_edges(ctx, field)
+				return ec.fieldContext_ControlConnection_edges(ctx, field)
 			case "pageInfo":
-				return ec.fieldContext_MitigationConnection_pageInfo(ctx, field)
+				return ec.fieldContext_ControlConnection_pageInfo(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type MitigationConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ControlConnection", field.Name)
 		},
 	}
 	defer func() {
@@ -6288,7 +6998,7 @@ func (ec *executionContext) fieldContext_Framework_mitigations(ctx context.Conte
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Framework_mitigations_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Framework_controls_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6572,14 +7282,12 @@ func (ec *executionContext) fieldContext_FrameworkEdge_node(_ context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Framework_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Framework_version(ctx, field)
 			case "name":
 				return ec.fieldContext_Framework_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Framework_description(ctx, field)
-			case "mitigations":
-				return ec.fieldContext_Framework_mitigations(ctx, field)
+			case "controls":
+				return ec.fieldContext_Framework_controls(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Framework_createdAt(ctx, field)
 			case "updatedAt":
@@ -6724,50 +7432,6 @@ func (ec *executionContext) fieldContext_Mitigation_id(_ context.Context, field 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mitigation_version(ctx context.Context, field graphql.CollectedField, obj *types.Mitigation) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mitigation_version(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Version, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mitigation_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mitigation",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7331,8 +7995,6 @@ func (ec *executionContext) fieldContext_MitigationEdge_node(_ context.Context, 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Mitigation_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Mitigation_version(ctx, field)
 			case "category":
 				return ec.fieldContext_Mitigation_category(ctx, field)
 			case "name":
@@ -8353,6 +9015,65 @@ func (ec *executionContext) fieldContext_Mutation_importFramework(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_importFramework_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteFramework(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteFramework(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteFramework(rctx, fc.Args["input"].(types.DeleteFrameworkInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteFrameworkPayload)
+	fc.Result = res
+	return ec.marshalNDeleteFrameworkPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteFrameworkPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteFramework(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedFrameworkId":
+				return ec.fieldContext_DeleteFrameworkPayload_deletedFrameworkId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteFrameworkPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteFramework_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -9383,6 +10104,67 @@ func (ec *executionContext) fieldContext_Organization_policies(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Organization_mitigations(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_mitigations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Organization().Mitigations(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.MitigationOrderBy))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.MitigationConnection)
+	fc.Result = res
+	return ec.marshalNMitigationConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMitigationConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_mitigations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_MitigationConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_MitigationConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MitigationConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Organization_mitigations_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Organization_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Organization_createdAt(ctx, field)
 	if err != nil {
@@ -9674,6 +10456,8 @@ func (ec *executionContext) fieldContext_OrganizationEdge_node(_ context.Context
 				return ec.fieldContext_Organization_peoples(ctx, field)
 			case "policies":
 				return ec.fieldContext_Organization_policies(ctx, field)
+			case "mitigations":
+				return ec.fieldContext_Organization_mitigations(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Organization_createdAt(ctx, field)
 			case "updatedAt":
@@ -10163,50 +10947,6 @@ func (ec *executionContext) fieldContext_People_updatedAt(_ context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _People_version(ctx context.Context, field graphql.CollectedField, obj *types.People) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_People_version(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Version, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_People_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "People",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _PeopleConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.PeopleConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_PeopleConnection_edges(ctx, field)
 	if err != nil {
@@ -10408,8 +11148,6 @@ func (ec *executionContext) fieldContext_PeopleEdge_node(_ context.Context, fiel
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_People_updatedAt(ctx, field)
-			case "version":
-				return ec.fieldContext_People_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
 		},
@@ -10456,50 +11194,6 @@ func (ec *executionContext) fieldContext_Policy_id(_ context.Context, field grap
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Policy_version(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Policy_version(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Version, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Policy_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Policy",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -10731,8 +11425,6 @@ func (ec *executionContext) fieldContext_Policy_owner(_ context.Context, field g
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_People_updatedAt(ctx, field)
-			case "version":
-				return ec.fieldContext_People_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
 		},
@@ -11017,8 +11709,6 @@ func (ec *executionContext) fieldContext_PolicyEdge_node(_ context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Policy_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Policy_version(ctx, field)
 			case "name":
 				return ec.fieldContext_Policy_name(ctx, field)
 			case "status":
@@ -11454,50 +12144,6 @@ func (ec *executionContext) fieldContext_Task_id(_ context.Context, field graphq
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_version(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_version(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Version, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Task_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Task",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Task_name(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_name(ctx, field)
 	if err != nil {
@@ -11721,8 +12367,6 @@ func (ec *executionContext) fieldContext_Task_assignedTo(_ context.Context, fiel
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_People_updatedAt(ctx, field)
-			case "version":
-				return ec.fieldContext_People_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
 		},
@@ -12068,8 +12712,6 @@ func (ec *executionContext) fieldContext_TaskEdge_node(_ context.Context, field 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Task_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Task_version(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
@@ -12134,8 +12776,6 @@ func (ec *executionContext) fieldContext_UnassignTaskPayload_task(_ context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Task_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Task_version(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
@@ -12200,14 +12840,12 @@ func (ec *executionContext) fieldContext_UpdateFrameworkPayload_framework(_ cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Framework_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Framework_version(ctx, field)
 			case "name":
 				return ec.fieldContext_Framework_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Framework_description(ctx, field)
-			case "mitigations":
-				return ec.fieldContext_Framework_mitigations(ctx, field)
+			case "controls":
+				return ec.fieldContext_Framework_controls(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Framework_createdAt(ctx, field)
 			case "updatedAt":
@@ -12260,8 +12898,6 @@ func (ec *executionContext) fieldContext_UpdateMitigationPayload_mitigation(_ co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Mitigation_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Mitigation_version(ctx, field)
 			case "category":
 				return ec.fieldContext_Mitigation_category(ctx, field)
 			case "name":
@@ -12340,6 +12976,8 @@ func (ec *executionContext) fieldContext_UpdateOrganizationPayload_organization(
 				return ec.fieldContext_Organization_peoples(ctx, field)
 			case "policies":
 				return ec.fieldContext_Organization_policies(ctx, field)
+			case "mitigations":
+				return ec.fieldContext_Organization_mitigations(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Organization_createdAt(ctx, field)
 			case "updatedAt":
@@ -12404,8 +13042,6 @@ func (ec *executionContext) fieldContext_UpdatePeoplePayload_people(_ context.Co
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_People_updatedAt(ctx, field)
-			case "version":
-				return ec.fieldContext_People_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
 		},
@@ -12454,8 +13090,6 @@ func (ec *executionContext) fieldContext_UpdatePolicyPayload_policy(_ context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Policy_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Policy_version(ctx, field)
 			case "name":
 				return ec.fieldContext_Policy_name(ctx, field)
 			case "status":
@@ -12518,8 +13152,6 @@ func (ec *executionContext) fieldContext_UpdateTaskPayload_task(_ context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Task_id(ctx, field)
-			case "version":
-				return ec.fieldContext_Task_version(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
@@ -12606,8 +13238,6 @@ func (ec *executionContext) fieldContext_UpdateVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Vendor_updatedAt(ctx, field)
-			case "version":
-				return ec.fieldContext_Vendor_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
 		},
@@ -13605,50 +14235,6 @@ func (ec *executionContext) fieldContext_Vendor_updatedAt(_ context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Vendor_version(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Vendor_version(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Version, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Vendor_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vendor",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _VendorConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.VendorConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_VendorConnection_edges(ctx, field)
 	if err != nil {
@@ -13860,8 +14446,6 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Vendor_updatedAt(ctx, field)
-			case "version":
-				return ec.fieldContext_Vendor_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
 		},
@@ -16042,6 +16626,40 @@ func (ec *executionContext) unmarshalInputConfirmEmailInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputControlOrder(ctx context.Context, obj any) (types.ControlOrderBy, error) {
+	var it types.ControlOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNControlOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateFrameworkInput(ctx context.Context, obj any) (types.CreateFrameworkInput, error) {
 	var it types.CreateFrameworkInput
 	asMap := map[string]any{}
@@ -16090,20 +16708,20 @@ func (ec *executionContext) unmarshalInputCreateMitigationInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"frameworkId", "name", "description", "category", "importance"}
+	fieldsInOrder := [...]string{"organizationId", "name", "description", "category", "importance"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "frameworkId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("frameworkId"))
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
 			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.FrameworkID = data
+			it.OrganizationID = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -16448,6 +17066,33 @@ func (ec *executionContext) unmarshalInputDeleteEvidenceInput(ctx context.Contex
 				return it, err
 			}
 			it.EvidenceID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDeleteFrameworkInput(ctx context.Context, obj any) (types.DeleteFrameworkInput, error) {
+	var it types.DeleteFrameworkInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"frameworkId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "frameworkId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("frameworkId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FrameworkID = data
 		}
 	}
 
@@ -16970,7 +17615,7 @@ func (ec *executionContext) unmarshalInputUpdateFrameworkInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "expectedVersion", "name", "description"}
+	fieldsInOrder := [...]string{"id", "name", "description"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -16984,13 +17629,6 @@ func (ec *executionContext) unmarshalInputUpdateFrameworkInput(ctx context.Conte
 				return it, err
 			}
 			it.ID = data
-		case "expectedVersion":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expectedVersion"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ExpectedVersion = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -17018,7 +17656,7 @@ func (ec *executionContext) unmarshalInputUpdateMitigationInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "expectedVersion", "name", "description", "category", "state", "importance"}
+	fieldsInOrder := [...]string{"id", "name", "description", "category", "state", "importance"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -17032,13 +17670,6 @@ func (ec *executionContext) unmarshalInputUpdateMitigationInput(ctx context.Cont
 				return it, err
 			}
 			it.ID = data
-		case "expectedVersion":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expectedVersion"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ExpectedVersion = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -17128,7 +17759,7 @@ func (ec *executionContext) unmarshalInputUpdatePeopleInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "expectedVersion", "fullName", "primaryEmailAddress", "additionalEmailAddresses", "kind"}
+	fieldsInOrder := [...]string{"id", "fullName", "primaryEmailAddress", "additionalEmailAddresses", "kind"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -17142,13 +17773,6 @@ func (ec *executionContext) unmarshalInputUpdatePeopleInput(ctx context.Context,
 				return it, err
 			}
 			it.ID = data
-		case "expectedVersion":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expectedVersion"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ExpectedVersion = data
 		case "fullName":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -17190,7 +17814,7 @@ func (ec *executionContext) unmarshalInputUpdatePolicyInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "expectedVersion", "name", "content", "status", "reviewDate", "ownerId"}
+	fieldsInOrder := [...]string{"id", "name", "content", "status", "reviewDate", "ownerId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -17204,13 +17828,6 @@ func (ec *executionContext) unmarshalInputUpdatePolicyInput(ctx context.Context,
 				return it, err
 			}
 			it.ID = data
-		case "expectedVersion":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expectedVersion"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ExpectedVersion = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -17259,7 +17876,7 @@ func (ec *executionContext) unmarshalInputUpdateTaskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"taskId", "expectedVersion", "name", "description", "state", "timeEstimate"}
+	fieldsInOrder := [...]string{"taskId", "name", "description", "state", "timeEstimate"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -17273,13 +17890,6 @@ func (ec *executionContext) unmarshalInputUpdateTaskInput(ctx context.Context, o
 				return it, err
 			}
 			it.TaskID = data
-		case "expectedVersion":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expectedVersion"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ExpectedVersion = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -17321,7 +17931,7 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "expectedVersion", "name", "description", "serviceStartAt", "serviceTerminationAt", "serviceCriticality", "riskTier", "statusPageUrl", "termsOfServiceUrl", "privacyPolicyUrl"}
+	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartAt", "serviceTerminationAt", "serviceCriticality", "riskTier", "statusPageUrl", "termsOfServiceUrl", "privacyPolicyUrl"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -17335,13 +17945,6 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.ID = data
-		case "expectedVersion":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expectedVersion"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ExpectedVersion = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -17577,6 +18180,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Framework(ctx, sel, obj)
+	case types.Control:
+		return ec._Control(ctx, sel, &obj)
+	case *types.Control:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Control(ctx, sel, obj)
 	case types.Mitigation:
 		return ec._Mitigation(ctx, sel, &obj)
 	case *types.Mitigation:
@@ -17673,6 +18283,158 @@ func (ec *executionContext) _ConfirmEmailPayload(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("ConfirmEmailPayload")
 		case "success":
 			out.Values[i] = ec._ConfirmEmailPayload_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var controlImplementors = []string{"Control", "Node"}
+
+func (ec *executionContext) _Control(ctx context.Context, sel ast.SelectionSet, obj *types.Control) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, controlImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Control")
+		case "id":
+			out.Values[i] = ec._Control_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "referenceId":
+			out.Values[i] = ec._Control_referenceId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Control_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description":
+			out.Values[i] = ec._Control_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Control_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Control_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var controlConnectionImplementors = []string{"ControlConnection"}
+
+func (ec *executionContext) _ControlConnection(ctx context.Context, sel ast.SelectionSet, obj *types.ControlConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, controlConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ControlConnection")
+		case "edges":
+			out.Values[i] = ec._ControlConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._ControlConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var controlEdgeImplementors = []string{"ControlEdge"}
+
+func (ec *executionContext) _ControlEdge(ctx context.Context, sel ast.SelectionSet, obj *types.ControlEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, controlEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ControlEdge")
+		case "cursor":
+			out.Values[i] = ec._ControlEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._ControlEdge_node(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -17985,6 +18747,45 @@ func (ec *executionContext) _DeleteEvidencePayload(ctx context.Context, sel ast.
 			out.Values[i] = graphql.MarshalString("DeleteEvidencePayload")
 		case "deletedEvidenceId":
 			out.Values[i] = ec._DeleteEvidencePayload_deletedEvidenceId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteFrameworkPayloadImplementors = []string{"DeleteFrameworkPayload"}
+
+func (ec *executionContext) _DeleteFrameworkPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteFrameworkPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteFrameworkPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteFrameworkPayload")
+		case "deletedFrameworkId":
+			out.Values[i] = ec._DeleteFrameworkPayload_deletedFrameworkId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -18424,11 +19225,6 @@ func (ec *executionContext) _Framework(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "version":
-			out.Values[i] = ec._Framework_version(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "name":
 			out.Values[i] = ec._Framework_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -18439,7 +19235,7 @@ func (ec *executionContext) _Framework(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "mitigations":
+		case "controls":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -18448,7 +19244,7 @@ func (ec *executionContext) _Framework(ctx context.Context, sel ast.SelectionSet
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Framework_mitigations(ctx, field, obj)
+				res = ec._Framework_controls(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -18687,11 +19483,6 @@ func (ec *executionContext) _Mitigation(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = graphql.MarshalString("Mitigation")
 		case "id":
 			out.Values[i] = ec._Mitigation_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "version":
-			out.Values[i] = ec._Mitigation_version(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -19011,6 +19802,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "importFramework":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_importFramework(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteFramework":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteFramework(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -19342,6 +20140,42 @@ func (ec *executionContext) _Organization(ctx context.Context, sel ast.Selection
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "mitigations":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Organization_mitigations(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Organization_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -19557,11 +20391,6 @@ func (ec *executionContext) _People(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "version":
-			out.Values[i] = ec._People_version(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19686,11 +20515,6 @@ func (ec *executionContext) _Policy(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = graphql.MarshalString("Policy")
 		case "id":
 			out.Values[i] = ec._Policy_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "version":
-			out.Values[i] = ec._Policy_version(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -20058,11 +20882,6 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = graphql.MarshalString("Task")
 		case "id":
 			out.Values[i] = ec._Task_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "version":
-			out.Values[i] = ec._Task_version(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -20830,11 +21649,6 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "version":
-			out.Values[i] = ec._Vendor_version(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -21414,6 +22228,109 @@ func (ec *executionContext) marshalNConfirmEmailPayload2ᚖgithubᚗcomᚋgetpro
 	return ec._ConfirmEmailPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNControl2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControl(ctx context.Context, sel ast.SelectionSet, v *types.Control) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Control(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNControlConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlConnection(ctx context.Context, sel ast.SelectionSet, v types.ControlConnection) graphql.Marshaler {
+	return ec._ControlConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNControlConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlConnection(ctx context.Context, sel ast.SelectionSet, v *types.ControlConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ControlConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNControlEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.ControlEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlEdge(ctx context.Context, sel ast.SelectionSet, v *types.ControlEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ControlEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNControlOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlOrderField(ctx context.Context, v any) (coredata.ControlOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNControlOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlOrderField[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNControlOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.ControlOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNControlOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlOrderField[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNControlOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlOrderField = map[string]coredata.ControlOrderField{
+		"CREATED_AT": coredata.ControlOrderFieldCreatedAt,
+	}
+	marshalNControlOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlOrderField = map[coredata.ControlOrderField]string{
+		coredata.ControlOrderFieldCreatedAt: "CREATED_AT",
+	}
+)
+
 func (ec *executionContext) unmarshalNCreateFrameworkInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateFrameworkInput(ctx context.Context, v any) (types.CreateFrameworkInput, error) {
 	res, err := ec.unmarshalInputCreateFrameworkInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -21594,6 +22511,25 @@ func (ec *executionContext) marshalNDeleteEvidencePayload2ᚖgithubᚗcomᚋgetp
 		return graphql.Null
 	}
 	return ec._DeleteEvidencePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeleteFrameworkInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteFrameworkInput(ctx context.Context, v any) (types.DeleteFrameworkInput, error) {
+	res, err := ec.unmarshalInputDeleteFrameworkInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteFrameworkPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteFrameworkPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteFrameworkPayload) graphql.Marshaler {
+	return ec._DeleteFrameworkPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteFrameworkPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteFrameworkPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteFrameworkPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteFrameworkPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeleteOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationInput(ctx context.Context, v any) (types.DeleteOrganizationInput, error) {
@@ -21921,12 +22857,12 @@ func (ec *executionContext) marshalNFrameworkEdge2ᚖgithubᚗcomᚋgetproboᚋp
 
 func (ec *executionContext) unmarshalNFrameworkOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐFrameworkOrderField(ctx context.Context, v any) (coredata.FrameworkOrderField, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := coredata.FrameworkOrderField(tmp)
+	res := unmarshalNFrameworkOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐFrameworkOrderField[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNFrameworkOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐFrameworkOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.FrameworkOrderField) graphql.Marshaler {
-	res := graphql.MarshalString(string(v))
+	res := graphql.MarshalString(marshalNFrameworkOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐFrameworkOrderField[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -21934,6 +22870,15 @@ func (ec *executionContext) marshalNFrameworkOrderField2githubᚗcomᚋgetprobo�
 	}
 	return res
 }
+
+var (
+	unmarshalNFrameworkOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐFrameworkOrderField = map[string]coredata.FrameworkOrderField{
+		"CREATED_AT": coredata.FrameworkOrderFieldCreatedAt,
+	}
+	marshalNFrameworkOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐFrameworkOrderField = map[coredata.FrameworkOrderField]string{
+		coredata.FrameworkOrderFieldCreatedAt: "CREATED_AT",
+	}
+)
 
 func (ec *executionContext) unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, v any) (gid.GID, error) {
 	res, err := types.UnmarshalGIDScalar(v)
@@ -23470,6 +24415,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOControlOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlOrderBy(ctx context.Context, v any) (*types.ControlOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputControlOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx context.Context, v any) (*page.CursorKey, error) {

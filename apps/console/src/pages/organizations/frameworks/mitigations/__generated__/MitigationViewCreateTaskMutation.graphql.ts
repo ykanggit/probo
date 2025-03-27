@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<958545e211155678a1a43d8ef1717071>>
+ * @generated SignedSource<<e544ac1f4a0b6d728cba2b66a2f97520>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -35,7 +35,6 @@ export type MitigationViewCreateTaskMutation$data = {
         readonly name: string;
         readonly state: TaskState;
         readonly timeEstimate: any | null | undefined;
-        readonly version: number;
       };
     };
   };
@@ -113,13 +112,6 @@ v4 = {
           "args": null,
           "kind": "ScalarField",
           "name": "state",
-          "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "version",
           "storageKey": null
         },
         {
@@ -220,16 +212,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "dedf546da903060c79209ab7695bde12",
+    "cacheID": "273c3d2ae0de44280e85e47db23db892",
     "id": null,
     "metadata": {},
     "name": "MitigationViewCreateTaskMutation",
     "operationKind": "mutation",
-    "text": "mutation MitigationViewCreateTaskMutation(\n  $input: CreateTaskInput!\n) {\n  createTask(input: $input) {\n    taskEdge {\n      node {\n        id\n        name\n        description\n        timeEstimate\n        state\n        version\n        assignedTo {\n          id\n          fullName\n          primaryEmailAddress\n        }\n      }\n    }\n  }\n}\n"
+    "text": "mutation MitigationViewCreateTaskMutation(\n  $input: CreateTaskInput!\n) {\n  createTask(input: $input) {\n    taskEdge {\n      node {\n        id\n        name\n        description\n        timeEstimate\n        state\n        assignedTo {\n          id\n          fullName\n          primaryEmailAddress\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "683fe4d2a3d33e989a8b5593f99799a5";
+(node as any).hash = "ad8a56e4976e9dc15f4ee8e1b32d9fa9";
 
 export default node;

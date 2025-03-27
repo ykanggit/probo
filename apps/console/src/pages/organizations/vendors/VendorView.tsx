@@ -36,7 +36,6 @@ const vendorViewQuery = graphql`
         privacyPolicyUrl
         createdAt
         updatedAt
-        version
       }
     }
   }
@@ -57,7 +56,6 @@ const updateVendorMutation = graphql`
         termsOfServiceUrl
         privacyPolicyUrl
         updatedAt
-        version
       }
     }
   }
@@ -145,7 +143,6 @@ function VendorViewContent({
       variables: {
         input: {
           id: data.node.id,
-          expectedVersion: data.node.version,
           ...formattedData,
         },
       },
@@ -176,7 +173,7 @@ function VendorViewContent({
         }
       },
     });
-  }, [commit, data.node.id, data.node.version, formData, loadQuery, toast]);
+  }, [commit, data.node.id, formData, loadQuery, toast]);
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
     setFormData((prev) => ({

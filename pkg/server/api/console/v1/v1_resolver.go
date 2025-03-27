@@ -36,28 +36,29 @@ func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*s
 	return &result, nil
 }
 
-// Mitigations is the resolver for the mitigations field.
-func (r *frameworkResolver) Mitigations(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error) {
+// Controls is the resolver for the controls field.
+func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
-	pageOrderBy := page.OrderBy[coredata.MitigationOrderField]{
-		Field:     coredata.MitigationOrderFieldCreatedAt,
+	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
+		Field:     coredata.ControlOrderFieldCreatedAt,
 		Direction: page.OrderDirectionDesc,
 	}
 	if orderBy != nil {
-		pageOrderBy = page.OrderBy[coredata.MitigationOrderField]{
+		pageOrderBy = page.OrderBy[coredata.ControlOrderField]{
 			Field:     orderBy.Field,
 			Direction: orderBy.Direction,
 		}
 	}
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
-	page, err := svc.Mitigations.ListForFrameworkID(ctx, obj.ID, cursor)
+
+	page, err := svc.Controls.ListForFrameworkID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list framework mitigations: %w", err)
+		return nil, fmt.Errorf("cannot list controls: %w", err)
 	}
 
-	return types.NewMitigationConnection(page), nil
+	return types.NewControlConnection(page), nil
 }
 
 // Tasks is the resolver for the tasks field.
@@ -115,7 +116,6 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 
 	vendor, err := svc.Vendors.Update(ctx, probo.UpdateVendorRequest{
 		ID:                   input.ID,
-		ExpectedVersion:      input.ExpectedVersion,
 		Name:                 input.Name,
 		Description:          input.Description,
 		ServiceStartAt:       input.ServiceStartAt,
@@ -176,7 +176,6 @@ func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdateP
 
 	people, err := svc.Peoples.Update(ctx, probo.UpdatePeopleRequest{
 		ID:                       input.ID,
-		ExpectedVersion:          input.ExpectedVersion,
 		FullName:                 input.FullName,
 		PrimaryEmailAddress:      input.PrimaryEmailAddress,
 		AdditionalEmailAddresses: &input.AdditionalEmailAddresses,
@@ -281,12 +280,11 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTas
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
 
 	task, err := svc.Tasks.Update(ctx, probo.UpdateTaskRequest{
-		TaskID:          input.TaskID,
-		ExpectedVersion: input.ExpectedVersion,
-		Name:            input.Name,
-		Description:     input.Description,
-		State:           input.State,
-		TimeEstimate:    input.TimeEstimate,
+		TaskID:       input.TaskID,
+		Name:         input.Name,
+		Description:  input.Description,
+		State:        input.State,
+		TimeEstimate: input.TimeEstimate,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update task: %w", err)
@@ -346,7 +344,6 @@ func (r *mutationResolver) CreateFramework(ctx context.Context, input types.Crea
 	framework, err := svc.Frameworks.Create(ctx, probo.CreateFrameworkRequest{
 		OrganizationID: input.OrganizationID,
 		Name:           input.Name,
-		Description:    input.Description,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot create framework: %w", err)
@@ -362,10 +359,9 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
 	framework, err := svc.Frameworks.Update(ctx, probo.UpdateFrameworkRequest{
-		ID:              input.ID,
-		ExpectedVersion: input.ExpectedVersion,
-		Name:            input.Name,
-		Description:     input.Description,
+		ID:          input.ID,
+		Name:        input.Name,
+		Description: input.Description,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update framework: %w", err)
@@ -376,12 +372,26 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 	}, nil
 }
 
+// DeleteFramework is the resolver for the deleteFramework field.
+func (r *mutationResolver) DeleteFramework(ctx context.Context, input types.DeleteFrameworkInput) (*types.DeleteFrameworkPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.FrameworkID.TenantID())
+
+	err := svc.Frameworks.Delete(ctx, input.FrameworkID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete framework: %w", err)
+	}
+
+	return &types.DeleteFrameworkPayload{
+		DeletedFrameworkID: input.FrameworkID,
+	}, nil
+}
+
 // ImportFramework is the resolver for the importFramework field.
 func (r *mutationResolver) ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
 
 	req := probo.ImportFrameworkRequest{}
-	if err := json.NewDecoder(input.File.File).Decode(&req.Data); err != nil {
+	if err := json.NewDecoder(input.File.File).Decode(&req.Framework); err != nil {
 		return nil, fmt.Errorf("cannot decode framework: %w", err)
 	}
 
@@ -395,16 +405,16 @@ func (r *mutationResolver) ImportFramework(ctx context.Context, input types.Impo
 	}, nil
 }
 
-// CreateMitigation is the resolver for the createMitigation field.
+// // CreateMitigation is the resolver for the createMitigation field.
 func (r *mutationResolver) CreateMitigation(ctx context.Context, input types.CreateMitigationInput) (*types.CreateMitigationPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.FrameworkID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
 
 	mitigation, err := svc.Mitigations.Create(ctx, probo.CreateMitigationRequest{
-		FrameworkID: input.FrameworkID,
-		Name:        input.Name,
-		Description: input.Description,
-		Category:    input.Category,
-		Importance:  input.Importance,
+		OrganizationID: input.OrganizationID,
+		Name:           input.Name,
+		Description:    input.Description,
+		Category:       input.Category,
+		Importance:     input.Importance,
 	})
 	if err != nil {
 		panic(fmt.Errorf("cannot create mitigation: %w", err))
@@ -420,13 +430,12 @@ func (r *mutationResolver) UpdateMitigation(ctx context.Context, input types.Upd
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
 	mitigation, err := svc.Mitigations.Update(ctx, probo.UpdateMitigationRequest{
-		ID:              input.ID,
-		ExpectedVersion: input.ExpectedVersion,
-		Name:            input.Name,
-		Description:     input.Description,
-		Category:        input.Category,
-		Importance:      input.Importance,
-		State:           input.State,
+		ID:          input.ID,
+		Name:        input.Name,
+		Description: input.Description,
+		Category:    input.Category,
+		Importance:  input.Importance,
+		State:       input.State,
 	})
 	if err != nil {
 		panic(fmt.Errorf("cannot update mitigation: %w", err))
@@ -515,13 +524,12 @@ func (r *mutationResolver) UpdatePolicy(ctx context.Context, input types.UpdateP
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
 	policy, err := svc.Policies.Update(ctx, probo.UpdatePolicyRequest{
-		ID:              input.ID,
-		ExpectedVersion: input.ExpectedVersion,
-		Name:            input.Name,
-		Content:         input.Content,
-		Status:          input.Status,
-		ReviewDate:      input.ReviewDate,
-		OwnerID:         input.OwnerID,
+		ID:         input.ID,
+		Name:       input.Name,
+		Content:    input.Content,
+		Status:     input.Status,
+		ReviewDate: input.ReviewDate,
+		OwnerID:    input.OwnerID,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update policy: %w", err)
@@ -731,6 +739,31 @@ func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organiza
 	}
 
 	return types.NewPolicyConnection(page), nil
+}
+
+// Mitigations is the resolver for the mitigations field.
+func (r *organizationResolver) Mitigations(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.MitigationOrderField]{
+		Field:     coredata.MitigationOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.MitigationOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Mitigations.ListForOrganizationID(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list organization mitigations: %w", err)
+	}
+
+	return types.NewMitigationConnection(page), nil
 }
 
 // Owner is the resolver for the owner field.

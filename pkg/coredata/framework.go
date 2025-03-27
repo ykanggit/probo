@@ -30,27 +30,20 @@ type (
 	Framework struct {
 		ID             gid.GID   `db:"id"`
 		OrganizationID gid.GID   `db:"organization_id"`
+		ReferenceID    string    `db:"reference_id"`
 		Name           string    `db:"name"`
 		Description    string    `db:"description"`
-		ContentRef     string    `db:"content_ref"`
 		CreatedAt      time.Time `db:"created_at"`
 		UpdatedAt      time.Time `db:"updated_at"`
-		Version        int       `db:"version"`
 	}
 
 	Frameworks []*Framework
-
-	UpdateFrameworkParams struct {
-		ExpectedVersion int
-		Name            *string
-		Description     *string
-	}
 )
 
-func (f Framework) CursorKey(orderBy FrameworkOrderField) page.CursorKey {
+func (f *Framework) CursorKey(orderBy FrameworkOrderField) page.CursorKey {
 	switch orderBy {
 	case FrameworkOrderFieldCreatedAt:
-		return page.NewCursorKey(f.ID, f.CreatedAt)
+		return page.CursorKey{ID: f.ID, Value: f.CreatedAt}
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
@@ -67,25 +60,23 @@ func (f *Frameworks) LoadByOrganizationID(
 SELECT
     id,
     organization_id,
+    reference_id,
     name,
     description,
-    content_ref,
     created_at,
-    updated_at,
-    version
+    updated_at
 FROM
     frameworks
 WHERE
     %s
     AND organization_id = @organization_id
-    AND %s
+	AND %s
 `
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.NamedArgs{"organization_id": organizationID}
 	maps.Copy(args, scope.SQLArguments())
-	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -112,12 +103,11 @@ func (f *Framework) LoadByID(
 SELECT
     id,
     organization_id,
+    reference_id,
     name,
     description,
-    content_ref,
     created_at,
-    updated_at,
-    version
+    updated_at
 FROM
     frameworks
 WHERE
@@ -156,23 +146,21 @@ INSERT INTO
         tenant_id,
         id,
         organization_id,
+        reference_id,
         name,
         description,
-        content_ref,
         created_at,
-        updated_at,
-        version
+        updated_at
     )
 VALUES (
     @tenant_id,
     @framework_id,
     @organization_id,
+    @reference_id,
     @name,
     @description,
-    @content_ref,
     @created_at,
-    @updated_at,
-    @version
+    @updated_at
 );
 `
 
@@ -180,12 +168,11 @@ VALUES (
 		"tenant_id":       scope.GetTenantID(),
 		"framework_id":    f.ID,
 		"organization_id": f.OrganizationID,
+		"reference_id":    f.ReferenceID,
 		"name":            f.Name,
 		"description":     f.Description,
-		"content_ref":     f.ContentRef,
 		"created_at":      f.CreatedAt,
 		"updated_at":      f.UpdatedAt,
-		"version":         f.Version,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -217,55 +204,28 @@ func (f *Framework) Update(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	params UpdateFrameworkParams,
 ) error {
 	q := `
-UPDATE frameworks SET
-    name = COALESCE(@name, name),
-    description = COALESCE(@description, description),
-    updated_at = @updated_at,
-    version = version + 1
-WHERE %s
-    AND id = @framework_id
-    AND version = @expected_version
-RETURNING 
-    id,
-    organization_id,
-    name,
-    description,
-    content_ref,
-    created_at,
-    updated_at,
-    version
+UPDATE frameworks
+SET
+  name = @name,
+  description = @description,
+  updated_at = @updated_at
+WHERE 
+  %s
+  AND id = @framework_id
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
-		"framework_id":     f.ID,
-		"expected_version": params.ExpectedVersion,
-		"updated_at":       time.Now(),
-	}
-
-	if params.Name != nil {
-		args["name"] = *params.Name
-	}
-	if params.Description != nil {
-		args["description"] = *params.Description
+		"framework_id": f.ID,
+		"updated_at":   f.UpdatedAt,
+		"name":         f.Name,
+		"description":  f.Description,
 	}
 
 	maps.Copy(args, scope.SQLArguments())
 
-	rows, err := conn.Query(ctx, q, args)
-	if err != nil {
-		return fmt.Errorf("cannot query frameworks: %w", err)
-	}
-
-	framework, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Framework])
-	if err != nil {
-		return fmt.Errorf("cannot collect framework: %w", err)
-	}
-
-	*f = framework
-
-	return nil
+	_, err := conn.Exec(ctx, q, args)
+	return err
 }

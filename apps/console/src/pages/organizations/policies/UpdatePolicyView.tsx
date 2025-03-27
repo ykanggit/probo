@@ -30,7 +30,6 @@ const UpdatePolicyViewQuery = graphql`
         name
         content
         status
-        version
         reviewDate
         owner {
           id
@@ -52,7 +51,6 @@ const UpdatePolicyMutation = graphql`
         name
         content
         status
-        version
         reviewDate
         owner {
           id
@@ -115,7 +113,6 @@ function UpdatePolicyViewContent({
           status,
           reviewDate: reviewDateValue,
           ownerId,
-          expectedVersion: data.policy.version!,
         },
       },
       onCompleted: (response, errors) => {

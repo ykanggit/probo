@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<39cfe3277c49d7a0ff2099d6ad579e7d>>
+ * @generated SignedSource<<d6d22035bb11c4fff1db97bac26aa7d1>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,7 +14,6 @@ export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" |
 export type UpdateMitigationInput = {
   category?: string | null | undefined;
   description?: string | null | undefined;
-  expectedVersion: number;
   id: string;
   importance?: MitigationImportance | null | undefined;
   name?: string | null | undefined;
@@ -32,7 +31,6 @@ export type UpdateMitigationViewUpdateMitigationMutation$data = {
       readonly importance: MitigationImportance;
       readonly name: string;
       readonly state: MitigationState;
-      readonly version: number;
     };
   };
 };
@@ -113,13 +111,6 @@ v1 = [
             "kind": "ScalarField",
             "name": "state",
             "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "version",
-            "storageKey": null
           }
         ],
         "storageKey": null
@@ -146,16 +137,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "5ebe3d38712b444c98c08661b7431da3",
+    "cacheID": "4a58a30780331c2d00bab2c3b613635b",
     "id": null,
     "metadata": {},
     "name": "UpdateMitigationViewUpdateMitigationMutation",
     "operationKind": "mutation",
-    "text": "mutation UpdateMitigationViewUpdateMitigationMutation(\n  $input: UpdateMitigationInput!\n) {\n  updateMitigation(input: $input) {\n    mitigation {\n      id\n      name\n      description\n      category\n      importance\n      state\n      version\n    }\n  }\n}\n"
+    "text": "mutation UpdateMitigationViewUpdateMitigationMutation(\n  $input: UpdateMitigationInput!\n) {\n  updateMitigation(input: $input) {\n    mitigation {\n      id\n      name\n      description\n      category\n      importance\n      state\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c68d76d527359d182749b309d2d8d6dd";
+(node as any).hash = "b8cf81c9342fe42160ee39f572b01b24";
 
 export default node;

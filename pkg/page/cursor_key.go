@@ -27,6 +27,12 @@ type CursorKey struct {
 	Value any
 }
 
+// StringCursorKey is a cursor key for string IDs
+type StringCursorKey struct {
+	ID    string
+	Value any
+}
+
 var (
 	CursorKeyNil CursorKey
 

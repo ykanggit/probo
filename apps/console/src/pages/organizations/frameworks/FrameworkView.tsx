@@ -1,24 +1,27 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import {
   graphql,
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
+  useMutation,
+  ConnectionHandler,
 } from "react-relay";
-import {
-  AlertCircle,
-  CheckCircle2,
-  ChevronDown,
-  ChevronRight,
-  Clock,
-  Plus,
-  X,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import type { FrameworkViewQuery as FrameworkViewQueryType } from "./__generated__/FrameworkViewQuery.graphql";
+import type { FrameworkViewDeleteMutation } from "./__generated__/FrameworkViewDeleteMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
 import { FrameworkViewSkeleton } from "./FrameworkPage";
 
@@ -29,15 +32,14 @@ const FrameworkViewQuery = graphql`
       ... on Framework {
         name
         description
-        mitigations(first: 100) @connection(key: "FrameworkView_mitigations") {
+        controls(first: 100, orderBy: { field: CREATED_AT, direction: ASC })
+          @connection(key: "FrameworkView_controls") {
           edges {
             node {
               id
+              referenceId
               name
               description
-              state
-              category
-              importance
             }
           }
         }
@@ -46,25 +48,16 @@ const FrameworkViewQuery = graphql`
   }
 `;
 
-interface Mitigation {
-  id?: string;
-  name?: string;
-  description?: string;
-  state?: string;
-  category?: string;
-  importance?: string;
-  status?: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  progress: number;
-  mitigations: Mitigation[];
-  doneCount: number;
-  totalCount: number;
-}
+const DeleteFrameworkMutation = graphql`
+  mutation FrameworkViewDeleteMutation(
+    $input: DeleteFrameworkInput!
+    $connections: [ID!]!
+  ) {
+    deleteFramework(input: $input) {
+      deletedFrameworkId @deleteEdge(connections: $connections)
+    }
+  }
+`;
 
 function FrameworkViewContent({
   queryRef,
@@ -73,158 +66,73 @@ function FrameworkViewContent({
 }) {
   const data = usePreloadedQuery(FrameworkViewQuery, queryRef);
   const framework = data.node;
-  const mitigations =
-    framework.mitigations?.edges.map((edge) => edge?.node) ?? [];
   const navigate = useNavigate();
   const { organizationId } = useParams();
+  const { toast } = useToast();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  // Monitor URL hash for changes and update state accordingly
-  const [hashValue, setHashValue] = useState(window.location.hash);
+  // Extract controls from the GraphQL response
+  const controls = framework?.controls?.edges?.map((edge) => edge.node) || [];
 
-  // Get the active category from the hash (used when returning from a mitigation)
-  const hashCategory = hashValue.substring(1)
-    ? decodeURIComponent(hashValue.substring(1))
-    : "";
+  // Setup delete mutation
+  const [commitDeleteMutation] = useMutation<FrameworkViewDeleteMutation>(
+    DeleteFrameworkMutation
+  );
 
-  // Keep track of manually expanded categories
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(() => {
-    return hashCategory ? [hashCategory] : [];
-  });
+  const handleDeleteFramework = useCallback(() => {
+    setIsDeleting(true);
 
-  // When hash changes, update expanded categories to include the hash category
-  useEffect(() => {
-    if (hashCategory && !expandedCategories.includes(hashCategory)) {
-      setExpandedCategories((prev) => [...prev, hashCategory]);
-    }
-  }, [hashCategory, expandedCategories]);
+    const connectionId = ConnectionHandler.getConnectionID(
+      organizationId!,
+      "FrameworkListView_frameworks"
+    );
 
-  // Listen for hash changes (like when using back button)
-  useEffect(() => {
-    const handleHashChange = () => {
-      setHashValue(window.location.hash);
-    };
+    commitDeleteMutation({
+      variables: {
+        input: {
+          frameworkId: framework.id,
+        },
+        connections: [connectionId],
+      },
+      onCompleted: (_, errors) => {
+        setIsDeleting(false);
+        setIsDeleteDialogOpen(false);
 
-    window.addEventListener("hashchange", handleHashChange);
+        if (errors) {
+          console.error("Error deleting framework:", errors);
+          toast({
+            title: "Error",
+            description: "Failed to delete framework. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
 
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-    };
-  }, []);
+        toast({
+          title: "Success",
+          description: "Framework deleted successfully.",
+        });
 
-  // Map mitigation state to status for the new design
-  const mapStateToStatus = (state?: string): string => {
-    if (!state) return "incomplete";
-    switch (state) {
-      case "IMPLEMENTED":
-        return "complete";
-      case "NOT_APPLICABLE":
-        return "not-applicable";
-      case "NOT_STARTED":
-        return "not-started";
-      default:
-        return "in-progress";
-    }
-  };
-
-  const processedControls = mitigations.map((mitigation) => ({
-    ...mitigation,
-    status: mapStateToStatus(mitigation.state),
-  }));
-
-  // Calculate global progress
-  const implementedCount = processedControls.filter(
-    (mitigation) => mitigation.status === "complete"
-  ).length;
-  const notApplicableCount = processedControls.filter(
-    (mitigation) => mitigation.status === "not-applicable"
-  ).length;
-  const totalControls = processedControls.length;
-
-  // Include not-applicable as effectively "complete" for progress percentage
-  const effectiveCompletedCount = implementedCount + notApplicableCount;
-  const globalProgress = totalControls
-    ? Math.round((effectiveCompletedCount / totalControls) * 100)
-    : 0;
-
-  // Get global status counts
-  const globalStatusCounts = processedControls.reduce((acc, mitigation) => {
-    if (mitigation.status) {
-      acc[mitigation.status] = (acc[mitigation.status] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
-
-  // Group mitigations by category
-  const controlsByCategory = processedControls.reduce((acc, mitigation) => {
-    if (!mitigation?.category) return acc;
-    if (!acc[mitigation.category]) {
-      acc[mitigation.category] = [];
-    }
-    acc[mitigation.category].push(mitigation);
-    return acc;
-  }, {} as Record<string, Mitigation[]>);
-
-  // Function to toggle a category's expanded state - now supports multiple expanded categories
-  const toggleCategory = (categoryId: string) => {
-    setExpandedCategories((prev) => {
-      if (prev.includes(categoryId)) {
-        return prev.filter((id) => id !== categoryId);
-      } else {
-        return [...prev, categoryId];
-      }
+        navigate(`/organizations/${organizationId}/frameworks`);
+      },
+      onError: (error) => {
+        setIsDeleting(false);
+        setIsDeleteDialogOpen(false);
+        console.error("Error deleting framework:", error);
+        toast({
+          title: "Error",
+          description: "Failed to delete framework. Please try again.",
+          variant: "destructive",
+        });
+      },
     });
-  };
-
-  const categories: Category[] = Object.entries(controlsByCategory)
-    .map(([categoryName, categoryControls]) => {
-      const catImplementedCount = categoryControls.filter(
-        (mitigation) => mitigation.status === "complete"
-      ).length;
-      const catNotApplicableCount = categoryControls.filter(
-        (mitigation) => mitigation.status === "not-applicable"
-      ).length;
-      // Consider both "complete" and "not-applicable" as done for category progress
-      const catDoneCount = catImplementedCount + catNotApplicableCount;
-      const catTotalCount = categoryControls.length;
-      const progress = catTotalCount
-        ? Math.round((catDoneCount / catTotalCount) * 100)
-        : 0;
-
-      return {
-        id: categoryName,
-        name: categoryName,
-        description: `Controls related to ${categoryName.toLowerCase()}`,
-        progress: progress,
-        mitigations: categoryControls.sort((a, b) =>
-          (a.name || "").localeCompare(b.name || "")
-        ),
-        doneCount: catDoneCount,
-        totalCount: catTotalCount,
-      };
-    })
-    .filter((category) => category.mitigations.length > 0)
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "complete":
-        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
-      case "in-progress":
-        return <Clock className="h-5 w-5 text-blue-500" />;
-      case "not-started":
-        return <AlertCircle className="h-5 w-5 text-gray-200" />;
-      case "incomplete":
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
-      case "not-applicable":
-        return <X className="h-5 w-5 text-gray-300" />;
-      default:
-        return null;
-    }
-  };
+  }, [framework.id, organizationId, commitDeleteMutation, navigate, toast]);
 
   return (
     <PageTemplate
       title={framework.name ?? ""}
+      description={framework.description || ""}
       actions={
         <div className="flex gap-4">
           <Button variant="outline" asChild>
@@ -234,242 +142,93 @@ function FrameworkViewContent({
               Edit Framework
             </Link>
           </Button>
-          <Button asChild>
-            <Link
-              to={`/organizations/${organizationId}/frameworks/${framework.id}/mitigations/create`}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create Mitigation
-            </Link>
+          <Button
+            variant="destructive"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            Delete Framework
           </Button>
         </div>
       }
     >
-      {/* Global Progress Summary */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-1">
-          <h3 className="text-lg font-medium">Framework Implementation</h3>
-          <span className="text-sm text-muted-foreground">
-            {globalProgress}% complete
-          </span>
-        </div>
-
-        {/* Progress bar container */}
-        <div className="w-full h-5 rounded-full overflow-hidden bg-muted mb-2">
-          {/* Segmented progress bar */}
-          <div className="flex h-full">
-            {/* Complete segment */}
-            {globalStatusCounts.complete > 0 && (
-              <div
-                className="bg-green-500 h-full"
-                style={{
-                  width: `${
-                    (globalStatusCounts.complete / totalControls) * 100
-                  }%`,
-                }}
-              />
-            )}
-            {/* In-progress segment */}
-            {globalStatusCounts["in-progress"] > 0 && (
-              <div
-                className="bg-blue-500 h-full"
-                style={{
-                  width: `${
-                    (globalStatusCounts["in-progress"] / totalControls) * 100
-                  }%`,
-                }}
-              />
-            )}
-            {/* Incomplete segment */}
-            {globalStatusCounts.incomplete > 0 && (
-              <div
-                className="bg-red-500 h-full"
-                style={{
-                  width: `${
-                    (globalStatusCounts.incomplete / totalControls) * 100
-                  }%`,
-                }}
-              />
-            )}
-            {/* Not applicable segment */}
-            {globalStatusCounts["not-applicable"] > 0 && (
-              <div
-                className="bg-gray-600 h-full"
-                style={{
-                  width: `${
-                    (globalStatusCounts["not-applicable"] / totalControls) * 100
-                  }%`,
-                }}
-              />
-            )}
-            {/* Not started segment */}
-            {globalStatusCounts["not-started"] > 0 && (
-              <div
-                className="bg-gray-200 h-full"
-                style={{
-                  width: `${
-                    (globalStatusCounts["not-started"] / totalControls) * 100
-                  }%`,
-                }}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Status legend - reorder to match progress bar */}
-        <div className="flex flex-wrap items-center gap-4 text-sm">
-          {globalStatusCounts.complete > 0 && (
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span>Complete ({globalStatusCounts.complete})</span>
-            </div>
-          )}
-          {globalStatusCounts["in-progress"] > 0 && (
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-              <span>In Progress ({globalStatusCounts["in-progress"]})</span>
-            </div>
-          )}
-          {globalStatusCounts.incomplete > 0 && (
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <span>Incomplete ({globalStatusCounts.incomplete})</span>
-            </div>
-          )}
-          {globalStatusCounts["not-applicable"] > 0 && (
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <div className="w-3 h-3 rounded-full bg-gray-600"></div>
-              <span>
-                Not Applicable ({globalStatusCounts["not-applicable"]})
-              </span>
-            </div>
-          )}
-          {globalStatusCounts["not-started"] > 0 && (
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <div className="w-3 h-3 rounded-full bg-gray-200"></div>
-              <span>Not Started ({globalStatusCounts["not-started"]})</span>
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="grid gap-6">
-        {categories.map((category) => {
-          const isExpanded = expandedCategories.includes(category.id);
-
-          return (
-            <div
-              key={category.id}
-              className="border rounded-lg overflow-hidden"
-            >
-              <Card className="border-0 shadow-none">
-                <CardHeader
-                  className="bg-muted/50 cursor-pointer"
-                  onClick={() => toggleCategory(category.id)}
+        {controls.length > 0 ? (
+          controls.map((control) => (
+            <Card key={control.id} className="overflow-hidden">
+              <CardHeader className="bg-muted/20">
+                <div
+                  className="font-medium cursor-pointer flex items-center"
+                  onClick={() => {
+                    navigate(
+                      `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
+                    );
+                  }}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CardTitle>{category.name}</CardTitle>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>
-                        {category.doneCount} / {category.totalCount}
-                      </span>
-                      {isExpanded ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      )}
-                    </div>
+                  <span className="font-mono text-sm mr-3">
+                    {control.referenceId}
+                  </span>
+                  <CardTitle>{control.name}</CardTitle>
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {control.description}
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <h4 className="text-sm font-semibold mb-3">Mitigations</h4>
+                <div className="text-sm text-muted-foreground text-center py-4 border rounded-md">
+                  <p>
+                    Mitigations will be displayed here once connected to this
+                    control
+                  </p>
+                  <div className="mt-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link
+                        to={`/organizations/${organizationId}/frameworks/${framework.id}/mitigations/create`}
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        Link Mitigation
+                      </Link>
+                    </Button>
                   </div>
-                </CardHeader>
-
-                {isExpanded && (
-                  <CardContent className="p-0">
-                    {category.mitigations.length > 0 ? (
-                      <div className="w-full">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="bg-muted/30 text-sm font-medium text-muted-foreground">
-                              <th className="w-24 px-4 py-2 text-left">
-                                Importance
-                              </th>
-                              <th className="w-24 px-4 py-2 text-left">
-                                Status
-                              </th>
-                              <th className="px-4 py-2 text-left">
-                                Mitigation
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y">
-                            {category.mitigations.map((mitigation) => (
-                              <tr
-                                key={mitigation.id || Math.random().toString()}
-                                className="hover:bg-muted/50 cursor-pointer"
-                                onClick={() => {
-                                  if (mitigation?.id) {
-                                    // Always store just this category in the hash
-                                    // This is what will be expanded when returning
-                                    const encoded = encodeURIComponent(
-                                      category.id
-                                    );
-                                    window.location.hash = encoded;
-                                    setHashValue("#" + encoded);
-
-                                    // Make sure this category is expanded in the local state as well
-                                    if (
-                                      !expandedCategories.includes(category.id)
-                                    ) {
-                                      setExpandedCategories((prev) => [
-                                        ...prev,
-                                        category.id,
-                                      ]);
-                                    }
-
-                                    // Use a small timeout to ensure the hash change is processed by the browser
-                                    setTimeout(() => {
-                                      navigate(
-                                        `/organizations/${organizationId}/frameworks/${framework.id}/mitigations/${mitigation.id}`
-                                      );
-                                    }, 100);
-                                  }
-                                }}
-                              >
-                                <td className="w-24 px-4 py-3 align-middle">
-                                  <Badge variant="outline" className="text-xs">
-                                    {mitigation.importance}
-                                  </Badge>
-                                </td>
-                                <td className="w-24 px-4 py-3 align-middle">
-                                  <div className="flex items-center justify-center">
-                                    {mitigation.status
-                                      ? getStatusIcon(mitigation.status)
-                                      : null}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-3 align-middle">
-                                  <div className="font-medium">
-                                    {mitigation.name}
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center p-6 text-center text-muted-foreground">
-                        No mitigations in this category
-                      </div>
-                    )}
-                  </CardContent>
-                )}
-              </Card>
-            </div>
-          );
-        })}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <div className="flex items-center justify-center p-6 text-center text-muted-foreground">
+            No controls available for this framework
+          </div>
+        )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Framework</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the framework &quot;
+              {framework.name}&quot;? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteFramework}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageTemplate>
   );
 }

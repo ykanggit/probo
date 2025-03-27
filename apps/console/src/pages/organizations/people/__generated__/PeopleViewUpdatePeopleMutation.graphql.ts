@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c1c3f4fa54eb6e43c52b088d2b872fee>>
+ * @generated SignedSource<<552b78c5e34c5ce2065dd1190f47f632>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,7 +12,6 @@ import { ConcreteRequest } from 'relay-runtime';
 export type PeopleKind = "CONTRACTOR" | "EMPLOYEE" | "SERVICE_ACCOUNT";
 export type UpdatePeopleInput = {
   additionalEmailAddresses?: ReadonlyArray<string> | null | undefined;
-  expectedVersion: number;
   fullName?: string | null | undefined;
   id: string;
   kind?: PeopleKind | null | undefined;
@@ -30,7 +29,6 @@ export type PeopleViewUpdatePeopleMutation$data = {
       readonly kind: PeopleKind;
       readonly primaryEmailAddress: string;
       readonly updatedAt: string;
-      readonly version: number;
     };
   };
 };
@@ -111,13 +109,6 @@ v1 = [
             "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "version",
-            "storageKey": null
           }
         ],
         "storageKey": null
@@ -144,16 +135,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "96bba526a231dd76ef58d32ec01aac3a",
+    "cacheID": "d09fc02a745b951e278cd492343e49f1",
     "id": null,
     "metadata": {},
     "name": "PeopleViewUpdatePeopleMutation",
     "operationKind": "mutation",
-    "text": "mutation PeopleViewUpdatePeopleMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      updatedAt\n      version\n    }\n  }\n}\n"
+    "text": "mutation PeopleViewUpdatePeopleMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "957952927fbe2337a180599f34ce961c";
+(node as any).hash = "15fece3e846bd713533b9e91a1ceffe2";
 
 export default node;

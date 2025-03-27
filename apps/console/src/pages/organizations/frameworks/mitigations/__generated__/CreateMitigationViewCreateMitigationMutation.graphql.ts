@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<22a6faa89009d6784bc9a89c2456f12e>>
+ * @generated SignedSource<<07454812ea72dd51d0b615737e75a2a1>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,9 +14,9 @@ export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" |
 export type CreateMitigationInput = {
   category: string;
   description: string;
-  frameworkId: string;
   importance: MitigationImportance;
   name: string;
+  organizationId: string;
 };
 export type CreateMitigationViewCreateMitigationMutation$variables = {
   connections: ReadonlyArray<string>;
