@@ -26,40 +26,39 @@ import (
 )
 
 type (
-	ControlService struct {
+	MitigationService struct {
 		svc *TenantService
 	}
 
-	CreateControlRequest struct {
+	CreateMitigationRequest struct {
 		FrameworkID gid.GID
 		Name        string
 		Description string
-		ContentRef  string
 		Category    string
-		Importance  coredata.ControlImportance
+		Importance  coredata.MitigationImportance
 	}
 
-	UpdateControlRequest struct {
+	UpdateMitigationRequest struct {
 		ID              gid.GID
 		ExpectedVersion int
 		Name            *string
 		Description     *string
 		Category        *string
-		State           *coredata.ControlState
-		Importance      *coredata.ControlImportance
+		State           *coredata.MitigationState
+		Importance      *coredata.MitigationImportance
 	}
 )
 
-func (s ControlService) Get(
+func (s MitigationService) Get(
 	ctx context.Context,
-	controlID gid.GID,
-) (*coredata.Control, error) {
-	control := &coredata.Control{}
+	mitigationID gid.GID,
+) (*coredata.Mitigation, error) {
+	mitigation := &coredata.Mitigation{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return control.LoadByID(ctx, conn, s.svc.scope, controlID)
+			return mitigation.LoadByID(ctx, conn, s.svc.scope, mitigationID)
 		},
 	)
 
@@ -67,14 +66,14 @@ func (s ControlService) Get(
 		return nil, err
 	}
 
-	return control, nil
+	return mitigation, nil
 }
 
-func (s ControlService) Update(
+func (s MitigationService) Update(
 	ctx context.Context,
-	req UpdateControlRequest,
-) (*coredata.Control, error) {
-	params := coredata.UpdateControlParams{
+	req UpdateMitigationRequest,
+) (*coredata.Mitigation, error) {
+	params := coredata.UpdateMitigationParams{
 		ExpectedVersion: req.ExpectedVersion,
 		Name:            req.Name,
 		Description:     req.Description,
@@ -83,31 +82,31 @@ func (s ControlService) Update(
 		Importance:      req.Importance,
 	}
 
-	control := &coredata.Control{ID: req.ID}
+	mitigation := &coredata.Mitigation{ID: req.ID}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return control.Update(ctx, conn, s.svc.scope, params)
+			return mitigation.Update(ctx, conn, s.svc.scope, params)
 		})
 	if err != nil {
 		return nil, err
 	}
 
-	return control, nil
+	return mitigation, nil
 }
 
-func (s ControlService) ListForFrameworkID(
+func (s MitigationService) ListForFrameworkID(
 	ctx context.Context,
 	frameworkID gid.GID,
-	cursor *page.Cursor[coredata.ControlOrderField],
-) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
-	var controls coredata.Controls
+	cursor *page.Cursor[coredata.MitigationOrderField],
+) (*page.Page[*coredata.Mitigation, coredata.MitigationOrderField], error) {
+	var mitigations coredata.Mitigations
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return controls.LoadByFrameworkID(
+			return mitigations.LoadByFrameworkID(
 				ctx,
 				conn,
 				s.svc.scope,
@@ -121,30 +120,29 @@ func (s ControlService) ListForFrameworkID(
 		return nil, err
 	}
 
-	return page.NewPage(controls, cursor), nil
+	return page.NewPage(mitigations, cursor), nil
 }
 
-func (s ControlService) Create(
+func (s MitigationService) Create(
 	ctx context.Context,
-	req CreateControlRequest,
-) (*coredata.Control, error) {
+	req CreateMitigationRequest,
+) (*coredata.Mitigation, error) {
 	now := time.Now()
-	controlID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.ControlEntityType)
+	mitigationID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.MitigationEntityType)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create control global id: %w", err)
+		return nil, fmt.Errorf("cannot create mitigation global id: %w", err)
 	}
 
 	framework := &coredata.Framework{}
-	control := &coredata.Control{
-		ID:          controlID,
+	mitigation := &coredata.Mitigation{
+		ID:          mitigationID,
 		FrameworkID: req.FrameworkID,
 		Name:        req.Name,
 		Description: req.Description,
 		Category:    req.Category,
-		State:       coredata.ControlStateNotStarted,
-		Importance:  req.Importance,
-		ContentRef:  req.ContentRef,
+		State:       coredata.MitigationStateNotStarted,
 		Standards:   []string{},
+		Importance:  req.Importance,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
@@ -156,8 +154,8 @@ func (s ControlService) Create(
 				return fmt.Errorf("cannot load framework %q: %w", req.FrameworkID, err)
 			}
 
-			if err := control.Insert(ctx, conn, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot insert control: %w", err)
+			if err := mitigation.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert mitigation: %w", err)
 			}
 
 			return nil
@@ -168,5 +166,5 @@ func (s ControlService) Create(
 		return nil, err
 	}
 
-	return control, nil
+	return mitigation, nil
 }

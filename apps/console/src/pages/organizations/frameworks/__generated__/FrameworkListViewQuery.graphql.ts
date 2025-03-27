@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c2ec2b3948d67ed6b924494adcae63aa>>
+ * @generated SignedSource<<6b6bb27f3ae9e9cf720be1c3655c595e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
+export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type FrameworkListViewQuery$variables = {
   organizationId: string;
 };
@@ -18,17 +18,17 @@ export type FrameworkListViewQuery$data = {
     readonly frameworks?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
-          readonly controls: {
-            readonly edges: ReadonlyArray<{
-              readonly node: {
-                readonly id: string;
-                readonly state: ControlState;
-              };
-            }>;
-          };
           readonly createdAt: string;
           readonly description: string;
           readonly id: string;
+          readonly mitigations: {
+            readonly edges: ReadonlyArray<{
+              readonly node: {
+                readonly id: string;
+                readonly state: MitigationState;
+              };
+            }>;
+          };
           readonly name: string;
           readonly updatedAt: string;
         };
@@ -112,15 +112,15 @@ v5 = [
           {
             "alias": null,
             "args": (v3/*: any*/),
-            "concreteType": "ControlConnection",
+            "concreteType": "MitigationConnection",
             "kind": "LinkedField",
-            "name": "controls",
+            "name": "mitigations",
             "plural": false,
             "selections": [
               {
                 "alias": null,
                 "args": null,
-                "concreteType": "ControlEdge",
+                "concreteType": "MitigationEdge",
                 "kind": "LinkedField",
                 "name": "edges",
                 "plural": true,
@@ -128,7 +128,7 @@ v5 = [
                   {
                     "alias": null,
                     "args": null,
-                    "concreteType": "Control",
+                    "concreteType": "Mitigation",
                     "kind": "LinkedField",
                     "name": "node",
                     "plural": false,
@@ -148,7 +148,7 @@ v5 = [
                 "storageKey": null
               }
             ],
-            "storageKey": "controls(first:100)"
+            "storageKey": "mitigations(first:100)"
           },
           {
             "alias": null,
@@ -291,7 +291,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "88bb77e2d10398380353d5a90ba5d6d6",
+    "cacheID": "e5d4da21773770d146fb7d91e435caef",
     "id": null,
     "metadata": {
       "connection": [
@@ -308,11 +308,11 @@ return {
     },
     "name": "FrameworkListViewQuery",
     "operationKind": "query",
-    "text": "query FrameworkListViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            controls(first: 100) {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query FrameworkListViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      frameworks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            mitigations(first: 100) {\n              edges {\n                node {\n                  id\n                  state\n                }\n              }\n            }\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "e5d315fb00e4fee74b53685b6441ed54";
+(node as any).hash = "8da147529de5e229e38b836bd584e484";
 
 export default node;

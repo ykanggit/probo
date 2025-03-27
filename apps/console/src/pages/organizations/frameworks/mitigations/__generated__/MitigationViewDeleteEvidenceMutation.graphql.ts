@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ff037e64f503f247a68922f86248bb10>>
+ * @generated SignedSource<<c7cba05f3dbc917afc82d3a3dae6045c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,21 +9,21 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type DeleteVendorInput = {
-  vendorId: string;
+export type DeleteEvidenceInput = {
+  evidenceId: string;
 };
-export type VendorListPageDeleteVendorMutation$variables = {
+export type MitigationViewDeleteEvidenceMutation$variables = {
   connections: ReadonlyArray<string>;
-  input: DeleteVendorInput;
+  input: DeleteEvidenceInput;
 };
-export type VendorListPageDeleteVendorMutation$data = {
-  readonly deleteVendor: {
-    readonly deletedVendorId: string;
+export type MitigationViewDeleteEvidenceMutation$data = {
+  readonly deleteEvidence: {
+    readonly deletedEvidenceId: string;
   };
 };
-export type VendorListPageDeleteVendorMutation = {
-  response: VendorListPageDeleteVendorMutation$data;
-  variables: VendorListPageDeleteVendorMutation$variables;
+export type MitigationViewDeleteEvidenceMutation = {
+  response: MitigationViewDeleteEvidenceMutation$data;
+  variables: MitigationViewDeleteEvidenceMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -48,7 +48,7 @@ v3 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "deletedVendorId",
+  "name": "deletedEvidenceId",
   "storageKey": null
 };
 return {
@@ -59,14 +59,14 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "VendorListPageDeleteVendorMutation",
+    "name": "MitigationViewDeleteEvidenceMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "DeleteVendorPayload",
+        "concreteType": "DeleteEvidencePayload",
         "kind": "LinkedField",
-        "name": "deleteVendor",
+        "name": "deleteEvidence",
         "plural": false,
         "selections": [
           (v3/*: any*/)
@@ -84,14 +84,14 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "VendorListPageDeleteVendorMutation",
+    "name": "MitigationViewDeleteEvidenceMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "DeleteVendorPayload",
+        "concreteType": "DeleteEvidencePayload",
         "kind": "LinkedField",
-        "name": "deleteVendor",
+        "name": "deleteEvidence",
         "plural": false,
         "selections": [
           (v3/*: any*/),
@@ -102,7 +102,7 @@ return {
             "handle": "deleteEdge",
             "key": "",
             "kind": "ScalarHandle",
-            "name": "deletedVendorId",
+            "name": "deletedEvidenceId",
             "handleArgs": [
               {
                 "kind": "Variable",
@@ -117,16 +117,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "278e42c6c988a64d4c863198f02df901",
+    "cacheID": "4770e84f6f87fb95b9f102cf8e572f44",
     "id": null,
     "metadata": {},
-    "name": "VendorListPageDeleteVendorMutation",
+    "name": "MitigationViewDeleteEvidenceMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorListPageDeleteVendorMutation(\n  $input: DeleteVendorInput!\n) {\n  deleteVendor(input: $input) {\n    deletedVendorId\n  }\n}\n"
+    "text": "mutation MitigationViewDeleteEvidenceMutation(\n  $input: DeleteEvidenceInput!\n) {\n  deleteEvidence(input: $input) {\n    deletedEvidenceId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "20a320191535706246ae00aa05df991e";
+(node as any).hash = "993f84f2e310e888a78200abb9b79ae0";
 
 export default node;

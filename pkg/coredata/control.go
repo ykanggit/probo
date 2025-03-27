@@ -28,47 +28,47 @@ import (
 )
 
 type (
-	Control struct {
-		ID          gid.GID           `db:"id"`
-		FrameworkID gid.GID           `db:"framework_id"`
-		Category    string            `db:"category"`
-		Name        string            `db:"name"`
-		Description string            `db:"description"`
-		Importance  ControlImportance `db:"importance"`
-		State       ControlState      `db:"state"`
-		ContentRef  string            `db:"content_ref"`
-		CreatedAt   time.Time         `db:"created_at"`
-		UpdatedAt   time.Time         `db:"updated_at"`
-		Version     int               `db:"version"`
-		Standards   []string          `db:"standards"`
+	Mitigation struct {
+		ID          gid.GID              `db:"id"`
+		FrameworkID gid.GID              `db:"framework_id"`
+		Category    string               `db:"category"`
+		Name        string               `db:"name"`
+		Description string               `db:"description"`
+		Importance  MitigationImportance `db:"importance"`
+		State       MitigationState      `db:"state"`
+		ContentRef  string               `db:"content_ref"`
+		CreatedAt   time.Time            `db:"created_at"`
+		UpdatedAt   time.Time            `db:"updated_at"`
+		Version     int                  `db:"version"`
+		Standards   []string             `db:"standards"`
 	}
 
-	Controls []*Control
+	Mitigations []*Mitigation
 
-	UpdateControlParams struct {
+	UpdateMitigationParams struct {
 		ExpectedVersion int
 		Name            *string
 		Description     *string
 		Category        *string
-		State           *ControlState
-		Importance      *ControlImportance
+		State           *MitigationState
+		Importance      *MitigationImportance
 	}
 )
 
-func (c Control) CursorKey(orderBy ControlOrderField) page.CursorKey {
+func (c Mitigation) CursorKey(orderBy MitigationOrderField) page.CursorKey {
 	switch orderBy {
-	case ControlOrderFieldCreatedAt:
+	case MitigationOrderFieldCreatedAt:
 		return page.NewCursorKey(c.ID, c.CreatedAt)
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
-func (c *Control) LoadByID(
+func (c *Mitigation) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	controlID gid.GID,
+	mitigationID gid.GID,
 ) error {
 	q := `
 SELECT
@@ -85,41 +85,41 @@ SELECT
 	standards,
 	version
 FROM
-    controls
+    mitigations
 WHERE
     %s
-    AND id = @control_id
+    AND id = @mitigation_id
 LIMIT 1;
 `
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"control_id": controlID}
+	args := pgx.StrictNamedArgs{"mitigation_id": mitigationID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return fmt.Errorf("cannot query controls: %w", err)
+		return fmt.Errorf("cannot query mitigations: %w", err)
 	}
 
-	control, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Control])
+	mitigation, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Mitigation])
 	if err != nil {
-		return fmt.Errorf("cannot collect controls: %w", err)
+		return fmt.Errorf("cannot collect mitigations: %w", err)
 	}
 
-	*c = control
+	*c = mitigation
 
 	return nil
 }
 
-func (c Control) Insert(
+func (c Mitigation) Insert(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
-    controls (
+    mitigations (
         tenant_id,
         id,
         framework_id,
@@ -136,7 +136,7 @@ INSERT INTO
     )
 VALUES (
     @tenant_id,
-    @control_id,
+    @mitigation_id,
     @framework_id,
 	@category,
     @name,
@@ -152,30 +152,30 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
-		"tenant_id":    scope.GetTenantID(),
-		"control_id":   c.ID,
-		"framework_id": c.FrameworkID,
-		"category":     c.Category,
-		"name":         c.Name,
-		"version":      0,
-		"description":  c.Description,
-		"content_ref":  c.ContentRef,
-		"created_at":   c.CreatedAt,
-		"updated_at":   c.UpdatedAt,
-		"state":        c.State,
-		"importance":   c.Importance,
-		"standards":    c.Standards,
+		"tenant_id":     scope.GetTenantID(),
+		"mitigation_id": c.ID,
+		"framework_id":  c.FrameworkID,
+		"category":      c.Category,
+		"name":          c.Name,
+		"version":       0,
+		"description":   c.Description,
+		"content_ref":   c.ContentRef,
+		"created_at":    c.CreatedAt,
+		"updated_at":    c.UpdatedAt,
+		"state":         c.State,
+		"importance":    c.Importance,
+		"standards":     c.Standards,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
 }
 
-func (c *Controls) LoadByFrameworkID(
+func (c *Mitigations) LoadByFrameworkID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
 	frameworkID gid.GID,
-	cursor *page.Cursor[ControlOrderField],
+	cursor *page.Cursor[MitigationOrderField],
 ) error {
 	q := `
 SELECT
@@ -192,7 +192,7 @@ SELECT
 	standards,
 	version
 FROM
-    controls
+    mitigations
 WHERE
     %s
     AND framework_id = @framework_id
@@ -206,27 +206,27 @@ WHERE
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return fmt.Errorf("cannot query controls: %w", err)
+		return fmt.Errorf("cannot query mitigations: %w", err)
 	}
 
-	controls, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Control])
+	mitigations, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Mitigation])
 	if err != nil {
-		return fmt.Errorf("cannot collect controls: %w", err)
+		return fmt.Errorf("cannot collect mitigations: %w", err)
 	}
 
-	*c = controls
+	*c = mitigations
 
 	return nil
 }
 
-func (c *Control) Update(
+func (c *Mitigation) Update(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	params UpdateControlParams,
+	params UpdateMitigationParams,
 ) error {
 	q := `
-UPDATE controls SET
+UPDATE mitigations SET
     name = COALESCE(@name, name),
     description = COALESCE(@description, description),
     category = COALESCE(@category, category),
@@ -235,7 +235,7 @@ UPDATE controls SET
     updated_at = @updated_at,
     version = version + 1
 WHERE %s
-    AND id = @control_id
+    AND id = @mitigation_id
     AND version = @expected_version
 RETURNING 
     id,
@@ -254,7 +254,7 @@ RETURNING
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.NamedArgs{
-		"control_id":       c.ID,
+		"mitigation_id":    c.ID,
 		"expected_version": params.ExpectedVersion,
 		"name":             params.Name,
 		"description":      params.Description,
@@ -268,15 +268,15 @@ RETURNING
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return fmt.Errorf("cannot query controls: %w", err)
+		return fmt.Errorf("cannot query mitigations: %w", err)
 	}
 
-	control, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Control])
+	mitigation, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Mitigation])
 	if err != nil {
-		return fmt.Errorf("cannot collect controls: %w", err)
+		return fmt.Errorf("cannot collect mitigations: %w", err)
 	}
 
-	*c = control
+	*c = mitigation
 
 	return nil
 }

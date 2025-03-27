@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1e5aa858fdcd0179ebfd8ffba00b6bd7>>
+ * @generated SignedSource<<22a6faa89009d6784bc9a89c2456f12e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,41 +9,35 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
-export type ServiceCriticality = "HIGH" | "LOW" | "MEDIUM";
-export type CreateVendorInput = {
+export type MitigationImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
+export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
+export type CreateMitigationInput = {
+  category: string;
   description: string;
+  frameworkId: string;
+  importance: MitigationImportance;
   name: string;
-  organizationId: string;
-  privacyPolicyUrl?: string | null | undefined;
-  riskTier: RiskTier;
-  serviceCriticality: ServiceCriticality;
-  serviceStartAt: string;
-  serviceTerminationAt?: string | null | undefined;
-  statusPageUrl?: string | null | undefined;
-  termsOfServiceUrl?: string | null | undefined;
 };
-export type VendorListPageCreateVendorMutation$variables = {
+export type CreateMitigationViewCreateMitigationMutation$variables = {
   connections: ReadonlyArray<string>;
-  input: CreateVendorInput;
+  input: CreateMitigationInput;
 };
-export type VendorListPageCreateVendorMutation$data = {
-  readonly createVendor: {
-    readonly vendorEdge: {
+export type CreateMitigationViewCreateMitigationMutation$data = {
+  readonly createMitigation: {
+    readonly mitigationEdge: {
       readonly node: {
-        readonly createdAt: string;
+        readonly category: string;
         readonly description: string;
         readonly id: string;
         readonly name: string;
-        readonly riskTier: RiskTier;
-        readonly updatedAt: string;
+        readonly state: MitigationState;
       };
     };
   };
 };
-export type VendorListPageCreateVendorMutation = {
-  response: VendorListPageCreateVendorMutation$data;
-  variables: VendorListPageCreateVendorMutation$variables;
+export type CreateMitigationViewCreateMitigationMutation = {
+  response: CreateMitigationViewCreateMitigationMutation$data;
+  variables: CreateMitigationViewCreateMitigationMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -67,15 +61,15 @@ v2 = [
 v3 = {
   "alias": null,
   "args": null,
-  "concreteType": "VendorEdge",
+  "concreteType": "MitigationEdge",
   "kind": "LinkedField",
-  "name": "vendorEdge",
+  "name": "mitigationEdge",
   "plural": false,
   "selections": [
     {
       "alias": null,
       "args": null,
-      "concreteType": "Vendor",
+      "concreteType": "Mitigation",
       "kind": "LinkedField",
       "name": "node",
       "plural": false,
@@ -105,21 +99,14 @@ v3 = {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "createdAt",
+          "name": "category",
           "storageKey": null
         },
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "updatedAt",
-          "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "riskTier",
+          "name": "state",
           "storageKey": null
         }
       ],
@@ -136,14 +123,14 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "VendorListPageCreateVendorMutation",
+    "name": "CreateMitigationViewCreateMitigationMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "CreateVendorPayload",
+        "concreteType": "CreateMitigationPayload",
         "kind": "LinkedField",
-        "name": "createVendor",
+        "name": "createMitigation",
         "plural": false,
         "selections": [
           (v3/*: any*/)
@@ -161,14 +148,14 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "VendorListPageCreateVendorMutation",
+    "name": "CreateMitigationViewCreateMitigationMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "CreateVendorPayload",
+        "concreteType": "CreateMitigationPayload",
         "kind": "LinkedField",
-        "name": "createVendor",
+        "name": "createMitigation",
         "plural": false,
         "selections": [
           (v3/*: any*/),
@@ -179,7 +166,7 @@ return {
             "handle": "prependEdge",
             "key": "",
             "kind": "LinkedHandle",
-            "name": "vendorEdge",
+            "name": "mitigationEdge",
             "handleArgs": [
               {
                 "kind": "Variable",
@@ -194,16 +181,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "7ab96ef77e598ee748273b37bb9b42d2",
+    "cacheID": "09c15768681bc81e7035ff20e90e81a0",
     "id": null,
     "metadata": {},
-    "name": "VendorListPageCreateVendorMutation",
+    "name": "CreateMitigationViewCreateMitigationMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorListPageCreateVendorMutation(\n  $input: CreateVendorInput!\n) {\n  createVendor(input: $input) {\n    vendorEdge {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n      }\n    }\n  }\n}\n"
+    "text": "mutation CreateMitigationViewCreateMitigationMutation(\n  $input: CreateMitigationInput!\n) {\n  createMitigation(input: $input) {\n    mitigationEdge {\n      node {\n        id\n        name\n        description\n        category\n        state\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "603ba3f92a342a8e1fb20057612b7c79";
+(node as any).hash = "42db1acd8c6e92678c9e6355a77e1eb6";
 
 export default node;

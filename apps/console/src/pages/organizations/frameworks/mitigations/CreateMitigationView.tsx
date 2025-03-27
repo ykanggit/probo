@@ -17,19 +17,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  CreateControlViewCreateControlMutation,
-  ControlImportance,
-} from "./__generated__/CreateControlViewCreateControlMutation.graphql";
+  CreateMitigationViewCreateMitigationMutation,
+  MitigationImportance,
+} from "./__generated__/CreateMitigationViewCreateMitigationMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
-import { CreateControlViewSkeleton } from "./CreateControlPage";
+import { CreateMitigationViewSkeleton } from "./CreateMitigationPage";
 
-const createControlMutation = graphql`
-  mutation CreateControlViewCreateControlMutation(
-    $input: CreateControlInput!
+const createMitigationMutation = graphql`
+  mutation CreateMitigationViewCreateMitigationMutation(
+    $input: CreateMitigationInput!
     $connections: [ID!]!
   ) {
-    createControl(input: $input) {
-      controlEdge @prependEdge(connections: $connections) {
+    createMitigation(input: $input) {
+      mitigationEdge @prependEdge(connections: $connections) {
         node {
           id
           name
@@ -103,7 +103,7 @@ function EditableField({
   );
 }
 
-function CreateControlViewContent() {
+function CreateMitigationViewContent() {
   const { organizationId, frameworkId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -111,11 +111,13 @@ function CreateControlViewContent() {
     name: "",
     description: "",
     category: "",
-    importance: "MANDATORY" as ControlImportance,
+    importance: "MANDATORY" as MitigationImportance,
   });
 
   const [commit, isInFlight] =
-    useMutation<CreateControlViewCreateControlMutation>(createControlMutation);
+    useMutation<CreateMitigationViewCreateMitigationMutation>(
+      createMitigationMutation
+    );
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
     setFormData((prev) => ({
@@ -138,7 +140,7 @@ function CreateControlViewContent() {
 
     const connectionId = ConnectionHandler.getConnectionID(
       frameworkId!,
-      "FrameworkOverviewPage_controls"
+      "FrameworkOverviewPage_mitigations"
     );
 
     commit({
@@ -156,7 +158,7 @@ function CreateControlViewContent() {
         if (errors) {
           toast({
             title: "Error",
-            description: errors[0]?.message || "Failed to create control",
+            description: errors[0]?.message || "Failed to create mitigation",
             variant: "destructive",
           });
           return;
@@ -164,17 +166,17 @@ function CreateControlViewContent() {
 
         toast({
           title: "Success",
-          description: "Control created successfully",
+          description: "Mitigation created successfully",
         });
 
         navigate(
-          `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${data.createControl.controlEdge.node.id}`
+          `/organizations/${organizationId}/frameworks/${frameworkId}/mitigations/${data.createMitigation.mitigationEdge.node.id}`
         );
       },
       onError(error) {
         toast({
           title: "Error",
-          description: error.message || "Failed to create control",
+          description: error.message || "Failed to create mitigation",
           variant: "destructive",
         });
       },
@@ -183,8 +185,8 @@ function CreateControlViewContent() {
 
   return (
     <PageTemplate
-      title="Create Control"
-      description="Create a new control for your framework"
+      title="Create Mitigation"
+      description="Create a new mitigation for your framework"
     >
       <Card className="max-w-2xl">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -200,7 +202,7 @@ function CreateControlViewContent() {
             value={formData.category}
             onChange={(value) => handleFieldChange("category", value)}
             required
-            helpText="The category this control belongs to"
+            helpText="The category this mitigation belongs to"
           />
 
           <EditableField
@@ -209,7 +211,7 @@ function CreateControlViewContent() {
             onChange={(value) => handleFieldChange("description", value)}
             required
             multiline
-            helpText="Provide a detailed description of the control"
+            helpText="Provide a detailed description of the mitigation"
           />
 
           <div className="space-y-2">
@@ -219,7 +221,7 @@ function CreateControlViewContent() {
             <Select
               value={formData.importance}
               onValueChange={(value) =>
-                handleFieldChange("importance", value as ControlImportance)
+                handleFieldChange("importance", value as MitigationImportance)
               }
             >
               <SelectTrigger>
@@ -246,7 +248,7 @@ function CreateControlViewContent() {
               Cancel
             </Button>
             <Button type="submit" disabled={isInFlight}>
-              {isInFlight ? "Creating..." : "Create Control"}
+              {isInFlight ? "Creating..." : "Create Mitigation"}
             </Button>
           </div>
         </form>
@@ -257,8 +259,8 @@ function CreateControlViewContent() {
 
 export default function CreateControlView() {
   return (
-    <Suspense fallback={<CreateControlViewSkeleton />}>
-      <CreateControlViewContent />
+    <Suspense fallback={<CreateMitigationViewSkeleton />}>
+      <CreateMitigationViewContent />
     </Suspense>
   );
 }

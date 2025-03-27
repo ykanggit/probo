@@ -9,9 +9,9 @@ import { CreatePeoplePage } from "./people/CreatePeoplePage";
 import { PeoplePage } from "./people/PeoplePage";
 import { CreateFrameworkPage } from "./frameworks/CreateFrameworkPage";
 import { UpdateFrameworkPage } from "./frameworks/UpdateFrameworkPage";
-import { CreateControlPage } from "./frameworks/controls/CreateControlPage";
-import { ControlPage } from "./frameworks/controls/ControlPage";
-import { UpdateControlPage } from "./frameworks/controls/UpdateControlPage";
+import { CreateMitigationPage } from "./frameworks/mitigations/CreateMitigationPage";
+import { MitigationPage } from "./frameworks/mitigations/MitigationPage";
+import { UpdateMitigationPage } from "./frameworks/mitigations/UpdateMitigationPage";
 import { VendorPage } from "./vendors/VendorPage";
 import { PolicyListPage } from "./policies/PolicyListPage";
 import { CreatePolicyPage } from "./policies/CreatePolicyPage";
@@ -38,16 +38,16 @@ export function OrganizationsRoutes() {
           element={<UpdateFrameworkPage />}
         />
         <Route
-          path="frameworks/:frameworkId/controls/create"
-          element={<CreateControlPage />}
+          path="frameworks/:frameworkId/mitigations/create"
+          element={<CreateMitigationPage />}
         />
         <Route
-          path="frameworks/:frameworkId/controls/:controlId"
-          element={<ControlPage />}
+          path="frameworks/:frameworkId/mitigations/:mitigationId"
+          element={<MitigationPage />}
         />
         <Route
-          path="frameworks/:frameworkId/controls/:controlId/update"
-          element={<UpdateControlPage />}
+          path="frameworks/:frameworkId/mitigations/:mitigationId/update"
+          element={<UpdateMitigationPage />}
         />
         <Route path="vendors/:vendorId" element={<VendorPage />} />
         <Route path="policies" element={<PolicyListPage />} />

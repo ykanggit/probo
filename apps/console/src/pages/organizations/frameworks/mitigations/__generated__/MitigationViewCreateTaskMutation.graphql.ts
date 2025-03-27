@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<93ac47858fbd7c339faac83f193cb21b>>
+ * @generated SignedSource<<958545e211155678a1a43d8ef1717071>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,16 +12,16 @@ import { ConcreteRequest } from 'relay-runtime';
 export type TaskState = "DONE" | "TODO";
 export type CreateTaskInput = {
   assignedToId?: string | null | undefined;
-  controlId: string;
   description: string;
+  mitigationId: string;
   name: string;
   timeEstimate?: any | null | undefined;
 };
-export type ControlViewCreateTaskMutation$variables = {
+export type MitigationViewCreateTaskMutation$variables = {
   connections: ReadonlyArray<string>;
   input: CreateTaskInput;
 };
-export type ControlViewCreateTaskMutation$data = {
+export type MitigationViewCreateTaskMutation$data = {
   readonly createTask: {
     readonly taskEdge: {
       readonly node: {
@@ -40,9 +40,9 @@ export type ControlViewCreateTaskMutation$data = {
     };
   };
 };
-export type ControlViewCreateTaskMutation = {
-  response: ControlViewCreateTaskMutation$data;
-  variables: ControlViewCreateTaskMutation$variables;
+export type MitigationViewCreateTaskMutation = {
+  response: MitigationViewCreateTaskMutation$data;
+  variables: MitigationViewCreateTaskMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -162,7 +162,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "ControlViewCreateTaskMutation",
+    "name": "MitigationViewCreateTaskMutation",
     "selections": [
       {
         "alias": null,
@@ -187,7 +187,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "ControlViewCreateTaskMutation",
+    "name": "MitigationViewCreateTaskMutation",
     "selections": [
       {
         "alias": null,
@@ -220,16 +220,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "f823a58c96ee652fd522df58de3710a1",
+    "cacheID": "dedf546da903060c79209ab7695bde12",
     "id": null,
     "metadata": {},
-    "name": "ControlViewCreateTaskMutation",
+    "name": "MitigationViewCreateTaskMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlViewCreateTaskMutation(\n  $input: CreateTaskInput!\n) {\n  createTask(input: $input) {\n    taskEdge {\n      node {\n        id\n        name\n        description\n        timeEstimate\n        state\n        version\n        assignedTo {\n          id\n          fullName\n          primaryEmailAddress\n        }\n      }\n    }\n  }\n}\n"
+    "text": "mutation MitigationViewCreateTaskMutation(\n  $input: CreateTaskInput!\n) {\n  createTask(input: $input) {\n    taskEdge {\n      node {\n        id\n        name\n        description\n        timeEstimate\n        state\n        version\n        assignedTo {\n          id\n          fullName\n          primaryEmailAddress\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5d50a685dad17446a0cab1891dc00374";
+(node as any).hash = "683fe4d2a3d33e989a8b5593f99799a5";
 
 export default node;

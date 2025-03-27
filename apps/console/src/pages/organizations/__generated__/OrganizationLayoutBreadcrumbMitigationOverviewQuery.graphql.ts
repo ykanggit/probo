@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ebdda8f7be44df65a5ba836693e48bea>>
+ * @generated SignedSource<<e194a128ba01be3824345ec9386bc7e5>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,18 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type OrganizationLayoutBreadcrumbControlOverviewQuery$variables = {
-  controlId: string;
+export type OrganizationLayoutBreadcrumbMitigationOverviewQuery$variables = {
+  mitigationId: string;
 };
-export type OrganizationLayoutBreadcrumbControlOverviewQuery$data = {
-  readonly control: {
+export type OrganizationLayoutBreadcrumbMitigationOverviewQuery$data = {
+  readonly mitigation: {
     readonly id: string;
     readonly name?: string;
   };
 };
-export type OrganizationLayoutBreadcrumbControlOverviewQuery = {
-  response: OrganizationLayoutBreadcrumbControlOverviewQuery$data;
-  variables: OrganizationLayoutBreadcrumbControlOverviewQuery$variables;
+export type OrganizationLayoutBreadcrumbMitigationOverviewQuery = {
+  response: OrganizationLayoutBreadcrumbMitigationOverviewQuery$data;
+  variables: OrganizationLayoutBreadcrumbMitigationOverviewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -28,14 +28,14 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "controlId"
+    "name": "mitigationId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "controlId"
+    "variableName": "mitigationId"
   }
 ],
 v2 = {
@@ -56,7 +56,7 @@ v3 = {
       "storageKey": null
     }
   ],
-  "type": "Control",
+  "type": "Mitigation",
   "abstractKey": null
 };
 return {
@@ -64,10 +64,10 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "OrganizationLayoutBreadcrumbControlOverviewQuery",
+    "name": "OrganizationLayoutBreadcrumbMitigationOverviewQuery",
     "selections": [
       {
-        "alias": "control",
+        "alias": "mitigation",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -87,10 +87,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "OrganizationLayoutBreadcrumbControlOverviewQuery",
+    "name": "OrganizationLayoutBreadcrumbMitigationOverviewQuery",
     "selections": [
       {
-        "alias": "control",
+        "alias": "mitigation",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -112,16 +112,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "2fa16d62f29015853c425704e3de3fd4",
+    "cacheID": "12d02036b7f66c280ddd621941750d00",
     "id": null,
     "metadata": {},
-    "name": "OrganizationLayoutBreadcrumbControlOverviewQuery",
+    "name": "OrganizationLayoutBreadcrumbMitigationOverviewQuery",
     "operationKind": "query",
-    "text": "query OrganizationLayoutBreadcrumbControlOverviewQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n    }\n  }\n}\n"
+    "text": "query OrganizationLayoutBreadcrumbMitigationOverviewQuery(\n  $mitigationId: ID!\n) {\n  mitigation: node(id: $mitigationId) {\n    __typename\n    id\n    ... on Mitigation {\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "202e114f9b94e9c0bf805b0ae8f69fcd";
+(node as any).hash = "cd0a93d3c44467278a33729c4a46b0bf";
 
 export default node;

@@ -29,7 +29,7 @@ const FrameworkViewQuery = graphql`
       ... on Framework {
         name
         description
-        controls(first: 100) @connection(key: "FrameworkView_controls") {
+        mitigations(first: 100) @connection(key: "FrameworkView_mitigations") {
           edges {
             node {
               id
@@ -46,7 +46,7 @@ const FrameworkViewQuery = graphql`
   }
 `;
 
-interface Control {
+interface Mitigation {
   id?: string;
   name?: string;
   description?: string;
@@ -61,7 +61,7 @@ interface Category {
   name: string;
   description: string;
   progress: number;
-  controls: Control[];
+  mitigations: Mitigation[];
   doneCount: number;
   totalCount: number;
 }
@@ -73,14 +73,15 @@ function FrameworkViewContent({
 }) {
   const data = usePreloadedQuery(FrameworkViewQuery, queryRef);
   const framework = data.node;
-  const controls = framework.controls?.edges.map((edge) => edge?.node) ?? [];
+  const mitigations =
+    framework.mitigations?.edges.map((edge) => edge?.node) ?? [];
   const navigate = useNavigate();
   const { organizationId } = useParams();
 
   // Monitor URL hash for changes and update state accordingly
   const [hashValue, setHashValue] = useState(window.location.hash);
 
-  // Get the active category from the hash (used when returning from a control)
+  // Get the active category from the hash (used when returning from a mitigation)
   const hashCategory = hashValue.substring(1)
     ? decodeURIComponent(hashValue.substring(1))
     : "";
@@ -110,7 +111,7 @@ function FrameworkViewContent({
     };
   }, []);
 
-  // Map control state to status for the new design
+  // Map mitigation state to status for the new design
   const mapStateToStatus = (state?: string): string => {
     if (!state) return "incomplete";
     switch (state) {
@@ -125,17 +126,17 @@ function FrameworkViewContent({
     }
   };
 
-  const processedControls = controls.map((control) => ({
-    ...control,
-    status: mapStateToStatus(control.state),
+  const processedControls = mitigations.map((mitigation) => ({
+    ...mitigation,
+    status: mapStateToStatus(mitigation.state),
   }));
 
   // Calculate global progress
   const implementedCount = processedControls.filter(
-    (control) => control.status === "complete"
+    (mitigation) => mitigation.status === "complete"
   ).length;
   const notApplicableCount = processedControls.filter(
-    (control) => control.status === "not-applicable"
+    (mitigation) => mitigation.status === "not-applicable"
   ).length;
   const totalControls = processedControls.length;
 
@@ -146,22 +147,22 @@ function FrameworkViewContent({
     : 0;
 
   // Get global status counts
-  const globalStatusCounts = processedControls.reduce((acc, control) => {
-    if (control.status) {
-      acc[control.status] = (acc[control.status] || 0) + 1;
+  const globalStatusCounts = processedControls.reduce((acc, mitigation) => {
+    if (mitigation.status) {
+      acc[mitigation.status] = (acc[mitigation.status] || 0) + 1;
     }
     return acc;
   }, {} as Record<string, number>);
 
-  // Group controls by category
-  const controlsByCategory = processedControls.reduce((acc, control) => {
-    if (!control?.category) return acc;
-    if (!acc[control.category]) {
-      acc[control.category] = [];
+  // Group mitigations by category
+  const controlsByCategory = processedControls.reduce((acc, mitigation) => {
+    if (!mitigation?.category) return acc;
+    if (!acc[mitigation.category]) {
+      acc[mitigation.category] = [];
     }
-    acc[control.category].push(control);
+    acc[mitigation.category].push(mitigation);
     return acc;
-  }, {} as Record<string, Control[]>);
+  }, {} as Record<string, Mitigation[]>);
 
   // Function to toggle a category's expanded state - now supports multiple expanded categories
   const toggleCategory = (categoryId: string) => {
@@ -177,10 +178,10 @@ function FrameworkViewContent({
   const categories: Category[] = Object.entries(controlsByCategory)
     .map(([categoryName, categoryControls]) => {
       const catImplementedCount = categoryControls.filter(
-        (control) => control.status === "complete"
+        (mitigation) => mitigation.status === "complete"
       ).length;
       const catNotApplicableCount = categoryControls.filter(
-        (control) => control.status === "not-applicable"
+        (mitigation) => mitigation.status === "not-applicable"
       ).length;
       // Consider both "complete" and "not-applicable" as done for category progress
       const catDoneCount = catImplementedCount + catNotApplicableCount;
@@ -194,14 +195,14 @@ function FrameworkViewContent({
         name: categoryName,
         description: `Controls related to ${categoryName.toLowerCase()}`,
         progress: progress,
-        controls: categoryControls.sort((a, b) =>
+        mitigations: categoryControls.sort((a, b) =>
           (a.name || "").localeCompare(b.name || "")
         ),
         doneCount: catDoneCount,
         totalCount: catTotalCount,
       };
     })
-    .filter((category) => category.controls.length > 0)
+    .filter((category) => category.mitigations.length > 0)
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const getStatusIcon = (status: string) => {
@@ -235,10 +236,10 @@ function FrameworkViewContent({
           </Button>
           <Button asChild>
             <Link
-              to={`/organizations/${organizationId}/frameworks/${framework.id}/controls/create`}
+              to={`/organizations/${organizationId}/frameworks/${framework.id}/mitigations/create`}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Create Control
+              Create Mitigation
             </Link>
           </Button>
         </div>
@@ -385,7 +386,7 @@ function FrameworkViewContent({
 
                 {isExpanded && (
                   <CardContent className="p-0">
-                    {category.controls.length > 0 ? (
+                    {category.mitigations.length > 0 ? (
                       <div className="w-full">
                         <table className="w-full">
                           <thead>
@@ -396,16 +397,18 @@ function FrameworkViewContent({
                               <th className="w-24 px-4 py-2 text-left">
                                 Status
                               </th>
-                              <th className="px-4 py-2 text-left">Control</th>
+                              <th className="px-4 py-2 text-left">
+                                Mitigation
+                              </th>
                             </tr>
                           </thead>
                           <tbody className="divide-y">
-                            {category.controls.map((control) => (
+                            {category.mitigations.map((mitigation) => (
                               <tr
-                                key={control.id || Math.random().toString()}
+                                key={mitigation.id || Math.random().toString()}
                                 className="hover:bg-muted/50 cursor-pointer"
                                 onClick={() => {
-                                  if (control?.id) {
+                                  if (mitigation?.id) {
                                     // Always store just this category in the hash
                                     // This is what will be expanded when returning
                                     const encoded = encodeURIComponent(
@@ -427,7 +430,7 @@ function FrameworkViewContent({
                                     // Use a small timeout to ensure the hash change is processed by the browser
                                     setTimeout(() => {
                                       navigate(
-                                        `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
+                                        `/organizations/${organizationId}/frameworks/${framework.id}/mitigations/${mitigation.id}`
                                       );
                                     }, 100);
                                   }
@@ -435,19 +438,19 @@ function FrameworkViewContent({
                               >
                                 <td className="w-24 px-4 py-3 align-middle">
                                   <Badge variant="outline" className="text-xs">
-                                    {control.importance}
+                                    {mitigation.importance}
                                   </Badge>
                                 </td>
                                 <td className="w-24 px-4 py-3 align-middle">
                                   <div className="flex items-center justify-center">
-                                    {control.status
-                                      ? getStatusIcon(control.status)
+                                    {mitigation.status
+                                      ? getStatusIcon(mitigation.status)
                                       : null}
                                   </div>
                                 </td>
                                 <td className="px-4 py-3 align-middle">
                                   <div className="font-medium">
-                                    {control.name}
+                                    {mitigation.name}
                                   </div>
                                 </td>
                               </tr>
@@ -457,7 +460,7 @@ function FrameworkViewContent({
                       </div>
                     ) : (
                       <div className="flex items-center justify-center p-6 text-center text-muted-foreground">
-                        No controls in this category
+                        No mitigations in this category
                       </div>
                     )}
                   </CardContent>

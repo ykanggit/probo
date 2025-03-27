@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<be19ac6afdae6f9be1b869afbd0a0838>>
+ * @generated SignedSource<<780c10208a633b2ce7cd34ccc580cf25>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,10 +9,10 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ControlViewOrganizationQuery$variables = {
+export type MitigationViewOrganizationQuery$variables = {
   organizationId: string;
 };
-export type ControlViewOrganizationQuery$data = {
+export type MitigationViewOrganizationQuery$data = {
   readonly organization: {
     readonly id: string;
     readonly peoples?: {
@@ -26,9 +26,9 @@ export type ControlViewOrganizationQuery$data = {
     };
   };
 };
-export type ControlViewOrganizationQuery = {
-  response: ControlViewOrganizationQuery$data;
-  variables: ControlViewOrganizationQuery$variables;
+export type MitigationViewOrganizationQuery = {
+  response: MitigationViewOrganizationQuery$data;
+  variables: MitigationViewOrganizationQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -153,7 +153,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ControlViewOrganizationQuery",
+    "name": "MitigationViewOrganizationQuery",
     "selections": [
       {
         "alias": "organization",
@@ -174,10 +174,10 @@ return {
                 ],
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
-                "name": "__ControlView_peoples_connection",
+                "name": "__MitigationView_peoples_connection",
                 "plural": false,
                 "selections": (v5/*: any*/),
-                "storageKey": "__ControlView_peoples_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
+                "storageKey": "__MitigationView_peoples_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
               }
             ],
             "type": "Organization",
@@ -194,7 +194,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ControlViewOrganizationQuery",
+    "name": "MitigationViewOrganizationQuery",
     "selections": [
       {
         "alias": "organization",
@@ -226,7 +226,7 @@ return {
                   "orderBy"
                 ],
                 "handle": "connection",
-                "key": "ControlView_peoples",
+                "key": "MitigationView_peoples",
                 "kind": "LinkedHandle",
                 "name": "peoples"
               }
@@ -240,7 +240,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9a339515a618cf48b77e74890b016272",
+    "cacheID": "3d1fc2d02bc6eea68edcabc6fc6f0b56",
     "id": null,
     "metadata": {
       "connection": [
@@ -255,13 +255,13 @@ return {
         }
       ]
     },
-    "name": "ControlViewOrganizationQuery",
+    "name": "MitigationViewOrganizationQuery",
     "operationKind": "query",
-    "text": "query ControlViewOrganizationQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query MitigationViewOrganizationQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n        edges {\n          node {\n            id\n            fullName\n            primaryEmailAddress\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "22507c997964e19a663c819b750e50c9";
+(node as any).hash = "73abf70f60b6f5a07b25f3c83676e02f";
 
 export default node;

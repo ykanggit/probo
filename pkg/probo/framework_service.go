@@ -53,12 +53,12 @@ type (
 				Description string `json:"description"`
 				Version     string `json:"version"`
 				Controls    []struct {
-					ContentRef  string                     `json:"content-ref"`
-					Category    string                     `json:"category"`
-					Importance  coredata.ControlImportance `json:"importance"`
-					Standards   []string                   `json:"standards"`
-					Name        string                     `json:"name"`
-					Description string                     `json:"description"`
+					ContentRef  string                        `json:"content-ref"`
+					Category    string                        `json:"category"`
+					Importance  coredata.MitigationImportance `json:"importance"`
+					Standards   []string                      `json:"standards"`
+					Name        string                        `json:"name"`
+					Description string                        `json:"description"`
 					Tasks       []struct {
 						Name         string `json:"name"`
 						Description  string `json:"description"`
@@ -212,31 +212,31 @@ func (s FrameworkService) Import(
 		UpdatedAt:      now,
 	}
 
-	importedControls := coredata.Controls{}
+	importedMitigations := coredata.Mitigations{}
 	importedTasks := coredata.Tasks{}
-	for _, control := range req.Data.Framework.Controls {
-		controlID, err := gid.NewGID(organizationID.TenantID(), coredata.ControlEntityType)
+	for _, mitigation := range req.Data.Framework.Controls {
+		controlID, err := gid.NewGID(organizationID.TenantID(), coredata.MitigationEntityType)
 		if err != nil {
 			return nil, fmt.Errorf("cannot create global id: %w", err)
 		}
 
-		importedControl := &coredata.Control{
+		importedControl := &coredata.Mitigation{
 			ID:          controlID,
 			FrameworkID: frameworkID,
-			Category:    control.Category,
-			Importance:  coredata.ControlImportance(control.Importance),
-			Name:        control.Name,
-			Description: control.Description,
-			State:       coredata.ControlStateNotStarted,
-			ContentRef:  control.ContentRef,
+			Category:    mitigation.Category,
+			Importance:  coredata.MitigationImportance(mitigation.Importance),
+			Name:        mitigation.Name,
+			Description: mitigation.Description,
+			State:       coredata.MitigationStateNotStarted,
+			ContentRef:  mitigation.ContentRef,
 			CreatedAt:   now,
 			UpdatedAt:   now,
-			Standards:   control.Standards,
+			Standards:   mitigation.Standards,
 		}
 
-		importedControls = append(importedControls, importedControl)
+		importedMitigations = append(importedMitigations, importedControl)
 
-		for _, task := range control.Tasks {
+		for _, task := range mitigation.Tasks {
 			taskID, err := gid.NewGID(organizationID.TenantID(), coredata.TaskEntityType)
 			if err != nil {
 				return nil, fmt.Errorf("cannot create global id: %w", err)
@@ -249,11 +249,10 @@ func (s FrameworkService) Import(
 
 			importedTasks = append(importedTasks, &coredata.Task{
 				ID:           taskID,
-				ControlID:    controlID,
+				MitigationID: controlID,
 				Name:         task.Name,
 				State:        coredata.TaskStateTodo,
 				Description:  task.Description,
-				ContentRef:   "",
 				CreatedAt:    now,
 				UpdatedAt:    now,
 				TimeEstimate: timeEstimate,
@@ -270,9 +269,9 @@ func (s FrameworkService) Import(
 				return fmt.Errorf("cannot insert framework: %w", err)
 			}
 
-			for _, importedControl := range importedControls {
-				if err := importedControl.Insert(ctx, tx, s.svc.scope); err != nil {
-					return fmt.Errorf("cannot insert control: %w", err)
+			for _, importedMitigation := range importedMitigations {
+				if err := importedMitigation.Insert(ctx, tx, s.svc.scope); err != nil {
+					return fmt.Errorf("cannot insert mitigation: %w", err)
 				}
 			}
 

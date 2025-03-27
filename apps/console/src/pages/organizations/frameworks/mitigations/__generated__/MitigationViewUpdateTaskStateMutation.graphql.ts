@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<42dcc8ca7d9ad288321e73fa5175db44>>
+ * @generated SignedSource<<4aed09b28d5d1ec083abfeeb874b9ce3>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,32 +9,31 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ControlImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
-export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type UpdateControlInput = {
-  category?: string | null | undefined;
+export type TaskState = "DONE" | "TODO";
+export type UpdateTaskInput = {
   description?: string | null | undefined;
   expectedVersion: number;
-  id: string;
-  importance?: ControlImportance | null | undefined;
   name?: string | null | undefined;
-  state?: ControlState | null | undefined;
+  state?: TaskState | null | undefined;
+  taskId: string;
+  timeEstimate?: any | null | undefined;
 };
-export type ControlViewUpdateControlStateMutation$variables = {
-  input: UpdateControlInput;
+export type MitigationViewUpdateTaskStateMutation$variables = {
+  input: UpdateTaskInput;
 };
-export type ControlViewUpdateControlStateMutation$data = {
-  readonly updateControl: {
-    readonly control: {
+export type MitigationViewUpdateTaskStateMutation$data = {
+  readonly updateTask: {
+    readonly task: {
       readonly id: string;
-      readonly state: ControlState;
+      readonly state: TaskState;
+      readonly timeEstimate: any | null | undefined;
       readonly version: number;
     };
   };
 };
-export type ControlViewUpdateControlStateMutation = {
-  response: ControlViewUpdateControlStateMutation$data;
-  variables: ControlViewUpdateControlStateMutation$variables;
+export type MitigationViewUpdateTaskStateMutation = {
+  response: MitigationViewUpdateTaskStateMutation$data;
+  variables: MitigationViewUpdateTaskStateMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -55,17 +54,17 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "UpdateControlPayload",
+    "concreteType": "UpdateTaskPayload",
     "kind": "LinkedField",
-    "name": "updateControl",
+    "name": "updateTask",
     "plural": false,
     "selections": [
       {
         "alias": null,
         "args": null,
-        "concreteType": "Control",
+        "concreteType": "Task",
         "kind": "LinkedField",
-        "name": "control",
+        "name": "task",
         "plural": false,
         "selections": [
           {
@@ -80,6 +79,13 @@ v1 = [
             "args": null,
             "kind": "ScalarField",
             "name": "state",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "timeEstimate",
             "storageKey": null
           },
           {
@@ -101,7 +107,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ControlViewUpdateControlStateMutation",
+    "name": "MitigationViewUpdateTaskStateMutation",
     "selections": (v1/*: any*/),
     "type": "Mutation",
     "abstractKey": null
@@ -110,20 +116,20 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ControlViewUpdateControlStateMutation",
+    "name": "MitigationViewUpdateTaskStateMutation",
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "b34b9c0ddec55d16efcc2f38e8334773",
+    "cacheID": "8de0d061237d4ebcbb366b8eefff6d94",
     "id": null,
     "metadata": {},
-    "name": "ControlViewUpdateControlStateMutation",
+    "name": "MitigationViewUpdateTaskStateMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlViewUpdateControlStateMutation(\n  $input: UpdateControlInput!\n) {\n  updateControl(input: $input) {\n    control {\n      id\n      state\n      version\n    }\n  }\n}\n"
+    "text": "mutation MitigationViewUpdateTaskStateMutation(\n  $input: UpdateTaskInput!\n) {\n  updateTask(input: $input) {\n    task {\n      id\n      state\n      timeEstimate\n      version\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3eaaab55403bfaf343d4a740ad0128e1";
+(node as any).hash = "81dca6c475859526370ef60b4757428b";
 
 export default node;

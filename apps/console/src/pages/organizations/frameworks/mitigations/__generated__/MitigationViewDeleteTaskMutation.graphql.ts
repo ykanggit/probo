@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5cc5a8fcb02623e685586d2f3510fb4a>>
+ * @generated SignedSource<<c91c57e5263b695d85ca6d95f14acc1d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,21 +9,21 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type DeleteEvidenceInput = {
-  evidenceId: string;
+export type DeleteTaskInput = {
+  taskId: string;
 };
-export type ControlViewDeleteEvidenceMutation$variables = {
+export type MitigationViewDeleteTaskMutation$variables = {
   connections: ReadonlyArray<string>;
-  input: DeleteEvidenceInput;
+  input: DeleteTaskInput;
 };
-export type ControlViewDeleteEvidenceMutation$data = {
-  readonly deleteEvidence: {
-    readonly deletedEvidenceId: string;
+export type MitigationViewDeleteTaskMutation$data = {
+  readonly deleteTask: {
+    readonly deletedTaskId: string;
   };
 };
-export type ControlViewDeleteEvidenceMutation = {
-  response: ControlViewDeleteEvidenceMutation$data;
-  variables: ControlViewDeleteEvidenceMutation$variables;
+export type MitigationViewDeleteTaskMutation = {
+  response: MitigationViewDeleteTaskMutation$data;
+  variables: MitigationViewDeleteTaskMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -48,7 +48,7 @@ v3 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "deletedEvidenceId",
+  "name": "deletedTaskId",
   "storageKey": null
 };
 return {
@@ -59,14 +59,14 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "ControlViewDeleteEvidenceMutation",
+    "name": "MitigationViewDeleteTaskMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "DeleteEvidencePayload",
+        "concreteType": "DeleteTaskPayload",
         "kind": "LinkedField",
-        "name": "deleteEvidence",
+        "name": "deleteTask",
         "plural": false,
         "selections": [
           (v3/*: any*/)
@@ -84,14 +84,14 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "ControlViewDeleteEvidenceMutation",
+    "name": "MitigationViewDeleteTaskMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "DeleteEvidencePayload",
+        "concreteType": "DeleteTaskPayload",
         "kind": "LinkedField",
-        "name": "deleteEvidence",
+        "name": "deleteTask",
         "plural": false,
         "selections": [
           (v3/*: any*/),
@@ -102,7 +102,7 @@ return {
             "handle": "deleteEdge",
             "key": "",
             "kind": "ScalarHandle",
-            "name": "deletedEvidenceId",
+            "name": "deletedTaskId",
             "handleArgs": [
               {
                 "kind": "Variable",
@@ -117,16 +117,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "594da4829274c817424f9b84ba99a5a6",
+    "cacheID": "f586e9c07d233eb31a72c2564c448fe4",
     "id": null,
     "metadata": {},
-    "name": "ControlViewDeleteEvidenceMutation",
+    "name": "MitigationViewDeleteTaskMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlViewDeleteEvidenceMutation(\n  $input: DeleteEvidenceInput!\n) {\n  deleteEvidence(input: $input) {\n    deletedEvidenceId\n  }\n}\n"
+    "text": "mutation MitigationViewDeleteTaskMutation(\n  $input: DeleteTaskInput!\n) {\n  deleteTask(input: $input) {\n    deletedTaskId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a6b5e90e931adf04f45be9403b291ad9";
+(node as any).hash = "2d6cfcb4704b95bc89f9f4715488d133";
 
 export default node;

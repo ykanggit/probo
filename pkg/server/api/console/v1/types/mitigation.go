@@ -20,31 +20,31 @@ import (
 )
 
 type (
-	ControlOrderBy OrderBy[coredata.ControlOrderField]
+	MitigationOrderBy OrderBy[coredata.MitigationOrderField]
 )
 
-func NewControlConnection(p *page.Page[*coredata.Control, coredata.ControlOrderField]) *ControlConnection {
-	var edges = make([]*ControlEdge, len(p.Data))
+func NewMitigationConnection(p *page.Page[*coredata.Mitigation, coredata.MitigationOrderField]) *MitigationConnection {
+	var edges = make([]*MitigationEdge, len(p.Data))
 
 	for i := range edges {
-		edges[i] = NewControlEdge(p.Data[i], p.Cursor.OrderBy.Field)
+		edges[i] = NewMitigationEdge(p.Data[i], p.Cursor.OrderBy.Field)
 	}
 
-	return &ControlConnection{
+	return &MitigationConnection{
 		Edges:    edges,
 		PageInfo: NewPageInfo(p),
 	}
 }
 
-func NewControlEdge(c *coredata.Control, orderBy coredata.ControlOrderField) *ControlEdge {
-	return &ControlEdge{
+func NewMitigationEdge(c *coredata.Mitigation, orderBy coredata.MitigationOrderField) *MitigationEdge {
+	return &MitigationEdge{
 		Cursor: c.CursorKey(orderBy),
-		Node:   NewControl(c),
+		Node:   NewMitigation(c),
 	}
 }
 
-func NewControl(c *coredata.Control) *Control {
-	return &Control{
+func NewMitigation(c *coredata.Mitigation) *Mitigation {
+	return &Mitigation{
 		ID:          c.ID,
 		Version:     c.Version,
 		Category:    c.Category,

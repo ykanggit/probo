@@ -14,7 +14,7 @@ export function PolicyListViewSkeleton() {
       description="Manage your organization's policies"
       actions={<div className="bg-muted animate-pulse h-9 w-1/6 rounded-lg" />}
     >
-      {/* Search and filter controls skeleton */}
+      {/* Search and filter mitigations skeleton */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex-1 h-10 bg-muted animate-pulse rounded" />
         <div className="flex gap-2">

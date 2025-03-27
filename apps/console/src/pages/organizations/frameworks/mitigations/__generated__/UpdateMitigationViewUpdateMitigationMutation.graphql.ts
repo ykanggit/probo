@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5223ef96f75ea5f5d4b124d190dfd455>>
+ * @generated SignedSource<<39cfe3277c49d7a0ff2099d6ad579e7d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,36 +9,36 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ControlImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
-export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type UpdateControlInput = {
+export type MitigationImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
+export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
+export type UpdateMitigationInput = {
   category?: string | null | undefined;
   description?: string | null | undefined;
   expectedVersion: number;
   id: string;
-  importance?: ControlImportance | null | undefined;
+  importance?: MitigationImportance | null | undefined;
   name?: string | null | undefined;
-  state?: ControlState | null | undefined;
+  state?: MitigationState | null | undefined;
 };
-export type UpdateControlViewUpdateControlMutation$variables = {
-  input: UpdateControlInput;
+export type UpdateMitigationViewUpdateMitigationMutation$variables = {
+  input: UpdateMitigationInput;
 };
-export type UpdateControlViewUpdateControlMutation$data = {
-  readonly updateControl: {
-    readonly control: {
+export type UpdateMitigationViewUpdateMitigationMutation$data = {
+  readonly updateMitigation: {
+    readonly mitigation: {
       readonly category: string;
       readonly description: string;
       readonly id: string;
-      readonly importance: ControlImportance;
+      readonly importance: MitigationImportance;
       readonly name: string;
-      readonly state: ControlState;
+      readonly state: MitigationState;
       readonly version: number;
     };
   };
 };
-export type UpdateControlViewUpdateControlMutation = {
-  response: UpdateControlViewUpdateControlMutation$data;
-  variables: UpdateControlViewUpdateControlMutation$variables;
+export type UpdateMitigationViewUpdateMitigationMutation = {
+  response: UpdateMitigationViewUpdateMitigationMutation$data;
+  variables: UpdateMitigationViewUpdateMitigationMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -59,17 +59,17 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "UpdateControlPayload",
+    "concreteType": "UpdateMitigationPayload",
     "kind": "LinkedField",
-    "name": "updateControl",
+    "name": "updateMitigation",
     "plural": false,
     "selections": [
       {
         "alias": null,
         "args": null,
-        "concreteType": "Control",
+        "concreteType": "Mitigation",
         "kind": "LinkedField",
-        "name": "control",
+        "name": "mitigation",
         "plural": false,
         "selections": [
           {
@@ -133,7 +133,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "UpdateControlViewUpdateControlMutation",
+    "name": "UpdateMitigationViewUpdateMitigationMutation",
     "selections": (v1/*: any*/),
     "type": "Mutation",
     "abstractKey": null
@@ -142,20 +142,20 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "UpdateControlViewUpdateControlMutation",
+    "name": "UpdateMitigationViewUpdateMitigationMutation",
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "1702f16b6cc6452422c0f72acee25359",
+    "cacheID": "5ebe3d38712b444c98c08661b7431da3",
     "id": null,
     "metadata": {},
-    "name": "UpdateControlViewUpdateControlMutation",
+    "name": "UpdateMitigationViewUpdateMitigationMutation",
     "operationKind": "mutation",
-    "text": "mutation UpdateControlViewUpdateControlMutation(\n  $input: UpdateControlInput!\n) {\n  updateControl(input: $input) {\n    control {\n      id\n      name\n      description\n      category\n      importance\n      state\n      version\n    }\n  }\n}\n"
+    "text": "mutation UpdateMitigationViewUpdateMitigationMutation(\n  $input: UpdateMitigationInput!\n) {\n  updateMitigation(input: $input) {\n    mitigation {\n      id\n      name\n      description\n      category\n      importance\n      state\n      version\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "e0f0940fe564406ef95473420b336128";
+(node as any).hash = "c68d76d527359d182749b309d2d8d6dd";
 
 export default node;

@@ -15,26 +15,26 @@
 package coredata
 
 type (
-	ControlOrderField string
+	MitigationOrderField string
 )
 
 const (
-	ControlOrderFieldCreatedAt ControlOrderField = "CREATED_AT"
+	MitigationOrderFieldCreatedAt MitigationOrderField = "CREATED_AT"
 )
 
-func (p ControlOrderField) Column() string {
+func (p MitigationOrderField) Column() string {
 	return string(p)
 }
 
-func (p ControlOrderField) String() string {
+func (p MitigationOrderField) String() string {
 	return string(p)
 }
 
-func (p ControlOrderField) MarshalText() ([]byte, error) {
+func (p MitigationOrderField) MarshalText() ([]byte, error) {
 	return []byte(p.String()), nil
 }
 
-func (p *ControlOrderField) UnmarshalText(text []byte) error {
-	*p = ControlOrderField(text)
+func (p *MitigationOrderField) UnmarshalText(text []byte) error {
+	*p = MitigationOrderField(text)
 	return nil
 }

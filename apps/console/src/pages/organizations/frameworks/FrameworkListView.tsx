@@ -37,7 +37,7 @@ const FrameworkListViewQuery = graphql`
               id
               name
               description
-              controls(first: 100) {
+              mitigations(first: 100) {
                 edges {
                   node {
                     id
@@ -66,7 +66,7 @@ const FrameworkListViewImportFrameworkMutation = graphql`
           id
           name
           description
-          controls(first: 100) {
+          mitigations(first: 100) {
             edges {
               node {
                 id
@@ -240,10 +240,10 @@ function FrameworkListViewContent({
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
           {frameworks.map((framework) => {
-            const validatedControls = framework.controls.edges.filter(
+            const validatedControls = framework.mitigations.edges.filter(
               (edge) => edge?.node?.state === "IMPLEMENTED"
             ).length;
-            const totalControls = framework.controls.edges.length;
+            const totalControls = framework.mitigations.edges.length;
 
             return (
               <Link
@@ -267,7 +267,7 @@ function FrameworkListViewContent({
                   }
                   progress={
                     validatedControls === totalControls
-                      ? "All controls validated"
+                      ? "All mitigations validated"
                       : `${validatedControls}/${totalControls} Controls validated`
                   }
                 />

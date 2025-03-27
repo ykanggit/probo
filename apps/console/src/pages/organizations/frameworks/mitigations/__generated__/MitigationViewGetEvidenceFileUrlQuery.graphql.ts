@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6097cb76bff61c342c2b6389a8e7f618>>
+ * @generated SignedSource<<c39e6569df1609b4a9cf0a6c1673df3a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,18 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ControlViewGetEvidenceFileUrlQuery$variables = {
+export type MitigationViewGetEvidenceFileUrlQuery$variables = {
   evidenceId: string;
 };
-export type ControlViewGetEvidenceFileUrlQuery$data = {
+export type MitigationViewGetEvidenceFileUrlQuery$data = {
   readonly node: {
     readonly fileUrl?: string | null | undefined;
     readonly id?: string;
   };
 };
-export type ControlViewGetEvidenceFileUrlQuery = {
-  response: ControlViewGetEvidenceFileUrlQuery$data;
-  variables: ControlViewGetEvidenceFileUrlQuery$variables;
+export type MitigationViewGetEvidenceFileUrlQuery = {
+  response: MitigationViewGetEvidenceFileUrlQuery$data;
+  variables: MitigationViewGetEvidenceFileUrlQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -57,7 +57,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ControlViewGetEvidenceFileUrlQuery",
+    "name": "MitigationViewGetEvidenceFileUrlQuery",
     "selections": [
       {
         "alias": null,
@@ -87,7 +87,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ControlViewGetEvidenceFileUrlQuery",
+    "name": "MitigationViewGetEvidenceFileUrlQuery",
     "selections": [
       {
         "alias": null,
@@ -119,16 +119,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b656f027db1774647bcd0eefad36f66f",
+    "cacheID": "1dc81a5d665b9141b5cd62ef893ff0e1",
     "id": null,
     "metadata": {},
-    "name": "ControlViewGetEvidenceFileUrlQuery",
+    "name": "MitigationViewGetEvidenceFileUrlQuery",
     "operationKind": "query",
-    "text": "query ControlViewGetEvidenceFileUrlQuery(\n  $evidenceId: ID!\n) {\n  node(id: $evidenceId) {\n    __typename\n    ... on Evidence {\n      id\n      fileUrl\n    }\n    id\n  }\n}\n"
+    "text": "query MitigationViewGetEvidenceFileUrlQuery(\n  $evidenceId: ID!\n) {\n  node(id: $evidenceId) {\n    __typename\n    ... on Evidence {\n      id\n      fileUrl\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a06f8279b87274b3cec4a11f44a53f49";
+(node as any).hash = "9d7bbfc81ce73246b671989102da3192";
 
 export default node;

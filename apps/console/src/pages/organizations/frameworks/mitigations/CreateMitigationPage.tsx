@@ -4,26 +4,29 @@ import { Suspense } from "react";
 import { useLocation } from "react-router";
 import { lazy } from "@probo/react-lazy";
 
-const CreateControlView = lazy(() => import("./CreateControlView"));
+const CreateMitigationView = lazy(() => import("./CreateMitigationView"));
 
-export function CreateControlViewSkeleton() {
+export function CreateMitigationViewSkeleton() {
   return (
     <PageTemplateSkeleton
-      title="Create Control"
-      description="Create a new control for your framework"
+      title="Create Mitigation"
+      description="Create a new mitigation for your framework"
     >
       <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
     </PageTemplateSkeleton>
   );
 }
 
-export function CreateControlPage() {
+export function CreateMitigationPage() {
   const location = useLocation();
 
   return (
-    <Suspense key={location.pathname} fallback={<CreateControlViewSkeleton />}>
+    <Suspense
+      key={location.pathname}
+      fallback={<CreateMitigationViewSkeleton />}
+    >
       <ErrorBoundaryWithLocation>
-        <CreateControlView />
+        <CreateMitigationView />
       </ErrorBoundaryWithLocation>
     </Suspense>
   );

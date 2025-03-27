@@ -21,23 +21,23 @@ interface Node {
   id: ID!
 }
 
-enum ControlState
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ControlState") {
+enum MitigationState
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.MitigationState") {
   NOT_STARTED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ControlStateNotStarted"
+      value: "github.com/getprobo/probo/pkg/coredata.MitigationStateNotStarted"
     )
   IN_PROGRESS
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ControlStateInProgress"
+      value: "github.com/getprobo/probo/pkg/coredata.MitigationStateInProgress"
     )
   NOT_APPLICABLE
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ControlStateNotApplicable"
+      value: "github.com/getprobo/probo/pkg/coredata.MitigationStateNotApplicable"
     )
   IMPLEMENTED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ControlStateImplemented"
+      value: "github.com/getprobo/probo/pkg/coredata.MitigationStateImplemented"
     )
 }
 
@@ -75,19 +75,21 @@ enum PeopleKind
     )
 }
 
-enum ControlImportance
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ControlImportance") {
+enum MitigationImportance
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.MitigationImportance"
+  ) {
   MANDATORY
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ControlImportanceMandatory"
+      value: "github.com/getprobo/probo/pkg/coredata.MitigationImportanceMandatory"
     )
   PREFERRED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ControlImportancePreferred"
+      value: "github.com/getprobo/probo/pkg/coredata.MitigationImportancePreferred"
     )
   ADVANCED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ControlImportanceAdvanced"
+      value: "github.com/getprobo/probo/pkg/coredata.MitigationImportanceAdvanced"
     )
 }
 
@@ -187,8 +189,10 @@ enum FrameworkOrderField
   NAME
 }
 
-enum ControlOrderField
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ControlOrderField") {
+enum MitigationOrderField
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.MitigationOrderField"
+  ) {
   NAME
 }
 
@@ -231,12 +235,12 @@ input FrameworkOrder
   field: FrameworkOrderField!
 }
 
-input ControlOrder
+input MitigationOrder
   @goModel(
-    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.ControlOrderBy"
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.MitigationOrderBy"
   ) {
   direction: OrderDirection!
-  field: ControlOrderField!
+  field: MitigationOrderField!
 }
 
 input TaskOrder
@@ -327,36 +331,36 @@ type Framework implements Node {
   name: String!
   description: String!
 
-  controls(
+  mitigations(
     first: Int
     after: CursorKey
     last: Int
     before: CursorKey
-    orderBy: ControlOrder
-  ): ControlConnection! @goField(forceResolver: true)
+    orderBy: MitigationOrder
+  ): MitigationConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
 }
 
-type ControlConnection {
-  edges: [ControlEdge!]!
+type MitigationConnection {
+  edges: [MitigationEdge!]!
   pageInfo: PageInfo!
 }
 
-type ControlEdge {
+type MitigationEdge {
   cursor: CursorKey!
-  node: Control!
+  node: Mitigation!
 }
 
-type Control implements Node {
+type Mitigation implements Node {
   id: ID!
   version: Int!
   category: String!
   name: String!
   description: String!
-  state: ControlState!
-  importance: ControlImportance!
+  state: MitigationState!
+  importance: MitigationImportance!
 
   tasks(
     first: Int
@@ -503,8 +507,8 @@ type Mutation {
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
   importFramework(input: ImportFrameworkInput!): ImportFrameworkPayload!
 
-  createControl(input: CreateControlInput!): CreateControlPayload!
-  updateControl(input: UpdateControlInput!): UpdateControlPayload!
+  createMitigation(input: CreateMitigationInput!): CreateMitigationPayload!
+  updateMitigation(input: UpdateMitigationInput!): UpdateMitigationPayload!
 
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
@@ -639,7 +643,7 @@ type DeleteOrganizationPayload {
 }
 
 input CreateTaskInput {
-  controlId: ID!
+  mitigationId: ID!
   name: String!
   description: String!
   timeEstimate: Duration
@@ -675,16 +679,16 @@ type CreateFrameworkPayload {
   frameworkEdge: FrameworkEdge!
 }
 
-input CreateControlInput {
+input CreateMitigationInput {
   frameworkId: ID!
   name: String!
   description: String!
   category: String!
-  importance: ControlImportance!
+  importance: MitigationImportance!
 }
 
-type CreateControlPayload {
-  controlEdge: ControlEdge!
+type CreateMitigationPayload {
+  mitigationEdge: MitigationEdge!
 }
 
 type UpdateFrameworkPayload {
@@ -699,18 +703,18 @@ type UpdatePeoplePayload {
   people: People!
 }
 
-input UpdateControlInput {
+input UpdateMitigationInput {
   id: ID!
   expectedVersion: Int!
   name: String
   description: String
   category: String
-  state: ControlState
-  importance: ControlImportance
+  state: MitigationState
+  importance: MitigationImportance
 }
 
-type UpdateControlPayload {
-  control: Control!
+type UpdateMitigationPayload {
+  mitigation: Mitigation!
 }
 
 input UploadEvidenceInput {

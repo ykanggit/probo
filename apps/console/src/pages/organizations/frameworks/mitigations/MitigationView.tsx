@@ -71,18 +71,18 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 
-import type { ControlViewQuery as ControlViewQueryType } from "./__generated__/ControlViewQuery.graphql";
-import type { ControlViewUpdateTaskStateMutation as ControlViewUpdateTaskStateMutationType } from "./__generated__/ControlViewUpdateTaskStateMutation.graphql";
-import type { ControlViewCreateTaskMutation as ControlViewCreateTaskMutationType } from "./__generated__/ControlViewCreateTaskMutation.graphql";
-import type { ControlViewDeleteTaskMutation as ControlViewDeleteTaskMutationType } from "./__generated__/ControlViewDeleteTaskMutation.graphql";
-import type { ControlViewUploadEvidenceMutation as ControlViewUploadEvidenceMutationType } from "./__generated__/ControlViewUploadEvidenceMutation.graphql";
-import type { ControlViewDeleteEvidenceMutation as ControlViewDeleteEvidenceMutationType } from "./__generated__/ControlViewDeleteEvidenceMutation.graphql";
-import type { ControlViewAssignTaskMutation as ControlViewAssignTaskMutationType } from "./__generated__/ControlViewAssignTaskMutation.graphql";
-import type { ControlViewUnassignTaskMutation as ControlViewUnassignTaskMutationType } from "./__generated__/ControlViewUnassignTaskMutation.graphql";
-import type { ControlViewOrganizationQuery$data } from "./__generated__/ControlViewOrganizationQuery.graphql";
-import type { ControlViewUpdateControlStateMutation as ControlViewUpdateControlStateMutationType } from "./__generated__/ControlViewUpdateControlStateMutation.graphql";
+import type { MitigationViewQuery as MitigationViewQueryType } from "./__generated__/MitigationViewQuery.graphql";
+import type { MitigationViewUpdateTaskStateMutation as MitigationViewUpdateTaskStateMutationType } from "./__generated__/MitigationViewUpdateTaskStateMutation.graphql";
+import type { MitigationViewCreateTaskMutation as MitigationViewCreateTaskMutationType } from "./__generated__/MitigationViewCreateTaskMutation.graphql";
+import type { MitigationViewDeleteTaskMutation as MitigationViewDeleteTaskMutationType } from "./__generated__/MitigationViewDeleteTaskMutation.graphql";
+import type { MitigationViewUploadEvidenceMutation as MitigationViewUploadEvidenceMutationType } from "./__generated__/MitigationViewUploadEvidenceMutation.graphql";
+import type { MitigationViewDeleteEvidenceMutation as MitigationViewDeleteEvidenceMutationType } from "./__generated__/MitigationViewDeleteEvidenceMutation.graphql";
+import type { MitigationViewAssignTaskMutation as MitigationViewAssignTaskMutationType } from "./__generated__/MitigationViewAssignTaskMutation.graphql";
+import type { MitigationViewUnassignTaskMutation as MitigationViewUnassignTaskMutationType } from "./__generated__/MitigationViewUnassignTaskMutation.graphql";
+import type { MitigationViewOrganizationQuery$data } from "./__generated__/MitigationViewOrganizationQuery.graphql";
+import type { MitigationViewUpdateMitigationStateMutation as MitigationViewUpdateMitigationStateMutationType } from "./__generated__/MitigationViewUpdateMitigationStateMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
-import { ControlViewSkeleton } from "./ControlPage";
+import { MitigationViewSkeleton } from "./MitigationPage";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -121,18 +121,18 @@ const formatDuration = (isoDuration: string): string => {
   }
 };
 
-const controlViewQuery = graphql`
-  query ControlViewQuery($controlId: ID!) {
-    control: node(id: $controlId) {
+const mitigationViewQuery = graphql`
+  query MitigationViewQuery($mitigationId: ID!) {
+    mitigation: node(id: $mitigationId) {
       id
-      ... on Control {
+      ... on Mitigation {
         name
         description
         state
         importance
         category
         version
-        tasks(first: 100) @connection(key: "ControlView_tasks") {
+        tasks(first: 100) @connection(key: "MitigationView_tasks") {
           __id
           edges {
             node {
@@ -147,7 +147,8 @@ const controlViewQuery = graphql`
                 fullName
                 primaryEmailAddress
               }
-              evidences(first: 50) @connection(key: "ControlView_evidences") {
+              evidences(first: 50)
+                @connection(key: "MitigationView_evidences") {
                 __id
                 edges {
                   node {
@@ -171,7 +172,7 @@ const controlViewQuery = graphql`
 `;
 
 const updateTaskStateMutation = graphql`
-  mutation ControlViewUpdateTaskStateMutation($input: UpdateTaskInput!) {
+  mutation MitigationViewUpdateTaskStateMutation($input: UpdateTaskInput!) {
     updateTask(input: $input) {
       task {
         id
@@ -184,7 +185,7 @@ const updateTaskStateMutation = graphql`
 `;
 
 const createTaskMutation = graphql`
-  mutation ControlViewCreateTaskMutation(
+  mutation MitigationViewCreateTaskMutation(
     $input: CreateTaskInput!
     $connections: [ID!]!
   ) {
@@ -209,7 +210,7 @@ const createTaskMutation = graphql`
 `;
 
 const deleteTaskMutation = graphql`
-  mutation ControlViewDeleteTaskMutation(
+  mutation MitigationViewDeleteTaskMutation(
     $input: DeleteTaskInput!
     $connections: [ID!]!
   ) {
@@ -220,7 +221,7 @@ const deleteTaskMutation = graphql`
 `;
 
 const uploadEvidenceMutation = graphql`
-  mutation ControlViewUploadEvidenceMutation(
+  mutation MitigationViewUploadEvidenceMutation(
     $input: UploadEvidenceInput!
     $connections: [ID!]!
   ) {
@@ -243,7 +244,7 @@ const uploadEvidenceMutation = graphql`
 `;
 
 const deleteEvidenceMutation = graphql`
-  mutation ControlViewDeleteEvidenceMutation(
+  mutation MitigationViewDeleteEvidenceMutation(
     $input: DeleteEvidenceInput!
     $connections: [ID!]!
   ) {
@@ -255,7 +256,7 @@ const deleteEvidenceMutation = graphql`
 
 // Add a GraphQL query to fetch the fileUrl for an evidence item
 const getEvidenceFileUrlQuery = graphql`
-  query ControlViewGetEvidenceFileUrlQuery($evidenceId: ID!) {
+  query MitigationViewGetEvidenceFileUrlQuery($evidenceId: ID!) {
     node(id: $evidenceId) {
       ... on Evidence {
         id
@@ -266,7 +267,7 @@ const getEvidenceFileUrlQuery = graphql`
 `;
 
 const assignTaskMutation = graphql`
-  mutation ControlViewAssignTaskMutation($input: AssignTaskInput!) {
+  mutation MitigationViewAssignTaskMutation($input: AssignTaskInput!) {
     assignTask(input: $input) {
       task {
         id
@@ -282,7 +283,7 @@ const assignTaskMutation = graphql`
 `;
 
 const unassignTaskMutation = graphql`
-  mutation ControlViewUnassignTaskMutation($input: UnassignTaskInput!) {
+  mutation MitigationViewUnassignTaskMutation($input: UnassignTaskInput!) {
     unassignTask(input: $input) {
       task {
         id
@@ -297,10 +298,12 @@ const unassignTaskMutation = graphql`
   }
 `;
 
-const updateControlStateMutation = graphql`
-  mutation ControlViewUpdateControlStateMutation($input: UpdateControlInput!) {
-    updateControl(input: $input) {
-      control {
+const updateMitigationStateMutation = graphql`
+  mutation MitigationViewUpdateMitigationStateMutation(
+    $input: UpdateMitigationInput!
+  ) {
+    updateMitigation(input: $input) {
+      mitigation {
         id
         state
         version
@@ -310,12 +313,12 @@ const updateControlStateMutation = graphql`
 `;
 
 const organizationQuery = graphql`
-  query ControlViewOrganizationQuery($organizationId: ID!) {
+  query MitigationViewOrganizationQuery($organizationId: ID!) {
     organization: node(id: $organizationId) {
       id
       ... on Organization {
         peoples(first: 100, orderBy: { direction: ASC, field: FULL_NAME })
-          @connection(key: "ControlView_peoples") {
+          @connection(key: "MitigationView_peoples") {
           edges {
             node {
               id
@@ -329,17 +332,17 @@ const organizationQuery = graphql`
   }
 `;
 
-function ControlViewContent({
+function MitigationViewContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<ControlViewQueryType>;
+  queryRef: PreloadedQuery<MitigationViewQueryType>;
 }) {
-  const data = usePreloadedQuery<ControlViewQueryType>(
-    controlViewQuery,
+  const data = usePreloadedQuery<MitigationViewQueryType>(
+    mitigationViewQuery,
     queryRef
   );
   const { toast } = useToast();
-  const { organizationId, frameworkId, controlId } = useParams();
+  const { organizationId, frameworkId, mitigationId } = useParams();
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
 
@@ -349,7 +352,7 @@ function ControlViewContent({
 
   // Load organization data for people selector
   const [organizationData, setOrganizationData] =
-    useState<ControlViewOrganizationQuery$data | null>(null);
+    useState<MitigationViewOrganizationQuery$data | null>(null);
 
   useEffect(() => {
     if (organizationId) {
@@ -358,7 +361,7 @@ function ControlViewContent({
       })
         .toPromise()
         .then((response) => {
-          setOrganizationData(response as ControlViewOrganizationQuery$data);
+          setOrganizationData(response as MitigationViewOrganizationQuery$data);
         })
         .catch((error) => {
           console.error("Error fetching organization data:", error);
@@ -423,27 +426,29 @@ function ControlViewContent({
     return "bg-gray-100 text-gray-800";
   };
 
-  const [updateTask] = useMutation<ControlViewUpdateTaskStateMutationType>(
+  const [updateTask] = useMutation<MitigationViewUpdateTaskStateMutationType>(
     updateTaskStateMutation
   );
   const [createTask] =
-    useMutation<ControlViewCreateTaskMutationType>(createTaskMutation);
+    useMutation<MitigationViewCreateTaskMutationType>(createTaskMutation);
   const [deleteTask] =
-    useMutation<ControlViewDeleteTaskMutationType>(deleteTaskMutation);
-  const [uploadEvidence] = useMutation<ControlViewUploadEvidenceMutationType>(
-    uploadEvidenceMutation
-  );
-  const [deleteEvidence] = useMutation<ControlViewDeleteEvidenceMutationType>(
-    deleteEvidenceMutation
-  );
+    useMutation<MitigationViewDeleteTaskMutationType>(deleteTaskMutation);
+  const [uploadEvidence] =
+    useMutation<MitigationViewUploadEvidenceMutationType>(
+      uploadEvidenceMutation
+    );
+  const [deleteEvidence] =
+    useMutation<MitigationViewDeleteEvidenceMutationType>(
+      deleteEvidenceMutation
+    );
   const [assignTask] =
-    useMutation<ControlViewAssignTaskMutationType>(assignTaskMutation);
+    useMutation<MitigationViewAssignTaskMutationType>(assignTaskMutation);
   const [unassignTask] =
-    useMutation<ControlViewUnassignTaskMutationType>(unassignTaskMutation);
+    useMutation<MitigationViewUnassignTaskMutationType>(unassignTaskMutation);
 
-  const [updateControlState] =
-    useMutation<ControlViewUpdateControlStateMutationType>(
-      updateControlStateMutation
+  const [updateMitigationState] =
+    useMutation<MitigationViewUpdateMitigationStateMutationType>(
+      updateMitigationStateMutation
     );
 
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
@@ -518,7 +523,7 @@ function ControlViewContent({
   // Track if task panel is open
   const [isTaskPanelOpen, setIsTaskPanelOpen] = useState(false);
 
-  const tasks = data.control.tasks?.edges.map((edge) => edge.node) || [];
+  const tasks = data.mitigation.tasks?.edges.map((edge) => edge.node) || [];
 
   // Add useEffect to handle URL parameters for task selection
   useEffect(() => {
@@ -666,10 +671,10 @@ function ControlViewContent({
       return;
     }
 
-    if (!data.control.id) {
+    if (!data.mitigation.id) {
       toast({
         title: "Error creating task",
-        description: "Control ID is missing",
+        description: "Mitigation ID is missing",
         variant: "destructive",
       });
       return;
@@ -679,9 +684,9 @@ function ControlViewContent({
 
     createTask({
       variables: {
-        connections: [`${data.control.tasks?.__id}`],
+        connections: [`${data.mitigation.tasks?.__id}`],
         input: {
-          controlId: data.control.id,
+          mitigationId: data.mitigation.id,
           name: newTaskName,
           description: newTaskDescription,
           timeEstimate: isoTimeEstimate === "" ? null : isoTimeEstimate,
@@ -719,7 +724,7 @@ function ControlViewContent({
 
     deleteTask({
       variables: {
-        connections: [`${data.control.tasks?.__id}`],
+        connections: [`${data.mitigation.tasks?.__id}`],
         input: {
           taskId: taskToDelete.id,
         },
@@ -742,9 +747,9 @@ function ControlViewContent({
     });
   };
 
-  const handleEditControl = () => {
+  const handleEditMitigation = () => {
     navigate(
-      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}/update`
+      `/organizations/${organizationId}/frameworks/${frameworkId}/mitigations/${mitigationId}/update`
     );
   };
 
@@ -1098,31 +1103,31 @@ function ControlViewContent({
     });
   };
 
-  // Function to handle control state change
-  const handleControlStateChange = (newState: string) => {
-    updateControlState({
+  // Function to handle mitigation state change
+  const handleMitigationStateChange = (newState: string) => {
+    updateMitigationState({
       variables: {
         input: {
-          id: data.control.id,
+          id: data.mitigation.id,
           state: newState as
             | "NOT_STARTED"
             | "IN_PROGRESS"
             | "IMPLEMENTED"
             | "NOT_APPLICABLE",
-          expectedVersion: data.control.version!,
+          expectedVersion: data.mitigation.version!,
         },
       },
       onCompleted: () => {
         toast({
-          title: "Control state updated",
-          description: `Control state has been updated to ${formatState(
+          title: "Mitigation state updated",
+          description: `Mitigation state has been updated to ${formatState(
             newState
           )}.`,
         });
       },
       onError: (error) => {
         toast({
-          title: "Error updating control state",
+          title: "Error updating mitigation state",
           description: error.message,
           variant: "destructive",
         });
@@ -1255,23 +1260,23 @@ function ControlViewContent({
 
   return (
     <PageTemplate
-      title={data.control.name ?? ""}
+      title={data.mitigation.name ?? ""}
       actions={
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleEditControl}>
-            Edit Control
+          <Button variant="outline" size="sm" onClick={handleEditMitigation}>
+            Edit Mitigation
           </Button>
           <Select
-            defaultValue={data.control.state}
-            onValueChange={handleControlStateChange}
+            defaultValue={data.mitigation.state}
+            onValueChange={handleMitigationStateChange}
           >
             <SelectTrigger className="w-[160px] h-8 text-sm">
               <div
                 className={`${getStateColor(
-                  data.control.state
+                  data.mitigation.state
                 )} px-2 py-0.5 rounded-full text-sm w-full text-center`}
               >
-                {formatState(data.control.state)}
+                {formatState(data.mitigation.state)}
               </div>
             </SelectTrigger>
             <SelectContent>
@@ -1283,10 +1288,10 @@ function ControlViewContent({
           </Select>
           <div
             className={`${getImportanceColor(
-              data.control.importance
+              data.mitigation.importance
             )} px-3 py-1 rounded-full text-sm`}
           >
-            {formatImportance(data.control.importance)}
+            {formatImportance(data.mitigation.importance)}
           </div>
         </div>
       }
@@ -1295,7 +1300,7 @@ function ControlViewContent({
         <Card className="mt-4">
           <CardContent className="pt-6">
             <div className="prose prose-gray prose-sm md:prose-base text-gray-600 max-w-3xl">
-              <ReactMarkdown>{data.control.description}</ReactMarkdown>
+              <ReactMarkdown>{data.mitigation.description}</ReactMarkdown>
             </div>
           </CardContent>
         </Card>
@@ -1320,8 +1325,8 @@ function ControlViewContent({
                 <DialogHeader>
                   <DialogTitle>Create New Task</DialogTitle>
                   <DialogDescription>
-                    Add a new task to this control. Click save when you&apos;re
-                    done.
+                    Add a new task to this mitigation. Click save when
+                    you&apos;re done.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
@@ -2530,24 +2535,24 @@ function ControlViewContent({
   );
 }
 
-export default function ControlView() {
-  const { controlId } = useParams();
+export default function MitigationView() {
+  const { mitigationId } = useParams();
   const [queryRef, loadQuery] =
-    useQueryLoader<ControlViewQueryType>(controlViewQuery);
+    useQueryLoader<MitigationViewQueryType>(mitigationViewQuery);
 
   useEffect(() => {
-    if (controlId) {
-      loadQuery({ controlId });
+    if (mitigationId) {
+      loadQuery({ mitigationId });
     }
-  }, [controlId, loadQuery]);
+  }, [mitigationId, loadQuery]);
 
   if (!queryRef) {
-    return <ControlViewSkeleton />;
+    return <MitigationViewSkeleton />;
   }
 
   return (
-    <Suspense fallback={<ControlViewSkeleton />}>
-      <ControlViewContent queryRef={queryRef} />
+    <Suspense fallback={<MitigationViewSkeleton />}>
+      <MitigationViewContent queryRef={queryRef} />
     </Suspense>
   );
 }

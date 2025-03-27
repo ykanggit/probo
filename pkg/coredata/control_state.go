@@ -20,65 +20,65 @@ import (
 )
 
 type (
-	ControlState uint8
+	MitigationState uint8
 )
 
 const (
-	ControlStateNotStarted ControlState = iota
-	ControlStateInProgress
-	ControlStateNotApplicable
-	ControlStateImplemented
+	MitigationStateNotStarted MitigationState = iota
+	MitigationStateInProgress
+	MitigationStateNotApplicable
+	MitigationStateImplemented
 )
 
-func (cs ControlState) MarshalText() ([]byte, error) {
+func (cs MitigationState) MarshalText() ([]byte, error) {
 	return []byte(cs.String()), nil
 }
 
-func (cs *ControlState) UnmarshalText(data []byte) error {
+func (cs *MitigationState) UnmarshalText(data []byte) error {
 	val := string(data)
 
 	switch val {
-	case ControlStateNotStarted.String():
-		*cs = ControlStateNotStarted
-	case ControlStateInProgress.String():
-		*cs = ControlStateInProgress
-	case ControlStateNotApplicable.String():
-		*cs = ControlStateNotApplicable
-	case ControlStateImplemented.String():
-		*cs = ControlStateImplemented
+	case MitigationStateNotStarted.String():
+		*cs = MitigationStateNotStarted
+	case MitigationStateInProgress.String():
+		*cs = MitigationStateInProgress
+	case MitigationStateNotApplicable.String():
+		*cs = MitigationStateNotApplicable
+	case MitigationStateImplemented.String():
+		*cs = MitigationStateImplemented
 	default:
-		return fmt.Errorf("invalid ControlState value: %q", val)
+		return fmt.Errorf("invalid MitigationState value: %q", val)
 	}
 
 	return nil
 }
 
-func (cs ControlState) String() string {
+func (cs MitigationState) String() string {
 	var val string
 
 	switch cs {
-	case ControlStateNotStarted:
+	case MitigationStateNotStarted:
 		val = "NOT_STARTED"
-	case ControlStateInProgress:
+	case MitigationStateInProgress:
 		val = "IN_PROGRESS"
-	case ControlStateNotApplicable:
+	case MitigationStateNotApplicable:
 		val = "NOT_APPLICABLE"
-	case ControlStateImplemented:
+	case MitigationStateImplemented:
 		val = "IMPLEMENTED"
 	}
 
 	return val
 }
 
-func (cs *ControlState) Scan(value any) error {
+func (cs *MitigationState) Scan(value any) error {
 	val, ok := value.(string)
 	if !ok {
-		return fmt.Errorf("invalid scan source for ControlState, expected string got %T", value)
+		return fmt.Errorf("invalid scan source for MitigationState, expected string got %T", value)
 	}
 
 	return cs.UnmarshalText([]byte(val))
 }
 
-func (cs ControlState) Value() (driver.Value, error) {
+func (cs MitigationState) Value() (driver.Value, error) {
 	return cs.String(), nil
 }

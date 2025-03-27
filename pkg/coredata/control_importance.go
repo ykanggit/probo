@@ -20,48 +20,48 @@ import (
 	"fmt"
 )
 
-type ControlImportance uint8
+type MitigationImportance uint8
 
 const (
-	ControlImportanceMandatory ControlImportance = iota
-	ControlImportancePreferred
-	ControlImportanceAdvanced
+	MitigationImportanceMandatory MitigationImportance = iota
+	MitigationImportancePreferred
+	MitigationImportanceAdvanced
 )
 
-func (i ControlImportance) String() string {
+func (i MitigationImportance) String() string {
 	return []string{"MANDATORY", "PREFERRED", "ADVANCED"}[i]
 }
 
-func (i *ControlImportance) Scan(value interface{}) error {
+func (i *MitigationImportance) Scan(value interface{}) error {
 	switch v := value.(type) {
 	case uint8:
-		*i = ControlImportance(v)
+		*i = MitigationImportance(v)
 	case string:
 		switch v {
 		case "MANDATORY":
-			*i = ControlImportanceMandatory
+			*i = MitigationImportanceMandatory
 		case "PREFERRED":
-			*i = ControlImportancePreferred
+			*i = MitigationImportancePreferred
 		case "ADVANCED":
-			*i = ControlImportanceAdvanced
+			*i = MitigationImportanceAdvanced
 		default:
-			return fmt.Errorf("invalid ControlImportance value: %q", v)
+			return fmt.Errorf("invalid MitigationImportance value: %q", v)
 		}
 	default:
-		return fmt.Errorf("unsupported type for ControlImportance: %T", value)
+		return fmt.Errorf("unsupported type for MitigationImportance: %T", value)
 	}
 	return nil
 }
 
-func (i ControlImportance) Value() (driver.Value, error) {
+func (i MitigationImportance) Value() (driver.Value, error) {
 	return i.String(), nil
 }
 
-func (i ControlImportance) MarshalJSON() ([]byte, error) {
+func (i MitigationImportance) MarshalJSON() ([]byte, error) {
 	return json.Marshal(i.String())
 }
 
-func (i *ControlImportance) UnmarshalJSON(data []byte) error {
+func (i *MitigationImportance) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
@@ -69,18 +69,18 @@ func (i *ControlImportance) UnmarshalJSON(data []byte) error {
 
 	switch s {
 	case "MANDATORY":
-		*i = ControlImportanceMandatory
+		*i = MitigationImportanceMandatory
 	case "PREFERRED":
-		*i = ControlImportancePreferred
+		*i = MitigationImportancePreferred
 	case "ADVANCED":
-		*i = ControlImportanceAdvanced
+		*i = MitigationImportanceAdvanced
 	default:
-		return fmt.Errorf("invalid ControlImportance value: %q", s)
+		return fmt.Errorf("invalid MitigationImportance value: %q", s)
 	}
 	return nil
 }
 
-func (i *ControlImportance) UnmarshalText(text []byte) error {
+func (i *MitigationImportance) UnmarshalText(text []byte) error {
 	var s string
 	if err := json.Unmarshal(text, &s); err != nil {
 		return err
@@ -88,13 +88,13 @@ func (i *ControlImportance) UnmarshalText(text []byte) error {
 
 	switch s {
 	case "MANDATORY":
-		*i = ControlImportanceMandatory
+		*i = MitigationImportanceMandatory
 	case "PREFERRED":
-		*i = ControlImportancePreferred
+		*i = MitigationImportancePreferred
 	case "ADVANCED":
-		*i = ControlImportanceAdvanced
+		*i = MitigationImportanceAdvanced
 	default:
-		return fmt.Errorf("invalid ControlImportance value: %q", s)
+		return fmt.Errorf("invalid MitigationImportance value: %q", s)
 	}
 	return nil
 }

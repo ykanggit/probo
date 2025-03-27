@@ -36,44 +36,6 @@ type ConfirmEmailPayload struct {
 	Success bool `json:"success"`
 }
 
-type Control struct {
-	ID          gid.GID                    `json:"id"`
-	Version     int                        `json:"version"`
-	Category    string                     `json:"category"`
-	Name        string                     `json:"name"`
-	Description string                     `json:"description"`
-	State       coredata.ControlState      `json:"state"`
-	Importance  coredata.ControlImportance `json:"importance"`
-	Tasks       *TaskConnection            `json:"tasks"`
-	CreatedAt   time.Time                  `json:"createdAt"`
-	UpdatedAt   time.Time                  `json:"updatedAt"`
-}
-
-func (Control) IsNode()             {}
-func (this Control) GetID() gid.GID { return this.ID }
-
-type ControlConnection struct {
-	Edges    []*ControlEdge `json:"edges"`
-	PageInfo *PageInfo      `json:"pageInfo"`
-}
-
-type ControlEdge struct {
-	Cursor page.CursorKey `json:"cursor"`
-	Node   *Control       `json:"node"`
-}
-
-type CreateControlInput struct {
-	FrameworkID gid.GID                    `json:"frameworkId"`
-	Name        string                     `json:"name"`
-	Description string                     `json:"description"`
-	Category    string                     `json:"category"`
-	Importance  coredata.ControlImportance `json:"importance"`
-}
-
-type CreateControlPayload struct {
-	ControlEdge *ControlEdge `json:"controlEdge"`
-}
-
 type CreateFrameworkInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 	Name           string  `json:"name"`
@@ -82,6 +44,18 @@ type CreateFrameworkInput struct {
 
 type CreateFrameworkPayload struct {
 	FrameworkEdge *FrameworkEdge `json:"frameworkEdge"`
+}
+
+type CreateMitigationInput struct {
+	FrameworkID gid.GID                       `json:"frameworkId"`
+	Name        string                        `json:"name"`
+	Description string                        `json:"description"`
+	Category    string                        `json:"category"`
+	Importance  coredata.MitigationImportance `json:"importance"`
+}
+
+type CreateMitigationPayload struct {
+	MitigationEdge *MitigationEdge `json:"mitigationEdge"`
 }
 
 type CreateOrganizationInput struct {
@@ -118,7 +92,7 @@ type CreatePolicyPayload struct {
 }
 
 type CreateTaskInput struct {
-	ControlID    gid.GID        `json:"controlId"`
+	MitigationID gid.GID        `json:"mitigationId"`
 	Name         string         `json:"name"`
 	Description  string         `json:"description"`
 	TimeEstimate *time.Duration `json:"timeEstimate,omitempty"`
@@ -222,13 +196,13 @@ type EvidenceEdge struct {
 }
 
 type Framework struct {
-	ID          gid.GID            `json:"id"`
-	Version     int                `json:"version"`
-	Name        string             `json:"name"`
-	Description string             `json:"description"`
-	Controls    *ControlConnection `json:"controls"`
-	CreatedAt   time.Time          `json:"createdAt"`
-	UpdatedAt   time.Time          `json:"updatedAt"`
+	ID          gid.GID               `json:"id"`
+	Version     int                   `json:"version"`
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	Mitigations *MitigationConnection `json:"mitigations"`
+	CreatedAt   time.Time             `json:"createdAt"`
+	UpdatedAt   time.Time             `json:"updatedAt"`
 }
 
 func (Framework) IsNode()             {}
@@ -261,6 +235,32 @@ type InviteUserInput struct {
 
 type InviteUserPayload struct {
 	Success bool `json:"success"`
+}
+
+type Mitigation struct {
+	ID          gid.GID                       `json:"id"`
+	Version     int                           `json:"version"`
+	Category    string                        `json:"category"`
+	Name        string                        `json:"name"`
+	Description string                        `json:"description"`
+	State       coredata.MitigationState      `json:"state"`
+	Importance  coredata.MitigationImportance `json:"importance"`
+	Tasks       *TaskConnection               `json:"tasks"`
+	CreatedAt   time.Time                     `json:"createdAt"`
+	UpdatedAt   time.Time                     `json:"updatedAt"`
+}
+
+func (Mitigation) IsNode()             {}
+func (this Mitigation) GetID() gid.GID { return this.ID }
+
+type MitigationConnection struct {
+	Edges    []*MitigationEdge `json:"edges"`
+	PageInfo *PageInfo         `json:"pageInfo"`
+}
+
+type MitigationEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Mitigation    `json:"node"`
 }
 
 type Mutation struct {
@@ -404,20 +404,6 @@ type UnassignTaskPayload struct {
 	Task *Task `json:"task"`
 }
 
-type UpdateControlInput struct {
-	ID              gid.GID                     `json:"id"`
-	ExpectedVersion int                         `json:"expectedVersion"`
-	Name            *string                     `json:"name,omitempty"`
-	Description     *string                     `json:"description,omitempty"`
-	Category        *string                     `json:"category,omitempty"`
-	State           *coredata.ControlState      `json:"state,omitempty"`
-	Importance      *coredata.ControlImportance `json:"importance,omitempty"`
-}
-
-type UpdateControlPayload struct {
-	Control *Control `json:"control"`
-}
-
 type UpdateFrameworkInput struct {
 	ID              gid.GID `json:"id"`
 	ExpectedVersion int     `json:"expectedVersion"`
@@ -427,6 +413,20 @@ type UpdateFrameworkInput struct {
 
 type UpdateFrameworkPayload struct {
 	Framework *Framework `json:"framework"`
+}
+
+type UpdateMitigationInput struct {
+	ID              gid.GID                        `json:"id"`
+	ExpectedVersion int                            `json:"expectedVersion"`
+	Name            *string                        `json:"name,omitempty"`
+	Description     *string                        `json:"description,omitempty"`
+	Category        *string                        `json:"category,omitempty"`
+	State           *coredata.MitigationState      `json:"state,omitempty"`
+	Importance      *coredata.MitigationImportance `json:"importance,omitempty"`
+}
+
+type UpdateMitigationPayload struct {
+	Mitigation *Mitigation `json:"mitigation"`
 }
 
 type UpdateOrganizationInput struct {

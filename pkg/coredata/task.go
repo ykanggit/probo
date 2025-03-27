@@ -30,16 +30,15 @@ import (
 type (
 	Task struct {
 		ID           gid.GID        `db:"id"`
-		ControlID    gid.GID        `db:"control_id"`
+		MitigationID gid.GID        `db:"mitigation_id"`
 		Name         string         `db:"name"`
 		Description  string         `db:"description"`
 		State        TaskState      `db:"state"`
-		ContentRef   string         `db:"content_ref"`
+		TimeEstimate *time.Duration `db:"time_estimate"`
+		AssignedToID *gid.GID       `db:"assigned_to"`
 		CreatedAt    time.Time      `db:"created_at"`
 		UpdatedAt    time.Time      `db:"updated_at"`
 		Version      int            `db:"version"`
-		AssignedTo   *gid.GID       `db:"assigned_to"`
-		TimeEstimate *time.Duration `db:"time_estimate"`
 	}
 
 	Tasks []*Task
@@ -53,16 +52,16 @@ type (
 	}
 )
 
-func (t Task) CursorKey(orderBy TaskOrderField) page.CursorKey {
+func (c Task) CursorKey(orderBy TaskOrderField) page.CursorKey {
 	switch orderBy {
 	case TaskOrderFieldCreatedAt:
-		return page.NewCursorKey(t.ID, t.CreatedAt)
+		return page.NewCursorKey(c.ID, c.CreatedAt)
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
-func (t *Task) LoadByID(
+func (c *Task) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -71,13 +70,12 @@ func (t *Task) LoadByID(
 	q := `
 SELECT
     id,
-    control_id,
+    mitigation_id,
     name,
     description,
-	time_estimate,
     state,
-	assigned_to,
-    content_ref,
+    time_estimate,
+    assigned_to,
     created_at,
     updated_at,
     version
@@ -96,104 +94,100 @@ LIMIT 1;
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
-		return fmt.Errorf("cannot query task: %w", err)
+		return fmt.Errorf("cannot query tasks: %w", err)
 	}
 
 	task, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Task])
 	if err != nil {
-		return fmt.Errorf("cannot collect task: %w", err)
+		return fmt.Errorf("cannot collect tasks: %w", err)
 	}
 
-	*t = task
+	*c = task
 
 	return nil
 }
 
-func (t Task) Insert(
+func (c Task) Insert(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
 ) error {
 	q := `
-INSERT INTO tasks (
-    tenant_id,
-    id,
-    name,
-    control_id,
-    description,
-    content_ref,
-    created_at,
-    updated_at,
-    version,
-    state,
-	time_estimate,
-	assigned_to
-)
+INSERT INTO
+    tasks (
+        tenant_id,
+        id,
+        mitigation_id,
+        name,
+        description,
+        state,
+        time_estimate,
+        assigned_to,
+        created_at,
+        updated_at,
+        version
+    )
 VALUES (
     @tenant_id,
     @task_id,
+    @mitigation_id,
     @name,
-    @control_id,
     @description,
-    @content_ref,
+    @state,
+    @time_estimate,
+    @assigned_to,
     @created_at,
     @updated_at,
-    @version,
-    @state,
-	@time_estimate,
-	@assigned_to
+    @version
 );
 `
 
 	args := pgx.StrictNamedArgs{
 		"tenant_id":     scope.GetTenantID(),
-		"task_id":       t.ID,
-		"control_id":    t.ControlID,
-		"name":          t.Name,
-		"description":   t.Description,
-		"content_ref":   t.ContentRef,
-		"created_at":    t.CreatedAt,
-		"updated_at":    t.UpdatedAt,
-		"version":       t.Version,
-		"state":         t.State,
-		"time_estimate": t.TimeEstimate,
-		"assigned_to":   t.AssignedTo,
+		"task_id":       c.ID,
+		"mitigation_id": c.MitigationID,
+		"name":          c.Name,
+		"description":   c.Description,
+		"state":         c.State,
+		"time_estimate": c.TimeEstimate,
+		"assigned_to":   c.AssignedToID,
+		"created_at":    c.CreatedAt,
+		"updated_at":    c.UpdatedAt,
+		"version":       0,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
 }
 
-func (t *Tasks) LoadByControlID(
+func (c *Tasks) LoadByMitigationID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	controlID gid.GID,
+	mitigationID gid.GID,
 	cursor *page.Cursor[TaskOrderField],
 ) error {
 	q := `
 SELECT
     id,
-    control_id,
+    mitigation_id,
     name,
     description,
     state,
-	time_estimate,
-    content_ref,
+    time_estimate,
+    assigned_to,
     created_at,
     updated_at,
-    version,
-	assigned_to
+    version
 FROM
     tasks
 WHERE
     %s
-    AND control_id = @control_id
+    AND mitigation_id = @mitigation_id
     AND %s
 `
-
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"control_id": controlID}
+	args := pgx.StrictNamedArgs{"mitigation_id": mitigationID}
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
@@ -207,40 +201,44 @@ WHERE
 		return fmt.Errorf("cannot collect tasks: %w", err)
 	}
 
-	*t = tasks
+	*c = tasks
 
 	return nil
 }
 
-func (t *Task) Update(
+func (c *Task) Update(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
 	params UpdateTaskParams,
 ) error {
 	q := `
-UPDATE tasks
-SET
+UPDATE tasks SET
     name = COALESCE(@name, name),
     description = COALESCE(@description, description),
     state = COALESCE(@state, state),
-	time_estimate = COALESCE(@time_estimate, time_estimate),
+    time_estimate = COALESCE(@time_estimate, time_estimate),
     updated_at = @updated_at,
     version = version + 1
-WHERE
-    %s
+WHERE %s
     AND id = @task_id
     AND version = @expected_version
-RETURNING
-	state,
-	time_estimate,
-	updated_at,
-    version;
+RETURNING 
+    id,
+    mitigation_id,
+    name,
+    description,
+    state,
+    time_estimate,
+    assigned_to,
+    created_at,
+    updated_at,
+    version
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{
-		"task_id":          t.ID,
+	args := pgx.NamedArgs{
+		"task_id":          c.ID,
 		"expected_version": params.ExpectedVersion,
 		"name":             params.Name,
 		"description":      params.Description,
@@ -248,75 +246,235 @@ RETURNING
 		"time_estimate":    params.TimeEstimate,
 		"updated_at":       time.Now(),
 	}
+
 	maps.Copy(args, scope.SQLArguments())
 
-	err := conn.QueryRow(ctx, q, args).Scan(&t.State, &t.TimeEstimate, &t.UpdatedAt, &t.Version)
-	return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query tasks: %w", err)
+	}
+
+	task, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Task])
+	if err != nil {
+		return fmt.Errorf("cannot collect tasks: %w", err)
+	}
+
+	*c = task
+
+	return nil
 }
 
-func (t *Task) AssignTo(
+func (c *Task) AssignTo(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	assignedTo gid.GID,
+	assignTo gid.GID,
 ) error {
 	q := `
-UPDATE tasks
-SET
-    assigned_to = @assigned_to
-WHERE
-    %s
+UPDATE tasks SET
+    assigned_to = @assigned_to,
+    updated_at = @updated_at,
+    version = version + 1
+WHERE %s
     AND id = @task_id
+RETURNING 
+    id,
+    mitigation_id,
+    name,
+    description,
+    state,
+    time_estimate,
+    assigned_to,
+    created_at,
+    updated_at,
+    version
 `
-
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{
-		"task_id":     t.ID,
-		"assigned_to": assignedTo,
+	args := pgx.NamedArgs{
+		"task_id":     c.ID,
+		"assigned_to": assignTo,
+		"updated_at":  time.Now(),
 	}
+
 	maps.Copy(args, scope.SQLArguments())
 
-	_, err := conn.Exec(ctx, q, args)
-	return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query tasks: %w", err)
+	}
+
+	task, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Task])
+	if err != nil {
+		return fmt.Errorf("cannot collect tasks: %w", err)
+	}
+
+	*c = task
+
+	return nil
 }
 
-func (t *Task) Unassign(
+func (c *Task) Unassign(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
 ) error {
 	q := `
-UPDATE tasks
-SET
-    assigned_to = NULL
-WHERE
-    %s
+UPDATE tasks SET
+    assigned_to = NULL,
+    updated_at = @updated_at,
+    version = version + 1
+WHERE %s
     AND id = @task_id
+RETURNING 
+    id,
+    mitigation_id,
+    name,
+    description,
+    state,
+    time_estimate,
+    assigned_to,
+    created_at,
+    updated_at,
+    version
 `
-
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{
-		"task_id": t.ID,
+	args := pgx.NamedArgs{
+		"task_id":    c.ID,
+		"updated_at": time.Now(),
 	}
+
 	maps.Copy(args, scope.SQLArguments())
 
-	_, err := conn.Exec(ctx, q, args)
-	return err
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query tasks: %w", err)
+	}
+
+	task, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Task])
+	if err != nil {
+		return fmt.Errorf("cannot collect tasks: %w", err)
+	}
+
+	*c = task
+
+	return nil
 }
 
-func (t *Task) Delete(
+func (c *Task) Delete(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
 ) error {
-	q := `DELETE FROM tasks WHERE %s AND id = @task_id`
+	q := `
+DELETE FROM tasks
+WHERE %s
+    AND id = @task_id
+`
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"task_id": t.ID}
+	args := pgx.NamedArgs{
+		"task_id": c.ID,
+	}
+
 	maps.Copy(args, scope.SQLArguments())
 
 	_, err := conn.Exec(ctx, q, args)
-	return err
+	if err != nil {
+		return fmt.Errorf("cannot delete task: %w", err)
+	}
+
+	return nil
+}
+
+// Helper functions for task management
+
+var (
+	ErrAssignTaskFailed   = fmt.Errorf("failed to assign task")
+	ErrUnassignTaskFailed = fmt.Errorf("failed to unassign task")
+	ErrUpdateTaskFailed   = fmt.Errorf("failed to update task")
+	ErrDeleteTaskFailed   = fmt.Errorf("failed to delete task")
+)
+
+type TaskUpdate struct {
+	Name         *string
+	Description  *string
+	State        *TaskState
+	TimeEstimate *time.Duration
+}
+
+func AssignTask(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	taskID gid.GID,
+	assignedToID gid.GID,
+) (*Task, error) {
+	task := &Task{ID: taskID}
+	if err := task.LoadByID(ctx, conn, scope, taskID); err != nil {
+		return nil, ErrAssignTaskFailed
+	}
+
+	if err := task.AssignTo(ctx, conn, scope, assignedToID); err != nil {
+		return nil, ErrAssignTaskFailed
+	}
+
+	return task, nil
+}
+
+func UnassignTask(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	taskID gid.GID,
+) (*Task, error) {
+	task := &Task{ID: taskID}
+	if err := task.LoadByID(ctx, conn, scope, taskID); err != nil {
+		return nil, ErrUnassignTaskFailed
+	}
+
+	if err := task.Unassign(ctx, conn, scope); err != nil {
+		return nil, ErrUnassignTaskFailed
+	}
+
+	return task, nil
+}
+
+func UpdateTask(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	taskID gid.GID,
+	expectedVersion int,
+	updates *TaskUpdate,
+) (*Task, error) {
+	task := &Task{ID: taskID}
+
+	if err := task.Update(ctx, conn, scope, UpdateTaskParams{
+		ExpectedVersion: expectedVersion,
+		Name:            updates.Name,
+		Description:     updates.Description,
+		State:           updates.State,
+		TimeEstimate:    updates.TimeEstimate,
+	}); err != nil {
+		return nil, ErrUpdateTaskFailed
+	}
+
+	return task, nil
+}
+
+func DeleteTask(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	taskID gid.GID,
+) error {
+	task := &Task{ID: taskID}
+
+	if err := task.Delete(ctx, conn, scope); err != nil {
+		return ErrDeleteTaskFailed
+	}
+
+	return nil
 }

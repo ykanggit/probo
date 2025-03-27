@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - Add sidebar to show a task.
 - Add task estimate edition.
 
+### Changed
+
+- Rename control in mitigation.
+
 ### Fixed
 
 - Fix panic in GraphQL resolver are not reported.

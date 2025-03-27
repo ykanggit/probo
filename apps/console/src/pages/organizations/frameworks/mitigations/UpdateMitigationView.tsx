@@ -22,18 +22,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { UpdateControlViewUpdateControlMutation as UpdateControlViewUpdateControlMutationType } from "./__generated__/UpdateControlViewUpdateControlMutation.graphql";
 import type {
-  ControlState,
-  ControlImportance,
-} from "./__generated__/UpdateControlViewUpdateControlMutation.graphql";
+  MitigationState,
+  MitigationImportance,
+  UpdateMitigationViewUpdateMitigationMutation,
+} from "./__generated__/UpdateMitigationViewUpdateMitigationMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
-import { UpdateControlViewSkeleton } from "./UpdateControlPage";
+import { MitigationViewSkeleton } from "./MitigationPage";
 
-const updateControlMutation = graphql`
-  mutation UpdateControlViewUpdateControlMutation($input: UpdateControlInput!) {
-    updateControl(input: $input) {
-      control {
+const updateMitigationMutation = graphql`
+  mutation UpdateMitigationViewUpdateMitigationMutation(
+    $input: UpdateMitigationInput!
+  ) {
+    updateMitigation(input: $input) {
+      mitigation {
         id
         name
         description
@@ -46,10 +48,10 @@ const updateControlMutation = graphql`
   }
 `;
 
-const updateControlQuery = graphql`
-  query UpdateControlViewQuery($controlId: ID!) {
-    node(id: $controlId) {
-      ... on Control {
+const updateMitigationQuery = graphql`
+  query UpdateMitigationViewQuery($mitigationId: ID!) {
+    node(id: $mitigationId) {
+      ... on Mitigation {
         id
         name
         description
@@ -123,16 +125,16 @@ function EditableField({
   );
 }
 
-function UpdateControlViewContent({
+function UpdateMitigationViewContent({
   queryRef,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   queryRef: PreloadedQuery<any>;
 }) {
-  const { organizationId, frameworkId, controlId } = useParams();
+  const { organizationId, frameworkId, mitigationId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const data = usePreloadedQuery(updateControlQuery, queryRef);
+  const data = usePreloadedQuery(updateMitigationQuery, queryRef);
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     name: "",
@@ -155,8 +157,8 @@ function UpdateControlViewContent({
   }, [data.node]);
 
   const [commit, isInFlight] =
-    useMutation<UpdateControlViewUpdateControlMutationType>(
-      updateControlMutation
+    useMutation<UpdateMitigationViewUpdateMitigationMutation>(
+      updateMitigationMutation
     );
 
   const handleFieldChange = (field: keyof typeof formData, value: string) => {
@@ -169,7 +171,7 @@ function UpdateControlViewContent({
 
   const handleCancel = () => {
     navigate(
-      `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`
+      `/organizations/${organizationId}/frameworks/${frameworkId}/mitigations/${mitigationId}`
     );
   };
 
@@ -193,10 +195,10 @@ function UpdateControlViewContent({
       name?: string;
       description?: string;
       category?: string;
-      state?: ControlState;
-      importance?: ControlImportance;
+      state?: MitigationState;
+      importance?: MitigationImportance;
     } = {
-      id: controlId!,
+      id: mitigationId!,
       expectedVersion: data.node.version,
     };
 
@@ -210,10 +212,10 @@ function UpdateControlViewContent({
       input.category = formData.category;
     }
     if (editedFields.has("state")) {
-      input.state = formData.state as ControlState;
+      input.state = formData.state as MitigationState;
     }
     if (editedFields.has("importance")) {
-      input.importance = formData.importance as ControlImportance;
+      input.importance = formData.importance as MitigationImportance;
     }
 
     commit({
@@ -224,7 +226,7 @@ function UpdateControlViewContent({
         if (errors) {
           toast({
             title: "Error",
-            description: errors[0]?.message || "Failed to update control",
+            description: errors[0]?.message || "Failed to update mitigation",
             variant: "destructive",
           });
           return;
@@ -232,17 +234,17 @@ function UpdateControlViewContent({
 
         toast({
           title: "Success",
-          description: "Control updated successfully",
+          description: "Mitigation updated successfully",
         });
 
         navigate(
-          `/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`
+          `/organizations/${organizationId}/frameworks/${frameworkId}/mitigations/${mitigationId}`
         );
       },
       onError(error) {
         toast({
           title: "Error",
-          description: error.message || "Failed to update control",
+          description: error.message || "Failed to update mitigation",
           variant: "destructive",
         });
       },
@@ -251,8 +253,8 @@ function UpdateControlViewContent({
 
   return (
     <PageTemplate
-      title="Update Control"
-      description="Update the control details"
+      title="Update Mitigation"
+      description="Update the mitigation details"
     >
       <Card className="max-w-2xl">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -269,7 +271,7 @@ function UpdateControlViewContent({
             onChange={(value) => handleFieldChange("description", value)}
             required
             multiline
-            helpText="Provide a detailed description of the control"
+            helpText="Provide a detailed description of the mitigation"
           />
 
           <EditableField
@@ -323,7 +325,7 @@ function UpdateControlViewContent({
               Cancel
             </Button>
             <Button type="submit" disabled={isInFlight || !hasChanges}>
-              {isInFlight ? "Updating..." : "Update Control"}
+              {isInFlight ? "Updating..." : "Update Mitigation"}
             </Button>
           </div>
         </form>
@@ -333,23 +335,23 @@ function UpdateControlViewContent({
 }
 
 export default function UpdateControlView() {
-  const { controlId } = useParams();
+  const { mitigationId } = useParams();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [queryRef, loadQuery] = useQueryLoader<any>(updateControlQuery);
+  const [queryRef, loadQuery] = useQueryLoader<any>(updateMitigationQuery);
 
   useEffect(() => {
-    if (controlId) {
-      loadQuery({ controlId });
+    if (mitigationId) {
+      loadQuery({ mitigationId });
     }
-  }, [controlId, loadQuery]);
+  }, [mitigationId, loadQuery]);
 
   if (!queryRef) {
-    return <UpdateControlViewSkeleton />;
+    return <MitigationViewSkeleton />;
   }
 
   return (
-    <Suspense fallback={<UpdateControlViewSkeleton />}>
-      <UpdateControlViewContent queryRef={queryRef} />
+    <Suspense fallback={<MitigationViewSkeleton />}>
+      <UpdateMitigationViewContent queryRef={queryRef} />
     </Suspense>
   );
 }

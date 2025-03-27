@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<839284c6c29a5727d0ca521b1d804c5f>>
+ * @generated SignedSource<<338c4c7afa073c41eacac21a2996d1f9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,25 +9,25 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ControlImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
-export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type UpdateControlViewQuery$variables = {
-  controlId: string;
+export type MitigationImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
+export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
+export type UpdateMitigationViewQuery$variables = {
+  mitigationId: string;
 };
-export type UpdateControlViewQuery$data = {
+export type UpdateMitigationViewQuery$data = {
   readonly node: {
     readonly category?: string;
     readonly description?: string;
     readonly id?: string;
-    readonly importance?: ControlImportance;
+    readonly importance?: MitigationImportance;
     readonly name?: string;
-    readonly state?: ControlState;
+    readonly state?: MitigationState;
     readonly version?: number;
   };
 };
-export type UpdateControlViewQuery = {
-  response: UpdateControlViewQuery$data;
-  variables: UpdateControlViewQuery$variables;
+export type UpdateMitigationViewQuery = {
+  response: UpdateMitigationViewQuery$data;
+  variables: UpdateMitigationViewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -35,14 +35,14 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "controlId"
+    "name": "mitigationId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "controlId"
+    "variableName": "mitigationId"
   }
 ],
 v2 = {
@@ -99,7 +99,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "UpdateControlViewQuery",
+    "name": "UpdateMitigationViewQuery",
     "selections": [
       {
         "alias": null,
@@ -120,7 +120,7 @@ return {
               (v7/*: any*/),
               (v8/*: any*/)
             ],
-            "type": "Control",
+            "type": "Mitigation",
             "abstractKey": null
           }
         ],
@@ -134,7 +134,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "UpdateControlViewQuery",
+    "name": "UpdateMitigationViewQuery",
     "selections": [
       {
         "alias": null,
@@ -162,7 +162,7 @@ return {
               (v7/*: any*/),
               (v8/*: any*/)
             ],
-            "type": "Control",
+            "type": "Mitigation",
             "abstractKey": null
           }
         ],
@@ -171,16 +171,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d578024453f1901119a772154524070d",
+    "cacheID": "c2e9133d77f3e090267b19f4ab270c72",
     "id": null,
     "metadata": {},
-    "name": "UpdateControlViewQuery",
+    "name": "UpdateMitigationViewQuery",
     "operationKind": "query",
-    "text": "query UpdateControlViewQuery(\n  $controlId: ID!\n) {\n  node(id: $controlId) {\n    __typename\n    ... on Control {\n      id\n      name\n      description\n      category\n      importance\n      state\n      version\n    }\n    id\n  }\n}\n"
+    "text": "query UpdateMitigationViewQuery(\n  $mitigationId: ID!\n) {\n  node(id: $mitigationId) {\n    __typename\n    ... on Mitigation {\n      id\n      name\n      description\n      category\n      importance\n      state\n      version\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "e6a997a27a8e45c01ad415e73b794cae";
+(node as any).hash = "3e977744beb9c403aa8be232c8112a9b";
 
 export default node;

@@ -19,31 +19,6 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
-// Tasks is the resolver for the tasks field.
-func (r *controlResolver) Tasks(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
-
-	pageOrderBy := page.OrderBy[coredata.TaskOrderField]{
-		Field:     coredata.TaskOrderFieldCreatedAt,
-		Direction: page.OrderDirectionDesc,
-	}
-	if orderBy != nil {
-		pageOrderBy = page.OrderBy[coredata.TaskOrderField]{
-			Field:     orderBy.Field,
-			Direction: orderBy.Direction,
-		}
-	}
-
-	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
-
-	page, err := svc.Tasks.ListForControlID(ctx, obj.ID, cursor)
-	if err != nil {
-		return nil, fmt.Errorf("cannot list control tasks: %w", err)
-	}
-
-	return types.NewTaskConnection(page), nil
-}
-
 // FileURL is the resolver for the fileUrl field.
 func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*string, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
@@ -61,16 +36,40 @@ func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*s
 	return &result, nil
 }
 
-// Controls is the resolver for the controls field.
-func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+// Mitigations is the resolver for the mitigations field.
+func (r *frameworkResolver) Mitigations(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
-	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
-		Field:     coredata.ControlOrderFieldCreatedAt,
+	pageOrderBy := page.OrderBy[coredata.MitigationOrderField]{
+		Field:     coredata.MitigationOrderFieldCreatedAt,
 		Direction: page.OrderDirectionDesc,
 	}
 	if orderBy != nil {
-		pageOrderBy = page.OrderBy[coredata.ControlOrderField]{
+		pageOrderBy = page.OrderBy[coredata.MitigationOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+	page, err := svc.Mitigations.ListForFrameworkID(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list framework mitigations: %w", err)
+	}
+
+	return types.NewMitigationConnection(page), nil
+}
+
+// Tasks is the resolver for the tasks field.
+func (r *mitigationResolver) Tasks(ctx context.Context, obj *types.Mitigation, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.TaskOrderField]{
+		Field:     coredata.TaskOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.TaskOrderField]{
 			Field:     orderBy.Field,
 			Direction: orderBy.Direction,
 		}
@@ -78,12 +77,12 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Controls.ListForFrameworkID(ctx, obj.ID, cursor)
+	page, err := svc.Tasks.ListForMitigationID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list framework controls: %w", err)
+		return nil, fmt.Errorf("cannot list mitigation tasks: %w", err)
 	}
 
-	return types.NewControlConnection(page), nil
+	return types.NewTaskConnection(page), nil
 }
 
 // CreateVendor is the resolver for the createVendor field.
@@ -260,10 +259,10 @@ func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.D
 
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.ControlID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
 
 	task, err := svc.Tasks.Create(ctx, probo.CreateTaskRequest{
-		ControlID:    input.ControlID,
+		MitigationID: input.MitigationID,
 		Name:         input.Name,
 		Description:  input.Description,
 		TimeEstimate: input.TimeEstimate,
@@ -282,7 +281,7 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTas
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
 
 	task, err := svc.Tasks.Update(ctx, probo.UpdateTaskRequest{
-		ID:              input.TaskID,
+		TaskID:          input.TaskID,
 		ExpectedVersion: input.ExpectedVersion,
 		Name:            input.Name,
 		Description:     input.Description,
@@ -396,11 +395,11 @@ func (r *mutationResolver) ImportFramework(ctx context.Context, input types.Impo
 	}, nil
 }
 
-// CreateControl is the resolver for the createControl field.
-func (r *mutationResolver) CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error) {
+// CreateMitigation is the resolver for the createMitigation field.
+func (r *mutationResolver) CreateMitigation(ctx context.Context, input types.CreateMitigationInput) (*types.CreateMitigationPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.FrameworkID.TenantID())
 
-	control, err := svc.Controls.Create(ctx, probo.CreateControlRequest{
+	mitigation, err := svc.Mitigations.Create(ctx, probo.CreateMitigationRequest{
 		FrameworkID: input.FrameworkID,
 		Name:        input.Name,
 		Description: input.Description,
@@ -408,33 +407,33 @@ func (r *mutationResolver) CreateControl(ctx context.Context, input types.Create
 		Importance:  input.Importance,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("cannot create control: %w", err)
+		panic(fmt.Errorf("cannot create mitigation: %w", err))
 	}
 
-	return &types.CreateControlPayload{
-		ControlEdge: types.NewControlEdge(control, coredata.ControlOrderFieldCreatedAt),
+	return &types.CreateMitigationPayload{
+		MitigationEdge: types.NewMitigationEdge(mitigation, coredata.MitigationOrderFieldCreatedAt),
 	}, nil
 }
 
-// UpdateControl is the resolver for the updateControl field.
-func (r *mutationResolver) UpdateControl(ctx context.Context, input types.UpdateControlInput) (*types.UpdateControlPayload, error) {
+// UpdateMitigation is the resolver for the updateMitigation field.
+func (r *mutationResolver) UpdateMitigation(ctx context.Context, input types.UpdateMitigationInput) (*types.UpdateMitigationPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
-	control, err := svc.Controls.Update(ctx, probo.UpdateControlRequest{
+	mitigation, err := svc.Mitigations.Update(ctx, probo.UpdateMitigationRequest{
 		ID:              input.ID,
 		ExpectedVersion: input.ExpectedVersion,
 		Name:            input.Name,
 		Description:     input.Description,
 		Category:        input.Category,
-		State:           input.State,
 		Importance:      input.Importance,
+		State:           input.State,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("cannot update control: %w", err)
+		panic(fmt.Errorf("cannot update mitigation: %w", err))
 	}
 
-	return &types.UpdateControlPayload{
-		Control: types.NewControl(control),
+	return &types.UpdateMitigationPayload{
+		Mitigation: types.NewMitigation(mitigation),
 	}, nil
 }
 
@@ -785,13 +784,13 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 		}
 
 		return types.NewFramework(framework), nil
-	case coredata.ControlEntityType:
-		control, err := svc.Controls.Get(ctx, id)
+	case coredata.MitigationEntityType:
+		mitigation, err := svc.Mitigations.Get(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
-		return types.NewControl(control), nil
+		return types.NewMitigation(mitigation), nil
 	case coredata.TaskEntityType:
 		task, err := svc.Tasks.Get(ctx, id)
 		if err != nil {
@@ -838,11 +837,11 @@ func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.
 		return nil, fmt.Errorf("cannot get task: %w", err)
 	}
 
-	if task.AssignedTo == nil {
+	if task.AssignedToID == nil {
 		return nil, nil
 	}
 
-	people, err := svc.Peoples.Get(ctx, *task.AssignedTo)
+	people, err := svc.Peoples.Get(ctx, *task.AssignedToID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get assigned to: %w", err)
 	}
@@ -899,14 +898,14 @@ func (r *viewerResolver) Organizations(ctx context.Context, obj *types.Viewer, f
 	}, nil
 }
 
-// Control returns schema.ControlResolver implementation.
-func (r *Resolver) Control() schema.ControlResolver { return &controlResolver{r} }
-
 // Evidence returns schema.EvidenceResolver implementation.
 func (r *Resolver) Evidence() schema.EvidenceResolver { return &evidenceResolver{r} }
 
 // Framework returns schema.FrameworkResolver implementation.
 func (r *Resolver) Framework() schema.FrameworkResolver { return &frameworkResolver{r} }
+
+// Mitigation returns schema.MitigationResolver implementation.
+func (r *Resolver) Mitigation() schema.MitigationResolver { return &mitigationResolver{r} }
 
 // Mutation returns schema.MutationResolver implementation.
 func (r *Resolver) Mutation() schema.MutationResolver { return &mutationResolver{r} }
@@ -926,9 +925,9 @@ func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 // Viewer returns schema.ViewerResolver implementation.
 func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
 
-type controlResolver struct{ *Resolver }
 type evidenceResolver struct{ *Resolver }
 type frameworkResolver struct{ *Resolver }
+type mitigationResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type policyResolver struct{ *Resolver }

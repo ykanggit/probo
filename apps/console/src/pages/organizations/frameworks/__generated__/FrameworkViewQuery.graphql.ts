@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c36de2ad1593c2dfefe28d7d3bbbddba>>
+ * @generated SignedSource<<1abc57788d51404af0931c7e120c01a7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,27 +9,27 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ControlImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
-export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
+export type MitigationImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
+export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type FrameworkViewQuery$variables = {
   frameworkId: string;
 };
 export type FrameworkViewQuery$data = {
   readonly node: {
-    readonly controls?: {
+    readonly description?: string;
+    readonly id: string;
+    readonly mitigations?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly category: string;
           readonly description: string;
           readonly id: string;
-          readonly importance: ControlImportance;
+          readonly importance: MitigationImportance;
           readonly name: string;
-          readonly state: ControlState;
+          readonly state: MitigationState;
         };
       }>;
     };
-    readonly description?: string;
-    readonly id: string;
     readonly name?: string;
   };
 };
@@ -85,7 +85,7 @@ v6 = [
   {
     "alias": null,
     "args": null,
-    "concreteType": "ControlEdge",
+    "concreteType": "MitigationEdge",
     "kind": "LinkedField",
     "name": "edges",
     "plural": true,
@@ -93,7 +93,7 @@ v6 = [
       {
         "alias": null,
         "args": null,
-        "concreteType": "Control",
+        "concreteType": "Mitigation",
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
@@ -191,11 +191,11 @@ return {
               (v3/*: any*/),
               (v4/*: any*/),
               {
-                "alias": "controls",
+                "alias": "mitigations",
                 "args": null,
-                "concreteType": "ControlConnection",
+                "concreteType": "MitigationConnection",
                 "kind": "LinkedField",
-                "name": "__FrameworkView_controls_connection",
+                "name": "__FrameworkView_mitigations_connection",
                 "plural": false,
                 "selections": (v6/*: any*/),
                 "storageKey": null
@@ -235,21 +235,21 @@ return {
               {
                 "alias": null,
                 "args": (v7/*: any*/),
-                "concreteType": "ControlConnection",
+                "concreteType": "MitigationConnection",
                 "kind": "LinkedField",
-                "name": "controls",
+                "name": "mitigations",
                 "plural": false,
                 "selections": (v6/*: any*/),
-                "storageKey": "controls(first:100)"
+                "storageKey": "mitigations(first:100)"
               },
               {
                 "alias": null,
                 "args": (v7/*: any*/),
                 "filters": null,
                 "handle": "connection",
-                "key": "FrameworkView_controls",
+                "key": "FrameworkView_mitigations",
                 "kind": "LinkedHandle",
-                "name": "controls"
+                "name": "mitigations"
               }
             ],
             "type": "Framework",
@@ -261,7 +261,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "f8edefde219c5fa1a5c7c85e287d846a",
+    "cacheID": "c60a352d14662dd43ab93b9a4dcebee8",
     "id": null,
     "metadata": {
       "connection": [
@@ -271,18 +271,18 @@ return {
           "direction": "forward",
           "path": [
             "node",
-            "controls"
+            "mitigations"
           ]
         }
       ]
     },
     "name": "FrameworkViewQuery",
     "operationKind": "query",
-    "text": "query FrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            category\n            importance\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query FrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      mitigations(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            category\n            importance\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "9e8a9b37d956ec4c9dfba88e7b1120f3";
+(node as any).hash = "f65af17f461e1c112573c0d14d08479d";
 
 export default node;

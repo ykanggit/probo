@@ -16,6 +16,7 @@ package probo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -31,16 +32,15 @@ type (
 	}
 
 	CreateTaskRequest struct {
-		ControlID    gid.GID
+		MitigationID gid.GID
 		Name         string
-		ContentRef   string
 		Description  string
 		TimeEstimate *time.Duration
-		AssignedTo   *gid.GID
+		AssignedToID *gid.GID
 	}
 
 	UpdateTaskRequest struct {
-		ID              gid.GID
+		TaskID          gid.GID
 		ExpectedVersion int
 		Name            *string
 		Description     *string
@@ -53,173 +53,41 @@ func (s TaskService) Create(
 	ctx context.Context,
 	req CreateTaskRequest,
 ) (*coredata.Task, error) {
-	now := time.Now()
-	taskID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.TaskEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create task global id: %w", err)
-	}
-
-	control := &coredata.Control{}
-	task := &coredata.Task{
-		ID:           taskID,
-		ControlID:    req.ControlID,
-		Name:         req.Name,
-		ContentRef:   req.ContentRef,
-		State:        coredata.TaskStateTodo,
-		Description:  req.Description,
-		TimeEstimate: req.TimeEstimate,
-		AssignedTo:   req.AssignedTo,
-		CreatedAt:    now,
-		UpdatedAt:    now,
-	}
-
-	err = s.svc.pg.WithTx(
-		ctx,
-		func(conn pg.Conn) error {
-			if err := control.LoadByID(ctx, conn, s.svc.scope, req.ControlID); err != nil {
-				return fmt.Errorf("cannot laod control %q: %w", req.ControlID, err)
-			}
-
-			if err := task.Insert(ctx, conn, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot insert task: %w", err)
-			}
-
-			return nil
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return task, nil
-}
-
-func (s TaskService) Assign(
-	ctx context.Context,
-	taskID gid.GID,
-	assignedTo gid.GID,
-) (*coredata.Task, error) {
-	task := &coredata.Task{ID: taskID}
+	mitigation := &coredata.Mitigation{}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			if err := task.LoadByID(ctx, conn, s.svc.scope, taskID); err != nil {
-				return fmt.Errorf("cannot load task %q: %w", taskID, err)
+			if err := mitigation.LoadByID(ctx, conn, s.svc.scope, req.MitigationID); err != nil {
+				return fmt.Errorf("cannot load mitigation %q: %w", req.MitigationID, err)
 			}
 
-			task.AssignedTo = &assignedTo
-
-			if err := task.AssignTo(ctx, conn, s.svc.scope, assignedTo); err != nil {
-				return fmt.Errorf("cannot assign task %q to %q: %w", taskID, assignedTo, err)
+			now := time.Now()
+			taskID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.TaskEntityType)
+			if err != nil {
+				return fmt.Errorf("cannot generate id: %w", err)
 			}
 
-			return nil
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return task, nil
-}
-
-func (s TaskService) Unassign(
-	ctx context.Context,
-	taskID gid.GID,
-) (*coredata.Task, error) {
-	task := &coredata.Task{ID: taskID}
-
-	err := s.svc.pg.WithTx(
-		ctx,
-		func(conn pg.Conn) error {
-			if err := task.LoadByID(ctx, conn, s.svc.scope, taskID); err != nil {
-				return fmt.Errorf("cannot load task %q: %w", taskID, err)
+			task := &coredata.Task{
+				ID:           taskID,
+				MitigationID: req.MitigationID,
+				Name:         req.Name,
+				Description:  req.Description,
+				TimeEstimate: req.TimeEstimate,
+				AssignedToID: req.AssignedToID,
+				State:        coredata.TaskStateTodo,
+				CreatedAt:    now,
+				UpdatedAt:    now,
 			}
 
-			task.AssignedTo = nil
-
-			if err := task.Unassign(ctx, conn, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot unassign task %q: %w", taskID, err)
-			}
-
-			return nil
+			return task.Insert(ctx, conn, s.svc.scope)
 		},
 	)
-
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot create task: %w", err)
 	}
 
-	return task, nil
-}
-
-func (s TaskService) Update(
-	ctx context.Context,
-	req UpdateTaskRequest,
-) (*coredata.Task, error) {
-	params := coredata.UpdateTaskParams{
-		ExpectedVersion: req.ExpectedVersion,
-		Name:            req.Name,
-		Description:     req.Description,
-		State:           req.State,
-		TimeEstimate:    req.TimeEstimate,
-	}
-
-	task := &coredata.Task{ID: req.ID}
-
-	err := s.svc.pg.WithTx(
-		ctx,
-		func(conn pg.Conn) error {
-			return task.Update(ctx, conn, s.svc.scope, params)
-		})
-	if err != nil {
-		return nil, err
-	}
-
-	return task, nil
-}
-
-func (s TaskService) ListForControlID(
-	ctx context.Context,
-	controlID gid.GID,
-	cursor *page.Cursor[coredata.TaskOrderField],
-) (*page.Page[*coredata.Task, coredata.TaskOrderField], error) {
-	var tasks coredata.Tasks
-
-	err := s.svc.pg.WithConn(
-		ctx,
-		func(conn pg.Conn) error {
-			return tasks.LoadByControlID(
-				ctx,
-				conn,
-				s.svc.scope,
-				controlID,
-				cursor,
-			)
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return page.NewPage(tasks, cursor), nil
-}
-
-func (s TaskService) Delete(
-	ctx context.Context,
-	taskID gid.GID,
-) error {
-	task := coredata.Task{ID: taskID}
-	return s.svc.pg.WithConn(
-		ctx,
-		func(conn pg.Conn) error {
-			return task.Delete(ctx, conn, s.svc.scope)
-		},
-	)
+	return s.Get(ctx, req.MitigationID)
 }
 
 func (s TaskService) Get(
@@ -234,10 +102,140 @@ func (s TaskService) Get(
 			return task.LoadByID(ctx, conn, s.svc.scope, taskID)
 		},
 	)
-
 	if err != nil {
 		return nil, err
 	}
 
 	return task, nil
+}
+
+func (s TaskService) Assign(
+	ctx context.Context,
+	taskID gid.GID,
+	assignedToID gid.GID,
+) (*coredata.Task, error) {
+	task := &coredata.Task{}
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			var assignErr error
+			task, assignErr = coredata.AssignTask(ctx, conn, s.svc.scope, taskID, assignedToID)
+			return assignErr
+		},
+	)
+	if err != nil {
+		if errors.Is(err, coredata.ErrAssignTaskFailed) {
+			return nil, errors.New("failed to assign task, please try again")
+		}
+		return nil, err
+	}
+
+	return task, nil
+}
+
+func (s TaskService) Unassign(
+	ctx context.Context,
+	taskID gid.GID,
+) (*coredata.Task, error) {
+	task := &coredata.Task{}
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			var unassignErr error
+			task, unassignErr = coredata.UnassignTask(ctx, conn, s.svc.scope, taskID)
+			return unassignErr
+		},
+	)
+	if err != nil {
+		if errors.Is(err, coredata.ErrUnassignTaskFailed) {
+			return nil, errors.New("failed to unassign task, please try again")
+		}
+		return nil, err
+	}
+
+	return task, nil
+}
+
+func (s TaskService) Update(
+	ctx context.Context,
+	req UpdateTaskRequest,
+) (*coredata.Task, error) {
+	task := &coredata.Task{}
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			var updateErr error
+			task, updateErr = coredata.UpdateTask(
+				ctx,
+				conn,
+				s.svc.scope,
+				req.TaskID,
+				req.ExpectedVersion,
+				&coredata.TaskUpdate{
+					Name:         req.Name,
+					Description:  req.Description,
+					State:        req.State,
+					TimeEstimate: req.TimeEstimate,
+				},
+			)
+			return updateErr
+		},
+	)
+	if err != nil {
+		if errors.Is(err, coredata.ErrUpdateTaskFailed) {
+			return nil, errors.New("failed to update task, please try again")
+		}
+		return nil, err
+	}
+
+	return task, nil
+}
+
+func (s TaskService) Delete(
+	ctx context.Context,
+	taskID gid.GID,
+) error {
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			return coredata.DeleteTask(ctx, conn, s.svc.scope, taskID)
+		},
+	)
+	if err != nil {
+		if errors.Is(err, coredata.ErrDeleteTaskFailed) {
+			return errors.New("failed to delete task, please try again")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (s TaskService) ListForMitigationID(
+	ctx context.Context,
+	mitigationID gid.GID,
+	cursor *page.Cursor[coredata.TaskOrderField],
+) (*page.Page[*coredata.Task, coredata.TaskOrderField], error) {
+	var tasks coredata.Tasks
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return tasks.LoadByMitigationID(
+				ctx,
+				conn,
+				s.svc.scope,
+				mitigationID,
+				cursor,
+			)
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(tasks, cursor), nil
 }

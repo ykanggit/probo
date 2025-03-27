@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d90309f0abd5f91c5f38c3070e27758b>>
+ * @generated SignedSource<<d54298db57548f693ed2ca2418c9128c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,22 +9,22 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ControlImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
-export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type EvidenceState = "EXPIRED" | "INVALID" | "VALID";
 export type EvidenceType = "FILE" | "LINK";
+export type MitigationImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
+export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type TaskState = "DONE" | "TODO";
-export type ControlViewQuery$variables = {
-  controlId: string;
+export type MitigationViewQuery$variables = {
+  mitigationId: string;
 };
-export type ControlViewQuery$data = {
-  readonly control: {
+export type MitigationViewQuery$data = {
+  readonly mitigation: {
     readonly category?: string;
     readonly description?: string;
     readonly id: string;
-    readonly importance?: ControlImportance;
+    readonly importance?: MitigationImportance;
     readonly name?: string;
-    readonly state?: ControlState;
+    readonly state?: MitigationState;
     readonly tasks?: {
       readonly __id: string;
       readonly edges: ReadonlyArray<{
@@ -61,9 +61,9 @@ export type ControlViewQuery$data = {
     readonly version?: number;
   };
 };
-export type ControlViewQuery = {
-  response: ControlViewQuery$data;
-  variables: ControlViewQuery$variables;
+export type MitigationViewQuery = {
+  response: MitigationViewQuery$data;
+  variables: MitigationViewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -71,14 +71,14 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "controlId"
+    "name": "mitigationId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "controlId"
+    "variableName": "mitigationId"
   }
 ],
 v2 = {
@@ -305,10 +305,10 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ControlViewQuery",
+    "name": "MitigationViewQuery",
     "selections": [
       {
-        "alias": "control",
+        "alias": "mitigation",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -330,7 +330,7 @@ return {
                 "args": null,
                 "concreteType": "TaskConnection",
                 "kind": "LinkedField",
-                "name": "__ControlView_tasks_connection",
+                "name": "__MitigationView_tasks_connection",
                 "plural": false,
                 "selections": [
                   {
@@ -361,7 +361,7 @@ return {
                             "args": null,
                             "concreteType": "EvidenceConnection",
                             "kind": "LinkedField",
-                            "name": "__ControlView_evidences_connection",
+                            "name": "__MitigationView_evidences_connection",
                             "plural": false,
                             "selections": (v15/*: any*/),
                             "storageKey": null
@@ -380,7 +380,7 @@ return {
                 "storageKey": null
               }
             ],
-            "type": "Control",
+            "type": "Mitigation",
             "abstractKey": null
           }
         ],
@@ -394,10 +394,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ControlViewQuery",
+    "name": "MitigationViewQuery",
     "selections": [
       {
-        "alias": "control",
+        "alias": "mitigation",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -461,7 +461,7 @@ return {
                             "args": (v17/*: any*/),
                             "filters": null,
                             "handle": "connection",
-                            "key": "ControlView_evidences",
+                            "key": "MitigationView_evidences",
                             "kind": "LinkedHandle",
                             "name": "evidences"
                           },
@@ -483,12 +483,12 @@ return {
                 "args": (v16/*: any*/),
                 "filters": null,
                 "handle": "connection",
-                "key": "ControlView_tasks",
+                "key": "MitigationView_tasks",
                 "kind": "LinkedHandle",
                 "name": "tasks"
               }
             ],
-            "type": "Control",
+            "type": "Mitigation",
             "abstractKey": null
           }
         ],
@@ -497,7 +497,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "35556c446c544e8b281b572272daae6b",
+    "cacheID": "8e9c3cef43daff0bdbfff4e33d7c70ad",
     "id": null,
     "metadata": {
       "connection": [
@@ -512,19 +512,19 @@ return {
           "cursor": null,
           "direction": "forward",
           "path": [
-            "control",
+            "mitigation",
             "tasks"
           ]
         }
       ]
     },
-    "name": "ControlViewQuery",
+    "name": "MitigationViewQuery",
     "operationKind": "query",
-    "text": "query ControlViewQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      name\n      description\n      state\n      importance\n      category\n      version\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            version\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  type\n                  url\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query MitigationViewQuery(\n  $mitigationId: ID!\n) {\n  mitigation: node(id: $mitigationId) {\n    __typename\n    id\n    ... on Mitigation {\n      name\n      description\n      state\n      importance\n      category\n      version\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            version\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  type\n                  url\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "cf9ee1fdc5e0e09c6b883299af7ffa37";
+(node as any).hash = "f0baeab367be46290f2f15df836ed153";
 
 export default node;

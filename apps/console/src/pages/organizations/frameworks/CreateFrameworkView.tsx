@@ -170,7 +170,7 @@ function CreateFrameworkViewContent() {
   return (
     <PageTemplate
       title="Create Framework"
-      description="Create a new framework to organize your controls"
+      description="Create a new framework to organize your mitigations"
     >
       <Card className="max-w-2xl">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">

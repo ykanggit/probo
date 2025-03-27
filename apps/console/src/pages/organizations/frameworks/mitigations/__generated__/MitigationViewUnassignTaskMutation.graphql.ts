@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c9adac41c9c5084befb16e9c01a12900>>
+ * @generated SignedSource<<9cb5a3f1c6f0c2a3265ecdc6ececd13d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,10 +12,10 @@ import { ConcreteRequest } from 'relay-runtime';
 export type UnassignTaskInput = {
   taskId: string;
 };
-export type ControlViewUnassignTaskMutation$variables = {
+export type MitigationViewUnassignTaskMutation$variables = {
   input: UnassignTaskInput;
 };
-export type ControlViewUnassignTaskMutation$data = {
+export type MitigationViewUnassignTaskMutation$data = {
   readonly unassignTask: {
     readonly task: {
       readonly assignedTo: {
@@ -28,9 +28,9 @@ export type ControlViewUnassignTaskMutation$data = {
     };
   };
 };
-export type ControlViewUnassignTaskMutation = {
-  response: ControlViewUnassignTaskMutation$data;
-  variables: ControlViewUnassignTaskMutation$variables;
+export type MitigationViewUnassignTaskMutation = {
+  response: MitigationViewUnassignTaskMutation$data;
+  variables: MitigationViewUnassignTaskMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -117,7 +117,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ControlViewUnassignTaskMutation",
+    "name": "MitigationViewUnassignTaskMutation",
     "selections": (v2/*: any*/),
     "type": "Mutation",
     "abstractKey": null
@@ -126,20 +126,20 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ControlViewUnassignTaskMutation",
+    "name": "MitigationViewUnassignTaskMutation",
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "15ebb533fa8c9ef25aba306106a198eb",
+    "cacheID": "e493ae65ba1e53627dd3f260e8814e41",
     "id": null,
     "metadata": {},
-    "name": "ControlViewUnassignTaskMutation",
+    "name": "MitigationViewUnassignTaskMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlViewUnassignTaskMutation(\n  $input: UnassignTaskInput!\n) {\n  unassignTask(input: $input) {\n    task {\n      id\n      version\n      assignedTo {\n        id\n        fullName\n        primaryEmailAddress\n      }\n    }\n  }\n}\n"
+    "text": "mutation MitigationViewUnassignTaskMutation(\n  $input: UnassignTaskInput!\n) {\n  unassignTask(input: $input) {\n    task {\n      id\n      version\n      assignedTo {\n        id\n        fullName\n        primaryEmailAddress\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "b0956d42397dc015e2ece4ff37a83857";
+(node as any).hash = "3f5a0d2b753d0a759e3004c0b557c505";
 
 export default node;

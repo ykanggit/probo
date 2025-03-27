@@ -14,7 +14,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { cn } from "@/lib/utils";
 import { OrganizationLayoutOrganizationQuery } from "./__generated__/OrganizationLayoutOrganizationQuery.graphql";
-import { OrganizationLayoutBreadcrumbControlOverviewQuery } from "./__generated__/OrganizationLayoutBreadcrumbControlOverviewQuery.graphql";
+import { OrganizationLayoutBreadcrumbMitigationOverviewQuery } from "./__generated__/OrganizationLayoutBreadcrumbMitigationOverviewQuery.graphql";
 import { OrganizationLayoutBreadcrumbFrameworkOverviewQuery } from "./__generated__/OrganizationLayoutBreadcrumbFrameworkOverviewQuery.graphql";
 import { OrganizationLayoutBreadcrumbPeopleOverviewQuery } from "./__generated__/OrganizationLayoutBreadcrumbPeopleOverviewQuery.graphql";
 import { OrganizationLayoutBreadcrumbPolicyOverviewQuery } from "./__generated__/OrganizationLayoutBreadcrumbPolicyOverviewQuery.graphql";
@@ -270,23 +270,23 @@ function BreadcrumbPeopleOverview() {
   );
 }
 
-function BreadcrumbControlOverview() {
-  const { organizationId, frameworkId, controlId } = useParams();
+function BreadcrumbMitigationOverview() {
+  const { organizationId, frameworkId, mitigationId } = useParams();
   const data =
-    useLazyLoadQuery<OrganizationLayoutBreadcrumbControlOverviewQuery>(
+    useLazyLoadQuery<OrganizationLayoutBreadcrumbMitigationOverviewQuery>(
       graphql`
-        query OrganizationLayoutBreadcrumbControlOverviewQuery(
-          $controlId: ID!
+        query OrganizationLayoutBreadcrumbMitigationOverviewQuery(
+          $mitigationId: ID!
         ) {
-          control: node(id: $controlId) {
+          mitigation: node(id: $mitigationId) {
             id
-            ... on Control {
+            ... on Mitigation {
               name
             }
           }
         }
       `,
-      { controlId: controlId! }
+      { mitigationId: mitigationId! }
     );
 
   return (
@@ -294,9 +294,9 @@ function BreadcrumbControlOverview() {
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadCrumbNavLink
-          to={`/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`}
+          to={`/organizations/${organizationId}/frameworks/${frameworkId}/mitigations/${mitigationId}`}
         >
-          {data.control?.name}
+          {data.mitigation?.name}
         </BreadCrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
@@ -304,23 +304,23 @@ function BreadcrumbControlOverview() {
   );
 }
 
-function BreadcrumbCreateControl() {
+function BreadcrumbCreateMitigation() {
   return (
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbPage>Create Control</BreadcrumbPage>
+        <BreadcrumbPage>Create Mitigation</BreadcrumbPage>
       </BreadcrumbItem>
     </>
   );
 }
 
-function BreadcrumbUpdateControl() {
+function BreadcrumbUpdateMitigation() {
   return (
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbPage>Update Control</BreadcrumbPage>
+        <BreadcrumbPage>Update Mitigation</BreadcrumbPage>
       </BreadcrumbItem>
     </>
   );
@@ -423,20 +423,20 @@ export default function OrganizationLayout() {
                     }
                   >
                     <Route
-                      path="controls/create"
-                      element={<BreadcrumbCreateControl />}
+                      path="mitigations/create"
+                      element={<BreadcrumbCreateMitigation />}
                     />
                     <Route
-                      path="controls/:controlId"
+                      path="mitigations/:mitigationId"
                       element={
                         <Suspense>
-                          <BreadcrumbControlOverview />
+                          <BreadcrumbMitigationOverview />
                         </Suspense>
                       }
                     >
                       <Route
                         path="update"
-                        element={<BreadcrumbUpdateControl />}
+                        element={<BreadcrumbUpdateMitigation />}
                       />
                     </Route>
                     <Route

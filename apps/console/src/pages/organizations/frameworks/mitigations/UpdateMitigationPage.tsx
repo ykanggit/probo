@@ -4,26 +4,29 @@ import { lazy } from "@probo/react-lazy";
 import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../../ErrorBoundary";
 
-const UpdateControlView = lazy(() => import("./UpdateControlView"));
+const UpdateMitigationView = lazy(() => import("./UpdateMitigationView"));
 
-export function UpdateControlViewSkeleton() {
+export function UpdateMitigationViewSkeleton() {
   return (
     <PageTemplateSkeleton
-      title="Update Control"
-      description="Update the control details"
+      title="Update Mitigation"
+      description="Update the mitigation details"
     >
       <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
     </PageTemplateSkeleton>
   );
 }
 
-export function UpdateControlPage() {
+export function UpdateMitigationPage() {
   const location = useLocation();
 
   return (
-    <Suspense key={location.pathname} fallback={<UpdateControlViewSkeleton />}>
+    <Suspense
+      key={location.pathname}
+      fallback={<UpdateMitigationViewSkeleton />}
+    >
       <ErrorBoundaryWithLocation>
-        <UpdateControlView />
+        <UpdateMitigationView />
       </ErrorBoundaryWithLocation>
     </Suspense>
   );

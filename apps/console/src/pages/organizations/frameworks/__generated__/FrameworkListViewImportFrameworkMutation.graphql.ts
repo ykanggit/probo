@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0d36f3f459adaca2f0abab59d9208bf9>>
+ * @generated SignedSource<<11936aad3da2565a509b1566774e0ecf>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type ControlState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
+export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type ImportFrameworkInput = {
   file: any;
   organizationId: string;
@@ -22,17 +22,17 @@ export type FrameworkListViewImportFrameworkMutation$data = {
   readonly importFramework: {
     readonly frameworkEdge: {
       readonly node: {
-        readonly controls: {
-          readonly edges: ReadonlyArray<{
-            readonly node: {
-              readonly id: string;
-              readonly state: ControlState;
-            };
-          }>;
-        };
         readonly createdAt: string;
         readonly description: string;
         readonly id: string;
+        readonly mitigations: {
+          readonly edges: ReadonlyArray<{
+            readonly node: {
+              readonly id: string;
+              readonly state: MitigationState;
+            };
+          }>;
+        };
         readonly name: string;
         readonly updatedAt: string;
       };
@@ -109,15 +109,15 @@ v4 = {
               "value": 100
             }
           ],
-          "concreteType": "ControlConnection",
+          "concreteType": "MitigationConnection",
           "kind": "LinkedField",
-          "name": "controls",
+          "name": "mitigations",
           "plural": false,
           "selections": [
             {
               "alias": null,
               "args": null,
-              "concreteType": "ControlEdge",
+              "concreteType": "MitigationEdge",
               "kind": "LinkedField",
               "name": "edges",
               "plural": true,
@@ -125,7 +125,7 @@ v4 = {
                 {
                   "alias": null,
                   "args": null,
-                  "concreteType": "Control",
+                  "concreteType": "Mitigation",
                   "kind": "LinkedField",
                   "name": "node",
                   "plural": false,
@@ -145,7 +145,7 @@ v4 = {
               "storageKey": null
             }
           ],
-          "storageKey": "controls(first:100)"
+          "storageKey": "mitigations(first:100)"
         },
         {
           "alias": null,
@@ -233,16 +233,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b225cace8b9956333d0175a7e0a4c04d",
+    "cacheID": "d2d34f8e054d753d956120ea14791f79",
     "id": null,
     "metadata": {},
     "name": "FrameworkListViewImportFrameworkMutation",
     "operationKind": "mutation",
-    "text": "mutation FrameworkListViewImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n        controls(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation FrameworkListViewImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n        mitigations(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "fa1a8aa9d16bc50eac99392d3de59f6c";
+(node as any).hash = "a812db41b10d16c25959a5a733fe6088";
 
 export default node;
