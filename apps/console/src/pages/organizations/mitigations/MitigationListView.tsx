@@ -461,11 +461,6 @@ function MitigationListContent({
                                   <div className="font-medium">
                                     {mitigation.name}
                                   </div>
-                                  {mitigation.description && (
-                                    <div className="text-sm text-muted-foreground line-clamp-1">
-                                      {mitigation.description}
-                                    </div>
-                                  )}
                                 </td>
                               </tr>
                             ))}
