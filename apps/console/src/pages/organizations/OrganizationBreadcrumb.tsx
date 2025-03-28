@@ -18,6 +18,7 @@ import { OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery } from "./__generat
 import { OrganizationBreadcrumbBreadcrumbVendorOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbVendorOverviewQuery.graphql";
 import { OrganizationBreadcrumbOrganizationQuery } from "./__generated__/OrganizationBreadcrumbOrganizationQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbMitigationViewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbMitigationViewQuery.graphql";
+import { OrganizationBreadcrumbBreadcrumbControlQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbControlQuery.graphql";
 
 const BreadcrumbNavLink = ({
   to,
@@ -459,6 +460,36 @@ function BreadcrumbMitigationView() {
   );
 }
 
+function BreadcrumbControl() {
+  const { organizationId, frameworkId, controlId } = useParams();
+  const data = useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbControlQuery>(
+    graphql`
+      query OrganizationBreadcrumbBreadcrumbControlQuery($controlId: ID!) {
+        control: node(id: $controlId) {
+          id
+          ... on Control {
+            referenceId
+          }
+        }
+      }
+    `,
+    { controlId: controlId! },
+    { fetchPolicy: "store-or-network" }
+  );
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`}
+        >
+          {data.control?.referenceId}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
 export function BreadCrumb() {
   return (
     <Routes>
@@ -488,6 +519,14 @@ export function BreadCrumb() {
               </Suspense>
             }
           >
+            <Route
+              path="controls/:controlId"
+              element={
+                <Suspense>
+                  <BreadcrumbControl />
+                </Suspense>
+              }
+            />
             <Route
               path="mitigations/create"
               element={<BreadcrumbCreateMitigation />}
