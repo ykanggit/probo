@@ -51,41 +51,39 @@ func (s TaskService) Create(
 	ctx context.Context,
 	req CreateTaskRequest,
 ) (*coredata.Task, error) {
-	mitigation := &coredata.Mitigation{}
+	now := time.Now()
+	taskID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.TaskEntityType)
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate id: %w", err)
+	}
 
-	err := s.svc.pg.WithTx(
+	task := &coredata.Task{
+		ID:           taskID,
+		MitigationID: req.MitigationID,
+		Name:         req.Name,
+		Description:  req.Description,
+		TimeEstimate: req.TimeEstimate,
+		AssignedToID: req.AssignedToID,
+		State:        coredata.TaskStateTodo,
+		CreatedAt:    now,
+		UpdatedAt:    now,
+	}
+
+	err = s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			if err := mitigation.LoadByID(ctx, conn, s.svc.scope, req.MitigationID); err != nil {
-				return fmt.Errorf("cannot load mitigation %q: %w", req.MitigationID, err)
+			if err := task.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert task: %w", err)
 			}
 
-			now := time.Now()
-			taskID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.TaskEntityType)
-			if err != nil {
-				return fmt.Errorf("cannot generate id: %w", err)
-			}
-
-			task := &coredata.Task{
-				ID:           taskID,
-				MitigationID: req.MitigationID,
-				Name:         req.Name,
-				Description:  req.Description,
-				TimeEstimate: req.TimeEstimate,
-				AssignedToID: req.AssignedToID,
-				State:        coredata.TaskStateTodo,
-				CreatedAt:    now,
-				UpdatedAt:    now,
-			}
-
-			return task.Insert(ctx, conn, s.svc.scope)
+			return nil
 		},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create task: %w", err)
 	}
 
-	return s.Get(ctx, req.MitigationID)
+	return task, nil
 }
 
 func (s TaskService) Get(
