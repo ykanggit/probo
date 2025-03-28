@@ -20,6 +20,7 @@ import { UpdatePolicyPage } from "./policies/UpdatePolicyPage";
 import { SettingsPage } from "./SettingsPage";
 import { CreateOrganizationPage } from "./CreateOrganizationPage";
 import HomePage from "./HomePage";
+import NotFoundPage from "../NotFoundPage";
 
 export function OrganizationsRoutes() {
   return (
@@ -58,6 +59,7 @@ export function OrganizationsRoutes() {
           element={<UpdatePolicyPage />}
         />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
 
       <Route path="*" element={<NoOrganizationLayout />}>

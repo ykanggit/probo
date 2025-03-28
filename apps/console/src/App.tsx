@@ -27,7 +27,6 @@ posthog.init(process.env.POSTHOG_KEY!, {
 const OrganizationSelectionPage = lazy(
   () => import("./pages/OrganizationSelectionPage")
 );
-const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 function App() {
   return (
@@ -60,15 +59,6 @@ function App() {
                       <AuthLayout>
                         <AuthenticationRoutes />
                       </AuthLayout>
-                    }
-                  />
-
-                  <Route
-                    path="*"
-                    element={
-                      <Suspense>
-                        <NotFoundPage />
-                      </Suspense>
                     }
                   />
                 </Route>

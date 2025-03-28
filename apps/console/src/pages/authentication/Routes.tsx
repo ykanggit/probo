@@ -7,6 +7,7 @@ import LoginPage from "./LoginPage";
 import RegisterPage from "./RegisterPage";
 import ResetPasswordPage from "./ResetPasswordPage";
 import { VisitorErrorBoundaryWithLocation } from "./ErrorBoundary";
+import NotFoundPage from "../NotFoundPage";
 
 export function AuthenticationRoutes() {
   return (
@@ -71,6 +72,7 @@ export function AuthenticationRoutes() {
           </Suspense>
         }
       />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
