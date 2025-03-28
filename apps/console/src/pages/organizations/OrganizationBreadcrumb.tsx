@@ -17,6 +17,7 @@ import { OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery } from "./__generat
 import { OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbVendorOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbVendorOverviewQuery.graphql";
 import { OrganizationBreadcrumbOrganizationQuery } from "./__generated__/OrganizationBreadcrumbOrganizationQuery.graphql";
+import { OrganizationBreadcrumbBreadcrumbMitigationViewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbMitigationViewQuery.graphql";
 
 const BreadcrumbNavLink = ({
   to,
@@ -400,6 +401,64 @@ function BreadcrumbPolicyOverview() {
   );
 }
 
+function BreadcrumbMitigationList() {
+  const { organizationId } = useParams();
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink to={`/organizations/${organizationId}/mitigations`}>
+          Mitigations
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbMitigationView() {
+  const { organizationId, mitigationId } = useParams();
+  const data =
+    useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbMitigationViewQuery>(
+      graphql`
+        query OrganizationBreadcrumbBreadcrumbMitigationViewQuery(
+          $mitigationId: ID!
+        ) {
+          mitigation: node(id: $mitigationId) {
+            id
+            ... on Mitigation {
+              name
+              category
+            }
+          }
+        }
+      `,
+      { mitigationId: mitigationId! }
+    );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/mitigations#${data.mitigation.category}`}
+        >
+          {data.mitigation.category}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/mitigations/${mitigationId}`}
+        >
+          {data.mitigation.name}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
 export function BreadCrumb() {
   return (
     <Routes>
@@ -410,6 +469,16 @@ export function BreadCrumb() {
           </Suspense>
         }
       >
+        <Route path="mitigations" element={<BreadcrumbMitigationList />}>
+          <Route
+            path=":mitigationId"
+            element={
+              <Suspense>
+                <BreadcrumbMitigationView />
+              </Suspense>
+            }
+          />
+        </Route>
         <Route path="frameworks" element={<BreadcrumbFrameworkList />}>
           <Route
             path=":frameworkId"
