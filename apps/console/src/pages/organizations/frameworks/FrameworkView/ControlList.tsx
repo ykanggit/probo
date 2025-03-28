@@ -3,6 +3,8 @@ import { ControlList_List$key } from "./__generated__/ControlList_List.graphql";
 import { NavLink, useParams } from "react-router";
 import { cn } from "@/lib/utils";
 
+const maxControlNameLength = 80;
+
 export const controlListFragment = graphql`
   fragment ControlList_List on Framework {
     controls(first: 100, orderBy: { field: CREATED_AT, direction: ASC })
@@ -68,7 +70,9 @@ export function ControlList(props: ControlListProps) {
                     isActive && "font-medium"
                   )}
                 >
-                  {control.name}
+                  {control.name.length > maxControlNameLength
+                    ? `${control.name.slice(0, maxControlNameLength - 2)}…`
+                    : control.name}
                 </div>
               </>
             );
