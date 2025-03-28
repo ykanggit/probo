@@ -42,14 +42,6 @@ type (
 	}
 
 	Tasks []*Task
-
-	UpdateTaskParams struct {
-		ExpectedVersion int
-		Name            *string
-		Description     *string
-		State           *TaskState
-		TimeEstimate    *time.Duration
-	}
 )
 
 func (c Task) CursorKey(orderBy TaskOrderField) page.CursorKey {
@@ -210,58 +202,33 @@ func (c *Task) Update(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	params UpdateTaskParams,
 ) error {
 	q := `
-UPDATE tasks SET
-    name = COALESCE(@name, name),
-    description = COALESCE(@description, description),
-    state = COALESCE(@state, state),
-    time_estimate = COALESCE(@time_estimate, time_estimate),
-    updated_at = @updated_at,
-    version = version + 1
+UPDATE tasks
+SET
+  name = @name,
+  description = @description,
+  state = @state,
+  time_estimate = @time_estimate,
+  updated_at = @updated_at
 WHERE %s
     AND id = @task_id
-    AND version = @expected_version
-RETURNING 
-    id,
-    mitigation_id,
-    name,
-    description,
-    state,
-    time_estimate,
-    assigned_to,
-    created_at,
-    updated_at,
-    version
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.NamedArgs{
-		"task_id":          c.ID,
-		"expected_version": params.ExpectedVersion,
-		"name":             params.Name,
-		"description":      params.Description,
-		"state":            params.State,
-		"time_estimate":    params.TimeEstimate,
-		"updated_at":       time.Now(),
+		"task_id":       c.ID,
+		"name":          c.Name,
+		"description":   c.Description,
+		"state":         c.State,
+		"time_estimate": c.TimeEstimate,
+		"updated_at":    c.UpdatedAt,
 	}
 
 	maps.Copy(args, scope.SQLArguments())
 
-	rows, err := conn.Query(ctx, q, args)
-	if err != nil {
-		return fmt.Errorf("cannot query tasks: %w", err)
-	}
-
-	task, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Task])
-	if err != nil {
-		return fmt.Errorf("cannot collect tasks: %w", err)
-	}
-
-	*c = task
-
-	return nil
+	_, err := conn.Exec(ctx, q, args)
+	return err
 }
 
 func (c *Task) AssignTo(
@@ -383,97 +350,6 @@ WHERE %s
 	_, err := conn.Exec(ctx, q, args)
 	if err != nil {
 		return fmt.Errorf("cannot delete task: %w", err)
-	}
-
-	return nil
-}
-
-// Helper functions for task management
-
-var (
-	ErrAssignTaskFailed   = fmt.Errorf("failed to assign task")
-	ErrUnassignTaskFailed = fmt.Errorf("failed to unassign task")
-	ErrUpdateTaskFailed   = fmt.Errorf("failed to update task")
-	ErrDeleteTaskFailed   = fmt.Errorf("failed to delete task")
-)
-
-type TaskUpdate struct {
-	Name         *string
-	Description  *string
-	State        *TaskState
-	TimeEstimate *time.Duration
-}
-
-func AssignTask(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-	taskID gid.GID,
-	assignedToID gid.GID,
-) (*Task, error) {
-	task := &Task{ID: taskID}
-	if err := task.LoadByID(ctx, conn, scope, taskID); err != nil {
-		return nil, ErrAssignTaskFailed
-	}
-
-	if err := task.AssignTo(ctx, conn, scope, assignedToID); err != nil {
-		return nil, ErrAssignTaskFailed
-	}
-
-	return task, nil
-}
-
-func UnassignTask(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-	taskID gid.GID,
-) (*Task, error) {
-	task := &Task{ID: taskID}
-	if err := task.LoadByID(ctx, conn, scope, taskID); err != nil {
-		return nil, ErrUnassignTaskFailed
-	}
-
-	if err := task.Unassign(ctx, conn, scope); err != nil {
-		return nil, ErrUnassignTaskFailed
-	}
-
-	return task, nil
-}
-
-func UpdateTask(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-	taskID gid.GID,
-	expectedVersion int,
-	updates *TaskUpdate,
-) (*Task, error) {
-	task := &Task{ID: taskID}
-
-	if err := task.Update(ctx, conn, scope, UpdateTaskParams{
-		ExpectedVersion: expectedVersion,
-		Name:            updates.Name,
-		Description:     updates.Description,
-		State:           updates.State,
-		TimeEstimate:    updates.TimeEstimate,
-	}); err != nil {
-		return nil, ErrUpdateTaskFailed
-	}
-
-	return task, nil
-}
-
-func DeleteTask(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-	taskID gid.GID,
-) error {
-	task := &Task{ID: taskID}
-
-	if err := task.Delete(ctx, conn, scope); err != nil {
-		return ErrDeleteTaskFailed
 	}
 
 	return nil

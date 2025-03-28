@@ -71,18 +71,18 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 
-import type { MitigationViewQuery as MitigationViewQueryType } from "./__generated__/MitigationViewQuery.graphql";
-import type { MitigationViewUpdateTaskStateMutation as MitigationViewUpdateTaskStateMutationType } from "./__generated__/MitigationViewUpdateTaskStateMutation.graphql";
-import type { MitigationViewCreateTaskMutation as MitigationViewCreateTaskMutationType } from "./__generated__/MitigationViewCreateTaskMutation.graphql";
-import type { MitigationViewDeleteTaskMutation as MitigationViewDeleteTaskMutationType } from "./__generated__/MitigationViewDeleteTaskMutation.graphql";
-import type { MitigationViewUploadEvidenceMutation as MitigationViewUploadEvidenceMutationType } from "./__generated__/MitigationViewUploadEvidenceMutation.graphql";
-import type { MitigationViewDeleteEvidenceMutation as MitigationViewDeleteEvidenceMutationType } from "./__generated__/MitigationViewDeleteEvidenceMutation.graphql";
-import type { MitigationViewAssignTaskMutation as MitigationViewAssignTaskMutationType } from "./__generated__/MitigationViewAssignTaskMutation.graphql";
-import type { MitigationViewUnassignTaskMutation as MitigationViewUnassignTaskMutationType } from "./__generated__/MitigationViewUnassignTaskMutation.graphql";
-import type { MitigationViewOrganizationQuery$data } from "./__generated__/MitigationViewOrganizationQuery.graphql";
-import type { MitigationViewUpdateMitigationStateMutation as MitigationViewUpdateMitigationStateMutationType } from "./__generated__/MitigationViewUpdateMitigationStateMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
 import { MitigationViewSkeleton } from "./MitigationPage";
+import { MitigationViewUpdateTaskStateMutation as MitigationViewUpdateTaskStateMutationType } from "./__generated__/MitigationViewUpdateTaskStateMutation.graphql";
+import { MitigationViewCreateTaskMutation as MitigationViewCreateTaskMutationType } from "./__generated__/MitigationViewCreateTaskMutation.graphql";
+import { MitigationViewDeleteTaskMutation as MitigationViewDeleteTaskMutationType } from "./__generated__/MitigationViewDeleteTaskMutation.graphql";
+import { MitigationViewUploadEvidenceMutation as MitigationViewUploadEvidenceMutationType } from "./__generated__/MitigationViewUploadEvidenceMutation.graphql";
+import { MitigationViewDeleteEvidenceMutation as MitigationViewDeleteEvidenceMutationType } from "./__generated__/MitigationViewDeleteEvidenceMutation.graphql";
+import { MitigationViewAssignTaskMutation as MitigationViewAssignTaskMutationType } from "./__generated__/MitigationViewAssignTaskMutation.graphql";
+import { MitigationViewUnassignTaskMutation as MitigationViewUnassignTaskMutationType } from "./__generated__/MitigationViewUnassignTaskMutation.graphql";
+import { MitigationViewUpdateMitigationStateMutation as MitigationViewUpdateMitigationStateMutationType } from "./__generated__/MitigationViewUpdateMitigationStateMutation.graphql";
+import { MitigationViewQuery as MitigationViewQueryType } from "./__generated__/MitigationViewQuery.graphql";
+import { MitigationViewOrganizationQuery$data } from "./__generated__/MitigationViewOrganizationQuery.graphql";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {

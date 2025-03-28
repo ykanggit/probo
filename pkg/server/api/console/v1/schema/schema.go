@@ -2409,7 +2409,10 @@ enum MitigationOrderField
   @goModel(
     model: "github.com/getprobo/probo/pkg/coredata.MitigationOrderField"
   ) {
-  NAME
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.MitigationOrderFieldCreatedAt"
+    )
 }
 
 enum TaskOrderField
@@ -23057,12 +23060,12 @@ var (
 
 func (ec *executionContext) unmarshalNMitigationOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMitigationOrderField(ctx context.Context, v any) (coredata.MitigationOrderField, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := coredata.MitigationOrderField(tmp)
+	res := unmarshalNMitigationOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMitigationOrderField[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNMitigationOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMitigationOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.MitigationOrderField) graphql.Marshaler {
-	res := graphql.MarshalString(string(v))
+	res := graphql.MarshalString(marshalNMitigationOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMitigationOrderField[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -23070,6 +23073,15 @@ func (ec *executionContext) marshalNMitigationOrderField2githubᚗcomᚋgetprobo
 	}
 	return res
 }
+
+var (
+	unmarshalNMitigationOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMitigationOrderField = map[string]coredata.MitigationOrderField{
+		"CREATED_AT": coredata.MitigationOrderFieldCreatedAt,
+	}
+	marshalNMitigationOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMitigationOrderField = map[coredata.MitigationOrderField]string{
+		coredata.MitigationOrderFieldCreatedAt: "CREATED_AT",
+	}
+)
 
 func (ec *executionContext) unmarshalNMitigationState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMitigationState(ctx context.Context, v any) (coredata.MitigationState, error) {
 	tmp, err := graphql.UnmarshalString(v)

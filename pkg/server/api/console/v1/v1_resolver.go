@@ -372,20 +372,6 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 	}, nil
 }
 
-// DeleteFramework is the resolver for the deleteFramework field.
-func (r *mutationResolver) DeleteFramework(ctx context.Context, input types.DeleteFrameworkInput) (*types.DeleteFrameworkPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.FrameworkID.TenantID())
-
-	err := svc.Frameworks.Delete(ctx, input.FrameworkID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot delete framework: %w", err)
-	}
-
-	return &types.DeleteFrameworkPayload{
-		DeletedFrameworkID: input.FrameworkID,
-	}, nil
-}
-
 // ImportFramework is the resolver for the importFramework field.
 func (r *mutationResolver) ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
@@ -402,6 +388,20 @@ func (r *mutationResolver) ImportFramework(ctx context.Context, input types.Impo
 
 	return &types.ImportFrameworkPayload{
 		FrameworkEdge: types.NewFrameworkEdge(framework, coredata.FrameworkOrderFieldCreatedAt),
+	}, nil
+}
+
+// DeleteFramework is the resolver for the deleteFramework field.
+func (r *mutationResolver) DeleteFramework(ctx context.Context, input types.DeleteFrameworkInput) (*types.DeleteFrameworkPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.FrameworkID.TenantID())
+
+	err := svc.Frameworks.Delete(ctx, input.FrameworkID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete framework: %w", err)
+	}
+
+	return &types.DeleteFrameworkPayload{
+		DeletedFrameworkID: input.FrameworkID,
 	}, nil
 }
 

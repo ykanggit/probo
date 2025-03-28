@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Suspense } from "react";
 import { lazy } from "@probo/react-lazy";
 import { useLocation } from "react-router";
-import { ErrorBoundaryWithLocation } from "../../ErrorBoundary";
+import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
 
 const MitigationView = lazy(() => import("./MitigationView"));
 

@@ -9,9 +9,7 @@ import { CreatePeoplePage } from "./people/CreatePeoplePage";
 import { PeoplePage } from "./people/PeoplePage";
 import { CreateFrameworkPage } from "./frameworks/CreateFrameworkPage";
 import { UpdateFrameworkPage } from "./frameworks/UpdateFrameworkPage";
-import { CreateMitigationPage } from "./frameworks/mitigations/CreateMitigationPage";
-import { MitigationPage } from "./frameworks/mitigations/MitigationPage";
-import { UpdateMitigationPage } from "./frameworks/mitigations/UpdateMitigationPage";
+import { MitigationPage } from "./mitigations/MitigationPage";
 import { VendorPage } from "./vendors/VendorPage";
 import { PolicyListPage } from "./policies/PolicyListPage";
 import { CreatePolicyPage } from "./policies/CreatePolicyPage";
@@ -19,6 +17,8 @@ import { PolicyPage } from "./policies/PolicyPage";
 import { UpdatePolicyPage } from "./policies/UpdatePolicyPage";
 import { SettingsPage } from "./SettingsPage";
 import { CreateOrganizationPage } from "./CreateOrganizationPage";
+import { MitigationListPage } from "./mitigations/MitigationListPage";
+
 import HomePage from "./HomePage";
 import NotFoundPage from "../NotFoundPage";
 
@@ -38,18 +38,13 @@ export function OrganizationsRoutes() {
           path="frameworks/:frameworkId/update"
           element={<UpdateFrameworkPage />}
         />
+        <Route path="mitigations" element={<MitigationListPage />} />
+        <Route path="mitigations/:mitigationId" element={<MitigationPage />} />
+        {/* <Route path="mitigations/create" element={<CreateMitigationPage />} />
         <Route
-          path="frameworks/:frameworkId/mitigations/create"
-          element={<CreateMitigationPage />}
-        />
-        <Route
-          path="frameworks/:frameworkId/mitigations/:mitigationId"
-          element={<MitigationPage />}
-        />
-        <Route
-          path="frameworks/:frameworkId/mitigations/:mitigationId/update"
+          path="mitigations/:mitigationId/update"
           element={<UpdateMitigationPage />}
-        />
+        /> */}
         <Route path="vendors/:vendorId" element={<VendorPage />} />
         <Route path="policies" element={<PolicyListPage />} />
         <Route path="policies/create" element={<CreatePolicyPage />} />

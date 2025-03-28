@@ -212,7 +212,10 @@ enum MitigationOrderField
   @goModel(
     model: "github.com/getprobo/probo/pkg/coredata.MitigationOrderField"
   ) {
-  NAME
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.MitigationOrderFieldCreatedAt"
+    )
 }
 
 enum TaskOrderField

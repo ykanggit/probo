@@ -44,15 +44,6 @@ type (
 	}
 
 	Mitigations []*Mitigation
-
-	UpdateMitigationParams struct {
-		ExpectedVersion int
-		Name            *string
-		Description     *string
-		Category        *string
-		State           *MitigationState
-		Importance      *MitigationImportance
-	}
 )
 
 func (c Mitigation) CursorKey(orderBy MitigationOrderField) page.CursorKey {
@@ -223,60 +214,33 @@ func (c *Mitigation) Update(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	params UpdateMitigationParams,
 ) error {
 	q := `
-UPDATE mitigations SET
-    name = COALESCE(@name, name),
-    description = COALESCE(@description, description),
-    category = COALESCE(@category, category),
-	state = COALESCE(@state, state),
-	importance = COALESCE(@importance, importance),
-    updated_at = @updated_at,
-    version = version + 1
+UPDATE mitigations
+SET
+  name = @name,
+  description = @description,
+  category = @category,
+  state = @state,
+  importance = @importance,
+  updated_at = @updated_at
 WHERE %s
     AND id = @mitigation_id
-    AND version = @expected_version
-RETURNING 
-    id,
-    organization_id,
-    category,
-    name,
-    description,
-	importance,
-	state,
-    content_ref,
-    created_at,
-    updated_at,
-	standards,
-	version
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.NamedArgs{
-		"mitigation_id":    c.ID,
-		"expected_version": params.ExpectedVersion,
-		"name":             params.Name,
-		"description":      params.Description,
-		"category":         params.Category,
-		"state":            params.State,
-		"importance":       params.Importance,
-		"updated_at":       time.Now(),
+		"mitigation_id": c.ID,
+		"name":          c.Name,
+		"description":   c.Description,
+		"category":      c.Category,
+		"state":         c.State,
+		"importance":    c.Importance,
+		"updated_at":    c.UpdatedAt,
 	}
 
 	maps.Copy(args, scope.SQLArguments())
 
-	rows, err := conn.Query(ctx, q, args)
-	if err != nil {
-		return fmt.Errorf("cannot query mitigations: %w", err)
-	}
-
-	mitigation, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Mitigation])
-	if err != nil {
-		return fmt.Errorf("cannot collect mitigations: %w", err)
-	}
-
-	*c = mitigation
-
-	return nil
+	_, err := conn.Exec(ctx, q, args)
+	return err
 }

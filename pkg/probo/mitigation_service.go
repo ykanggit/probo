@@ -39,13 +39,12 @@ type (
 	}
 
 	UpdateMitigationRequest struct {
-		ID              gid.GID
-		ExpectedVersion int
-		Name            *string
-		Description     *string
-		Category        *string
-		State           *coredata.MitigationState
-		Importance      *coredata.MitigationImportance
+		ID          gid.GID
+		Name        *string
+		Description *string
+		Category    *string
+		State       *coredata.MitigationState
+		Importance  *coredata.MitigationImportance
 	}
 )
 
@@ -73,22 +72,44 @@ func (s MitigationService) Update(
 	ctx context.Context,
 	req UpdateMitigationRequest,
 ) (*coredata.Mitigation, error) {
-	params := coredata.UpdateMitigationParams{
-		ExpectedVersion: req.ExpectedVersion,
-		Name:            req.Name,
-		Description:     req.Description,
-		Category:        req.Category,
-		State:           req.State,
-		Importance:      req.Importance,
-	}
-
 	mitigation := &coredata.Mitigation{ID: req.ID}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return mitigation.Update(ctx, conn, s.svc.scope, params)
-		})
+			if err := mitigation.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
+				return fmt.Errorf("cannot load mitigation: %w", err)
+			}
+
+			if req.Name != nil {
+				mitigation.Name = *req.Name
+			}
+
+			if req.Description != nil {
+				mitigation.Description = *req.Description
+			}
+
+			if req.Category != nil {
+				mitigation.Category = *req.Category
+			}
+
+			if req.State != nil {
+				mitigation.State = *req.State
+			}
+
+			if req.Importance != nil {
+				mitigation.Importance = *req.Importance
+			}
+
+			mitigation.UpdatedAt = time.Now()
+
+			if err := mitigation.Update(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot update mitigation: %w", err)
+			}
+
+			return nil
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

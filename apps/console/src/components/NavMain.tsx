@@ -145,9 +145,11 @@ function getNavItems(organizationId?: string): NavItem[] {
         : undefined,
     },
     {
-      title: "Risk",
+      title: "Risks",
       icon: Shield,
-      url: organizationId ? `/organizations/${organizationId}/risk` : undefined,
+      url: organizationId
+        ? `/organizations/${organizationId}/risks`
+        : undefined,
     },
     {
       title: "Frameworks",

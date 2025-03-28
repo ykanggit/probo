@@ -16,7 +16,6 @@ package probo
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -40,12 +39,11 @@ type (
 	}
 
 	UpdateTaskRequest struct {
-		TaskID          gid.GID
-		ExpectedVersion int
-		Name            *string
-		Description     *string
-		State           *coredata.TaskState
-		TimeEstimate    *time.Duration
+		TaskID       gid.GID
+		Name         *string
+		Description  *string
+		State        *coredata.TaskState
+		TimeEstimate *time.Duration
 	}
 )
 
@@ -114,20 +112,15 @@ func (s TaskService) Assign(
 	taskID gid.GID,
 	assignedToID gid.GID,
 ) (*coredata.Task, error) {
-	task := &coredata.Task{}
+	task := &coredata.Task{ID: taskID}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			var assignErr error
-			task, assignErr = coredata.AssignTask(ctx, conn, s.svc.scope, taskID, assignedToID)
-			return assignErr
+			return task.AssignTo(ctx, conn, s.svc.scope, assignedToID)
 		},
 	)
 	if err != nil {
-		if errors.Is(err, coredata.ErrAssignTaskFailed) {
-			return nil, errors.New("failed to assign task, please try again")
-		}
 		return nil, err
 	}
 
@@ -138,20 +131,15 @@ func (s TaskService) Unassign(
 	ctx context.Context,
 	taskID gid.GID,
 ) (*coredata.Task, error) {
-	task := &coredata.Task{}
+	task := &coredata.Task{ID: taskID}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			var unassignErr error
-			task, unassignErr = coredata.UnassignTask(ctx, conn, s.svc.scope, taskID)
-			return unassignErr
+			return task.Unassign(ctx, conn, s.svc.scope)
 		},
 	)
 	if err != nil {
-		if errors.Is(err, coredata.ErrUnassignTaskFailed) {
-			return nil, errors.New("failed to unassign task, please try again")
-		}
 		return nil, err
 	}
 
@@ -162,32 +150,41 @@ func (s TaskService) Update(
 	ctx context.Context,
 	req UpdateTaskRequest,
 ) (*coredata.Task, error) {
-	task := &coredata.Task{}
+	task := &coredata.Task{ID: req.TaskID}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			var updateErr error
-			task, updateErr = coredata.UpdateTask(
-				ctx,
-				conn,
-				s.svc.scope,
-				req.TaskID,
-				req.ExpectedVersion,
-				&coredata.TaskUpdate{
-					Name:         req.Name,
-					Description:  req.Description,
-					State:        req.State,
-					TimeEstimate: req.TimeEstimate,
-				},
-			)
-			return updateErr
+			if err := task.LoadByID(ctx, conn, s.svc.scope, req.TaskID); err != nil {
+				return fmt.Errorf("cannot load task %q: %w", req.TaskID, err)
+			}
+
+			if req.Name != nil {
+				task.Name = *req.Name
+			}
+
+			if req.Description != nil {
+				task.Description = *req.Description
+			}
+
+			if req.State != nil {
+				task.State = *req.State
+			}
+
+			if req.TimeEstimate != nil {
+				task.TimeEstimate = req.TimeEstimate
+			}
+
+			task.UpdatedAt = time.Now()
+
+			if err := task.Update(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot update task: %w", err)
+			}
+
+			return nil
 		},
 	)
 	if err != nil {
-		if errors.Is(err, coredata.ErrUpdateTaskFailed) {
-			return nil, errors.New("failed to update task, please try again")
-		}
 		return nil, err
 	}
 
@@ -198,16 +195,15 @@ func (s TaskService) Delete(
 	ctx context.Context,
 	taskID gid.GID,
 ) error {
+	task := &coredata.Task{ID: taskID}
+
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return coredata.DeleteTask(ctx, conn, s.svc.scope, taskID)
+			return task.Delete(ctx, conn, s.svc.scope)
 		},
 	)
 	if err != nil {
-		if errors.Is(err, coredata.ErrDeleteTaskFailed) {
-			return errors.New("failed to delete task, please try again")
-		}
 		return err
 	}
 
