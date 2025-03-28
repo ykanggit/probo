@@ -1,9 +1,9 @@
 import { PageTemplateSkeleton } from "@/components/PageTemplate";
 import { Card, CardContent } from "@/components/ui/card";
 import { Suspense } from "react";
-import { useLocation } from "react-router";
-import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
+import { useMatch } from "react-router";
 import { lazy } from "@probo/react-lazy";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const FrameworkView = lazy(() => import("./FrameworkView"));
 
@@ -36,13 +36,15 @@ export function FrameworkViewSkeleton() {
 }
 
 export function FrameworkPage() {
-  const location = useLocation();
+  const match = useMatch(
+    "organizations/:organizationId/frameworks/:frameworkId/*"
+  );
 
   return (
-    <Suspense key={location.pathname} fallback={<FrameworkViewSkeleton />}>
-      <ErrorBoundaryWithLocation>
+    <Suspense key={match?.pathnameBase} fallback={<FrameworkViewSkeleton />}>
+      <ErrorBoundary key={match?.pathnameBase}>
         <FrameworkView />
-      </ErrorBoundaryWithLocation>
+      </ErrorBoundary>
     </Suspense>
   );
 }

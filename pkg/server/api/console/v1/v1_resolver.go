@@ -844,6 +844,13 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 			return nil, err
 		}
 		return types.NewPolicy(policy), nil
+	case coredata.ControlEntityType:
+		control, err := svc.Controls.Get(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+
+		return types.NewControl(control), nil
 	default:
 	}
 

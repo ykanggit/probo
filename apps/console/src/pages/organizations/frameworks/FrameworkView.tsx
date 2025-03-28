@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState, useCallback } from "react";
-import { useParams, useNavigate, Link } from "react-router";
+import { useParams, useNavigate, Link, Outlet } from "react-router";
 import {
   graphql,
   PreloadedQuery,
@@ -8,8 +8,6 @@ import {
   useMutation,
   ConnectionHandler,
 } from "react-relay";
-import { Plus } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,6 +22,8 @@ import type { FrameworkViewQuery as FrameworkViewQueryType } from "./__generated
 import type { FrameworkViewDeleteMutation } from "./__generated__/FrameworkViewDeleteMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
 import { FrameworkViewSkeleton } from "./FrameworkPage";
+import { ControlList } from "./FrameworkView/ControlList";
+import ControlView from "./controls/ControlView";
 
 const FrameworkViewQuery = graphql`
   query FrameworkViewQuery($frameworkId: ID!) {
@@ -32,14 +32,14 @@ const FrameworkViewQuery = graphql`
       ... on Framework {
         name
         description
-        controls(first: 100, orderBy: { field: CREATED_AT, direction: ASC })
+        ...ControlList_List
+        controls(first: 1, orderBy: { field: CREATED_AT, direction: ASC })
           @connection(key: "FrameworkView_controls") {
           edges {
             node {
               id
               referenceId
               name
-              description
             }
           }
         }
@@ -66,14 +66,12 @@ function FrameworkViewContent({
 }) {
   const data = usePreloadedQuery(FrameworkViewQuery, queryRef);
   const framework = data.node;
+  const control = data.node.controls?.edges[0];
   const navigate = useNavigate();
-  const { organizationId } = useParams();
+  const { organizationId, controlId } = useParams();
   const { toast } = useToast();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  // Extract controls from the GraphQL response
-  const controls = framework?.controls?.edges?.map((edge) => edge.node) || [];
 
   // Setup delete mutation
   const [commitDeleteMutation] = useMutation<FrameworkViewDeleteMutation>(
@@ -151,54 +149,9 @@ function FrameworkViewContent({
         </div>
       }
     >
-      <div className="grid gap-6">
-        {controls.length > 0 ? (
-          controls.map((control) => (
-            <Card key={control.id} className="overflow-hidden">
-              <CardHeader className="bg-muted/20">
-                <div
-                  className="font-medium cursor-pointer flex items-center"
-                  onClick={() => {
-                    navigate(
-                      `/organizations/${organizationId}/frameworks/${framework.id}/controls/${control.id}`
-                    );
-                  }}
-                >
-                  <span className="font-mono text-sm mr-3">
-                    {control.referenceId}
-                  </span>
-                  <CardTitle>{control.name}</CardTitle>
-                </div>
-                <div className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
-                  {control.description}
-                </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <h4 className="text-sm font-semibold mb-3">Mitigations</h4>
-                <div className="text-sm text-muted-foreground text-center py-4 border rounded-md">
-                  <p>
-                    Mitigations will be displayed here once connected to this
-                    control
-                  </p>
-                  <div className="mt-2">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link
-                        to={`/organizations/${organizationId}/frameworks/${framework.id}/mitigations/create`}
-                      >
-                        <Plus className="h-3 w-3 mr-1" />
-                        Link Mitigation
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <div className="flex items-center justify-center p-6 text-center text-muted-foreground">
-            No controls available for this framework
-          </div>
-        )}
+      <div className="flex flex-row items-start justify-start w-full h-[calc(100vh-216px)] overflow-hidden -ml-8">
+        <ControlList fragmentKey={framework} />
+        {controlId ? <Outlet /> : <ControlView controlId={control?.node.id} />}
       </div>
 
       {/* Delete Confirmation Dialog */}
@@ -248,7 +201,7 @@ export default function FrameworkView() {
 
   return (
     <Suspense fallback={<FrameworkViewSkeleton />}>
-      {queryRef && <FrameworkViewContent queryRef={queryRef} />}
+      <FrameworkViewContent queryRef={queryRef} />
     </Suspense>
   );
 }

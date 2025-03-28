@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0185ea6dc887f2bbb5ca70ec28e916b2>>
+ * @generated SignedSource<<11d451bf710d818645f55fe5f0ddb114>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+import { FragmentRefs } from "relay-runtime";
 export type FrameworkViewQuery$variables = {
   frameworkId: string;
 };
@@ -17,7 +18,6 @@ export type FrameworkViewQuery$data = {
     readonly controls?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
-          readonly description: string;
           readonly id: string;
           readonly name: string;
           readonly referenceId: string;
@@ -27,6 +27,7 @@ export type FrameworkViewQuery$data = {
     readonly description?: string;
     readonly id: string;
     readonly name?: string;
+    readonly " $fragmentSpreads": FragmentRefs<"ControlList_List">;
   };
 };
 export type FrameworkViewQuery = {
@@ -111,7 +112,6 @@ v7 = [
             "storageKey": null
           },
           (v3/*: any*/),
-          (v4/*: any*/),
           (v6/*: any*/)
         ],
         "storageKey": null
@@ -181,6 +181,11 @@ return {
             "selections": [
               (v3/*: any*/),
               (v4/*: any*/),
+              {
+                "args": null,
+                "kind": "FragmentSpread",
+                "name": "ControlList_List"
+              },
               {
                 "alias": "controls",
                 "args": [
@@ -256,7 +261,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a1fa5a0efc291c92478c061d32b90e43",
+    "cacheID": "5bf64e09bf7f44c56b75bbb63b9b272f",
     "id": null,
     "metadata": {
       "connection": [
@@ -273,11 +278,11 @@ return {
     },
     "name": "FrameworkViewQuery",
     "operationKind": "query",
-    "text": "query FrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      controls(first: 100, orderBy: {field: CREATED_AT, direction: ASC}) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            description\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query FrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      ...ControlList_List\n      controls(first: 100, orderBy: {field: CREATED_AT, direction: ASC}) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n\nfragment ControlList_List on Framework {\n  controls(first: 100, orderBy: {field: CREATED_AT, direction: ASC}) {\n    edges {\n      node {\n        id\n        referenceId\n        name\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ff9593fc321c840ae9ef1da48a13c3e5";
+(node as any).hash = "d4837d95c7bd721bf1851c1b977fd018";
 
 export default node;

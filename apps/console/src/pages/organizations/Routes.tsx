@@ -1,26 +1,26 @@
 import { Route, Routes } from "react-router";
-import { VendorListPage } from "./vendors/VendorListPage";
-import OrganizationLayout from "./OrganizationLayout";
+import NotFoundPage from "../NotFoundPage";
+import { CreateOrganizationPage } from "./CreateOrganizationPage";
+import HomePage from "./HomePage";
 import NoOrganizationLayout from "./NoOrganizationLayout";
+import OrganizationLayout from "./OrganizationLayout";
+import { SettingsPage } from "./SettingsPage";
+import { CreateFrameworkPage } from "./frameworks/CreateFrameworkPage";
 import { FrameworkListPage } from "./frameworks/FrameworkListPage";
 import { FrameworkPage } from "./frameworks/FrameworkPage";
-import { PeopleListPage } from "./people/PeopleListPage";
-import { CreatePeoplePage } from "./people/CreatePeoplePage";
-import { PeoplePage } from "./people/PeoplePage";
-import { CreateFrameworkPage } from "./frameworks/CreateFrameworkPage";
 import { UpdateFrameworkPage } from "./frameworks/UpdateFrameworkPage";
+import { ControlPage } from "./frameworks/controls/ControlPage";
 import { MitigationPage } from "./mitigations/MitigationPage";
-import { VendorPage } from "./vendors/VendorPage";
-import { PolicyListPage } from "./policies/PolicyListPage";
+import { MitigationListPage } from "./mitigations/MitigationListPage";
+import { CreatePeoplePage } from "./people/CreatePeoplePage";
+import { PeopleListPage } from "./people/PeopleListPage";
+import { PeoplePage } from "./people/PeoplePage";
 import { CreatePolicyPage } from "./policies/CreatePolicyPage";
+import { PolicyListPage } from "./policies/PolicyListPage";
 import { PolicyPage } from "./policies/PolicyPage";
 import { UpdatePolicyPage } from "./policies/UpdatePolicyPage";
-import { SettingsPage } from "./SettingsPage";
-import { CreateOrganizationPage } from "./CreateOrganizationPage";
-import { MitigationListPage } from "./mitigations/MitigationListPage";
-
-import HomePage from "./HomePage";
-import NotFoundPage from "../NotFoundPage";
+import { VendorListPage } from "./vendors/VendorListPage";
+import { VendorPage } from "./vendors/VendorPage";
 
 export function OrganizationsRoutes() {
   return (
@@ -33,18 +33,16 @@ export function OrganizationsRoutes() {
         <Route path="vendors" element={<VendorListPage />} />
         <Route path="frameworks" element={<FrameworkListPage />} />
         <Route path="frameworks/create" element={<CreateFrameworkPage />} />
-        <Route path="frameworks/:frameworkId" element={<FrameworkPage />} />
-        <Route
-          path="frameworks/:frameworkId/update"
-          element={<UpdateFrameworkPage />}
-        />
+        <Route path="frameworks/:frameworkId/*">
+          <Route element={<FrameworkPage />}>
+            <Route index />
+            <Route path="controls/:controlId" element={<ControlPage />} />
+          </Route>
+          <Route path="update" element={<UpdateFrameworkPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
         <Route path="mitigations" element={<MitigationListPage />} />
         <Route path="mitigations/:mitigationId" element={<MitigationPage />} />
-        {/* <Route path="mitigations/create" element={<CreateMitigationPage />} />
-        <Route
-          path="mitigations/:mitigationId/update"
-          element={<UpdateMitigationPage />}
-        /> */}
         <Route path="vendors/:vendorId" element={<VendorPage />} />
         <Route path="policies" element={<PolicyListPage />} />
         <Route path="policies/create" element={<CreatePolicyPage />} />

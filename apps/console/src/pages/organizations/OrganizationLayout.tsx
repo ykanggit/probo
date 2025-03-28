@@ -7,7 +7,10 @@ import { BreadCrumb } from "./OrganizationBreadcrumb";
 import { cn } from "@/lib/utils";
 
 export default function OrganizationLayout() {
-  const match = useMatch(
+  const controlMatch = useMatch(
+    "organizations/:organizationId/frameworks/:frameworkId/controls/*"
+  );
+  const frameworkMatch = useMatch(
     "organizations/:organizationId/frameworks/:frameworkId"
   );
 
@@ -19,16 +22,16 @@ export default function OrganizationLayout() {
       <SidebarInset>
         <div
           className={cn(
-            "p-8",
-            match
+            "p-8 h-screen overflow-auto",
+            controlMatch || frameworkMatch
               ? "w-full"
               : "mx-auto w-lg md:w-xl lg:w-3xl xl:w-4xl 2xl:w-5xl"
           )}
         >
-          <header className="flex shrink-0 items-center gap-2">
+          <header className="flex shrink-0 items-center gap-2 mb-7">
             <BreadCrumb />
           </header>
-          <div className="mt-7 w-full">
+          <div className="w-full">
             <Outlet />
           </div>
         </div>
