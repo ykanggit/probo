@@ -1,3 +1,4 @@
+# Directives
 directive @goField(
   forceResolver: Boolean
   name: String
@@ -11,14 +12,31 @@ directive @goModel(
 
 directive @goEnum(value: String) on ENUM_VALUE
 
+# Scalars
 scalar CursorKey
 scalar Void
 scalar Datetime
 scalar Upload
 scalar Duration
 
+# Interfaces
 interface Node {
   id: ID!
+}
+
+# Pagination
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: CursorKey
+  endCursor: CursorKey
+}
+
+# Enums
+enum OrderDirection
+  @goModel(model: "github.com/getprobo/probo/pkg/page.OrderDirection") {
+  ASC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionAsc")
+  DESC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionDesc")
 }
 
 enum MitigationState
@@ -93,84 +111,53 @@ enum MitigationImportance
     )
 }
 
-type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: CursorKey
-  endCursor: CursorKey
+enum ServiceCriticality
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ServiceCriticality") {
+  LOW
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityLow"
+    )
+  MEDIUM
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityMedium"
+    )
+  HIGH
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityHigh"
+    )
 }
 
-type OrganizationConnection {
-  edges: [OrganizationEdge!]!
-  pageInfo: PageInfo!
+enum RiskTier
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskTier") {
+  CRITICAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierCritical")
+  SIGNIFICANT
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierSignificant")
+  GENERAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierGeneral")
 }
 
-type OrganizationEdge {
-  cursor: CursorKey!
-  node: Organization!
+enum PolicyStatus
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
+  DRAFT
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft")
+  ACTIVE
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusActive")
 }
 
-type Organization implements Node {
-  id: ID!
-  name: String!
-  logoUrl: String @goField(forceResolver: true)
-
-  users(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: UserOrder
-  ): UserConnection! @goField(forceResolver: true)
-
-  frameworks(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: FrameworkOrder
-  ): FrameworkConnection! @goField(forceResolver: true)
-
-  vendors(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: VendorOrder
-  ): VendorConnection! @goField(forceResolver: true)
-
-  peoples(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: PeopleOrder
-  ): PeopleConnection! @goField(forceResolver: true)
-
-  policies(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: PolicyOrder
-  ): PolicyConnection! @goField(forceResolver: true)
-
-  mitigations(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: MitigationOrder
-  ): MitigationConnection! @goField(forceResolver: true)
-
-  createdAt: Datetime!
-  updatedAt: Datetime!
+enum EvidenceType
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceType") {
+  FILE @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeFile")
+  LINK @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeLink")
 }
 
-enum OrderDirection
-  @goModel(model: "github.com/getprobo/probo/pkg/page.OrderDirection") {
-  ASC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionAsc")
-  DESC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionDesc")
+# Order Field Enums
+enum UserOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.UserOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.UserOrderFieldCreatedAt"
+    )
 }
 
 enum PeopleOrderField
@@ -231,6 +218,21 @@ enum PolicyOrderField
 enum EvidenceOrderField
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceOrderField") {
   CREATED_AT
+}
+
+enum OrganizationOrderField {
+  NAME
+  CREATED_AT
+  UPDATED_AT
+}
+
+# Order Input Types
+input UserOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.UserOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: UserOrderField!
 }
 
 input PeopleOrder
@@ -297,14 +299,75 @@ input EvidenceOrder
   field: EvidenceOrderField!
 }
 
-type PeopleConnection {
-  edges: [PeopleEdge!]!
-  pageInfo: PageInfo!
+input OrganizationOrder {
+  direction: OrderDirection!
+  field: OrganizationOrderField!
 }
 
-type PeopleEdge {
-  cursor: CursorKey!
-  node: People!
+# Core Types
+type Organization implements Node {
+  id: ID!
+  name: String!
+  logoUrl: String @goField(forceResolver: true)
+
+  users(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: UserOrder
+  ): UserConnection! @goField(forceResolver: true)
+
+  frameworks(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: FrameworkOrder
+  ): FrameworkConnection! @goField(forceResolver: true)
+
+  vendors(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: VendorOrder
+  ): VendorConnection! @goField(forceResolver: true)
+
+  peoples(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: PeopleOrder
+  ): PeopleConnection! @goField(forceResolver: true)
+
+  policies(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: PolicyOrder
+  ): PolicyConnection! @goField(forceResolver: true)
+
+  mitigations(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: MitigationOrder
+  ): MitigationConnection! @goField(forceResolver: true)
+
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type User implements Node {
+  id: ID!
+  fullName: String!
+  email: String!
+  createdAt: Datetime!
+  updatedAt: Datetime!
 }
 
 type People implements Node {
@@ -315,16 +378,6 @@ type People implements Node {
   kind: PeopleKind!
   createdAt: Datetime!
   updatedAt: Datetime!
-}
-
-type VendorConnection {
-  edges: [VendorEdge!]!
-  pageInfo: PageInfo!
-}
-
-type VendorEdge {
-  cursor: CursorKey!
-  node: Vendor!
 }
 
 type Vendor implements Node {
@@ -340,16 +393,6 @@ type Vendor implements Node {
   privacyPolicyUrl: String
   createdAt: Datetime!
   updatedAt: Datetime!
-}
-
-type FrameworkConnection {
-  edges: [FrameworkEdge!]!
-  pageInfo: PageInfo!
-}
-
-type FrameworkEdge {
-  cursor: CursorKey!
-  node: Framework!
 }
 
 type Framework implements Node {
@@ -369,16 +412,6 @@ type Framework implements Node {
   updatedAt: Datetime!
 }
 
-type ControlConnection {
-  edges: [ControlEdge!]!
-  pageInfo: PageInfo!
-}
-
-type ControlEdge {
-  cursor: CursorKey!
-  node: Control!
-}
-
 type Control implements Node {
   id: ID!
   referenceId: String!
@@ -386,16 +419,6 @@ type Control implements Node {
   description: String!
   createdAt: Datetime!
   updatedAt: Datetime!
-}
-
-type MitigationConnection {
-  edges: [MitigationEdge!]!
-  pageInfo: PageInfo!
-}
-
-type MitigationEdge {
-  cursor: CursorKey!
-  node: Mitigation!
 }
 
 type Mitigation implements Node {
@@ -418,16 +441,6 @@ type Mitigation implements Node {
   updatedAt: Datetime!
 }
 
-type TaskConnection {
-  edges: [TaskEdge!]!
-  pageInfo: PageInfo!
-}
-
-type TaskEdge {
-  cursor: CursorKey!
-  node: Task!
-}
-
 type Task implements Node {
   id: ID!
   name: String!
@@ -448,22 +461,6 @@ type Task implements Node {
   updatedAt: Datetime!
 }
 
-type EvidenceConnection {
-  edges: [EvidenceEdge!]!
-  pageInfo: PageInfo!
-}
-
-type EvidenceEdge {
-  cursor: CursorKey!
-  node: Evidence!
-}
-
-enum EvidenceType
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceType") {
-  FILE @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeFile")
-  LINK @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeLink")
-}
-
 type Evidence implements Node {
   id: ID!
   fileUrl: String @goField(forceResolver: true)
@@ -479,20 +476,13 @@ type Evidence implements Node {
   updatedAt: Datetime!
 }
 
-type UserConnection {
-  edges: [UserEdge!]!
-  pageInfo: PageInfo!
-}
-
-type UserEdge {
-  cursor: CursorKey!
-  node: User!
-}
-
-type User implements Node {
+type Policy implements Node {
   id: ID!
-  fullName: String!
-  email: String!
+  name: String!
+  status: PolicyStatus!
+  content: String!
+  reviewDate: Datetime
+  owner: People! @goField(forceResolver: true)
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -502,14 +492,8 @@ type Session {
   expiresAt: Datetime!
 }
 
-type Query {
-  node(id: ID!): Node!
-  viewer: Viewer!
-}
-
 type Viewer {
   id: ID!
-
   user: User!
 
   organizations(
@@ -521,15 +505,115 @@ type Viewer {
   ): OrganizationConnection! @goField(forceResolver: true)
 }
 
+# Connection Types
+type OrganizationConnection {
+  edges: [OrganizationEdge!]!
+  pageInfo: PageInfo!
+}
+
+type OrganizationEdge {
+  cursor: CursorKey!
+  node: Organization!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+}
+
+type UserEdge {
+  cursor: CursorKey!
+  node: User!
+}
+
+type PeopleConnection {
+  edges: [PeopleEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PeopleEdge {
+  cursor: CursorKey!
+  node: People!
+}
+
+type VendorConnection {
+  edges: [VendorEdge!]!
+  pageInfo: PageInfo!
+}
+
+type VendorEdge {
+  cursor: CursorKey!
+  node: Vendor!
+}
+
+type FrameworkConnection {
+  edges: [FrameworkEdge!]!
+  pageInfo: PageInfo!
+}
+
+type FrameworkEdge {
+  cursor: CursorKey!
+  node: Framework!
+}
+
+type ControlConnection {
+  edges: [ControlEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ControlEdge {
+  cursor: CursorKey!
+  node: Control!
+}
+
+type MitigationConnection {
+  edges: [MitigationEdge!]!
+  pageInfo: PageInfo!
+}
+
+type MitigationEdge {
+  cursor: CursorKey!
+  node: Mitigation!
+}
+
+type TaskConnection {
+  edges: [TaskEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TaskEdge {
+  cursor: CursorKey!
+  node: Task!
+}
+
+type EvidenceConnection {
+  edges: [EvidenceEdge!]!
+  pageInfo: PageInfo!
+}
+
+type EvidenceEdge {
+  cursor: CursorKey!
+  node: Evidence!
+}
+
+type PolicyConnection {
+  edges: [PolicyEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PolicyEdge {
+  cursor: CursorKey!
+  node: Policy!
+}
+
+# Root Types
+type Query {
+  node(id: ID!): Node!
+  viewer: Viewer!
+}
+
 type Mutation {
-  createVendor(input: CreateVendorInput!): CreateVendorPayload!
-  updateVendor(input: UpdateVendorInput!): UpdateVendorPayload!
-  deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
-
-  createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
-  updatePeople(input: UpdatePeopleInput!): UpdatePeoplePayload!
-  deletePeople(input: DeletePeopleInput!): DeletePeoplePayload!
-
+  # Organization mutations
   createOrganization(
     input: CreateOrganizationInput!
   ): CreateOrganizationPayload!
@@ -540,30 +624,62 @@ type Mutation {
     input: DeleteOrganizationInput!
   ): DeleteOrganizationPayload!
 
+  # User mutations
+  confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
+  inviteUser(input: InviteUserInput!): InviteUserPayload!
+  removeUser(input: RemoveUserInput!): RemoveUserPayload!
+
+  # People mutations
+  createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
+  updatePeople(input: UpdatePeopleInput!): UpdatePeoplePayload!
+  deletePeople(input: DeletePeopleInput!): DeletePeoplePayload!
+
+  # Vendor mutations
+  createVendor(input: CreateVendorInput!): CreateVendorPayload!
+  updateVendor(input: UpdateVendorInput!): UpdateVendorPayload!
+  deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
+
+  # Framework mutations
+  createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
+  updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
+  importFramework(input: ImportFrameworkInput!): ImportFrameworkPayload!
+  deleteFramework(input: DeleteFrameworkInput!): DeleteFrameworkPayload!
+
+  # Mitigation mutations
+  createMitigation(input: CreateMitigationInput!): CreateMitigationPayload!
+  updateMitigation(input: UpdateMitigationInput!): UpdateMitigationPayload!
+  importMitigation(input: ImportMitigationInput!): ImportMitigationPayload!
+
+  # Task mutations
   createTask(input: CreateTaskInput!): CreateTaskPayload!
   updateTask(input: UpdateTaskInput!): UpdateTaskPayload!
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
   assignTask(input: AssignTaskInput!): AssignTaskPayload!
   unassignTask(input: UnassignTaskInput!): UnassignTaskPayload!
 
-  createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
-  updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
-  importFramework(input: ImportFrameworkInput!): ImportFrameworkPayload!
-  deleteFramework(input: DeleteFrameworkInput!): DeleteFrameworkPayload!
-
-  createMitigation(input: CreateMitigationInput!): CreateMitigationPayload!
-  updateMitigation(input: UpdateMitigationInput!): UpdateMitigationPayload!
-
+  # Evidence mutations
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
 
+  # Policy mutations
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
   updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
+}
 
-  confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
-  inviteUser(input: InviteUserInput!): InviteUserPayload!
-  removeUser(input: RemoveUserInput!): RemoveUserPayload!
+# Input Types
+input CreateOrganizationInput {
+  name: String!
+}
+
+input UpdateOrganizationInput {
+  organizationId: ID!
+  name: String
+  logo: Upload
+}
+
+input DeleteOrganizationInput {
+  organizationId: ID!
 }
 
 input CreateVendorInput {
@@ -579,12 +695,21 @@ input CreateVendorInput {
   privacyPolicyUrl: String
 }
 
-input DeleteVendorInput {
-  vendorId: ID!
+input UpdateVendorInput {
+  id: ID!
+  name: String
+  description: String
+  serviceStartAt: Datetime
+  serviceTerminationAt: Datetime
+  serviceCriticality: ServiceCriticality
+  riskTier: RiskTier
+  statusPageUrl: String
+  termsOfServiceUrl: String
+  privacyPolicyUrl: String
 }
 
-input DeletePeopleInput {
-  peopleId: ID!
+input DeleteVendorInput {
+  vendorId: ID!
 }
 
 input CreatePeopleInput {
@@ -603,113 +728,8 @@ input UpdatePeopleInput {
   kind: PeopleKind
 }
 
-enum ServiceCriticality
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ServiceCriticality") {
-  LOW
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityLow"
-    )
-  MEDIUM
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityMedium"
-    )
-  HIGH
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityHigh"
-    )
-}
-
-enum RiskTier
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskTier") {
-  CRITICAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierCritical")
-  SIGNIFICANT
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierSignificant")
-  GENERAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierGeneral")
-}
-
-input UpdateVendorInput {
-  id: ID!
-  name: String
-  description: String
-  serviceStartAt: Datetime
-  serviceTerminationAt: Datetime
-  serviceCriticality: ServiceCriticality
-  riskTier: RiskTier
-  statusPageUrl: String
-  termsOfServiceUrl: String
-  privacyPolicyUrl: String
-}
-
-type CreatePeoplePayload {
-  peopleEdge: PeopleEdge!
-}
-
-type CreateVendorPayload {
-  vendorEdge: VendorEdge!
-}
-
-type DeleteVendorPayload {
-  deletedVendorId: ID!
-}
-
-type DeletePeoplePayload {
-  deletedPeopleId: ID!
-}
-
-input CreateOrganizationInput {
-  name: String!
-}
-
-input UpdateOrganizationInput {
-  organizationId: ID!
-  name: String
-  logo: Upload
-}
-
-input DeleteOrganizationInput {
-  organizationId: ID!
-}
-
-type CreateOrganizationPayload {
-  organizationEdge: OrganizationEdge!
-}
-
-type UpdateOrganizationPayload {
-  organization: Organization!
-}
-
-type DeleteOrganizationPayload {
-  deletedOrganizationId: ID!
-}
-
-input CreateTaskInput {
-  mitigationId: ID!
-  name: String!
-  description: String!
-  timeEstimate: Duration
-  assignedToId: ID
-}
-
-type CreateTaskPayload {
-  taskEdge: TaskEdge!
-}
-
-input DeleteTaskInput {
-  taskId: ID!
-}
-
-type DeleteTaskPayload {
-  deletedTaskId: ID!
-}
-
-input DeleteFrameworkInput {
-  frameworkId: ID!
-}
-
-type DeleteFrameworkPayload {
-  deletedFrameworkId: ID!
+input DeletePeopleInput {
+  peopleId: ID!
 }
 
 input CreateFrameworkInput {
@@ -724,8 +744,13 @@ input UpdateFrameworkInput {
   description: String
 }
 
-type CreateFrameworkPayload {
-  frameworkEdge: FrameworkEdge!
+input ImportFrameworkInput {
+  organizationId: ID!
+  file: Upload!
+}
+
+input DeleteFrameworkInput {
+  frameworkId: ID!
 }
 
 input CreateMitigationInput {
@@ -734,22 +759,6 @@ input CreateMitigationInput {
   description: String!
   category: String!
   importance: MitigationImportance!
-}
-
-type CreateMitigationPayload {
-  mitigationEdge: MitigationEdge!
-}
-
-type UpdateFrameworkPayload {
-  framework: Framework!
-}
-
-type UpdateVendorPayload {
-  vendor: Vendor!
-}
-
-type UpdatePeoplePayload {
-  people: People!
 }
 
 input UpdateMitigationInput {
@@ -761,8 +770,38 @@ input UpdateMitigationInput {
   importance: MitigationImportance
 }
 
-type UpdateMitigationPayload {
-  mitigation: Mitigation!
+input ImportMitigationInput {
+  organizationId: ID!
+  file: Upload!
+}
+
+input CreateTaskInput {
+  mitigationId: ID!
+  name: String!
+  description: String!
+  timeEstimate: Duration
+  assignedToId: ID
+}
+
+input UpdateTaskInput {
+  taskId: ID!
+  name: String
+  description: String
+  state: TaskState
+  timeEstimate: Duration
+}
+
+input DeleteTaskInput {
+  taskId: ID!
+}
+
+input AssignTaskInput {
+  taskId: ID!
+  assignedToId: ID!
+}
+
+input UnassignTaskInput {
+  taskId: ID!
 }
 
 input UploadEvidenceInput {
@@ -774,24 +813,8 @@ input UploadEvidenceInput {
   description: String!
 }
 
-type UploadEvidencePayload {
-  evidenceEdge: EvidenceEdge!
-}
-
 input DeleteEvidenceInput {
   evidenceId: ID!
-}
-
-type DeleteEvidencePayload {
-  deletedEvidenceId: ID!
-}
-
-enum PolicyStatus
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
-  DRAFT
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft")
-  ACTIVE
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusActive")
 }
 
 input CreatePolicyInput {
@@ -816,6 +839,114 @@ input DeletePolicyInput {
   policyId: ID!
 }
 
+input ConfirmEmailInput {
+  token: String!
+}
+
+input InviteUserInput {
+  organizationId: ID!
+  email: String!
+  fullName: String!
+}
+
+input RemoveUserInput {
+  organizationId: ID!
+  userId: ID!
+}
+
+# Payload Types
+type CreateOrganizationPayload {
+  organizationEdge: OrganizationEdge!
+}
+
+type UpdateOrganizationPayload {
+  organization: Organization!
+}
+
+type DeleteOrganizationPayload {
+  deletedOrganizationId: ID!
+}
+
+type CreateVendorPayload {
+  vendorEdge: VendorEdge!
+}
+
+type UpdateVendorPayload {
+  vendor: Vendor!
+}
+
+type DeleteVendorPayload {
+  deletedVendorId: ID!
+}
+
+type CreatePeoplePayload {
+  peopleEdge: PeopleEdge!
+}
+
+type UpdatePeoplePayload {
+  people: People!
+}
+
+type DeletePeoplePayload {
+  deletedPeopleId: ID!
+}
+
+type CreateFrameworkPayload {
+  frameworkEdge: FrameworkEdge!
+}
+
+type UpdateFrameworkPayload {
+  framework: Framework!
+}
+
+type ImportFrameworkPayload {
+  frameworkEdge: FrameworkEdge!
+}
+
+type DeleteFrameworkPayload {
+  deletedFrameworkId: ID!
+}
+
+type CreateMitigationPayload {
+  mitigationEdge: MitigationEdge!
+}
+
+type UpdateMitigationPayload {
+  mitigation: Mitigation!
+}
+
+type ImportMitigationPayload {
+  success: Boolean!
+}
+
+type CreateTaskPayload {
+  taskEdge: TaskEdge!
+}
+
+type UpdateTaskPayload {
+  task: Task!
+}
+
+type DeleteTaskPayload {
+  deletedTaskId: ID!
+}
+
+type AssignTaskPayload {
+  task: Task!
+}
+
+type UnassignTaskPayload {
+  task: Task!
+}
+
+type UploadEvidencePayload {
+  evidenceEdge: EvidenceEdge!
+}
+
+type DeleteEvidencePayload {
+  deletedEvidenceId: ID!
+}
+
 type CreatePolicyPayload {
   policyEdge: PolicyEdge!
 }
@@ -828,115 +959,14 @@ type DeletePolicyPayload {
   deletedPolicyId: ID!
 }
 
-type Policy implements Node {
-  id: ID!
-  name: String!
-  status: PolicyStatus!
-  content: String!
-  reviewDate: Datetime
-  owner: People! @goField(forceResolver: true)
-  createdAt: Datetime!
-  updatedAt: Datetime!
-}
-
-type PolicyConnection {
-  edges: [PolicyEdge!]!
-  pageInfo: PageInfo!
-}
-
-type PolicyEdge {
-  cursor: CursorKey!
-  node: Policy!
-}
-
-input UpdateTaskInput {
-  taskId: ID!
-  name: String
-  description: String
-  state: TaskState
-  timeEstimate: Duration
-}
-
-type UpdateTaskPayload {
-  task: Task!
-}
-
-input ConfirmEmailInput {
-  token: String!
-}
-
 type ConfirmEmailPayload {
   success: Boolean!
-}
-
-input ImportFrameworkInput {
-  organizationId: ID!
-  file: Upload!
-}
-
-type ImportFrameworkPayload {
-  frameworkEdge: FrameworkEdge!
-}
-
-input AssignTaskInput {
-  taskId: ID!
-  assignedToId: ID!
-}
-
-type AssignTaskPayload {
-  task: Task!
-}
-
-input UnassignTaskInput {
-  taskId: ID!
-}
-
-type UnassignTaskPayload {
-  task: Task!
-}
-
-input InviteUserInput {
-  organizationId: ID!
-  email: String!
-  fullName: String!
 }
 
 type InviteUserPayload {
   success: Boolean!
 }
 
-input RemoveUserInput {
-  organizationId: ID!
-  userId: ID!
-}
-
 type RemoveUserPayload {
   success: Boolean!
-}
-
-enum OrganizationOrderField {
-  NAME
-  CREATED_AT
-  UPDATED_AT
-}
-
-input OrganizationOrder {
-  direction: OrderDirection!
-  field: OrganizationOrderField!
-}
-
-enum UserOrderField
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.UserOrderField") {
-  CREATED_AT
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.UserOrderFieldCreatedAt"
-    )
-}
-
-input UserOrder
-  @goModel(
-    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.UserOrderBy"
-  ) {
-  direction: OrderDirection!
-  field: UserOrderField!
 }
