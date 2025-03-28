@@ -33,8 +33,10 @@ const FrameworkViewQuery = graphql`
         name
         description
         ...ControlList_List
-        controls(first: 1, orderBy: { field: CREATED_AT, direction: ASC })
-          @connection(key: "FrameworkView_controls") {
+        firstControl: controls(
+          first: 1
+          orderBy: { field: CREATED_AT, direction: ASC }
+        ) @connection(key: "FrameworkView_firstControl") {
           edges {
             node {
               id
@@ -66,7 +68,7 @@ function FrameworkViewContent({
 }) {
   const data = usePreloadedQuery(FrameworkViewQuery, queryRef);
   const framework = data.node;
-  const control = data.node.controls?.edges[0];
+  const control = data.node.firstControl?.edges[0];
   const navigate = useNavigate();
   const { organizationId, controlId } = useParams();
   const { toast } = useToast();

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<11d451bf710d818645f55fe5f0ddb114>>
+ * @generated SignedSource<<0476147756ad426abb8651c6a62821f3>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,7 +15,8 @@ export type FrameworkViewQuery$variables = {
 };
 export type FrameworkViewQuery$data = {
   readonly node: {
-    readonly controls?: {
+    readonly description?: string;
+    readonly firstControl?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly id: string;
@@ -24,7 +25,6 @@ export type FrameworkViewQuery$data = {
         };
       }>;
     };
-    readonly description?: string;
     readonly id: string;
     readonly name?: string;
     readonly " $fragmentSpreads": FragmentRefs<"ControlList_List">;
@@ -159,6 +159,17 @@ v8 = [
     "value": 100
   },
   (v5/*: any*/)
+],
+v9 = [
+  "orderBy"
+],
+v10 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 1
+  },
+  (v5/*: any*/)
 ];
 return {
   "fragment": {
@@ -187,16 +198,16 @@ return {
                 "name": "ControlList_List"
               },
               {
-                "alias": "controls",
+                "alias": "firstControl",
                 "args": [
                   (v5/*: any*/)
                 ],
                 "concreteType": "ControlConnection",
                 "kind": "LinkedField",
-                "name": "__FrameworkView_controls_connection",
+                "name": "__FrameworkView_firstControl_connection",
                 "plural": false,
                 "selections": (v7/*: any*/),
-                "storageKey": "__FrameworkView_controls_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"CREATED_AT\"})"
+                "storageKey": "__FrameworkView_firstControl_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"CREATED_AT\"})"
               }
             ],
             "type": "Framework",
@@ -243,11 +254,28 @@ return {
               {
                 "alias": null,
                 "args": (v8/*: any*/),
-                "filters": [
-                  "orderBy"
-                ],
+                "filters": (v9/*: any*/),
                 "handle": "connection",
                 "key": "FrameworkView_controls",
+                "kind": "LinkedHandle",
+                "name": "controls"
+              },
+              {
+                "alias": "firstControl",
+                "args": (v10/*: any*/),
+                "concreteType": "ControlConnection",
+                "kind": "LinkedField",
+                "name": "controls",
+                "plural": false,
+                "selections": (v7/*: any*/),
+                "storageKey": "controls(first:1,orderBy:{\"direction\":\"ASC\",\"field\":\"CREATED_AT\"})"
+              },
+              {
+                "alias": "firstControl",
+                "args": (v10/*: any*/),
+                "filters": (v9/*: any*/),
+                "handle": "connection",
+                "key": "FrameworkView_firstControl",
                 "kind": "LinkedHandle",
                 "name": "controls"
               }
@@ -261,7 +289,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "5bf64e09bf7f44c56b75bbb63b9b272f",
+    "cacheID": "17fd996ebe2e664652323e290a027cfa",
     "id": null,
     "metadata": {
       "connection": [
@@ -271,18 +299,18 @@ return {
           "direction": "forward",
           "path": [
             "node",
-            "controls"
+            "firstControl"
           ]
         }
       ]
     },
     "name": "FrameworkViewQuery",
     "operationKind": "query",
-    "text": "query FrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      ...ControlList_List\n      controls(first: 100, orderBy: {field: CREATED_AT, direction: ASC}) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n\nfragment ControlList_List on Framework {\n  controls(first: 100, orderBy: {field: CREATED_AT, direction: ASC}) {\n    edges {\n      node {\n        id\n        referenceId\n        name\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query FrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      ...ControlList_List\n      firstControl: controls(first: 1, orderBy: {field: CREATED_AT, direction: ASC}) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n\nfragment ControlList_List on Framework {\n  controls(first: 100, orderBy: {field: CREATED_AT, direction: ASC}) {\n    edges {\n      node {\n        id\n        referenceId\n        name\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d4837d95c7bd721bf1851c1b977fd018";
+(node as any).hash = "2567d3e2996074a21656830be7f807f1";
 
 export default node;
