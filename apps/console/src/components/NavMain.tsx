@@ -24,14 +24,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import {
-  BookOpen,
-  Building,
-  FileText,
-  Settings,
-  ToyBrick,
-  Users,
-} from "lucide-react";
+import { BookOpen, FileText, Settings, ToyBrick, Users } from "lucide-react";
 
 interface NavItem {
   title: string;
