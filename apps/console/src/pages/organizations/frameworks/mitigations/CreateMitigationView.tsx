@@ -146,7 +146,7 @@ function CreateMitigationViewContent() {
     commit({
       variables: {
         input: {
-          frameworkId: frameworkId!,
+          organizationId: organizationId!,
           name: formData.name,
           description: formData.description,
           category: formData.category,
