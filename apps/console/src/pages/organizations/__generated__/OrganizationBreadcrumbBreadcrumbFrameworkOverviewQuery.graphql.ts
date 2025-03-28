@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<02beff12353573ba1a8701513b4e9a7e>>
+ * @generated SignedSource<<f0b3ca17f1e3263ada95c2529d127cb9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,18 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type OrganizationLayoutBreadcrumbPolicyOverviewQuery$variables = {
-  policyId: string;
+export type OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery$variables = {
+  frameworkId: string;
 };
-export type OrganizationLayoutBreadcrumbPolicyOverviewQuery$data = {
-  readonly policy: {
+export type OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery$data = {
+  readonly framework: {
     readonly id: string;
     readonly name?: string;
   };
 };
-export type OrganizationLayoutBreadcrumbPolicyOverviewQuery = {
-  response: OrganizationLayoutBreadcrumbPolicyOverviewQuery$data;
-  variables: OrganizationLayoutBreadcrumbPolicyOverviewQuery$variables;
+export type OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery = {
+  response: OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery$data;
+  variables: OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -28,14 +28,14 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "policyId"
+    "name": "frameworkId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "policyId"
+    "variableName": "frameworkId"
   }
 ],
 v2 = {
@@ -56,7 +56,7 @@ v3 = {
       "storageKey": null
     }
   ],
-  "type": "Policy",
+  "type": "Framework",
   "abstractKey": null
 };
 return {
@@ -64,10 +64,10 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "OrganizationLayoutBreadcrumbPolicyOverviewQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery",
     "selections": [
       {
-        "alias": "policy",
+        "alias": "framework",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -87,10 +87,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "OrganizationLayoutBreadcrumbPolicyOverviewQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery",
     "selections": [
       {
-        "alias": "policy",
+        "alias": "framework",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -112,16 +112,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a7bbb574545c752bde0eba468ec494d7",
+    "cacheID": "7621d4cc3a8961e17c017c147084668e",
     "id": null,
     "metadata": {},
-    "name": "OrganizationLayoutBreadcrumbPolicyOverviewQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery",
     "operationKind": "query",
-    "text": "query OrganizationLayoutBreadcrumbPolicyOverviewQuery(\n  $policyId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n    }\n  }\n}\n"
+    "text": "query OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery(\n  $frameworkId: ID!\n) {\n  framework: node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "90b9df71a590d79f4e083aa117ad7302";
+(node as any).hash = "8556d69533cf7115847e6a676f275714";
 
 export default node;

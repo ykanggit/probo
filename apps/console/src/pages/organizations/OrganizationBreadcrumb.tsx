@@ -1,0 +1,502 @@
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { cn } from "@/lib/utils";
+import { ReactNode, Suspense } from "react";
+import { graphql, useLazyLoadQuery } from "react-relay";
+import { NavLink, Outlet, Route, Routes, To, useParams } from "react-router";
+
+import { OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery.graphql";
+import { OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery.graphql";
+import { OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery.graphql";
+import { OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery.graphql";
+import { OrganizationBreadcrumbBreadcrumbVendorOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbVendorOverviewQuery.graphql";
+import { OrganizationBreadcrumbOrganizationQuery } from "./__generated__/OrganizationBreadcrumbOrganizationQuery.graphql";
+
+const BreadcrumbNavLink = ({
+  to,
+  children,
+  className,
+}: {
+  to: To;
+  children?: ReactNode;
+  className?: string;
+}) => {
+  return (
+    <BreadcrumbLink asChild>
+      <NavLink to={to} end>
+        {({ isActive }) => (
+          <BreadcrumbPage
+            className={cn(
+              "text-gray-300",
+              isActive && "text-gray-700",
+              className
+            )}
+          >
+            {children}
+          </BreadcrumbPage>
+        )}
+      </NavLink>
+    </BreadcrumbLink>
+  );
+};
+
+function BreadcrumbHome() {
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbNavLink to="/">Home</BreadcrumbNavLink>
+        </BreadcrumbItem>
+        <Outlet />
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}
+
+function BreadCrumbOrganization() {
+  const { organizationId } = useParams();
+
+  const data = useLazyLoadQuery<OrganizationBreadcrumbOrganizationQuery>(
+    graphql`
+      query OrganizationBreadcrumbOrganizationQuery($organizationId: ID!) {
+        organization: node(id: $organizationId) {
+          ... on Organization {
+            name
+          }
+        }
+      }
+    `,
+    { organizationId: organizationId! },
+    { fetchPolicy: "store-or-network" }
+  );
+
+  return (
+    <Breadcrumb className="select-none">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbNavLink to={`/organizations/${organizationId}`}>
+            {data.organization?.name || "Home"}
+          </BreadcrumbNavLink>
+        </BreadcrumbItem>
+        <Outlet />
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}
+
+function BreadcrumbFrameworkList() {
+  const { organizationId } = useParams();
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink to={`/organizations/${organizationId}/frameworks`}>
+          Frameworks
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbCreateFramework() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Create</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbFrameworkOverview() {
+  const { organizationId, frameworkId } = useParams();
+  const data =
+    useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery>(
+      graphql`
+        query OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery(
+          $frameworkId: ID!
+        ) {
+          framework: node(id: $frameworkId) {
+            id
+            ... on Framework {
+              name
+            }
+          }
+        }
+      `,
+      { frameworkId: frameworkId! }
+    );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/frameworks/${frameworkId}`}
+        >
+          {data.framework?.name}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbUpdateFramework() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Update</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbVendorList() {
+  const { organizationId } = useParams();
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink to={`/organizations/${organizationId}/vendors`}>
+          Vendors
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbVendorOverview() {
+  const { organizationId, vendorId } = useParams();
+  const data =
+    useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbVendorOverviewQuery>(
+      graphql`
+        query OrganizationBreadcrumbBreadcrumbVendorOverviewQuery(
+          $vendorId: ID!
+        ) {
+          vendor: node(id: $vendorId) {
+            id
+            ... on Vendor {
+              name
+            }
+          }
+        }
+      `,
+      { vendorId: vendorId! },
+      { fetchPolicy: "store-or-network" }
+    );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/vendors/${data.vendor.id}`}
+        >
+          {data.vendor.name}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbPeopleList() {
+  const { organizationId } = useParams();
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink to={`/organizations/${organizationId}/people`}>
+          People
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbCreatePeople() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Create</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbUpdatePolicy() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Update</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbPeopleOverview() {
+  const { organizationId, peopleId } = useParams();
+  const data =
+    useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery>(
+      graphql`
+        query OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery(
+          $peopleId: ID!
+        ) {
+          people: node(id: $peopleId) {
+            id
+            ... on People {
+              fullName
+            }
+          }
+        }
+      `,
+      { peopleId: peopleId! },
+      { fetchPolicy: "store-or-network" }
+    );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/people/${data.people.id}`}
+        >
+          {data.people.fullName}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbMitigationOverview() {
+  const { organizationId, frameworkId, mitigationId } = useParams();
+  const data =
+    useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery>(
+      graphql`
+        query OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery(
+          $mitigationId: ID!
+        ) {
+          mitigation: node(id: $mitigationId) {
+            id
+            ... on Mitigation {
+              name
+            }
+          }
+        }
+      `,
+      { mitigationId: mitigationId! }
+    );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/frameworks/${frameworkId}/mitigations/${mitigationId}`}
+        >
+          {data.mitigation?.name}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbCreateMitigation() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Create Mitigation</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbUpdateMitigation() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Update Mitigation</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbPolicyList() {
+  const { organizationId } = useParams();
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink to={`/organizations/${organizationId}/policies`}>
+          Policies
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbCreatePolicy() {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Create Policy</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbPolicyOverview() {
+  const { organizationId, policyId } = useParams();
+  const data =
+    useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery>(
+      graphql`
+        query OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery(
+          $policyId: ID!
+        ) {
+          policy: node(id: $policyId) {
+            id
+            ... on Policy {
+              name
+            }
+          }
+        }
+      `,
+      { policyId: policyId! },
+      { fetchPolicy: "store-or-network" }
+    );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/policies/${policyId}`}
+        >
+          {data.policy?.name}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+export function BreadCrumb() {
+  return (
+    <Routes>
+      <Route
+        element={
+          <Suspense>
+            <BreadCrumbOrganization />
+          </Suspense>
+        }
+      >
+        <Route path="frameworks" element={<BreadcrumbFrameworkList />}>
+          <Route
+            path=":frameworkId"
+            element={
+              <Suspense>
+                <BreadcrumbFrameworkOverview />
+              </Suspense>
+            }
+          >
+            <Route
+              path="mitigations/create"
+              element={<BreadcrumbCreateMitigation />}
+            />
+            <Route
+              path="mitigations/:mitigationId"
+              element={
+                <Suspense>
+                  <BreadcrumbMitigationOverview />
+                </Suspense>
+              }
+            >
+              <Route path="update" element={<BreadcrumbUpdateMitigation />} />
+            </Route>
+            <Route path="update" element={<BreadcrumbUpdateFramework />} />
+          </Route>
+          <Route path="create" element={<BreadcrumbCreateFramework />} />
+        </Route>
+        <Route path="people" element={<BreadcrumbPeopleList />}>
+          <Route
+            path=":peopleId"
+            element={
+              <Suspense>
+                <BreadcrumbPeopleOverview />
+              </Suspense>
+            }
+          />
+          <Route path="create" element={<BreadcrumbCreatePeople />} />
+        </Route>
+        <Route path="vendors" element={<BreadcrumbVendorList />}>
+          <Route
+            path=":vendorId"
+            element={
+              <Suspense>
+                <BreadcrumbVendorOverview />
+              </Suspense>
+            }
+          />
+        </Route>
+        <Route path="policies" element={<BreadcrumbPolicyList />}>
+          <Route
+            path=":policyId"
+            element={
+              <Suspense>
+                <BreadcrumbPolicyOverview />
+              </Suspense>
+            }
+          >
+            <Route path="update" element={<BreadcrumbUpdatePolicy />} />
+          </Route>
+          <Route path="create" element={<BreadcrumbCreatePolicy />} />
+        </Route>
+        <Route
+          path="settings"
+          element={
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Settings</BreadcrumbPage>
+              </BreadcrumbItem>
+            </>
+          }
+        />
+      </Route>
+
+      <Route path="*" element={<BreadcrumbHome />}>
+        <Route
+          path="create"
+          element={
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Create Organization</BreadcrumbPage>
+              </BreadcrumbItem>
+            </>
+          }
+        />
+      </Route>
+    </Routes>
+  );
+}

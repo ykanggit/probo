@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c8aadda28109f223c394a98b8ac9c14e>>
+ * @generated SignedSource<<e4082102cdacffc65067fc1169e4dc22>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,17 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type OrganizationLayoutOrganizationQuery$variables = {
-  organizationId: string;
+export type OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery$variables = {
+  peopleId: string;
 };
-export type OrganizationLayoutOrganizationQuery$data = {
-  readonly organization: {
-    readonly name?: string;
+export type OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery$data = {
+  readonly people: {
+    readonly fullName?: string;
+    readonly id: string;
   };
 };
-export type OrganizationLayoutOrganizationQuery = {
-  response: OrganizationLayoutOrganizationQuery$data;
-  variables: OrganizationLayoutOrganizationQuery$variables;
+export type OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery = {
+  response: OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery$data;
+  variables: OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -27,28 +28,35 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "organizationId"
+    "name": "peopleId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "organizationId"
+    "variableName": "peopleId"
   }
 ],
 v2 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v3 = {
   "kind": "InlineFragment",
   "selections": [
     {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
-      "name": "name",
+      "name": "fullName",
       "storageKey": null
     }
   ],
-  "type": "Organization",
+  "type": "People",
   "abstractKey": null
 };
 return {
@@ -56,17 +64,18 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "OrganizationLayoutOrganizationQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery",
     "selections": [
       {
-        "alias": "organization",
+        "alias": "people",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/)
+          (v2/*: any*/),
+          (v3/*: any*/)
         ],
         "storageKey": null
       }
@@ -78,10 +87,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "OrganizationLayoutOrganizationQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery",
     "selections": [
       {
-        "alias": "organization",
+        "alias": "people",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -96,29 +105,23 @@ return {
             "storageKey": null
           },
           (v2/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "id",
-            "storageKey": null
-          }
+          (v3/*: any*/)
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "f4716079c4ca6a1012c7044a3328af01",
+    "cacheID": "8e31b69ca914380fb45a65f6caef4f55",
     "id": null,
     "metadata": {},
-    "name": "OrganizationLayoutOrganizationQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery",
     "operationKind": "query",
-    "text": "query OrganizationLayoutOrganizationQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      name\n    }\n    id\n  }\n}\n"
+    "text": "query OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery(\n  $peopleId: ID!\n) {\n  people: node(id: $peopleId) {\n    __typename\n    id\n    ... on People {\n      fullName\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "878d0ca4790ce128c108f29135074919";
+(node as any).hash = "754df51d74ab4c3be0b83fdc689e5cfc";
 
 export default node;

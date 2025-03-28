@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e194a128ba01be3824345ec9386bc7e5>>
+ * @generated SignedSource<<c3c793d3ca3ac86b817343883938ab0c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,18 +9,17 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type OrganizationLayoutBreadcrumbMitigationOverviewQuery$variables = {
-  mitigationId: string;
+export type OrganizationBreadcrumbOrganizationQuery$variables = {
+  organizationId: string;
 };
-export type OrganizationLayoutBreadcrumbMitigationOverviewQuery$data = {
-  readonly mitigation: {
-    readonly id: string;
+export type OrganizationBreadcrumbOrganizationQuery$data = {
+  readonly organization: {
     readonly name?: string;
   };
 };
-export type OrganizationLayoutBreadcrumbMitigationOverviewQuery = {
-  response: OrganizationLayoutBreadcrumbMitigationOverviewQuery$data;
-  variables: OrganizationLayoutBreadcrumbMitigationOverviewQuery$variables;
+export type OrganizationBreadcrumbOrganizationQuery = {
+  response: OrganizationBreadcrumbOrganizationQuery$data;
+  variables: OrganizationBreadcrumbOrganizationQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -28,24 +27,17 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "mitigationId"
+    "name": "organizationId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "mitigationId"
+    "variableName": "organizationId"
   }
 ],
 v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
-},
-v3 = {
   "kind": "InlineFragment",
   "selections": [
     {
@@ -56,7 +48,7 @@ v3 = {
       "storageKey": null
     }
   ],
-  "type": "Mitigation",
+  "type": "Organization",
   "abstractKey": null
 };
 return {
@@ -64,18 +56,17 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "OrganizationLayoutBreadcrumbMitigationOverviewQuery",
+    "name": "OrganizationBreadcrumbOrganizationQuery",
     "selections": [
       {
-        "alias": "mitigation",
+        "alias": "organization",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/),
-          (v3/*: any*/)
+          (v2/*: any*/)
         ],
         "storageKey": null
       }
@@ -87,10 +78,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "OrganizationLayoutBreadcrumbMitigationOverviewQuery",
+    "name": "OrganizationBreadcrumbOrganizationQuery",
     "selections": [
       {
-        "alias": "mitigation",
+        "alias": "organization",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -105,23 +96,29 @@ return {
             "storageKey": null
           },
           (v2/*: any*/),
-          (v3/*: any*/)
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "id",
+            "storageKey": null
+          }
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "12d02036b7f66c280ddd621941750d00",
+    "cacheID": "18cbf77dbfbf76b1f2f51331372de068",
     "id": null,
     "metadata": {},
-    "name": "OrganizationLayoutBreadcrumbMitigationOverviewQuery",
+    "name": "OrganizationBreadcrumbOrganizationQuery",
     "operationKind": "query",
-    "text": "query OrganizationLayoutBreadcrumbMitigationOverviewQuery(\n  $mitigationId: ID!\n) {\n  mitigation: node(id: $mitigationId) {\n    __typename\n    id\n    ... on Mitigation {\n      name\n    }\n  }\n}\n"
+    "text": "query OrganizationBreadcrumbOrganizationQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      name\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "cd0a93d3c44467278a33729c4a46b0bf";
+(node as any).hash = "f8d5fa8a458cdd965df43de084f6a095";
 
 export default node;

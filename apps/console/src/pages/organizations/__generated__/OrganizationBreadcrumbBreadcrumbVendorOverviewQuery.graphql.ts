@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d0ab5ff850203d4209b0d189e8c28b7c>>
+ * @generated SignedSource<<8c8b57ca97101932acdb5d73038e228c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,18 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type OrganizationLayoutBreadcrumbVendorOverviewQuery$variables = {
+export type OrganizationBreadcrumbBreadcrumbVendorOverviewQuery$variables = {
   vendorId: string;
 };
-export type OrganizationLayoutBreadcrumbVendorOverviewQuery$data = {
+export type OrganizationBreadcrumbBreadcrumbVendorOverviewQuery$data = {
   readonly vendor: {
     readonly id: string;
     readonly name?: string;
   };
 };
-export type OrganizationLayoutBreadcrumbVendorOverviewQuery = {
-  response: OrganizationLayoutBreadcrumbVendorOverviewQuery$data;
-  variables: OrganizationLayoutBreadcrumbVendorOverviewQuery$variables;
+export type OrganizationBreadcrumbBreadcrumbVendorOverviewQuery = {
+  response: OrganizationBreadcrumbBreadcrumbVendorOverviewQuery$data;
+  variables: OrganizationBreadcrumbBreadcrumbVendorOverviewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -64,7 +64,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "OrganizationLayoutBreadcrumbVendorOverviewQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbVendorOverviewQuery",
     "selections": [
       {
         "alias": "vendor",
@@ -87,7 +87,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "OrganizationLayoutBreadcrumbVendorOverviewQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbVendorOverviewQuery",
     "selections": [
       {
         "alias": "vendor",
@@ -112,16 +112,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "cdf321fbd087d345096d8af142d99608",
+    "cacheID": "e3b7ec1aa637099854e157f0f06f5289",
     "id": null,
     "metadata": {},
-    "name": "OrganizationLayoutBreadcrumbVendorOverviewQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbVendorOverviewQuery",
     "operationKind": "query",
-    "text": "query OrganizationLayoutBreadcrumbVendorOverviewQuery(\n  $vendorId: ID!\n) {\n  vendor: node(id: $vendorId) {\n    __typename\n    id\n    ... on Vendor {\n      name\n    }\n  }\n}\n"
+    "text": "query OrganizationBreadcrumbBreadcrumbVendorOverviewQuery(\n  $vendorId: ID!\n) {\n  vendor: node(id: $vendorId) {\n    __typename\n    id\n    ... on Vendor {\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "41b87834c3e5625381d8434930cf29db";
+(node as any).hash = "eb448c353f367e8b4de619facc855959";
 
 export default node;

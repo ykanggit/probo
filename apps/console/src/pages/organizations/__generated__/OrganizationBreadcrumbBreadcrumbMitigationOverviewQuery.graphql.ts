@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2a843b85994d7b675c2e0504ea8c687e>>
+ * @generated SignedSource<<5ba3e58b066b4fb849ab455b287dc1ff>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,18 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type OrganizationLayoutBreadcrumbPeopleOverviewQuery$variables = {
-  peopleId: string;
+export type OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery$variables = {
+  mitigationId: string;
 };
-export type OrganizationLayoutBreadcrumbPeopleOverviewQuery$data = {
-  readonly people: {
-    readonly fullName?: string;
+export type OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery$data = {
+  readonly mitigation: {
     readonly id: string;
+    readonly name?: string;
   };
 };
-export type OrganizationLayoutBreadcrumbPeopleOverviewQuery = {
-  response: OrganizationLayoutBreadcrumbPeopleOverviewQuery$data;
-  variables: OrganizationLayoutBreadcrumbPeopleOverviewQuery$variables;
+export type OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery = {
+  response: OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery$data;
+  variables: OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -28,14 +28,14 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "peopleId"
+    "name": "mitigationId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "peopleId"
+    "variableName": "mitigationId"
   }
 ],
 v2 = {
@@ -52,11 +52,11 @@ v3 = {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
-      "name": "fullName",
+      "name": "name",
       "storageKey": null
     }
   ],
-  "type": "People",
+  "type": "Mitigation",
   "abstractKey": null
 };
 return {
@@ -64,10 +64,10 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "OrganizationLayoutBreadcrumbPeopleOverviewQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery",
     "selections": [
       {
-        "alias": "people",
+        "alias": "mitigation",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -87,10 +87,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "OrganizationLayoutBreadcrumbPeopleOverviewQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery",
     "selections": [
       {
-        "alias": "people",
+        "alias": "mitigation",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -112,16 +112,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "3f43dd20847240f85b9e4f7e1d2ae1e6",
+    "cacheID": "1f6462cdfacf6a2ce5bf51135d26daf3",
     "id": null,
     "metadata": {},
-    "name": "OrganizationLayoutBreadcrumbPeopleOverviewQuery",
+    "name": "OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery",
     "operationKind": "query",
-    "text": "query OrganizationLayoutBreadcrumbPeopleOverviewQuery(\n  $peopleId: ID!\n) {\n  people: node(id: $peopleId) {\n    __typename\n    id\n    ... on People {\n      fullName\n    }\n  }\n}\n"
+    "text": "query OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery(\n  $mitigationId: ID!\n) {\n  mitigation: node(id: $mitigationId) {\n    __typename\n    id\n    ... on Mitigation {\n      name\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "715ffb6eaef0bdeec2c1a42e17d37ba9";
+(node as any).hash = "83c2699bc436040d610f5113cc267e7f";
 
 export default node;
