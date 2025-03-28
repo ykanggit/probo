@@ -20,6 +20,28 @@ import { OrganizationBreadcrumbOrganizationQuery } from "./__generated__/Organiz
 import { OrganizationBreadcrumbBreadcrumbMitigationViewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbMitigationViewQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbControlQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbControlQuery.graphql";
 
+const New = () => {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>New</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+};
+
+const Edit = () => {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Edit</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+};
+
 const BreadcrumbNavLink = ({
   to,
   children,
@@ -107,17 +129,6 @@ function BreadcrumbFrameworkList() {
   );
 }
 
-function BreadcrumbCreateFramework() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbPage>Create</BreadcrumbPage>
-      </BreadcrumbItem>
-    </>
-  );
-}
-
 function BreadcrumbFrameworkOverview() {
   const { organizationId, frameworkId } = useParams();
   const data =
@@ -148,17 +159,6 @@ function BreadcrumbFrameworkOverview() {
         </BreadcrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
-    </>
-  );
-}
-
-function BreadcrumbUpdateFramework() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbPage>Update</BreadcrumbPage>
-      </BreadcrumbItem>
     </>
   );
 }
@@ -224,28 +224,6 @@ function BreadcrumbPeopleList() {
         </BreadcrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
-    </>
-  );
-}
-
-function BreadcrumbCreatePeople() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbPage>Create</BreadcrumbPage>
-      </BreadcrumbItem>
-    </>
-  );
-}
-
-function BreadcrumbUpdatePolicy() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbPage>Update</BreadcrumbPage>
-      </BreadcrumbItem>
     </>
   );
 }
@@ -319,28 +297,6 @@ function BreadcrumbMitigationOverview() {
   );
 }
 
-function BreadcrumbCreateMitigation() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbPage>Create Mitigation</BreadcrumbPage>
-      </BreadcrumbItem>
-    </>
-  );
-}
-
-function BreadcrumbUpdateMitigation() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbPage>Update Mitigation</BreadcrumbPage>
-      </BreadcrumbItem>
-    </>
-  );
-}
-
 function BreadcrumbPolicyList() {
   const { organizationId } = useParams();
   return (
@@ -352,17 +308,6 @@ function BreadcrumbPolicyList() {
         </BreadcrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
-    </>
-  );
-}
-
-function BreadcrumbCreatePolicy() {
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbPage>Create Policy</BreadcrumbPage>
-      </BreadcrumbItem>
     </>
   );
 }
@@ -501,6 +446,7 @@ export function BreadCrumb() {
         }
       >
         <Route path="mitigations" element={<BreadcrumbMitigationList />}>
+          <Route path="new" element={<New />} />
           <Route
             path=":mitigationId"
             element={
@@ -528,10 +474,6 @@ export function BreadCrumb() {
               }
             />
             <Route
-              path="mitigations/create"
-              element={<BreadcrumbCreateMitigation />}
-            />
-            <Route
               path="mitigations/:mitigationId"
               element={
                 <Suspense>
@@ -539,11 +481,11 @@ export function BreadCrumb() {
                 </Suspense>
               }
             >
-              <Route path="update" element={<BreadcrumbUpdateMitigation />} />
+              <Route path="update" element={<Edit />} />
             </Route>
-            <Route path="update" element={<BreadcrumbUpdateFramework />} />
+            <Route path="update" element={<Edit />} />
           </Route>
-          <Route path="create" element={<BreadcrumbCreateFramework />} />
+          <Route path="create" element={<New />} />
         </Route>
         <Route path="people" element={<BreadcrumbPeopleList />}>
           <Route
@@ -554,7 +496,7 @@ export function BreadCrumb() {
               </Suspense>
             }
           />
-          <Route path="create" element={<BreadcrumbCreatePeople />} />
+          <Route path="create" element={<New />} />
         </Route>
         <Route path="vendors" element={<BreadcrumbVendorList />}>
           <Route
@@ -575,9 +517,9 @@ export function BreadCrumb() {
               </Suspense>
             }
           >
-            <Route path="update" element={<BreadcrumbUpdatePolicy />} />
+            <Route path="update" element={<Edit />} />
           </Route>
-          <Route path="create" element={<BreadcrumbCreatePolicy />} />
+          <Route path="create" element={<New />} />
         </Route>
         <Route
           path="settings"

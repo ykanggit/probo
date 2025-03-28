@@ -5,7 +5,7 @@ import {
   usePreloadedQuery,
   useQueryLoader,
 } from "react-relay";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import {
   ChevronRight,
@@ -19,6 +19,7 @@ import { PageTemplate } from "@/components/PageTemplate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MitigationListViewQuery as MitigationListViewQueryType } from "./__generated__/MitigationListViewQuery.graphql";
 import { MitigationListViewSkeleton } from "./MitigationListPage";
+import { Button } from "@/components/ui/button";
 
 const mitigationListViewQuery = graphql`
   query MitigationListViewQuery($organizationId: ID!, $first: Int) {
@@ -28,7 +29,7 @@ const mitigationListViewQuery = graphql`
         mitigations(
           first: $first
           orderBy: { direction: ASC, field: CREATED_AT }
-        ) {
+        ) @connection(key: "MitigationListView_mitigations") {
           edges {
             node {
               id
@@ -252,6 +253,13 @@ function MitigationListContent({
     <PageTemplate
       title="Mitigations"
       description="Mitigations are actions taken to reduce the risk. Add them to track their implementation status."
+      actions={
+        <Button asChild>
+          <Link to={`/organizations/${organizationId}/mitigations/new`}>
+            New Mitigation
+          </Link>
+        </Button>
+      }
     >
       {/* Global Progress Summary */}
       <div className="mb-8">

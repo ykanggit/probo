@@ -21,6 +21,7 @@ import { PolicyPage } from "./policies/PolicyPage";
 import { UpdatePolicyPage } from "./policies/UpdatePolicyPage";
 import { VendorListPage } from "./vendors/VendorListPage";
 import { VendorPage } from "./vendors/VendorPage";
+import { MitigationNewPage } from "./mitigations/MitigationNewPage";
 
 export function OrganizationsRoutes() {
   return (
@@ -42,6 +43,7 @@ export function OrganizationsRoutes() {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
         <Route path="mitigations" element={<MitigationListPage />} />
+        <Route path="mitigations/new" element={<MitigationNewPage />} />
         <Route path="mitigations/:mitigationId" element={<MitigationPage />} />
         <Route path="vendors/:vendorId" element={<VendorPage />} />
         <Route path="policies" element={<PolicyListPage />} />
