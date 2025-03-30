@@ -256,6 +256,15 @@ type ImportFrameworkPayload struct {
 	FrameworkEdge *FrameworkEdge `json:"frameworkEdge"`
 }
 
+type ImportMitigationInput struct {
+	OrganizationID gid.GID        `json:"organizationId"`
+	File           graphql.Upload `json:"file"`
+}
+
+type ImportMitigationPayload struct {
+	MitigationEdges []*MitigationEdge `json:"mitigationEdges"`
+}
+
 type InviteUserInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 	Email          string  `json:"email"`

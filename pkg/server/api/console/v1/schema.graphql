@@ -916,7 +916,7 @@ type UpdateMitigationPayload {
 }
 
 type ImportMitigationPayload {
-  success: Boolean!
+  mitigationEdges: [MitigationEdge!]!
 }
 
 type CreateTaskPayload {

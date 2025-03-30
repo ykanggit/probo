@@ -1,9 +1,10 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import {
   graphql,
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
+  useMutation,
 } from "react-relay";
 import { useParams, useNavigate, Link } from "react-router";
 import { Badge } from "@/components/ui/badge";
@@ -20,16 +21,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MitigationListViewQuery as MitigationListViewQueryType } from "./__generated__/MitigationListViewQuery.graphql";
 import { MitigationListViewSkeleton } from "./MitigationListPage";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { MitigationListViewImportMitigationMutation as MitigationListViewImportMitigationMutationType } from "./__generated__/MitigationListViewImportMitigationMutation.graphql";
 
 const mitigationListViewQuery = graphql`
   query MitigationListViewQuery($organizationId: ID!, $first: Int) {
     organization: node(id: $organizationId) {
       id
       ... on Organization {
-        mitigations(
-          first: $first
-          orderBy: { direction: ASC, field: CREATED_AT }
-        ) @connection(key: "MitigationListView_mitigations") {
+        mitigations(first: $first)
+          @connection(key: "MitigationListView_mitigations") {
+          __id
           edges {
             node {
               id
@@ -42,6 +44,28 @@ const mitigationListViewQuery = graphql`
               updatedAt
             }
           }
+        }
+      }
+    }
+  }
+`;
+
+const importMitigationMutation = graphql`
+  mutation MitigationListViewImportMitigationMutation(
+    $input: ImportMitigationInput!
+    $connections: [ID!]!
+  ) {
+    importMitigation(input: $input) {
+      mitigationEdges @appendEdge(connections: $connections) {
+        node {
+          id
+          name
+          description
+          category
+          state
+          importance
+          createdAt
+          updatedAt
         }
       }
     }
@@ -93,6 +117,14 @@ function MitigationListContent({
 
   const navigate = useNavigate();
   const { organizationId } = useParams();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const { toast } = useToast();
+
+  const [importMitigation] =
+    useMutation<MitigationListViewImportMitigationMutationType>(
+      importMitigationMutation
+    );
 
   // Monitor URL hash for changes and update state accordingly
   const [hashValue, setHashValue] = useState(window.location.hash);
@@ -249,18 +281,75 @@ function MitigationListContent({
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+
+    importMitigation({
+      variables: {
+        connections: [data.organization.mitigations.__id],
+        input: {
+          organizationId: organizationId!,
+          file: null,
+        },
+      },
+      uploadables: {
+        "input.file": file,
+      },
+      onCompleted: () => {
+        setIsImporting(false);
+        toast({
+          title: "Mitigations imported",
+          description: "Mitigations have been imported successfully.",
+          variant: "default",
+        });
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      },
+      onError: (error) => {
+        setIsImporting(false);
+        toast({
+          title: "Error importing mitigations",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
   return (
     <PageTemplate
       title="Mitigations"
       description="Mitigations are actions taken to reduce the risk. Add them to track their implementation status."
       actions={
-        <Button asChild>
-          <Link to={`/organizations/${organizationId}/mitigations/new`}>
-            New Mitigation
-          </Link>
-        </Button>
+        <div className="flex gap-4">
+          <Button
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isImporting}
+          >
+            {isImporting ? "Importing..." : "Import Mitigations"}
+          </Button>
+          <Button asChild>
+            <Link to={`/organizations/${organizationId}/mitigations/new`}>
+              New Mitigation
+            </Link>
+          </Button>
+        </div>
       }
     >
+      {/* Hidden file input for mitigation import */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+        accept=".json"
+      />
+
       {/* Global Progress Summary */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-1">

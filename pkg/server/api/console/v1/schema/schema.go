@@ -187,6 +187,10 @@ type ComplexityRoot struct {
 		FrameworkEdge func(childComplexity int) int
 	}
 
+	ImportMitigationPayload struct {
+		MitigationEdges func(childComplexity int) int
+	}
+
 	InviteUserPayload struct {
 		Success func(childComplexity int) int
 	}
@@ -231,6 +235,7 @@ type ComplexityRoot struct {
 		DeleteTask         func(childComplexity int, input types.DeleteTaskInput) int
 		DeleteVendor       func(childComplexity int, input types.DeleteVendorInput) int
 		ImportFramework    func(childComplexity int, input types.ImportFrameworkInput) int
+		ImportMitigation   func(childComplexity int, input types.ImportMitigationInput) int
 		InviteUser         func(childComplexity int, input types.InviteUserInput) int
 		RemoveUser         func(childComplexity int, input types.RemoveUserInput) int
 		UnassignTask       func(childComplexity int, input types.UnassignTaskInput) int
@@ -448,34 +453,35 @@ type MitigationResolver interface {
 	Tasks(ctx context.Context, obj *types.Mitigation, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
 }
 type MutationResolver interface {
-	CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error)
-	UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.UpdateVendorPayload, error)
-	DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error)
-	CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error)
-	UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.UpdatePeoplePayload, error)
-	DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error)
 	CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error)
 	UpdateOrganization(ctx context.Context, input types.UpdateOrganizationInput) (*types.UpdateOrganizationPayload, error)
 	DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error)
-	CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error)
-	UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error)
-	DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error)
-	AssignTask(ctx context.Context, input types.AssignTaskInput) (*types.AssignTaskPayload, error)
-	UnassignTask(ctx context.Context, input types.UnassignTaskInput) (*types.UnassignTaskPayload, error)
+	ConfirmEmail(ctx context.Context, input types.ConfirmEmailInput) (*types.ConfirmEmailPayload, error)
+	InviteUser(ctx context.Context, input types.InviteUserInput) (*types.InviteUserPayload, error)
+	RemoveUser(ctx context.Context, input types.RemoveUserInput) (*types.RemoveUserPayload, error)
+	CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error)
+	UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.UpdatePeoplePayload, error)
+	DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error)
+	CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error)
+	UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.UpdateVendorPayload, error)
+	DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error)
 	CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error)
 	UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error)
 	ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error)
 	DeleteFramework(ctx context.Context, input types.DeleteFrameworkInput) (*types.DeleteFrameworkPayload, error)
 	CreateMitigation(ctx context.Context, input types.CreateMitigationInput) (*types.CreateMitigationPayload, error)
 	UpdateMitigation(ctx context.Context, input types.UpdateMitigationInput) (*types.UpdateMitigationPayload, error)
+	ImportMitigation(ctx context.Context, input types.ImportMitigationInput) (*types.ImportMitigationPayload, error)
+	CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error)
+	UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error)
+	DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error)
+	AssignTask(ctx context.Context, input types.AssignTaskInput) (*types.AssignTaskPayload, error)
+	UnassignTask(ctx context.Context, input types.UnassignTaskInput) (*types.UnassignTaskPayload, error)
 	UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error)
 	DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error)
 	CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error)
 	UpdatePolicy(ctx context.Context, input types.UpdatePolicyInput) (*types.UpdatePolicyPayload, error)
 	DeletePolicy(ctx context.Context, input types.DeletePolicyInput) (*types.DeletePolicyPayload, error)
-	ConfirmEmail(ctx context.Context, input types.ConfirmEmailInput) (*types.ConfirmEmailPayload, error)
-	InviteUser(ctx context.Context, input types.InviteUserInput) (*types.InviteUserPayload, error)
-	RemoveUser(ctx context.Context, input types.RemoveUserInput) (*types.RemoveUserPayload, error)
 }
 type OrganizationResolver interface {
 	LogoURL(ctx context.Context, obj *types.Organization) (*string, error)
@@ -889,6 +895,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ImportFrameworkPayload.FrameworkEdge(childComplexity), true
 
+	case "ImportMitigationPayload.mitigationEdges":
+		if e.complexity.ImportMitigationPayload.MitigationEdges == nil {
+			break
+		}
+
+		return e.complexity.ImportMitigationPayload.MitigationEdges(childComplexity), true
+
 	case "InviteUserPayload.success":
 		if e.complexity.InviteUserPayload.Success == nil {
 			break
@@ -1195,6 +1208,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ImportFramework(childComplexity, args["input"].(types.ImportFrameworkInput)), true
+
+	case "Mutation.importMitigation":
+		if e.complexity.Mutation.ImportMitigation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_importMitigation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ImportMitigation(childComplexity, args["input"].(types.ImportMitigationInput)), true
 
 	case "Mutation.inviteUser":
 		if e.complexity.Mutation.InviteUser == nil {
@@ -2080,6 +2105,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputEvidenceOrder,
 		ec.unmarshalInputFrameworkOrder,
 		ec.unmarshalInputImportFrameworkInput,
+		ec.unmarshalInputImportMitigationInput,
 		ec.unmarshalInputInviteUserInput,
 		ec.unmarshalInputMitigationOrder,
 		ec.unmarshalInputOrganizationOrder,
@@ -2195,7 +2221,8 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../schema.graphql", Input: `directive @goField(
+	{Name: "../schema.graphql", Input: `# Directives
+directive @goField(
   forceResolver: Boolean
   name: String
   omittable: Boolean
@@ -2208,14 +2235,31 @@ directive @goModel(
 
 directive @goEnum(value: String) on ENUM_VALUE
 
+# Scalars
 scalar CursorKey
 scalar Void
 scalar Datetime
 scalar Upload
 scalar Duration
 
+# Interfaces
 interface Node {
   id: ID!
+}
+
+# Pagination
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: CursorKey
+  endCursor: CursorKey
+}
+
+# Enums
+enum OrderDirection
+  @goModel(model: "github.com/getprobo/probo/pkg/page.OrderDirection") {
+  ASC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionAsc")
+  DESC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionDesc")
 }
 
 enum MitigationState
@@ -2290,84 +2334,53 @@ enum MitigationImportance
     )
 }
 
-type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: CursorKey
-  endCursor: CursorKey
+enum ServiceCriticality
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ServiceCriticality") {
+  LOW
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityLow"
+    )
+  MEDIUM
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityMedium"
+    )
+  HIGH
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityHigh"
+    )
 }
 
-type OrganizationConnection {
-  edges: [OrganizationEdge!]!
-  pageInfo: PageInfo!
+enum RiskTier
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskTier") {
+  CRITICAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierCritical")
+  SIGNIFICANT
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierSignificant")
+  GENERAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierGeneral")
 }
 
-type OrganizationEdge {
-  cursor: CursorKey!
-  node: Organization!
+enum PolicyStatus
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
+  DRAFT
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft")
+  ACTIVE
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusActive")
 }
 
-type Organization implements Node {
-  id: ID!
-  name: String!
-  logoUrl: String @goField(forceResolver: true)
-
-  users(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: UserOrder
-  ): UserConnection! @goField(forceResolver: true)
-
-  frameworks(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: FrameworkOrder
-  ): FrameworkConnection! @goField(forceResolver: true)
-
-  vendors(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: VendorOrder
-  ): VendorConnection! @goField(forceResolver: true)
-
-  peoples(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: PeopleOrder
-  ): PeopleConnection! @goField(forceResolver: true)
-
-  policies(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: PolicyOrder
-  ): PolicyConnection! @goField(forceResolver: true)
-
-  mitigations(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-    orderBy: MitigationOrder
-  ): MitigationConnection! @goField(forceResolver: true)
-
-  createdAt: Datetime!
-  updatedAt: Datetime!
+enum EvidenceType
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceType") {
+  FILE @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeFile")
+  LINK @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeLink")
 }
 
-enum OrderDirection
-  @goModel(model: "github.com/getprobo/probo/pkg/page.OrderDirection") {
-  ASC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionAsc")
-  DESC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionDesc")
+# Order Field Enums
+enum UserOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.UserOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.UserOrderFieldCreatedAt"
+    )
 }
 
 enum PeopleOrderField
@@ -2428,6 +2441,21 @@ enum PolicyOrderField
 enum EvidenceOrderField
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceOrderField") {
   CREATED_AT
+}
+
+enum OrganizationOrderField {
+  NAME
+  CREATED_AT
+  UPDATED_AT
+}
+
+# Order Input Types
+input UserOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.UserOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: UserOrderField!
 }
 
 input PeopleOrder
@@ -2494,14 +2522,75 @@ input EvidenceOrder
   field: EvidenceOrderField!
 }
 
-type PeopleConnection {
-  edges: [PeopleEdge!]!
-  pageInfo: PageInfo!
+input OrganizationOrder {
+  direction: OrderDirection!
+  field: OrganizationOrderField!
 }
 
-type PeopleEdge {
-  cursor: CursorKey!
-  node: People!
+# Core Types
+type Organization implements Node {
+  id: ID!
+  name: String!
+  logoUrl: String @goField(forceResolver: true)
+
+  users(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: UserOrder
+  ): UserConnection! @goField(forceResolver: true)
+
+  frameworks(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: FrameworkOrder
+  ): FrameworkConnection! @goField(forceResolver: true)
+
+  vendors(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: VendorOrder
+  ): VendorConnection! @goField(forceResolver: true)
+
+  peoples(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: PeopleOrder
+  ): PeopleConnection! @goField(forceResolver: true)
+
+  policies(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: PolicyOrder
+  ): PolicyConnection! @goField(forceResolver: true)
+
+  mitigations(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: MitigationOrder
+  ): MitigationConnection! @goField(forceResolver: true)
+
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type User implements Node {
+  id: ID!
+  fullName: String!
+  email: String!
+  createdAt: Datetime!
+  updatedAt: Datetime!
 }
 
 type People implements Node {
@@ -2512,16 +2601,6 @@ type People implements Node {
   kind: PeopleKind!
   createdAt: Datetime!
   updatedAt: Datetime!
-}
-
-type VendorConnection {
-  edges: [VendorEdge!]!
-  pageInfo: PageInfo!
-}
-
-type VendorEdge {
-  cursor: CursorKey!
-  node: Vendor!
 }
 
 type Vendor implements Node {
@@ -2537,16 +2616,6 @@ type Vendor implements Node {
   privacyPolicyUrl: String
   createdAt: Datetime!
   updatedAt: Datetime!
-}
-
-type FrameworkConnection {
-  edges: [FrameworkEdge!]!
-  pageInfo: PageInfo!
-}
-
-type FrameworkEdge {
-  cursor: CursorKey!
-  node: Framework!
 }
 
 type Framework implements Node {
@@ -2566,16 +2635,6 @@ type Framework implements Node {
   updatedAt: Datetime!
 }
 
-type ControlConnection {
-  edges: [ControlEdge!]!
-  pageInfo: PageInfo!
-}
-
-type ControlEdge {
-  cursor: CursorKey!
-  node: Control!
-}
-
 type Control implements Node {
   id: ID!
   referenceId: String!
@@ -2583,16 +2642,6 @@ type Control implements Node {
   description: String!
   createdAt: Datetime!
   updatedAt: Datetime!
-}
-
-type MitigationConnection {
-  edges: [MitigationEdge!]!
-  pageInfo: PageInfo!
-}
-
-type MitigationEdge {
-  cursor: CursorKey!
-  node: Mitigation!
 }
 
 type Mitigation implements Node {
@@ -2615,16 +2664,6 @@ type Mitigation implements Node {
   updatedAt: Datetime!
 }
 
-type TaskConnection {
-  edges: [TaskEdge!]!
-  pageInfo: PageInfo!
-}
-
-type TaskEdge {
-  cursor: CursorKey!
-  node: Task!
-}
-
 type Task implements Node {
   id: ID!
   name: String!
@@ -2645,22 +2684,6 @@ type Task implements Node {
   updatedAt: Datetime!
 }
 
-type EvidenceConnection {
-  edges: [EvidenceEdge!]!
-  pageInfo: PageInfo!
-}
-
-type EvidenceEdge {
-  cursor: CursorKey!
-  node: Evidence!
-}
-
-enum EvidenceType
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceType") {
-  FILE @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeFile")
-  LINK @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeLink")
-}
-
 type Evidence implements Node {
   id: ID!
   fileUrl: String @goField(forceResolver: true)
@@ -2676,20 +2699,13 @@ type Evidence implements Node {
   updatedAt: Datetime!
 }
 
-type UserConnection {
-  edges: [UserEdge!]!
-  pageInfo: PageInfo!
-}
-
-type UserEdge {
-  cursor: CursorKey!
-  node: User!
-}
-
-type User implements Node {
+type Policy implements Node {
   id: ID!
-  fullName: String!
-  email: String!
+  name: String!
+  status: PolicyStatus!
+  content: String!
+  reviewDate: Datetime
+  owner: People! @goField(forceResolver: true)
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -2699,14 +2715,8 @@ type Session {
   expiresAt: Datetime!
 }
 
-type Query {
-  node(id: ID!): Node!
-  viewer: Viewer!
-}
-
 type Viewer {
   id: ID!
-
   user: User!
 
   organizations(
@@ -2718,15 +2728,115 @@ type Viewer {
   ): OrganizationConnection! @goField(forceResolver: true)
 }
 
+# Connection Types
+type OrganizationConnection {
+  edges: [OrganizationEdge!]!
+  pageInfo: PageInfo!
+}
+
+type OrganizationEdge {
+  cursor: CursorKey!
+  node: Organization!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+}
+
+type UserEdge {
+  cursor: CursorKey!
+  node: User!
+}
+
+type PeopleConnection {
+  edges: [PeopleEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PeopleEdge {
+  cursor: CursorKey!
+  node: People!
+}
+
+type VendorConnection {
+  edges: [VendorEdge!]!
+  pageInfo: PageInfo!
+}
+
+type VendorEdge {
+  cursor: CursorKey!
+  node: Vendor!
+}
+
+type FrameworkConnection {
+  edges: [FrameworkEdge!]!
+  pageInfo: PageInfo!
+}
+
+type FrameworkEdge {
+  cursor: CursorKey!
+  node: Framework!
+}
+
+type ControlConnection {
+  edges: [ControlEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ControlEdge {
+  cursor: CursorKey!
+  node: Control!
+}
+
+type MitigationConnection {
+  edges: [MitigationEdge!]!
+  pageInfo: PageInfo!
+}
+
+type MitigationEdge {
+  cursor: CursorKey!
+  node: Mitigation!
+}
+
+type TaskConnection {
+  edges: [TaskEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TaskEdge {
+  cursor: CursorKey!
+  node: Task!
+}
+
+type EvidenceConnection {
+  edges: [EvidenceEdge!]!
+  pageInfo: PageInfo!
+}
+
+type EvidenceEdge {
+  cursor: CursorKey!
+  node: Evidence!
+}
+
+type PolicyConnection {
+  edges: [PolicyEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PolicyEdge {
+  cursor: CursorKey!
+  node: Policy!
+}
+
+# Root Types
+type Query {
+  node(id: ID!): Node!
+  viewer: Viewer!
+}
+
 type Mutation {
-  createVendor(input: CreateVendorInput!): CreateVendorPayload!
-  updateVendor(input: UpdateVendorInput!): UpdateVendorPayload!
-  deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
-
-  createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
-  updatePeople(input: UpdatePeopleInput!): UpdatePeoplePayload!
-  deletePeople(input: DeletePeopleInput!): DeletePeoplePayload!
-
+  # Organization mutations
   createOrganization(
     input: CreateOrganizationInput!
   ): CreateOrganizationPayload!
@@ -2737,30 +2847,62 @@ type Mutation {
     input: DeleteOrganizationInput!
   ): DeleteOrganizationPayload!
 
+  # User mutations
+  confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
+  inviteUser(input: InviteUserInput!): InviteUserPayload!
+  removeUser(input: RemoveUserInput!): RemoveUserPayload!
+
+  # People mutations
+  createPeople(input: CreatePeopleInput!): CreatePeoplePayload!
+  updatePeople(input: UpdatePeopleInput!): UpdatePeoplePayload!
+  deletePeople(input: DeletePeopleInput!): DeletePeoplePayload!
+
+  # Vendor mutations
+  createVendor(input: CreateVendorInput!): CreateVendorPayload!
+  updateVendor(input: UpdateVendorInput!): UpdateVendorPayload!
+  deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
+
+  # Framework mutations
+  createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
+  updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
+  importFramework(input: ImportFrameworkInput!): ImportFrameworkPayload!
+  deleteFramework(input: DeleteFrameworkInput!): DeleteFrameworkPayload!
+
+  # Mitigation mutations
+  createMitigation(input: CreateMitigationInput!): CreateMitigationPayload!
+  updateMitigation(input: UpdateMitigationInput!): UpdateMitigationPayload!
+  importMitigation(input: ImportMitigationInput!): ImportMitigationPayload!
+
+  # Task mutations
   createTask(input: CreateTaskInput!): CreateTaskPayload!
   updateTask(input: UpdateTaskInput!): UpdateTaskPayload!
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
   assignTask(input: AssignTaskInput!): AssignTaskPayload!
   unassignTask(input: UnassignTaskInput!): UnassignTaskPayload!
 
-  createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
-  updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
-  importFramework(input: ImportFrameworkInput!): ImportFrameworkPayload!
-  deleteFramework(input: DeleteFrameworkInput!): DeleteFrameworkPayload!
-
-  createMitigation(input: CreateMitigationInput!): CreateMitigationPayload!
-  updateMitigation(input: UpdateMitigationInput!): UpdateMitigationPayload!
-
+  # Evidence mutations
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
 
+  # Policy mutations
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
   updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
+}
 
-  confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
-  inviteUser(input: InviteUserInput!): InviteUserPayload!
-  removeUser(input: RemoveUserInput!): RemoveUserPayload!
+# Input Types
+input CreateOrganizationInput {
+  name: String!
+}
+
+input UpdateOrganizationInput {
+  organizationId: ID!
+  name: String
+  logo: Upload
+}
+
+input DeleteOrganizationInput {
+  organizationId: ID!
 }
 
 input CreateVendorInput {
@@ -2776,12 +2918,21 @@ input CreateVendorInput {
   privacyPolicyUrl: String
 }
 
-input DeleteVendorInput {
-  vendorId: ID!
+input UpdateVendorInput {
+  id: ID!
+  name: String
+  description: String
+  serviceStartAt: Datetime
+  serviceTerminationAt: Datetime
+  serviceCriticality: ServiceCriticality
+  riskTier: RiskTier
+  statusPageUrl: String
+  termsOfServiceUrl: String
+  privacyPolicyUrl: String
 }
 
-input DeletePeopleInput {
-  peopleId: ID!
+input DeleteVendorInput {
+  vendorId: ID!
 }
 
 input CreatePeopleInput {
@@ -2800,113 +2951,8 @@ input UpdatePeopleInput {
   kind: PeopleKind
 }
 
-enum ServiceCriticality
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ServiceCriticality") {
-  LOW
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityLow"
-    )
-  MEDIUM
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityMedium"
-    )
-  HIGH
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityHigh"
-    )
-}
-
-enum RiskTier
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskTier") {
-  CRITICAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierCritical")
-  SIGNIFICANT
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierSignificant")
-  GENERAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierGeneral")
-}
-
-input UpdateVendorInput {
-  id: ID!
-  name: String
-  description: String
-  serviceStartAt: Datetime
-  serviceTerminationAt: Datetime
-  serviceCriticality: ServiceCriticality
-  riskTier: RiskTier
-  statusPageUrl: String
-  termsOfServiceUrl: String
-  privacyPolicyUrl: String
-}
-
-type CreatePeoplePayload {
-  peopleEdge: PeopleEdge!
-}
-
-type CreateVendorPayload {
-  vendorEdge: VendorEdge!
-}
-
-type DeleteVendorPayload {
-  deletedVendorId: ID!
-}
-
-type DeletePeoplePayload {
-  deletedPeopleId: ID!
-}
-
-input CreateOrganizationInput {
-  name: String!
-}
-
-input UpdateOrganizationInput {
-  organizationId: ID!
-  name: String
-  logo: Upload
-}
-
-input DeleteOrganizationInput {
-  organizationId: ID!
-}
-
-type CreateOrganizationPayload {
-  organizationEdge: OrganizationEdge!
-}
-
-type UpdateOrganizationPayload {
-  organization: Organization!
-}
-
-type DeleteOrganizationPayload {
-  deletedOrganizationId: ID!
-}
-
-input CreateTaskInput {
-  mitigationId: ID!
-  name: String!
-  description: String!
-  timeEstimate: Duration
-  assignedToId: ID
-}
-
-type CreateTaskPayload {
-  taskEdge: TaskEdge!
-}
-
-input DeleteTaskInput {
-  taskId: ID!
-}
-
-type DeleteTaskPayload {
-  deletedTaskId: ID!
-}
-
-input DeleteFrameworkInput {
-  frameworkId: ID!
-}
-
-type DeleteFrameworkPayload {
-  deletedFrameworkId: ID!
+input DeletePeopleInput {
+  peopleId: ID!
 }
 
 input CreateFrameworkInput {
@@ -2921,8 +2967,13 @@ input UpdateFrameworkInput {
   description: String
 }
 
-type CreateFrameworkPayload {
-  frameworkEdge: FrameworkEdge!
+input ImportFrameworkInput {
+  organizationId: ID!
+  file: Upload!
+}
+
+input DeleteFrameworkInput {
+  frameworkId: ID!
 }
 
 input CreateMitigationInput {
@@ -2931,22 +2982,6 @@ input CreateMitigationInput {
   description: String!
   category: String!
   importance: MitigationImportance!
-}
-
-type CreateMitigationPayload {
-  mitigationEdge: MitigationEdge!
-}
-
-type UpdateFrameworkPayload {
-  framework: Framework!
-}
-
-type UpdateVendorPayload {
-  vendor: Vendor!
-}
-
-type UpdatePeoplePayload {
-  people: People!
 }
 
 input UpdateMitigationInput {
@@ -2958,8 +2993,38 @@ input UpdateMitigationInput {
   importance: MitigationImportance
 }
 
-type UpdateMitigationPayload {
-  mitigation: Mitigation!
+input ImportMitigationInput {
+  organizationId: ID!
+  file: Upload!
+}
+
+input CreateTaskInput {
+  mitigationId: ID!
+  name: String!
+  description: String!
+  timeEstimate: Duration
+  assignedToId: ID
+}
+
+input UpdateTaskInput {
+  taskId: ID!
+  name: String
+  description: String
+  state: TaskState
+  timeEstimate: Duration
+}
+
+input DeleteTaskInput {
+  taskId: ID!
+}
+
+input AssignTaskInput {
+  taskId: ID!
+  assignedToId: ID!
+}
+
+input UnassignTaskInput {
+  taskId: ID!
 }
 
 input UploadEvidenceInput {
@@ -2971,24 +3036,8 @@ input UploadEvidenceInput {
   description: String!
 }
 
-type UploadEvidencePayload {
-  evidenceEdge: EvidenceEdge!
-}
-
 input DeleteEvidenceInput {
   evidenceId: ID!
-}
-
-type DeleteEvidencePayload {
-  deletedEvidenceId: ID!
-}
-
-enum PolicyStatus
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
-  DRAFT
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft")
-  ACTIVE
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusActive")
 }
 
 input CreatePolicyInput {
@@ -3013,6 +3062,114 @@ input DeletePolicyInput {
   policyId: ID!
 }
 
+input ConfirmEmailInput {
+  token: String!
+}
+
+input InviteUserInput {
+  organizationId: ID!
+  email: String!
+  fullName: String!
+}
+
+input RemoveUserInput {
+  organizationId: ID!
+  userId: ID!
+}
+
+# Payload Types
+type CreateOrganizationPayload {
+  organizationEdge: OrganizationEdge!
+}
+
+type UpdateOrganizationPayload {
+  organization: Organization!
+}
+
+type DeleteOrganizationPayload {
+  deletedOrganizationId: ID!
+}
+
+type CreateVendorPayload {
+  vendorEdge: VendorEdge!
+}
+
+type UpdateVendorPayload {
+  vendor: Vendor!
+}
+
+type DeleteVendorPayload {
+  deletedVendorId: ID!
+}
+
+type CreatePeoplePayload {
+  peopleEdge: PeopleEdge!
+}
+
+type UpdatePeoplePayload {
+  people: People!
+}
+
+type DeletePeoplePayload {
+  deletedPeopleId: ID!
+}
+
+type CreateFrameworkPayload {
+  frameworkEdge: FrameworkEdge!
+}
+
+type UpdateFrameworkPayload {
+  framework: Framework!
+}
+
+type ImportFrameworkPayload {
+  frameworkEdge: FrameworkEdge!
+}
+
+type DeleteFrameworkPayload {
+  deletedFrameworkId: ID!
+}
+
+type CreateMitigationPayload {
+  mitigationEdge: MitigationEdge!
+}
+
+type UpdateMitigationPayload {
+  mitigation: Mitigation!
+}
+
+type ImportMitigationPayload {
+  mitigationEdges: [MitigationEdge!]!
+}
+
+type CreateTaskPayload {
+  taskEdge: TaskEdge!
+}
+
+type UpdateTaskPayload {
+  task: Task!
+}
+
+type DeleteTaskPayload {
+  deletedTaskId: ID!
+}
+
+type AssignTaskPayload {
+  task: Task!
+}
+
+type UnassignTaskPayload {
+  task: Task!
+}
+
+type UploadEvidencePayload {
+  evidenceEdge: EvidenceEdge!
+}
+
+type DeleteEvidencePayload {
+  deletedEvidenceId: ID!
+}
+
 type CreatePolicyPayload {
   policyEdge: PolicyEdge!
 }
@@ -3025,117 +3182,16 @@ type DeletePolicyPayload {
   deletedPolicyId: ID!
 }
 
-type Policy implements Node {
-  id: ID!
-  name: String!
-  status: PolicyStatus!
-  content: String!
-  reviewDate: Datetime
-  owner: People! @goField(forceResolver: true)
-  createdAt: Datetime!
-  updatedAt: Datetime!
-}
-
-type PolicyConnection {
-  edges: [PolicyEdge!]!
-  pageInfo: PageInfo!
-}
-
-type PolicyEdge {
-  cursor: CursorKey!
-  node: Policy!
-}
-
-input UpdateTaskInput {
-  taskId: ID!
-  name: String
-  description: String
-  state: TaskState
-  timeEstimate: Duration
-}
-
-type UpdateTaskPayload {
-  task: Task!
-}
-
-input ConfirmEmailInput {
-  token: String!
-}
-
 type ConfirmEmailPayload {
   success: Boolean!
-}
-
-input ImportFrameworkInput {
-  organizationId: ID!
-  file: Upload!
-}
-
-type ImportFrameworkPayload {
-  frameworkEdge: FrameworkEdge!
-}
-
-input AssignTaskInput {
-  taskId: ID!
-  assignedToId: ID!
-}
-
-type AssignTaskPayload {
-  task: Task!
-}
-
-input UnassignTaskInput {
-  taskId: ID!
-}
-
-type UnassignTaskPayload {
-  task: Task!
-}
-
-input InviteUserInput {
-  organizationId: ID!
-  email: String!
-  fullName: String!
 }
 
 type InviteUserPayload {
   success: Boolean!
 }
 
-input RemoveUserInput {
-  organizationId: ID!
-  userId: ID!
-}
-
 type RemoveUserPayload {
   success: Boolean!
-}
-
-enum OrganizationOrderField {
-  NAME
-  CREATED_AT
-  UPDATED_AT
-}
-
-input OrganizationOrder {
-  direction: OrderDirection!
-  field: OrganizationOrderField!
-}
-
-enum UserOrderField
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.UserOrderField") {
-  CREATED_AT
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.UserOrderFieldCreatedAt"
-    )
-}
-
-input UserOrder
-  @goModel(
-    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.UserOrderBy"
-  ) {
-  direction: OrderDirection!
-  field: UserOrderField!
 }
 `, BuiltIn: false},
 }
@@ -3723,6 +3779,29 @@ func (ec *executionContext) field_Mutation_importFramework_argsInput(
 	}
 
 	var zeroVal types.ImportFrameworkInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_importMitigation_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_importMitigation_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_importMitigation_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.ImportMitigationInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNImportMitigationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐImportMitigationInput(ctx, tmp)
+	}
+
+	var zeroVal types.ImportMitigationInput
 	return zeroVal, nil
 }
 
@@ -7352,6 +7431,56 @@ func (ec *executionContext) fieldContext_ImportFrameworkPayload_frameworkEdge(_ 
 	return fc, nil
 }
 
+func (ec *executionContext) _ImportMitigationPayload_mitigationEdges(ctx context.Context, field graphql.CollectedField, obj *types.ImportMitigationPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImportMitigationPayload_mitigationEdges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MitigationEdges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.MitigationEdge)
+	fc.Result = res
+	return ec.marshalNMitigationEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMitigationEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImportMitigationPayload_mitigationEdges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImportMitigationPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_MitigationEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_MitigationEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MitigationEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _InviteUserPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.InviteUserPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_InviteUserPayload_success(ctx, field)
 	if err != nil {
@@ -8021,8 +8150,8 @@ func (ec *executionContext) fieldContext_MitigationEdge_node(_ context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createVendor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createVendor(ctx, field)
+func (ec *executionContext) _Mutation_createOrganization(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createOrganization(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8035,7 +8164,7 @@ func (ec *executionContext) _Mutation_createVendor(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateVendor(rctx, fc.Args["input"].(types.CreateVendorInput))
+		return ec.resolvers.Mutation().CreateOrganization(rctx, fc.Args["input"].(types.CreateOrganizationInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8047,12 +8176,12 @@ func (ec *executionContext) _Mutation_createVendor(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.CreateVendorPayload)
+	res := resTmp.(*types.CreateOrganizationPayload)
 	fc.Result = res
-	return ec.marshalNCreateVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorPayload(ctx, field.Selections, res)
+	return ec.marshalNCreateOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateOrganizationPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createOrganization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -8060,10 +8189,10 @@ func (ec *executionContext) fieldContext_Mutation_createVendor(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "vendorEdge":
-				return ec.fieldContext_CreateVendorPayload_vendorEdge(ctx, field)
+			case "organizationEdge":
+				return ec.fieldContext_CreateOrganizationPayload_organizationEdge(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type CreateVendorPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type CreateOrganizationPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -8073,15 +8202,15 @@ func (ec *executionContext) fieldContext_Mutation_createVendor(ctx context.Conte
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_updateVendor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateVendor(ctx, field)
+func (ec *executionContext) _Mutation_updateOrganization(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateOrganization(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8094,7 +8223,7 @@ func (ec *executionContext) _Mutation_updateVendor(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateVendor(rctx, fc.Args["input"].(types.UpdateVendorInput))
+		return ec.resolvers.Mutation().UpdateOrganization(rctx, fc.Args["input"].(types.UpdateOrganizationInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8106,12 +8235,12 @@ func (ec *executionContext) _Mutation_updateVendor(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.UpdateVendorPayload)
+	res := resTmp.(*types.UpdateOrganizationPayload)
 	fc.Result = res
-	return ec.marshalNUpdateVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorPayload(ctx, field.Selections, res)
+	return ec.marshalNUpdateOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateOrganizationPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_updateVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_updateOrganization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -8119,10 +8248,10 @@ func (ec *executionContext) fieldContext_Mutation_updateVendor(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "vendor":
-				return ec.fieldContext_UpdateVendorPayload_vendor(ctx, field)
+			case "organization":
+				return ec.fieldContext_UpdateOrganizationPayload_organization(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type UpdateVendorPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type UpdateOrganizationPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -8132,15 +8261,15 @@ func (ec *executionContext) fieldContext_Mutation_updateVendor(ctx context.Conte
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_updateOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_deleteVendor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteVendor(ctx, field)
+func (ec *executionContext) _Mutation_deleteOrganization(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteOrganization(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8153,7 +8282,7 @@ func (ec *executionContext) _Mutation_deleteVendor(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteVendor(rctx, fc.Args["input"].(types.DeleteVendorInput))
+		return ec.resolvers.Mutation().DeleteOrganization(rctx, fc.Args["input"].(types.DeleteOrganizationInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8165,12 +8294,12 @@ func (ec *executionContext) _Mutation_deleteVendor(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.DeleteVendorPayload)
+	res := resTmp.(*types.DeleteOrganizationPayload)
 	fc.Result = res
-	return ec.marshalNDeleteVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorPayload(ctx, field.Selections, res)
+	return ec.marshalNDeleteOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_deleteVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_deleteOrganization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -8178,10 +8307,10 @@ func (ec *executionContext) fieldContext_Mutation_deleteVendor(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "deletedVendorId":
-				return ec.fieldContext_DeleteVendorPayload_deletedVendorId(ctx, field)
+			case "deletedOrganizationId":
+				return ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type DeleteVendorPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type DeleteOrganizationPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -8191,7 +8320,184 @@ func (ec *executionContext) fieldContext_Mutation_deleteVendor(ctx context.Conte
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_deleteOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_confirmEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_confirmEmail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ConfirmEmail(rctx, fc.Args["input"].(types.ConfirmEmailInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ConfirmEmailPayload)
+	fc.Result = res
+	return ec.marshalNConfirmEmailPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐConfirmEmailPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_confirmEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_ConfirmEmailPayload_success(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ConfirmEmailPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_confirmEmail_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_inviteUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_inviteUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InviteUser(rctx, fc.Args["input"].(types.InviteUserInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.InviteUserPayload)
+	fc.Result = res
+	return ec.marshalNInviteUserPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐInviteUserPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_inviteUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_InviteUserPayload_success(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type InviteUserPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_inviteUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_removeUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_removeUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RemoveUser(rctx, fc.Args["input"].(types.RemoveUserInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.RemoveUserPayload)
+	fc.Result = res
+	return ec.marshalNRemoveUserPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveUserPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_removeUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_RemoveUserPayload_success(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type RemoveUserPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_removeUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8375,8 +8681,8 @@ func (ec *executionContext) fieldContext_Mutation_deletePeople(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createOrganization(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createOrganization(ctx, field)
+func (ec *executionContext) _Mutation_createVendor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createVendor(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8389,7 +8695,7 @@ func (ec *executionContext) _Mutation_createOrganization(ctx context.Context, fi
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateOrganization(rctx, fc.Args["input"].(types.CreateOrganizationInput))
+		return ec.resolvers.Mutation().CreateVendor(rctx, fc.Args["input"].(types.CreateVendorInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8401,12 +8707,12 @@ func (ec *executionContext) _Mutation_createOrganization(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.CreateOrganizationPayload)
+	res := resTmp.(*types.CreateVendorPayload)
 	fc.Result = res
-	return ec.marshalNCreateOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateOrganizationPayload(ctx, field.Selections, res)
+	return ec.marshalNCreateVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createOrganization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -8414,10 +8720,10 @@ func (ec *executionContext) fieldContext_Mutation_createOrganization(ctx context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "organizationEdge":
-				return ec.fieldContext_CreateOrganizationPayload_organizationEdge(ctx, field)
+			case "vendorEdge":
+				return ec.fieldContext_CreateVendorPayload_vendorEdge(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type CreateOrganizationPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type CreateVendorPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -8427,15 +8733,15 @@ func (ec *executionContext) fieldContext_Mutation_createOrganization(ctx context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_updateOrganization(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateOrganization(ctx, field)
+func (ec *executionContext) _Mutation_updateVendor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateVendor(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8448,7 +8754,7 @@ func (ec *executionContext) _Mutation_updateOrganization(ctx context.Context, fi
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateOrganization(rctx, fc.Args["input"].(types.UpdateOrganizationInput))
+		return ec.resolvers.Mutation().UpdateVendor(rctx, fc.Args["input"].(types.UpdateVendorInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8460,12 +8766,12 @@ func (ec *executionContext) _Mutation_updateOrganization(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.UpdateOrganizationPayload)
+	res := resTmp.(*types.UpdateVendorPayload)
 	fc.Result = res
-	return ec.marshalNUpdateOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateOrganizationPayload(ctx, field.Selections, res)
+	return ec.marshalNUpdateVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_updateOrganization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_updateVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -8473,10 +8779,10 @@ func (ec *executionContext) fieldContext_Mutation_updateOrganization(ctx context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "organization":
-				return ec.fieldContext_UpdateOrganizationPayload_organization(ctx, field)
+			case "vendor":
+				return ec.fieldContext_UpdateVendorPayload_vendor(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type UpdateOrganizationPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type UpdateVendorPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -8486,15 +8792,15 @@ func (ec *executionContext) fieldContext_Mutation_updateOrganization(ctx context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_updateVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_deleteOrganization(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteOrganization(ctx, field)
+func (ec *executionContext) _Mutation_deleteVendor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteVendor(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8507,7 +8813,7 @@ func (ec *executionContext) _Mutation_deleteOrganization(ctx context.Context, fi
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteOrganization(rctx, fc.Args["input"].(types.DeleteOrganizationInput))
+		return ec.resolvers.Mutation().DeleteVendor(rctx, fc.Args["input"].(types.DeleteVendorInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8519,12 +8825,12 @@ func (ec *executionContext) _Mutation_deleteOrganization(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.DeleteOrganizationPayload)
+	res := resTmp.(*types.DeleteVendorPayload)
 	fc.Result = res
-	return ec.marshalNDeleteOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx, field.Selections, res)
+	return ec.marshalNDeleteVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_deleteOrganization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_deleteVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -8532,10 +8838,10 @@ func (ec *executionContext) fieldContext_Mutation_deleteOrganization(ctx context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "deletedOrganizationId":
-				return ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
+			case "deletedVendorId":
+				return ec.fieldContext_DeleteVendorPayload_deletedVendorId(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type DeleteOrganizationPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type DeleteVendorPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -8545,302 +8851,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteOrganization(ctx context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createTask(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateTask(rctx, fc.Args["input"].(types.CreateTaskInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.CreateTaskPayload)
-	fc.Result = res
-	return ec.marshalNCreateTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTaskPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "taskEdge":
-				return ec.fieldContext_CreateTaskPayload_taskEdge(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type CreateTaskPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updateTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateTask(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateTask(rctx, fc.Args["input"].(types.UpdateTaskInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.UpdateTaskPayload)
-	fc.Result = res
-	return ec.marshalNUpdateTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateTaskPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "task":
-				return ec.fieldContext_UpdateTaskPayload_task(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type UpdateTaskPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteTask(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteTask(rctx, fc.Args["input"].(types.DeleteTaskInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.DeleteTaskPayload)
-	fc.Result = res
-	return ec.marshalNDeleteTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteTaskPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "deletedTaskId":
-				return ec.fieldContext_DeleteTaskPayload_deletedTaskId(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type DeleteTaskPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_assignTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_assignTask(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AssignTask(rctx, fc.Args["input"].(types.AssignTaskInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.AssignTaskPayload)
-	fc.Result = res
-	return ec.marshalNAssignTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssignTaskPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_assignTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "task":
-				return ec.fieldContext_AssignTaskPayload_task(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type AssignTaskPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_assignTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_unassignTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_unassignTask(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UnassignTask(rctx, fc.Args["input"].(types.UnassignTaskInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.UnassignTaskPayload)
-	fc.Result = res
-	return ec.marshalNUnassignTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUnassignTaskPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_unassignTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "task":
-				return ec.fieldContext_UnassignTaskPayload_task(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type UnassignTaskPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_unassignTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_deleteVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -9201,6 +9212,360 @@ func (ec *executionContext) fieldContext_Mutation_updateMitigation(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_importMitigation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_importMitigation(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ImportMitigation(rctx, fc.Args["input"].(types.ImportMitigationInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ImportMitigationPayload)
+	fc.Result = res
+	return ec.marshalNImportMitigationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐImportMitigationPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_importMitigation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "mitigationEdges":
+				return ec.fieldContext_ImportMitigationPayload_mitigationEdges(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ImportMitigationPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_importMitigation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createTask(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTask(rctx, fc.Args["input"].(types.CreateTaskInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateTaskPayload)
+	fc.Result = res
+	return ec.marshalNCreateTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTaskPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "taskEdge":
+				return ec.fieldContext_CreateTaskPayload_taskEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateTaskPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateTask(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateTask(rctx, fc.Args["input"].(types.UpdateTaskInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UpdateTaskPayload)
+	fc.Result = res
+	return ec.marshalNUpdateTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateTaskPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "task":
+				return ec.fieldContext_UpdateTaskPayload_task(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateTaskPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteTask(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteTask(rctx, fc.Args["input"].(types.DeleteTaskInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteTaskPayload)
+	fc.Result = res
+	return ec.marshalNDeleteTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteTaskPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedTaskId":
+				return ec.fieldContext_DeleteTaskPayload_deletedTaskId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteTaskPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_assignTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_assignTask(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AssignTask(rctx, fc.Args["input"].(types.AssignTaskInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.AssignTaskPayload)
+	fc.Result = res
+	return ec.marshalNAssignTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssignTaskPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_assignTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "task":
+				return ec.fieldContext_AssignTaskPayload_task(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AssignTaskPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_assignTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_unassignTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_unassignTask(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UnassignTask(rctx, fc.Args["input"].(types.UnassignTaskInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UnassignTaskPayload)
+	fc.Result = res
+	return ec.marshalNUnassignTaskPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUnassignTaskPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_unassignTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "task":
+				return ec.fieldContext_UnassignTaskPayload_task(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UnassignTaskPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_unassignTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_uploadEvidence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_uploadEvidence(ctx, field)
 	if err != nil {
@@ -9490,183 +9855,6 @@ func (ec *executionContext) fieldContext_Mutation_deletePolicy(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deletePolicy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_confirmEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_confirmEmail(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ConfirmEmail(rctx, fc.Args["input"].(types.ConfirmEmailInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.ConfirmEmailPayload)
-	fc.Result = res
-	return ec.marshalNConfirmEmailPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐConfirmEmailPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_confirmEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "success":
-				return ec.fieldContext_ConfirmEmailPayload_success(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ConfirmEmailPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_confirmEmail_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_inviteUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_inviteUser(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().InviteUser(rctx, fc.Args["input"].(types.InviteUserInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.InviteUserPayload)
-	fc.Result = res
-	return ec.marshalNInviteUserPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐInviteUserPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_inviteUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "success":
-				return ec.fieldContext_InviteUserPayload_success(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type InviteUserPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_inviteUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_removeUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_removeUser(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RemoveUser(rctx, fc.Args["input"].(types.RemoveUserInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.RemoveUserPayload)
-	fc.Result = res
-	return ec.marshalNRemoveUserPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveUserPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_removeUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "success":
-				return ec.fieldContext_RemoveUserPayload_success(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type RemoveUserPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_removeUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -17339,6 +17527,40 @@ func (ec *executionContext) unmarshalInputImportFrameworkInput(ctx context.Conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputImportMitigationInput(ctx context.Context, obj any) (types.ImportMitigationInput, error) {
+	var it types.ImportMitigationInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"organizationId", "file"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
+		case "file":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+			data, err := ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.File = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputInviteUserInput(ctx context.Context, obj any) (types.InviteUserInput, error) {
 	var it types.InviteUserInput
 	asMap := map[string]any{}
@@ -18162,6 +18384,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Organization(ctx, sel, obj)
+	case types.User:
+		return ec._User(ctx, sel, &obj)
+	case *types.User:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._User(ctx, sel, obj)
 	case types.People:
 		return ec._People(ctx, sel, &obj)
 	case *types.People:
@@ -18211,13 +18440,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Evidence(ctx, sel, obj)
-	case types.User:
-		return ec._User(ctx, sel, &obj)
-	case *types.User:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._User(ctx, sel, obj)
 	case types.Policy:
 		return ec._Policy(ctx, sel, &obj)
 	case *types.Policy:
@@ -19434,6 +19656,45 @@ func (ec *executionContext) _ImportFrameworkPayload(ctx context.Context, sel ast
 	return out
 }
 
+var importMitigationPayloadImplementors = []string{"ImportMitigationPayload"}
+
+func (ec *executionContext) _ImportMitigationPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ImportMitigationPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, importMitigationPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ImportMitigationPayload")
+		case "mitigationEdges":
+			out.Values[i] = ec._ImportMitigationPayload_mitigationEdges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var inviteUserPayloadImplementors = []string{"InviteUserPayload"}
 
 func (ec *executionContext) _InviteUserPayload(ctx context.Context, sel ast.SelectionSet, obj *types.InviteUserPayload) graphql.Marshaler {
@@ -19690,23 +19951,44 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createVendor":
+		case "createOrganization":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createVendor(ctx, field)
+				return ec._Mutation_createOrganization(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updateVendor":
+		case "updateOrganization":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateVendor(ctx, field)
+				return ec._Mutation_updateOrganization(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "deleteVendor":
+		case "deleteOrganization":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteVendor(ctx, field)
+				return ec._Mutation_deleteOrganization(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "confirmEmail":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_confirmEmail(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "inviteUser":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_inviteUser(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "removeUser":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_removeUser(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -19732,58 +20014,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createOrganization":
+		case "createVendor":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createOrganization(ctx, field)
+				return ec._Mutation_createVendor(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updateOrganization":
+		case "updateVendor":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateOrganization(ctx, field)
+				return ec._Mutation_updateVendor(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "deleteOrganization":
+		case "deleteVendor":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteOrganization(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createTask":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createTask(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "updateTask":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateTask(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "deleteTask":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteTask(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "assignTask":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_assignTask(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "unassignTask":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_unassignTask(ctx, field)
+				return ec._Mutation_deleteVendor(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -19830,6 +20077,48 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "importMitigation":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_importMitigation(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createTask":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createTask(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateTask":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateTask(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteTask":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteTask(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "assignTask":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_assignTask(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "unassignTask":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_unassignTask(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "uploadEvidence":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_uploadEvidence(ctx, field)
@@ -19861,27 +20150,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deletePolicy":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deletePolicy(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "confirmEmail":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_confirmEmail(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "inviteUser":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_inviteUser(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "removeUser":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_removeUser(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -22915,6 +23183,25 @@ func (ec *executionContext) marshalNImportFrameworkPayload2ᚖgithubᚗcomᚋget
 		return graphql.Null
 	}
 	return ec._ImportFrameworkPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNImportMitigationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐImportMitigationInput(ctx context.Context, v any) (types.ImportMitigationInput, error) {
+	res, err := ec.unmarshalInputImportMitigationInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNImportMitigationPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐImportMitigationPayload(ctx context.Context, sel ast.SelectionSet, v types.ImportMitigationPayload) graphql.Marshaler {
+	return ec._ImportMitigationPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNImportMitigationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐImportMitigationPayload(ctx context.Context, sel ast.SelectionSet, v *types.ImportMitigationPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ImportMitigationPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v any) (int, error) {

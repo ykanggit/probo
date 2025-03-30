@@ -86,6 +86,170 @@ func (r *mitigationResolver) Tasks(ctx context.Context, obj *types.Mitigation, f
 	return types.NewTaskConnection(page), nil
 }
 
+// CreateOrganization is the resolver for the createOrganization field.
+func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error) {
+	svc := r.proboSvc.WithTenant(gid.NewTenantID())
+
+	organization, err := svc.Organizations.Create(ctx, probo.CreateOrganizationRequest{
+		Name: input.Name,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create organization: %w", err)
+	}
+
+	err = r.usrmgrSvc.EnrollUserInOrganization(ctx, UserFromContext(ctx).ID, organization.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot add user to organization: %w", err)
+	}
+
+	tenantIDs, _ := ctx.Value(userTenantContextKey).(*[]gid.TenantID)
+	*tenantIDs = append(*tenantIDs, organization.ID.TenantID())
+
+	return &types.CreateOrganizationPayload{
+		OrganizationEdge: types.NewOrganizationEdge(organization, coredata.OrganizationOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateOrganization is the resolver for the updateOrganization field.
+func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.UpdateOrganizationInput) (*types.UpdateOrganizationPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+
+	req := probo.UpdateOrganizationRequest{
+		ID:   input.OrganizationID,
+		Name: input.Name,
+	}
+
+	if input.Logo != nil {
+		req.File = input.Logo.File
+	}
+
+	organization, err := svc.Organizations.Update(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("cannot update organization: %w", err)
+	}
+
+	return &types.UpdateOrganizationPayload{
+		Organization: types.NewOrganization(organization),
+	}, nil
+}
+
+// DeleteOrganization is the resolver for the deleteOrganization field.
+func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteOrganization - deleteOrganization"))
+}
+
+// ConfirmEmail is the resolver for the confirmEmail field.
+func (r *mutationResolver) ConfirmEmail(ctx context.Context, input types.ConfirmEmailInput) (*types.ConfirmEmailPayload, error) {
+	err := r.usrmgrSvc.ConfirmEmail(ctx, input.Token)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.ConfirmEmailPayload{Success: true}, nil
+}
+
+// InviteUser is the resolver for the inviteUser field.
+func (r *mutationResolver) InviteUser(ctx context.Context, input types.InviteUserInput) (*types.InviteUserPayload, error) {
+	user := UserFromContext(ctx)
+
+	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to list organizations for user: %w", err))
+	}
+
+	for _, organization := range organizations {
+		if organization.ID == input.OrganizationID {
+			err := r.usrmgrSvc.InviteUser(ctx, input.OrganizationID, input.FullName, input.Email)
+			if err != nil {
+				return nil, err
+			}
+
+			return &types.InviteUserPayload{Success: true}, nil
+		}
+	}
+
+	return nil, fmt.Errorf("organization not found")
+}
+
+// RemoveUser is the resolver for the removeUser field.
+func (r *mutationResolver) RemoveUser(ctx context.Context, input types.RemoveUserInput) (*types.RemoveUserPayload, error) {
+	user := UserFromContext(ctx)
+
+	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to list organizations for user: %w", err))
+	}
+
+	for _, organization := range organizations {
+		if organization.ID == input.OrganizationID {
+			err := r.usrmgrSvc.RemoveUser(ctx, input.OrganizationID, input.UserID)
+			if err != nil {
+				return nil, err
+			}
+
+			return &types.RemoveUserPayload{Success: true}, nil
+		}
+	}
+
+	return nil, fmt.Errorf("organization not found")
+}
+
+// CreatePeople is the resolver for the createPeople field.
+func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+
+	people, err := svc.Peoples.Create(ctx, probo.CreatePeopleRequest{
+		OrganizationID:           input.OrganizationID,
+		FullName:                 input.FullName,
+		PrimaryEmailAddress:      input.PrimaryEmailAddress,
+		AdditionalEmailAddresses: []string{},
+		Kind:                     input.Kind,
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot create people: %w", err)
+	}
+
+	return &types.CreatePeoplePayload{
+		PeopleEdge: types.NewPeopleEdge(people, coredata.PeopleOrderFieldFullName),
+	}, nil
+}
+
+// UpdatePeople is the resolver for the updatePeople field.
+func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.UpdatePeoplePayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
+
+	people, err := svc.Peoples.Update(ctx, probo.UpdatePeopleRequest{
+		ID:                       input.ID,
+		FullName:                 input.FullName,
+		PrimaryEmailAddress:      input.PrimaryEmailAddress,
+		AdditionalEmailAddresses: &input.AdditionalEmailAddresses,
+		Kind:                     input.Kind,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update people: %w", err)
+	}
+
+	return &types.UpdatePeoplePayload{
+		People: types.NewPeople(people),
+	}, nil
+}
+
+// DeletePeople is the resolver for the deletePeople field.
+func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.PeopleID.TenantID())
+
+	err := svc.Peoples.Delete(ctx, input.PeopleID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete people: %w", err)
+	}
+
+	return &types.DeletePeoplePayload{
+		DeletedPeopleID: input.PeopleID,
+	}, nil
+}
+
 // CreateVendor is the resolver for the createVendor field.
 func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
@@ -146,194 +310,6 @@ func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteV
 
 	return &types.DeleteVendorPayload{
 		DeletedVendorID: input.VendorID,
-	}, nil
-}
-
-// CreatePeople is the resolver for the createPeople field.
-func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
-
-	people, err := svc.Peoples.Create(ctx, probo.CreatePeopleRequest{
-		OrganizationID:           input.OrganizationID,
-		FullName:                 input.FullName,
-		PrimaryEmailAddress:      input.PrimaryEmailAddress,
-		AdditionalEmailAddresses: []string{},
-		Kind:                     input.Kind,
-	})
-
-	if err != nil {
-		return nil, fmt.Errorf("cannot create people: %w", err)
-	}
-
-	return &types.CreatePeoplePayload{
-		PeopleEdge: types.NewPeopleEdge(people, coredata.PeopleOrderFieldFullName),
-	}, nil
-}
-
-// UpdatePeople is the resolver for the updatePeople field.
-func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.UpdatePeoplePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
-
-	people, err := svc.Peoples.Update(ctx, probo.UpdatePeopleRequest{
-		ID:                       input.ID,
-		FullName:                 input.FullName,
-		PrimaryEmailAddress:      input.PrimaryEmailAddress,
-		AdditionalEmailAddresses: &input.AdditionalEmailAddresses,
-		Kind:                     input.Kind,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cannot update people: %w", err)
-	}
-
-	return &types.UpdatePeoplePayload{
-		People: types.NewPeople(people),
-	}, nil
-}
-
-// DeletePeople is the resolver for the deletePeople field.
-func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.PeopleID.TenantID())
-
-	err := svc.Peoples.Delete(ctx, input.PeopleID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot delete people: %w", err)
-	}
-
-	return &types.DeletePeoplePayload{
-		DeletedPeopleID: input.PeopleID,
-	}, nil
-}
-
-// CreateOrganization is the resolver for the createOrganization field.
-func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error) {
-	svc := r.proboSvc.WithTenant(gid.NewTenantID())
-
-	organization, err := svc.Organizations.Create(ctx, probo.CreateOrganizationRequest{
-		Name: input.Name,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cannot create organization: %w", err)
-	}
-
-	err = r.usrmgrSvc.EnrollUserInOrganization(ctx, UserFromContext(ctx).ID, organization.ID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot add user to organization: %w", err)
-	}
-
-	tenantIDs, _ := ctx.Value(userTenantContextKey).(*[]gid.TenantID)
-	*tenantIDs = append(*tenantIDs, organization.ID.TenantID())
-
-	return &types.CreateOrganizationPayload{
-		OrganizationEdge: types.NewOrganizationEdge(organization, coredata.OrganizationOrderFieldCreatedAt),
-	}, nil
-}
-
-// UpdateOrganization is the resolver for the updateOrganization field.
-func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.UpdateOrganizationInput) (*types.UpdateOrganizationPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
-
-	req := probo.UpdateOrganizationRequest{
-		ID:   input.OrganizationID,
-		Name: input.Name,
-	}
-
-	if input.Logo != nil {
-		req.File = input.Logo.File
-	}
-
-	organization, err := svc.Organizations.Update(ctx, req)
-	if err != nil {
-		return nil, fmt.Errorf("cannot update organization: %w", err)
-	}
-
-	return &types.UpdateOrganizationPayload{
-		Organization: types.NewOrganization(organization),
-	}, nil
-}
-
-// DeleteOrganization is the resolver for the deleteOrganization field.
-func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error) {
-	panic(fmt.Errorf("not implemented: DeleteOrganization - deleteOrganization"))
-}
-
-// CreateTask is the resolver for the createTask field.
-func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
-
-	task, err := svc.Tasks.Create(ctx, probo.CreateTaskRequest{
-		MitigationID: input.MitigationID,
-		Name:         input.Name,
-		Description:  input.Description,
-		TimeEstimate: input.TimeEstimate,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cannot create task: %w", err)
-	}
-
-	return &types.CreateTaskPayload{
-		TaskEdge: types.NewTaskEdge(task, coredata.TaskOrderFieldCreatedAt),
-	}, nil
-}
-
-// UpdateTask is the resolver for the updateTask field.
-func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
-
-	task, err := svc.Tasks.Update(ctx, probo.UpdateTaskRequest{
-		TaskID:       input.TaskID,
-		Name:         input.Name,
-		Description:  input.Description,
-		State:        input.State,
-		TimeEstimate: input.TimeEstimate,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cannot update task: %w", err)
-	}
-
-	return &types.UpdateTaskPayload{
-		Task: types.NewTask(task),
-	}, nil
-}
-
-// DeleteTask is the resolver for the deleteTask field.
-func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
-
-	err := svc.Tasks.Delete(ctx, input.TaskID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot delete task: %w", err)
-	}
-
-	return &types.DeleteTaskPayload{
-		DeletedTaskID: input.TaskID,
-	}, nil
-}
-
-// AssignTask is the resolver for the assignTask field.
-func (r *mutationResolver) AssignTask(ctx context.Context, input types.AssignTaskInput) (*types.AssignTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
-
-	task, err := svc.Tasks.Assign(ctx, input.TaskID, input.AssignedToID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot assign task: %w", err)
-	}
-
-	return &types.AssignTaskPayload{
-		Task: types.NewTask(task),
-	}, nil
-}
-
-// UnassignTask is the resolver for the unassignTask field.
-func (r *mutationResolver) UnassignTask(ctx context.Context, input types.UnassignTaskInput) (*types.UnassignTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
-
-	task, err := svc.Tasks.Unassign(ctx, input.TaskID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot unassign task: %w", err)
-	}
-
-	return &types.UnassignTaskPayload{
-		Task: types.NewTask(task),
 	}, nil
 }
 
@@ -446,6 +422,111 @@ func (r *mutationResolver) UpdateMitigation(ctx context.Context, input types.Upd
 	}, nil
 }
 
+// ImportMitigation is the resolver for the importMitigation field.
+func (r *mutationResolver) ImportMitigation(ctx context.Context, input types.ImportMitigationInput) (*types.ImportMitigationPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+
+	var req probo.ImportMitigationRequest
+	if err := json.NewDecoder(input.File.File).Decode(&req.Mitigations); err != nil {
+		return nil, fmt.Errorf("cannot unmarshal mitigation: %w", err)
+	}
+
+	mitigations, err := svc.Mitigations.Import(ctx, input.OrganizationID, req)
+	if err != nil {
+		return nil, fmt.Errorf("cannot import mitigation: %w", err)
+	}
+
+	mitigationEdges := make([]*types.MitigationEdge, len(mitigations.Data))
+	for i, mitigation := range mitigations.Data {
+		mitigationEdges[i] = types.NewMitigationEdge(mitigation, coredata.MitigationOrderFieldCreatedAt)
+	}
+
+	return &types.ImportMitigationPayload{
+		MitigationEdges: mitigationEdges,
+	}, nil
+}
+
+// CreateTask is the resolver for the createTask field.
+func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
+
+	task, err := svc.Tasks.Create(ctx, probo.CreateTaskRequest{
+		MitigationID: input.MitigationID,
+		Name:         input.Name,
+		Description:  input.Description,
+		TimeEstimate: input.TimeEstimate,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create task: %w", err)
+	}
+
+	return &types.CreateTaskPayload{
+		TaskEdge: types.NewTaskEdge(task, coredata.TaskOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateTask is the resolver for the updateTask field.
+func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+
+	task, err := svc.Tasks.Update(ctx, probo.UpdateTaskRequest{
+		TaskID:       input.TaskID,
+		Name:         input.Name,
+		Description:  input.Description,
+		State:        input.State,
+		TimeEstimate: input.TimeEstimate,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update task: %w", err)
+	}
+
+	return &types.UpdateTaskPayload{
+		Task: types.NewTask(task),
+	}, nil
+}
+
+// DeleteTask is the resolver for the deleteTask field.
+func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+
+	err := svc.Tasks.Delete(ctx, input.TaskID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete task: %w", err)
+	}
+
+	return &types.DeleteTaskPayload{
+		DeletedTaskID: input.TaskID,
+	}, nil
+}
+
+// AssignTask is the resolver for the assignTask field.
+func (r *mutationResolver) AssignTask(ctx context.Context, input types.AssignTaskInput) (*types.AssignTaskPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+
+	task, err := svc.Tasks.Assign(ctx, input.TaskID, input.AssignedToID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot assign task: %w", err)
+	}
+
+	return &types.AssignTaskPayload{
+		Task: types.NewTask(task),
+	}, nil
+}
+
+// UnassignTask is the resolver for the unassignTask field.
+func (r *mutationResolver) UnassignTask(ctx context.Context, input types.UnassignTaskInput) (*types.UnassignTaskPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+
+	task, err := svc.Tasks.Unassign(ctx, input.TaskID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot unassign task: %w", err)
+	}
+
+	return &types.UnassignTaskPayload{
+		Task: types.NewTask(task),
+	}, nil
+}
+
 // UploadEvidence is the resolver for the uploadEvidence field.
 func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
@@ -552,63 +633,6 @@ func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeleteP
 	return &types.DeletePolicyPayload{
 		DeletedPolicyID: input.PolicyID,
 	}, nil
-}
-
-// ConfirmEmail is the resolver for the confirmEmail field.
-func (r *mutationResolver) ConfirmEmail(ctx context.Context, input types.ConfirmEmailInput) (*types.ConfirmEmailPayload, error) {
-	err := r.usrmgrSvc.ConfirmEmail(ctx, input.Token)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.ConfirmEmailPayload{Success: true}, nil
-}
-
-// InviteUser is the resolver for the inviteUser field.
-func (r *mutationResolver) InviteUser(ctx context.Context, input types.InviteUserInput) (*types.InviteUserPayload, error) {
-	user := UserFromContext(ctx)
-
-	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, user.ID)
-	if err != nil {
-		panic(fmt.Errorf("failed to list organizations for user: %w", err))
-	}
-
-	for _, organization := range organizations {
-		if organization.ID == input.OrganizationID {
-			err := r.usrmgrSvc.InviteUser(ctx, input.OrganizationID, input.FullName, input.Email)
-			if err != nil {
-				return nil, err
-			}
-
-			return &types.InviteUserPayload{Success: true}, nil
-		}
-	}
-
-	return nil, fmt.Errorf("organization not found")
-}
-
-// RemoveUser is the resolver for the removeUser field.
-func (r *mutationResolver) RemoveUser(ctx context.Context, input types.RemoveUserInput) (*types.RemoveUserPayload, error) {
-	user := UserFromContext(ctx)
-
-	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, user.ID)
-	if err != nil {
-		panic(fmt.Errorf("failed to list organizations for user: %w", err))
-	}
-
-	for _, organization := range organizations {
-		if organization.ID == input.OrganizationID {
-			err := r.usrmgrSvc.RemoveUser(ctx, input.OrganizationID, input.UserID)
-			if err != nil {
-				return nil, err
-			}
-
-			return &types.RemoveUserPayload{Success: true}, nil
-		}
-	}
-
-	return nil, fmt.Errorf("organization not found")
 }
 
 // LogoURL is the resolver for the logoUrl field.

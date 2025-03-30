@@ -46,6 +46,14 @@ type (
 		State       *coredata.MitigationState
 		Importance  *coredata.MitigationImportance
 	}
+
+	ImportMitigationRequest struct {
+		Mitigations []struct {
+			Name        string `json:"name"`
+			Description string `json:"description"`
+			Category    string `json:"category"`
+		} `json:"mitigations"`
+	}
 )
 
 func (s MitigationService) Get(
@@ -66,6 +74,65 @@ func (s MitigationService) Get(
 	}
 
 	return mitigation, nil
+}
+
+func (s MitigationService) Import(
+	ctx context.Context,
+	organizationID gid.GID,
+	req ImportMitigationRequest,
+) (*page.Page[*coredata.Mitigation, coredata.MitigationOrderField], error) {
+
+	importedMitigations := coredata.Mitigations{}
+	for _, mitigation := range req.Mitigations {
+		now := time.Now()
+
+		mitigationID, err := gid.NewGID(organizationID.TenantID(), coredata.MitigationEntityType)
+		if err != nil {
+			return nil, fmt.Errorf("cannot create global id: %w", err)
+		}
+
+		importedMitigations = append(importedMitigations, &coredata.Mitigation{
+			ID:             mitigationID,
+			OrganizationID: organizationID,
+			Name:           mitigation.Name,
+			Description:    mitigation.Description,
+			Category:       mitigation.Category,
+			State:          coredata.MitigationStateNotStarted,
+			Standards:      []string{},
+			Importance:     coredata.MitigationImportancePreferred,
+			CreatedAt:      now,
+			UpdatedAt:      now,
+		})
+	}
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			for _, mitigation := range importedMitigations {
+				if err := mitigation.Insert(ctx, tx, s.svc.scope); err != nil {
+					return fmt.Errorf("cannot insert mitigation: %w", err)
+				}
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot import mitigations: %w", err)
+	}
+
+	cursor := page.NewCursor(
+		len(importedMitigations),
+		nil,
+		page.Head,
+		page.OrderBy[coredata.MitigationOrderField]{
+			Field:     coredata.MitigationOrderFieldCreatedAt,
+			Direction: page.OrderDirectionAsc,
+		},
+	)
+
+	return page.NewPage(importedMitigations, cursor), nil
 }
 
 func (s MitigationService) Update(

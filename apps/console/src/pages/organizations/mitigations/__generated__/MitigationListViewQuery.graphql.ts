@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c919ae742bdab52e5e68fb5c7fe92812>>
+ * @generated SignedSource<<a98cd84786da5d6229cb66bc24ad92d0>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -19,6 +19,7 @@ export type MitigationListViewQuery$data = {
   readonly organization: {
     readonly id: string;
     readonly mitigations?: {
+      readonly __id: string;
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly category: string;
@@ -65,21 +66,13 @@ v3 = {
   "storageKey": null
 },
 v4 = {
-  "kind": "Literal",
-  "name": "orderBy",
-  "value": {
-    "direction": "ASC",
-    "field": "CREATED_AT"
-  }
-},
-v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v6 = [
+v5 = [
   {
     "alias": null,
     "args": null,
@@ -146,7 +139,7 @@ v6 = [
             "name": "updatedAt",
             "storageKey": null
           },
-          (v5/*: any*/)
+          (v4/*: any*/)
         ],
         "storageKey": null
       },
@@ -184,15 +177,26 @@ v6 = [
       }
     ],
     "storageKey": null
+  },
+  {
+    "kind": "ClientExtension",
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "__id",
+        "storageKey": null
+      }
+    ]
   }
 ],
-v7 = [
+v6 = [
   {
     "kind": "Variable",
     "name": "first",
     "variableName": "first"
-  },
-  (v4/*: any*/)
+  }
 ];
 return {
   "fragment": {
@@ -218,15 +222,13 @@ return {
             "selections": [
               {
                 "alias": "mitigations",
-                "args": [
-                  (v4/*: any*/)
-                ],
+                "args": null,
                 "concreteType": "MitigationConnection",
                 "kind": "LinkedField",
                 "name": "__MitigationListView_mitigations_connection",
                 "plural": false,
-                "selections": (v6/*: any*/),
-                "storageKey": "__MitigationListView_mitigations_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"CREATED_AT\"})"
+                "selections": (v5/*: any*/),
+                "storageKey": null
               }
             ],
             "type": "Organization",
@@ -256,27 +258,25 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v5/*: any*/),
+          (v4/*: any*/),
           (v3/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v7/*: any*/),
+                "args": (v6/*: any*/),
                 "concreteType": "MitigationConnection",
                 "kind": "LinkedField",
                 "name": "mitigations",
                 "plural": false,
-                "selections": (v6/*: any*/),
+                "selections": (v5/*: any*/),
                 "storageKey": null
               },
               {
                 "alias": null,
-                "args": (v7/*: any*/),
-                "filters": [
-                  "orderBy"
-                ],
+                "args": (v6/*: any*/),
+                "filters": null,
                 "handle": "connection",
                 "key": "MitigationListView_mitigations",
                 "kind": "LinkedHandle",
@@ -292,7 +292,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "cb49e5e7740ec71ce0b8e1abbdbcf24d",
+    "cacheID": "9951f5e4be50df7a883af63426fe5fde",
     "id": null,
     "metadata": {
       "connection": [
@@ -309,11 +309,11 @@ return {
     },
     "name": "MitigationListViewQuery",
     "operationKind": "query",
-    "text": "query MitigationListViewQuery(\n  $organizationId: ID!\n  $first: Int\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      mitigations(first: $first, orderBy: {direction: ASC, field: CREATED_AT}) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            state\n            importance\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query MitigationListViewQuery(\n  $organizationId: ID!\n  $first: Int\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      mitigations(first: $first) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            state\n            importance\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ee7fdf984d5cb376068ba53d0a56c59b";
+(node as any).hash = "c2da6b42a986dd18cd18603c5f5809ad";
 
 export default node;
