@@ -5,6 +5,7 @@ import {
   usePreloadedQuery,
   useQueryLoader,
   useMutation,
+  ConnectionHandler,
 } from "react-relay";
 import { useParams, useNavigate, Link } from "react-router";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +32,6 @@ const mitigationListViewQuery = graphql`
       ... on Organization {
         mitigations(first: $first)
           @connection(key: "MitigationListView_mitigations") {
-          __id
           edges {
             node {
               id
@@ -289,7 +289,12 @@ function MitigationListContent({
 
     importMitigation({
       variables: {
-        connections: [data.organization.mitigations.__id],
+        connections: [
+          ConnectionHandler.getConnectionID(
+            data.organization.id,
+            "MitigationListView_mitigations"
+          ),
+        ],
         input: {
           organizationId: organizationId!,
           file: null,
