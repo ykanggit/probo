@@ -215,6 +215,14 @@ enum PolicyOrderField
   NAME
 }
 
+enum RiskOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldCreatedAt"
+    )
+}
+
 enum EvidenceOrderField
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceOrderField") {
   CREATED_AT
@@ -291,6 +299,14 @@ input PolicyOrder
   field: PolicyOrderField!
 }
 
+input RiskOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.RiskOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: RiskOrderField!
+}
+
 input EvidenceOrder
   @goModel(
     model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.EvidenceOrderBy"
@@ -357,6 +373,14 @@ type Organization implements Node {
     before: CursorKey
     orderBy: MitigationOrder
   ): MitigationConnection! @goField(forceResolver: true)
+
+  risks(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: RiskOrder
+  ): RiskConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -487,6 +511,14 @@ type Policy implements Node {
   updatedAt: Datetime!
 }
 
+type Risk implements Node {
+  id: ID!
+  name: String!
+  description: String!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
 type Session {
   id: ID!
   expiresAt: Datetime!
@@ -606,6 +638,16 @@ type PolicyEdge {
   node: Policy!
 }
 
+type RiskConnection {
+  edges: [RiskEdge!]!
+  pageInfo: PageInfo!
+}
+
+type RiskEdge {
+  cursor: CursorKey!
+  node: Risk!
+}
+
 # Root Types
 type Query {
   node(id: ID!): Node!
@@ -656,6 +698,11 @@ type Mutation {
   deleteTask(input: DeleteTaskInput!): DeleteTaskPayload!
   assignTask(input: AssignTaskInput!): AssignTaskPayload!
   unassignTask(input: UnassignTaskInput!): UnassignTaskPayload!
+
+  # Risk mutations
+  createRisk(input: CreateRiskInput!): CreateRiskPayload!
+  updateRisk(input: UpdateRiskInput!): UpdateRiskPayload!
+  deleteRisk(input: DeleteRiskInput!): DeleteRiskPayload!
 
   # Evidence mutations
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
@@ -804,6 +851,22 @@ input UnassignTaskInput {
   taskId: ID!
 }
 
+input CreateRiskInput {
+  organizationId: ID!
+  name: String!
+  description: String!
+}
+
+input UpdateRiskInput {
+  id: ID!
+  name: String
+  description: String
+}
+
+input DeleteRiskInput {
+  riskId: ID!
+}
+
 input UploadEvidenceInput {
   taskId: ID!
   name: String!
@@ -937,6 +1000,18 @@ type AssignTaskPayload {
 
 type UnassignTaskPayload {
   task: Task!
+}
+
+type CreateRiskPayload {
+  riskEdge: RiskEdge!
+}
+
+type UpdateRiskPayload {
+  risk: Risk!
+}
+
+type DeleteRiskPayload {
+  deletedRiskId: ID!
 }
 
 type UploadEvidencePayload {

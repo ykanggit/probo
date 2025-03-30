@@ -113,6 +113,16 @@ type CreatePolicyPayload struct {
 	PolicyEdge *PolicyEdge `json:"policyEdge"`
 }
 
+type CreateRiskInput struct {
+	OrganizationID gid.GID `json:"organizationId"`
+	Name           string  `json:"name"`
+	Description    string  `json:"description"`
+}
+
+type CreateRiskPayload struct {
+	RiskEdge *RiskEdge `json:"riskEdge"`
+}
+
 type CreateTaskInput struct {
 	MitigationID gid.GID        `json:"mitigationId"`
 	Name         string         `json:"name"`
@@ -180,6 +190,14 @@ type DeletePolicyInput struct {
 
 type DeletePolicyPayload struct {
 	DeletedPolicyID gid.GID `json:"deletedPolicyId"`
+}
+
+type DeleteRiskInput struct {
+	RiskID gid.GID `json:"riskId"`
+}
+
+type DeleteRiskPayload struct {
+	DeletedRiskID gid.GID `json:"deletedRiskId"`
 }
 
 type DeleteTaskInput struct {
@@ -313,6 +331,7 @@ type Organization struct {
 	Peoples     *PeopleConnection     `json:"peoples"`
 	Policies    *PolicyConnection     `json:"policies"`
 	Mitigations *MitigationConnection `json:"mitigations"`
+	Risks       *RiskConnection       `json:"risks"`
 	CreatedAt   time.Time             `json:"createdAt"`
 	UpdatedAt   time.Time             `json:"updatedAt"`
 }
@@ -399,6 +418,27 @@ type RemoveUserInput struct {
 
 type RemoveUserPayload struct {
 	Success bool `json:"success"`
+}
+
+type Risk struct {
+	ID          gid.GID   `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
+func (Risk) IsNode()             {}
+func (this Risk) GetID() gid.GID { return this.ID }
+
+type RiskConnection struct {
+	Edges    []*RiskEdge `json:"edges"`
+	PageInfo *PageInfo   `json:"pageInfo"`
+}
+
+type RiskEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Risk          `json:"node"`
 }
 
 type Session struct {
@@ -495,6 +535,16 @@ type UpdatePolicyInput struct {
 
 type UpdatePolicyPayload struct {
 	Policy *Policy `json:"policy"`
+}
+
+type UpdateRiskInput struct {
+	ID          gid.GID `json:"id"`
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type UpdateRiskPayload struct {
+	Risk *Risk `json:"risk"`
 }
 
 type UpdateTaskInput struct {

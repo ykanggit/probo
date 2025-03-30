@@ -14,21 +14,27 @@
 
 package coredata
 
-const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MitigationEntityType
-	TaskEntityType
-	EvidenceEntityType
-	_ControlStateTransitionEntityType
-	_TaskStateTransitionEntityType
-	VendorEntityType
-	PeopleEntityType
-	_EvidenceStateTransitionEntityType
-	PolicyEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
+type (
+	RiskOrderField string
 )
+
+const (
+	RiskOrderFieldCreatedAt RiskOrderField = "CREATED_AT"
+)
+
+func (p RiskOrderField) Column() string {
+	return string(p)
+}
+
+func (p RiskOrderField) String() string {
+	return string(p)
+}
+
+func (p RiskOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *RiskOrderField) UnmarshalText(text []byte) error {
+	*p = RiskOrderField(text)
+	return nil
+}

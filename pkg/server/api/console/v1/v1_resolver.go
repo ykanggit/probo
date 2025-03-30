@@ -457,7 +457,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 		TimeEstimate: input.TimeEstimate,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("cannot create task: %w", err)
+		panic(fmt.Errorf("cannot create task: %w", err))
 	}
 
 	return &types.CreateTaskPayload{
@@ -477,7 +477,7 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTas
 		TimeEstimate: input.TimeEstimate,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("cannot update task: %w", err)
+		panic(fmt.Errorf("cannot update task: %w", err))
 	}
 
 	return &types.UpdateTaskPayload{
@@ -491,7 +491,7 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTas
 
 	err := svc.Tasks.Delete(ctx, input.TaskID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot delete task: %w", err)
+		panic(fmt.Errorf("cannot delete task: %w", err))
 	}
 
 	return &types.DeleteTaskPayload{
@@ -505,7 +505,7 @@ func (r *mutationResolver) AssignTask(ctx context.Context, input types.AssignTas
 
 	task, err := svc.Tasks.Assign(ctx, input.TaskID, input.AssignedToID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot assign task: %w", err)
+		panic(fmt.Errorf("cannot assign task: %w", err))
 	}
 
 	return &types.AssignTaskPayload{
@@ -519,11 +519,67 @@ func (r *mutationResolver) UnassignTask(ctx context.Context, input types.Unassig
 
 	task, err := svc.Tasks.Unassign(ctx, input.TaskID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unassign task: %w", err)
+		panic(fmt.Errorf("cannot unassign task: %w", err))
 	}
 
 	return &types.UnassignTaskPayload{
 		Task: types.NewTask(task),
+	}, nil
+}
+
+// CreateRisk is the resolver for the createRisk field.
+func (r *mutationResolver) CreateRisk(ctx context.Context, input types.CreateRiskInput) (*types.CreateRiskPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+
+	risk, err := svc.Risks.Create(
+		ctx,
+		probo.CreateRiskRequest{
+			OrganizationID: input.OrganizationID,
+			Name:           input.Name,
+			Description:    input.Description,
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("cannot create risk: %w", err))
+	}
+
+	return &types.CreateRiskPayload{
+		RiskEdge: types.NewRiskEdge(risk, coredata.RiskOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateRisk is the resolver for the updateRisk field.
+func (r *mutationResolver) UpdateRisk(ctx context.Context, input types.UpdateRiskInput) (*types.UpdateRiskPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
+
+	risk, err := svc.Risks.Update(
+		ctx,
+		probo.UpdateRiskRequest{
+			ID:          input.ID,
+			Name:        input.Name,
+			Description: input.Description,
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("cannot update risk: %w", err))
+	}
+
+	return &types.UpdateRiskPayload{
+		Risk: types.NewRisk(risk),
+	}, nil
+}
+
+// DeleteRisk is the resolver for the deleteRisk field.
+func (r *mutationResolver) DeleteRisk(ctx context.Context, input types.DeleteRiskInput) (*types.DeleteRiskPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+
+	err := svc.Risks.Delete(ctx, input.RiskID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete risk: %w", err))
+	}
+
+	return &types.DeleteRiskPayload{
+		DeletedRiskID: input.RiskID,
 	}, nil
 }
 
@@ -790,6 +846,31 @@ func (r *organizationResolver) Mitigations(ctx context.Context, obj *types.Organ
 	return types.NewMitigationConnection(page), nil
 }
 
+// Risks is the resolver for the risks field.
+func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.RiskOrderField]{
+		Field:     coredata.RiskOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.RiskOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Risks.ListForOrganizationID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list organization risks: %w", err))
+	}
+
+	return types.NewRiskConnection(page), nil
+}
+
 // Owner is the resolver for the owner field.
 func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.People, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
@@ -875,6 +956,12 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 		}
 
 		return types.NewControl(control), nil
+	case coredata.RiskEntityType:
+		risk, err := svc.Risks.Get(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		return types.NewRisk(risk), nil
 	default:
 	}
 

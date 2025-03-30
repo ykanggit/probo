@@ -47,6 +47,7 @@ type (
 		Peoples       *PeopleService
 		Policies      *PolicyService
 		Controls      *ControlService
+		Risks         *RiskService
 	}
 )
 
@@ -86,6 +87,7 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.Policies = &PolicyService{svc: tenantService}
 	tenantService.Organizations = &OrganizationService{svc: tenantService}
 	tenantService.Controls = &ControlService{svc: tenantService}
+	tenantService.Risks = &RiskService{svc: tenantService}
 
 	return tenantService
 }

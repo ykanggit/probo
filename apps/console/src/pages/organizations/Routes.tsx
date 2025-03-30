@@ -22,6 +22,8 @@ import { UpdatePolicyPage } from "./policies/UpdatePolicyPage";
 import { VendorListPage } from "./vendors/VendorListPage";
 import { VendorPage } from "./vendors/VendorPage";
 import { MitigationNewPage } from "./mitigations/MitigationNewPage";
+import { RiskListPage } from "./risks/RiskListPage";
+import { NewRiskPage } from "./risks/NewRiskPage";
 
 export function OrganizationsRoutes() {
   return (
@@ -53,6 +55,8 @@ export function OrganizationsRoutes() {
           path="policies/:policyId/update"
           element={<UpdatePolicyPage />}
         />
+        <Route path="risks" element={<RiskListPage />} />
+        <Route path="risks/new" element={<NewRiskPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
