@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 
 - Add sidebar to show a task.
 - Add task estimate edition.
+- Add control+framework auditor views.
+- Add import mitigations support.
+- Add import framework support.
+- Add risk object management.
 
 ### Changed
 
