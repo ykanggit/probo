@@ -231,7 +231,7 @@ export default function FrameworkListView() {
 
   return (
     <Suspense fallback={<FrameworkListViewSkeleton />}>
-      {queryRef && <FrameworkListViewContent queryRef={queryRef} />}
+      <FrameworkListViewContent queryRef={queryRef} />
     </Suspense>
   );
 }
