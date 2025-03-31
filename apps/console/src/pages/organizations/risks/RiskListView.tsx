@@ -99,6 +99,23 @@ const deleteRiskMutation = graphql`
   }
 `;
 
+// Helper functions to convert float values to text
+const floatToProbabilityText = (value: number): string => {
+  if (value <= 0.1) return "Very Low";
+  if (value <= 0.3) return "Low";
+  if (value <= 0.5) return "Medium";
+  if (value <= 0.7) return "High";
+  return "Very High";
+};
+
+const floatToImpactText = (value: number): string => {
+  if (value <= 0.1) return "Very Low";
+  if (value <= 0.3) return "Low";
+  if (value <= 0.5) return "Medium";
+  if (value <= 0.7) return "High";
+  return "Very High";
+};
+
 function LoadAboveButton({
   isLoading,
   hasMore,
@@ -271,19 +288,16 @@ function RiskListViewContent({
               <table className="w-full caption-bottom text-sm">
                 <thead className="[&_tr]:border-b">
                   <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-1/2">
                       Name
                     </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                      Description
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-1/4">
                       Probability
                     </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-1/4">
                       Impact
                     </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-[80px]">
                       Actions
                     </th>
                   </tr>
@@ -292,7 +306,7 @@ function RiskListViewContent({
                   {risks.length === 0 ? (
                     <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                       <td
-                        colSpan={5}
+                        colSpan={4}
                         className="text-center p-4 align-middle text-muted-foreground"
                       >
                         No risks found. Create a new risk to get started.
@@ -304,17 +318,16 @@ function RiskListViewContent({
                         key={risk.id}
                         className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted cursor-pointer"
                       >
-                        <td className="p-4 align-middle font-medium">
+                        <td className="p-4 align-middle font-medium w-1/2">
                           {risk.name}
                         </td>
-                        <td className="p-4 align-middle">{risk.description}</td>
-                        <td className="p-4 align-middle">
-                          {(risk.probability * 100).toFixed(0)}%
+                        <td className="p-4 align-middle w-1/4 whitespace-nowrap">
+                          {floatToProbabilityText(risk.probability)}
                         </td>
-                        <td className="p-4 align-middle">
-                          {(risk.impact * 100).toFixed(0)}%
+                        <td className="p-4 align-middle w-1/4 whitespace-nowrap">
+                          {floatToImpactText(risk.impact)}
                         </td>
-                        <td className="p-4 align-middle">
+                        <td className="p-4 align-middle w-[80px]">
                           <Button
                             variant="ghost"
                             size="icon"
