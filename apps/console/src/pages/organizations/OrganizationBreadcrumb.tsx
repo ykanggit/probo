@@ -435,6 +435,21 @@ function BreadcrumbControl() {
   );
 }
 
+function BreadcrumbRiskList() {
+  const { organizationId } = useParams();
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink to={`/organizations/${organizationId}/risks`}>
+          Risks
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
 export function BreadCrumb() {
   return (
     <Routes>
@@ -455,6 +470,9 @@ export function BreadCrumb() {
               </Suspense>
             }
           />
+        </Route>
+        <Route path="risks" element={<BreadcrumbRiskList />}>
+          <Route path="new" element={<New />} />
         </Route>
         <Route path="frameworks" element={<BreadcrumbFrameworkList />}>
           <Route
