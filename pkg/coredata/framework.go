@@ -16,6 +16,7 @@ package coredata
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"maps"
 	"time"
@@ -23,6 +24,7 @@ import (
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"go.gearno.de/kit/pg"
 )
 
@@ -38,7 +40,16 @@ type (
 	}
 
 	Frameworks []*Framework
+
+	ErrFrameworkReferenceIDAlreadyExists struct {
+		ReferenceID    string
+		OrganizationID gid.GID
+	}
 )
+
+func (e ErrFrameworkReferenceIDAlreadyExists) Error() string {
+	return fmt.Sprintf("framework with reference ID %q already exists for organization %s", e.ReferenceID, e.OrganizationID)
+}
 
 func (f *Framework) CursorKey(orderBy FrameworkOrderField) page.CursorKey {
 	switch orderBy {
@@ -175,7 +186,22 @@ VALUES (
 		"updated_at":      f.UpdatedAt,
 	}
 	_, err := conn.Exec(ctx, q, args)
-	return err
+
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "23505" && pgErr.ConstraintName == "frameworks_org_ref_unique" {
+				return &ErrFrameworkReferenceIDAlreadyExists{
+					ReferenceID:    f.ReferenceID,
+					OrganizationID: f.OrganizationID,
+				}
+			}
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func (f Framework) Delete(
