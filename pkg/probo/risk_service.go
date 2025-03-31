@@ -34,12 +34,16 @@ type (
 		OrganizationID gid.GID
 		Name           string
 		Description    string
+		Probability    float64
+		Impact         float64
 	}
 
 	UpdateRiskRequest struct {
 		ID          gid.GID
 		Name        *string
 		Description *string
+		Probability *float64
+		Impact      *float64
 	}
 )
 
@@ -58,6 +62,8 @@ func (s RiskService) Create(
 		OrganizationID: req.OrganizationID,
 		Name:           req.Name,
 		Description:    req.Description,
+		Probability:    req.Probability,
+		Impact:         req.Impact,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
@@ -116,6 +122,16 @@ func (s RiskService) Update(
 			if req.Description != nil {
 				risk.Description = *req.Description
 			}
+
+			if req.Probability != nil {
+				risk.Probability = *req.Probability
+			}
+
+			if req.Impact != nil {
+				risk.Impact = *req.Impact
+			}
+
+			risk.UpdatedAt = time.Now()
 
 			if err := risk.Update(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot update risk: %w", err)

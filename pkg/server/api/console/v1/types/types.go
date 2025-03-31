@@ -117,6 +117,8 @@ type CreateRiskInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 	Name           string  `json:"name"`
 	Description    string  `json:"description"`
+	Probability    float64 `json:"probability"`
+	Impact         float64 `json:"impact"`
 }
 
 type CreateRiskPayload struct {
@@ -424,6 +426,8 @@ type Risk struct {
 	ID          gid.GID   `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	Probability float64   `json:"probability"`
+	Impact      float64   `json:"impact"`
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
@@ -538,9 +542,11 @@ type UpdatePolicyPayload struct {
 }
 
 type UpdateRiskInput struct {
-	ID          gid.GID `json:"id"`
-	Name        *string `json:"name,omitempty"`
-	Description *string `json:"description,omitempty"`
+	ID          gid.GID  `json:"id"`
+	Name        *string  `json:"name,omitempty"`
+	Description *string  `json:"description,omitempty"`
+	Probability *float64 `json:"probability,omitempty"`
+	Impact      *float64 `json:"impact,omitempty"`
 }
 
 type UpdateRiskPayload struct {

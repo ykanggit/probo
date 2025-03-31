@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a98cd84786da5d6229cb66bc24ad92d0>>
+ * @generated SignedSource<<cfd9a630fcbe359cd0b4db0e940dd564>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -19,7 +19,6 @@ export type MitigationListViewQuery$data = {
   readonly organization: {
     readonly id: string;
     readonly mitigations?: {
-      readonly __id: string;
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly category: string;
@@ -177,18 +176,6 @@ v5 = [
       }
     ],
     "storageKey": null
-  },
-  {
-    "kind": "ClientExtension",
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "__id",
-        "storageKey": null
-      }
-    ]
   }
 ],
 v6 = [
@@ -314,6 +301,6 @@ return {
 };
 })();
 
-(node as any).hash = "c2da6b42a986dd18cd18603c5f5809ad";
+(node as any).hash = "6b2de4417fd7175dd9ccd34549e097b7";
 
 export default node;

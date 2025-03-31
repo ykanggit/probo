@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5cb8bd63e484e9c8d842ddf05618d475>>
+ * @generated SignedSource<<1d60fbe24f12a69953d5ade8fb94ec1e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -19,7 +19,9 @@ export type RiskListView_risks$data = {
         readonly createdAt: string;
         readonly description: string;
         readonly id: string;
+        readonly impact: number;
         readonly name: string;
+        readonly probability: number;
         readonly updatedAt: string;
       };
     }>;
@@ -141,6 +143,20 @@ return {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
+                  "name": "probability",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "impact",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
                   "name": "description",
                   "storageKey": null
                 },
@@ -239,6 +255,6 @@ return {
 };
 })();
 
-(node as any).hash = "4a665835c97d7b93725e8bbe708d7cfb";
+(node as any).hash = "59f58f0b1c17242dea5e762b6337bf98";
 
 export default node;

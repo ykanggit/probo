@@ -48,6 +48,8 @@ func NewRisk(r *coredata.Risk) *Risk {
 		ID:          r.ID,
 		Name:        r.Name,
 		Description: r.Description,
+		Probability: r.Probability,
+		Impact:      r.Impact,
 		CreatedAt:   r.CreatedAt,
 		UpdatedAt:   r.UpdatedAt,
 	}

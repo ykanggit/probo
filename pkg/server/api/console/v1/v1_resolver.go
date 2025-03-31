@@ -537,6 +537,8 @@ func (r *mutationResolver) CreateRisk(ctx context.Context, input types.CreateRis
 			OrganizationID: input.OrganizationID,
 			Name:           input.Name,
 			Description:    input.Description,
+			Probability:    input.Probability,
+			Impact:         input.Impact,
 		},
 	)
 	if err != nil {
@@ -558,6 +560,8 @@ func (r *mutationResolver) UpdateRisk(ctx context.Context, input types.UpdateRis
 			ID:          input.ID,
 			Name:        input.Name,
 			Description: input.Description,
+			Probability: input.Probability,
+			Impact:      input.Impact,
 		},
 	)
 	if err != nil {

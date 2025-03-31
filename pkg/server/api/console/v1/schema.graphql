@@ -515,6 +515,8 @@ type Risk implements Node {
   id: ID!
   name: String!
   description: String!
+  probability: Float!
+  impact: Float!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -855,12 +857,16 @@ input CreateRiskInput {
   organizationId: ID!
   name: String!
   description: String!
+  probability: Float!
+  impact: Float!
 }
 
 input UpdateRiskInput {
   id: ID!
   name: String
   description: String
+  probability: Float
+  impact: Float
 }
 
 input DeleteRiskInput {

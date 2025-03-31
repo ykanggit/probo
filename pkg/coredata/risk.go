@@ -32,6 +32,8 @@ type (
 		OrganizationID gid.GID
 		Name           string
 		Description    string
+		Probability    float64
+		Impact         float64
 		CreatedAt      time.Time
 		UpdatedAt      time.Time
 	}
@@ -61,6 +63,8 @@ SELECT
 	organization_id,
 	name,
 	description,
+	probability,
+	impact,
 	created_at,
 	updated_at
 FROM risks
@@ -100,6 +104,8 @@ SELECT
 	organization_id,
 	name,
 	description,
+	probability,
+	impact,
 	created_at,
 	updated_at
 FROM risks
@@ -133,8 +139,8 @@ func (r *Risk) Insert(
 	scope Scoper,
 ) error {
 	q := `
-INSERT INTO risks (id, tenant_id, organization_id, name, description, created_at, updated_at)
-VALUES (@id, @tenant_id, @organization_id, @name, @description, @created_at, @updated_at)
+INSERT INTO risks (id, tenant_id, organization_id, name, description, probability, impact, created_at, updated_at)
+VALUES (@id, @tenant_id, @organization_id, @name, @description, @probability, @impact, @created_at, @updated_at)
 `
 
 	args := pgx.StrictNamedArgs{
@@ -143,6 +149,8 @@ VALUES (@id, @tenant_id, @organization_id, @name, @description, @created_at, @up
 		"organization_id": r.OrganizationID,
 		"name":            r.Name,
 		"description":     r.Description,
+		"probability":     r.Probability,
+		"impact":          r.Impact,
 		"created_at":      r.CreatedAt,
 		"updated_at":      r.UpdatedAt,
 	}
@@ -161,6 +169,8 @@ UPDATE risks
 SET
 	name = @name,
 	description = @description,
+	probability = @probability,
+	impact = @impact,
 	updated_at = @updated_at
 WHERE %s
 	AND tenant_id = @tenant_id
@@ -170,6 +180,8 @@ WHERE %s
 	args := pgx.StrictNamedArgs{
 		"name":        r.Name,
 		"description": r.Description,
+		"probability": r.Probability,
+		"impact":      r.Impact,
 		"updated_at":  r.UpdatedAt,
 	}
 	maps.Copy(args, scope.SQLArguments())

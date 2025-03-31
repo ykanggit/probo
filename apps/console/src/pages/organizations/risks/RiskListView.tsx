@@ -71,6 +71,8 @@ const riskListFragment = graphql`
         node {
           id
           name
+          probability
+          impact
           description
           createdAt
           updatedAt
@@ -276,6 +278,12 @@ function RiskListViewContent({
                       Description
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      Probability
+                    </th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      Impact %
+                    </th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                       Actions
                     </th>
                   </tr>
@@ -284,7 +292,7 @@ function RiskListViewContent({
                   {risks.length === 0 ? (
                     <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                       <td
-                        colSpan={3}
+                        colSpan={5}
                         className="text-center p-4 align-middle text-muted-foreground"
                       >
                         No risks found. Create a new risk to get started.
@@ -300,6 +308,12 @@ function RiskListViewContent({
                           {risk.name}
                         </td>
                         <td className="p-4 align-middle">{risk.description}</td>
+                        <td className="p-4 align-middle">
+                          {(risk.probability * 100).toFixed(0)}%
+                        </td>
+                        <td className="p-4 align-middle">
+                          {(risk.impact * 100).toFixed(0)}%
+                        </td>
                         <td className="p-4 align-middle">
                           <Button
                             variant="ghost"

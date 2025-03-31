@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2812fb6e9c5db33d4c616daf9a11b012>>
+ * @generated SignedSource<<f8cd1d0374c4a6de2b577c7fcb35c984>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -192,6 +192,20 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
+                            "name": "probability",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "impact",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
                             "name": "description",
                             "storageKey": null
                           },
@@ -296,12 +310,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "7b0cab0d71217df4a49ea2245b2705a8",
+    "cacheID": "78d7871004210dec73a83511b147856f",
     "id": null,
     "metadata": {},
     "name": "RiskListViewQuery",
     "operationKind": "query",
-    "text": "query RiskListViewQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...RiskListView_risks_pbnwq\n  }\n}\n\nfragment RiskListView_risks_pbnwq on Organization {\n  risks(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query RiskListViewQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...RiskListView_risks_pbnwq\n  }\n}\n\nfragment RiskListView_risks_pbnwq on Organization {\n  risks(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        probability\n        impact\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
