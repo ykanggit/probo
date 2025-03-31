@@ -22,6 +22,7 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
+	"github.com/getprobo/probo/pkg/slug"
 	"go.gearno.de/kit/pg"
 )
 
@@ -33,6 +34,7 @@ type (
 	CreateFrameworkRequest struct {
 		OrganizationID gid.GID
 		Name           string
+		Description    string
 	}
 
 	UpdateFrameworkRequest struct {
@@ -67,6 +69,8 @@ func (s FrameworkService) Create(
 		ID:             frameworkID,
 		OrganizationID: req.OrganizationID,
 		Name:           req.Name,
+		Description:    req.Description,
+		ReferenceID:    slug.Make(req.Name),
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
