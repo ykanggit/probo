@@ -55,6 +55,67 @@ type (
 	}
 )
 
+func (s ControlService) ListForMitigationID(
+	ctx context.Context,
+	mitigationID gid.GID,
+	cursor *page.Cursor[coredata.ControlOrderField],
+) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
+	var controls coredata.Controls
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return controls.LoadByMitigationID(ctx, conn, s.svc.scope, mitigationID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot list controls: %w", err)
+	}
+
+	return page.NewPage(controls, cursor), nil
+}
+
+func (s ControlService) CreateMapping(
+	ctx context.Context,
+	controlID gid.GID,
+	mitigationID gid.GID,
+) error {
+	controlMitigation := &coredata.ControlMitigation{
+		ControlID:    controlID,
+		MitigationID: mitigationID,
+		TenantID:     s.svc.scope.GetTenantID(),
+		CreatedAt:    time.Now(),
+	}
+
+	return s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return controlMitigation.Insert(ctx, conn, s.svc.scope)
+		},
+	)
+}
+
+func (s ControlService) DeleteMapping(
+	ctx context.Context,
+	controlID gid.GID,
+	mitigationID gid.GID,
+) error {
+	controlMitigation := &coredata.ControlMitigation{
+		ControlID:    controlID,
+		MitigationID: mitigationID,
+		TenantID:     s.svc.scope.GetTenantID(),
+		CreatedAt:    time.Now(),
+	}
+
+	return s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return controlMitigation.Delete(ctx, conn, s.svc.scope)
+		},
+	)
+}
+
 // Create creates a new control
 func (s ControlService) Create(
 	ctx context.Context,

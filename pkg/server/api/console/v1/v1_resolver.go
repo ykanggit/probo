@@ -19,6 +19,31 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
+// Mitigations is the resolver for the mitigations field.
+func (r *controlResolver) Mitigations(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.MitigationOrderField]{
+		Field:     coredata.MitigationOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.MitigationOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Mitigations.ListForControlID(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list mitigations: %w", err)
+	}
+
+	return types.NewMitigationConnection(page), nil
+}
+
 // FileURL is the resolver for the fileUrl field.
 func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*string, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
@@ -84,6 +109,36 @@ func (r *mitigationResolver) Tasks(ctx context.Context, obj *types.Mitigation, f
 	}
 
 	return types.NewTaskConnection(page), nil
+}
+
+// Risks is the resolver for the risks field.
+func (r *mitigationResolver) Risks(ctx context.Context, obj *types.Mitigation, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error) {
+	panic(fmt.Errorf("not implemented: Risks - risks"))
+}
+
+// Controls is the resolver for the controls field.
+func (r *mitigationResolver) Controls(ctx context.Context, obj *types.Mitigation, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
+		Field:     coredata.ControlOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ControlOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Controls.ListForMitigationID(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list mitigation controls: %w", err)
+	}
+
+	return types.NewControlConnection(page), nil
 }
 
 // CreateOrganization is the resolver for the createOrganization field.
@@ -443,6 +498,34 @@ func (r *mutationResolver) ImportMitigation(ctx context.Context, input types.Imp
 
 	return &types.ImportMitigationPayload{
 		MitigationEdges: mitigationEdges,
+	}, nil
+}
+
+// CreateControlMapping is the resolver for the createControlMapping field.
+func (r *mutationResolver) CreateControlMapping(ctx context.Context, input types.CreateControlMappingInput) (*types.CreateControlMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
+
+	err := svc.Controls.CreateMapping(ctx, input.ControlID, input.MitigationID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create control mapping: %w", err)
+	}
+
+	return &types.CreateControlMappingPayload{
+		Success: true,
+	}, nil
+}
+
+// DeleteControlMapping is the resolver for the deleteControlMapping field.
+func (r *mutationResolver) DeleteControlMapping(ctx context.Context, input types.DeleteControlMappingInput) (*types.DeleteControlMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
+
+	err := svc.Controls.DeleteMapping(ctx, input.ControlID, input.MitigationID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete control mapping: %w", err)
+	}
+
+	return &types.DeleteControlMappingPayload{
+		Success: true,
 	}, nil
 }
 
@@ -983,6 +1066,11 @@ func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
 	}, nil
 }
 
+// Controls is the resolver for the controls field.
+func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+	panic(fmt.Errorf("not implemented: Controls - controls"))
+}
+
 // AssignedTo is the resolver for the assignedTo field.
 func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
@@ -1053,6 +1141,9 @@ func (r *viewerResolver) Organizations(ctx context.Context, obj *types.Viewer, f
 	}, nil
 }
 
+// Control returns schema.ControlResolver implementation.
+func (r *Resolver) Control() schema.ControlResolver { return &controlResolver{r} }
+
 // Evidence returns schema.EvidenceResolver implementation.
 func (r *Resolver) Evidence() schema.EvidenceResolver { return &evidenceResolver{r} }
 
@@ -1074,12 +1165,16 @@ func (r *Resolver) Policy() schema.PolicyResolver { return &policyResolver{r} }
 // Query returns schema.QueryResolver implementation.
 func (r *Resolver) Query() schema.QueryResolver { return &queryResolver{r} }
 
+// Risk returns schema.RiskResolver implementation.
+func (r *Resolver) Risk() schema.RiskResolver { return &riskResolver{r} }
+
 // Task returns schema.TaskResolver implementation.
 func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 
 // Viewer returns schema.ViewerResolver implementation.
 func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
 
+type controlResolver struct{ *Resolver }
 type evidenceResolver struct{ *Resolver }
 type frameworkResolver struct{ *Resolver }
 type mitigationResolver struct{ *Resolver }
@@ -1087,5 +1182,6 @@ type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type policyResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type riskResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
 type viewerResolver struct{ *Resolver }

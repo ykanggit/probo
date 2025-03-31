@@ -137,7 +137,7 @@ function FrameworkViewContent({
         <div className="flex gap-4">
           <Button variant="outline" asChild>
             <Link
-              to={`/organizations/${organizationId}/frameworks/${framework.id}/update`}
+              to={`/organizations/${organizationId}/frameworks/${framework.id}/edit`}
             >
               Edit Framework
             </Link>

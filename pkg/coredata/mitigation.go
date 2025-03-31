@@ -30,6 +30,7 @@ import (
 type (
 	Mitigation struct {
 		ID             gid.GID              `db:"id"`
+		TenantID       gid.TenantID         `db:"tenant_id"`
 		OrganizationID gid.GID              `db:"organization_id"`
 		Category       string               `db:"category"`
 		Name           string               `db:"name"`
@@ -39,7 +40,6 @@ type (
 		ContentRef     string               `db:"content_ref"`
 		CreatedAt      time.Time            `db:"created_at"`
 		UpdatedAt      time.Time            `db:"updated_at"`
-		Version        int                  `db:"version"`
 		Standards      []string             `db:"standards"`
 	}
 
@@ -55,6 +55,123 @@ func (c Mitigation) CursorKey(orderBy MitigationOrderField) page.CursorKey {
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
+func (c *Mitigations) LoadByControlID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	controlID gid.GID,
+	cursor *page.Cursor[MitigationOrderField],
+) error {
+	q := `
+WITH mtgtns AS (
+	SELECT
+		m.id,
+		m.tenant_id,
+		m.organization_id,
+		m.category,
+		m.name,
+		m.description,
+		m.state,
+		m.importance,
+		m.content_ref,
+		m.created_at,
+		m.updated_at,
+		m.standards
+	FROM
+		mitigations m
+	INNER JOIN
+		controls_mitigations cm ON m.id = cm.mitigation_id
+	WHERE
+		cm.control_id = @control_id
+)
+SELECT
+	id,
+	tenant_id,
+	organization_id,
+	category,
+	name,
+	description,
+	state,
+	importance,
+	content_ref,
+	created_at,
+	updated_at,
+	standards
+FROM
+	mtgtns
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"control_id": controlID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query mitigations: %w", err)
+	}
+
+	mitigations, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Mitigation])
+	if err != nil {
+		return fmt.Errorf("cannot collect mitigations: %w", err)
+	}
+
+	*c = mitigations
+
+	return nil
+}
+
+func (c *Mitigations) LoadByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+	cursor *page.Cursor[MitigationOrderField],
+) error {
+	q := `
+SELECT
+    id,
+	tenant_id,
+    organization_id,
+	category,
+    name,
+    description,
+    state,
+	importance,
+    content_ref,
+    created_at,
+    updated_at,
+	standards
+FROM
+    mitigations
+WHERE
+    %s
+    AND organization_id = @organization_id
+    AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query mitigations: %w", err)
+	}
+
+	mitigations, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Mitigation])
+	if err != nil {
+		return fmt.Errorf("cannot collect mitigations: %w", err)
+	}
+
+	*c = mitigations
+
+	return nil
+}
+
 func (c *Mitigation) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -64,6 +181,7 @@ func (c *Mitigation) LoadByID(
 	q := `
 SELECT
     id,
+	tenant_id,
     organization_id,
     category,
     name,
@@ -73,8 +191,7 @@ SELECT
     content_ref,
     created_at,
     updated_at,
-	standards,
-	version
+	standards
 FROM
     mitigations
 WHERE
@@ -122,8 +239,7 @@ INSERT INTO
         content_ref,
         created_at,
         updated_at,
-		standards,
-		version
+		standards
     )
 VALUES (
     @tenant_id,
@@ -137,8 +253,7 @@ VALUES (
     @content_ref,
     @created_at,
     @updated_at,
-	@standards,
-    @version
+	@standards
 );
 `
 
@@ -148,7 +263,6 @@ VALUES (
 		"organization_id": c.OrganizationID,
 		"category":        c.Category,
 		"name":            c.Name,
-		"version":         0,
 		"description":     c.Description,
 		"content_ref":     c.ContentRef,
 		"created_at":      c.CreatedAt,
@@ -159,55 +273,6 @@ VALUES (
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
-}
-
-func (c *Mitigations) LoadByOrganizationID(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-	organizationID gid.GID,
-	cursor *page.Cursor[MitigationOrderField],
-) error {
-	q := `
-SELECT
-    id,
-    organization_id,
-	category,
-    name,
-    description,
-    state,
-	importance,
-    content_ref,
-    created_at,
-    updated_at,
-	standards,
-	version
-FROM
-    mitigations
-WHERE
-    %s
-    AND organization_id = @organization_id
-    AND %s
-`
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
-
-	args := pgx.StrictNamedArgs{"organization_id": organizationID}
-	maps.Copy(args, scope.SQLArguments())
-	maps.Copy(args, cursor.SQLArguments())
-
-	rows, err := conn.Query(ctx, q, args)
-	if err != nil {
-		return fmt.Errorf("cannot query mitigations: %w", err)
-	}
-
-	mitigations, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Mitigation])
-	if err != nil {
-		return fmt.Errorf("cannot collect mitigations: %w", err)
-	}
-
-	*c = mitigations
-
-	return nil
 }
 
 func (c *Mitigation) Update(

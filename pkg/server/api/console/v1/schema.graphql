@@ -441,6 +441,15 @@ type Control implements Node {
   referenceId: String!
   name: String!
   description: String!
+
+  mitigations(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: MitigationOrder
+  ): MitigationConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -460,6 +469,22 @@ type Mitigation implements Node {
     before: CursorKey
     orderBy: TaskOrder
   ): TaskConnection! @goField(forceResolver: true)
+
+  risks(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: RiskOrder
+  ): RiskConnection! @goField(forceResolver: true)
+
+  controls(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: ControlOrder
+  ): ControlConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -517,6 +542,15 @@ type Risk implements Node {
   description: String!
   probability: Float!
   impact: Float!
+
+  controls(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: ControlOrder
+  ): ControlConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -694,6 +728,14 @@ type Mutation {
   updateMitigation(input: UpdateMitigationInput!): UpdateMitigationPayload!
   importMitigation(input: ImportMitigationInput!): ImportMitigationPayload!
 
+  # Control mutations
+  createControlMapping(
+    input: CreateControlMappingInput!
+  ): CreateControlMappingPayload!
+  deleteControlMapping(
+    input: DeleteControlMappingInput!
+  ): DeleteControlMappingPayload!
+
   # Task mutations
   createTask(input: CreateTaskInput!): CreateTaskPayload!
   updateTask(input: UpdateTaskInput!): UpdateTaskPayload!
@@ -853,6 +895,16 @@ input UnassignTaskInput {
   taskId: ID!
 }
 
+input CreateControlMappingInput {
+  controlId: ID!
+  mitigationId: ID!
+}
+
+input DeleteControlMappingInput {
+  controlId: ID!
+  mitigationId: ID!
+}
+
 input CreateRiskInput {
   organizationId: ID!
   name: String!
@@ -1006,6 +1058,14 @@ type AssignTaskPayload {
 
 type UnassignTaskPayload {
   task: Task!
+}
+
+type CreateControlMappingPayload {
+  success: Boolean!
+}
+
+type DeleteControlMappingPayload {
+  success: Boolean!
 }
 
 type CreateRiskPayload {

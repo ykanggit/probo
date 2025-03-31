@@ -37,12 +37,13 @@ type ConfirmEmailPayload struct {
 }
 
 type Control struct {
-	ID          gid.GID   `json:"id"`
-	ReferenceID string    `json:"referenceId"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          gid.GID               `json:"id"`
+	ReferenceID string                `json:"referenceId"`
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	Mitigations *MitigationConnection `json:"mitigations"`
+	CreatedAt   time.Time             `json:"createdAt"`
+	UpdatedAt   time.Time             `json:"updatedAt"`
 }
 
 func (Control) IsNode()             {}
@@ -56,6 +57,15 @@ type ControlConnection struct {
 type ControlEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Control       `json:"node"`
+}
+
+type CreateControlMappingInput struct {
+	ControlID    gid.GID `json:"controlId"`
+	MitigationID gid.GID `json:"mitigationId"`
+}
+
+type CreateControlMappingPayload struct {
+	Success bool `json:"success"`
 }
 
 type CreateFrameworkInput struct {
@@ -152,6 +162,15 @@ type CreateVendorInput struct {
 
 type CreateVendorPayload struct {
 	VendorEdge *VendorEdge `json:"vendorEdge"`
+}
+
+type DeleteControlMappingInput struct {
+	ControlID    gid.GID `json:"controlId"`
+	MitigationID gid.GID `json:"mitigationId"`
+}
+
+type DeleteControlMappingPayload struct {
+	Success bool `json:"success"`
 }
 
 type DeleteEvidenceInput struct {
@@ -303,6 +322,8 @@ type Mitigation struct {
 	State       coredata.MitigationState      `json:"state"`
 	Importance  coredata.MitigationImportance `json:"importance"`
 	Tasks       *TaskConnection               `json:"tasks"`
+	Risks       *RiskConnection               `json:"risks"`
+	Controls    *ControlConnection            `json:"controls"`
 	CreatedAt   time.Time                     `json:"createdAt"`
 	UpdatedAt   time.Time                     `json:"updatedAt"`
 }
@@ -423,13 +444,14 @@ type RemoveUserPayload struct {
 }
 
 type Risk struct {
-	ID          gid.GID   `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Probability float64   `json:"probability"`
-	Impact      float64   `json:"impact"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          gid.GID            `json:"id"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	Probability float64            `json:"probability"`
+	Impact      float64            `json:"impact"`
+	Controls    *ControlConnection `json:"controls"`
+	CreatedAt   time.Time          `json:"createdAt"`
+	UpdatedAt   time.Time          `json:"updatedAt"`
 }
 
 func (Risk) IsNode()             {}

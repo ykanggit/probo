@@ -43,7 +43,7 @@ func (cm ControlMitigation) Insert(
 ) error {
 	q := `
 INSERT INTO
-    control_mitigations (
+    controls_mitigations (
         control_id,
         mitigation_id,
         tenant_id,
@@ -75,7 +75,7 @@ func (cm ControlMitigation) Delete(
 	q := `
 DELETE
 FROM
-    control_mitigations
+    controls_mitigations
 WHERE
     %s
     AND control_id = @control_id

@@ -30,8 +30,8 @@ type (
 	Control struct {
 		ID          gid.GID      `db:"id"`
 		ReferenceID string       `db:"reference_id"`
-		FrameworkID gid.GID      `db:"framework_id"`
 		TenantID    gid.TenantID `db:"tenant_id"`
+		FrameworkID gid.GID      `db:"framework_id"`
 		Name        string       `db:"name"`
 		Description string       `db:"description"`
 		CreatedAt   time.Time    `db:"created_at"`
@@ -54,6 +54,65 @@ func (c Control) CursorKey(orderBy ControlOrderField) page.CursorKey {
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
+}
+
+func (c *Controls) LoadByMitigationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	mitigationID gid.GID,
+	cursor *page.Cursor[ControlOrderField],
+) error {
+	q := `
+WITH ctrl AS (
+	SELECT
+		c.id,
+		c.reference_id,
+		c.framework_id,
+		c.tenant_id,
+		c.name,
+		c.description,
+		c.created_at,
+		c.updated_at
+	FROM
+		controls c
+	INNER JOIN
+		controls_mitigations cm ON c.id = cm.control_id
+	WHERE
+		cm.mitigation_id = @mitigation_id
+)
+SELECT
+	id,
+	reference_id,
+	framework_id,
+    tenant_id,
+	name,
+	description,
+	created_at,
+	updated_at
+FROM
+	ctrl
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.NamedArgs{"mitigation_id": mitigationID}
+	maps.Copy(args, scope.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query controls: %w", err)
+	}
+
+	controls, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Control])
+	if err != nil {
+		return fmt.Errorf("cannot collect controls: %w", err)
+	}
+
+	*c = controls
+
+	return nil
 }
 
 func (c *Controls) LoadByFrameworkID(

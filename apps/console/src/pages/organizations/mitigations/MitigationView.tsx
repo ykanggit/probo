@@ -34,6 +34,8 @@ import {
   UserMinus,
   User,
   Link2,
+  Search,
+  Link as LinkIcon,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -58,6 +60,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import ReactMarkdown from "react-markdown";
 import { Textarea } from "@/components/ui/textarea";
@@ -70,6 +73,7 @@ import {
   SheetTitle,
   SheetClose,
 } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 
 import { PageTemplate } from "@/components/PageTemplate";
 import { MitigationViewSkeleton } from "./MitigationPage";
@@ -83,6 +87,10 @@ import { MitigationViewUnassignTaskMutation as MitigationViewUnassignTaskMutatio
 import { MitigationViewUpdateMitigationStateMutation as MitigationViewUpdateMitigationStateMutationType } from "./__generated__/MitigationViewUpdateMitigationStateMutation.graphql";
 import { MitigationViewQuery as MitigationViewQueryType } from "./__generated__/MitigationViewQuery.graphql";
 import { MitigationViewOrganizationQuery$data } from "./__generated__/MitigationViewOrganizationQuery.graphql";
+import { MitigationViewFrameworksQuery$data } from "./__generated__/MitigationViewFrameworksQuery.graphql";
+import { MitigationViewLinkedControlsQuery$data } from "./__generated__/MitigationViewLinkedControlsQuery.graphql";
+import { MitigationViewCreateControlMappingMutation$data } from "./__generated__/MitigationViewCreateControlMappingMutation.graphql";
+import { MitigationViewDeleteControlMappingMutation$data } from "./__generated__/MitigationViewDeleteControlMappingMutation.graphql";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -325,6 +333,75 @@ const organizationQuery = graphql`
   }
 `;
 
+// New queries and mutations for Control Mapping
+const frameworksQuery = graphql`
+  query MitigationViewFrameworksQuery($organizationId: ID!) {
+    organization: node(id: $organizationId) {
+      id
+      ... on Organization {
+        frameworks(first: 100) @connection(key: "Organization__frameworks") {
+          edges {
+            node {
+              id
+              name
+              controls(first: 100) @connection(key: "Framework__controls") {
+                edges {
+                  node {
+                    id
+                    referenceId
+                    name
+                    description
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const linkedControlsQuery = graphql`
+  query MitigationViewLinkedControlsQuery($mitigationId: ID!) {
+    mitigation: node(id: $mitigationId) {
+      id
+      ... on Mitigation {
+        controls(first: 100) @connection(key: "Mitigation__controls") {
+          edges {
+            node {
+              id
+              referenceId
+              name
+              description
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const createControlMappingMutation = graphql`
+  mutation MitigationViewCreateControlMappingMutation(
+    $input: CreateControlMappingInput!
+  ) {
+    createControlMapping(input: $input) {
+      success
+    }
+  }
+`;
+
+const deleteControlMappingMutation = graphql`
+  mutation MitigationViewDeleteControlMappingMutation(
+    $input: DeleteControlMappingInput!
+  ) {
+    deleteControlMapping(input: $input) {
+      success
+    }
+  }
+`;
+
 function MitigationViewContent({
   queryRef,
 }: {
@@ -347,25 +424,55 @@ function MitigationViewContent({
   const [organizationData, setOrganizationData] =
     useState<MitigationViewOrganizationQuery$data | null>(null);
 
+  // Control mapping state
+  const [isControlMappingDialogOpen, setIsControlMappingDialogOpen] =
+    useState(false);
+  const [frameworksData, setFrameworksData] = useState<any | null>(null);
+  const [linkedControlsData, setLinkedControlsData] = useState<any | null>(
+    null
+  );
+  const [controlSearchQuery, setControlSearchQuery] = useState("");
+  const [selectedFrameworkId, setSelectedFrameworkId] = useState<string | null>(
+    null
+  );
+  const [isLoadingControls, setIsLoadingControls] = useState(false);
+  const [isLinkingControl, setIsLinkingControl] = useState(false);
+  const [isUnlinkingControl, setIsUnlinkingControl] = useState(false);
+
+  // Create mutation hooks for control mapping
+  const [commitCreateControlMapping] = useMutation(
+    createControlMappingMutation
+  );
+  const [commitDeleteControlMapping] = useMutation(
+    deleteControlMappingMutation
+  );
+
   useEffect(() => {
     if (organizationId) {
-      fetchQuery(environment, organizationQuery, {
-        organizationId,
-      })
-        .toPromise()
-        .then((response) => {
-          setOrganizationData(response as MitigationViewOrganizationQuery$data);
-        })
-        .catch((error) => {
-          console.error("Error fetching organization data:", error);
-          toast({
-            title: "Error",
-            description: "Failed to load people data",
-            variant: "destructive",
-          });
-        });
+      fetchQuery(environment, organizationQuery, { organizationId }).subscribe({
+        next: (data) => {
+          setOrganizationData(data);
+        },
+        error: (error) => {
+          console.error("Error fetching organization:", error);
+        },
+      });
     }
-  }, [organizationId, environment, toast]);
+  }, [environment, organizationId]);
+
+  // Load linked controls when component mounts
+  useEffect(() => {
+    if (mitigationId) {
+      fetchQuery(environment, linkedControlsQuery, { mitigationId }).subscribe({
+        next: (data) => {
+          setLinkedControlsData(data);
+        },
+        error: (error) => {
+          console.error("Error fetching linked controls:", error);
+        },
+      });
+    }
+  }, [environment, mitigationId]);
 
   const formatImportance = (importance: string | undefined): string => {
     if (!importance) return "";
@@ -1123,9 +1230,9 @@ function MitigationViewContent({
 
   // Update SheetContent to handle closing
   const handleCloseTaskPanel = () => {
+    setSelectedTask(null);
     setIsTaskPanelOpen(false);
-
-    // Remove the task ID from URL parameters when closing
+    // Remove taskId from URL when panel is closed
     searchParams.delete("taskId");
     setSearchParams(searchParams);
   };
@@ -1242,6 +1349,227 @@ function MitigationViewContent({
     [parseISODuration]
   );
 
+  // Control mapping functions
+  const loadFrameworksAndControls = useCallback(() => {
+    if (!organizationId || !mitigationId) return;
+
+    setIsLoadingControls(true);
+
+    // Fetch all frameworks and their controls
+    fetchQuery(environment, frameworksQuery, { organizationId }).subscribe({
+      next: (data: any) => {
+        setFrameworksData(data);
+        if (
+          data?.organization?.frameworks?.edges?.length > 0 &&
+          !selectedFrameworkId
+        ) {
+          // Select the first framework by default if none is selected
+          setSelectedFrameworkId(data.organization.frameworks.edges[0].node.id);
+        }
+      },
+      complete: () => {
+        // Fetch already linked controls for this mitigation
+        fetchQuery(environment, linkedControlsQuery, {
+          mitigationId,
+        }).subscribe({
+          next: (data: any) => {
+            setLinkedControlsData(data);
+            setIsLoadingControls(false);
+          },
+          error: (error) => {
+            console.error("Error fetching linked controls:", error);
+            setIsLoadingControls(false);
+            toast({
+              title: "Error",
+              description: "Failed to load linked controls.",
+              variant: "destructive",
+            });
+          },
+        });
+      },
+      error: (error) => {
+        console.error("Error fetching frameworks:", error);
+        setIsLoadingControls(false);
+        toast({
+          title: "Error",
+          description: "Failed to load frameworks and controls.",
+          variant: "destructive",
+        });
+      },
+    });
+  }, [environment, mitigationId, organizationId, selectedFrameworkId, toast]);
+
+  const getControls = useCallback(() => {
+    if (!frameworksData?.organization?.frameworks?.edges) return [];
+
+    // Get controls from the selected framework
+    const frameworks = frameworksData.organization.frameworks.edges;
+    if (selectedFrameworkId) {
+      const selectedFramework = frameworks.find(
+        (edge: any) => edge.node.id === selectedFrameworkId
+      );
+
+      if (selectedFramework?.node?.controls?.edges) {
+        return selectedFramework.node.controls.edges.map(
+          (edge: any) => edge.node
+        );
+      }
+    }
+
+    // If no framework is selected or it doesn't have controls, return controls from all frameworks
+    return frameworks.flatMap((framework: any) =>
+      framework.node.controls.edges.map((edge: any) => edge.node)
+    );
+  }, [frameworksData, selectedFrameworkId]);
+
+  const getLinkedControls = useCallback(() => {
+    if (!linkedControlsData?.mitigation?.controls?.edges) return [];
+    return linkedControlsData.mitigation.controls.edges.map(
+      (edge) => edge.node
+    );
+  }, [linkedControlsData]);
+
+  const isControlLinked = useCallback(
+    (controlId: string) => {
+      const linkedControls = getLinkedControls();
+      return linkedControls.some((control: any) => control.id === controlId);
+    },
+    [getLinkedControls]
+  );
+
+  const handleLinkControl = useCallback(
+    (controlId: string) => {
+      if (!mitigationId) return;
+
+      setIsLinkingControl(true);
+
+      commitCreateControlMapping({
+        variables: {
+          input: {
+            controlId,
+            mitigationId,
+          },
+        },
+        onCompleted: (_, errors) => {
+          setIsLinkingControl(false);
+
+          if (errors) {
+            console.error("Error linking control:", errors);
+            toast({
+              title: "Error",
+              description: "Failed to link control. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Refresh linked controls data
+          fetchQuery(environment, linkedControlsQuery, {
+            mitigationId,
+          }).subscribe({
+            next: (data: any) => {
+              setLinkedControlsData(data);
+            },
+            error: (error) => {
+              console.error("Error refreshing linked controls:", error);
+            },
+          });
+
+          toast({
+            title: "Success",
+            description: "Control successfully linked to mitigation.",
+          });
+        },
+        onError: (error) => {
+          setIsLinkingControl(false);
+          console.error("Error linking control:", error);
+          toast({
+            title: "Error",
+            description: "Failed to link control. Please try again.",
+            variant: "destructive",
+          });
+        },
+      });
+    },
+    [commitCreateControlMapping, environment, mitigationId, toast]
+  );
+
+  const handleUnlinkControl = useCallback(
+    (controlId: string) => {
+      if (!mitigationId) return;
+
+      setIsUnlinkingControl(true);
+
+      commitDeleteControlMapping({
+        variables: {
+          input: {
+            controlId,
+            mitigationId,
+          },
+        },
+        onCompleted: (_, errors) => {
+          setIsUnlinkingControl(false);
+
+          if (errors) {
+            console.error("Error unlinking control:", errors);
+            toast({
+              title: "Error",
+              description: "Failed to unlink control. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Refresh linked controls data
+          fetchQuery(environment, linkedControlsQuery, {
+            mitigationId,
+          }).subscribe({
+            next: (data: any) => {
+              setLinkedControlsData(data);
+            },
+            error: (error) => {
+              console.error("Error refreshing linked controls:", error);
+            },
+          });
+
+          toast({
+            title: "Success",
+            description: "Control successfully unlinked from mitigation.",
+          });
+        },
+        onError: (error) => {
+          setIsUnlinkingControl(false);
+          console.error("Error unlinking control:", error);
+          toast({
+            title: "Error",
+            description: "Failed to unlink control. Please try again.",
+            variant: "destructive",
+          });
+        },
+      });
+    },
+    [commitDeleteControlMapping, environment, mitigationId, toast]
+  );
+
+  const handleOpenControlMappingDialog = useCallback(() => {
+    loadFrameworksAndControls();
+    setIsControlMappingDialogOpen(true);
+  }, [loadFrameworksAndControls]);
+
+  const filteredControls = useCallback(() => {
+    const controls = getControls();
+    if (!controlSearchQuery) return controls;
+
+    const lowerQuery = controlSearchQuery.toLowerCase();
+    return controls.filter(
+      (control: any) =>
+        control.referenceId.toLowerCase().includes(lowerQuery) ||
+        control.name.toLowerCase().includes(lowerQuery) ||
+        (control.description &&
+          control.description.toLowerCase().includes(lowerQuery))
+    );
+  }, [controlSearchQuery, getControls]);
+
   return (
     <PageTemplate
       title={data.mitigation.name ?? ""}
@@ -1286,6 +1614,217 @@ function MitigationViewContent({
             <div className="prose prose-gray prose-sm md:prose-base text-gray-600 max-w-3xl">
               <ReactMarkdown>{data.mitigation.description}</ReactMarkdown>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Control Mapping Section */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Controls</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1"
+            onClick={handleOpenControlMappingDialog}
+          >
+            <LinkIcon className="w-4 h-4" />
+            <span>Map to Controls</span>
+          </Button>
+        </div>
+
+        {/* Control Mapping Dialog */}
+        <Dialog
+          open={isControlMappingDialogOpen}
+          onOpenChange={setIsControlMappingDialogOpen}
+        >
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+            <DialogHeader>
+              <DialogTitle>Map Mitigation to Controls</DialogTitle>
+              <DialogDescription>
+                Search and select controls to link to this mitigation. This
+                helps track which controls are addressed by this mitigation.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search controls by ID, name, or description..."
+                    value={controlSearchQuery}
+                    onChange={(e) => setControlSearchQuery(e.target.value)}
+                    className="w-full pl-10"
+                  />
+                </div>
+              </div>
+
+              <div className="w-64">
+                <Select
+                  value={selectedFrameworkId || "all"}
+                  onValueChange={(value) =>
+                    setSelectedFrameworkId(value === "all" ? null : value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select framework" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Frameworks</SelectItem>
+                    {frameworksData?.organization?.frameworks?.edges?.map(
+                      (edge: any) => (
+                        <SelectItem key={edge.node.id} value={edge.node.id}>
+                          {edge.node.name}
+                        </SelectItem>
+                      )
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-hidden">
+              {isLoadingControls ? (
+                <div className="flex items-center justify-center h-full">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                  <span className="ml-2">Loading controls...</span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-2 max-h-[50vh] overflow-y-auto pr-2">
+                  {filteredControls().length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      No controls found. Try adjusting your search or select a
+                      different framework.
+                    </div>
+                  ) : (
+                    filteredControls().map((control: any) => {
+                      const isLinked = isControlLinked(control.id);
+                      return (
+                        <Card
+                          key={control.id}
+                          className="border overflow-hidden"
+                        >
+                          <div
+                            className={`p-4 ${isLinked ? "bg-blue-50" : ""}`}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <div className="font-mono text-sm px-1 py-0.5 rounded-sm bg-lime-100 border border-lime-200 text-lime-800 font-bold">
+                                    {control.referenceId}
+                                  </div>
+                                  {isLinked && (
+                                    <Badge
+                                      variant="outline"
+                                      className="bg-blue-100 text-blue-800 border-blue-200"
+                                    >
+                                      Linked
+                                    </Badge>
+                                  )}
+                                </div>
+                                <h3 className="font-medium">{control.name}</h3>
+                                {control.description && (
+                                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                    {control.description}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="ml-4">
+                                {isLinked ? (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleUnlinkControl(control.id)
+                                    }
+                                    disabled={isUnlinkingControl}
+                                    className="text-red-500 border-red-200 hover:bg-red-50"
+                                  >
+                                    {isUnlinkingControl ? (
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                      <X className="w-4 h-4" />
+                                    )}
+                                    <span className="ml-1">Unlink</span>
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleLinkControl(control.id)
+                                    }
+                                    disabled={isLinkingControl}
+                                    className="text-blue-500 border-blue-200 hover:bg-blue-50"
+                                  >
+                                    {isLinkingControl ? (
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                      <LinkIcon className="w-4 h-4" />
+                                    )}
+                                    <span className="ml-1">Link</span>
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+            </div>
+
+            <DialogFooter className="mt-4">
+              <Button onClick={() => setIsControlMappingDialogOpen(false)}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Linked Controls List */}
+        <Card>
+          <CardContent className="p-4">
+            {linkedControlsData?.mitigation?.controls?.edges?.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {getLinkedControls().map((control: any) => (
+                  <Card key={control.id} className="border overflow-hidden">
+                    <div className="p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="font-mono text-sm px-1 py-0.5 rounded-sm bg-lime-100 border border-lime-200 text-lime-800 font-bold">
+                          {control.referenceId}
+                        </div>
+                      </div>
+                      <h3 className="font-medium text-sm">{control.name}</h3>
+                      {control.description && (
+                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                          {control.description}
+                        </p>
+                      )}
+                      <div className="flex justify-end mt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleUnlinkControl(control.id)}
+                          disabled={isUnlinkingControl}
+                          className="text-sm h-7 text-red-500 border-red-200 hover:bg-red-50"
+                        >
+                          Unlink
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No controls linked to this mitigation yet. Click "Map to
+                Controls" to link controls.
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

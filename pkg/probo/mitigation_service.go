@@ -57,6 +57,27 @@ type (
 	}
 )
 
+func (s MitigationService) ListForControlID(
+	ctx context.Context,
+	controlID gid.GID,
+	cursor *page.Cursor[coredata.MitigationOrderField],
+) (*page.Page[*coredata.Mitigation, coredata.MitigationOrderField], error) {
+	var mitigations coredata.Mitigations
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return mitigations.LoadByControlID(ctx, conn, s.svc.scope, controlID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(mitigations, cursor), nil
+}
+
 func (s MitigationService) Get(
 	ctx context.Context,
 	mitigationID gid.GID,
