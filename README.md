@@ -81,9 +81,7 @@ Probo is designed to be accessible, transparent, and community-driven.
 
 The application will be available at:
 
-- Frontend: http://localhost:3000
-- API: http://localhost:8080
-- Grafana: http://localhost:3001
+- Application: http://localhost:8080
 
 For detailed setup instructions, see our [Contributing Guide](CONTRIBUTING.md).
 
