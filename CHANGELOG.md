@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Rename control in mitigation.
+- Home page is now mitigations page.
 
 ### Fixed
 
