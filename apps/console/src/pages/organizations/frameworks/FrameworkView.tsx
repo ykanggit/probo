@@ -153,7 +153,7 @@ function FrameworkViewContent({
     >
       <div className="flex flex-row items-start justify-start w-full h-[calc(100vh-216px)] overflow-hidden -ml-8">
         <ControlList fragmentKey={framework} />
-        {controlId ? <Outlet /> : <ControlView controlId={control?.node.id} />}
+        {controlId && <ControlView controlId={control?.node.id} />}
       </div>
 
       {/* Delete Confirmation Dialog */}
