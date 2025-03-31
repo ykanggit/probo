@@ -298,7 +298,7 @@ function RiskListViewContent({
                       Impact
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-[80px]">
-                      Actions
+                      Action
                     </th>
                   </tr>
                 </thead>
