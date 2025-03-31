@@ -22,6 +22,74 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Risk template library - static definitions of common risks
+const riskTemplates = [
+  {
+    id: "data-breach",
+    name: "Data Breach",
+    description:
+      "Unauthorized access to sensitive data resulting in data disclosure, theft, or corruption.",
+    probability: "HIGH",
+    impact: "HIGH",
+  },
+  {
+    id: "service-outage",
+    name: "Service Outage",
+    description:
+      "System downtime or degradation affecting availability of services to customers.",
+    probability: "MEDIUM",
+    impact: "HIGH",
+  },
+  {
+    id: "compliance-violation",
+    name: "Compliance Violation",
+    description:
+      "Failure to meet regulatory requirements resulting in penalties or legal action.",
+    probability: "MEDIUM",
+    impact: "VERY_HIGH",
+  },
+  {
+    id: "insider-threat",
+    name: "Insider Threat",
+    description:
+      "Malicious actions by employees or contractors with privileged access to systems or data.",
+    probability: "LOW",
+    impact: "HIGH",
+  },
+  {
+    id: "third-party-risk",
+    name: "Third-Party Risk",
+    description:
+      "Vulnerabilities introduced through vendors, suppliers, or partners with access to systems or data.",
+    probability: "MEDIUM",
+    impact: "MEDIUM",
+  },
+  {
+    id: "ransomware",
+    name: "Ransomware Attack",
+    description:
+      "Malware that encrypts data and demands payment for decryption keys.",
+    probability: "MEDIUM",
+    impact: "VERY_HIGH",
+  },
+  {
+    id: "ddos",
+    name: "DDoS Attack",
+    description:
+      "Distributed denial of service attack overwhelming systems and preventing legitimate access.",
+    probability: "MEDIUM",
+    impact: "HIGH",
+  },
+  {
+    id: "credential-compromise",
+    name: "Credential Compromise",
+    description:
+      "Unauthorized access to accounts due to weak, stolen, or improperly secured credentials.",
+    probability: "HIGH",
+    impact: "HIGH",
+  },
+];
+
 const createRiskMutation = graphql`
   mutation NewRiskViewCreateRiskMutation(
     $input: CreateRiskInput!
@@ -51,6 +119,7 @@ export default function NewRiskView() {
   const [probability, setProbability] = useState<string>("MEDIUM");
   const [impact, setImpact] = useState<string>("MEDIUM");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const { toast } = useToast();
 
   const [commitMutation, isInFlight] = useMutation(createRiskMutation);
@@ -87,6 +156,28 @@ export default function NewRiskView() {
         return 0.9;
       default:
         return 0.5;
+    }
+  };
+
+  // Handle template selection and prefill form
+  const handleTemplateChange = (templateId: string) => {
+    setSelectedTemplate(templateId);
+
+    if (templateId === "none") {
+      // Clear form if "Select a template" is chosen
+      setName("");
+      setDescription("");
+      setProbability("MEDIUM");
+      setImpact("MEDIUM");
+      return;
+    }
+
+    const template = riskTemplates.find((t) => t.id === templateId);
+    if (template) {
+      setName(template.name);
+      setDescription(template.description);
+      setProbability(template.probability);
+      setImpact(template.impact);
     }
   };
 
@@ -162,11 +253,35 @@ export default function NewRiskView() {
         <CardHeader>
           <CardTitle>Risk Details</CardTitle>
           <CardDescription>
-            Enter the details of the risk you want to add to your organization.
+            Enter the details of the risk you want to add to your organization
+            or select from a template.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="template">Risk Template</Label>
+              <Select
+                value={selectedTemplate}
+                onValueChange={handleTemplateChange}
+              >
+                <SelectTrigger id="template">
+                  <SelectValue placeholder="Select a risk template" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Select a template</SelectItem>
+                  {riskTemplates.map((template) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      {template.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground">
+                Select a template to prefill the form or create a custom risk.
+              </p>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
