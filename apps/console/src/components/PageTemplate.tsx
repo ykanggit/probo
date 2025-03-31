@@ -15,7 +15,7 @@ export const PageTemplate: FC<PageContainerProps & PageHeaderProps> = ({
   return (
     <PageContainer title={title}>
       <PageHeader
-        className="mb-17"
+        className="mb-12"
         title={title}
         description={description}
         actions={actions}
