@@ -49,9 +49,10 @@ type (
 
 	ImportMitigationRequest struct {
 		Mitigations []struct {
-			Name        string `json:"name"`
-			Description string `json:"description"`
-			Category    string `json:"category"`
+			Name        string                        `json:"name"`
+			Description string                        `json:"description"`
+			Category    string                        `json:"category"`
+			Importance  coredata.MitigationImportance `json:"importance"`
 		} `json:"mitigations"`
 	}
 )
@@ -99,7 +100,7 @@ func (s MitigationService) Import(
 			Category:       mitigation.Category,
 			State:          coredata.MitigationStateNotStarted,
 			Standards:      []string{},
-			Importance:     coredata.MitigationImportancePreferred,
+			Importance:     mitigation.Importance,
 			CreatedAt:      now,
 			UpdatedAt:      now,
 		})
