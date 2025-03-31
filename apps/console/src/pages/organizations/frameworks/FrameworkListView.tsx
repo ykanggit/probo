@@ -13,14 +13,6 @@ import type { FrameworkListViewQuery as FrameworkListViewQueryType } from "./__g
 import { Button } from "@/components/ui/button";
 import { Plus, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FrameworkListViewImportFrameworkMutation as FrameworkListViewImportFrameworkMutationType } from "./__generated__/FrameworkListViewImportFrameworkMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
@@ -77,10 +69,15 @@ function FrameworkListViewContent({
     useMutation<FrameworkListViewImportFrameworkMutationType>(
       FrameworkListViewImportFrameworkMutation
     );
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const handleImportClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,7 +103,6 @@ function FrameworkListViewContent({
       },
       onCompleted: () => {
         setIsUploading(false);
-        setIsImportDialogOpen(false);
         toast({
           title: "Framework imported",
           description: "Framework has been imported successfully.",
@@ -133,38 +129,23 @@ function FrameworkListViewContent({
       description="Manage your compliance frameworks"
       actions={
         <div className="flex gap-4">
-          <Dialog
-            open={isImportDialogOpen}
-            onOpenChange={setIsImportDialogOpen}
+          <Input
+            id="framework-file"
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            disabled={isUploading}
+            accept=".json"
+            className="hidden"
+          />
+          <Button
+            variant="outline"
+            onClick={handleImportClick}
+            disabled={isUploading}
           >
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Upload className="mr-2 h-4 w-4" />
-                Import Framework
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Import Framework</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="framework-file">Upload Framework File</Label>
-                  <Input
-                    id="framework-file"
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    disabled={isUploading}
-                    accept=".json"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Upload a JSON file containing your framework definition.
-                  </p>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+            <Upload className="mr-2 h-4 w-4" />
+            Import Framework
+          </Button>
           <Button asChild>
             <Link to={`/organizations/${organizationId}/frameworks/create`}>
               <Plus className="mr-2 h-4 w-4" />
