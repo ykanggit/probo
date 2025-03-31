@@ -281,7 +281,7 @@ function RiskListViewContent({
                       Probability
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                      Impact %
+                      Impact
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                       Actions
