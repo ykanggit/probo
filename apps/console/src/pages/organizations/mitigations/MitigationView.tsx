@@ -38,6 +38,7 @@ import {
   Link as LinkIcon,
   CheckSquare,
   ShieldCheck,
+  AlertTriangle,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -88,7 +89,10 @@ import { MitigationViewAssignTaskMutation as MitigationViewAssignTaskMutationTyp
 import { MitigationViewUnassignTaskMutation as MitigationViewUnassignTaskMutationType } from "./__generated__/MitigationViewUnassignTaskMutation.graphql";
 import { MitigationViewUpdateMitigationStateMutation as MitigationViewUpdateMitigationStateMutationType } from "./__generated__/MitigationViewUpdateMitigationStateMutation.graphql";
 import { MitigationViewQuery as MitigationViewQueryType } from "./__generated__/MitigationViewQuery.graphql";
-import { MitigationViewOrganizationQuery$data } from "./__generated__/MitigationViewOrganizationQuery.graphql";
+import {
+  MitigationViewOrganizationQuery,
+  MitigationViewOrganizationQuery$data,
+} from "./__generated__/MitigationViewOrganizationQuery.graphql";
 import {
   MitigationViewFrameworksQuery,
   MitigationViewFrameworksQuery$data,
@@ -97,6 +101,10 @@ import {
   MitigationViewLinkedControlsQuery,
   MitigationViewLinkedControlsQuery$data,
 } from "./__generated__/MitigationViewLinkedControlsQuery.graphql";
+import {
+  MitigationViewRisksQuery,
+  MitigationViewRisksQuery$data,
+} from "./__generated__/MitigationViewRisksQuery.graphql";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -408,6 +416,30 @@ const deleteControlMappingMutation = graphql`
   }
 `;
 
+// Add query to fetch risks linked to a mitigation
+const mitigationRisksQuery = graphql`
+  query MitigationViewRisksQuery($mitigationId: ID!) {
+    mitigation: node(id: $mitigationId) {
+      id
+      ... on Mitigation {
+        risks(first: 100) @connection(key: "MitigationView_risks") {
+          edges {
+            node {
+              id
+              name
+              description
+              probability
+              impact
+              createdAt
+              updatedAt
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 // Define type for framework structure
 type FrameworkEdge = {
   node: {
@@ -431,6 +463,29 @@ type ControlNode = {
   referenceId: string;
   name: string;
   description?: string;
+};
+
+// Define Risk type
+type RiskNode = {
+  id: string;
+  name: string;
+  description: string;
+  probability: number;
+  impact: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// Define the risks data type
+type MitigationRisksData = {
+  mitigation?: {
+    id: string;
+    risks?: {
+      edges: Array<{
+        node: RiskNode;
+      }>;
+    };
+  };
 };
 
 function MitigationViewContent({
@@ -505,6 +560,25 @@ function MitigationViewContent({
           console.error("Error fetching linked controls:", error);
         },
       });
+    }
+  }, [environment, mitigationId]);
+
+  // Add state for risks data
+  const [risksData, setRisksData] = useState<MitigationRisksData | null>(null);
+
+  // Load risks data when component mounts
+  useEffect(() => {
+    if (mitigationId) {
+      fetchQuery(environment, mitigationRisksQuery, { mitigationId }).subscribe(
+        {
+          next: (data: unknown) => {
+            setRisksData(data as MitigationRisksData);
+          },
+          error: (error: Error) => {
+            console.error("Error fetching risks:", error);
+          },
+        }
+      );
     }
   }, [environment, mitigationId]);
 
@@ -1618,6 +1692,47 @@ function MitigationViewContent({
     );
   }, [controlSearchQuery, getControls]);
 
+  // Helper function to get risk severity color
+  const getRiskSeverityColor = (
+    probability: number,
+    impact: number
+  ): string => {
+    const severity = probability * impact;
+
+    if (severity >= 0.75) return "bg-red-100 text-red-800";
+    if (severity >= 0.5) return "bg-orange-100 text-orange-800";
+    if (severity >= 0.25) return "bg-yellow-100 text-yellow-800";
+    return "bg-green-100 text-green-800";
+  };
+
+  // Helper function to get risk severity text
+  const getRiskSeverityText = (probability: number, impact: number): string => {
+    const severity = probability * impact;
+
+    if (severity >= 0.75) return "Critical";
+    if (severity >= 0.5) return "High";
+    if (severity >= 0.25) return "Medium";
+    return "Low";
+  };
+
+  // Format probability as text
+  const formatProbability = (value: number): string => {
+    if (value <= 0.1) return "Very Low";
+    if (value <= 0.3) return "Low";
+    if (value <= 0.5) return "Medium";
+    if (value <= 0.7) return "High";
+    return "Very High";
+  };
+
+  // Format impact as text
+  const formatImpact = (value: number): string => {
+    if (value <= 0.1) return "Very Low";
+    if (value <= 0.3) return "Low";
+    if (value <= 0.5) return "Medium";
+    if (value <= 0.7) return "High";
+    return "Very High";
+  };
+
   return (
     <PageTemplate
       title={data.mitigation.name ?? ""}
@@ -1689,6 +1804,16 @@ function MitigationViewContent({
               linkedControlsData.mitigation.controls.edges.length > 0 && (
                 <span className="ml-1.5 bg-blue-100 text-blue-800 rounded-full text-xs px-2 py-0.5">
                   {linkedControlsData.mitigation.controls.edges.length}
+                </span>
+              )}
+          </TabsTrigger>
+          <TabsTrigger value="risks" className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4" />
+            Risks
+            {risksData?.mitigation?.risks?.edges &&
+              risksData.mitigation.risks.edges.length > 0 && (
+                <span className="ml-1.5 bg-blue-100 text-blue-800 rounded-full text-xs px-2 py-0.5">
+                  {risksData.mitigation.risks.edges.length}
                 </span>
               )}
           </TabsTrigger>
@@ -2488,6 +2613,88 @@ function MitigationViewContent({
                 </div>
               )}
             </div>
+          </div>
+        </TabsContent>
+
+        {/* Risks Tab Content */}
+        <TabsContent value="risks">
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Risks</h2>
+            </div>
+
+            <Card>
+              <CardContent className="p-4">
+                {risksData?.mitigation?.risks?.edges &&
+                risksData.mitigation.risks.edges.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left font-medium text-sm py-2 px-4">
+                            Risk Name
+                          </th>
+                          <th className="text-left font-medium text-sm py-2 px-4">
+                            Probability
+                          </th>
+                          <th className="text-left font-medium text-sm py-2 px-4">
+                            Impact
+                          </th>
+                          <th className="text-left font-medium text-sm py-2 px-4">
+                            Severity
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {risksData.mitigation.risks.edges.map(({ node }) => (
+                          <tr
+                            key={node.id}
+                            className="border-b hover:bg-gray-50"
+                            onClick={() =>
+                              navigate(
+                                `/organizations/${organizationId}/risks/${node.id}`
+                              )
+                            }
+                            style={{ cursor: "pointer" }}
+                          >
+                            <td className="py-3 px-4 font-medium text-sm">
+                              {node.name}
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs inline-block">
+                                {formatProbability(node.probability)}
+                              </div>
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full text-xs inline-block">
+                                {formatImpact(node.impact)}
+                              </div>
+                            </td>
+                            <td className="py-3 px-4">
+                              <div
+                                className={`${getRiskSeverityColor(
+                                  node.probability,
+                                  node.impact
+                                )} px-2 py-0.5 rounded-full text-xs inline-block`}
+                              >
+                                {getRiskSeverityText(
+                                  node.probability,
+                                  node.impact
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    No risks linked to this mitigation yet.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>

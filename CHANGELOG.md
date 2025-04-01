@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - Add import framework support.
 - Add risk object management.
 - Add risk template.
-- Add mapping between control and risk.
+  - Add mapping between control and risk.
 
 ### Changed
 

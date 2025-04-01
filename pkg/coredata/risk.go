@@ -79,7 +79,6 @@ WITH rsks AS (
 SELECT
 	id,
 	organization_id,
-	tenant_id,
 	name,
 	description,
 	probability,
