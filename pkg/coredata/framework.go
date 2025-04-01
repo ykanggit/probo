@@ -104,6 +104,48 @@ WHERE
 	return nil
 }
 
+func (f *Framework) LoadByReferenceID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	referenceID string,
+) error {
+	q := `
+SELECT
+    id,
+    organization_id,
+    reference_id,
+    name,
+    description,
+    created_at,
+    updated_at
+FROM
+    frameworks
+WHERE
+    %s
+    AND reference_id = @reference_id
+LIMIT 1;
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"reference_id": referenceID}
+	maps.Copy(args, scope.SQLArguments())
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query frameworks: %w", err)
+	}
+
+	framework, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Framework])
+	if err != nil {
+		return fmt.Errorf("cannot collect framework: %w", err)
+	}
+
+	*f = framework
+
+	return nil
+}
+
 func (f *Framework) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,

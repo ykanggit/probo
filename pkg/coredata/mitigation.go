@@ -37,10 +37,9 @@ type (
 		Description    string               `db:"description"`
 		Importance     MitigationImportance `db:"importance"`
 		State          MitigationState      `db:"state"`
-		ContentRef     string               `db:"content_ref"`
+		ReferenceID    string               `db:"reference_id"`
 		CreatedAt      time.Time            `db:"created_at"`
 		UpdatedAt      time.Time            `db:"updated_at"`
-		Standards      []string             `db:"standards"`
 	}
 
 	Mitigations []*Mitigation
@@ -73,10 +72,9 @@ WITH mtgtns AS (
 		m.description,
 		m.state,
 		m.importance,
-		m.content_ref,
+		m.reference_id,
 		m.created_at,
-		m.updated_at,
-		m.standards
+		m.updated_at
 	FROM
 		mitigations m
 	INNER JOIN
@@ -93,10 +91,9 @@ SELECT
 	description,
 	state,
 	importance,
-	content_ref,
+	reference_id,
 	created_at,
-	updated_at,
-	standards
+	updated_at
 FROM
 	mtgtns
 WHERE %s
@@ -141,10 +138,9 @@ WITH mtgtns AS (
 		m.description,
 		m.state,
 		m.importance,
-		m.content_ref,
+		m.reference_id,
 		m.created_at,
-		m.updated_at,
-		m.standards
+		m.updated_at
 	FROM
 		mitigations m
 	INNER JOIN
@@ -161,10 +157,9 @@ SELECT
 	description,
 	state,
 	importance,
-	content_ref,
+	reference_id,
 	created_at,
-	updated_at,
-	standards
+	updated_at
 FROM
 	mtgtns
 WHERE %s
@@ -208,10 +203,9 @@ SELECT
     description,
     state,
 	importance,
-    content_ref,
+    reference_id,
     created_at,
-    updated_at,
-	standards
+    updated_at
 FROM
     mitigations
 WHERE
@@ -256,10 +250,9 @@ SELECT
     description,
     state,
 	importance,
-    content_ref,
+    reference_id,
     created_at,
-    updated_at,
-	standards
+    updated_at
 FROM
     mitigations
 WHERE
@@ -272,6 +265,87 @@ LIMIT 1;
 
 	args := pgx.StrictNamedArgs{"mitigation_id": mitigationID}
 	maps.Copy(args, scope.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query mitigations: %w", err)
+	}
+
+	mitigation, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Mitigation])
+	if err != nil {
+		return fmt.Errorf("cannot collect mitigations: %w", err)
+	}
+
+	*c = mitigation
+
+	return nil
+}
+
+func (c *Mitigation) Upsert(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+) error {
+	q := `
+INSERT INTO
+    mitigations (
+        tenant_id,
+        id,
+        organization_id,
+		category,
+        name,
+		importance,
+		state,
+        description,
+        reference_id,
+        created_at,
+        updated_at
+	)
+VALUES (
+    @tenant_id,
+    @mitigation_id,
+    @organization_id,
+	@category,
+    @name,
+	@importance,
+	@state,
+    @description,
+    @reference_id,
+    @created_at,
+    @updated_at
+)
+ON CONFLICT (organization_id, reference_id) DO UPDATE SET
+    name = @name,
+    description = @description,
+    category = @category,
+    updated_at = @updated_at
+RETURNING
+	tenant_id,
+    id,
+    organization_id,
+	category,
+    name,
+	importance,
+	state,
+    description,
+	reference_id,
+    created_at,
+    updated_at
+`
+
+	args := pgx.StrictNamedArgs{
+		"tenant_id":       scope.GetTenantID(),
+		"mitigation_id":   c.ID,
+		"organization_id": c.OrganizationID,
+		"category":        c.Category,
+		"name":            c.Name,
+		"importance":      c.Importance,
+		"state":           c.State,
+		"description":     c.Description,
+		"reference_id":    c.ReferenceID,
+		"created_at":      c.CreatedAt,
+		"updated_at":      c.UpdatedAt,
+	}
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -304,10 +378,9 @@ INSERT INTO
 		importance,
 		state,
         description,
-        content_ref,
+        reference_id,
         created_at,
-        updated_at,
-		standards
+        updated_at
     )
 VALUES (
     @tenant_id,
@@ -318,10 +391,9 @@ VALUES (
 	@importance,
 	@state,
     @description,
-    @content_ref,
+    @reference_id,
     @created_at,
-    @updated_at,
-	@standards
+    @updated_at
 );
 `
 
@@ -332,12 +404,11 @@ VALUES (
 		"category":        c.Category,
 		"name":            c.Name,
 		"description":     c.Description,
-		"content_ref":     c.ContentRef,
+		"reference_id":    c.ReferenceID,
 		"created_at":      c.CreatedAt,
 		"updated_at":      c.UpdatedAt,
 		"state":           c.State,
 		"importance":      c.Importance,
-		"standards":       c.Standards,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err

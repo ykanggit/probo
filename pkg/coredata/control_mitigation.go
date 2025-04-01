@@ -36,6 +36,38 @@ type (
 	ControlMitigations []*ControlMitigation
 )
 
+func (cm ControlMitigation) Upsert(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+) error {
+	q := `
+INSERT INTO
+    controls_mitigations (
+        control_id,
+        mitigation_id,
+        tenant_id,
+        created_at
+    )
+VALUES (
+    @control_id,
+    @mitigation_id,
+    @tenant_id,
+    @created_at
+)
+ON CONFLICT (control_id, mitigation_id) DO NOTHING;
+`
+
+	args := pgx.StrictNamedArgs{
+		"control_id":    cm.ControlID,
+		"mitigation_id": cm.MitigationID,
+		"tenant_id":     scope.GetTenantID(),
+		"created_at":    cm.CreatedAt,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (cm ControlMitigation) Insert(
 	ctx context.Context,
 	conn pg.Conn,

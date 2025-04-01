@@ -22,6 +22,7 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
+	"github.com/getprobo/probo/pkg/slug"
 	"go.gearno.de/kit/pg"
 )
 
@@ -65,6 +66,7 @@ func (s TaskService) Create(
 		TimeEstimate: req.TimeEstimate,
 		AssignedToID: req.AssignedToID,
 		State:        coredata.TaskStateTodo,
+		ReferenceID:  slug.Make(req.Name),
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}

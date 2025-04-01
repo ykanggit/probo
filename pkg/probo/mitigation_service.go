@@ -53,6 +53,16 @@ type (
 			Description string                        `json:"description"`
 			Category    string                        `json:"category"`
 			Importance  coredata.MitigationImportance `json:"importance"`
+			ReferenceID string                        `json:"reference-id"`
+			Standards   []struct {
+				Framework string `json:"framework"`
+				Control   string `json:"control"`
+			} `json:"standards"`
+			Tasks []struct {
+				Name        string `json:"name"`
+				Description string `json:"description"`
+				ReferenceID string `json:"reference-id"`
+			} `json:"tasks"`
 		} `json:"mitigations"`
 	}
 )
@@ -124,36 +134,80 @@ func (s MitigationService) Import(
 	organizationID gid.GID,
 	req ImportMitigationRequest,
 ) (*page.Page[*coredata.Mitigation, coredata.MitigationOrderField], error) {
-
 	importedMitigations := coredata.Mitigations{}
-	for _, mitigation := range req.Mitigations {
-		now := time.Now()
-
-		mitigationID, err := gid.NewGID(organizationID.TenantID(), coredata.MitigationEntityType)
-		if err != nil {
-			return nil, fmt.Errorf("cannot create global id: %w", err)
-		}
-
-		importedMitigations = append(importedMitigations, &coredata.Mitigation{
-			ID:             mitigationID,
-			OrganizationID: organizationID,
-			Name:           mitigation.Name,
-			Description:    mitigation.Description,
-			Category:       mitigation.Category,
-			State:          coredata.MitigationStateNotStarted,
-			Standards:      []string{},
-			Importance:     mitigation.Importance,
-			CreatedAt:      now,
-			UpdatedAt:      now,
-		})
-	}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
-			for _, mitigation := range importedMitigations {
-				if err := mitigation.Insert(ctx, tx, s.svc.scope); err != nil {
-					return fmt.Errorf("cannot insert mitigation: %w", err)
+			for i := range req.Mitigations {
+				now := time.Now()
+
+				mitigationID, err := gid.NewGID(organizationID.TenantID(), coredata.MitigationEntityType)
+				if err != nil {
+					return fmt.Errorf("cannot create global id: %w", err)
+				}
+
+				mitigation := &coredata.Mitigation{
+					ID:             mitigationID,
+					OrganizationID: organizationID,
+					Name:           req.Mitigations[i].Name,
+					Description:    req.Mitigations[i].Description,
+					Category:       req.Mitigations[i].Category,
+					State:          coredata.MitigationStateNotStarted,
+					ReferenceID:    req.Mitigations[i].ReferenceID,
+					Importance:     req.Mitigations[i].Importance,
+					CreatedAt:      now,
+					UpdatedAt:      now,
+				}
+
+				importedMitigations = append(importedMitigations, mitigation)
+
+				if err := mitigation.Upsert(ctx, tx, s.svc.scope); err != nil {
+					return fmt.Errorf("cannot upsert mitigation: %w", err)
+				}
+
+				for j := range req.Mitigations[i].Tasks {
+					taskID, err := gid.NewGID(organizationID.TenantID(), coredata.TaskEntityType)
+					if err != nil {
+						return fmt.Errorf("cannot create global id: %w", err)
+					}
+
+					task := &coredata.Task{
+						ID:           taskID,
+						MitigationID: mitigation.ID,
+						Name:         req.Mitigations[i].Tasks[j].Name,
+						Description:  req.Mitigations[i].Tasks[j].Description,
+						ReferenceID:  req.Mitigations[i].Tasks[j].ReferenceID,
+						State:        coredata.TaskStateTodo,
+						CreatedAt:    now,
+						UpdatedAt:    now,
+					}
+
+					if err := task.Upsert(ctx, tx, s.svc.scope); err != nil {
+						return fmt.Errorf("cannot upsert task: %w", err)
+					}
+				}
+
+				for _, standard := range req.Mitigations[i].Standards {
+					framework := &coredata.Framework{}
+					if err := framework.LoadByReferenceID(ctx, tx, s.svc.scope, standard.Framework); err != nil {
+						continue
+					}
+
+					control := &coredata.Control{}
+					if err := control.LoadByFrameworkIDAndReferenceID(ctx, tx, s.svc.scope, framework.ID, standard.Control); err != nil {
+						continue
+					}
+
+					controlMitigation := &coredata.ControlMitigation{
+						ControlID:    control.ID,
+						MitigationID: mitigation.ID,
+						CreatedAt:    now,
+					}
+
+					if err := controlMitigation.Upsert(ctx, tx, s.svc.scope); err != nil {
+						return fmt.Errorf("cannot insert control mitigation: %w", err)
+					}
 				}
 			}
 
@@ -271,7 +325,6 @@ func (s MitigationService) Create(
 		Description:    req.Description,
 		Category:       req.Category,
 		State:          coredata.MitigationStateNotStarted,
-		Standards:      []string{},
 		Importance:     req.Importance,
 		CreatedAt:      now,
 		UpdatedAt:      now,

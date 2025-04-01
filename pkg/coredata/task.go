@@ -34,11 +34,11 @@ type (
 		Name         string         `db:"name"`
 		Description  string         `db:"description"`
 		State        TaskState      `db:"state"`
+		ReferenceID  string         `db:"reference_id"`
 		TimeEstimate *time.Duration `db:"time_estimate"`
 		AssignedToID *gid.GID       `db:"assigned_to"`
 		CreatedAt    time.Time      `db:"created_at"`
 		UpdatedAt    time.Time      `db:"updated_at"`
-		Version      int            `db:"version"`
 	}
 
 	Tasks []*Task
@@ -66,11 +66,11 @@ SELECT
     name,
     description,
     state,
+    reference_id,
     time_estimate,
     assigned_to,
     created_at,
-    updated_at,
-    version
+    updated_at
 FROM
     tasks
 WHERE
@@ -112,12 +112,12 @@ INSERT INTO
         mitigation_id,
         name,
         description,
+        reference_id,
         state,
         time_estimate,
         assigned_to,
         created_at,
-        updated_at,
-        version
+        updated_at
     )
 VALUES (
     @tenant_id,
@@ -125,12 +125,12 @@ VALUES (
     @mitigation_id,
     @name,
     @description,
+    @reference_id,
     @state,
     @time_estimate,
     @assigned_to,
     @created_at,
-    @updated_at,
-    @version
+    @updated_at
 );
 `
 
@@ -140,15 +140,93 @@ VALUES (
 		"mitigation_id": c.MitigationID,
 		"name":          c.Name,
 		"description":   c.Description,
+		"reference_id":  c.ReferenceID,
 		"state":         c.State,
 		"time_estimate": c.TimeEstimate,
 		"assigned_to":   c.AssignedToID,
 		"created_at":    c.CreatedAt,
 		"updated_at":    c.UpdatedAt,
-		"version":       0,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
+}
+
+func (c *Task) Upsert(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+) error {
+	q := `
+INSERT INTO
+    tasks (
+        tenant_id,
+        id,
+        mitigation_id,
+        name,
+        description,
+        reference_id,
+        state,
+        time_estimate,
+        assigned_to,
+        created_at,
+        updated_at
+    )
+VALUES (
+    @tenant_id,
+    @task_id,
+    @mitigation_id,
+    @name,
+    @description,
+    @reference_id,
+    @state,
+    @time_estimate,
+    @assigned_to,
+    @created_at,
+    @updated_at
+)
+ON CONFLICT (mitigation_id, reference_id) DO UPDATE SET
+    name = @name,
+    description = @description,
+    updated_at = @updated_at
+RETURNING
+    id,
+    mitigation_id,
+    name,
+    description,
+    reference_id,
+    state,
+    time_estimate,
+    assigned_to,
+    created_at,
+    updated_at
+`
+
+	args := pgx.StrictNamedArgs{
+		"tenant_id":     scope.GetTenantID(),
+		"task_id":       c.ID,
+		"mitigation_id": c.MitigationID,
+		"name":          c.Name,
+		"description":   c.Description,
+		"reference_id":  c.ReferenceID,
+		"state":         c.State,
+		"time_estimate": c.TimeEstimate,
+		"assigned_to":   c.AssignedToID,
+		"created_at":    c.CreatedAt,
+		"updated_at":    c.UpdatedAt,
+	}
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot upsert task: %w", err)
+	}
+
+	task, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Task])
+	if err != nil {
+		return fmt.Errorf("cannot collect tasks: %w", err)
+	}
+
+	*c = task
+
+	return nil
 }
 
 func (c *Tasks) LoadByMitigationID(
@@ -165,11 +243,11 @@ SELECT
     name,
     description,
     state,
+    reference_id,
     time_estimate,
     assigned_to,
     created_at,
-    updated_at,
-    version
+    updated_at
 FROM
     tasks
 WHERE
@@ -240,8 +318,7 @@ func (c *Task) AssignTo(
 	q := `
 UPDATE tasks SET
     assigned_to = @assigned_to,
-    updated_at = @updated_at,
-    version = version + 1
+    updated_at = @updated_at
 WHERE %s
     AND id = @task_id
 RETURNING 
@@ -249,12 +326,12 @@ RETURNING
     mitigation_id,
     name,
     description,
+    reference_id,
     state,
     time_estimate,
     assigned_to,
     created_at,
-    updated_at,
-    version
+    updated_at
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
@@ -289,8 +366,7 @@ func (c *Task) Unassign(
 	q := `
 UPDATE tasks SET
     assigned_to = NULL,
-    updated_at = @updated_at,
-    version = version + 1
+    updated_at = @updated_at
 WHERE %s
     AND id = @task_id
 RETURNING 
@@ -298,12 +374,12 @@ RETURNING
     mitigation_id,
     name,
     description,
+    reference_id,
     state,
     time_estimate,
     assigned_to,
     created_at,
-    updated_at,
-    version
+    updated_at
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 

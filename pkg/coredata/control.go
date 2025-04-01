@@ -159,6 +159,50 @@ WHERE
 	return nil
 }
 
+func (c *Control) LoadByFrameworkIDAndReferenceID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	frameworkID gid.GID,
+	referenceID string,
+) error {
+	q := `
+SELECT
+    id,
+    reference_id,
+    framework_id,
+    tenant_id,
+    name,
+    description,
+    created_at,
+    updated_at
+FROM
+    controls
+WHERE
+    %s
+    AND framework_id = @framework_id
+    AND reference_id = @reference_id
+LIMIT 1;
+`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"framework_id": frameworkID, "reference_id": referenceID}
+	maps.Copy(args, scope.SQLArguments())
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query controls: %w", err)
+	}
+
+	control, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Control])
+	if err != nil {
+		return fmt.Errorf("cannot collect control: %w", err)
+	}
+
+	*c = control
+
+	return nil
+}
+
 func (c *Control) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
