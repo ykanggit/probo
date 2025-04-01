@@ -62,6 +62,7 @@ WITH rsks AS (
 	SELECT
 		r.id,
 		r.organization_id,
+		r.tenant_id,
 		r.name,
 		r.description,
 		r.probability,
@@ -78,6 +79,7 @@ WITH rsks AS (
 SELECT
 	id,
 	organization_id,
+	tenant_id,
 	name,
 	description,
 	probability,
