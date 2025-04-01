@@ -111,6 +111,10 @@ type ComplexityRoot struct {
 		PolicyEdge func(childComplexity int) int
 	}
 
+	CreateRiskMappingPayload struct {
+		Success func(childComplexity int) int
+	}
+
 	CreateRiskPayload struct {
 		RiskEdge func(childComplexity int) int
 	}
@@ -145,6 +149,10 @@ type ComplexityRoot struct {
 
 	DeletePolicyPayload struct {
 		DeletedPolicyID func(childComplexity int) int
+	}
+
+	DeleteRiskMappingPayload struct {
+		Success func(childComplexity int) int
 	}
 
 	DeleteRiskPayload struct {
@@ -248,6 +256,7 @@ type ComplexityRoot struct {
 		CreatePeople         func(childComplexity int, input types.CreatePeopleInput) int
 		CreatePolicy         func(childComplexity int, input types.CreatePolicyInput) int
 		CreateRisk           func(childComplexity int, input types.CreateRiskInput) int
+		CreateRiskMapping    func(childComplexity int, input types.CreateRiskMappingInput) int
 		CreateTask           func(childComplexity int, input types.CreateTaskInput) int
 		CreateVendor         func(childComplexity int, input types.CreateVendorInput) int
 		DeleteControlMapping func(childComplexity int, input types.DeleteControlMappingInput) int
@@ -257,6 +266,7 @@ type ComplexityRoot struct {
 		DeletePeople         func(childComplexity int, input types.DeletePeopleInput) int
 		DeletePolicy         func(childComplexity int, input types.DeletePolicyInput) int
 		DeleteRisk           func(childComplexity int, input types.DeleteRiskInput) int
+		DeleteRiskMapping    func(childComplexity int, input types.DeleteRiskMappingInput) int
 		DeleteTask           func(childComplexity int, input types.DeleteTaskInput) int
 		DeleteVendor         func(childComplexity int, input types.DeleteVendorInput) int
 		ImportFramework      func(childComplexity int, input types.ImportFrameworkInput) int
@@ -358,11 +368,11 @@ type ComplexityRoot struct {
 	}
 
 	Risk struct {
-		Controls    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) int
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Impact      func(childComplexity int) int
+		Mitigations func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) int
 		Name        func(childComplexity int) int
 		Probability func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
@@ -539,6 +549,8 @@ type MutationResolver interface {
 	CreateRisk(ctx context.Context, input types.CreateRiskInput) (*types.CreateRiskPayload, error)
 	UpdateRisk(ctx context.Context, input types.UpdateRiskInput) (*types.UpdateRiskPayload, error)
 	DeleteRisk(ctx context.Context, input types.DeleteRiskInput) (*types.DeleteRiskPayload, error)
+	CreateRiskMapping(ctx context.Context, input types.CreateRiskMappingInput) (*types.CreateRiskMappingPayload, error)
+	DeleteRiskMapping(ctx context.Context, input types.DeleteRiskMappingInput) (*types.DeleteRiskMappingPayload, error)
 	UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error)
 	DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error)
 	CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error)
@@ -563,7 +575,7 @@ type QueryResolver interface {
 	Viewer(ctx context.Context) (*types.Viewer, error)
 }
 type RiskResolver interface {
-	Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
+	Mitigations(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error)
 }
 type TaskResolver interface {
 	AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error)
@@ -730,6 +742,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CreatePolicyPayload.PolicyEdge(childComplexity), true
 
+	case "CreateRiskMappingPayload.success":
+		if e.complexity.CreateRiskMappingPayload.Success == nil {
+			break
+		}
+
+		return e.complexity.CreateRiskMappingPayload.Success(childComplexity), true
+
 	case "CreateRiskPayload.riskEdge":
 		if e.complexity.CreateRiskPayload.RiskEdge == nil {
 			break
@@ -792,6 +811,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeletePolicyPayload.DeletedPolicyID(childComplexity), true
+
+	case "DeleteRiskMappingPayload.success":
+		if e.complexity.DeleteRiskMappingPayload.Success == nil {
+			break
+		}
+
+		return e.complexity.DeleteRiskMappingPayload.Success(childComplexity), true
 
 	case "DeleteRiskPayload.deletedRiskId":
 		if e.complexity.DeleteRiskPayload.DeletedRiskID == nil {
@@ -1243,6 +1269,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateRisk(childComplexity, args["input"].(types.CreateRiskInput)), true
 
+	case "Mutation.createRiskMapping":
+		if e.complexity.Mutation.CreateRiskMapping == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createRiskMapping_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateRiskMapping(childComplexity, args["input"].(types.CreateRiskMappingInput)), true
+
 	case "Mutation.createTask":
 		if e.complexity.Mutation.CreateTask == nil {
 			break
@@ -1350,6 +1388,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteRisk(childComplexity, args["input"].(types.DeleteRiskInput)), true
+
+	case "Mutation.deleteRiskMapping":
+		if e.complexity.Mutation.DeleteRiskMapping == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteRiskMapping_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteRiskMapping(childComplexity, args["input"].(types.DeleteRiskMappingInput)), true
 
 	case "Mutation.deleteTask":
 		if e.complexity.Mutation.DeleteTask == nil {
@@ -1905,18 +1955,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.RemoveUserPayload.Success(childComplexity), true
 
-	case "Risk.controls":
-		if e.complexity.Risk.Controls == nil {
-			break
-		}
-
-		args, err := ec.field_Risk_controls_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Risk.Controls(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.ControlOrderBy)), true
-
 	case "Risk.createdAt":
 		if e.complexity.Risk.CreatedAt == nil {
 			break
@@ -1944,6 +1982,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Risk.Impact(childComplexity), true
+
+	case "Risk.mitigations":
+		if e.complexity.Risk.Mitigations == nil {
+			break
+		}
+
+		args, err := ec.field_Risk_mitigations_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Risk.Mitigations(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.MitigationOrderBy)), true
 
 	case "Risk.name":
 		if e.complexity.Risk.Name == nil {
@@ -2393,6 +2443,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreatePeopleInput,
 		ec.unmarshalInputCreatePolicyInput,
 		ec.unmarshalInputCreateRiskInput,
+		ec.unmarshalInputCreateRiskMappingInput,
 		ec.unmarshalInputCreateTaskInput,
 		ec.unmarshalInputCreateVendorInput,
 		ec.unmarshalInputDeleteControlMappingInput,
@@ -2402,6 +2453,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeletePolicyInput,
 		ec.unmarshalInputDeleteRiskInput,
+		ec.unmarshalInputDeleteRiskMappingInput,
 		ec.unmarshalInputDeleteTaskInput,
 		ec.unmarshalInputDeleteVendorInput,
 		ec.unmarshalInputEvidenceOrder,
@@ -3070,13 +3122,13 @@ type Risk implements Node {
   probability: Float!
   impact: Float!
 
-  controls(
+  mitigations(
     first: Int
     after: CursorKey
     last: Int
     before: CursorKey
-    orderBy: ControlOrder
-  ): ControlConnection! @goField(forceResolver: true)
+    orderBy: MitigationOrder
+  ): MitigationConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -3274,6 +3326,8 @@ type Mutation {
   createRisk(input: CreateRiskInput!): CreateRiskPayload!
   updateRisk(input: UpdateRiskInput!): UpdateRiskPayload!
   deleteRisk(input: DeleteRiskInput!): DeleteRiskPayload!
+  createRiskMapping(input: CreateRiskMappingInput!): CreateRiskMappingPayload!
+  deleteRiskMapping(input: DeleteRiskMappingInput!): DeleteRiskMappingPayload!
 
   # Evidence mutations
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
@@ -3452,6 +3506,18 @@ input DeleteRiskInput {
   riskId: ID!
 }
 
+input CreateRiskMappingInput {
+  riskId: ID!
+  mitigationId: ID!
+  probability: Float!
+  impact: Float!
+}
+
+input DeleteRiskMappingInput {
+  riskId: ID!
+  mitigationId: ID!
+}
+
 input UploadEvidenceInput {
   taskId: ID!
   name: String!
@@ -3605,6 +3671,14 @@ type UpdateRiskPayload {
 
 type DeleteRiskPayload {
   deletedRiskId: ID!
+}
+
+type CreateRiskMappingPayload {
+  success: Boolean!
+}
+
+type DeleteRiskMappingPayload {
+  success: Boolean!
 }
 
 type UploadEvidencePayload {
@@ -4305,6 +4379,29 @@ func (ec *executionContext) field_Mutation_createPolicy_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_createRiskMapping_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createRiskMapping_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createRiskMapping_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateRiskMappingInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateRiskMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateRiskMappingInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateRiskMappingInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_createRisk_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -4509,6 +4606,29 @@ func (ec *executionContext) field_Mutation_deletePolicy_argsInput(
 	}
 
 	var zeroVal types.DeletePolicyInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteRiskMapping_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteRiskMapping_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteRiskMapping_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteRiskMappingInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteRiskMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteRiskMappingInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteRiskMappingInput
 	return zeroVal, nil
 }
 
@@ -5614,37 +5734,37 @@ func (ec *executionContext) field_Query_node_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Risk_controls_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Risk_mitigations_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Risk_controls_argsFirst(ctx, rawArgs)
+	arg0, err := ec.field_Risk_mitigations_argsFirst(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["first"] = arg0
-	arg1, err := ec.field_Risk_controls_argsAfter(ctx, rawArgs)
+	arg1, err := ec.field_Risk_mitigations_argsAfter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["after"] = arg1
-	arg2, err := ec.field_Risk_controls_argsLast(ctx, rawArgs)
+	arg2, err := ec.field_Risk_mitigations_argsLast(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["last"] = arg2
-	arg3, err := ec.field_Risk_controls_argsBefore(ctx, rawArgs)
+	arg3, err := ec.field_Risk_mitigations_argsBefore(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["before"] = arg3
-	arg4, err := ec.field_Risk_controls_argsOrderBy(ctx, rawArgs)
+	arg4, err := ec.field_Risk_mitigations_argsOrderBy(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["orderBy"] = arg4
 	return args, nil
 }
-func (ec *executionContext) field_Risk_controls_argsFirst(
+func (ec *executionContext) field_Risk_mitigations_argsFirst(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*int, error) {
@@ -5657,7 +5777,7 @@ func (ec *executionContext) field_Risk_controls_argsFirst(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Risk_controls_argsAfter(
+func (ec *executionContext) field_Risk_mitigations_argsAfter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*page.CursorKey, error) {
@@ -5670,7 +5790,7 @@ func (ec *executionContext) field_Risk_controls_argsAfter(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Risk_controls_argsLast(
+func (ec *executionContext) field_Risk_mitigations_argsLast(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*int, error) {
@@ -5683,7 +5803,7 @@ func (ec *executionContext) field_Risk_controls_argsLast(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Risk_controls_argsBefore(
+func (ec *executionContext) field_Risk_mitigations_argsBefore(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*page.CursorKey, error) {
@@ -5696,16 +5816,16 @@ func (ec *executionContext) field_Risk_controls_argsBefore(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Risk_controls_argsOrderBy(
+func (ec *executionContext) field_Risk_mitigations_argsOrderBy(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*types.ControlOrderBy, error) {
+) (*types.MitigationOrderBy, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
 	if tmp, ok := rawArgs["orderBy"]; ok {
-		return ec.unmarshalOControlOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlOrderBy(ctx, tmp)
+		return ec.unmarshalOMitigationOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMitigationOrderBy(ctx, tmp)
 	}
 
-	var zeroVal *types.ControlOrderBy
+	var zeroVal *types.MitigationOrderBy
 	return zeroVal, nil
 }
 
@@ -6934,6 +7054,50 @@ func (ec *executionContext) fieldContext_CreatePolicyPayload_policyEdge(_ contex
 	return fc, nil
 }
 
+func (ec *executionContext) _CreateRiskMappingPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.CreateRiskMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateRiskMappingPayload_success(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Success, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateRiskMappingPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateRiskMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CreateRiskPayload_riskEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateRiskPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CreateRiskPayload_riskEdge(ctx, field)
 	if err != nil {
@@ -7343,6 +7507,50 @@ func (ec *executionContext) fieldContext_DeletePolicyPayload_deletedPolicyId(_ c
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteRiskMappingPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.DeleteRiskMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteRiskMappingPayload_success(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Success, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteRiskMappingPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteRiskMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -11267,6 +11475,124 @@ func (ec *executionContext) fieldContext_Mutation_deleteRisk(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createRiskMapping(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createRiskMapping(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateRiskMapping(rctx, fc.Args["input"].(types.CreateRiskMappingInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateRiskMappingPayload)
+	fc.Result = res
+	return ec.marshalNCreateRiskMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateRiskMappingPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createRiskMapping(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_CreateRiskMappingPayload_success(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateRiskMappingPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createRiskMapping_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteRiskMapping(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteRiskMapping(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteRiskMapping(rctx, fc.Args["input"].(types.DeleteRiskMappingInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteRiskMappingPayload)
+	fc.Result = res
+	return ec.marshalNDeleteRiskMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteRiskMappingPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteRiskMapping(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_DeleteRiskMappingPayload_success(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteRiskMappingPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteRiskMapping_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_uploadEvidence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_uploadEvidence(ctx, field)
 	if err != nil {
@@ -14187,8 +14513,8 @@ func (ec *executionContext) fieldContext_Risk_impact(_ context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Risk_controls(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Risk_controls(ctx, field)
+func (ec *executionContext) _Risk_mitigations(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Risk_mitigations(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -14201,7 +14527,7 @@ func (ec *executionContext) _Risk_controls(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Risk().Controls(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.ControlOrderBy))
+		return ec.resolvers.Risk().Mitigations(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.MitigationOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14213,12 +14539,12 @@ func (ec *executionContext) _Risk_controls(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.ControlConnection)
+	res := resTmp.(*types.MitigationConnection)
 	fc.Result = res
-	return ec.marshalNControlConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlConnection(ctx, field.Selections, res)
+	return ec.marshalNMitigationConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMitigationConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Risk_controls(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Risk_mitigations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Risk",
 		Field:      field,
@@ -14227,11 +14553,11 @@ func (ec *executionContext) fieldContext_Risk_controls(ctx context.Context, fiel
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "edges":
-				return ec.fieldContext_ControlConnection_edges(ctx, field)
+				return ec.fieldContext_MitigationConnection_edges(ctx, field)
 			case "pageInfo":
-				return ec.fieldContext_ControlConnection_pageInfo(ctx, field)
+				return ec.fieldContext_MitigationConnection_pageInfo(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ControlConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type MitigationConnection", field.Name)
 		},
 	}
 	defer func() {
@@ -14241,7 +14567,7 @@ func (ec *executionContext) fieldContext_Risk_controls(ctx context.Context, fiel
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Risk_controls_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Risk_mitigations_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -14533,8 +14859,8 @@ func (ec *executionContext) fieldContext_RiskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Risk_probability(ctx, field)
 			case "impact":
 				return ec.fieldContext_Risk_impact(ctx, field)
-			case "controls":
-				return ec.fieldContext_Risk_controls(ctx, field)
+			case "mitigations":
+				return ec.fieldContext_Risk_mitigations(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Risk_createdAt(ctx, field)
 			case "updatedAt":
@@ -15700,8 +16026,8 @@ func (ec *executionContext) fieldContext_UpdateRiskPayload_risk(_ context.Contex
 				return ec.fieldContext_Risk_probability(ctx, field)
 			case "impact":
 				return ec.fieldContext_Risk_impact(ctx, field)
-			case "controls":
-				return ec.fieldContext_Risk_controls(ctx, field)
+			case "mitigations":
+				return ec.fieldContext_Risk_mitigations(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Risk_createdAt(ctx, field)
 			case "updatedAt":
@@ -19591,6 +19917,54 @@ func (ec *executionContext) unmarshalInputCreateRiskInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateRiskMappingInput(ctx context.Context, obj any) (types.CreateRiskMappingInput, error) {
+	var it types.CreateRiskMappingInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"riskId", "mitigationId", "probability", "impact"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "riskId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("riskId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RiskID = data
+		case "mitigationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mitigationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MitigationID = data
+		case "probability":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("probability"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Probability = data
+		case "impact":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("impact"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Impact = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, obj any) (types.CreateTaskInput, error) {
 	var it types.CreateTaskInput
 	asMap := map[string]any{}
@@ -19926,6 +20300,40 @@ func (ec *executionContext) unmarshalInputDeleteRiskInput(ctx context.Context, o
 				return it, err
 			}
 			it.RiskID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDeleteRiskMappingInput(ctx context.Context, obj any) (types.DeleteRiskMappingInput, error) {
+	var it types.DeleteRiskMappingInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"riskId", "mitigationId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "riskId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("riskId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RiskID = data
+		case "mitigationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mitigationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MitigationID = data
 		}
 	}
 
@@ -21613,6 +22021,45 @@ func (ec *executionContext) _CreatePolicyPayload(ctx context.Context, sel ast.Se
 	return out
 }
 
+var createRiskMappingPayloadImplementors = []string{"CreateRiskMappingPayload"}
+
+func (ec *executionContext) _CreateRiskMappingPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateRiskMappingPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createRiskMappingPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateRiskMappingPayload")
+		case "success":
+			out.Values[i] = ec._CreateRiskMappingPayload_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createRiskPayloadImplementors = []string{"CreateRiskPayload"}
 
 func (ec *executionContext) _CreateRiskPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateRiskPayload) graphql.Marshaler {
@@ -21938,6 +22385,45 @@ func (ec *executionContext) _DeletePolicyPayload(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("DeletePolicyPayload")
 		case "deletedPolicyId":
 			out.Values[i] = ec._DeletePolicyPayload_deletedPolicyId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteRiskMappingPayloadImplementors = []string{"DeleteRiskMappingPayload"}
+
+func (ec *executionContext) _DeleteRiskMappingPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteRiskMappingPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteRiskMappingPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteRiskMappingPayload")
+		case "success":
+			out.Values[i] = ec._DeleteRiskMappingPayload_success(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -23075,6 +23561,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createRiskMapping":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createRiskMapping(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteRiskMapping":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteRiskMapping(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "uploadEvidence":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_uploadEvidence(ctx, field)
@@ -24124,7 +24624,7 @@ func (ec *executionContext) _Risk(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "controls":
+		case "mitigations":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -24133,7 +24633,7 @@ func (ec *executionContext) _Risk(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Risk_controls(ctx, field, obj)
+				res = ec._Risk_mitigations(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -25945,6 +26445,25 @@ func (ec *executionContext) unmarshalNCreateRiskInput2githubᚗcomᚋgetproboᚋ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNCreateRiskMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateRiskMappingInput(ctx context.Context, v any) (types.CreateRiskMappingInput, error) {
+	res, err := ec.unmarshalInputCreateRiskMappingInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateRiskMappingPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateRiskMappingPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateRiskMappingPayload) graphql.Marshaler {
+	return ec._CreateRiskMappingPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateRiskMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateRiskMappingPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateRiskMappingPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateRiskMappingPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNCreateRiskPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateRiskPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateRiskPayload) graphql.Marshaler {
 	return ec._CreateRiskPayload(ctx, sel, &v)
 }
@@ -26144,6 +26663,25 @@ func (ec *executionContext) marshalNDeletePolicyPayload2ᚖgithubᚗcomᚋgetpro
 func (ec *executionContext) unmarshalNDeleteRiskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteRiskInput(ctx context.Context, v any) (types.DeleteRiskInput, error) {
 	res, err := ec.unmarshalInputDeleteRiskInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNDeleteRiskMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteRiskMappingInput(ctx context.Context, v any) (types.DeleteRiskMappingInput, error) {
+	res, err := ec.unmarshalInputDeleteRiskMappingInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteRiskMappingPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteRiskMappingPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteRiskMappingPayload) graphql.Marshaler {
+	return ec._DeleteRiskMappingPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteRiskMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteRiskMappingPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteRiskMappingPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteRiskMappingPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDeleteRiskPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteRiskPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteRiskPayload) graphql.Marshaler {

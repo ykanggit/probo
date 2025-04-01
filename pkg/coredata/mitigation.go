@@ -55,6 +55,74 @@ func (c Mitigation) CursorKey(orderBy MitigationOrderField) page.CursorKey {
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
+func (c *Mitigations) LoadByRiskID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	riskID gid.GID,
+	cursor *page.Cursor[MitigationOrderField],
+) error {
+	q := `
+WITH mtgtns AS (
+	SELECT
+		m.id,
+		m.tenant_id,
+		m.organization_id,
+		m.category,
+		m.name,
+		m.description,
+		m.state,
+		m.importance,
+		m.content_ref,
+		m.created_at,
+		m.updated_at,
+		m.standards
+	FROM
+		mitigations m
+	INNER JOIN
+		risks_mitigations rm ON m.id = rm.mitigation_id
+	WHERE
+		rm.risk_id = @risk_id
+)
+SELECT
+	id,
+	tenant_id,
+	organization_id,
+	category,
+	name,
+	description,
+	state,
+	importance,
+	content_ref,
+	created_at,
+	updated_at,
+	standards
+FROM
+	mtgtns
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"risk_id": riskID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query mitigations: %w", err)
+	}
+
+	mitigations, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Mitigation])
+	if err != nil {
+		return fmt.Errorf("cannot collect mitigations: %w", err)
+	}
+
+	*c = mitigations
+
+	return nil
+}
+
 func (c *Mitigations) LoadByControlID(
 	ctx context.Context,
 	conn pg.Conn,

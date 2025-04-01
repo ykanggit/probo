@@ -50,6 +50,65 @@ func (r *Risk) CursorKey(orderBy RiskOrderField) page.CursorKey {
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
+func (r *Risks) LoadByMitigationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	mitigationID gid.GID,
+	cursor *page.Cursor[RiskOrderField],
+) error {
+	q := `
+WITH rsks AS (
+	SELECT
+		r.id,
+		r.organization_id,
+		r.name,
+		r.description,
+		r.probability,
+		r.impact,
+		r.created_at,
+		r.updated_at
+	FROM
+		risks r
+	INNER JOIN
+		risks_mitigations rm ON r.id = rm.risk_id
+	WHERE
+		rm.mitigation_id = @mitigation_id
+)
+SELECT
+	id,
+	organization_id,
+	name,
+	description,
+	probability,
+	impact,
+	created_at,
+	updated_at
+FROM
+	rsks
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.NamedArgs{"mitigation_id": mitigationID}
+	maps.Copy(args, scope.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query risks: %w", err)
+	}
+
+	risks, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Risk])
+	if err != nil {
+		return fmt.Errorf("cannot collect risks: %w", err)
+	}
+
+	*r = risks
+
+	return nil
+}
+
 func (r *Risks) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,

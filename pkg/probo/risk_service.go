@@ -47,6 +47,71 @@ type (
 	}
 )
 
+func (s RiskService) ListForMitigationID(
+	ctx context.Context,
+	mitigationID gid.GID,
+	cursor *page.Cursor[coredata.RiskOrderField],
+) (*page.Page[*coredata.Risk, coredata.RiskOrderField], error) {
+	var risks coredata.Risks
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return risks.LoadByMitigationID(ctx, conn, s.svc.scope, mitigationID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot list risks: %w", err)
+	}
+
+	return page.NewPage(risks, cursor), nil
+}
+
+func (s RiskService) CreateMapping(
+	ctx context.Context,
+	riskID gid.GID,
+	mitigationID gid.GID,
+	probability float64,
+	impact float64,
+) error {
+	riskMitigation := &coredata.RiskMitigation{
+		RiskID:       riskID,
+		MitigationID: mitigationID,
+		TenantID:     s.svc.scope.GetTenantID(),
+		CreatedAt:    time.Now(),
+		Probability:  probability,
+		Impact:       impact,
+	}
+
+	return s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return riskMitigation.Insert(ctx, conn, s.svc.scope)
+		},
+	)
+}
+
+func (s RiskService) DeleteMapping(
+	ctx context.Context,
+	riskID gid.GID,
+	mitigationID gid.GID,
+) error {
+	riskMitigation := &coredata.RiskMitigation{
+		RiskID:       riskID,
+		MitigationID: mitigationID,
+		TenantID:     s.svc.scope.GetTenantID(),
+		CreatedAt:    time.Now(),
+	}
+
+	return s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return riskMitigation.Delete(ctx, conn, s.svc.scope)
+		},
+	)
+}
+
 func (s RiskService) Create(
 	ctx context.Context,
 	req CreateRiskRequest,

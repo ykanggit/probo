@@ -113,7 +113,27 @@ func (r *mitigationResolver) Tasks(ctx context.Context, obj *types.Mitigation, f
 
 // Risks is the resolver for the risks field.
 func (r *mitigationResolver) Risks(ctx context.Context, obj *types.Mitigation, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error) {
-	panic(fmt.Errorf("not implemented: Risks - risks"))
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.RiskOrderField]{
+		Field:     coredata.RiskOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.RiskOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Risks.ListForMitigationID(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list mitigation risks: %w", err)
+	}
+
+	return types.NewRiskConnection(page), nil
 }
 
 // Controls is the resolver for the controls field.
@@ -670,6 +690,34 @@ func (r *mutationResolver) DeleteRisk(ctx context.Context, input types.DeleteRis
 	}, nil
 }
 
+// CreateRiskMapping is the resolver for the createRiskMapping field.
+func (r *mutationResolver) CreateRiskMapping(ctx context.Context, input types.CreateRiskMappingInput) (*types.CreateRiskMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+
+	err := svc.Risks.CreateMapping(ctx, input.RiskID, input.MitigationID, input.Probability, input.Impact)
+	if err != nil {
+		panic(fmt.Errorf("cannot create risk mapping: %w", err))
+	}
+
+	return &types.CreateRiskMappingPayload{
+		Success: true,
+	}, nil
+}
+
+// DeleteRiskMapping is the resolver for the deleteRiskMapping field.
+func (r *mutationResolver) DeleteRiskMapping(ctx context.Context, input types.DeleteRiskMappingInput) (*types.DeleteRiskMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+
+	err := svc.Risks.DeleteMapping(ctx, input.RiskID, input.MitigationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete risk mapping: %w", err))
+	}
+
+	return &types.DeleteRiskMappingPayload{
+		Success: true,
+	}, nil
+}
+
 // UploadEvidence is the resolver for the uploadEvidence field.
 func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
@@ -700,7 +748,7 @@ func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.Uploa
 
 	evidence, err := svc.Evidences.Create(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create evidence: %w", err)
+		panic(fmt.Errorf("failed to create evidence: %w", err))
 	}
 
 	return &types.UploadEvidencePayload{
@@ -714,7 +762,7 @@ func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.Delet
 
 	err := svc.Evidences.Delete(ctx, input.EvidenceID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to delete evidence: %w", err)
+		panic(fmt.Errorf("failed to delete evidence: %w", err))
 	}
 
 	return &types.DeleteEvidencePayload{
@@ -735,7 +783,7 @@ func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreateP
 		OwnerID:        input.OwnerID,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("cannot create policy: %w", err)
+		panic(fmt.Errorf("cannot create policy: %w", err))
 	}
 
 	return &types.CreatePolicyPayload{
@@ -756,7 +804,7 @@ func (r *mutationResolver) UpdatePolicy(ctx context.Context, input types.UpdateP
 		OwnerID:    input.OwnerID,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("cannot update policy: %w", err)
+		panic(fmt.Errorf("cannot update policy: %w", err))
 	}
 
 	return &types.UpdatePolicyPayload{
@@ -770,7 +818,7 @@ func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeleteP
 
 	err := svc.Policies.Delete(ctx, input.PolicyID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot delete policy: %w", err)
+		panic(fmt.Errorf("cannot delete policy: %w", err))
 	}
 
 	return &types.DeletePolicyPayload{
@@ -802,7 +850,7 @@ func (r *organizationResolver) Users(ctx context.Context, obj *types.Organizatio
 
 	page, err := r.usrmgrSvc.ListUsersForTenant(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list users: %w", err)
+		panic(fmt.Errorf("cannot list users: %w", err))
 	}
 
 	return types.NewUserConnection(page), nil
@@ -827,7 +875,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 
 	page, err := svc.Frameworks.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list organization frameworks: %w", err)
+		panic(fmt.Errorf("cannot list organization frameworks: %w", err))
 	}
 
 	return types.NewFrameworkConnection(page), nil
@@ -852,7 +900,7 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 
 	page, err := svc.Vendors.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list organization vendors: %w", err)
+		panic(fmt.Errorf("cannot list organization vendors: %w", err))
 	}
 
 	return types.NewVendorConnection(page), nil
@@ -877,7 +925,7 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 
 	page, err := svc.Peoples.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list organization peoples: %w", err)
+		panic(fmt.Errorf("cannot list organization peoples: %w", err))
 	}
 
 	return types.NewPeopleConnection(page), nil
@@ -902,7 +950,7 @@ func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organiza
 
 	page, err := svc.Policies.ListByOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list organization policies: %w", err)
+		panic(fmt.Errorf("cannot list organization policies: %w", err))
 	}
 
 	return types.NewPolicyConnection(page), nil
@@ -927,7 +975,7 @@ func (r *organizationResolver) Mitigations(ctx context.Context, obj *types.Organ
 
 	page, err := svc.Mitigations.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list organization mitigations: %w", err)
+		panic(fmt.Errorf("cannot list organization mitigations: %w", err))
 	}
 
 	return types.NewMitigationConnection(page), nil
@@ -964,13 +1012,13 @@ func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.P
 
 	policy, err := svc.Policies.Get(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get policy: %w", err)
+		panic(fmt.Errorf("cannot get policy: %w", err))
 	}
 
 	// Get the owner
 	owner, err := svc.Peoples.Get(ctx, policy.OwnerID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get owner: %w", err)
+		panic(fmt.Errorf("cannot get owner: %w", err))
 	}
 
 	return types.NewPeople(owner), nil
@@ -984,69 +1032,69 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 	case coredata.OrganizationEntityType:
 		organization, err := svc.Organizations.Get(ctx, id)
 		if err != nil {
-			return nil, err
+			panic(fmt.Errorf("cannot get organization: %w", err))
 		}
 
 		return types.NewOrganization(organization), nil
 	case coredata.PeopleEntityType:
 		people, err := svc.Peoples.Get(ctx, id)
 		if err != nil {
-			return nil, err
+			panic(fmt.Errorf("cannot get people: %w", err))
 		}
 
 		return types.NewPeople(people), nil
 	case coredata.VendorEntityType:
 		vendor, err := svc.Vendors.Get(ctx, id)
 		if err != nil {
-			return nil, err
+			panic(fmt.Errorf("cannot get vendor: %w", err))
 		}
 
 		return types.NewVendor(vendor), nil
 	case coredata.FrameworkEntityType:
 		framework, err := svc.Frameworks.Get(ctx, id)
 		if err != nil {
-			return nil, err
+			panic(fmt.Errorf("cannot get framework: %w", err))
 		}
 
 		return types.NewFramework(framework), nil
 	case coredata.MitigationEntityType:
 		mitigation, err := svc.Mitigations.Get(ctx, id)
 		if err != nil {
-			return nil, err
+			panic(fmt.Errorf("cannot get mitigation: %w", err))
 		}
 
 		return types.NewMitigation(mitigation), nil
 	case coredata.TaskEntityType:
 		task, err := svc.Tasks.Get(ctx, id)
 		if err != nil {
-			return nil, err
+			panic(fmt.Errorf("cannot get task: %w", err))
 		}
 
 		return types.NewTask(task), nil
 	case coredata.EvidenceEntityType:
 		evidence, err := svc.Evidences.Get(ctx, id)
 		if err != nil {
-			return nil, err
+			panic(fmt.Errorf("cannot get evidence: %w", err))
 		}
 
 		return types.NewEvidence(evidence), nil
 	case coredata.PolicyEntityType:
 		policy, err := svc.Policies.Get(ctx, id)
 		if err != nil {
-			return nil, err
+			panic(fmt.Errorf("cannot get policy: %w", err))
 		}
 		return types.NewPolicy(policy), nil
 	case coredata.ControlEntityType:
 		control, err := svc.Controls.Get(ctx, id)
 		if err != nil {
-			return nil, err
+			panic(fmt.Errorf("cannot get control: %w", err))
 		}
 
 		return types.NewControl(control), nil
 	case coredata.RiskEntityType:
 		risk, err := svc.Risks.Get(ctx, id)
 		if err != nil {
-			return nil, err
+			panic(fmt.Errorf("cannot get risk: %w", err))
 		}
 		return types.NewRisk(risk), nil
 	default:
@@ -1066,9 +1114,29 @@ func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
 	}, nil
 }
 
-// Controls is the resolver for the controls field.
-func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
-	panic(fmt.Errorf("not implemented: Controls - controls"))
+// Mitigations is the resolver for the mitigations field.
+func (r *riskResolver) Mitigations(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.MitigationOrderField]{
+		Field:     coredata.MitigationOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.MitigationOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Mitigations.ListForRiskID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list risk mitigations: %w", err))
+	}
+
+	return types.NewMitigationConnection(page), nil
 }
 
 // AssignedTo is the resolver for the assignedTo field.
@@ -1077,7 +1145,7 @@ func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.
 
 	task, err := svc.Tasks.Get(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get task: %w", err)
+		panic(fmt.Errorf("cannot get task: %w", err))
 	}
 
 	if task.AssignedToID == nil {
@@ -1086,7 +1154,7 @@ func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.
 
 	people, err := svc.Peoples.Get(ctx, *task.AssignedToID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get assigned to: %w", err)
+		panic(fmt.Errorf("cannot get assigned to: %w", err))
 	}
 
 	return types.NewPeople(people), nil

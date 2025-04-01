@@ -543,13 +543,13 @@ type Risk implements Node {
   probability: Float!
   impact: Float!
 
-  controls(
+  mitigations(
     first: Int
     after: CursorKey
     last: Int
     before: CursorKey
-    orderBy: ControlOrder
-  ): ControlConnection! @goField(forceResolver: true)
+    orderBy: MitigationOrder
+  ): MitigationConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -747,6 +747,8 @@ type Mutation {
   createRisk(input: CreateRiskInput!): CreateRiskPayload!
   updateRisk(input: UpdateRiskInput!): UpdateRiskPayload!
   deleteRisk(input: DeleteRiskInput!): DeleteRiskPayload!
+  createRiskMapping(input: CreateRiskMappingInput!): CreateRiskMappingPayload!
+  deleteRiskMapping(input: DeleteRiskMappingInput!): DeleteRiskMappingPayload!
 
   # Evidence mutations
   uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
@@ -925,6 +927,18 @@ input DeleteRiskInput {
   riskId: ID!
 }
 
+input CreateRiskMappingInput {
+  riskId: ID!
+  mitigationId: ID!
+  probability: Float!
+  impact: Float!
+}
+
+input DeleteRiskMappingInput {
+  riskId: ID!
+  mitigationId: ID!
+}
+
 input UploadEvidenceInput {
   taskId: ID!
   name: String!
@@ -1078,6 +1092,14 @@ type UpdateRiskPayload {
 
 type DeleteRiskPayload {
   deletedRiskId: ID!
+}
+
+type CreateRiskMappingPayload {
+  success: Boolean!
+}
+
+type DeleteRiskMappingPayload {
+  success: Boolean!
 }
 
 type UploadEvidencePayload {

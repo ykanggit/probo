@@ -131,6 +131,17 @@ type CreateRiskInput struct {
 	Impact         float64 `json:"impact"`
 }
 
+type CreateRiskMappingInput struct {
+	RiskID       gid.GID `json:"riskId"`
+	MitigationID gid.GID `json:"mitigationId"`
+	Probability  float64 `json:"probability"`
+	Impact       float64 `json:"impact"`
+}
+
+type CreateRiskMappingPayload struct {
+	Success bool `json:"success"`
+}
+
 type CreateRiskPayload struct {
 	RiskEdge *RiskEdge `json:"riskEdge"`
 }
@@ -215,6 +226,15 @@ type DeletePolicyPayload struct {
 
 type DeleteRiskInput struct {
 	RiskID gid.GID `json:"riskId"`
+}
+
+type DeleteRiskMappingInput struct {
+	RiskID       gid.GID `json:"riskId"`
+	MitigationID gid.GID `json:"mitigationId"`
+}
+
+type DeleteRiskMappingPayload struct {
+	Success bool `json:"success"`
 }
 
 type DeleteRiskPayload struct {
@@ -444,14 +464,14 @@ type RemoveUserPayload struct {
 }
 
 type Risk struct {
-	ID          gid.GID            `json:"id"`
-	Name        string             `json:"name"`
-	Description string             `json:"description"`
-	Probability float64            `json:"probability"`
-	Impact      float64            `json:"impact"`
-	Controls    *ControlConnection `json:"controls"`
-	CreatedAt   time.Time          `json:"createdAt"`
-	UpdatedAt   time.Time          `json:"updatedAt"`
+	ID          gid.GID               `json:"id"`
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	Probability float64               `json:"probability"`
+	Impact      float64               `json:"impact"`
+	Mitigations *MitigationConnection `json:"mitigations"`
+	CreatedAt   time.Time             `json:"createdAt"`
+	UpdatedAt   time.Time             `json:"updatedAt"`
 }
 
 func (Risk) IsNode()             {}
