@@ -44,23 +44,9 @@ type (
 		PrivacyPolicyURL     *string            `db:"privacy_policy_url"`
 		CreatedAt            time.Time          `db:"created_at"`
 		UpdatedAt            time.Time          `db:"updated_at"`
-		Version              int                `db:"version"`
 	}
 
 	Vendors []*Vendor
-
-	UpdateVendorParams struct {
-		ExpectedVersion      int
-		Name                 *string
-		Description          *string
-		ServiceStartAt       *time.Time
-		ServiceTerminationAt *time.Time
-		ServiceCriticality   *ServiceCriticality
-		RiskTier             *RiskTier
-		StatusPageURL        *string
-		TermsOfServiceURL    *string
-		PrivacyPolicyURL     *string
-	}
 )
 
 func (v Vendor) CursorKey(orderBy VendorOrderField) page.CursorKey {
@@ -94,8 +80,7 @@ SELECT
     terms_of_service_url,
     privacy_policy_url,
     created_at,
-    updated_at,
-    version
+    updated_at
 FROM
     vendors
 WHERE
@@ -146,8 +131,7 @@ INSERT INTO
         terms_of_service_url,
         privacy_policy_url,
         created_at,
-        updated_at,
-        version
+        updated_at
     )
 VALUES (
     @tenant_id,
@@ -163,8 +147,7 @@ VALUES (
     @terms_of_service_url,
     @privacy_policy_url,
     @created_at,
-    @updated_at,
-    1
+    @updated_at
 )
 `
 
@@ -227,8 +210,7 @@ SELECT
     terms_of_service_url,
     privacy_policy_url,
     created_at,
-    updated_at,
-    version
+    updated_at
 FROM
     vendors
 WHERE
@@ -261,70 +243,41 @@ func (v *Vendor) Update(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	params UpdateVendorParams,
 ) error {
 	q := `
-UPDATE vendors SET
-    name = COALESCE(@name, name),
-    description = COALESCE(@description, description),
-    service_start_at = COALESCE(@service_start_at, service_start_at),
-    service_termination_at = COALESCE(@service_termination_at, service_termination_at),
-    service_criticality = COALESCE(@service_criticality, service_criticality),
-    risk_tier = COALESCE(@risk_tier, risk_tier),
-    status_page_url = COALESCE(@status_page_url, status_page_url),
-    terms_of_service_url = COALESCE(@terms_of_service_url, terms_of_service_url),
-    privacy_policy_url = COALESCE(@privacy_policy_url, privacy_policy_url),
-    updated_at = @updated_at,
-    version = version + 1
+UPDATE vendors
+SET
+	name = @name,
+	description = @description,
+	service_start_at = @service_start_at,
+	service_termination_at = @service_termination_at,
+	service_criticality = @service_criticality,
+	risk_tier = @risk_tier,
+	status_page_url = @status_page_url,
+	terms_of_service_url = @terms_of_service_url,
+	privacy_policy_url = @privacy_policy_url,
+	updated_at = @updated_at
 WHERE %s
     AND id = @vendor_id
-    AND version = @expected_version
-RETURNING 
-    id,
-    organization_id,
-    name,
-    description,
-    service_start_at,
-    service_termination_at,
-    service_criticality,
-    risk_tier,
-    status_page_url,
-    terms_of_service_url,
-    privacy_policy_url,
-    created_at,
-    updated_at,
-    version
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
 		"vendor_id":              v.ID,
-		"expected_version":       params.ExpectedVersion,
 		"updated_at":             time.Now(),
-		"name":                   params.Name,
-		"description":            params.Description,
-		"service_start_at":       params.ServiceStartAt,
-		"service_termination_at": params.ServiceTerminationAt,
-		"service_criticality":    params.ServiceCriticality,
-		"risk_tier":              params.RiskTier,
-		"status_page_url":        params.StatusPageURL,
-		"terms_of_service_url":   params.TermsOfServiceURL,
-		"privacy_policy_url":     params.PrivacyPolicyURL,
+		"name":                   v.Name,
+		"description":            v.Description,
+		"service_start_at":       v.ServiceStartAt,
+		"service_termination_at": v.ServiceTerminationAt,
+		"service_criticality":    v.ServiceCriticality,
+		"risk_tier":              v.RiskTier,
+		"status_page_url":        v.StatusPageURL,
+		"terms_of_service_url":   v.TermsOfServiceURL,
+		"privacy_policy_url":     v.PrivacyPolicyURL,
 	}
 
 	maps.Copy(args, scope.SQLArguments())
 
-	rows, err := conn.Query(ctx, q, args)
-	if err != nil {
-		return fmt.Errorf("cannot query vendor: %w", err)
-	}
-
-	vendor, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Vendor])
-	if err != nil {
-		return fmt.Errorf("cannot collect vendor: %w", err)
-	}
-
-	*v = vendor
-
-	return nil
+	_, err := conn.Exec(ctx, q, args)
+	return err
 }

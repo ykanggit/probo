@@ -89,26 +89,59 @@ func (s VendorService) Update(
 	ctx context.Context,
 	req UpdateVendorRequest,
 ) (*coredata.Vendor, error) {
-	params := coredata.UpdateVendorParams{
-		ExpectedVersion:      req.ExpectedVersion,
-		Name:                 req.Name,
-		Description:          req.Description,
-		ServiceStartAt:       req.ServiceStartAt,
-		ServiceTerminationAt: req.ServiceTerminationAt,
-		ServiceCriticality:   req.ServiceCriticality,
-		RiskTier:             req.RiskTier,
-		StatusPageURL:        req.StatusPageURL,
-		TermsOfServiceURL:    req.TermsOfServiceURL,
-		PrivacyPolicyURL:     req.PrivacyPolicyURL,
-	}
-
-	vendor := &coredata.Vendor{ID: req.ID}
+	vendor := &coredata.Vendor{}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return vendor.Update(ctx, conn, s.svc.scope, params)
-		})
+			if err := vendor.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
+				return fmt.Errorf("cannot load vendor %q: %w", req.ID, err)
+			}
+
+			if req.Name != nil {
+				vendor.Name = *req.Name
+			}
+
+			if req.Description != nil {
+				vendor.Description = *req.Description
+			}
+
+			if req.ServiceStartAt != nil {
+				vendor.ServiceStartAt = *req.ServiceStartAt
+			}
+
+			if req.ServiceTerminationAt != nil {
+				vendor.ServiceTerminationAt = req.ServiceTerminationAt
+			}
+
+			if req.ServiceCriticality != nil {
+				vendor.ServiceCriticality = *req.ServiceCriticality
+			}
+
+			if req.RiskTier != nil {
+				vendor.RiskTier = *req.RiskTier
+			}
+
+			if req.StatusPageURL != nil {
+				vendor.StatusPageURL = req.StatusPageURL
+			}
+
+			if req.TermsOfServiceURL != nil {
+				vendor.TermsOfServiceURL = req.TermsOfServiceURL
+			}
+
+			if req.PrivacyPolicyURL != nil {
+				vendor.PrivacyPolicyURL = req.PrivacyPolicyURL
+			}
+
+			if err := vendor.Update(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot update vendor: %w", err)
+			}
+
+			return nil
+		},
+	)
+
 	if err != nil {
 		return nil, err
 	}
