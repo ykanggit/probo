@@ -36,6 +36,8 @@ import {
   Link2,
   Search,
   Link as LinkIcon,
+  CheckSquare,
+  ShieldCheck,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -444,6 +446,9 @@ function MitigationViewContent({
   const { organizationId, frameworkId, mitigationId } = useParams();
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
+
+  // Add state for main content tabs
+  const [mainContentTab, setMainContentTab] = useState<string>("tasks");
 
   // Add URLSearchParams handling for task persistence
   const [searchParams, setSearchParams] = useSearchParams();
@@ -883,7 +888,6 @@ function MitigationViewContent({
     setLinkEvidenceName("");
     setLinkEvidenceUrl("");
     setLinkEvidenceDescription("");
-    setActiveTab("file");
   };
 
   const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1662,781 +1666,831 @@ function MitigationViewContent({
         </Card>
       </div>
 
-      {/* Control Mapping Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Controls</h2>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1"
-            onClick={handleOpenControlMappingDialog}
-          >
-            <LinkIcon className="w-4 h-4" />
-            <span>Map to Controls</span>
-          </Button>
-        </div>
-
-        {/* Control Mapping Dialog */}
-        <Dialog
-          open={isControlMappingDialogOpen}
-          onOpenChange={setIsControlMappingDialogOpen}
-        >
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
-            <DialogHeader>
-              <DialogTitle>Map Mitigation to Controls</DialogTitle>
-              <DialogDescription>
-                Search and select controls to link to this mitigation. This
-                helps track which controls are addressed by this mitigation.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search controls by ID, name, or description..."
-                    value={controlSearchQuery}
-                    onChange={(e) => setControlSearchQuery(e.target.value)}
-                    className="w-full pl-10"
-                  />
-                </div>
-              </div>
-
-              <div className="w-64">
-                <Select
-                  value={selectedFrameworkId || "all"}
-                  onValueChange={(value) =>
-                    setSelectedFrameworkId(value === "all" ? null : value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select framework" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Frameworks</SelectItem>
-                    {frameworksData?.organization?.frameworks?.edges?.map(
-                      (edge) => (
-                        <SelectItem key={edge.node.id} value={edge.node.id}>
-                          {edge.node.name}
-                        </SelectItem>
-                      )
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-hidden">
-              {isLoadingControls ? (
-                <div className="flex items-center justify-center h-full">
-                  <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                  <span className="ml-2">Loading controls...</span>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-2 max-h-[50vh] overflow-y-auto pr-2">
-                  {filteredControls().length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      No controls found. Try adjusting your search or select a
-                      different framework.
-                    </div>
-                  ) : (
-                    filteredControls().map((control) => {
-                      const isLinked = isControlLinked(control.id);
-                      return (
-                        <Card
-                          key={control.id}
-                          className="border overflow-hidden"
-                        >
-                          <div
-                            className={`p-4 ${isLinked ? "bg-blue-50" : ""}`}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <div className="font-mono text-sm px-1 py-0.5 rounded-sm bg-lime-100 border border-lime-200 text-lime-800 font-bold">
-                                    {control.referenceId}
-                                  </div>
-                                  {isLinked && (
-                                    <Badge
-                                      variant="outline"
-                                      className="bg-blue-100 text-blue-800 border-blue-200"
-                                    >
-                                      Linked
-                                    </Badge>
-                                  )}
-                                </div>
-                                <h3 className="font-medium">{control.name}</h3>
-                                {control.description && (
-                                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                                    {control.description}
-                                  </p>
-                                )}
-                              </div>
-                              <div className="ml-4">
-                                {isLinked ? (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleUnlinkControl(control.id)
-                                    }
-                                    disabled={isUnlinkingControl}
-                                    className="text-red-500 border-red-200 hover:bg-red-50"
-                                  >
-                                    {isUnlinkingControl ? (
-                                      <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                      <X className="w-4 h-4" />
-                                    )}
-                                    <span className="ml-1">Unlink</span>
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleLinkControl(control.id)
-                                    }
-                                    disabled={isLinkingControl}
-                                    className="text-blue-500 border-blue-200 hover:bg-blue-50"
-                                  >
-                                    {isLinkingControl ? (
-                                      <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                      <LinkIcon className="w-4 h-4" />
-                                    )}
-                                    <span className="ml-1">Link</span>
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </Card>
-                      );
-                    })
-                  )}
-                </div>
-              )}
-            </div>
-
-            <DialogFooter className="mt-4">
-              <Button onClick={() => setIsControlMappingDialogOpen(false)}>
-                Close
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Linked Controls List */}
-        <Card>
-          <CardContent className="p-4">
-            {linkedControlsData?.mitigation?.controls?.edges &&
-            linkedControlsData.mitigation.controls.edges.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {getLinkedControls().map((control: ControlNode) => (
-                  <Card key={control.id} className="border overflow-hidden">
-                    <div className="p-3">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="font-mono text-sm px-1 py-0.5 rounded-sm bg-lime-100 border border-lime-200 text-lime-800 font-bold">
-                          {control.referenceId}
-                        </div>
-                      </div>
-                      <h3 className="font-medium text-sm">{control.name}</h3>
-                      {control.description && (
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                          {control.description}
-                        </p>
-                      )}
-                      <div className="flex justify-end mt-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleUnlinkControl(control.id)}
-                          disabled={isUnlinkingControl}
-                          className="text-sm h-7 text-red-500 border-red-200 hover:bg-red-50"
-                        >
-                          Unlink
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                No controls linked to this mitigation yet. Click &quot;Map to
-                Controls&quot; to link controls.
-              </div>
+      {/* Main Content Tabs */}
+      <Tabs
+        defaultValue="tasks"
+        value={mainContentTab}
+        onValueChange={setMainContentTab}
+      >
+        <TabsList className="mb-4">
+          <TabsTrigger value="tasks" className="flex items-center gap-2">
+            <CheckSquare className="w-4 h-4" />
+            Tasks
+            {tasks.length > 0 && (
+              <span className="ml-1.5 bg-blue-100 text-blue-800 rounded-full text-xs px-2 py-0.5">
+                {tasks.length}
+              </span>
             )}
-          </CardContent>
-        </Card>
-      </div>
+          </TabsTrigger>
+          <TabsTrigger value="controls" className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4" />
+            Controls
+            {linkedControlsData?.mitigation?.controls?.edges &&
+              linkedControlsData.mitigation.controls.edges.length > 0 && (
+                <span className="ml-1.5 bg-blue-100 text-blue-800 rounded-full text-xs px-2 py-0.5">
+                  {linkedControlsData.mitigation.controls.edges.length}
+                </span>
+              )}
+          </TabsTrigger>
+        </TabsList>
 
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Tasks</h2>
-          <div className="flex items-center gap-3">
-            <div className="text-sm text-gray-500 flex items-center bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
-              <FileIcon className="w-4 h-4 mr-2 text-blue-500" />
-              <span>Drag & drop files onto tasks to add evidence</span>
+        {/* Controls Tab Content */}
+        <TabsContent value="controls">
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Controls</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={handleOpenControlMappingDialog}
+              >
+                <LinkIcon className="w-4 h-4" />
+                <span>Map to Controls</span>
+              </Button>
             </div>
-            <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="flex items-center gap-1">
-                  <Plus className="w-4 h-4" />
-                  <span>Add Task</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
+
+            {/* Control Mapping Dialog */}
+            <Dialog
+              open={isControlMappingDialogOpen}
+              onOpenChange={setIsControlMappingDialogOpen}
+            >
+              <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
                 <DialogHeader>
-                  <DialogTitle>Create New Task</DialogTitle>
+                  <DialogTitle>Map Mitigation to Controls</DialogTitle>
                   <DialogDescription>
-                    Add a new task to this mitigation. Click save when
-                    you&apos;re done.
+                    Search and select controls to link to this mitigation. This
+                    helps track which controls are addressed by this mitigation.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-medium">
-                      Task Name
-                    </label>
-                    <Input
-                      id="name"
-                      value={newTaskName}
-                      onChange={(e) => setNewTaskName(e.target.value)}
-                      placeholder="Enter task name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="description"
-                      className="text-sm font-medium"
-                    >
-                      Description (optional)
-                    </label>
-                    <Textarea
-                      id="description"
-                      value={newTaskDescription}
-                      onChange={(e) => setNewTaskDescription(e.target.value)}
-                      placeholder="Enter task description"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="timeEstimate"
-                      className="text-sm font-medium"
-                    >
-                      Time Estimate (optional)
-                    </label>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <label
-                          htmlFor="days"
-                          className="text-xs text-gray-500 block mb-1"
-                        >
-                          Days
-                        </label>
-                        <Input
-                          id="days"
-                          type="number"
-                          min="0"
-                          value={timeEstimateDays}
-                          onChange={(e) => setTimeEstimateDays(e.target.value)}
-                          placeholder="0"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="hours"
-                          className="text-xs text-gray-500 block mb-1"
-                        >
-                          Hours
-                        </label>
-                        <Input
-                          id="hours"
-                          type="number"
-                          min="0"
-                          max="23"
-                          value={timeEstimateHours}
-                          onChange={(e) => setTimeEstimateHours(e.target.value)}
-                          placeholder="0"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="minutes"
-                          className="text-xs text-gray-500 block mb-1"
-                        >
-                          Minutes
-                        </label>
-                        <Input
-                          id="minutes"
-                          type="number"
-                          min="0"
-                          max="59"
-                          value={timeEstimateMinutes}
-                          onChange={(e) =>
-                            setTimeEstimateMinutes(e.target.value)
-                          }
-                          placeholder="0"
-                        />
-                      </div>
+
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Search controls by ID, name, or description..."
+                        value={controlSearchQuery}
+                        onChange={(e) => setControlSearchQuery(e.target.value)}
+                        className="w-full pl-10"
+                      />
                     </div>
                   </div>
+
+                  <div className="w-64">
+                    <Select
+                      value={selectedFrameworkId || "all"}
+                      onValueChange={(value) =>
+                        setSelectedFrameworkId(value === "all" ? null : value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select framework" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Frameworks</SelectItem>
+                        {frameworksData?.organization?.frameworks?.edges?.map(
+                          (edge) => (
+                            <SelectItem key={edge.node.id} value={edge.node.id}>
+                              {edge.node.name}
+                            </SelectItem>
+                          )
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsCreateTaskOpen(false)}
-                  >
-                    Cancel
+
+                <div className="flex-1 overflow-hidden">
+                  {isLoadingControls ? (
+                    <div className="flex items-center justify-center h-full">
+                      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                      <span className="ml-2">Loading controls...</span>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-2 max-h-[50vh] overflow-y-auto pr-2">
+                      {filteredControls().length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                          No controls found. Try adjusting your search or select
+                          a different framework.
+                        </div>
+                      ) : (
+                        filteredControls().map((control) => {
+                          const isLinked = isControlLinked(control.id);
+                          return (
+                            <Card
+                              key={control.id}
+                              className="border overflow-hidden"
+                            >
+                              <div
+                                className={`p-4 ${
+                                  isLinked ? "bg-blue-50" : ""
+                                }`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <div className="font-mono text-sm px-1 py-0.5 rounded-sm bg-lime-100 border border-lime-200 text-lime-800 font-bold">
+                                        {control.referenceId}
+                                      </div>
+                                      {isLinked && (
+                                        <Badge
+                                          variant="outline"
+                                          className="bg-blue-100 text-blue-800 border-blue-200"
+                                        >
+                                          Linked
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <h3 className="font-medium">
+                                      {control.name}
+                                    </h3>
+                                    {control.description && (
+                                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                        {control.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="ml-4">
+                                    {isLinked ? (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleUnlinkControl(control.id)
+                                        }
+                                        disabled={isUnlinkingControl}
+                                        className="text-red-500 border-red-200 hover:bg-red-50"
+                                      >
+                                        {isUnlinkingControl ? (
+                                          <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                          <X className="w-4 h-4" />
+                                        )}
+                                        <span className="ml-1">Unlink</span>
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleLinkControl(control.id)
+                                        }
+                                        disabled={isLinkingControl}
+                                        className="text-blue-500 border-blue-200 hover:bg-blue-50"
+                                      >
+                                        {isLinkingControl ? (
+                                          <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                          <LinkIcon className="w-4 h-4" />
+                                        )}
+                                        <span className="ml-1">Link</span>
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <DialogFooter className="mt-4">
+                  <Button onClick={() => setIsControlMappingDialogOpen(false)}>
+                    Close
                   </Button>
-                  <Button onClick={handleCreateTask}>Create Task</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            {/* Linked Controls List */}
+            <Card>
+              <CardContent className="p-4">
+                {linkedControlsData?.mitigation?.controls?.edges &&
+                linkedControlsData.mitigation.controls.edges.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left font-medium text-sm py-2 px-4">
+                            ID
+                          </th>
+                          <th className="text-left font-medium text-sm py-2 px-4">
+                            Control Name
+                          </th>
+                          <th className="text-right font-medium text-sm py-2 px-4">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {getLinkedControls().map((control: ControlNode) => (
+                          <tr
+                            key={control.id}
+                            className="border-b hover:bg-gray-50"
+                          >
+                            <td className="py-3 px-4">
+                              <div className="font-mono text-sm px-1.5 py-0.5 rounded-sm bg-lime-100 border border-lime-200 text-lime-800 font-bold inline-block">
+                                {control.referenceId}
+                              </div>
+                            </td>
+                            <td className="py-3 px-4 font-medium text-sm">
+                              {control.name}
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleUnlinkControl(control.id)}
+                                disabled={isUnlinkingControl}
+                                className="text-sm h-7 text-red-500 border-red-200 hover:bg-red-50"
+                              >
+                                Unlink
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    No controls linked to this mitigation yet. Click &quot;Map
+                    to Controls&quot; to link controls.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
-        </div>
-        <div className={`space-y-2 ${isDraggingFile ? "space-y-4" : ""}`}>
-          {tasks.map((task) => (
-            <div
-              key={task?.id}
-              className="rounded-md overflow-hidden border border-gray-200"
-            >
-              <div
-                className={`flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group relative transition-all duration-200 ${
-                  isDraggingFile && draggedOverTaskId !== task?.id
-                    ? "border-dashed border-blue-300 bg-blue-50 bg-opacity-30"
-                    : ""
-                } ${
-                  draggedOverTaskId === task?.id
-                    ? "bg-blue-50 border-2 border-blue-400 shadow-md"
-                    : ""
-                } ${
-                  selectedTask?.id === task?.id
-                    ? "bg-blue-50 border-blue-200"
-                    : ""
-                }`}
-                onClick={() => task && handleTaskClick(task)}
-                onDragOver={(e) => task?.id && handleDragOver(e, task.id)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => task?.id && handleDrop(e, task.id)}
-              >
-                {isDraggingFile && draggedOverTaskId !== task?.id && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-md z-10">
-                    <div className="flex items-center gap-2 text-blue-600 bg-white px-3 py-1.5 rounded-lg shadow-xs">
-                      <FileIcon className="w-4 h-4" />
-                      <p className="text-sm font-medium">Drop file here</p>
-                    </div>
-                  </div>
-                )}
+        </TabsContent>
 
-                {draggedOverTaskId === task?.id && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-md z-10 bg-blue-50 bg-opacity-90 backdrop-blur-sm border-2 border-dashed border-blue-400">
-                    <div className="flex items-center gap-2 text-blue-600 bg-white p-5 rounded-lg shadow-md">
-                      <FileText className="w-4 h-4 text-blue-500" />
-                      <p className="text-sm font-medium text-center">
-                        Drop file to add as evidence
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {uploadingTaskId === task?.id && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-95 rounded-md z-10 backdrop-blur-sm">
-                    <div className="flex flex-col items-center gap-3 text-blue-600">
-                      <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
-                      <p className="font-medium">Adding document...</p>
-                      <p className="text-sm text-gray-500">Please wait</p>
-                    </div>
-                  </div>
-                )}
-
-                <div
-                  className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer ${
-                    task?.state === "DONE"
-                      ? "border-gray-400 bg-gray-100"
-                      : "border-gray-300"
-                  } ${isDraggingFile ? "opacity-50" : ""}`}
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent task selection when checkbox is clicked
-                    if (task?.id && task?.state) {
-                      handleToggleTaskState(task.id, task.state);
-                    }
-                  }}
-                >
-                  {task?.state === "DONE" && (
-                    <CheckCircle2 className="w-4 h-4 text-gray-500" />
-                  )}
+        {/* Tasks Tab Content */}
+        <TabsContent value="tasks">
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">Tasks</h2>
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-gray-500 flex items-center bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
+                  <FileIcon className="w-4 h-4 mr-2 text-blue-500" />
+                  <span>Drag & drop files onto tasks to add evidence</span>
                 </div>
-                <div
-                  className={`flex-1 flex items-center justify-between ${
-                    isDraggingFile ? "opacity-50" : ""
-                  }`}
+                <Dialog
+                  open={isCreateTaskOpen}
+                  onOpenChange={setIsCreateTaskOpen}
                 >
-                  <div>
-                    <h3
-                      className={`text-sm ${
-                        task?.state === "DONE"
-                          ? "text-gray-500 line-through"
-                          : "text-gray-900"
-                      }`}
-                    >
-                      {task?.name}
-                    </h3>
-                    {task?.timeEstimate && (
-                      <p
-                        className={`text-xs mt-1 flex items-center ${
-                          task?.state === "DONE"
-                            ? "text-gray-400 line-through"
-                            : "text-blue-500"
-                        }`}
+                  <DialogTrigger asChild>
+                    <Button size="sm" className="flex items-center gap-1">
+                      <Plus className="w-4 h-4" />
+                      <span>Add Task</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New Task</DialogTitle>
+                      <DialogDescription>
+                        Add a new task to this mitigation. Click save when
+                        you&apos;re done.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="task-name">Task Name</Label>
+                        <Input
+                          id="task-name"
+                          value={newTaskName}
+                          onChange={(e) => setNewTaskName(e.target.value)}
+                          placeholder="What needs to be done?"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="task-description">
+                          Description (optional)
+                        </Label>
+                        <Textarea
+                          id="task-description"
+                          value={newTaskDescription}
+                          onChange={(e) =>
+                            setNewTaskDescription(e.target.value)
+                          }
+                          placeholder="Add more details about the task"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Time Estimate (optional)</Label>
+                        <div className="flex items-center gap-2">
+                          <div className="w-full">
+                            <Input
+                              type="number"
+                              min="0"
+                              value={timeEstimateDays}
+                              onChange={(e) =>
+                                setTimeEstimateDays(e.target.value)
+                              }
+                              placeholder="Days"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Days</p>
+                          </div>
+                          <div className="w-full">
+                            <Input
+                              type="number"
+                              min="0"
+                              max="23"
+                              value={timeEstimateHours}
+                              onChange={(e) =>
+                                setTimeEstimateHours(e.target.value)
+                              }
+                              placeholder="Hours"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Hours</p>
+                          </div>
+                          <div className="w-full">
+                            <Input
+                              type="number"
+                              min="0"
+                              max="59"
+                              value={timeEstimateMinutes}
+                              onChange={(e) =>
+                                setTimeEstimateMinutes(e.target.value)
+                              }
+                              placeholder="Minutes"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                              Minutes
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsCreateTaskOpen(false)}
                       >
-                        <span className="inline-block w-4 h-4 mr-1">⏱️</span>
-                        <span>{formatDuration(task.timeEstimate)}</span>
-                      </p>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleCreateTask}>Create Task</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+            <div className={`space-y-2 ${isDraggingFile ? "space-y-4" : ""}`}>
+              {tasks.map((task) => (
+                <div
+                  key={task?.id}
+                  className="rounded-md overflow-hidden border border-gray-200"
+                >
+                  <div
+                    className={`flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group relative transition-all duration-200 ${
+                      isDraggingFile && draggedOverTaskId !== task?.id
+                        ? "border-dashed border-blue-300 bg-blue-50 bg-opacity-30"
+                        : ""
+                    } ${
+                      draggedOverTaskId === task?.id
+                        ? "bg-blue-50 border-2 border-blue-400 shadow-md"
+                        : ""
+                    } ${
+                      selectedTask?.id === task?.id
+                        ? "bg-blue-50 border-blue-200"
+                        : ""
+                    }`}
+                    onClick={() => task && handleTaskClick(task)}
+                    onDragOver={(e) => task?.id && handleDragOver(e, task.id)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => task?.id && handleDrop(e, task.id)}
+                  >
+                    {isDraggingFile && draggedOverTaskId !== task?.id && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-md z-10">
+                        <div className="flex items-center gap-2 text-blue-600 bg-white px-3 py-1.5 rounded-lg shadow-xs">
+                          <FileIcon className="w-4 h-4" />
+                          <p className="text-sm font-medium">Drop file here</p>
+                        </div>
+                      </div>
                     )}
-                    {task?.assignedTo && (
-                      <p className="text-xs mt-1 flex items-center text-gray-600">
-                        <User className="w-3 h-3 mr-1" />
-                        <span>{task.assignedTo.fullName}</span>
-                      </p>
+
+                    {draggedOverTaskId === task?.id && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-md z-10 bg-blue-50 bg-opacity-90 backdrop-blur-sm border-2 border-dashed border-blue-400">
+                        <div className="flex items-center gap-2 text-blue-600 bg-white p-5 rounded-lg shadow-md">
+                          <FileText className="w-4 h-4 text-blue-500" />
+                          <p className="text-sm font-medium text-center">
+                            Drop file to add as evidence
+                          </p>
+                        </div>
+                      </div>
                     )}
-                  </div>
-                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {/* People Selector */}
-                    <Popover
-                      open={peoplePopoverOpen[task?.id || ""]}
-                      onOpenChange={(open: boolean) => {
-                        if (task?.id) {
-                          setPeoplePopoverOpen((prev) => ({
-                            ...prev,
-                            [task.id]: open,
-                          }));
+
+                    {uploadingTaskId === task?.id && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-95 rounded-md z-10 backdrop-blur-sm">
+                        <div className="flex flex-col items-center gap-3 text-blue-600">
+                          <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+                          <p className="font-medium">Adding document...</p>
+                          <p className="text-sm text-gray-500">Please wait</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div
+                      className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer ${
+                        task?.state === "DONE"
+                          ? "border-gray-400 bg-gray-100"
+                          : "border-gray-300"
+                      } ${isDraggingFile ? "opacity-50" : ""}`}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent task selection when checkbox is clicked
+                        if (task?.id && task?.state) {
+                          handleToggleTaskState(task.id, task.state);
                         }
                       }}
                     >
-                      <PopoverTrigger asChild>
+                      {task?.state === "DONE" && (
+                        <CheckCircle2 className="w-4 h-4 text-gray-500" />
+                      )}
+                    </div>
+                    <div
+                      className={`flex-1 flex items-center justify-between ${
+                        isDraggingFile ? "opacity-50" : ""
+                      }`}
+                    >
+                      <div>
+                        <h3
+                          className={`text-sm ${
+                            task?.state === "DONE"
+                              ? "text-gray-500 line-through"
+                              : "text-gray-900"
+                          }`}
+                        >
+                          {task?.name}
+                        </h3>
+                        {task?.timeEstimate && (
+                          <p
+                            className={`text-xs mt-1 flex items-center ${
+                              task?.state === "DONE"
+                                ? "text-gray-400 line-through"
+                                : "text-blue-500"
+                            }`}
+                          >
+                            <span className="inline-block w-4 h-4 mr-1">
+                              ⏱️
+                            </span>
+                            <span>{formatDuration(task.timeEstimate)}</span>
+                          </p>
+                        )}
+                        {task?.assignedTo && (
+                          <p className="text-xs mt-1 flex items-center text-gray-600">
+                            <User className="w-3 h-3 mr-1" />
+                            <span>{task.assignedTo.fullName}</span>
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {/* People Selector */}
+                        <Popover
+                          open={peoplePopoverOpen[task?.id || ""]}
+                          onOpenChange={(open: boolean) => {
+                            if (task?.id) {
+                              setPeoplePopoverOpen((prev) => ({
+                                ...prev,
+                                [task.id]: open,
+                              }));
+                            }
+                          }}
+                        >
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              className="text-gray-400 hover:text-blue-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (task?.id) {
+                                  setPeoplePopoverOpen((prev) => ({
+                                    ...prev,
+                                    [task.id]: !prev[task.id],
+                                  }));
+                                }
+                              }}
+                            >
+                              {task?.assignedTo ? (
+                                <UserMinus className="w-4 h-4" />
+                              ) : (
+                                <UserPlus className="w-4 h-4" />
+                              )}
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[250px] p-0" align="end">
+                            {task?.assignedTo ? (
+                              <div className="p-4 space-y-4">
+                                <div className="flex items-center gap-2">
+                                  <User className="w-4 h-4 text-gray-500" />
+                                  <div className="text-sm">
+                                    <p className="font-medium">
+                                      {task.assignedTo.fullName}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      {task.assignedTo.primaryEmailAddress}
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="sm"
+                                  className="w-full"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (task?.id) {
+                                      handleUnassignPerson(task.id);
+                                    }
+                                  }}
+                                >
+                                  <UserMinus className="w-4 h-4 mr-2" />
+                                  Unassign
+                                </Button>
+                              </div>
+                            ) : (
+                              <div className="max-h-[300px] overflow-y-auto">
+                                <div className="p-2 border-b">
+                                  <input
+                                    type="text"
+                                    placeholder="Search people to assign..."
+                                    className="w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value={peopleSearch[task?.id || ""] || ""}
+                                    onChange={(e) => {
+                                      if (task?.id) {
+                                        setPeopleSearch((prev) => ({
+                                          ...prev,
+                                          [task.id]: e.target.value,
+                                        }));
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                <div className="px-3 py-2 text-xs text-gray-500">
+                                  Click on a person to assign them to this task
+                                </div>
+                                <div className="py-1">
+                                  {!organizationData?.organization?.peoples?.edges?.some(
+                                    (edge) => {
+                                      if (!edge?.node) return false;
+                                      const searchTerm = (
+                                        peopleSearch[task?.id || ""] || ""
+                                      ).toLowerCase();
+                                      return (
+                                        !searchTerm ||
+                                        edge.node.fullName
+                                          .toLowerCase()
+                                          .includes(searchTerm) ||
+                                        edge.node.primaryEmailAddress
+                                          .toLowerCase()
+                                          .includes(searchTerm)
+                                      );
+                                    }
+                                  ) && (
+                                    <div className="py-6 text-center text-sm">
+                                      No people found.
+                                    </div>
+                                  )}
+                                  {organizationData?.organization?.peoples?.edges?.map(
+                                    (edge) => {
+                                      if (!edge?.node) return null;
+
+                                      const searchTerm = (
+                                        peopleSearch[task?.id || ""] || ""
+                                      ).toLowerCase();
+                                      if (
+                                        searchTerm &&
+                                        !edge.node.fullName
+                                          .toLowerCase()
+                                          .includes(searchTerm) &&
+                                        !edge.node.primaryEmailAddress
+                                          .toLowerCase()
+                                          .includes(searchTerm)
+                                      ) {
+                                        return null;
+                                      }
+
+                                      return (
+                                        <div
+                                          key={edge.node.id}
+                                          className="px-2 py-1 hover:bg-blue-50 cursor-pointer"
+                                        >
+                                          <button
+                                            type="button"
+                                            className="flex items-center w-full text-left"
+                                            onClick={(e) => {
+                                              e.stopPropagation(); // Add this line to prevent event bubbling
+                                              handleAssignPerson(
+                                                task.id,
+                                                edge.node.id
+                                              );
+                                              setPeoplePopoverOpen((prev) => ({
+                                                ...prev,
+                                                [task.id]: false,
+                                              }));
+                                            }}
+                                          >
+                                            <User className="mr-2 h-4 w-4 text-blue-500 flex-shrink-0" />
+                                            <div>
+                                              <p className="font-medium">
+                                                {edge.node.fullName}
+                                              </p>
+                                              <p className="text-xs text-gray-500">
+                                                {edge.node.primaryEmailAddress}
+                                              </p>
+                                            </div>
+                                          </button>
+                                        </div>
+                                      );
+                                    }
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </PopoverContent>
+                        </Popover>
+
                         <button
                           type="button"
                           className="text-gray-400 hover:text-blue-600"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (task?.id) {
-                              setPeoplePopoverOpen((prev) => ({
-                                ...prev,
-                                [task.id]: !prev[task.id],
-                              }));
+                            if (task?.id && task?.name) {
+                              handleUploadEvidence(task.id, task.name);
+                            }
+                          }}
+                          title="Add Evidence"
+                        >
+                          <FileText className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          className="text-gray-400 hover:text-red-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (task?.id && task?.name) {
+                              handleDeleteTask(task.id, task.name);
                             }
                           }}
                         >
-                          {task?.assignedTo ? (
-                            <UserMinus className="w-4 h-4" />
-                          ) : (
-                            <UserPlus className="w-4 h-4" />
-                          )}
+                          <Trash2 className="w-4 h-4" />
                         </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[250px] p-0" align="end">
-                        {task?.assignedTo ? (
-                          <div className="p-4 space-y-4">
-                            <div className="flex items-center gap-2">
-                              <User className="w-4 h-4 text-gray-500" />
-                              <div className="text-sm">
-                                <p className="font-medium">
-                                  {task.assignedTo.fullName}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {task.assignedTo.primaryEmailAddress}
-                                </p>
-                              </div>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              className="w-full"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (task?.id) {
-                                  handleUnassignPerson(task.id);
-                                }
-                              }}
-                            >
-                              <UserMinus className="w-4 h-4 mr-2" />
-                              Unassign
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="max-h-[300px] overflow-y-auto">
-                            <div className="p-2 border-b">
-                              <input
-                                type="text"
-                                placeholder="Search people to assign..."
-                                className="w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={peopleSearch[task?.id || ""] || ""}
-                                onChange={(e) => {
-                                  if (task?.id) {
-                                    setPeopleSearch((prev) => ({
-                                      ...prev,
-                                      [task.id]: e.target.value,
-                                    }));
-                                  }
-                                }}
-                              />
-                            </div>
-                            <div className="px-3 py-2 text-xs text-gray-500">
-                              Click on a person to assign them to this task
-                            </div>
-                            <div className="py-1">
-                              {!organizationData?.organization?.peoples?.edges?.some(
-                                (edge) => {
-                                  if (!edge?.node) return false;
-                                  const searchTerm = (
-                                    peopleSearch[task?.id || ""] || ""
-                                  ).toLowerCase();
-                                  return (
-                                    !searchTerm ||
-                                    edge.node.fullName
-                                      .toLowerCase()
-                                      .includes(searchTerm) ||
-                                    edge.node.primaryEmailAddress
-                                      .toLowerCase()
-                                      .includes(searchTerm)
-                                  );
-                                }
-                              ) && (
-                                <div className="py-6 text-center text-sm">
-                                  No people found.
-                                </div>
-                              )}
-                              {organizationData?.organization?.peoples?.edges?.map(
-                                (edge) => {
-                                  if (!edge?.node) return null;
-
-                                  const searchTerm = (
-                                    peopleSearch[task?.id || ""] || ""
-                                  ).toLowerCase();
-                                  if (
-                                    searchTerm &&
-                                    !edge.node.fullName
-                                      .toLowerCase()
-                                      .includes(searchTerm) &&
-                                    !edge.node.primaryEmailAddress
-                                      .toLowerCase()
-                                      .includes(searchTerm)
-                                  ) {
-                                    return null;
-                                  }
-
-                                  return (
-                                    <div
-                                      key={edge.node.id}
-                                      className="px-2 py-1 hover:bg-blue-50 cursor-pointer"
-                                    >
-                                      <button
-                                        type="button"
-                                        className="flex items-center w-full text-left"
-                                        onClick={(e) => {
-                                          e.stopPropagation(); // Add this line to prevent event bubbling
-                                          handleAssignPerson(
-                                            task.id,
-                                            edge.node.id
-                                          );
-                                          setPeoplePopoverOpen((prev) => ({
-                                            ...prev,
-                                            [task.id]: false,
-                                          }));
-                                        }}
-                                      >
-                                        <User className="mr-2 h-4 w-4 text-blue-500 flex-shrink-0" />
-                                        <div>
-                                          <p className="font-medium">
-                                            {edge.node.fullName}
-                                          </p>
-                                          <p className="text-xs text-gray-500">
-                                            {edge.node.primaryEmailAddress}
-                                          </p>
-                                        </div>
-                                      </button>
-                                    </div>
-                                  );
-                                }
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </PopoverContent>
-                    </Popover>
-
-                    <button
-                      type="button"
-                      className="text-gray-400 hover:text-blue-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (task?.id && task?.name) {
-                          handleUploadEvidence(task.id, task.name);
-                        }
-                      }}
-                      title="Add Evidence"
-                    >
-                      <FileText className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      className="text-gray-400 hover:text-red-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (task?.id && task?.name) {
-                          handleDeleteTask(task.id, task.name);
-                        }
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Evidence section */}
-              {task?.evidences?.edges && task.evidences.edges.length > 0 && (
-                <>
-                  <div
-                    className="bg-gray-50 border-t border-gray-200 px-4 py-2.5 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors"
-                    onClick={() => task.id && toggleEvidenceList(task.id)}
-                  >
-                    <div className="flex items-center gap-2">
-                      <FileIcon className="w-4 h-4 text-blue-500" />
-                      <span className="text-sm font-medium text-gray-700">
-                        {task.evidences.edges.length}{" "}
-                        {task.evidences.edges.length === 1
-                          ? "Evidence"
-                          : "Evidences"}
-                      </span>
+                      </div>
                     </div>
-                    {expandedEvidenceTaskId === task.id ? (
-                      <ChevronUp className="w-4 h-4 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    )}
                   </div>
 
-                  {expandedEvidenceTaskId === task.id && (
-                    <div className="bg-white border-t border-gray-200 p-3 space-y-2.5">
-                      {task.evidences.edges.map((edge) => {
-                        if (!edge) return null;
-                        const evidence = edge.node;
-                        if (!evidence) return null;
+                  {/* Evidence section */}
+                  {task?.evidences?.edges &&
+                    task.evidences.edges.length > 0 && (
+                      <>
+                        <div
+                          className="flex items-center justify-between px-4 py-2 border-t border-gray-200 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent task selection
+                            if (task.id) toggleEvidenceList(task.id);
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-blue-500" />
+                            <span className="text-xs text-gray-600">
+                              {task.evidences.edges.length}{" "}
+                              {task.evidences.edges.length === 1
+                                ? "Evidence"
+                                : "Evidences"}
+                            </span>
+                          </div>
+                          {expandedEvidenceTaskId === task.id ? (
+                            <ChevronUp className="w-4 h-4 text-gray-500" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-gray-500" />
+                          )}
+                        </div>
 
-                        return (
-                          <div
-                            key={evidence.id}
-                            className="flex items-center justify-between p-3 rounded-md border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all bg-gray-50"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="bg-white p-2 rounded-md border border-gray-200">
-                                {getFileIcon(evidence.mimeType, evidence.type)}
-                              </div>
-                              <div>
-                                <div className="text-sm font-medium text-gray-800">
-                                  {evidence.filename}
-                                </div>
-                                <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
-                                  {evidence.type === "FILE" ? (
-                                    <>
-                                      <span className="font-medium text-gray-600">
-                                        {formatFileSize(evidence.size)}
-                                      </span>
-                                      <span>•</span>
-                                    </>
-                                  ) : evidence.url ? (
-                                    <>
-                                      <span className="font-medium text-blue-600 truncate max-w-[200px]">
-                                        {evidence.url}
-                                      </span>
-                                      <span>•</span>
-                                    </>
-                                  ) : null}
-                                  <span>{formatDate(evidence.createdAt)}</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              {evidence.type === "FILE" ? (
-                                <>
-                                  {evidence.mimeType.startsWith("image/") ? (
-                                    <button
-                                      onClick={() =>
-                                        handlePreviewEvidence(evidence)
-                                      }
-                                      className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                      title="Preview Image"
-                                    >
-                                      <Eye className="w-4 h-4 text-blue-600" />
-                                    </button>
-                                  ) : (
+                        {expandedEvidenceTaskId === task.id && (
+                          <div className="bg-white border-t border-gray-200 p-3 space-y-2.5">
+                            {task.evidences.edges.map((edge) => {
+                              if (!edge) return null;
+                              const evidence = edge.node;
+                              if (!evidence) return null;
+
+                              return (
+                                <div
+                                  key={evidence.id}
+                                  className="flex items-center justify-between p-3 rounded-md border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all bg-gray-50"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="bg-white p-2 rounded-md border border-gray-200">
+                                      {getFileIcon(
+                                        evidence.mimeType,
+                                        evidence.type
+                                      )}
+                                    </div>
+                                    <div>
+                                      <div className="text-sm font-medium text-gray-800">
+                                        {evidence.filename}
+                                      </div>
+                                      <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
+                                        {evidence.type === "FILE" ? (
+                                          <>
+                                            <span className="font-medium text-gray-600">
+                                              {formatFileSize(evidence.size)}
+                                            </span>
+                                            <span>•</span>
+                                          </>
+                                        ) : evidence.url ? (
+                                          <>
+                                            <span className="font-medium text-blue-600 truncate max-w-[200px]">
+                                              {evidence.url}
+                                            </span>
+                                            <span>•</span>
+                                          </>
+                                        ) : null}
+                                        <span>
+                                          {formatDate(evidence.createdAt)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    {evidence.type === "FILE" ? (
+                                      <>
+                                        {evidence.mimeType.startsWith(
+                                          "image/"
+                                        ) ? (
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handlePreviewEvidence(evidence);
+                                            }}
+                                            className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                            title="Preview Image"
+                                          >
+                                            <Eye className="w-4 h-4 text-blue-600" />
+                                          </button>
+                                        ) : (
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handlePreviewEvidence(evidence);
+                                            }}
+                                            className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                            title="Download"
+                                          >
+                                            <Download className="w-4 h-4 text-blue-600" />
+                                          </button>
+                                        )}
+                                      </>
+                                    ) : evidence.url ? (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (evidence.url) {
+                                            window.open(evidence.url, "_blank");
+                                          }
+                                        }}
+                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                        title="Open Link"
+                                      >
+                                        <Link2 className="w-4 h-4 text-blue-600" />
+                                      </button>
+                                    ) : null}
                                     <button
                                       onClick={(e) => {
-                                        e.preventDefault();
-                                        handlePreviewEvidence(evidence);
+                                        e.stopPropagation();
+                                        if (task.id) {
+                                          handleDeleteEvidence(
+                                            evidence.id,
+                                            evidence.filename,
+                                            task.id
+                                          );
+                                        }
                                       }}
-                                      className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                      title="Download"
+                                      className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
+                                      title="Delete"
                                     >
-                                      <Download className="w-4 h-4 text-blue-600" />
+                                      <Trash2 className="w-4 h-4 text-red-500" />
                                     </button>
-                                  )}
-                                </>
-                              ) : evidence.url ? (
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    if (evidence.url) {
-                                      window.open(evidence.url, "_blank");
-                                    }
-                                  }}
-                                  className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                  title="Open Link"
-                                >
-                                  <Link2 className="w-4 h-4 text-blue-600" />
-                                </button>
-                              ) : null}
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  if (task?.id) {
-                                    handleDeleteEvidence(
-                                      evidence.id,
-                                      evidence.filename,
-                                      task.id
-                                    );
-                                  }
-                                }}
-                                className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
-                                title="Delete"
-                              >
-                                <Trash2 className="w-4 h-4 text-red-500" />
-                              </button>
-                            </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </>
+                        )}
+                      </>
+                    )}
+                </div>
+              ))}
+
+              {tasks.length === 0 && (
+                <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+                  <p>No tasks yet. Click &quot;Add Task&quot; to create one.</p>
+                </div>
               )}
             </div>
-          ))}
-
-          {tasks.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <p>No tasks yet. Click &quot;Add Task&quot; to create one.</p>
-            </div>
-          )}
-        </div>
-      </div>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Right task panel */}
       <Sheet open={isTaskPanelOpen} onOpenChange={handleCloseTaskPanel}>
