@@ -106,21 +106,6 @@ const createRiskMappingMutation = graphql`
   ) {
     createRiskMapping(input: $input) {
       success
-      risk {
-        id
-        mitigations(first: 100) @connection(key: "Risk__mitigations") {
-          edges {
-            node {
-              id
-              name
-              description
-              category
-              importance
-              state
-            }
-          }
-        }
-      }
     }
   }
 `;
@@ -132,22 +117,6 @@ const deleteRiskMappingMutation = graphql`
   ) {
     deleteRiskMapping(input: $input) {
       success
-      risk {
-        id
-        mitigations(first: 100) @connection(key: "Risk__mitigations") {
-          edges {
-            node {
-              id
-              name
-              description
-              category
-              importance
-              state
-              createdAt
-            }
-          }
-        }
-      }
     }
   }
 `;
