@@ -87,10 +87,14 @@ import { MitigationViewUnassignTaskMutation as MitigationViewUnassignTaskMutatio
 import { MitigationViewUpdateMitigationStateMutation as MitigationViewUpdateMitigationStateMutationType } from "./__generated__/MitigationViewUpdateMitigationStateMutation.graphql";
 import { MitigationViewQuery as MitigationViewQueryType } from "./__generated__/MitigationViewQuery.graphql";
 import { MitigationViewOrganizationQuery$data } from "./__generated__/MitigationViewOrganizationQuery.graphql";
-import { MitigationViewFrameworksQuery$data } from "./__generated__/MitigationViewFrameworksQuery.graphql";
-import { MitigationViewLinkedControlsQuery$data } from "./__generated__/MitigationViewLinkedControlsQuery.graphql";
-import { MitigationViewCreateControlMappingMutation$data } from "./__generated__/MitigationViewCreateControlMappingMutation.graphql";
-import { MitigationViewDeleteControlMappingMutation$data } from "./__generated__/MitigationViewDeleteControlMappingMutation.graphql";
+import {
+  MitigationViewFrameworksQuery,
+  MitigationViewFrameworksQuery$data,
+} from "./__generated__/MitigationViewFrameworksQuery.graphql";
+import {
+  MitigationViewLinkedControlsQuery,
+  MitigationViewLinkedControlsQuery$data,
+} from "./__generated__/MitigationViewLinkedControlsQuery.graphql";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -402,6 +406,31 @@ const deleteControlMappingMutation = graphql`
   }
 `;
 
+// Define type for framework structure
+type FrameworkEdge = {
+  node: {
+    id: string;
+    name: string;
+    controls: {
+      edges: Array<{
+        node: {
+          id: string;
+          referenceId: string;
+          name: string;
+          description?: string;
+        };
+      }>;
+    };
+  };
+};
+
+type ControlNode = {
+  id: string;
+  referenceId: string;
+  name: string;
+  description?: string;
+};
+
 function MitigationViewContent({
   queryRef,
 }: {
@@ -427,10 +456,10 @@ function MitigationViewContent({
   // Control mapping state
   const [isControlMappingDialogOpen, setIsControlMappingDialogOpen] =
     useState(false);
-  const [frameworksData, setFrameworksData] = useState<any | null>(null);
-  const [linkedControlsData, setLinkedControlsData] = useState<any | null>(
-    null
-  );
+  const [frameworksData, setFrameworksData] =
+    useState<MitigationViewFrameworksQuery$data | null>(null);
+  const [linkedControlsData, setLinkedControlsData] =
+    useState<MitigationViewLinkedControlsQuery$data | null>(null);
   const [controlSearchQuery, setControlSearchQuery] = useState("");
   const [selectedFrameworkId, setSelectedFrameworkId] = useState<string | null>(
     null
@@ -450,10 +479,10 @@ function MitigationViewContent({
   useEffect(() => {
     if (organizationId) {
       fetchQuery(environment, organizationQuery, { organizationId }).subscribe({
-        next: (data) => {
-          setOrganizationData(data);
+        next: (data: unknown) => {
+          setOrganizationData(data as MitigationViewOrganizationQuery$data);
         },
-        error: (error) => {
+        error: (error: Error) => {
           console.error("Error fetching organization:", error);
         },
       });
@@ -464,10 +493,10 @@ function MitigationViewContent({
   useEffect(() => {
     if (mitigationId) {
       fetchQuery(environment, linkedControlsQuery, { mitigationId }).subscribe({
-        next: (data) => {
-          setLinkedControlsData(data);
+        next: (data: unknown) => {
+          setLinkedControlsData(data as MitigationViewLinkedControlsQuery$data);
         },
-        error: (error) => {
+        error: (error: Error) => {
           console.error("Error fetching linked controls:", error);
         },
       });
@@ -1356,15 +1385,21 @@ function MitigationViewContent({
     setIsLoadingControls(true);
 
     // Fetch all frameworks and their controls
-    fetchQuery(environment, frameworksQuery, { organizationId }).subscribe({
-      next: (data: any) => {
+    fetchQuery<MitigationViewFrameworksQuery>(environment, frameworksQuery, {
+      organizationId,
+    }).subscribe({
+      next: (data) => {
         setFrameworksData(data);
         if (
-          data?.organization?.frameworks?.edges?.length > 0 &&
+          data?.organization?.frameworks?.edges &&
+          data.organization.frameworks.edges.length > 0 &&
           !selectedFrameworkId
         ) {
           // Select the first framework by default if none is selected
-          setSelectedFrameworkId(data.organization.frameworks.edges[0].node.id);
+          const frameworks = data.organization.frameworks.edges;
+          if (frameworks[0]?.node?.id) {
+            setSelectedFrameworkId(frameworks[0].node.id);
+          }
         }
       },
       complete: () => {
@@ -1372,11 +1407,13 @@ function MitigationViewContent({
         fetchQuery(environment, linkedControlsQuery, {
           mitigationId,
         }).subscribe({
-          next: (data: any) => {
-            setLinkedControlsData(data);
+          next: (data: unknown) => {
+            setLinkedControlsData(
+              data as MitigationViewLinkedControlsQuery$data
+            );
             setIsLoadingControls(false);
           },
-          error: (error) => {
+          error: (error: Error) => {
             console.error("Error fetching linked controls:", error);
             setIsLoadingControls(false);
             toast({
@@ -1387,7 +1424,7 @@ function MitigationViewContent({
           },
         });
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error("Error fetching frameworks:", error);
         setIsLoadingControls(false);
         toast({
@@ -1403,28 +1440,27 @@ function MitigationViewContent({
     if (!frameworksData?.organization?.frameworks?.edges) return [];
 
     // Get controls from the selected framework
-    const frameworks = frameworksData.organization.frameworks.edges;
+    const frameworks = frameworksData.organization.frameworks
+      .edges as Array<FrameworkEdge>;
     if (selectedFrameworkId) {
       const selectedFramework = frameworks.find(
-        (edge: any) => edge.node.id === selectedFrameworkId
+        (edge: FrameworkEdge) => edge.node.id === selectedFrameworkId
       );
 
       if (selectedFramework?.node?.controls?.edges) {
-        return selectedFramework.node.controls.edges.map(
-          (edge: any) => edge.node
-        );
+        return selectedFramework.node.controls.edges.map((edge) => edge.node);
       }
     }
 
     // If no framework is selected or it doesn't have controls, return controls from all frameworks
-    return frameworks.flatMap((framework: any) =>
-      framework.node.controls.edges.map((edge: any) => edge.node)
+    return frameworks.flatMap((framework: FrameworkEdge) =>
+      framework.node.controls.edges.map((edge) => edge.node)
     );
   }, [frameworksData, selectedFrameworkId]);
 
   const getLinkedControls = useCallback(() => {
     if (!linkedControlsData?.mitigation?.controls?.edges) return [];
-    return linkedControlsData.mitigation.controls.edges.map(
+    return (linkedControlsData.mitigation.controls.edges || []).map(
       (edge) => edge.node
     );
   }, [linkedControlsData]);
@@ -1432,7 +1468,9 @@ function MitigationViewContent({
   const isControlLinked = useCallback(
     (controlId: string) => {
       const linkedControls = getLinkedControls();
-      return linkedControls.some((control: any) => control.id === controlId);
+      return linkedControls.some(
+        (control: ControlNode) => control.id === controlId
+      );
     },
     [getLinkedControls]
   );
@@ -1464,13 +1502,17 @@ function MitigationViewContent({
           }
 
           // Refresh linked controls data
-          fetchQuery(environment, linkedControlsQuery, {
-            mitigationId,
-          }).subscribe({
-            next: (data: any) => {
+          fetchQuery<MitigationViewLinkedControlsQuery>(
+            environment,
+            linkedControlsQuery,
+            {
+              mitigationId,
+            }
+          ).subscribe({
+            next: (data) => {
               setLinkedControlsData(data);
             },
-            error: (error) => {
+            error: (error: Error) => {
               console.error("Error refreshing linked controls:", error);
             },
           });
@@ -1524,10 +1566,12 @@ function MitigationViewContent({
           fetchQuery(environment, linkedControlsQuery, {
             mitigationId,
           }).subscribe({
-            next: (data: any) => {
-              setLinkedControlsData(data);
+            next: (data: unknown) => {
+              setLinkedControlsData(
+                data as MitigationViewLinkedControlsQuery$data
+              );
             },
-            error: (error) => {
+            error: (error: Error) => {
               console.error("Error refreshing linked controls:", error);
             },
           });
@@ -1562,7 +1606,7 @@ function MitigationViewContent({
 
     const lowerQuery = controlSearchQuery.toLowerCase();
     return controls.filter(
-      (control: any) =>
+      (control: ControlNode) =>
         control.referenceId.toLowerCase().includes(lowerQuery) ||
         control.name.toLowerCase().includes(lowerQuery) ||
         (control.description &&
@@ -1673,7 +1717,7 @@ function MitigationViewContent({
                   <SelectContent>
                     <SelectItem value="all">All Frameworks</SelectItem>
                     {frameworksData?.organization?.frameworks?.edges?.map(
-                      (edge: any) => (
+                      (edge) => (
                         <SelectItem key={edge.node.id} value={edge.node.id}>
                           {edge.node.name}
                         </SelectItem>
@@ -1698,7 +1742,7 @@ function MitigationViewContent({
                       different framework.
                     </div>
                   ) : (
-                    filteredControls().map((control: any) => {
+                    filteredControls().map((control) => {
                       const isLinked = isControlLinked(control.id);
                       return (
                         <Card
@@ -1788,9 +1832,10 @@ function MitigationViewContent({
         {/* Linked Controls List */}
         <Card>
           <CardContent className="p-4">
-            {linkedControlsData?.mitigation?.controls?.edges?.length > 0 ? (
+            {linkedControlsData?.mitigation?.controls?.edges &&
+            linkedControlsData.mitigation.controls.edges.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {getLinkedControls().map((control: any) => (
+                {getLinkedControls().map((control: ControlNode) => (
                   <Card key={control.id} className="border overflow-hidden">
                     <div className="p-3">
                       <div className="flex items-center gap-2 mb-1">
@@ -1821,8 +1866,8 @@ function MitigationViewContent({
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                No controls linked to this mitigation yet. Click "Map to
-                Controls" to link controls.
+                No controls linked to this mitigation yet. Click &quot;Map to
+                Controls&quot; to link controls.
               </div>
             )}
           </CardContent>
