@@ -174,7 +174,7 @@ LIMIT 1;
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"id": r.ID}
+	args := pgx.StrictNamedArgs{"id": riskID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
