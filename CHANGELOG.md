@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add import control <> mitigation mapping.
+- Add mitigation tasks import.
+
 ## [0.3.0] - 2025-04-01
 
 ### Added
@@ -15,7 +20,7 @@ All notable changes to this project will be documented in this file.
 - Add import framework support.
 - Add risk object management.
 - Add risk template.
-  - Add mapping between control and risk.
+- Add mapping between control and risk.
 
 ### Changed
 
