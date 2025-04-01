@@ -24,6 +24,7 @@ import { VendorPage } from "./vendors/VendorPage";
 import { MitigationNewPage } from "./mitigations/MitigationNewPage";
 import { RiskListPage } from "./risks/RiskListPage";
 import { NewRiskPage } from "./risks/NewRiskPage";
+import ShowRiskView from "./risks/ShowRiskView";
 
 export function OrganizationsRoutes() {
   return (
@@ -57,6 +58,7 @@ export function OrganizationsRoutes() {
         />
         <Route path="risks" element={<RiskListPage />} />
         <Route path="risks/new" element={<NewRiskPage />} />
+        <Route path="risks/:riskId" element={<ShowRiskView />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

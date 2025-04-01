@@ -33,6 +33,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  ControlViewLinkedMitigationsQuery,
+  ControlViewLinkedMitigationsQuery$data,
+} from "./__generated__/ControlViewLinkedMitigationsQuery.graphql";
+import {
+  ControlViewOrganizationMitigationsQuery,
+  ControlViewOrganizationMitigationsQuery$data,
+} from "./__generated__/ControlViewOrganizationMitigationsQuery.graphql";
 
 const controlViewQuery = graphql`
   query ControlViewQuery($controlId: ID!) {
@@ -115,38 +123,6 @@ const deleteMitigationMappingMutation = graphql`
   }
 `;
 
-// Add type definitions for the GraphQL responses
-interface MitigationNode {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  importance: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-  state: "NOT_STARTED" | "IN_PROGRESS" | "IMPLEMENTED" | "NOT_APPLICABLE";
-}
-
-interface LinkedMitigationsData {
-  control?: {
-    id: string;
-    mitigations?: {
-      edges: Array<{
-        node: MitigationNode;
-      }>;
-    };
-  };
-}
-
-interface OrganizationMitigationsData {
-  organization?: {
-    id: string;
-    mitigations?: {
-      edges: Array<{
-        node: MitigationNode;
-      }>;
-    };
-  };
-}
-
 export function Control({
   control,
 }: {
@@ -163,9 +139,9 @@ export function Control({
   const [isMitigationMappingDialogOpen, setIsMitigationMappingDialogOpen] =
     useState(false);
   const [linkedMitigationsData, setLinkedMitigationsData] =
-    useState<LinkedMitigationsData | null>(null);
+    useState<ControlViewLinkedMitigationsQuery$data | null>(null);
   const [organizationMitigationsData, setOrganizationMitigationsData] =
-    useState<OrganizationMitigationsData | null>(null);
+    useState<ControlViewOrganizationMitigationsQuery$data | null>(null);
   const [mitigationSearchQuery, setMitigationSearchQuery] = useState("");
   const [isLoadingMitigations, setIsLoadingMitigations] = useState(false);
   const [isLinkingMitigation, setIsLinkingMitigation] = useState(false);
@@ -184,11 +160,15 @@ export function Control({
   useEffect(() => {
     if (control.id) {
       setIsLoadingMitigations(true);
-      fetchQuery(environment, linkedMitigationsQuery, {
-        controlId: control.id,
-      }).subscribe({
+      fetchQuery<ControlViewLinkedMitigationsQuery>(
+        environment,
+        linkedMitigationsQuery,
+        {
+          controlId: control.id,
+        }
+      ).subscribe({
         next: (data) => {
-          setLinkedMitigationsData(data as LinkedMitigationsData);
+          setLinkedMitigationsData(data);
           setIsLoadingMitigations(false);
         },
         error: (error: Error) => {
@@ -206,19 +186,27 @@ export function Control({
     setIsLoadingMitigations(true);
 
     // Fetch all mitigations for the organization
-    fetchQuery(environment, organizationMitigationsQuery, {
-      organizationId,
-    }).subscribe({
+    fetchQuery<ControlViewOrganizationMitigationsQuery>(
+      environment,
+      organizationMitigationsQuery,
+      {
+        organizationId,
+      }
+    ).subscribe({
       next: (data) => {
-        setOrganizationMitigationsData(data as OrganizationMitigationsData);
+        setOrganizationMitigationsData(data);
       },
       complete: () => {
         // Fetch linked mitigations for this control
-        fetchQuery(environment, linkedMitigationsQuery, {
-          controlId: control.id,
-        }).subscribe({
+        fetchQuery<ControlViewLinkedMitigationsQuery>(
+          environment,
+          linkedMitigationsQuery,
+          {
+            controlId: control.id,
+          }
+        ).subscribe({
           next: (data) => {
-            setLinkedMitigationsData(data as LinkedMitigationsData);
+            setLinkedMitigationsData(data);
             setIsLoadingMitigations(false);
           },
           error: (error: Error) => {
@@ -337,11 +325,15 @@ export function Control({
           }
 
           // Refresh linked mitigations data
-          fetchQuery(environment, linkedMitigationsQuery, {
-            controlId: control.id,
-          }).subscribe({
+          fetchQuery<ControlViewLinkedMitigationsQuery>(
+            environment,
+            linkedMitigationsQuery,
+            {
+              controlId: control.id,
+            }
+          ).subscribe({
             next: (data) => {
-              setLinkedMitigationsData(data as LinkedMitigationsData);
+              setLinkedMitigationsData(data);
             },
             error: (error: Error) => {
               console.error("Error refreshing linked mitigations:", error);
@@ -394,11 +386,15 @@ export function Control({
           }
 
           // Refresh linked mitigations data
-          fetchQuery(environment, linkedMitigationsQuery, {
-            controlId: control.id,
-          }).subscribe({
+          fetchQuery<ControlViewLinkedMitigationsQuery>(
+            environment,
+            linkedMitigationsQuery,
+            {
+              controlId: control.id,
+            }
+          ).subscribe({
             next: (data) => {
-              setLinkedMitigationsData(data as LinkedMitigationsData);
+              setLinkedMitigationsData(data);
             },
             error: (error: Error) => {
               console.error("Error refreshing linked mitigations:", error);
@@ -589,85 +585,81 @@ export function Control({
                           </tr>
                         </thead>
                         <tbody>
-                          {filteredMitigations().map(
-                            (mitigation: MitigationNode) => {
-                              const isLinked = isMitigationLinked(
-                                mitigation.id
-                              );
-                              return (
-                                <tr
-                                  key={mitigation.id}
-                                  className="border-b hover:bg-gray-50"
-                                >
-                                  <td className="py-3 px-4">
-                                    <div className="font-medium">
-                                      {mitigation.name}
+                          {filteredMitigations().map((mitigation) => {
+                            const isLinked = isMitigationLinked(mitigation.id);
+                            return (
+                              <tr
+                                key={mitigation.id}
+                                className="border-b hover:bg-gray-50"
+                              >
+                                <td className="py-3 px-4">
+                                  <div className="font-medium">
+                                    {mitigation.name}
+                                  </div>
+                                  {mitigation.description && (
+                                    <div className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                                      {mitigation.description}
                                     </div>
-                                    {mitigation.description && (
-                                      <div className="text-xs text-gray-500 line-clamp-1 mt-0.5">
-                                        {mitigation.description}
-                                      </div>
-                                    )}
-                                  </td>
-                                  <td className="py-3 px-4">
-                                    <div
-                                      className={`px-2 py-0.5 rounded-full text-xs ${getImportanceColor(
-                                        mitigation.importance
-                                      )} inline-block`}
+                                  )}
+                                </td>
+                                <td className="py-3 px-4">
+                                  <div
+                                    className={`px-2 py-0.5 rounded-full text-xs ${getImportanceColor(
+                                      mitigation.importance
+                                    )} inline-block`}
+                                  >
+                                    {formatImportance(mitigation.importance)}
+                                  </div>
+                                </td>
+                                <td className="py-3 px-4">
+                                  <div
+                                    className={`px-2 py-0.5 rounded-full text-xs ${getStateColor(
+                                      mitigation.state
+                                    )} inline-block`}
+                                  >
+                                    {formatState(mitigation.state)}
+                                  </div>
+                                </td>
+                                <td className="py-3 px-4 text-right whitespace-nowrap">
+                                  {isLinked ? (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleUnlinkMitigation(mitigation.id)
+                                      }
+                                      disabled={isUnlinkingMitigation}
+                                      className="text-xs h-7 text-red-500 border-red-200 hover:bg-red-50"
                                     >
-                                      {formatImportance(mitigation.importance)}
-                                    </div>
-                                  </td>
-                                  <td className="py-3 px-4">
-                                    <div
-                                      className={`px-2 py-0.5 rounded-full text-xs ${getStateColor(
-                                        mitigation.state
-                                      )} inline-block`}
+                                      {isUnlinkingMitigation ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <X className="w-4 h-4" />
+                                      )}
+                                      <span className="ml-1">Unlink</span>
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleLinkMitigation(mitigation.id)
+                                      }
+                                      disabled={isLinkingMitigation}
+                                      className="text-xs h-7 text-blue-500 border-blue-200 hover:bg-blue-50"
                                     >
-                                      {formatState(mitigation.state)}
-                                    </div>
-                                  </td>
-                                  <td className="py-3 px-4 text-right whitespace-nowrap">
-                                    {isLinked ? (
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                          handleUnlinkMitigation(mitigation.id)
-                                        }
-                                        disabled={isUnlinkingMitigation}
-                                        className="text-xs h-7 text-red-500 border-red-200 hover:bg-red-50"
-                                      >
-                                        {isUnlinkingMitigation ? (
-                                          <Loader2 className="w-4 h-4 animate-spin" />
-                                        ) : (
-                                          <X className="w-4 h-4" />
-                                        )}
-                                        <span className="ml-1">Unlink</span>
-                                      </Button>
-                                    ) : (
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                          handleLinkMitigation(mitigation.id)
-                                        }
-                                        disabled={isLinkingMitigation}
-                                        className="text-xs h-7 text-blue-500 border-blue-200 hover:bg-blue-50"
-                                      >
-                                        {isLinkingMitigation ? (
-                                          <Loader2 className="w-4 h-4 animate-spin" />
-                                        ) : (
-                                          <LinkIcon className="w-4 h-4" />
-                                        )}
-                                        <span className="ml-1">Link</span>
-                                      </Button>
-                                    )}
-                                  </td>
-                                </tr>
-                              );
-                            }
-                          )}
+                                      {isLinkingMitigation ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <LinkIcon className="w-4 h-4" />
+                                      )}
+                                      <span className="ml-1">Link</span>
+                                    </Button>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     )}
@@ -720,68 +712,66 @@ export function Control({
                     </tr>
                   </thead>
                   <tbody>
-                    {getLinkedMitigations().map(
-                      (mitigation: MitigationNode) => (
-                        <tr
-                          key={mitigation.id}
-                          className="border-b hover:bg-gray-50"
-                        >
-                          <td className="py-3 px-4">
-                            <div className="font-medium">{mitigation.name}</div>
-                            {mitigation.description && (
-                              <div className="text-xs text-gray-500 line-clamp-1 mt-0.5">
-                                {mitigation.description}
-                              </div>
-                            )}
-                          </td>
-                          <td className="py-3 px-4">
-                            <div
-                              className={`px-2 py-0.5 rounded-full text-xs ${getImportanceColor(
-                                mitigation.importance
-                              )} inline-block`}
+                    {getLinkedMitigations().map((mitigation) => (
+                      <tr
+                        key={mitigation.id}
+                        className="border-b hover:bg-gray-50"
+                      >
+                        <td className="py-3 px-4">
+                          <div className="font-medium">{mitigation.name}</div>
+                          {mitigation.description && (
+                            <div className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                              {mitigation.description}
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          <div
+                            className={`px-2 py-0.5 rounded-full text-xs ${getImportanceColor(
+                              mitigation.importance
+                            )} inline-block`}
+                          >
+                            {formatImportance(mitigation.importance)}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div
+                            className={`px-2 py-0.5 rounded-full text-xs ${getStateColor(
+                              mitigation.state
+                            )} inline-block`}
+                          >
+                            {formatState(mitigation.state)}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-right whitespace-nowrap">
+                          <div className="flex gap-2 justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              asChild
+                              className="text-xs h-7"
                             >
-                              {formatImportance(mitigation.importance)}
-                            </div>
-                          </td>
-                          <td className="py-3 px-4">
-                            <div
-                              className={`px-2 py-0.5 rounded-full text-xs ${getStateColor(
-                                mitigation.state
-                              )} inline-block`}
+                              <Link
+                                to={`/organizations/${organizationId}/mitigations/${mitigation.id}`}
+                              >
+                                View
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                handleUnlinkMitigation(mitigation.id)
+                              }
+                              disabled={isUnlinkingMitigation}
+                              className="text-xs h-7 text-red-500 border-red-200 hover:bg-red-50"
                             >
-                              {formatState(mitigation.state)}
-                            </div>
-                          </td>
-                          <td className="py-3 px-4 text-right whitespace-nowrap">
-                            <div className="flex gap-2 justify-end">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                asChild
-                                className="text-xs h-7"
-                              >
-                                <Link
-                                  to={`/organizations/${organizationId}/mitigations/${mitigation.id}`}
-                                >
-                                  View
-                                </Link>
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                  handleUnlinkMitigation(mitigation.id)
-                                }
-                                disabled={isUnlinkingMitigation}
-                                className="text-xs h-7 text-red-500 border-red-200 hover:bg-red-50"
-                              >
-                                Unlink
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    )}
+                              Unlink
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

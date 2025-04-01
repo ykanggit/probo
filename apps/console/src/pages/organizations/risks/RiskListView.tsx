@@ -318,21 +318,35 @@ function RiskListViewContent({
                         key={risk.id}
                         className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted cursor-pointer"
                       >
-                        <td className="p-4 align-middle font-medium w-1/2">
-                          {risk.name}
+                        <td className="p-0 align-middle font-medium w-1/2">
+                          <Link
+                            to={`/organizations/${organizationId}/risks/${risk.id}`}
+                            className="block p-4 h-full w-full"
+                          >
+                            {risk.name}
+                          </Link>
                         </td>
-                        <td className="p-4 align-middle w-1/4 whitespace-nowrap">
-                          {floatToProbabilityText(risk.probability)}
+                        <td className="p-0 align-middle w-1/4 whitespace-nowrap">
+                          <Link
+                            to={`/organizations/${organizationId}/risks/${risk.id}`}
+                            className="block p-4 h-full w-full"
+                          >
+                            {floatToProbabilityText(risk.probability)}
+                          </Link>
                         </td>
-                        <td className="p-4 align-middle w-1/4 whitespace-nowrap">
-                          {floatToImpactText(risk.impact)}
+                        <td className="p-0 align-middle w-1/4 whitespace-nowrap">
+                          <Link
+                            to={`/organizations/${organizationId}/risks/${risk.id}`}
+                            className="block p-4 h-full w-full"
+                          >
+                            {floatToImpactText(risk.impact)}
+                          </Link>
                         </td>
                         <td className="p-4 align-middle w-[80px]">
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
                               setRiskToDelete({ id: risk.id, name: risk.name });
                             }}
                           >
