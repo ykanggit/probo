@@ -2797,11 +2797,13 @@ function MitigationViewContent({
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleDeleteEvidence(
-                                          evidence.id,
-                                          evidence.filename,
-                                          task.id
-                                        );
+                                        if (selectedTask) {
+                                          handleDeleteEvidence(
+                                            evidence.id,
+                                            evidence.filename,
+                                            selectedTask.id
+                                          );
+                                        }
                                       }}
                                       className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
                                       title="Delete"
@@ -3296,11 +3298,13 @@ function MitigationViewContent({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDeleteEvidence(
-                                    evidence.id,
-                                    evidence.filename,
-                                    task.id
-                                  );
+                                  if (selectedTask) {
+                                    handleDeleteEvidence(
+                                      evidence.id,
+                                      evidence.filename,
+                                      selectedTask.id
+                                    );
+                                  }
                                 }}
                                 className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
                                 title="Delete"
