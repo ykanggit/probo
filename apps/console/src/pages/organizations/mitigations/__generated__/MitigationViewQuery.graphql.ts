@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5baf9229b2f520bcfa43960bd6af05e0>>
+ * @generated SignedSource<<3188657dfa050c818bf0dc06688d7fab>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type EvidenceState = "EXPIRED" | "INVALID" | "VALID";
+export type EvidenceState = "FULFILLED" | "REQUESTED";
 export type EvidenceType = "FILE" | "LINK";
 export type MitigationImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";

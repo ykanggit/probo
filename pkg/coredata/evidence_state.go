@@ -24,9 +24,8 @@ type (
 )
 
 const (
-	EvidenceStateValid EvidenceState = iota
-	EvidenceStateInvalid
-	EvidenceStateExpired
+	EvidenceStateRequested EvidenceState = iota
+	EvidenceStateFulfilled
 )
 
 func (es EvidenceState) MarshalText() ([]byte, error) {
@@ -37,12 +36,10 @@ func (es *EvidenceState) UnmarshalText(data []byte) error {
 	val := string(data)
 
 	switch val {
-	case EvidenceStateValid.String():
-		*es = EvidenceStateValid
-	case EvidenceStateInvalid.String():
-		*es = EvidenceStateInvalid
-	case EvidenceStateExpired.String():
-		*es = EvidenceStateExpired
+	case EvidenceStateRequested.String():
+		*es = EvidenceStateRequested
+	case EvidenceStateFulfilled.String():
+		*es = EvidenceStateFulfilled
 	default:
 		return fmt.Errorf("invalid EvidenceState value: %q", val)
 	}
@@ -54,12 +51,10 @@ func (es EvidenceState) String() string {
 	var val string
 
 	switch es {
-	case EvidenceStateValid:
-		val = "VALID"
-	case EvidenceStateInvalid:
-		val = "INVALID"
-	case EvidenceStateExpired:
-		val = "EXPIRED"
+	case EvidenceStateRequested:
+		val = "REQUESTED"
+	case EvidenceStateFulfilled:
+		val = "FULFILLED"
 	}
 
 	return val

@@ -67,15 +67,13 @@ enum TaskState
 
 enum EvidenceState
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.EvidenceState") {
-  VALID
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateValid")
-  INVALID
+  FULFILLED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateInvalid"
+      value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateFulfilled"
     )
-  EXPIRED
+  REQUESTED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateExpired"
+      value: "github.com/getprobo/probo/pkg/coredata.EvidenceStateRequested"
     )
 }
 
@@ -751,7 +749,9 @@ type Mutation {
   deleteRiskMapping(input: DeleteRiskMappingInput!): DeleteRiskMappingPayload!
 
   # Evidence mutations
-  uploadEvidence(input: UploadEvidenceInput!): UploadEvidencePayload!
+  requestEvidence(input: RequestEvidenceInput!): RequestEvidencePayload!
+  fulfillEvidence(input: FulfillEvidenceInput!): FulfillEvidencePayload!
+  createEvidence(input: CreateEvidenceInput!): CreateEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
 
   # Policy mutations
@@ -939,12 +939,25 @@ input DeleteRiskMappingInput {
   mitigationId: ID!
 }
 
-input UploadEvidenceInput {
+input RequestEvidenceInput {
   taskId: ID!
   name: String!
+  type: EvidenceType!
+  description: String!
+}
+
+input FulfillEvidenceInput {
+  evidenceId: ID!
   file: Upload
+  url: String
+}
+
+input CreateEvidenceInput {
+  taskId: ID!
+  name: String!
   type: EvidenceType!
   url: String
+  file: Upload
   description: String!
 }
 
@@ -1102,7 +1115,15 @@ type DeleteRiskMappingPayload {
   success: Boolean!
 }
 
-type UploadEvidencePayload {
+type RequestEvidencePayload {
+  evidenceEdge: EvidenceEdge!
+}
+
+type FulfillEvidencePayload {
+  evidenceEdge: EvidenceEdge!
+}
+
+type CreateEvidencePayload {
   evidenceEdge: EvidenceEdge!
 }
 

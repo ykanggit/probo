@@ -37,6 +37,19 @@ type (
 		svc *TenantService
 	}
 
+	RequestEvidenceRequest struct {
+		TaskID      gid.GID
+		Type        coredata.EvidenceType
+		Name        string
+		Description string
+	}
+
+	FulfilledEvidenceRequest struct {
+		EvidenceID gid.GID
+		File       io.Reader
+		URL        string
+	}
+
 	CreateEvidenceRequest struct {
 		TaskID      gid.GID
 		Name        string
@@ -67,6 +80,63 @@ func (s EvidenceService) Get(
 	return evidence, nil
 }
 
+func (s EvidenceService) Request(
+	ctx context.Context,
+	req RequestEvidenceRequest,
+) (*coredata.Evidence, error) {
+	evidenceID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.EvidenceEntityType)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create evidence global id: %w", err)
+	}
+
+	now := time.Now()
+
+	evidence := &coredata.Evidence{
+		ID:          evidenceID,
+		TaskID:      req.TaskID,
+		State:       coredata.EvidenceStateRequested,
+		Type:        req.Type,
+		Filename:    req.Name,
+		Description: req.Description,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
+
+	err = s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return evidence.Insert(ctx, conn, s.svc.scope)
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot insert evidence: %w", err)
+	}
+
+	return evidence, nil
+}
+
+func (s EvidenceService) Fulfill(
+	ctx context.Context,
+	req FulfilledEvidenceRequest,
+) (*coredata.Evidence, error) {
+	evidence := &coredata.Evidence{}
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := evidence.LoadByID(ctx, conn, s.svc.scope, req.EvidenceID); err != nil {
+				return fmt.Errorf("cannot load evidence: %w", err)
+			}
+
+			evidence.State = coredata.EvidenceStateFulfilled
+
+			return evidence.Update(ctx, conn, s.svc.scope)
+		},
+	)
+
+}
+
 func (s EvidenceService) Create(
 	ctx context.Context,
 	req CreateEvidenceRequest,
@@ -79,8 +149,8 @@ func (s EvidenceService) Create(
 
 	evidence := &coredata.Evidence{
 		ID:          evidenceID,
-		TaskID:      &req.TaskID,
-		State:       coredata.EvidenceStateValid,
+		TaskID:      req.TaskID,
+		State:       coredata.EvidenceStateFulfilled,
 		Type:        req.Type,
 		Filename:    req.Name,
 		URL:         req.URL,

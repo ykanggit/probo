@@ -61,7 +61,7 @@ LOOP:
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
-	case <-time.After(1 * time.Second):
+	case <-time.After(60 * time.Second):
 		ctx := context.Background()
 		if err := m.batchSendEmails(ctx); err != nil {
 			m.l.ErrorCtx(ctx, "cannot send email", log.Error(err))

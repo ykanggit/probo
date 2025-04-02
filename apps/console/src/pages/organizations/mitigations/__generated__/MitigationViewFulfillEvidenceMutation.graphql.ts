@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6e5efc598a8e6657fd0a1375e6104ff6>>
+ * @generated SignedSource<<c12714c0dab6d31865a2b49936566f05>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,22 +9,19 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type EvidenceState = "FULLFILLED" | "REQUESTED";
+export type EvidenceState = "FULFILLED" | "REQUESTED";
 export type EvidenceType = "FILE" | "LINK";
-export type UploadEvidenceInput = {
-  description: string;
+export type FulfillEvidenceInput = {
+  evidenceId: string;
   file?: any | null | undefined;
-  name: string;
-  taskId: string;
-  type: EvidenceType;
   url?: string | null | undefined;
 };
-export type MitigationViewUploadEvidenceMutation$variables = {
+export type MitigationViewFulfillEvidenceMutation$variables = {
   connections: ReadonlyArray<string>;
-  input: UploadEvidenceInput;
+  input: FulfillEvidenceInput;
 };
-export type MitigationViewUploadEvidenceMutation$data = {
-  readonly uploadEvidence: {
+export type MitigationViewFulfillEvidenceMutation$data = {
+  readonly fulfillEvidence: {
     readonly evidenceEdge: {
       readonly node: {
         readonly createdAt: string;
@@ -40,9 +37,9 @@ export type MitigationViewUploadEvidenceMutation$data = {
     };
   };
 };
-export type MitigationViewUploadEvidenceMutation = {
-  response: MitigationViewUploadEvidenceMutation$data;
-  variables: MitigationViewUploadEvidenceMutation$variables;
+export type MitigationViewFulfillEvidenceMutation = {
+  response: MitigationViewFulfillEvidenceMutation$data;
+  variables: MitigationViewFulfillEvidenceMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -156,14 +153,14 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "MitigationViewUploadEvidenceMutation",
+    "name": "MitigationViewFulfillEvidenceMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "UploadEvidencePayload",
+        "concreteType": "FulfillEvidencePayload",
         "kind": "LinkedField",
-        "name": "uploadEvidence",
+        "name": "fulfillEvidence",
         "plural": false,
         "selections": [
           (v3/*: any*/)
@@ -181,14 +178,14 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "MitigationViewUploadEvidenceMutation",
+    "name": "MitigationViewFulfillEvidenceMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "UploadEvidencePayload",
+        "concreteType": "FulfillEvidencePayload",
         "kind": "LinkedField",
-        "name": "uploadEvidence",
+        "name": "fulfillEvidence",
         "plural": false,
         "selections": [
           (v3/*: any*/),
@@ -214,16 +211,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "30a6915055d3f6b63d96836b26f05a45",
+    "cacheID": "147fdc881f797ace12dc1242cab782ad",
     "id": null,
     "metadata": {},
-    "name": "MitigationViewUploadEvidenceMutation",
+    "name": "MitigationViewFulfillEvidenceMutation",
     "operationKind": "mutation",
-    "text": "mutation MitigationViewUploadEvidenceMutation(\n  $input: UploadEvidenceInput!\n) {\n  uploadEvidence(input: $input) {\n    evidenceEdge {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        type\n        url\n        size\n        state\n        createdAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation MitigationViewFulfillEvidenceMutation(\n  $input: FulfillEvidenceInput!\n) {\n  fulfillEvidence(input: $input) {\n    evidenceEdge {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        type\n        url\n        size\n        state\n        createdAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "4cf5430a0971ba1ddf476765df614e30";
+(node as any).hash = "c0a1e6be43759cfbcd7e25a3b597926a";
 
 export default node;

@@ -68,6 +68,19 @@ type CreateControlMappingPayload struct {
 	Success bool `json:"success"`
 }
 
+type CreateEvidenceInput struct {
+	TaskID      gid.GID               `json:"taskId"`
+	Name        string                `json:"name"`
+	Type        coredata.EvidenceType `json:"type"`
+	URL         *string               `json:"url,omitempty"`
+	File        *graphql.Upload       `json:"file,omitempty"`
+	Description string                `json:"description"`
+}
+
+type CreateEvidencePayload struct {
+	EvidenceEdge *EvidenceEdge `json:"evidenceEdge"`
+}
+
 type CreateFrameworkInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 	Name           string  `json:"name"`
@@ -306,6 +319,16 @@ type FrameworkEdge struct {
 	Node   *Framework     `json:"node"`
 }
 
+type FulfillEvidenceInput struct {
+	EvidenceID gid.GID         `json:"evidenceId"`
+	File       *graphql.Upload `json:"file,omitempty"`
+	URL        *string         `json:"url,omitempty"`
+}
+
+type FulfillEvidencePayload struct {
+	EvidenceEdge *EvidenceEdge `json:"evidenceEdge"`
+}
+
 type ImportFrameworkInput struct {
 	OrganizationID gid.GID        `json:"organizationId"`
 	File           graphql.Upload `json:"file"`
@@ -461,6 +484,17 @@ type RemoveUserInput struct {
 
 type RemoveUserPayload struct {
 	Success bool `json:"success"`
+}
+
+type RequestEvidenceInput struct {
+	TaskID      gid.GID               `json:"taskId"`
+	Name        string                `json:"name"`
+	Type        coredata.EvidenceType `json:"type"`
+	Description string                `json:"description"`
+}
+
+type RequestEvidencePayload struct {
+	EvidenceEdge *EvidenceEdge `json:"evidenceEdge"`
 }
 
 type Risk struct {
@@ -622,19 +656,6 @@ type UpdateVendorInput struct {
 
 type UpdateVendorPayload struct {
 	Vendor *Vendor `json:"vendor"`
-}
-
-type UploadEvidenceInput struct {
-	TaskID      gid.GID               `json:"taskId"`
-	Name        string                `json:"name"`
-	File        *graphql.Upload       `json:"file,omitempty"`
-	Type        coredata.EvidenceType `json:"type"`
-	URL         *string               `json:"url,omitempty"`
-	Description string                `json:"description"`
-}
-
-type UploadEvidencePayload struct {
-	EvidenceEdge *EvidenceEdge `json:"evidenceEdge"`
 }
 
 type User struct {

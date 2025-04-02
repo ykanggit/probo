@@ -17,30 +17,41 @@ import {
   useRelayEnvironment,
 } from "react-relay";
 import {
+  AlertTriangle,
+  ArrowRight,
+  Check,
   CheckCircle2,
-  Plus,
-  Trash2,
-  FileIcon,
-  Loader2,
   ChevronDown,
   ChevronUp,
+  Clock,
   Download,
   Eye,
   File as FileGeneric,
+  FileIcon,
   FileText,
   Image,
-  X,
-  UserPlus,
-  UserMinus,
-  User,
   Link2,
+  Loader2,
+  LucideIcon,
+  MoreHorizontal,
+  Plus,
   Search,
-  Link as LinkIcon,
-  CheckSquare,
   ShieldCheck,
-  AlertTriangle,
+  Trash2,
+  Upload,
+  User,
+  UserMinus,
+  UserPlus,
+  X,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,7 +94,6 @@ import { MitigationViewSkeleton } from "./MitigationPage";
 import { MitigationViewUpdateTaskStateMutation as MitigationViewUpdateTaskStateMutationType } from "./__generated__/MitigationViewUpdateTaskStateMutation.graphql";
 import { MitigationViewCreateTaskMutation as MitigationViewCreateTaskMutationType } from "./__generated__/MitigationViewCreateTaskMutation.graphql";
 import { MitigationViewDeleteTaskMutation as MitigationViewDeleteTaskMutationType } from "./__generated__/MitigationViewDeleteTaskMutation.graphql";
-import { MitigationViewUploadEvidenceMutation as MitigationViewUploadEvidenceMutationType } from "./__generated__/MitigationViewUploadEvidenceMutation.graphql";
 import { MitigationViewDeleteEvidenceMutation as MitigationViewDeleteEvidenceMutationType } from "./__generated__/MitigationViewDeleteEvidenceMutation.graphql";
 import { MitigationViewAssignTaskMutation as MitigationViewAssignTaskMutationType } from "./__generated__/MitigationViewAssignTaskMutation.graphql";
 import { MitigationViewUnassignTaskMutation as MitigationViewUnassignTaskMutationType } from "./__generated__/MitigationViewUnassignTaskMutation.graphql";
@@ -105,6 +115,10 @@ import {
   MitigationViewRisksQuery,
   MitigationViewRisksQuery$data,
 } from "./__generated__/MitigationViewRisksQuery.graphql";
+import { MitigationViewCreateEvidenceMutation as MitigationViewCreateEvidenceMutationType } from "./__generated__/MitigationViewCreateEvidenceMutation.graphql";
+import { MitigationViewGetEvidenceFileUrlQuery as MitigationViewGetEvidenceFileUrlQueryType } from "./__generated__/MitigationViewGetEvidenceFileUrlQuery.graphql";
+import { MitigationViewFulfillEvidenceMutation as MitigationViewFulfillEvidenceMutationType } from "./__generated__/MitigationViewFulfillEvidenceMutation.graphql";
+import { MitigationViewUploadEvidenceMutation as MitigationViewUploadEvidenceMutationType } from "./__generated__/MitigationViewUploadEvidenceMutation.graphql";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -238,12 +252,12 @@ const deleteTaskMutation = graphql`
   }
 `;
 
-const uploadEvidenceMutation = graphql`
-  mutation MitigationViewUploadEvidenceMutation(
-    $input: UploadEvidenceInput!
+const createEvidenceMutation = graphql`
+  mutation MitigationViewCreateEvidenceMutation(
+    $input: CreateEvidenceInput!
     $connections: [ID!]!
   ) {
-    uploadEvidence(input: $input) {
+    createEvidence(input: $input) {
       evidenceEdge @appendEdge(connections: $connections) {
         node {
           id
@@ -412,6 +426,30 @@ const deleteControlMappingMutation = graphql`
   ) {
     deleteControlMapping(input: $input) {
       success
+    }
+  }
+`;
+
+// Add a mutation to fulfill evidence
+const fulfillEvidenceMutation = graphql`
+  mutation MitigationViewFulfillEvidenceMutation(
+    $input: FulfillEvidenceInput!
+    $connections: [ID!]!
+  ) {
+    fulfillEvidence(input: $input) {
+      evidenceEdge @appendEdge(connections: $connections) {
+        node {
+          id
+          filename
+          fileUrl
+          mimeType
+          type
+          url
+          size
+          state
+          createdAt
+        }
+      }
     }
   }
 `;
@@ -641,9 +679,9 @@ function MitigationViewContent({
     useMutation<MitigationViewCreateTaskMutationType>(createTaskMutation);
   const [deleteTask] =
     useMutation<MitigationViewDeleteTaskMutationType>(deleteTaskMutation);
-  const [uploadEvidence] =
-    useMutation<MitigationViewUploadEvidenceMutationType>(
-      uploadEvidenceMutation
+  const [createEvidence] =
+    useMutation<MitigationViewCreateEvidenceMutationType>(
+      createEvidenceMutation
     );
   const [deleteEvidence] =
     useMutation<MitigationViewDeleteEvidenceMutationType>(
@@ -653,6 +691,10 @@ function MitigationViewContent({
     useMutation<MitigationViewAssignTaskMutationType>(assignTaskMutation);
   const [unassignTask] =
     useMutation<MitigationViewUnassignTaskMutationType>(unassignTaskMutation);
+  const [fulfillEvidence] =
+    useMutation<MitigationViewFulfillEvidenceMutationType>(
+      fulfillEvidenceMutation
+    );
 
   const [updateMitigationState] =
     useMutation<MitigationViewUpdateMitigationStateMutationType>(
@@ -722,6 +764,14 @@ function MitigationViewContent({
   const [linkEvidenceUrl, setLinkEvidenceUrl] = useState("");
   const [linkEvidenceDescription, setLinkEvidenceDescription] = useState("");
   const [activeTab, setActiveTab] = useState<"file" | "link">("file");
+
+  // State for fulfill evidence dialog
+  const [fulfillEvidenceDialogOpen, setFulfillEvidenceDialogOpen] =
+    useState(false);
+  const [evidenceToFulfill, setEvidenceToFulfill] = useState<{
+    id: string;
+    filename: string;
+  } | null>(null);
 
   // Add state for selected task panel
   const [selectedTask, setSelectedTask] = useState<(typeof tasks)[0] | null>(
@@ -955,7 +1005,7 @@ function MitigationViewContent({
     );
   };
 
-  const handleUploadEvidence = (taskId: string, taskName: string) => {
+  const handleCreateEvidence = (taskId: string, taskName: string) => {
     setTaskForEvidence({ id: taskId, name: taskName });
     setEvidenceDialogOpen(true);
     // Reset form fields
@@ -980,7 +1030,7 @@ function MitigationViewContent({
     // Get the evidence connection ID for this task
     const evidenceConnectionId = getEvidenceConnectionId(taskForEvidence.id);
 
-    uploadEvidence({
+    createEvidence({
       variables: {
         input: {
           taskId: taskForEvidence.id,
@@ -1043,7 +1093,7 @@ function MitigationViewContent({
     const description =
       linkEvidenceDescription.trim() || `Link to ${linkEvidenceUrl}`;
 
-    uploadEvidence({
+    createEvidence({
       variables: {
         input: {
           taskId: taskForEvidence.id,
@@ -1109,7 +1159,7 @@ function MitigationViewContent({
     // Get the evidence connection ID for this task
     const evidenceConnectionId = getEvidenceConnectionId(taskId);
 
-    uploadEvidence({
+    createEvidence({
       variables: {
         input: {
           taskId: taskId,
@@ -1234,6 +1284,126 @@ function MitigationViewContent({
   ) => {
     setEvidenceToDelete({ id: evidenceId, filename, taskId });
     setIsDeleteEvidenceOpen(true);
+  };
+
+  const handleFulfillEvidence = (evidenceId: string, filename: string) => {
+    setEvidenceToFulfill({ id: evidenceId, filename });
+    setFulfillEvidenceDialogOpen(true);
+    setActiveTab("file");
+    setLinkEvidenceUrl("");
+    setLinkEvidenceDescription("");
+  };
+
+  const handleFulfillEvidenceWithFile = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!e.target.files || e.target.files.length === 0 || !evidenceToFulfill)
+      return;
+
+    const file = e.target.files[0];
+
+    // Show toast for upload started
+    toast({
+      title: "Uploading evidence",
+      description: `Uploading ${file.name}...`,
+      variant: "default",
+    });
+
+    const evidenceId = evidenceToFulfill.id;
+    // Get connection ID for the parent task (assuming it's available in the view)
+    const task = tasks.find((task) =>
+      task.evidences?.edges.some((edge) => edge?.node?.id === evidenceId)
+    );
+
+    const evidenceConnectionId = task?.id
+      ? getEvidenceConnectionId(task.id)
+      : null;
+
+    fulfillEvidence({
+      variables: {
+        input: {
+          evidenceId: evidenceId,
+          file: null,
+        },
+        connections: evidenceConnectionId ? [evidenceConnectionId] : [],
+      },
+      uploadables: {
+        "input.file": file,
+      },
+      onCompleted: () => {
+        setFulfillEvidenceDialogOpen(false);
+        setEvidenceToFulfill(null);
+        toast({
+          title: "Evidence uploaded",
+          description: "Evidence has been fulfilled successfully.",
+          variant: "default",
+        });
+        // Reset the file input
+        if (hiddenFileInputRef.current) {
+          hiddenFileInputRef.current.value = "";
+        }
+      },
+      onError: (error) => {
+        toast({
+          title: "Error uploading evidence",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const handleFulfillEvidenceWithLink = () => {
+    if (!evidenceToFulfill) return;
+
+    // Validate URL
+    if (!linkEvidenceUrl.trim()) {
+      toast({
+        title: "Error",
+        description: "Please provide a URL for the evidence",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Get connection ID for the parent task
+    const task = tasks.find((task) =>
+      task.evidences?.edges.some(
+        (edge) => edge?.node?.id === evidenceToFulfill.id
+      )
+    );
+
+    const evidenceConnectionId = task?.id
+      ? getEvidenceConnectionId(task.id)
+      : null;
+
+    fulfillEvidence({
+      variables: {
+        input: {
+          evidenceId: evidenceToFulfill.id,
+          url: linkEvidenceUrl,
+        },
+        connections: evidenceConnectionId ? [evidenceConnectionId] : [],
+      },
+      onCompleted: () => {
+        setFulfillEvidenceDialogOpen(false);
+        setEvidenceToFulfill(null);
+        setLinkEvidenceUrl("");
+        setLinkEvidenceDescription("");
+        toast({
+          title: "Evidence updated",
+          description: "Evidence has been fulfilled with link successfully.",
+          variant: "default",
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Error updating evidence",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   const confirmDeleteEvidence = () => {
@@ -1789,7 +1959,7 @@ function MitigationViewContent({
       >
         <TabsList className="mb-4">
           <TabsTrigger value="tasks" className="flex items-center gap-2">
-            <CheckSquare className="w-4 h-4" />
+            <Check className="w-4 h-4" />
             Tasks
             {tasks.length > 0 && (
               <span className="ml-1.5 bg-blue-100 text-blue-800 rounded-full text-xs px-2 py-0.5">
@@ -1830,7 +2000,7 @@ function MitigationViewContent({
                 className="flex items-center gap-1"
                 onClick={handleOpenControlMappingDialog}
               >
-                <LinkIcon className="w-4 h-4" />
+                <Link2 className="w-4 h-4" />
                 <span>Map to Controls</span>
               </Button>
             </div>
@@ -1967,7 +2137,7 @@ function MitigationViewContent({
                                         {isLinkingControl ? (
                                           <Loader2 className="w-4 h-4 animate-spin" />
                                         ) : (
-                                          <LinkIcon className="w-4 h-4" />
+                                          <Link2 className="w-4 h-4" />
                                         )}
                                         <span className="ml-1">Link</span>
                                       </Button>
@@ -2442,7 +2612,7 @@ function MitigationViewContent({
                           onClick={(e) => {
                             e.stopPropagation();
                             if (task?.id && task?.name) {
-                              handleUploadEvidence(task.id, task.name);
+                              handleCreateEvidence(task.id, task.name);
                             }
                           }}
                           title="Add Evidence"
@@ -2512,16 +2682,31 @@ function MitigationViewContent({
                                       )}
                                     </div>
                                     <div>
-                                      <div className="text-sm font-medium text-gray-800">
+                                      <div className="text-sm font-medium text-gray-800 flex items-center gap-2">
                                         {evidence.filename}
+                                        {evidence.state === "REQUESTED" && (
+                                          <Badge
+                                            variant="outline"
+                                            className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200"
+                                          >
+                                            Requested
+                                          </Badge>
+                                        )}
                                       </div>
                                       <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
-                                        {evidence.type === "FILE" ? (
+                                        {evidence.state === "REQUESTED" ? (
+                                          <span className="italic text-yellow-600">
+                                            Waiting for fulfillment
+                                          </span>
+                                        ) : evidence.type === "FILE" ? (
                                           <>
                                             <span className="font-medium text-gray-600">
                                               {formatFileSize(evidence.size)}
                                             </span>
                                             <span>•</span>
+                                            <span>
+                                              {formatDate(evidence.createdAt)}
+                                            </span>
                                           </>
                                         ) : evidence.url ? (
                                           <>
@@ -2529,16 +2714,34 @@ function MitigationViewContent({
                                               {evidence.url}
                                             </span>
                                             <span>•</span>
+                                            <span>
+                                              {formatDate(evidence.createdAt)}
+                                            </span>
                                           </>
-                                        ) : null}
-                                        <span>
-                                          {formatDate(evidence.createdAt)}
-                                        </span>
+                                        ) : (
+                                          <span>
+                                            {formatDate(evidence.createdAt)}
+                                          </span>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-1">
-                                    {evidence.type === "FILE" ? (
+                                    {evidence.state === "REQUESTED" ? (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleFulfillEvidence(
+                                            evidence.id,
+                                            evidence.filename
+                                          );
+                                        }}
+                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                        title="Fulfill Evidence"
+                                      >
+                                        <Upload className="w-4 h-4 text-green-600" />
+                                      </button>
+                                    ) : evidence.type === "FILE" ? (
                                       <>
                                         {evidence.mimeType.startsWith(
                                           "image/"
@@ -2583,13 +2786,11 @@ function MitigationViewContent({
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        if (task.id) {
-                                          handleDeleteEvidence(
-                                            evidence.id,
-                                            evidence.filename,
-                                            task.id
-                                          );
-                                        }
+                                        handleDeleteEvidence(
+                                          evidence.id,
+                                          evidence.filename,
+                                          task.id
+                                        );
                                       }}
                                       className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
                                       title="Delete"
@@ -2947,7 +3148,7 @@ function MitigationViewContent({
                       variant="outline"
                       size="sm"
                       onClick={() =>
-                        handleUploadEvidence(selectedTask.id, selectedTask.name)
+                        handleCreateEvidence(selectedTask.id, selectedTask.name)
                       }
                       className="flex items-center gap-1 text-xs"
                     >
@@ -2974,16 +3175,31 @@ function MitigationViewContent({
                                 {getFileIcon(evidence.mimeType, evidence.type)}
                               </div>
                               <div>
-                                <div className="text-sm font-medium text-gray-800">
+                                <div className="text-sm font-medium text-gray-800 flex items-center gap-2">
                                   {evidence.filename}
+                                  {evidence.state === "REQUESTED" && (
+                                    <Badge
+                                      variant="outline"
+                                      className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200"
+                                    >
+                                      Requested
+                                    </Badge>
+                                  )}
                                 </div>
                                 <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
-                                  {evidence.type === "FILE" ? (
+                                  {evidence.state === "REQUESTED" ? (
+                                    <span className="italic text-yellow-600">
+                                      Waiting for fulfillment
+                                    </span>
+                                  ) : evidence.type === "FILE" ? (
                                     <>
                                       <span className="font-medium text-gray-600">
                                         {formatFileSize(evidence.size)}
                                       </span>
                                       <span>•</span>
+                                      <span>
+                                        {formatDate(evidence.createdAt)}
+                                      </span>
                                     </>
                                   ) : evidence.url ? (
                                     <>
@@ -2991,20 +3207,41 @@ function MitigationViewContent({
                                         {evidence.url}
                                       </span>
                                       <span>•</span>
+                                      <span>
+                                        {formatDate(evidence.createdAt)}
+                                      </span>
                                     </>
-                                  ) : null}
-                                  <span>{formatDate(evidence.createdAt)}</span>
+                                  ) : (
+                                    <span>
+                                      {formatDate(evidence.createdAt)}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </div>
                             <div className="flex items-center gap-1">
-                              {evidence.type === "FILE" ? (
+                              {evidence.state === "REQUESTED" ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleFulfillEvidence(
+                                      evidence.id,
+                                      evidence.filename
+                                    );
+                                  }}
+                                  className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                  title="Fulfill Evidence"
+                                >
+                                  <Upload className="w-4 h-4 text-green-600" />
+                                </button>
+                              ) : evidence.type === "FILE" ? (
                                 <>
                                   {evidence.mimeType.startsWith("image/") ? (
                                     <button
-                                      onClick={() =>
-                                        handlePreviewEvidence(evidence)
-                                      }
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handlePreviewEvidence(evidence);
+                                      }}
                                       className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
                                       title="Preview Image"
                                     >
@@ -3013,7 +3250,7 @@ function MitigationViewContent({
                                   ) : (
                                     <button
                                       onClick={(e) => {
-                                        e.preventDefault();
+                                        e.stopPropagation();
                                         handlePreviewEvidence(evidence);
                                       }}
                                       className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
@@ -3026,7 +3263,7 @@ function MitigationViewContent({
                               ) : evidence.url ? (
                                 <button
                                   onClick={(e) => {
-                                    e.preventDefault();
+                                    e.stopPropagation();
                                     if (evidence.url) {
                                       window.open(evidence.url, "_blank");
                                     }
@@ -3039,11 +3276,11 @@ function MitigationViewContent({
                               ) : null}
                               <button
                                 onClick={(e) => {
-                                  e.preventDefault();
+                                  e.stopPropagation();
                                   handleDeleteEvidence(
                                     evidence.id,
                                     evidence.filename,
-                                    selectedTask.id
+                                    task.id
                                   );
                                 }}
                                 className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
@@ -3350,6 +3587,104 @@ function MitigationViewContent({
             <Button variant="destructive" onClick={confirmDeleteEvidence}>
               Delete
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Fulfill Evidence Dialog */}
+      <Dialog
+        open={fulfillEvidenceDialogOpen}
+        onOpenChange={setFulfillEvidenceDialogOpen}
+      >
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>Fulfill Evidence</DialogTitle>
+            <DialogDescription>
+              Provide the requested evidence: {evidenceToFulfill?.filename}
+            </DialogDescription>
+          </DialogHeader>
+
+          <Tabs
+            value={activeTab}
+            onValueChange={(value: string) =>
+              setActiveTab(value as "file" | "link")
+            }
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="file">Document</TabsTrigger>
+              <TabsTrigger value="link">Link</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="file" className="space-y-4">
+              <div className="space-y-4 pt-4">
+                <p>Upload a document to fulfill this evidence request.</p>
+                <Button
+                  onClick={() => {
+                    if (hiddenFileInputRef.current) {
+                      // Set a temp onchange handler for the file input
+                      const originalOnChange =
+                        hiddenFileInputRef.current.onchange;
+                      hiddenFileInputRef.current.onchange = (e) => {
+                        hiddenFileInputRef.current!.onchange =
+                          originalOnChange as any;
+                        handleFulfillEvidenceWithFile({
+                          target: {
+                            files: (e.target as HTMLInputElement)?.files,
+                          },
+                        } as React.ChangeEvent<HTMLInputElement>);
+                      };
+                      hiddenFileInputRef.current.click();
+                      setFulfillEvidenceDialogOpen(false);
+                    }
+                  }}
+                  className="w-full"
+                >
+                  Select Document
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="link" className="space-y-4 pt-4">
+              <div className="space-y-4">
+                <div className="grid w-full items-center gap-1.5">
+                  <Label htmlFor="evidence-url">URL</Label>
+                  <Input
+                    id="evidence-url"
+                    value={linkEvidenceUrl}
+                    onChange={(e) => setLinkEvidenceUrl(e.target.value)}
+                    placeholder="https://example.com"
+                    type="url"
+                  />
+                </div>
+
+                <div className="grid w-full items-center gap-1.5">
+                  <Label htmlFor="evidence-description">
+                    Description (optional)
+                  </Label>
+                  <Textarea
+                    id="evidence-description"
+                    value={linkEvidenceDescription}
+                    onChange={(e) => setLinkEvidenceDescription(e.target.value)}
+                    placeholder="Describe this evidence (optional)"
+                    className="min-h-[100px]"
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setFulfillEvidenceDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            {activeTab === "link" && (
+              <Button onClick={handleFulfillEvidenceWithLink}>
+                Submit Link
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

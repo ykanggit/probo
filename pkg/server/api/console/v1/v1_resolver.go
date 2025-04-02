@@ -718,20 +718,62 @@ func (r *mutationResolver) DeleteRiskMapping(ctx context.Context, input types.De
 	}, nil
 }
 
-// UploadEvidence is the resolver for the uploadEvidence field.
-func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.UploadEvidenceInput) (*types.UploadEvidencePayload, error) {
+// RequestEvidence is the resolver for the requestEvidence field.
+func (r *mutationResolver) RequestEvidence(ctx context.Context, input types.RequestEvidenceInput) (*types.RequestEvidencePayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
 
-	var url string
-	if input.URL != nil {
-		url = *input.URL
+	evidence, err := svc.Evidences.Request(
+		ctx,
+		probo.RequestEvidenceRequest{
+			TaskID:      input.TaskID,
+			Name:        input.Name,
+			Type:        input.Type,
+			Description: input.Description,
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("cannot request evidence: %w", err))
 	}
+
+	return &types.RequestEvidencePayload{
+		EvidenceEdge: types.NewEvidenceEdge(evidence, coredata.EvidenceOrderFieldCreatedAt),
+	}, nil
+}
+
+// FulfillEvidence is the resolver for the fulfillEvidence field.
+func (r *mutationResolver) FulfillEvidence(ctx context.Context, input types.FulfillEvidenceInput) (*types.FulfillEvidencePayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.EvidenceID.TenantID())
+
+	req := probo.FulfilledEvidenceRequest{
+		EvidenceID: input.EvidenceID,
+	}
+
+	if input.File != nil {
+		req.File = input.File.File
+	}
+
+	if input.URL != nil {
+		req.URL = *input.URL
+	}
+
+	evidence, err := svc.Evidences.Fulfill(ctx, req)
+	if err != nil {
+		panic(fmt.Errorf("cannot fulfill evidence: %w", err))
+	}
+
+	return &types.FulfillEvidencePayload{
+		EvidenceEdge: types.NewEvidenceEdge(evidence, coredata.EvidenceOrderFieldCreatedAt),
+	}, nil
+}
+
+// CreateEvidence is the resolver for the createEvidence field.
+func (r *mutationResolver) CreateEvidence(ctx context.Context, input types.CreateEvidenceInput) (*types.CreateEvidencePayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
 
 	req := probo.CreateEvidenceRequest{
 		TaskID:      input.TaskID,
 		Name:        input.Name,
 		Type:        input.Type,
-		URL:         url,
 		Description: input.Description,
 	}
 
@@ -751,7 +793,7 @@ func (r *mutationResolver) UploadEvidence(ctx context.Context, input types.Uploa
 		panic(fmt.Errorf("failed to create evidence: %w", err))
 	}
 
-	return &types.UploadEvidencePayload{
+	return &types.CreateEvidencePayload{
 		EvidenceEdge: types.NewEvidenceEdge(evidence, coredata.EvidenceOrderFieldCreatedAt),
 	}, nil
 }
