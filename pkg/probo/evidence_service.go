@@ -47,7 +47,8 @@ type (
 	FulfilledEvidenceRequest struct {
 		EvidenceID gid.GID
 		File       io.Reader
-		URL        string
+		URL        *string
+		Filename   *string
 	}
 
 	CreateEvidenceRequest struct {
@@ -131,10 +132,59 @@ func (s EvidenceService) Fulfill(
 
 			evidence.State = coredata.EvidenceStateFulfilled
 
+			if req.File != nil {
+				evidence.Type = coredata.EvidenceTypeFile
+
+				contentType := "application/octet-stream"
+				if req.Filename != nil {
+					evidence.Filename = *req.Filename
+					if detectedType := mime.TypeByExtension(filepath.Ext(*req.Filename)); detectedType != "" {
+						contentType = detectedType
+					}
+				}
+
+				objectKey, err := uuid.NewV7()
+				if err != nil {
+					return fmt.Errorf("cannot generate object key: %w", err)
+				}
+
+				_, err = s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
+					Bucket:      aws.String(s.svc.bucket),
+					Key:         aws.String(objectKey.String()),
+					Body:        req.File,
+					ContentType: aws.String(contentType),
+				})
+				if err != nil {
+					return fmt.Errorf("cannot upload file to S3: %w", err)
+				}
+
+				headOutput, err := s.svc.s3.HeadObject(ctx, &s3.HeadObjectInput{
+					Bucket: aws.String(s.svc.bucket),
+					Key:    aws.String(objectKey.String()),
+				})
+				if err != nil {
+					return fmt.Errorf("cannot get object metadata: %w", err)
+				}
+
+				evidence.ObjectKey = objectKey.String()
+				evidence.MimeType = contentType
+				evidence.Size = uint64(*headOutput.ContentLength)
+			} else if req.URL != nil {
+				evidence.Type = coredata.EvidenceTypeLink
+				evidence.URL = *req.URL
+			}
+
+			evidence.UpdatedAt = time.Now()
+
 			return evidence.Update(ctx, conn, s.svc.scope)
 		},
 	)
 
+	if err != nil {
+		return nil, fmt.Errorf("cannot update evidence: %w", err)
+	}
+
+	return evidence, nil
 }
 
 func (s EvidenceService) Create(
@@ -172,7 +222,7 @@ func (s EvidenceService) Create(
 			return nil, fmt.Errorf("cannot generate object key: %w", err)
 		}
 
-		putObjectOutput, err := s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
+		_, err = s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
 			Bucket:      aws.String(s.svc.bucket),
 			Key:         aws.String(objectKey.String()),
 			Body:        req.File,
@@ -189,8 +239,6 @@ func (s EvidenceService) Create(
 		if err != nil {
 			return nil, fmt.Errorf("cannot get object metadata: %w", err)
 		}
-
-		fmt.Println("putObjectOutput", putObjectOutput)
 
 		evidence.ObjectKey = objectKey.String()
 		evidence.MimeType = contentType

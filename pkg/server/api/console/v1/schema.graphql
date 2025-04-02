@@ -948,6 +948,7 @@ input RequestEvidenceInput {
 
 input FulfillEvidenceInput {
   evidenceId: ID!
+  name: String
   file: Upload
   url: String
 }

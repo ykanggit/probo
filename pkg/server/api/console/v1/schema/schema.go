@@ -3579,6 +3579,7 @@ input RequestEvidenceInput {
 
 input FulfillEvidenceInput {
   evidenceId: ID!
+  name: String
   file: Upload
   url: String
 }
@@ -20868,7 +20869,7 @@ func (ec *executionContext) unmarshalInputFulfillEvidenceInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"evidenceId", "file", "url"}
+	fieldsInOrder := [...]string{"evidenceId", "name", "file", "url"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -20882,6 +20883,13 @@ func (ec *executionContext) unmarshalInputFulfillEvidenceInput(ctx context.Conte
 				return it, err
 			}
 			it.EvidenceID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
 		case "file":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
 			data, err := ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)

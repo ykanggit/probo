@@ -210,6 +210,49 @@ WHERE
 	return nil
 }
 
+func (e Evidence) Update(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+) error {
+	q := `
+UPDATE
+    evidences
+SET
+	type = @type,
+	state = @state,
+	object_key = @object_key,
+	mime_type = @mime_type,
+	size = @size,
+	filename = @filename,
+	url = @url,
+	description = @description,
+	updated_at = @updated_at
+WHERE
+    %s
+	AND id = @evidence_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{
+		"evidence_id": e.ID,
+		"type":        e.Type,
+		"state":       e.State,
+		"object_key":  e.ObjectKey,
+		"mime_type":   e.MimeType,
+		"size":        e.Size,
+		"filename":    e.Filename,
+		"url":         e.URL,
+		"description": e.Description,
+		"updated_at":  e.UpdatedAt,
+	}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (e Evidence) Delete(
 	ctx context.Context,
 	conn pg.Conn,

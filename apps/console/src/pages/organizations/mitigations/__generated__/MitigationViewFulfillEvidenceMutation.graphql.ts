@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c12714c0dab6d31865a2b49936566f05>>
+ * @generated SignedSource<<c502368227307b9e9780b67691ec45a1>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,6 +14,7 @@ export type EvidenceType = "FILE" | "LINK";
 export type FulfillEvidenceInput = {
   evidenceId: string;
   file?: any | null | undefined;
+  name?: string | null | undefined;
   url?: string | null | undefined;
 };
 export type MitigationViewFulfillEvidenceMutation$variables = {

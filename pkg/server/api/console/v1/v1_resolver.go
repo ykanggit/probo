@@ -750,10 +750,11 @@ func (r *mutationResolver) FulfillEvidence(ctx context.Context, input types.Fulf
 
 	if input.File != nil {
 		req.File = input.File.File
+		req.Filename = &input.File.Filename
 	}
 
 	if input.URL != nil {
-		req.URL = *input.URL
+		req.URL = input.URL
 	}
 
 	evidence, err := svc.Evidences.Fulfill(ctx, req)

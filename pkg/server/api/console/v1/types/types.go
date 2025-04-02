@@ -321,6 +321,7 @@ type FrameworkEdge struct {
 
 type FulfillEvidenceInput struct {
 	EvidenceID gid.GID         `json:"evidenceId"`
+	Name       *string         `json:"name,omitempty"`
 	File       *graphql.Upload `json:"file,omitempty"`
 	URL        *string         `json:"url,omitempty"`
 }
