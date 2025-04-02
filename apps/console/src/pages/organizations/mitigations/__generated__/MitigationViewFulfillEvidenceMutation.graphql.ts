@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c502368227307b9e9780b67691ec45a1>>
+ * @generated SignedSource<<780fd466293ec923661adc90f801380a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -26,6 +26,7 @@ export type MitigationViewFulfillEvidenceMutation$data = {
     readonly evidenceEdge: {
       readonly node: {
         readonly createdAt: string;
+        readonly description: string;
         readonly fileUrl: string | null | undefined;
         readonly filename: string;
         readonly id: string;
@@ -139,6 +140,13 @@ v3 = {
           "kind": "ScalarField",
           "name": "createdAt",
           "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "description",
+          "storageKey": null
         }
       ],
       "storageKey": null
@@ -212,16 +220,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "147fdc881f797ace12dc1242cab782ad",
+    "cacheID": "efdf549604c425e8bb58ccf51df580c9",
     "id": null,
     "metadata": {},
     "name": "MitigationViewFulfillEvidenceMutation",
     "operationKind": "mutation",
-    "text": "mutation MitigationViewFulfillEvidenceMutation(\n  $input: FulfillEvidenceInput!\n) {\n  fulfillEvidence(input: $input) {\n    evidenceEdge {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        type\n        url\n        size\n        state\n        createdAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation MitigationViewFulfillEvidenceMutation(\n  $input: FulfillEvidenceInput!\n) {\n  fulfillEvidence(input: $input) {\n    evidenceEdge {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        type\n        url\n        size\n        state\n        createdAt\n        description\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c0a1e6be43759cfbcd7e25a3b597926a";
+(node as any).hash = "2a7f04e50e4e6fc39457a861a22baf08";
 
 export default node;

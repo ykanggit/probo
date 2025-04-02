@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3188657dfa050c818bf0dc06688d7fab>>
+ * @generated SignedSource<<8b25e364318ac90f1c1eaf313a6286cb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -40,6 +40,7 @@ export type MitigationViewQuery$data = {
             readonly edges: ReadonlyArray<{
               readonly node: {
                 readonly createdAt: string;
+                readonly description: string;
                 readonly filename: string;
                 readonly id: string;
                 readonly mimeType: string;
@@ -266,6 +267,7 @@ v14 = [
             "name": "createdAt",
             "storageKey": null
           },
+          (v4/*: any*/),
           (v10/*: any*/)
         ],
         "storageKey": null
@@ -484,7 +486,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "27e466aa3f7c929738fc108627fd5aa8",
+    "cacheID": "711b5dac4db6ca883144ece5d4bc48c3",
     "id": null,
     "metadata": {
       "connection": [
@@ -507,11 +509,11 @@ return {
     },
     "name": "MitigationViewQuery",
     "operationKind": "query",
-    "text": "query MitigationViewQuery(\n  $mitigationId: ID!\n) {\n  mitigation: node(id: $mitigationId) {\n    __typename\n    id\n    ... on Mitigation {\n      name\n      description\n      state\n      importance\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  type\n                  url\n                  createdAt\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query MitigationViewQuery(\n  $mitigationId: ID!\n) {\n  mitigation: node(id: $mitigationId) {\n    __typename\n    id\n    ... on Mitigation {\n      name\n      description\n      state\n      importance\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  type\n                  url\n                  createdAt\n                  description\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c26df14ee0f01a46868fdd73baa76638";
+(node as any).hash = "cb5d73e09aa6168901bf5db0f931e24c";
 
 export default node;

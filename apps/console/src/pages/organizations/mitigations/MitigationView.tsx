@@ -194,6 +194,7 @@ const mitigationViewQuery = graphql`
                     type
                     url
                     createdAt
+                    description
                   }
                 }
               }
@@ -269,6 +270,7 @@ const createEvidenceMutation = graphql`
           size
           state
           createdAt
+          description
         }
       }
     }
@@ -448,6 +450,7 @@ const fulfillEvidenceMutation = graphql`
           size
           state
           createdAt
+          description
         }
       }
     }
@@ -2697,6 +2700,14 @@ function MitigationViewContent({
                                         {evidence.state === "REQUESTED" ? (
                                           <span className="italic text-yellow-600">
                                             Waiting for fulfillment
+                                            {evidence.description && (
+                                              <>
+                                                <span className="mx-1">•</span>
+                                                <span className="text-gray-600 not-italic">
+                                                  {evidence.description}
+                                                </span>
+                                              </>
+                                            )}
                                           </span>
                                         ) : evidence.type === "FILE" ? (
                                           <>
@@ -3190,6 +3201,14 @@ function MitigationViewContent({
                                   {evidence.state === "REQUESTED" ? (
                                     <span className="italic text-yellow-600">
                                       Waiting for fulfillment
+                                      {evidence.description && (
+                                        <>
+                                          <span className="mx-1">•</span>
+                                          <span className="text-gray-600 not-italic">
+                                            {evidence.description}
+                                          </span>
+                                        </>
+                                      )}
                                     </span>
                                   ) : evidence.type === "FILE" ? (
                                     <>
