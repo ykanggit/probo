@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - Add import control <> mitigation mapping.
 - Add mitigation tasks import.
 
+### Changed
+
+- Evidence can now be requested.
+
 ## [0.3.0] - 2025-04-01
 
 ### Added
