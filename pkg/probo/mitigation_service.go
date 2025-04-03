@@ -199,11 +199,16 @@ func (s MitigationService) Import(
 							return fmt.Errorf("cannot create global id: %w", err)
 						}
 
+						referenceID, err := uuid.NewV4()
+						if err != nil {
+							return fmt.Errorf("cannot generate reference id: %w", err)
+						}
+
 						evidence := &coredata.Evidence{
 							State:       coredata.EvidenceStateRequested,
 							ID:          evidenceID,
-							TaskID:      taskID,
-							ReferenceID: req.Mitigations[i].Tasks[j].RequestedEvidences[k].ReferenceID,
+							TaskID:      task.ID,
+							ReferenceID: "custom-evidence-" + referenceID.String(),
 							Type:        req.Mitigations[i].Tasks[j].RequestedEvidences[k].Type,
 							Description: req.Mitigations[i].Tasks[j].RequestedEvidences[k].Name,
 							CreatedAt:   now,
