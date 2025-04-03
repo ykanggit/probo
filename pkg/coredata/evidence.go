@@ -31,6 +31,7 @@ type (
 		ID          gid.GID       `db:"id"`
 		TaskID      gid.GID       `db:"task_id"`
 		State       EvidenceState `db:"state"`
+		ReferenceID string        `db:"reference_id"`
 		Type        EvidenceType  `db:"type"`
 		ObjectKey   string        `db:"object_key"`
 		MimeType    string        `db:"mime_type"`
@@ -54,7 +55,7 @@ func (e Evidence) CursorKey(orderBy EvidenceOrderField) page.CursorKey {
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
-func (e Evidence) Insert(
+func (e Evidence) Upsert(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -65,6 +66,7 @@ INSERT INTO
         tenant_id,
         id,
         task_id,
+        reference_id,
         object_key,
         mime_type,
         size,
@@ -80,6 +82,73 @@ VALUES (
     @tenant_id,
     @evidence_id,
     @task_id,
+    @reference_id,
+    @object_key,
+    @mime_type,
+    @size,
+    @state,
+    @type,
+    @filename,
+    @url,
+    @description,
+    @created_at,
+    @updated_at
+)
+ON CONFLICT (task_id, reference_id) DO UPDATE SET
+	description = @description,
+	type = @type,
+	updated_at = @updated_at
+WHERE evidences.state = 'REQUESTED';
+`
+
+	args := pgx.StrictNamedArgs{
+		"tenant_id":    scope.GetTenantID(),
+		"evidence_id":  e.ID,
+		"task_id":      e.TaskID,
+		"reference_id": e.ReferenceID,
+		"object_key":   e.ObjectKey,
+		"mime_type":    e.MimeType,
+		"size":         e.Size,
+		"filename":     e.Filename,
+		"created_at":   e.CreatedAt,
+		"updated_at":   e.UpdatedAt,
+		"state":        e.State,
+		"type":         e.Type,
+		"url":          e.URL,
+		"description":  e.Description,
+	}
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
+func (e Evidence) Insert(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+) error {
+	q := `
+INSERT INTO
+    evidences (
+        tenant_id,
+        id,
+        task_id,
+        reference_id,
+        object_key,
+        mime_type,
+        size,
+        state,
+        type,
+        filename,
+        url,
+        description,
+        created_at,
+        updated_at
+    )
+VALUES (
+    @tenant_id,
+    @evidence_id,
+    @task_id,
+    @reference_id,
     @object_key,
     @mime_type,
     @size,
@@ -94,19 +163,20 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
-		"tenant_id":   scope.GetTenantID(),
-		"evidence_id": e.ID,
-		"task_id":     e.TaskID,
-		"object_key":  e.ObjectKey,
-		"mime_type":   e.MimeType,
-		"size":        e.Size,
-		"filename":    e.Filename,
-		"created_at":  e.CreatedAt,
-		"updated_at":  e.UpdatedAt,
-		"state":       e.State,
-		"type":        e.Type,
-		"url":         e.URL,
-		"description": e.Description,
+		"tenant_id":    scope.GetTenantID(),
+		"evidence_id":  e.ID,
+		"task_id":      e.TaskID,
+		"reference_id": e.ReferenceID,
+		"object_key":   e.ObjectKey,
+		"mime_type":    e.MimeType,
+		"size":         e.Size,
+		"filename":     e.Filename,
+		"created_at":   e.CreatedAt,
+		"updated_at":   e.UpdatedAt,
+		"state":        e.State,
+		"type":         e.Type,
+		"url":          e.URL,
+		"description":  e.Description,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -122,6 +192,7 @@ func (e *Evidence) LoadByID(
 SELECT
     id,
     task_id,
+    reference_id,
     state,
     type,
     object_key,
@@ -171,6 +242,7 @@ func (e *Evidences) LoadByTaskID(
 SELECT
     id,
     task_id,
+    reference_id,
     state,
     type,
     object_key,

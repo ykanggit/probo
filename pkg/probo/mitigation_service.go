@@ -22,6 +22,7 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
+	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
 
@@ -59,9 +60,14 @@ type (
 				Control   string `json:"control"`
 			} `json:"standards"`
 			Tasks []struct {
-				Name        string `json:"name"`
-				Description string `json:"description"`
-				ReferenceID string `json:"reference-id"`
+				Name               string `json:"name"`
+				Description        string `json:"description"`
+				ReferenceID        string `json:"reference-id"`
+				RequestedEvidences []struct {
+					ReferenceID string                `json:"reference-id"`
+					Type        coredata.EvidenceType `json:"type"`
+					Name        string                `json:"name"`
+				} `json:"requested-evidences"`
 			} `json:"tasks"`
 		} `json:"mitigations"`
 	}
@@ -185,6 +191,28 @@ func (s MitigationService) Import(
 
 					if err := task.Upsert(ctx, tx, s.svc.scope); err != nil {
 						return fmt.Errorf("cannot upsert task: %w", err)
+					}
+
+					for k := range req.Mitigations[i].Tasks[j].RequestedEvidences {
+						evidenceID, err := gid.NewGID(organizationID.TenantID(), coredata.EvidenceEntityType)
+						if err != nil {
+							return fmt.Errorf("cannot create global id: %w", err)
+						}
+
+						evidence := &coredata.Evidence{
+							State:       coredata.EvidenceStateRequested,
+							ID:          evidenceID,
+							TaskID:      taskID,
+							ReferenceID: req.Mitigations[i].Tasks[j].RequestedEvidences[k].ReferenceID,
+							Type:        req.Mitigations[i].Tasks[j].RequestedEvidences[k].Type,
+							Description: req.Mitigations[i].Tasks[j].RequestedEvidences[k].Name,
+							CreatedAt:   now,
+							UpdatedAt:   now,
+						}
+
+						if err := evidence.Upsert(ctx, tx, s.svc.scope); err != nil {
+							return fmt.Errorf("cannot upsert evidence: %w", err)
+						}
 					}
 				}
 
@@ -318,12 +346,18 @@ func (s MitigationService) Create(
 		return nil, fmt.Errorf("cannot create mitigation global id: %w", err)
 	}
 
+	referenceID, err := uuid.NewV4()
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate reference id: %w", err)
+	}
+
 	mitigation := &coredata.Mitigation{
 		ID:             mitigationID,
 		OrganizationID: req.OrganizationID,
 		Name:           req.Name,
 		Description:    req.Description,
 		Category:       req.Category,
+		ReferenceID:    "custom-mitigation-" + referenceID.String(),
 		State:          coredata.MitigationStateNotStarted,
 		Importance:     req.Importance,
 		CreatedAt:      now,

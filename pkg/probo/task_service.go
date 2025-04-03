@@ -22,7 +22,7 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
-	"github.com/getprobo/probo/pkg/slug"
+	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
 
@@ -58,6 +58,11 @@ func (s TaskService) Create(
 		return nil, fmt.Errorf("cannot generate id: %w", err)
 	}
 
+	referenceID, err := uuid.NewV4()
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate reference id: %w", err)
+	}
+
 	task := &coredata.Task{
 		ID:           taskID,
 		MitigationID: req.MitigationID,
@@ -66,7 +71,7 @@ func (s TaskService) Create(
 		TimeEstimate: req.TimeEstimate,
 		AssignedToID: req.AssignedToID,
 		State:        coredata.TaskStateTodo,
-		ReferenceID:  slug.Make(req.Name),
+		ReferenceID:  "custom-task-" + referenceID.String(),
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}

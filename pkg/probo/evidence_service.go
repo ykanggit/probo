@@ -197,10 +197,16 @@ func (s EvidenceService) Create(
 		return nil, fmt.Errorf("cannot create evidence global id: %w", err)
 	}
 
+	referenceID, err := uuid.NewV4()
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate reference id: %w", err)
+	}
+
 	evidence := &coredata.Evidence{
 		ID:          evidenceID,
 		TaskID:      req.TaskID,
 		State:       coredata.EvidenceStateFulfilled,
+		ReferenceID: "custom-evidence-" + referenceID.String(),
 		Type:        req.Type,
 		Filename:    req.Name,
 		URL:         req.URL,
