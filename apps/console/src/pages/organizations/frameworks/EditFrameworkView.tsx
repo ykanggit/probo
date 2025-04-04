@@ -15,13 +15,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { UpdateFrameworkViewUpdateFrameworkMutation } from "./__generated__/UpdateFrameworkViewUpdateFrameworkMutation.graphql";
-import { UpdateFrameworkViewQuery as UpdateFrameworkViewQueryType } from "./__generated__/UpdateFrameworkViewQuery.graphql";
+import { EditFrameworkViewUpdateFrameworkMutation } from "./__generated__/EditFrameworkViewUpdateFrameworkMutation.graphql";
+import { EditFrameworkViewQuery } from "./__generated__/EditFrameworkViewQuery.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
-import { UpdateFrameworkViewSkeleton } from "./UpdateFrameworkPage";
+import { EditFrameworkViewSkeleton } from "./EditFrameworkPage";
 
 const updateFrameworkMutation = graphql`
-  mutation UpdateFrameworkViewUpdateFrameworkMutation(
+  mutation EditFrameworkViewUpdateFrameworkMutation(
     $input: UpdateFrameworkInput!
   ) {
     updateFramework(input: $input) {
@@ -34,8 +34,8 @@ const updateFrameworkMutation = graphql`
   }
 `;
 
-const updateFrameworkQuery = graphql`
-  query UpdateFrameworkViewQuery($frameworkId: ID!) {
+const editFrameworkQuery = graphql`
+  query EditFrameworkViewQuery($frameworkId: ID!) {
     node(id: $frameworkId) {
       ... on Framework {
         id
@@ -107,15 +107,15 @@ function EditableField({
   );
 }
 
-function UpdateFrameworkViewContent({
+function EditFrameworkViewContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<UpdateFrameworkViewQueryType>;
+  queryRef: PreloadedQuery<EditFrameworkViewQuery>;
 }) {
   const { organizationId, frameworkId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const data = usePreloadedQuery(updateFrameworkQuery, queryRef);
+  const data = usePreloadedQuery(editFrameworkQuery, queryRef);
   const [, setEditedFields] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     name: "",
@@ -132,7 +132,7 @@ function UpdateFrameworkViewContent({
   }, [data.node]);
 
   const [commit, isInFlight] =
-    useMutation<UpdateFrameworkViewUpdateFrameworkMutation>(
+    useMutation<EditFrameworkViewUpdateFrameworkMutation>(
       updateFrameworkMutation
     );
 
@@ -232,10 +232,10 @@ function UpdateFrameworkViewContent({
   );
 }
 
-export default function UpdateFrameworkView() {
+export default function EditFrameworkView() {
   const { frameworkId } = useParams();
   const [queryRef, loadQuery] =
-    useQueryLoader<UpdateFrameworkViewQueryType>(updateFrameworkQuery);
+    useQueryLoader<EditFrameworkViewQuery>(editFrameworkQuery);
 
   useEffect(() => {
     if (frameworkId) {
@@ -244,12 +244,12 @@ export default function UpdateFrameworkView() {
   }, [frameworkId, loadQuery]);
 
   if (!queryRef) {
-    return <UpdateFrameworkViewSkeleton />;
+    return <EditFrameworkViewSkeleton />;
   }
 
   return (
-    <Suspense fallback={<UpdateFrameworkViewSkeleton />}>
-      <UpdateFrameworkViewContent queryRef={queryRef} />
+    <Suspense fallback={<EditFrameworkViewSkeleton />}>
+      <EditFrameworkViewContent queryRef={queryRef} />
     </Suspense>
   );
 }

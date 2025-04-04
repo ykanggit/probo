@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f6c5cb8b7001a4cee689302191d06ad9>>
+ * @generated SignedSource<<893e92f87ebfab909780d937879680d9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,19 +9,19 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type UpdateFrameworkViewQuery$variables = {
+export type EditFrameworkViewQuery$variables = {
   frameworkId: string;
 };
-export type UpdateFrameworkViewQuery$data = {
+export type EditFrameworkViewQuery$data = {
   readonly node: {
     readonly description?: string;
     readonly id?: string;
     readonly name?: string;
   };
 };
-export type UpdateFrameworkViewQuery = {
-  response: UpdateFrameworkViewQuery$data;
-  variables: UpdateFrameworkViewQuery$variables;
+export type EditFrameworkViewQuery = {
+  response: EditFrameworkViewQuery$data;
+  variables: EditFrameworkViewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -65,7 +65,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "UpdateFrameworkViewQuery",
+    "name": "EditFrameworkViewQuery",
     "selections": [
       {
         "alias": null,
@@ -96,7 +96,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "UpdateFrameworkViewQuery",
+    "name": "EditFrameworkViewQuery",
     "selections": [
       {
         "alias": null,
@@ -129,16 +129,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "5c423e61373989c4576989cb6c732547",
+    "cacheID": "2a55a5cc00d16dcb7d978dfcfbfcf8e6",
     "id": null,
     "metadata": {},
-    "name": "UpdateFrameworkViewQuery",
+    "name": "EditFrameworkViewQuery",
     "operationKind": "query",
-    "text": "query UpdateFrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    ... on Framework {\n      id\n      name\n      description\n    }\n    id\n  }\n}\n"
+    "text": "query EditFrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    ... on Framework {\n      id\n      name\n      description\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "416b7f0dbf33cbfe39578fc3243bf423";
+(node as any).hash = "b5a785e12393d6b16ddcc1750a6aa381";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9c98acb5c320005e303cd815550c0d74>>
+ * @generated SignedSource<<eccd1c8953dd5a4b93817a53ed43e3c4>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,10 +14,10 @@ export type UpdateFrameworkInput = {
   id: string;
   name?: string | null | undefined;
 };
-export type UpdateFrameworkViewUpdateFrameworkMutation$variables = {
+export type EditFrameworkViewUpdateFrameworkMutation$variables = {
   input: UpdateFrameworkInput;
 };
-export type UpdateFrameworkViewUpdateFrameworkMutation$data = {
+export type EditFrameworkViewUpdateFrameworkMutation$data = {
   readonly updateFramework: {
     readonly framework: {
       readonly description: string;
@@ -26,9 +26,9 @@ export type UpdateFrameworkViewUpdateFrameworkMutation$data = {
     };
   };
 };
-export type UpdateFrameworkViewUpdateFrameworkMutation = {
-  response: UpdateFrameworkViewUpdateFrameworkMutation$data;
-  variables: UpdateFrameworkViewUpdateFrameworkMutation$variables;
+export type EditFrameworkViewUpdateFrameworkMutation = {
+  response: EditFrameworkViewUpdateFrameworkMutation$data;
+  variables: EditFrameworkViewUpdateFrameworkMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -95,7 +95,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "UpdateFrameworkViewUpdateFrameworkMutation",
+    "name": "EditFrameworkViewUpdateFrameworkMutation",
     "selections": (v1/*: any*/),
     "type": "Mutation",
     "abstractKey": null
@@ -104,20 +104,20 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "UpdateFrameworkViewUpdateFrameworkMutation",
+    "name": "EditFrameworkViewUpdateFrameworkMutation",
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "8a41e224572c2419fc49c7fef6908d63",
+    "cacheID": "672c40ecde91237ef059320284b9d1c6",
     "id": null,
     "metadata": {},
-    "name": "UpdateFrameworkViewUpdateFrameworkMutation",
+    "name": "EditFrameworkViewUpdateFrameworkMutation",
     "operationKind": "mutation",
-    "text": "mutation UpdateFrameworkViewUpdateFrameworkMutation(\n  $input: UpdateFrameworkInput!\n) {\n  updateFramework(input: $input) {\n    framework {\n      id\n      name\n      description\n    }\n  }\n}\n"
+    "text": "mutation EditFrameworkViewUpdateFrameworkMutation(\n  $input: UpdateFrameworkInput!\n) {\n  updateFramework(input: $input) {\n    framework {\n      id\n      name\n      description\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "9b201a966e844a77d3d920a7e0165d15";
+(node as any).hash = "8fe1fd5bf26bce25a31cb724bcedec9f";
 
 export default node;
