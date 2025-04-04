@@ -4,9 +4,9 @@ import { lazy } from "@probo/react-lazy";
 import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
 
-const MitigationNewView = lazy(() => import("./MitigationNewView"));
+const NewMitigationView = lazy(() => import("./NewMitigationView"));
 
-export function MitigationNewViewSkeleton() {
+export function NewMitigationViewSkeleton() {
   return (
     <PageTemplateSkeleton
       title="New Mitigation"
@@ -17,13 +17,13 @@ export function MitigationNewViewSkeleton() {
   );
 }
 
-export function MitigationNewPage() {
+export function NewMitigationPage() {
   const location = useLocation();
 
   return (
-    <Suspense key={location.pathname} fallback={<MitigationNewViewSkeleton />}>
+    <Suspense key={location.pathname} fallback={<NewMitigationViewSkeleton />}>
       <ErrorBoundaryWithLocation>
-        <MitigationNewView />
+        <NewMitigationView />
       </ErrorBoundaryWithLocation>
     </Suspense>
   );

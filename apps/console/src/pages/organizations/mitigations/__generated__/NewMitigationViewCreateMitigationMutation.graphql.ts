@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<56ffdc565a3b834423a8a704d0fa68dc>>
+ * @generated SignedSource<<50b15dea665515ca83a54c39e03453c2>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,11 +17,11 @@ export type CreateMitigationInput = {
   name: string;
   organizationId: string;
 };
-export type MitigationNewViewCreateMitigationMutation$variables = {
+export type NewMitigationViewCreateMitigationMutation$variables = {
   connections: ReadonlyArray<string>;
   input: CreateMitigationInput;
 };
-export type MitigationNewViewCreateMitigationMutation$data = {
+export type NewMitigationViewCreateMitigationMutation$data = {
   readonly createMitigation: {
     readonly mitigationEdge: {
       readonly node: {
@@ -32,9 +32,9 @@ export type MitigationNewViewCreateMitigationMutation$data = {
     };
   };
 };
-export type MitigationNewViewCreateMitigationMutation = {
-  response: MitigationNewViewCreateMitigationMutation$data;
-  variables: MitigationNewViewCreateMitigationMutation$variables;
+export type NewMitigationViewCreateMitigationMutation = {
+  response: NewMitigationViewCreateMitigationMutation$data;
+  variables: NewMitigationViewCreateMitigationMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -106,7 +106,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "MitigationNewViewCreateMitigationMutation",
+    "name": "NewMitigationViewCreateMitigationMutation",
     "selections": [
       {
         "alias": null,
@@ -131,7 +131,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "MitigationNewViewCreateMitigationMutation",
+    "name": "NewMitigationViewCreateMitigationMutation",
     "selections": [
       {
         "alias": null,
@@ -164,16 +164,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "3e7544674c48e16ec6698e04f8b5fb5e",
+    "cacheID": "9615313ab1f2555f58a79b85741684f4",
     "id": null,
     "metadata": {},
-    "name": "MitigationNewViewCreateMitigationMutation",
+    "name": "NewMitigationViewCreateMitigationMutation",
     "operationKind": "mutation",
-    "text": "mutation MitigationNewViewCreateMitigationMutation(\n  $input: CreateMitigationInput!\n) {\n  createMitigation(input: $input) {\n    mitigationEdge {\n      node {\n        id\n        name\n        description\n      }\n    }\n  }\n}\n"
+    "text": "mutation NewMitigationViewCreateMitigationMutation(\n  $input: CreateMitigationInput!\n) {\n  createMitigation(input: $input) {\n    mitigationEdge {\n      node {\n        id\n        name\n        description\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "32c38d7a04244e041fc6023efc010d7f";
+(node as any).hash = "6b6ead3a24d113ec969c98680956ebb9";
 
 export default node;

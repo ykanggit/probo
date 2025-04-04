@@ -13,7 +13,7 @@ import { UpdateFrameworkPage } from "./frameworks/UpdateFrameworkPage";
 import { ControlPage } from "./frameworks/controls/ControlPage";
 import { EditMitigationPage } from "./mitigations/EditMitigationPage";
 import { MitigationListPage } from "./mitigations/MitigationListPage";
-import { MitigationNewPage } from "./mitigations/MitigationNewPage";
+import { NewMitigationPage } from "./mitigations/NewMitigationPage";
 import { MitigationPage } from "./mitigations/MitigationPage";
 import { CreatePeoplePage } from "./people/CreatePeoplePage";
 import { PeopleListPage } from "./people/PeopleListPage";
@@ -48,7 +48,7 @@ export function OrganizationsRoutes() {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
         <Route path="mitigations" element={<MitigationListPage />} />
-        <Route path="mitigations/new" element={<MitigationNewPage />} />
+        <Route path="mitigations/new" element={<NewMitigationPage />} />
         <Route path="mitigations/:mitigationId" element={<MitigationPage />} />
         <Route
           path="mitigations/:mitigationId/edit"
