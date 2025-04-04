@@ -1,48 +1,73 @@
-import { useState } from "react";
-import { ConnectionHandler, graphql, useMutation } from "react-relay";
+import { Suspense, useEffect, useState } from "react";
+import {
+  graphql,
+  PreloadedQuery,
+  useMutation,
+  usePreloadedQuery,
+  useQueryLoader,
+} from "react-relay";
 import { useParams, useNavigate } from "react-router";
 import { PageTemplate } from "@/components/PageTemplate";
 import { useToast } from "@/hooks/use-toast";
-import { MitigationNewViewCreateMitigationMutation } from "./__generated__/MitigationNewViewCreateMitigationMutation.graphql";
+import { EditMitigationViewUpdateMitigationMutation } from "./__generated__/EditMitigationViewUpdateMitigationMutation.graphql";
 import { EditableField } from "@/components/EditableField";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { EditMitigationViewSkeleton } from "./EditMitigationPage";
+import { EditMitigationViewQuery } from "./__generated__/EditMitigationViewQuery.graphql";
 
-const createMitigationMutation = graphql`
-  mutation MitigationNewViewCreateMitigationMutation(
-    $input: CreateMitigationInput!
-    $connections: [ID!]!
-  ) {
-    createMitigation(input: $input) {
-      mitigationEdge @prependEdge(connections: $connections) {
-        node {
-          id
-          name
-          description
-        }
+const editMitigationQuery = graphql`
+  query EditMitigationViewQuery($mitigationId: ID!) {
+    node(id: $mitigationId) {
+      ... on Mitigation {
+        id
+        name
+        description
+        category
+        importance
       }
     }
   }
 `;
 
-export default function MitigationNewView() {
+const updateMitigationMutation = graphql`
+  mutation EditMitigationViewUpdateMitigationMutation(
+    $input: UpdateMitigationInput!
+  ) {
+    updateMitigation(input: $input) {
+      mitigation {
+        id
+        name
+        description
+      }
+    }
+  }
+`;
+
+function EditMitigationViewContent({
+  queryRef,
+}: {
+  queryRef: PreloadedQuery<EditMitigationViewQuery>;
+}) {
   const { organizationId } = useParams<{
     organizationId: string;
   }>();
+  const { mitigationId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { node: mitigation } = usePreloadedQuery(editMitigationQuery, queryRef);
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    category: "",
-    importance: "MADATORY" as "MANDATORY" | "PREFERRED" | "ADVANCED",
+    name: mitigation.name ?? "",
+    description: mitigation.description ?? "",
+    category: mitigation.category ?? "",
+    importance: mitigation.importance,
   });
 
   const [commit, isInFlight] =
-    useMutation<MitigationNewViewCreateMitigationMutation>(
-      createMitigationMutation
+    useMutation<EditMitigationViewUpdateMitigationMutation>(
+      updateMitigationMutation
     );
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
@@ -64,27 +89,21 @@ export default function MitigationNewView() {
       return;
     }
 
-    const connectionId = ConnectionHandler.getConnectionID(
-      organizationId!,
-      "MitigationListView_mitigations"
-    );
-
     commit({
       variables: {
         input: {
-          organizationId: organizationId!,
+          id: mitigationId!,
           name: formData.name,
           description: formData.description,
           category: formData.category,
           importance: formData.importance,
         },
-        connections: [connectionId],
       },
       onCompleted(data, errors) {
         if (errors) {
           toast({
             title: "Error",
-            description: errors[0]?.message || "Failed to create mitigation",
+            description: errors[0]?.message || "Failed to update mitigation",
             variant: "destructive",
           });
           return;
@@ -92,17 +111,17 @@ export default function MitigationNewView() {
 
         toast({
           title: "Success",
-          description: "Mitigation created successfully",
+          description: "Mitigation updated successfully",
         });
 
         navigate(
-          `/organizations/${organizationId}/mitigations/${data.createMitigation.mitigationEdge.node.id}`
+          `/organizations/${organizationId}/mitigations/${mitigationId}`
         );
       },
       onError(error) {
         toast({
           title: "Error",
-          description: error.message || "Failed to create mitigation",
+          description: error.message || "Failed to update framework",
           variant: "destructive",
         });
       },
@@ -111,8 +130,8 @@ export default function MitigationNewView() {
 
   return (
     <PageTemplate
-      title="New Mitigation"
-      description="Add a new mitigation. You will be able to link it to control and risks"
+      title="Edit Mitigation"
+      description="Edit a mitigation. You will be able to link it to control and risks"
     >
       <Card className="max-w-2xl">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -190,17 +209,41 @@ export default function MitigationNewView() {
               type="button"
               variant="outline"
               onClick={() =>
-                navigate(`/organizations/${organizationId}/mitigations`)
+                navigate(
+                  `/organizations/${organizationId}/mitigations/${mitigationId}`
+                )
               }
             >
               Cancel
             </Button>
             <Button type="submit" disabled={isInFlight}>
-              {isInFlight ? "Creating..." : "Create Mitigation"}
+              {isInFlight ? "Updating..." : "Update Mitigation"}
             </Button>
           </div>
         </form>
       </Card>
     </PageTemplate>
+  );
+}
+
+export default function EditMitigationView() {
+  const { mitigationId } = useParams();
+  const [queryRef, loadQuery] =
+    useQueryLoader<EditMitigationViewQuery>(editMitigationQuery);
+
+  useEffect(() => {
+    if (mitigationId) {
+      loadQuery({ mitigationId });
+    }
+  }, [mitigationId, loadQuery]);
+
+  if (!queryRef) {
+    return <EditMitigationViewSkeleton />;
+  }
+
+  return (
+    <Suspense fallback={<EditMitigationViewSkeleton />}>
+      <EditMitigationViewContent queryRef={queryRef} />
+    </Suspense>
   );
 }

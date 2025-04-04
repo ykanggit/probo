@@ -18,12 +18,10 @@ import {
 } from "react-relay";
 import {
   AlertTriangle,
-  ArrowRight,
   Check,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
-  Clock,
   Download,
   Eye,
   File as FileGeneric,
@@ -32,8 +30,6 @@ import {
   Image,
   Link2,
   Loader2,
-  LucideIcon,
-  MoreHorizontal,
   Plus,
   Search,
   ShieldCheck,
@@ -44,14 +40,7 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,10 +88,7 @@ import { MitigationViewAssignTaskMutation as MitigationViewAssignTaskMutationTyp
 import { MitigationViewUnassignTaskMutation as MitigationViewUnassignTaskMutationType } from "./__generated__/MitigationViewUnassignTaskMutation.graphql";
 import { MitigationViewUpdateMitigationStateMutation as MitigationViewUpdateMitigationStateMutationType } from "./__generated__/MitigationViewUpdateMitigationStateMutation.graphql";
 import { MitigationViewQuery as MitigationViewQueryType } from "./__generated__/MitigationViewQuery.graphql";
-import {
-  MitigationViewOrganizationQuery,
-  MitigationViewOrganizationQuery$data,
-} from "./__generated__/MitigationViewOrganizationQuery.graphql";
+import { MitigationViewOrganizationQuery$data } from "./__generated__/MitigationViewOrganizationQuery.graphql";
 import {
   MitigationViewFrameworksQuery,
   MitigationViewFrameworksQuery$data,
@@ -111,14 +97,8 @@ import {
   MitigationViewLinkedControlsQuery,
   MitigationViewLinkedControlsQuery$data,
 } from "./__generated__/MitigationViewLinkedControlsQuery.graphql";
-import {
-  MitigationViewRisksQuery,
-  MitigationViewRisksQuery$data,
-} from "./__generated__/MitigationViewRisksQuery.graphql";
 import { MitigationViewCreateEvidenceMutation as MitigationViewCreateEvidenceMutationType } from "./__generated__/MitigationViewCreateEvidenceMutation.graphql";
-import { MitigationViewGetEvidenceFileUrlQuery as MitigationViewGetEvidenceFileUrlQueryType } from "./__generated__/MitigationViewGetEvidenceFileUrlQuery.graphql";
 import { MitigationViewFulfillEvidenceMutation as MitigationViewFulfillEvidenceMutationType } from "./__generated__/MitigationViewFulfillEvidenceMutation.graphql";
-import { MitigationViewUploadEvidenceMutation as MitigationViewUploadEvidenceMutationType } from "./__generated__/MitigationViewUploadEvidenceMutation.graphql";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -539,7 +519,7 @@ function MitigationViewContent({
     queryRef
   );
   const { toast } = useToast();
-  const { organizationId, frameworkId, mitigationId } = useParams();
+  const { organizationId, mitigationId } = useParams();
   const navigate = useNavigate();
   const environment = useRelayEnvironment();
 
@@ -1004,7 +984,7 @@ function MitigationViewContent({
 
   const handleEditMitigation = () => {
     navigate(
-      `/organizations/${organizationId}/frameworks/${frameworkId}/mitigations/${mitigationId}/update`
+      `/organizations/${organizationId}/mitigations/${mitigationId}/edit`
     );
   };
 
@@ -3648,8 +3628,7 @@ function MitigationViewContent({
                       const originalOnChange =
                         hiddenFileInputRef.current.onchange;
                       hiddenFileInputRef.current.onchange = (e) => {
-                        hiddenFileInputRef.current!.onchange =
-                          originalOnChange as any;
+                        hiddenFileInputRef.current!.onchange = originalOnChange;
                         handleFulfillEvidenceWithFile({
                           target: {
                             files: (e.target as HTMLInputElement)?.files,

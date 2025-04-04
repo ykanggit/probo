@@ -12,7 +12,6 @@ import { graphql, useLazyLoadQuery } from "react-relay";
 import { NavLink, Outlet, Route, Routes, To, useParams } from "react-router";
 
 import { OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbFrameworkOverviewQuery.graphql";
-import { OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbVendorOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbVendorOverviewQuery.graphql";
@@ -264,40 +263,6 @@ function BreadcrumbPeopleOverview() {
   );
 }
 
-function BreadcrumbMitigationOverview() {
-  const { organizationId, frameworkId, mitigationId } = useParams();
-  const data =
-    useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery>(
-      graphql`
-        query OrganizationBreadcrumbBreadcrumbMitigationOverviewQuery(
-          $mitigationId: ID!
-        ) {
-          mitigation: node(id: $mitigationId) {
-            id
-            ... on Mitigation {
-              name
-            }
-          }
-        }
-      `,
-      { mitigationId: mitigationId! }
-    );
-
-  return (
-    <>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbNavLink
-          to={`/organizations/${organizationId}/frameworks/${frameworkId}/mitigations/${mitigationId}`}
-        >
-          {data.mitigation?.name}
-        </BreadcrumbNavLink>
-      </BreadcrumbItem>
-      <Outlet />
-    </>
-  );
-}
-
 function BreadcrumbPolicyList() {
   const { organizationId } = useParams();
   return (
@@ -402,6 +367,7 @@ function BreadcrumbMitigationView() {
           {data.mitigation.name}
         </BreadcrumbNavLink>
       </BreadcrumbItem>
+      <Outlet />
     </>
   );
 }
@@ -472,7 +438,9 @@ export function BreadCrumb() {
                 <BreadcrumbMitigationView />
               </Suspense>
             }
-          />
+          >
+            <Route path="edit" element={<Edit />} />
+          </Route>
         </Route>
         <Route path="risks" element={<BreadcrumbRiskList />}>
           <Route path="new" element={<New />} />
@@ -494,16 +462,6 @@ export function BreadCrumb() {
                 </Suspense>
               }
             />
-            <Route
-              path="mitigations/:mitigationId"
-              element={
-                <Suspense>
-                  <BreadcrumbMitigationOverview />
-                </Suspense>
-              }
-            >
-              <Route path="update" element={<Edit />} />
-            </Route>
             <Route path="update" element={<Edit />} />
           </Route>
           <Route path="create" element={<New />} />
