@@ -178,7 +178,7 @@ function PolicyViewContent({
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
             <Link
-              to={`/organizations/${organizationId}/policies/${policy.id}/update`}
+              to={`/organizations/${organizationId}/policies/${policy.id}/edit`}
             >
               <Edit className="h-4 w-4 mr-2" />
               Edit
@@ -357,7 +357,7 @@ function PolicyViewContent({
 
           <Button asChild className="w-full">
             <Link
-              to={`/organizations/${organizationId}/policies/${policy.id}/update`}
+              to={`/organizations/${organizationId}/policies/${policy.id}/edit`}
             >
               <Edit className="mr-2 h-4 w-4" />
               Edit Policy

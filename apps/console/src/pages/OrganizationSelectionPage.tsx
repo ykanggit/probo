@@ -64,7 +64,7 @@ export default function OrganizationSelectionPage() {
             <CardFooter>
               <Button
                 className="w-full"
-                onClick={() => navigate("/organizations/create")}
+                onClick={() => navigate("/organizations/new")}
               >
                 <Plus className="mr-2 h-4 w-4" /> Create Organization
               </Button>
@@ -116,7 +116,7 @@ export default function OrganizationSelectionPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => navigate("/organizations/create")}
+                onClick={() => navigate("/organizations/new")}
               >
                 <Plus className="mr-2 h-4 w-4" /> Create Organization
               </Button>

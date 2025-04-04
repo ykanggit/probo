@@ -34,17 +34,17 @@ export function OrganizationsRoutes() {
       <Route path=":organizationId/*" element={<OrganizationLayout />}>
         <Route index element={<HomePage />} />
         <Route path="people" element={<PeopleListPage />} />
-        <Route path="people/create" element={<CreatePeoplePage />} />
+        <Route path="people/new" element={<CreatePeoplePage />} />
         <Route path="people/:peopleId" element={<PeoplePage />} />
         <Route path="vendors" element={<VendorListPage />} />
         <Route path="frameworks" element={<FrameworkListPage />} />
-        <Route path="frameworks/create" element={<CreateFrameworkPage />} />
+        <Route path="frameworks/new" element={<CreateFrameworkPage />} />
         <Route path="frameworks/:frameworkId/*">
           <Route element={<FrameworkLayout />}>
             <Route index element={<FrameworkPage />} />
             <Route path="controls/:controlId" element={<ControlPage />} />
           </Route>
-          <Route path="update" element={<UpdateFrameworkPage />} />
+          <Route path="edit" element={<UpdateFrameworkPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
         <Route path="mitigations" element={<MitigationListPage />} />
@@ -56,12 +56,9 @@ export function OrganizationsRoutes() {
         />
         <Route path="vendors/:vendorId" element={<VendorPage />} />
         <Route path="policies" element={<PolicyListPage />} />
-        <Route path="policies/create" element={<CreatePolicyPage />} />
+        <Route path="policies/new" element={<CreatePolicyPage />} />
         <Route path="policies/:policyId" element={<PolicyPage />} />
-        <Route
-          path="policies/:policyId/update"
-          element={<UpdatePolicyPage />}
-        />
+        <Route path="policies/:policyId/edit" element={<UpdatePolicyPage />} />
         <Route path="risks" element={<RiskListPage />} />
         <Route path="risks/new" element={<NewRiskPage />} />
         <Route path="risks/:riskId" element={<ShowRiskView />} />
@@ -70,7 +67,7 @@ export function OrganizationsRoutes() {
       </Route>
 
       <Route path="*" element={<NoOrganizationLayout />}>
-        <Route path="create" element={<CreateOrganizationPage />} />
+        <Route path="new" element={<CreateOrganizationPage />} />
       </Route>
     </Routes>
   );

@@ -69,12 +69,12 @@ export default function NoOrganizationLayout() {
             <Routes>
               <Route path="*" element={<BreadcrumbHome />}>
                 <Route
-                  path="create"
+                  path="new"
                   element={
                     <>
                       <BreadcrumbSeparator />
                       <BreadcrumbItem>
-                        <BreadcrumbPage>Create Organization</BreadcrumbPage>
+                        <BreadcrumbPage>New Organization</BreadcrumbPage>
                       </BreadcrumbItem>
                     </>
                   }

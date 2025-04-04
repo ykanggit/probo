@@ -147,7 +147,7 @@ function FrameworkListViewContent({
             Import Framework
           </Button>
           <Button asChild>
-            <Link to={`/organizations/${organizationId}/frameworks/create`}>
+            <Link to={`/organizations/${organizationId}/frameworks/new`}>
               <Plus className="mr-2 h-4 w-4" />
               Create Framework
             </Link>

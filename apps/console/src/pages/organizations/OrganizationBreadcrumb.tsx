@@ -463,9 +463,9 @@ export function BreadCrumb() {
                 </Suspense>
               }
             />
-            <Route path="update" element={<Edit />} />
+            <Route path="edit" element={<Edit />} />
           </Route>
-          <Route path="create" element={<New />} />
+          <Route path="new" element={<New />} />
         </Route>
         <Route path="people" element={<BreadcrumbPeopleList />}>
           <Route
@@ -476,7 +476,7 @@ export function BreadCrumb() {
               </Suspense>
             }
           />
-          <Route path="create" element={<New />} />
+          <Route path="new" element={<New />} />
         </Route>
         <Route path="vendors" element={<BreadcrumbVendorList />}>
           <Route
@@ -497,9 +497,9 @@ export function BreadCrumb() {
               </Suspense>
             }
           >
-            <Route path="update" element={<Edit />} />
+            <Route path="edit" element={<Edit />} />
           </Route>
-          <Route path="create" element={<New />} />
+          <Route path="new" element={<New />} />
         </Route>
         <Route
           path="settings"
@@ -516,7 +516,7 @@ export function BreadCrumb() {
 
       <Route path="*" element={<BreadcrumbHome />}>
         <Route
-          path="create"
+          path="new"
           element={
             <>
               <BreadcrumbSeparator />

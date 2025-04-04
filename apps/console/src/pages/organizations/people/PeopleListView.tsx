@@ -185,7 +185,7 @@ function PeopleListContent({
           style={{ borderRadius: "0.5rem" }}
           className="gap-2"
         >
-          <Link to={`/organizations/${organizationId}/people/create`}>
+          <Link to={`/organizations/${organizationId}/people/new`}>
             <UserPlus className="h-4 w-4" />
             Add a person
           </Link>

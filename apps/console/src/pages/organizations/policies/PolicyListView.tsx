@@ -225,7 +225,7 @@ function PolicyListViewContent({
       description="Manage your organization's policies"
       actions={
         <Button asChild>
-          <Link to={`/organizations/${organizationId}/policies/create`}>
+          <Link to={`/organizations/${organizationId}/policies/new`}>
             <Plus className="mr-2 h-4 w-4" />
             Create Policy
           </Link>
@@ -335,7 +335,7 @@ function PolicyListViewContent({
               </Button>
             ) : (
               <Button asChild>
-                <Link to={`/organizations/${organizationId}/policies/create`}>
+                <Link to={`/organizations/${organizationId}/policies/new`}>
                   <Plus className="mr-2 h-4 w-4" />
                   Create Policy
                 </Link>
