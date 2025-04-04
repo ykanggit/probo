@@ -5,9 +5,9 @@ import { useMatch } from "react-router";
 import { lazy } from "@probo/react-lazy";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-const FrameworkView = lazy(() => import("./FrameworkView"));
+const FrameworkLayoutView = lazy(() => import("./FrameworkLayoutView"));
 
-export function FrameworkViewSkeleton() {
+export function FrameworkLayoutViewSkeleton() {
   return (
     <PageTemplateSkeleton
       actions={
@@ -35,15 +35,18 @@ export function FrameworkViewSkeleton() {
   );
 }
 
-export function FrameworkPage() {
+export function FrameworkLayout() {
   const match = useMatch(
     "organizations/:organizationId/frameworks/:frameworkId/*"
   );
 
   return (
-    <Suspense key={match?.pathnameBase} fallback={<FrameworkViewSkeleton />}>
+    <Suspense
+      key={match?.pathnameBase}
+      fallback={<FrameworkLayoutViewSkeleton />}
+    >
       <ErrorBoundary key={match?.pathnameBase}>
-        <FrameworkView />
+        <FrameworkLayoutView />
       </ErrorBoundary>
     </Suspense>
   );

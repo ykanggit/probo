@@ -21,9 +21,8 @@ import { useToast } from "@/hooks/use-toast";
 import type { FrameworkViewQuery as FrameworkViewQueryType } from "./__generated__/FrameworkViewQuery.graphql";
 import type { FrameworkViewDeleteMutation } from "./__generated__/FrameworkViewDeleteMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
-import { FrameworkViewSkeleton } from "./FrameworkPage";
-import { ControlList } from "./FrameworkView/ControlList";
-import ControlView from "./controls/ControlView";
+import { FrameworkLayoutViewSkeleton } from "./FrameworkLayout";
+import { ControlList } from "./FrameworkLayoutView/ControlList";
 
 const FrameworkViewQuery = graphql`
   query FrameworkViewQuery($frameworkId: ID!) {
@@ -68,9 +67,8 @@ function FrameworkViewContent({
 }) {
   const data = usePreloadedQuery(FrameworkViewQuery, queryRef);
   const framework = data.node;
-  const control = data.node.firstControl?.edges[0];
   const navigate = useNavigate();
-  const { organizationId, controlId } = useParams();
+  const { organizationId } = useParams();
   const { toast } = useToast();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -153,7 +151,7 @@ function FrameworkViewContent({
     >
       <div className="flex flex-row items-start justify-start w-full h-[calc(100vh-216px)] overflow-hidden -ml-8">
         <ControlList fragmentKey={framework} />
-        {controlId && <ControlView controlId={control?.node.id} />}
+        <Outlet />
       </div>
 
       {/* Delete Confirmation Dialog */}
@@ -198,11 +196,11 @@ export default function FrameworkView() {
   }, [loadQuery, frameworkId]);
 
   if (!queryRef) {
-    return <FrameworkViewSkeleton />;
+    return <FrameworkLayoutViewSkeleton />;
   }
 
   return (
-    <Suspense fallback={<FrameworkViewSkeleton />}>
+    <Suspense fallback={<FrameworkLayoutViewSkeleton />}>
       <FrameworkViewContent queryRef={queryRef} />
     </Suspense>
   );

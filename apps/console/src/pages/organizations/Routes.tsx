@@ -7,7 +7,7 @@ import OrganizationLayout from "./OrganizationLayout";
 import { SettingsPage } from "./SettingsPage";
 import { CreateFrameworkPage } from "./frameworks/CreateFrameworkPage";
 import { FrameworkListPage } from "./frameworks/FrameworkListPage";
-import { FrameworkPage } from "./frameworks/FrameworkPage";
+import { FrameworkLayout } from "./frameworks/FrameworkLayout";
 import { UpdateFrameworkPage } from "./frameworks/UpdateFrameworkPage";
 import { ControlPage } from "./frameworks/controls/ControlPage";
 import { EditMitigationPage } from "./mitigations/EditMitigationPage";
@@ -39,7 +39,7 @@ export function OrganizationsRoutes() {
         <Route path="frameworks" element={<FrameworkListPage />} />
         <Route path="frameworks/create" element={<CreateFrameworkPage />} />
         <Route path="frameworks/:frameworkId/*">
-          <Route element={<FrameworkPage />}>
+          <Route element={<FrameworkLayout />}>
             <Route index />
             <Route path="controls/:controlId" element={<ControlPage />} />
           </Route>
