@@ -19,6 +19,7 @@ import { OrganizationBreadcrumbBreadcrumbVendorOverviewQuery } from "./__generat
 import { OrganizationBreadcrumbOrganizationQuery } from "./__generated__/OrganizationBreadcrumbOrganizationQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbMitigationViewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbMitigationViewQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbControlQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbControlQuery.graphql";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const New = () => {
   return (
@@ -455,9 +456,11 @@ export function BreadCrumb() {
     <Routes>
       <Route
         element={
-          <Suspense>
-            <BreadCrumbOrganization />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense>
+              <BreadCrumbOrganization />
+            </Suspense>
+          </ErrorBoundary>
         }
       >
         <Route path="mitigations" element={<BreadcrumbMitigationList />}>

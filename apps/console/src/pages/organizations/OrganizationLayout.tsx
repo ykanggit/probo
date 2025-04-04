@@ -5,6 +5,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { BreadCrumb } from "./OrganizationBreadcrumb";
 import { cn } from "@/lib/utils";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function OrganizationLayout() {
   const controlMatch = useMatch(
@@ -16,9 +17,11 @@ export default function OrganizationLayout() {
 
   return (
     <SidebarProvider>
-      <Suspense>
-        <AppSidebar className="p-4" />
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense>
+          <AppSidebar className="p-4" />
+        </Suspense>
+      </ErrorBoundary>
       <SidebarInset>
         <div
           className={cn(

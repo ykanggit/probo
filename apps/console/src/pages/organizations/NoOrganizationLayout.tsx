@@ -12,6 +12,7 @@ import {
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const BreadCrumbNavLink = ({
   to,
@@ -57,9 +58,11 @@ function BreadcrumbHome() {
 export default function NoOrganizationLayout() {
   return (
     <SidebarProvider>
-      <Suspense>
-        <AppSidebar className="p-4" />
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense>
+          <AppSidebar className="p-4" />
+        </Suspense>
+      </ErrorBoundary>
       <SidebarInset>
         <div className="mx-auto w-lg md:w-xl lg:w-3xl xl:w-4xl 2xl:w-5xl p-8">
           <header className="flex shrink-0 items-center gap-2">
