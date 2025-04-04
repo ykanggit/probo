@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<efc33f8979f142c09b65b2bd1d6e06be>>
+ * @generated SignedSource<<171200736f3a443faae3f8b7c2085f4f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,10 +18,10 @@ export type UpdatePolicyInput = {
   reviewDate?: string | null | undefined;
   status?: PolicyStatus | null | undefined;
 };
-export type UpdatePolicyViewMutation$variables = {
+export type EditPolicyViewMutation$variables = {
   input: UpdatePolicyInput;
 };
-export type UpdatePolicyViewMutation$data = {
+export type EditPolicyViewMutation$data = {
   readonly updatePolicy: {
     readonly policy: {
       readonly content: string;
@@ -36,9 +36,9 @@ export type UpdatePolicyViewMutation$data = {
     };
   };
 };
-export type UpdatePolicyViewMutation = {
-  response: UpdatePolicyViewMutation$data;
-  variables: UpdatePolicyViewMutation$variables;
+export type EditPolicyViewMutation = {
+  response: EditPolicyViewMutation$data;
+  variables: EditPolicyViewMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -139,7 +139,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "UpdatePolicyViewMutation",
+    "name": "EditPolicyViewMutation",
     "selections": (v2/*: any*/),
     "type": "Mutation",
     "abstractKey": null
@@ -148,20 +148,20 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "UpdatePolicyViewMutation",
+    "name": "EditPolicyViewMutation",
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "aae664c7d961ad4e17c8e37464a34865",
+    "cacheID": "643990a3ab54cb51144f434b023531e7",
     "id": null,
     "metadata": {},
-    "name": "UpdatePolicyViewMutation",
+    "name": "EditPolicyViewMutation",
     "operationKind": "mutation",
-    "text": "mutation UpdatePolicyViewMutation(\n  $input: UpdatePolicyInput!\n) {\n  updatePolicy(input: $input) {\n    policy {\n      id\n      name\n      content\n      status\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
+    "text": "mutation EditPolicyViewMutation(\n  $input: UpdatePolicyInput!\n) {\n  updatePolicy(input: $input) {\n    policy {\n      id\n      name\n      content\n      status\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d0f7b9d21b450416900ccb46439e2894";
+(node as any).hash = "41d4945568bc1f43eeedc727a968654d";
 
 export default node;

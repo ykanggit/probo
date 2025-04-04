@@ -4,12 +4,12 @@ import { lazy } from "@probo/react-lazy";
 import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
 
-const CreatePeopleView = lazy(() => import("./CreatePeopleView"));
+const NewPeopleView = lazy(() => import("./NewPeopleView"));
 
-export function CreatePeopleViewSkeleton() {
+export function NewPeopleViewSkeleton() {
   return (
     <PageTemplateSkeleton
-      title="Create Person"
+      title="New Person"
       description="Add a new person interacting with organization"
     >
       <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
@@ -17,13 +17,13 @@ export function CreatePeopleViewSkeleton() {
   );
 }
 
-export function CreatePeoplePage() {
+export function NewPeoplePage() {
   const location = useLocation();
 
   return (
-    <Suspense key={location.pathname} fallback={<CreatePeopleViewSkeleton />}>
+    <Suspense key={location.pathname} fallback={<NewPeopleViewSkeleton />}>
       <ErrorBoundaryWithLocation>
-        <CreatePeopleView />
+        <NewPeopleView />
       </ErrorBoundaryWithLocation>
     </Suspense>
   );

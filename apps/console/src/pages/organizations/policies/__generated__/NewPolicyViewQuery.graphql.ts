@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0d6c35628ee18fe62e21ea579a02d118>>
+ * @generated SignedSource<<84789bb949f94e924de1c9b9d566b4a5>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,17 +10,17 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type CreatePolicyViewQuery$variables = {
+export type NewPolicyViewQuery$variables = {
   organizationId: string;
 };
-export type CreatePolicyViewQuery$data = {
+export type NewPolicyViewQuery$data = {
   readonly organization: {
     readonly " $fragmentSpreads": FragmentRefs<"PeopleSelector_organization">;
   };
 };
-export type CreatePolicyViewQuery = {
-  response: CreatePolicyViewQuery$data;
-  variables: CreatePolicyViewQuery$variables;
+export type NewPolicyViewQuery = {
+  response: NewPolicyViewQuery$data;
+  variables: NewPolicyViewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -72,7 +72,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "CreatePolicyViewQuery",
+    "name": "NewPolicyViewQuery",
     "selections": [
       {
         "alias": "organization",
@@ -98,7 +98,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "CreatePolicyViewQuery",
+    "name": "NewPolicyViewQuery",
     "selections": [
       {
         "alias": "organization",
@@ -215,16 +215,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "85c335b0eeb8dc59c5255083f3c3c7e8",
+    "cacheID": "552067b4b0632972c14f7a8dcaf171aa",
     "id": null,
     "metadata": {},
-    "name": "CreatePolicyViewQuery",
+    "name": "NewPolicyViewQuery",
     "operationKind": "query",
-    "text": "query CreatePolicyViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query NewPolicyViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "9184af33ef358fb3c201d41469d49cc8";
+(node as any).hash = "98fa41bfaf0d76adce1c91cf8d6ade28";
 
 export default node;

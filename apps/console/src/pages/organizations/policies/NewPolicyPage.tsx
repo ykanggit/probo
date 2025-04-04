@@ -1,29 +1,29 @@
 import { PageTemplateSkeleton } from "@/components/PageTemplate";
 import { Suspense } from "react";
-import { lazy } from "@probo/react-lazy";
 import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
+import { lazy } from "@probo/react-lazy";
 
-const UpdatePolicyView = lazy(() => import("./UpdatePolicyView"));
+const NewPolicyView = lazy(() => import("./NewPolicyView"));
 
-export function UpdatePolicyViewSkeleton() {
+export function NewPolicyViewSkeleton() {
   return (
     <PageTemplateSkeleton
-      title="Update Policy"
-      description="Update an existing policy"
+      title="New Policy"
+      description="Add a new policy for your organization"
     >
       <div className="bg-muted animate-pulse rounded-lg h-[600px]" />
     </PageTemplateSkeleton>
   );
 }
 
-export function UpdatePolicyPage() {
+export function NewPolicyPage() {
   const location = useLocation();
 
   return (
-    <Suspense key={location.pathname} fallback={<UpdatePolicyViewSkeleton />}>
+    <Suspense key={location.pathname} fallback={<NewPolicyViewSkeleton />}>
       <ErrorBoundaryWithLocation>
-        <UpdatePolicyView />
+        <NewPolicyView />
       </ErrorBoundaryWithLocation>
     </Suspense>
   );

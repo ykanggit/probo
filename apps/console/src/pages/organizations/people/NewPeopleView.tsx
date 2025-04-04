@@ -8,12 +8,12 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CreatePeopleViewCreatePeopleMutation } from "./__generated__/CreatePeopleViewCreatePeopleMutation.graphql";
+import { NewPeopleViewCreatePeopleMutation } from "./__generated__/NewPeopleViewCreatePeopleMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
-import { CreatePeopleViewSkeleton } from "./CreatePeoplePage";
+import { NewPeopleViewSkeleton } from "./NewPeoplePage";
 
 const createPeopleMutation = graphql`
-  mutation CreatePeopleViewCreatePeopleMutation(
+  mutation NewPeopleViewCreatePeopleMutation(
     $input: CreatePeopleInput!
     $connections: [ID!]!
   ) {
@@ -65,12 +65,12 @@ function EditableField({
   );
 }
 
-function CreatePeopleViewContent() {
+function NewPeopleViewContent() {
   const navigate = useNavigate();
   const { organizationId } = useParams();
 
   const [createPeople] =
-    useMutation<CreatePeopleViewCreatePeopleMutation>(createPeopleMutation);
+    useMutation<NewPeopleViewCreatePeopleMutation>(createPeopleMutation);
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     fullName: "",
@@ -296,10 +296,10 @@ function CreatePeopleViewContent() {
   );
 }
 
-export default function CreatePeopleView() {
+export default function NewPeopleView() {
   return (
-    <Suspense fallback={<CreatePeopleViewSkeleton />}>
-      <CreatePeopleViewContent />
+    <Suspense fallback={<NewPeopleViewSkeleton />}>
+      <NewPeopleViewContent />
     </Suspense>
   );
 }

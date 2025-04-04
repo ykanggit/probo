@@ -18,13 +18,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PolicyEditor from "@/components/PolicyEditor";
 import PeopleSelector from "@/components/PeopleSelector";
 import { Suspense } from "react";
-import type { CreatePolicyViewMutation } from "./__generated__/CreatePolicyViewMutation.graphql";
-import type { CreatePolicyViewQuery as CreatePolicyViewQueryType } from "./__generated__/CreatePolicyViewQuery.graphql";
+import type { NewPolicyViewMutation } from "./__generated__/NewPolicyViewMutation.graphql";
+import type { NewPolicyViewQuery } from "./__generated__/NewPolicyViewQuery.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
-import { CreatePolicyViewSkeleton } from "./CreatePolicyPage";
+import { NewPolicyViewSkeleton } from "./NewPolicyPage";
 
-const CreatePolicyQuery = graphql`
-  query CreatePolicyViewQuery($organizationId: ID!) {
+const newPolicyQuery = graphql`
+  query NewPolicyViewQuery($organizationId: ID!) {
     organization: node(id: $organizationId) {
       ...PeopleSelector_organization
     }
@@ -32,7 +32,7 @@ const CreatePolicyQuery = graphql`
 `;
 
 const CreatePolicyMutation = graphql`
-  mutation CreatePolicyViewMutation(
+  mutation NewPolicyViewMutation(
     $input: CreatePolicyInput!
     $connections: [ID!]!
   ) {
@@ -57,14 +57,11 @@ const CreatePolicyMutation = graphql`
 function CreatePolicyForm({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<CreatePolicyViewQueryType>;
+  queryRef: PreloadedQuery<NewPolicyViewQuery>;
 }) {
   const navigate = useNavigate();
   const { organizationId } = useParams();
-  const data = usePreloadedQuery<CreatePolicyViewQueryType>(
-    CreatePolicyQuery,
-    queryRef
-  );
+  const data = usePreloadedQuery<NewPolicyViewQuery>(newPolicyQuery, queryRef);
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
   const [status, setStatus] = useState<"DRAFT" | "ACTIVE">("DRAFT");
@@ -74,14 +71,14 @@ function CreatePolicyForm({
   const { toast } = useToast();
 
   console.log(
-    "CreatePolicyView state - content:",
+    "NewPolicyView state - content:",
     content
       ? content.substring(0, 50) + (content.length > 50 ? "..." : "")
       : "empty"
   );
 
   const [commitMutation] =
-    useMutation<CreatePolicyViewMutation>(CreatePolicyMutation);
+    useMutation<NewPolicyViewMutation>(CreatePolicyMutation);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -261,10 +258,10 @@ function CreatePolicyForm({
   );
 }
 
-export default function CreatePolicyView() {
+export default function NewPolicyView() {
   const { organizationId } = useParams();
   const [queryRef, loadQuery] =
-    useQueryLoader<CreatePolicyViewQueryType>(CreatePolicyQuery);
+    useQueryLoader<NewPolicyViewQuery>(newPolicyQuery);
 
   useEffect(() => {
     if (organizationId) {
@@ -273,11 +270,11 @@ export default function CreatePolicyView() {
   }, [organizationId, loadQuery]);
 
   if (!queryRef) {
-    return <CreatePolicyViewSkeleton />;
+    return <NewPolicyViewSkeleton />;
   }
 
   return (
-    <Suspense fallback={<CreatePolicyViewSkeleton />}>
+    <Suspense fallback={<NewPolicyViewSkeleton />}>
       {<CreatePolicyForm queryRef={queryRef} />}
     </Suspense>
   );

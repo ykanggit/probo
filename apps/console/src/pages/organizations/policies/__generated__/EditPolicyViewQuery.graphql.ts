@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e3772627b3bf7e5938d48808edd9fcb8>>
+ * @generated SignedSource<<312876323f4072e43048dfe1b2e21d08>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,11 +11,11 @@
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type PolicyStatus = "ACTIVE" | "DRAFT";
-export type UpdatePolicyViewQuery$variables = {
+export type EditPolicyViewQuery$variables = {
   organizationId: string;
   policyId: string;
 };
-export type UpdatePolicyViewQuery$data = {
+export type EditPolicyViewQuery$data = {
   readonly organization: {
     readonly " $fragmentSpreads": FragmentRefs<"PeopleSelector_organization">;
   };
@@ -31,9 +31,9 @@ export type UpdatePolicyViewQuery$data = {
     readonly status?: PolicyStatus;
   };
 };
-export type UpdatePolicyViewQuery = {
-  response: UpdatePolicyViewQuery$data;
-  variables: UpdatePolicyViewQuery$variables;
+export type EditPolicyViewQuery = {
+  response: EditPolicyViewQuery$data;
+  variables: EditPolicyViewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -153,7 +153,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "UpdatePolicyViewQuery",
+    "name": "EditPolicyViewQuery",
     "selections": [
       {
         "alias": "policy",
@@ -195,7 +195,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "UpdatePolicyViewQuery",
+    "name": "EditPolicyViewQuery",
     "selections": [
       {
         "alias": "policy",
@@ -320,16 +320,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b7958bceabdd33c39fb403bdc6dbd85e",
+    "cacheID": "4d52d22f9d8acc7912a57d974f558248",
     "id": null,
     "metadata": {},
-    "name": "UpdatePolicyViewQuery",
+    "name": "EditPolicyViewQuery",
     "operationKind": "query",
-    "text": "query UpdatePolicyViewQuery(\n  $policyId: ID!\n  $organizationId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      status\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query EditPolicyViewQuery(\n  $policyId: ID!\n  $organizationId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n      content\n      status\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d29279c14662125a7fb14fa4da857f2b";
+(node as any).hash = "d16bdd881b27b1aa5368130ce036fd20";
 
 export default node;

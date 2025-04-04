@@ -17,13 +17,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Suspense } from "react";
 import PolicyEditor from "@/components/PolicyEditor";
 import PeopleSelector from "@/components/PeopleSelector";
-import type { UpdatePolicyViewQuery as UpdatePolicyViewQueryType } from "./__generated__/UpdatePolicyViewQuery.graphql";
-import type { UpdatePolicyViewMutation as UpdatePolicyViewMutationType } from "./__generated__/UpdatePolicyViewMutation.graphql";
+import type { EditPolicyViewQuery } from "./__generated__/EditPolicyViewQuery.graphql";
+import type { EditPolicyViewMutation as EditPolicyViewMutationType } from "./__generated__/EditPolicyViewMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
-import { UpdatePolicyViewSkeleton } from "./UpdatePolicyPage";
+import { EditPolicyViewSkeleton } from "./EditPolicyPage";
 
-const UpdatePolicyViewQuery = graphql`
-  query UpdatePolicyViewQuery($policyId: ID!, $organizationId: ID!) {
+const editPolicyViewQuery = graphql`
+  query EditPolicyViewQuery($policyId: ID!, $organizationId: ID!) {
     policy: node(id: $policyId) {
       id
       ... on Policy {
@@ -44,7 +44,7 @@ const UpdatePolicyViewQuery = graphql`
 `;
 
 const UpdatePolicyMutation = graphql`
-  mutation UpdatePolicyViewMutation($input: UpdatePolicyInput!) {
+  mutation EditPolicyViewMutation($input: UpdatePolicyInput!) {
     updatePolicy(input: $input) {
       policy {
         id
@@ -61,19 +61,19 @@ const UpdatePolicyMutation = graphql`
   }
 `;
 
-function UpdatePolicyViewContent({
+function EditPolicyViewContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<UpdatePolicyViewQueryType>;
+  queryRef: PreloadedQuery<EditPolicyViewQuery>;
 }) {
   const navigate = useNavigate();
   const { organizationId, policyId } = useParams();
-  const data = usePreloadedQuery<UpdatePolicyViewQueryType>(
-    UpdatePolicyViewQuery,
+  const data = usePreloadedQuery<EditPolicyViewQuery>(
+    editPolicyViewQuery,
     queryRef
   );
 
-  console.log("UpdatePolicyView data:", data.policy);
+  console.log("EditPolicyView data:", data.policy);
 
   const [name, setName] = useState(data.policy.name);
   const [content, setContent] = useState(data.policy.content || "");
@@ -85,14 +85,14 @@ function UpdatePolicyViewContent({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   console.log(
-    "UpdatePolicyView state - content:",
+    "EditPolicyView state - content:",
     content
       ? content.substring(0, 50) + (content.length > 50 ? "..." : "")
       : "empty"
   );
 
   const [commitMutation] =
-    useMutation<UpdatePolicyViewMutationType>(UpdatePolicyMutation);
+    useMutation<EditPolicyViewMutationType>(UpdatePolicyMutation);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -249,11 +249,10 @@ function UpdatePolicyViewContent({
   );
 }
 
-export default function UpdatePolicyView() {
+export default function EditPolicyView() {
   const { organizationId, policyId } = useParams();
-  const [queryRef, loadQuery] = useQueryLoader<UpdatePolicyViewQueryType>(
-    UpdatePolicyViewQuery
-  );
+  const [queryRef, loadQuery] =
+    useQueryLoader<EditPolicyViewQuery>(editPolicyViewQuery);
 
   useEffect(() => {
     if (organizationId && policyId) {
@@ -262,12 +261,12 @@ export default function UpdatePolicyView() {
   }, [organizationId, policyId, loadQuery]);
 
   if (!queryRef) {
-    return <UpdatePolicyViewSkeleton />;
+    return <EditPolicyViewSkeleton />;
   }
 
   return (
-    <Suspense fallback={<UpdatePolicyViewSkeleton />}>
-      {queryRef && <UpdatePolicyViewContent queryRef={queryRef} />}
+    <Suspense fallback={<EditPolicyViewSkeleton />}>
+      {queryRef && <EditPolicyViewContent queryRef={queryRef} />}
     </Suspense>
   );
 }

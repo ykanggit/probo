@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6100eacd24cc3b7e7fe5dc4539323e75>>
+ * @generated SignedSource<<2026b385ee5eb895da6ca9c919762913>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,11 +18,11 @@ export type CreatePolicyInput = {
   reviewDate?: string | null | undefined;
   status: PolicyStatus;
 };
-export type CreatePolicyViewMutation$variables = {
+export type NewPolicyViewMutation$variables = {
   connections: ReadonlyArray<string>;
   input: CreatePolicyInput;
 };
-export type CreatePolicyViewMutation$data = {
+export type NewPolicyViewMutation$data = {
   readonly createPolicy: {
     readonly policyEdge: {
       readonly node: {
@@ -39,9 +39,9 @@ export type CreatePolicyViewMutation$data = {
     };
   };
 };
-export type CreatePolicyViewMutation = {
-  response: CreatePolicyViewMutation$data;
-  variables: CreatePolicyViewMutation$variables;
+export type NewPolicyViewMutation = {
+  response: NewPolicyViewMutation$data;
+  variables: NewPolicyViewMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -147,7 +147,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "CreatePolicyViewMutation",
+    "name": "NewPolicyViewMutation",
     "selections": [
       {
         "alias": null,
@@ -172,7 +172,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "CreatePolicyViewMutation",
+    "name": "NewPolicyViewMutation",
     "selections": [
       {
         "alias": null,
@@ -205,16 +205,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "732425c047d258a0c592d60073c4fcbd",
+    "cacheID": "aa29cde3106d1c8d35c6ae8e74f310b7",
     "id": null,
     "metadata": {},
-    "name": "CreatePolicyViewMutation",
+    "name": "NewPolicyViewMutation",
     "operationKind": "mutation",
-    "text": "mutation CreatePolicyViewMutation(\n  $input: CreatePolicyInput!\n) {\n  createPolicy(input: $input) {\n    policyEdge {\n      node {\n        id\n        name\n        content\n        status\n        reviewDate\n        owner {\n          id\n          fullName\n        }\n      }\n    }\n  }\n}\n"
+    "text": "mutation NewPolicyViewMutation(\n  $input: CreatePolicyInput!\n) {\n  createPolicy(input: $input) {\n    policyEdge {\n      node {\n        id\n        name\n        content\n        status\n        reviewDate\n        owner {\n          id\n          fullName\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "af0c4091836cf3c833749da8495e378f";
+(node as any).hash = "f6dcabf6c51e3858c9750e00fcc0cc15";
 
 export default node;

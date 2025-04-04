@@ -15,13 +15,13 @@ import { EditMitigationPage } from "./mitigations/EditMitigationPage";
 import { MitigationListPage } from "./mitigations/MitigationListPage";
 import { MitigationPage } from "./mitigations/MitigationPage";
 import { NewMitigationPage } from "./mitigations/NewMitigationPage";
-import { CreatePeoplePage } from "./people/CreatePeoplePage";
+import { NewPeoplePage } from "./people/NewPeoplePage";
 import { PeopleListPage } from "./people/PeopleListPage";
 import { PeoplePage } from "./people/PeoplePage";
-import { CreatePolicyPage } from "./policies/CreatePolicyPage";
+import { EditPolicyPage } from "./policies/EditPolicyPage";
+import { NewPolicyPage } from "./policies/NewPolicyPage";
 import { PolicyListPage } from "./policies/PolicyListPage";
 import { PolicyPage } from "./policies/PolicyPage";
-import { UpdatePolicyPage } from "./policies/UpdatePolicyPage";
 import { NewRiskPage } from "./risks/NewRiskPage";
 import { RiskListPage } from "./risks/RiskListPage";
 import ShowRiskView from "./risks/ShowRiskView";
@@ -34,7 +34,7 @@ export function OrganizationsRoutes() {
       <Route path=":organizationId/*" element={<OrganizationLayout />}>
         <Route index element={<HomePage />} />
         <Route path="people" element={<PeopleListPage />} />
-        <Route path="people/new" element={<CreatePeoplePage />} />
+        <Route path="people/new" element={<NewPeoplePage />} />
         <Route path="people/:peopleId" element={<PeoplePage />} />
         <Route path="vendors" element={<VendorListPage />} />
         <Route path="frameworks" element={<FrameworkListPage />} />
@@ -56,9 +56,9 @@ export function OrganizationsRoutes() {
         />
         <Route path="vendors/:vendorId" element={<VendorPage />} />
         <Route path="policies" element={<PolicyListPage />} />
-        <Route path="policies/new" element={<CreatePolicyPage />} />
+        <Route path="policies/new" element={<NewPolicyPage />} />
         <Route path="policies/:policyId" element={<PolicyPage />} />
-        <Route path="policies/:policyId/edit" element={<UpdatePolicyPage />} />
+        <Route path="policies/:policyId/edit" element={<EditPolicyPage />} />
         <Route path="risks" element={<RiskListPage />} />
         <Route path="risks/new" element={<NewRiskPage />} />
         <Route path="risks/:riskId" element={<ShowRiskView />} />

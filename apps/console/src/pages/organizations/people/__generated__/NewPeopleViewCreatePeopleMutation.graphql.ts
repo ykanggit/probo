@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<eb07431152c49241a6e636984bbd5bee>>
+ * @generated SignedSource<<76fb19bfca9165a9c40d0b306e53c1de>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,11 +17,11 @@ export type CreatePeopleInput = {
   organizationId: string;
   primaryEmailAddress: string;
 };
-export type CreatePeopleViewCreatePeopleMutation$variables = {
+export type NewPeopleViewCreatePeopleMutation$variables = {
   connections: ReadonlyArray<string>;
   input: CreatePeopleInput;
 };
-export type CreatePeopleViewCreatePeopleMutation$data = {
+export type NewPeopleViewCreatePeopleMutation$data = {
   readonly createPeople: {
     readonly peopleEdge: {
       readonly node: {
@@ -34,9 +34,9 @@ export type CreatePeopleViewCreatePeopleMutation$data = {
     };
   };
 };
-export type CreatePeopleViewCreatePeopleMutation = {
-  response: CreatePeopleViewCreatePeopleMutation$data;
-  variables: CreatePeopleViewCreatePeopleMutation$variables;
+export type NewPeopleViewCreatePeopleMutation = {
+  response: NewPeopleViewCreatePeopleMutation$data;
+  variables: NewPeopleViewCreatePeopleMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -122,7 +122,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "CreatePeopleViewCreatePeopleMutation",
+    "name": "NewPeopleViewCreatePeopleMutation",
     "selections": [
       {
         "alias": null,
@@ -147,7 +147,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "CreatePeopleViewCreatePeopleMutation",
+    "name": "NewPeopleViewCreatePeopleMutation",
     "selections": [
       {
         "alias": null,
@@ -180,16 +180,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "f09d8f7be5234f21e7bfabecf8d8b0af",
+    "cacheID": "d9cfab5066a89013eef581dc016daf57",
     "id": null,
     "metadata": {},
-    "name": "CreatePeopleViewCreatePeopleMutation",
+    "name": "NewPeopleViewCreatePeopleMutation",
     "operationKind": "mutation",
-    "text": "mutation CreatePeopleViewCreatePeopleMutation(\n  $input: CreatePeopleInput!\n) {\n  createPeople(input: $input) {\n    peopleEdge {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        additionalEmailAddresses\n        kind\n      }\n    }\n  }\n}\n"
+    "text": "mutation NewPeopleViewCreatePeopleMutation(\n  $input: CreatePeopleInput!\n) {\n  createPeople(input: $input) {\n    peopleEdge {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        additionalEmailAddresses\n        kind\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ac8a85af6d2902de6f475588679ba038";
+(node as any).hash = "fd4b7a5907702712c654005de2a98996";
 
 export default node;
