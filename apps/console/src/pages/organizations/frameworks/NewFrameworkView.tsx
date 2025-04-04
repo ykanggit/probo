@@ -9,12 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CreateFrameworkViewCreateFrameworkMutation } from "./__generated__/CreateFrameworkViewCreateFrameworkMutation.graphql";
+import { NewFrameworkViewCreateFrameworkMutation } from "./__generated__/NewFrameworkViewCreateFrameworkMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
-import { CreateFrameworkViewSkeleton } from "./CreateFrameworkPage";
+import { NewFrameworkViewSkeleton } from "./NewFrameworkPage";
 
 const createFrameworkMutation = graphql`
-  mutation CreateFrameworkViewCreateFrameworkMutation(
+  mutation NewFrameworkViewCreateFrameworkMutation(
     $input: CreateFrameworkInput!
     $connections: [ID!]!
   ) {
@@ -91,7 +91,7 @@ function EditableField({
   );
 }
 
-function CreateFrameworkViewContent() {
+function NewFrameworkViewContent() {
   const { organizationId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -101,7 +101,7 @@ function CreateFrameworkViewContent() {
   });
 
   const [commit, isInFlight] =
-    useMutation<CreateFrameworkViewCreateFrameworkMutation>(
+    useMutation<NewFrameworkViewCreateFrameworkMutation>(
       createFrameworkMutation
     );
 
@@ -210,10 +210,10 @@ function CreateFrameworkViewContent() {
   );
 }
 
-export default function CreateFrameworkView() {
+export default function NewFrameworkView() {
   return (
-    <Suspense fallback={<CreateFrameworkViewSkeleton />}>
-      <CreateFrameworkViewContent />
+    <Suspense fallback={<NewFrameworkViewSkeleton />}>
+      <NewFrameworkViewContent />
     </Suspense>
   );
 }

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<dca7347e7f5c3d8271623553ee52094d>>
+ * @generated SignedSource<<88977ec320d7f163cf378446f9eb7f6a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,11 +14,11 @@ export type CreateFrameworkInput = {
   name: string;
   organizationId: string;
 };
-export type CreateFrameworkViewCreateFrameworkMutation$variables = {
+export type NewFrameworkViewCreateFrameworkMutation$variables = {
   connections: ReadonlyArray<string>;
   input: CreateFrameworkInput;
 };
-export type CreateFrameworkViewCreateFrameworkMutation$data = {
+export type NewFrameworkViewCreateFrameworkMutation$data = {
   readonly createFramework: {
     readonly frameworkEdge: {
       readonly node: {
@@ -29,9 +29,9 @@ export type CreateFrameworkViewCreateFrameworkMutation$data = {
     };
   };
 };
-export type CreateFrameworkViewCreateFrameworkMutation = {
-  response: CreateFrameworkViewCreateFrameworkMutation$data;
-  variables: CreateFrameworkViewCreateFrameworkMutation$variables;
+export type NewFrameworkViewCreateFrameworkMutation = {
+  response: NewFrameworkViewCreateFrameworkMutation$data;
+  variables: NewFrameworkViewCreateFrameworkMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -103,7 +103,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "CreateFrameworkViewCreateFrameworkMutation",
+    "name": "NewFrameworkViewCreateFrameworkMutation",
     "selections": [
       {
         "alias": null,
@@ -128,7 +128,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "CreateFrameworkViewCreateFrameworkMutation",
+    "name": "NewFrameworkViewCreateFrameworkMutation",
     "selections": [
       {
         "alias": null,
@@ -161,16 +161,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "7502bf40a1731a4b7fd1a019ac438b39",
+    "cacheID": "5b039fa77c4cfe00ce1001680520d9a9",
     "id": null,
     "metadata": {},
-    "name": "CreateFrameworkViewCreateFrameworkMutation",
+    "name": "NewFrameworkViewCreateFrameworkMutation",
     "operationKind": "mutation",
-    "text": "mutation CreateFrameworkViewCreateFrameworkMutation(\n  $input: CreateFrameworkInput!\n) {\n  createFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n      }\n    }\n  }\n}\n"
+    "text": "mutation NewFrameworkViewCreateFrameworkMutation(\n  $input: CreateFrameworkInput!\n) {\n  createFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n        description\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "cb800b9880232714d34698beb7bf8d84";
+(node as any).hash = "acf050994ea381c40d642a8d21e5bf98";
 
 export default node;

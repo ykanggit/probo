@@ -4,9 +4,9 @@ import { lazy } from "@probo/react-lazy";
 import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
 
-const CreateFrameworkView = lazy(() => import("./CreateFrameworkView"));
+const NewFrameworkView = lazy(() => import("./NewFrameworkView"));
 
-export function CreateFrameworkViewSkeleton() {
+export function NewFrameworkViewSkeleton() {
   return (
     <PageTemplateSkeleton
       title="Create Framework"
@@ -17,16 +17,13 @@ export function CreateFrameworkViewSkeleton() {
   );
 }
 
-export function CreateFrameworkPage() {
+export function NewFrameworkPage() {
   const location = useLocation();
 
   return (
-    <Suspense
-      key={location.pathname}
-      fallback={<CreateFrameworkViewSkeleton />}
-    >
+    <Suspense key={location.pathname} fallback={<NewFrameworkViewSkeleton />}>
       <ErrorBoundaryWithLocation>
-        <CreateFrameworkView />
+        <NewFrameworkView />
       </ErrorBoundaryWithLocation>
     </Suspense>
   );

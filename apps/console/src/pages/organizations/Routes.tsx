@@ -5,16 +5,16 @@ import HomePage from "./HomePage";
 import NoOrganizationLayout from "./NoOrganizationLayout";
 import OrganizationLayout from "./OrganizationLayout";
 import { SettingsPage } from "./SettingsPage";
-import { CreateFrameworkPage } from "./frameworks/CreateFrameworkPage";
+import { EditFrameworkPage } from "./frameworks/EditFrameworkPage";
 import { FrameworkLayout } from "./frameworks/FrameworkLayout";
 import { FrameworkListPage } from "./frameworks/FrameworkListPage";
 import { FrameworkPage } from "./frameworks/FrameworkPage";
-import { EditFrameworkPage } from "./frameworks/EditFrameworkPage";
+import { NewFrameworkPage } from "./frameworks/NewFrameworkPage";
 import { ControlPage } from "./frameworks/controls/ControlPage";
 import { EditMitigationPage } from "./mitigations/EditMitigationPage";
 import { MitigationListPage } from "./mitigations/MitigationListPage";
-import { NewMitigationPage } from "./mitigations/NewMitigationPage";
 import { MitigationPage } from "./mitigations/MitigationPage";
+import { NewMitigationPage } from "./mitigations/NewMitigationPage";
 import { CreatePeoplePage } from "./people/CreatePeoplePage";
 import { PeopleListPage } from "./people/PeopleListPage";
 import { PeoplePage } from "./people/PeoplePage";
@@ -38,7 +38,7 @@ export function OrganizationsRoutes() {
         <Route path="people/:peopleId" element={<PeoplePage />} />
         <Route path="vendors" element={<VendorListPage />} />
         <Route path="frameworks" element={<FrameworkListPage />} />
-        <Route path="frameworks/new" element={<CreateFrameworkPage />} />
+        <Route path="frameworks/new" element={<NewFrameworkPage />} />
         <Route path="frameworks/:frameworkId/*">
           <Route element={<FrameworkLayout />}>
             <Route index element={<FrameworkPage />} />
