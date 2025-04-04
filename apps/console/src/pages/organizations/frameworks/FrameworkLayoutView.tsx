@@ -18,14 +18,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import type { FrameworkViewQuery as FrameworkViewQueryType } from "./__generated__/FrameworkViewQuery.graphql";
-import type { FrameworkViewDeleteMutation } from "./__generated__/FrameworkViewDeleteMutation.graphql";
+import type { FrameworkLayoutViewQuery as FrameworkLayoutViewQueryType } from "./__generated__/FrameworkLayoutViewQuery.graphql";
+import type { FrameworkLayoutViewDeleteMutation } from "./__generated__/FrameworkLayoutViewDeleteMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
 import { FrameworkLayoutViewSkeleton } from "./FrameworkLayout";
 import { ControlList } from "./FrameworkLayoutView/ControlList";
 
-const FrameworkViewQuery = graphql`
-  query FrameworkViewQuery($frameworkId: ID!) {
+const FrameworkLayoutViewQuery = graphql`
+  query FrameworkLayoutViewQuery($frameworkId: ID!) {
     node(id: $frameworkId) {
       id
       ... on Framework {
@@ -35,7 +35,7 @@ const FrameworkViewQuery = graphql`
         firstControl: controls(
           first: 1
           orderBy: { field: CREATED_AT, direction: ASC }
-        ) @connection(key: "FrameworkView_firstControl") {
+        ) @connection(key: "FrameworkLayoutView_firstControl") {
           edges {
             node {
               id
@@ -50,7 +50,7 @@ const FrameworkViewQuery = graphql`
 `;
 
 const DeleteFrameworkMutation = graphql`
-  mutation FrameworkViewDeleteMutation(
+  mutation FrameworkLayoutViewDeleteMutation(
     $input: DeleteFrameworkInput!
     $connections: [ID!]!
   ) {
@@ -60,12 +60,12 @@ const DeleteFrameworkMutation = graphql`
   }
 `;
 
-function FrameworkViewContent({
+function FrameworkLayoutViewContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<FrameworkViewQueryType>;
+  queryRef: PreloadedQuery<FrameworkLayoutViewQueryType>;
 }) {
-  const data = usePreloadedQuery(FrameworkViewQuery, queryRef);
+  const data = usePreloadedQuery(FrameworkLayoutViewQuery, queryRef);
   const framework = data.node;
   const navigate = useNavigate();
   const { organizationId } = useParams();
@@ -74,7 +74,7 @@ function FrameworkViewContent({
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Setup delete mutation
-  const [commitDeleteMutation] = useMutation<FrameworkViewDeleteMutation>(
+  const [commitDeleteMutation] = useMutation<FrameworkLayoutViewDeleteMutation>(
     DeleteFrameworkMutation
   );
 
@@ -186,10 +186,11 @@ function FrameworkViewContent({
   );
 }
 
-export default function FrameworkView() {
+export default function FrameworkLayoutView() {
   const { frameworkId } = useParams();
-  const [queryRef, loadQuery] =
-    useQueryLoader<FrameworkViewQueryType>(FrameworkViewQuery);
+  const [queryRef, loadQuery] = useQueryLoader<FrameworkLayoutViewQueryType>(
+    FrameworkLayoutViewQuery
+  );
 
   useEffect(() => {
     loadQuery({ frameworkId: frameworkId! });
@@ -201,7 +202,7 @@ export default function FrameworkView() {
 
   return (
     <Suspense fallback={<FrameworkLayoutViewSkeleton />}>
-      <FrameworkViewContent queryRef={queryRef} />
+      <FrameworkLayoutViewContent queryRef={queryRef} />
     </Suspense>
   );
 }

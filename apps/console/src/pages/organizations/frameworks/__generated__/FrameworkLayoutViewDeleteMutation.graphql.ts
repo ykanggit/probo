@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9f35422e7d027485b106e6fb8879d460>>
+ * @generated SignedSource<<615df626961da33fb1e48249870eefe1>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,18 +12,18 @@ import { ConcreteRequest } from 'relay-runtime';
 export type DeleteFrameworkInput = {
   frameworkId: string;
 };
-export type FrameworkViewDeleteMutation$variables = {
+export type FrameworkLayoutViewDeleteMutation$variables = {
   connections: ReadonlyArray<string>;
   input: DeleteFrameworkInput;
 };
-export type FrameworkViewDeleteMutation$data = {
+export type FrameworkLayoutViewDeleteMutation$data = {
   readonly deleteFramework: {
     readonly deletedFrameworkId: string;
   };
 };
-export type FrameworkViewDeleteMutation = {
-  response: FrameworkViewDeleteMutation$data;
-  variables: FrameworkViewDeleteMutation$variables;
+export type FrameworkLayoutViewDeleteMutation = {
+  response: FrameworkLayoutViewDeleteMutation$data;
+  variables: FrameworkLayoutViewDeleteMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -59,7 +59,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "FrameworkViewDeleteMutation",
+    "name": "FrameworkLayoutViewDeleteMutation",
     "selections": [
       {
         "alias": null,
@@ -84,7 +84,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "FrameworkViewDeleteMutation",
+    "name": "FrameworkLayoutViewDeleteMutation",
     "selections": [
       {
         "alias": null,
@@ -117,16 +117,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b10bac4b295c5d2a9a564cbba4569633",
+    "cacheID": "bf9a90fe1038778a5bc29ea20e8b07b9",
     "id": null,
     "metadata": {},
-    "name": "FrameworkViewDeleteMutation",
+    "name": "FrameworkLayoutViewDeleteMutation",
     "operationKind": "mutation",
-    "text": "mutation FrameworkViewDeleteMutation(\n  $input: DeleteFrameworkInput!\n) {\n  deleteFramework(input: $input) {\n    deletedFrameworkId\n  }\n}\n"
+    "text": "mutation FrameworkLayoutViewDeleteMutation(\n  $input: DeleteFrameworkInput!\n) {\n  deleteFramework(input: $input) {\n    deletedFrameworkId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "8b20886821651ffb7e335df58fb46fc9";
+(node as any).hash = "52564100dcf31f83cabd0683a616982c";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c4c2d951d675bc0a763fcf90b6a9a959>>
+ * @generated SignedSource<<7598a6cf0314f71bab809d65acc60237>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,21 +9,21 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type DeleteControlMappingInput = {
+export type CreateControlMappingInput = {
   controlId: string;
   mitigationId: string;
 };
-export type ControlViewDeleteMitigationMappingMutation$variables = {
-  input: DeleteControlMappingInput;
+export type ControlCreateMitigationMappingMutation$variables = {
+  input: CreateControlMappingInput;
 };
-export type ControlViewDeleteMitigationMappingMutation$data = {
-  readonly deleteControlMapping: {
+export type ControlCreateMitigationMappingMutation$data = {
+  readonly createControlMapping: {
     readonly success: boolean;
   };
 };
-export type ControlViewDeleteMitigationMappingMutation = {
-  response: ControlViewDeleteMitigationMappingMutation$data;
-  variables: ControlViewDeleteMitigationMappingMutation$variables;
+export type ControlCreateMitigationMappingMutation = {
+  response: ControlCreateMitigationMappingMutation$data;
+  variables: ControlCreateMitigationMappingMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -44,9 +44,9 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "DeleteControlMappingPayload",
+    "concreteType": "CreateControlMappingPayload",
     "kind": "LinkedField",
-    "name": "deleteControlMapping",
+    "name": "createControlMapping",
     "plural": false,
     "selections": [
       {
@@ -65,7 +65,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ControlViewDeleteMitigationMappingMutation",
+    "name": "ControlCreateMitigationMappingMutation",
     "selections": (v1/*: any*/),
     "type": "Mutation",
     "abstractKey": null
@@ -74,20 +74,20 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ControlViewDeleteMitigationMappingMutation",
+    "name": "ControlCreateMitigationMappingMutation",
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "49d66f6dddce3b6c7a82334e36d9b464",
+    "cacheID": "57ab0bf99dd6ed3d2e980c51f185b9c0",
     "id": null,
     "metadata": {},
-    "name": "ControlViewDeleteMitigationMappingMutation",
+    "name": "ControlCreateMitigationMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlViewDeleteMitigationMappingMutation(\n  $input: DeleteControlMappingInput!\n) {\n  deleteControlMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation ControlCreateMitigationMappingMutation(\n  $input: CreateControlMappingInput!\n) {\n  createControlMapping(input: $input) {\n    success\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "6f954d3c3c2b38b68a0be5f51de3b935";
+(node as any).hash = "17ef8f09acabf19168dad896e4225e3d";
 
 export default node;

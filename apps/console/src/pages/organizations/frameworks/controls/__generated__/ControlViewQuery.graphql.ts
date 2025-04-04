@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<08f7a2f65fb9ae3f6970e76485fa59e4>>
+ * @generated SignedSource<<2b4d05f2a954b567c9278d604e32db9e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,15 +9,14 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+import { FragmentRefs } from "relay-runtime";
 export type ControlViewQuery$variables = {
   controlId: string;
 };
 export type ControlViewQuery$data = {
   readonly node: {
-    readonly description?: string;
     readonly id: string;
-    readonly name?: string;
-    readonly referenceId?: string;
+    readonly " $fragmentSpreads": FragmentRefs<"ControlFragment_Control">;
   };
 };
 export type ControlViewQuery = {
@@ -46,34 +45,6 @@ v2 = {
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
-},
-v3 = {
-  "kind": "InlineFragment",
-  "selections": [
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "description",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "name",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "referenceId",
-      "storageKey": null
-    }
-  ],
-  "type": "Control",
-  "abstractKey": null
 };
 return {
   "fragment": {
@@ -91,7 +62,11 @@ return {
         "plural": false,
         "selections": [
           (v2/*: any*/),
-          (v3/*: any*/)
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "ControlFragment_Control"
+          }
         ],
         "storageKey": null
       }
@@ -121,23 +96,50 @@ return {
             "storageKey": null
           },
           (v2/*: any*/),
-          (v3/*: any*/)
+          {
+            "kind": "InlineFragment",
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "description",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "name",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "referenceId",
+                "storageKey": null
+              }
+            ],
+            "type": "Control",
+            "abstractKey": null
+          }
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "be2e7ad630198d4c5476be3767a45d97",
+    "cacheID": "a65968fe47c5fb75f72a01d9785ae176",
     "id": null,
     "metadata": {},
     "name": "ControlViewQuery",
     "operationKind": "query",
-    "text": "query ControlViewQuery(\n  $controlId: ID!\n) {\n  node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      description\n      name\n      referenceId\n    }\n  }\n}\n"
+    "text": "query ControlViewQuery(\n  $controlId: ID!\n) {\n  node(id: $controlId) {\n    __typename\n    id\n    ...ControlFragment_Control\n  }\n}\n\nfragment ControlFragment_Control on Control {\n  id\n  description\n  name\n  referenceId\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d692873ef9c85a8f56b8a35e61e5a5bc";
+(node as any).hash = "ea6b1e9919c960be158d2f48aa3b4254";
 
 export default node;

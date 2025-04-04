@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0476147756ad426abb8651c6a62821f3>>
+ * @generated SignedSource<<2f29bc26fdb324cad6eb8d7bdd48447f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -19,15 +19,12 @@ export type FrameworkViewQuery$data = {
     readonly firstControl?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
-          readonly id: string;
-          readonly name: string;
-          readonly referenceId: string;
+          readonly " $fragmentSpreads": FragmentRefs<"ControlFragment_Control">;
         };
       }>;
     };
     readonly id: string;
     readonly name?: string;
-    readonly " $fragmentSpreads": FragmentRefs<"ControlList_List">;
   };
 };
 export type FrameworkViewQuery = {
@@ -86,84 +83,39 @@ v6 = {
   "name": "__typename",
   "storageKey": null
 },
-v7 = [
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "ControlEdge",
-    "kind": "LinkedField",
-    "name": "edges",
-    "plural": true,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "concreteType": "Control",
-        "kind": "LinkedField",
-        "name": "node",
-        "plural": false,
-        "selections": [
-          (v2/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "referenceId",
-            "storageKey": null
-          },
-          (v3/*: any*/),
-          (v6/*: any*/)
-        ],
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "cursor",
-        "storageKey": null
-      }
-    ],
-    "storageKey": null
-  },
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "PageInfo",
-    "kind": "LinkedField",
-    "name": "pageInfo",
-    "plural": false,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "endCursor",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "hasNextPage",
-        "storageKey": null
-      }
-    ],
-    "storageKey": null
-  }
-],
-v8 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 100
-  },
-  (v5/*: any*/)
-],
+v7 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "cursor",
+  "storageKey": null
+},
+v8 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "PageInfo",
+  "kind": "LinkedField",
+  "name": "pageInfo",
+  "plural": false,
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "endCursor",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "hasNextPage",
+      "storageKey": null
+    }
+  ],
+  "storageKey": null
+},
 v9 = [
-  "orderBy"
-],
-v10 = [
   {
     "kind": "Literal",
     "name": "first",
@@ -193,11 +145,6 @@ return {
               (v3/*: any*/),
               (v4/*: any*/),
               {
-                "args": null,
-                "kind": "FragmentSpread",
-                "name": "ControlList_List"
-              },
-              {
                 "alias": "firstControl",
                 "args": [
                   (v5/*: any*/)
@@ -206,7 +153,38 @@ return {
                 "kind": "LinkedField",
                 "name": "__FrameworkView_firstControl_connection",
                 "plural": false,
-                "selections": (v7/*: any*/),
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "ControlEdge",
+                    "kind": "LinkedField",
+                    "name": "edges",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "Control",
+                        "kind": "LinkedField",
+                        "name": "node",
+                        "plural": false,
+                        "selections": [
+                          {
+                            "args": null,
+                            "kind": "FragmentSpread",
+                            "name": "ControlFragment_Control"
+                          },
+                          (v6/*: any*/)
+                        ],
+                        "storageKey": null
+                      },
+                      (v7/*: any*/)
+                    ],
+                    "storageKey": null
+                  },
+                  (v8/*: any*/)
+                ],
                 "storageKey": "__FrameworkView_firstControl_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"CREATED_AT\"})"
               }
             ],
@@ -242,38 +220,57 @@ return {
               (v3/*: any*/),
               (v4/*: any*/),
               {
-                "alias": null,
-                "args": (v8/*: any*/),
-                "concreteType": "ControlConnection",
-                "kind": "LinkedField",
-                "name": "controls",
-                "plural": false,
-                "selections": (v7/*: any*/),
-                "storageKey": "controls(first:100,orderBy:{\"direction\":\"ASC\",\"field\":\"CREATED_AT\"})"
-              },
-              {
-                "alias": null,
-                "args": (v8/*: any*/),
-                "filters": (v9/*: any*/),
-                "handle": "connection",
-                "key": "FrameworkView_controls",
-                "kind": "LinkedHandle",
-                "name": "controls"
-              },
-              {
                 "alias": "firstControl",
-                "args": (v10/*: any*/),
+                "args": (v9/*: any*/),
                 "concreteType": "ControlConnection",
                 "kind": "LinkedField",
                 "name": "controls",
                 "plural": false,
-                "selections": (v7/*: any*/),
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "ControlEdge",
+                    "kind": "LinkedField",
+                    "name": "edges",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "Control",
+                        "kind": "LinkedField",
+                        "name": "node",
+                        "plural": false,
+                        "selections": [
+                          (v2/*: any*/),
+                          (v4/*: any*/),
+                          (v3/*: any*/),
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "referenceId",
+                            "storageKey": null
+                          },
+                          (v6/*: any*/)
+                        ],
+                        "storageKey": null
+                      },
+                      (v7/*: any*/)
+                    ],
+                    "storageKey": null
+                  },
+                  (v8/*: any*/)
+                ],
                 "storageKey": "controls(first:1,orderBy:{\"direction\":\"ASC\",\"field\":\"CREATED_AT\"})"
               },
               {
                 "alias": "firstControl",
-                "args": (v10/*: any*/),
-                "filters": (v9/*: any*/),
+                "args": (v9/*: any*/),
+                "filters": [
+                  "orderBy"
+                ],
                 "handle": "connection",
                 "key": "FrameworkView_firstControl",
                 "kind": "LinkedHandle",
@@ -289,7 +286,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "17fd996ebe2e664652323e290a027cfa",
+    "cacheID": "c7d856630ed8706055e1ff572d0e7293",
     "id": null,
     "metadata": {
       "connection": [
@@ -306,11 +303,11 @@ return {
     },
     "name": "FrameworkViewQuery",
     "operationKind": "query",
-    "text": "query FrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      ...ControlList_List\n      firstControl: controls(first: 1, orderBy: {field: CREATED_AT, direction: ASC}) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n\nfragment ControlList_List on Framework {\n  controls(first: 100, orderBy: {field: CREATED_AT, direction: ASC}) {\n    edges {\n      node {\n        id\n        referenceId\n        name\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query FrameworkViewQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    id\n    ... on Framework {\n      name\n      description\n      firstControl: controls(first: 1, orderBy: {field: CREATED_AT, direction: ASC}) {\n        edges {\n          node {\n            ...ControlFragment_Control\n            id\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n\nfragment ControlFragment_Control on Control {\n  id\n  description\n  name\n  referenceId\n}\n"
   }
 };
 })();
 
-(node as any).hash = "2567d3e2996074a21656830be7f807f1";
+(node as any).hash = "44f29d19bae9e1a0426f44f5d0edca45";
 
 export default node;

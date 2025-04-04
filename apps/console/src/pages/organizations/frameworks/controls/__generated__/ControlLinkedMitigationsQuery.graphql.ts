@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a41b64671a286465fbaa69551d5ec1c8>>
+ * @generated SignedSource<<d03d81a6969d83d42491f33bcbd1fc00>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,11 +11,11 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type MitigationImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type ControlViewOrganizationMitigationsQuery$variables = {
-  organizationId: string;
+export type ControlLinkedMitigationsQuery$variables = {
+  controlId: string;
 };
-export type ControlViewOrganizationMitigationsQuery$data = {
-  readonly organization: {
+export type ControlLinkedMitigationsQuery$data = {
+  readonly control: {
     readonly id: string;
     readonly mitigations?: {
       readonly edges: ReadonlyArray<{
@@ -31,9 +31,9 @@ export type ControlViewOrganizationMitigationsQuery$data = {
     };
   };
 };
-export type ControlViewOrganizationMitigationsQuery = {
-  response: ControlViewOrganizationMitigationsQuery$data;
-  variables: ControlViewOrganizationMitigationsQuery$variables;
+export type ControlLinkedMitigationsQuery = {
+  response: ControlLinkedMitigationsQuery$data;
+  variables: ControlLinkedMitigationsQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -41,14 +41,14 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "organizationId"
+    "name": "controlId"
   }
 ],
 v1 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "organizationId"
+    "variableName": "controlId"
   }
 ],
 v2 = {
@@ -170,10 +170,10 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ControlViewOrganizationMitigationsQuery",
+    "name": "ControlLinkedMitigationsQuery",
     "selections": [
       {
-        "alias": "organization",
+        "alias": "control",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -189,13 +189,13 @@ return {
                 "args": null,
                 "concreteType": "MitigationConnection",
                 "kind": "LinkedField",
-                "name": "__Organization__mitigations_connection",
+                "name": "__Control__mitigations_connection",
                 "plural": false,
                 "selections": (v4/*: any*/),
                 "storageKey": null
               }
             ],
-            "type": "Organization",
+            "type": "Control",
             "abstractKey": null
           }
         ],
@@ -209,10 +209,10 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ControlViewOrganizationMitigationsQuery",
+    "name": "ControlLinkedMitigationsQuery",
     "selections": [
       {
-        "alias": "organization",
+        "alias": "control",
         "args": (v1/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
@@ -239,12 +239,12 @@ return {
                 "args": (v5/*: any*/),
                 "filters": null,
                 "handle": "connection",
-                "key": "Organization__mitigations",
+                "key": "Control__mitigations",
                 "kind": "LinkedHandle",
                 "name": "mitigations"
               }
             ],
-            "type": "Organization",
+            "type": "Control",
             "abstractKey": null
           }
         ],
@@ -253,7 +253,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "f5c0ad1c64f05306ed6c23a5ad4d649e",
+    "cacheID": "082617925f3db2937654823bd7dc8833",
     "id": null,
     "metadata": {
       "connection": [
@@ -262,19 +262,19 @@ return {
           "cursor": null,
           "direction": "forward",
           "path": [
-            "organization",
+            "control",
             "mitigations"
           ]
         }
       ]
     },
-    "name": "ControlViewOrganizationMitigationsQuery",
+    "name": "ControlLinkedMitigationsQuery",
     "operationKind": "query",
-    "text": "query ControlViewOrganizationMitigationsQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      mitigations(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            importance\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlLinkedMitigationsQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      mitigations(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            importance\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5c14bf02367f0b6e5ccc633b7a77d1aa";
+(node as any).hash = "3d61e207c8a46a72f19e3414152438b8";
 
 export default node;

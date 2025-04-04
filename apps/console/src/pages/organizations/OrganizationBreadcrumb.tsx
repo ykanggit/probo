@@ -388,6 +388,7 @@ function BreadcrumbControl() {
     { controlId: controlId! },
     { fetchPolicy: "store-or-network" }
   );
+
   return (
     <>
       <BreadcrumbSeparator />
