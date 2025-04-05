@@ -63,7 +63,7 @@ export default function LoginPage() {
         <h1 className="text-2xl font-semibold tracking-tight">
           Login to your account
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-tertiary">
           Enter your email below to login to your account
         </p>
       </div>

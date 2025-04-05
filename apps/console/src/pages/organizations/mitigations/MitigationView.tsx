@@ -631,20 +631,20 @@ function MitigationViewContent({
   };
 
   const getStateColor = (state: string | undefined): string => {
-    if (!state) return "bg-gray-100 text-gray-800";
+    if (!state) return "bg-secondary-bg text-primary";
 
     const upperState = state.toUpperCase();
 
-    if (upperState === "NOT_STARTED") return "bg-gray-100 text-gray-800";
+    if (upperState === "NOT_STARTED") return "bg-secondary-bg text-primary";
     if (upperState === "IN_PROGRESS") return "bg-blue-100 text-blue-800";
     if (upperState === "NOT_APPLICABLE") return "bg-purple-100 text-purple-800";
     if (upperState === "IMPLEMENTED") return "bg-green-100 text-green-800";
 
-    return "bg-gray-100 text-gray-800";
+    return "bg-secondary-bg text-primary";
   };
 
   const getImportanceColor = (importance: string | undefined): string => {
-    if (!importance) return "bg-gray-100 text-gray-800";
+    if (!importance) return "bg-secondary-bg text-primary";
 
     const upperImportance = importance.toUpperCase();
 
@@ -652,7 +652,7 @@ function MitigationViewContent({
     if (upperImportance === "PREFERRED") return "bg-orange-100 text-orange-800";
     if (upperImportance === "ADVANCED") return "bg-blue-100 text-blue-800";
 
-    return "bg-gray-100 text-gray-800";
+    return "bg-secondary-bg text-primary";
   };
 
   const [updateTask] = useMutation<MitigationViewUpdateTaskStateMutationType>(
@@ -1214,7 +1214,7 @@ function MitigationViewContent({
     } else if (mimeType.includes("excel") || mimeType.includes("spreadsheet")) {
       return <FileText className="w-4 h-4 text-green-600" />;
     } else {
-      return <FileGeneric className="w-4 h-4 text-gray-500" />;
+      return <FileGeneric className="w-4 h-4 text-secondary" />;
     }
   };
 
@@ -1891,18 +1891,16 @@ function MitigationViewContent({
       title={data.mitigation.name ?? ""}
       actions={
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleEditMitigation}>
-            Edit Mitigation
-          </Button>
+          <Button onClick={handleEditMitigation}>Edit Mitigation</Button>
           <Select
             defaultValue={data.mitigation.state}
             onValueChange={handleMitigationStateChange}
           >
-            <SelectTrigger className="w-[160px] h-8 text-sm">
+            <SelectTrigger className="w-[160px] h-10 text-sm">
               <div
                 className={`${getStateColor(
                   data.mitigation.state
-                )} px-2 py-0.5 rounded-full text-sm w-full text-center`}
+                )} px-2 py-0.5 rounded-sm text-sm w-full text-center`}
               >
                 {formatState(data.mitigation.state)}
               </div>
@@ -1927,7 +1925,7 @@ function MitigationViewContent({
       <div className="space-y-4 mb-8">
         <Card className="mt-4">
           <CardContent className="pt-6">
-            <div className="prose prose-gray prose-sm md:prose-base text-gray-600 max-w-3xl">
+            <div className="prose prose-gray prose-sm md:prose-base text-secondary max-w-3xl">
               <ReactMarkdown>{data.mitigation.description}</ReactMarkdown>
             </div>
           </CardContent>
@@ -1939,8 +1937,9 @@ function MitigationViewContent({
         defaultValue="tasks"
         value={mainContentTab}
         onValueChange={setMainContentTab}
+        className="mb-4"
       >
-        <TabsList className="mb-4">
+        <TabsList className="border-b w-full p-0 h-auto">
           <TabsTrigger value="tasks" className="flex items-center gap-2">
             <Check className="w-4 h-4" />
             Tasks
@@ -2005,7 +2004,7 @@ function MitigationViewContent({
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="flex-1">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-tertiary" />
                       <Input
                         placeholder="Search controls by ID, name, or description..."
                         value={controlSearchQuery}
@@ -2048,7 +2047,7 @@ function MitigationViewContent({
                   ) : (
                     <div className="grid grid-cols-1 gap-2 max-h-[50vh] overflow-y-auto pr-2">
                       {filteredControls().length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-secondary">
                           No controls found. Try adjusting your search or select
                           a different framework.
                         </div>
@@ -2084,7 +2083,7 @@ function MitigationViewContent({
                                       {control.name}
                                     </h3>
                                     {control.description && (
-                                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                      <p className="text-sm text-secondary mt-1 line-clamp-2">
                                         {control.description}
                                       </p>
                                     )}
@@ -2168,7 +2167,7 @@ function MitigationViewContent({
                         {getLinkedControls().map((control: ControlNode) => (
                           <tr
                             key={control.id}
-                            className="border-b hover:bg-gray-50"
+                            className="border-b hover:bg-invert-bg"
                           >
                             <td className="py-3 px-4">
                               <div className="font-mono text-sm px-1.5 py-0.5 rounded-sm bg-lime-100 border border-lime-200 text-lime-800 font-bold inline-block">
@@ -2195,7 +2194,7 @@ function MitigationViewContent({
                     </table>
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-secondary">
                     No controls linked to this mitigation yet. Click &quot;Map
                     to Controls&quot; to link controls.
                   </div>
@@ -2211,7 +2210,7 @@ function MitigationViewContent({
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold">Tasks</h2>
               <div className="flex items-center gap-3">
-                <div className="text-sm text-gray-500 flex items-center bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
+                <div className="text-sm text-secondary flex items-center bg-invert-bg px-3 py-1.5 rounded-md border border-mid-b">
                   <FileIcon className="w-4 h-4 mr-2 text-blue-500" />
                   <span>Drag & drop files onto tasks to add evidence</span>
                 </div>
@@ -2269,7 +2268,7 @@ function MitigationViewContent({
                               }
                               placeholder="Days"
                             />
-                            <p className="text-xs text-gray-500 mt-1">Days</p>
+                            <p className="text-xs text-secondary mt-1">Days</p>
                           </div>
                           <div className="w-full">
                             <Input
@@ -2282,7 +2281,7 @@ function MitigationViewContent({
                               }
                               placeholder="Hours"
                             />
-                            <p className="text-xs text-gray-500 mt-1">Hours</p>
+                            <p className="text-xs text-secondary mt-1">Hours</p>
                           </div>
                           <div className="w-full">
                             <Input
@@ -2295,7 +2294,7 @@ function MitigationViewContent({
                               }
                               placeholder="Minutes"
                             />
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-secondary mt-1">
                               Minutes
                             </p>
                           </div>
@@ -2319,10 +2318,10 @@ function MitigationViewContent({
               {tasks.map((task) => (
                 <div
                   key={task?.id}
-                  className="rounded-md overflow-hidden border border-gray-200"
+                  className="rounded-md overflow-hidden border border-mid-b"
                 >
                   <div
-                    className={`flex items-center gap-3 py-4 px-2 hover:bg-gray-50 group relative transition-all duration-200 ${
+                    className={`flex items-center gap-3 py-4 px-2 hover:bg-invert-bg group relative transition-all duration-200 ${
                       isDraggingFile && draggedOverTaskId !== task?.id
                         ? "border-dashed border-blue-300 bg-blue-50 bg-opacity-30"
                         : ""
@@ -2365,16 +2364,14 @@ function MitigationViewContent({
                         <div className="flex flex-col items-center gap-3 text-blue-600">
                           <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
                           <p className="font-medium">Adding document...</p>
-                          <p className="text-sm text-gray-500">Please wait</p>
+                          <p className="text-sm text-secondary">Please wait</p>
                         </div>
                       </div>
                     )}
 
                     <div
                       className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer ${
-                        task?.state === "DONE"
-                          ? "border-gray-400 bg-gray-100"
-                          : "border-gray-300"
+                        task?.state === "DONE" && "border-strong-b"
                       } ${isDraggingFile ? "opacity-50" : ""}`}
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent task selection when checkbox is clicked
@@ -2384,7 +2381,7 @@ function MitigationViewContent({
                       }}
                     >
                       {task?.state === "DONE" && (
-                        <CheckCircle2 className="w-4 h-4 text-gray-500" />
+                        <CheckCircle2 className="w-4 h-4 text-secondary" />
                       )}
                     </div>
                     <div
@@ -2395,9 +2392,8 @@ function MitigationViewContent({
                       <div>
                         <h3
                           className={`text-sm ${
-                            task?.state === "DONE"
-                              ? "text-gray-500 line-through"
-                              : "text-gray-900"
+                            task?.state === "DONE" &&
+                            "text-secondary line-through"
                           }`}
                         >
                           {task?.name}
@@ -2406,7 +2402,7 @@ function MitigationViewContent({
                           <p
                             className={`text-xs mt-1 flex items-center ${
                               task?.state === "DONE"
-                                ? "text-gray-400 line-through"
+                                ? "text-tertiary line-through"
                                 : "text-blue-500"
                             }`}
                           >
@@ -2417,7 +2413,7 @@ function MitigationViewContent({
                           </p>
                         )}
                         {task?.assignedTo && (
-                          <p className="text-xs mt-1 flex items-center text-gray-600">
+                          <p className="text-xs mt-1 flex items-center text-secondary">
                             <User className="w-3 h-3 mr-1" />
                             <span>{task.assignedTo.fullName}</span>
                           </p>
@@ -2439,7 +2435,7 @@ function MitigationViewContent({
                           <PopoverTrigger asChild>
                             <button
                               type="button"
-                              className="text-gray-400 hover:text-blue-600"
+                              className="text-tertiary hover:text-blue-600"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (task?.id) {
@@ -2461,12 +2457,12 @@ function MitigationViewContent({
                             {task?.assignedTo ? (
                               <div className="p-4 space-y-4">
                                 <div className="flex items-center gap-2">
-                                  <User className="w-4 h-4 text-gray-500" />
+                                  <User className="w-4 h-4 text-secondary" />
                                   <div className="text-sm">
                                     <p className="font-medium">
                                       {task.assignedTo.fullName}
                                     </p>
-                                    <p className="text-xs text-gray-500">
+                                    <p className="text-xs text-secondary">
                                       {task.assignedTo.primaryEmailAddress}
                                     </p>
                                   </div>
@@ -2505,7 +2501,7 @@ function MitigationViewContent({
                                     }}
                                   />
                                 </div>
-                                <div className="px-3 py-2 text-xs text-gray-500">
+                                <div className="px-3 py-2 text-xs text-secondary">
                                   Click on a person to assign them to this task
                                 </div>
                                 <div className="py-1">
@@ -2574,7 +2570,7 @@ function MitigationViewContent({
                                               <p className="font-medium">
                                                 {edge.node.fullName}
                                               </p>
-                                              <p className="text-xs text-gray-500">
+                                              <p className="text-xs text-secondary">
                                                 {edge.node.primaryEmailAddress}
                                               </p>
                                             </div>
@@ -2591,7 +2587,7 @@ function MitigationViewContent({
 
                         <button
                           type="button"
-                          className="text-gray-400 hover:text-blue-600"
+                          className="text-tertiary hover:text-blue-600"
                           onClick={(e) => {
                             e.stopPropagation();
                             if (task?.id && task?.name) {
@@ -2604,7 +2600,7 @@ function MitigationViewContent({
                         </button>
                         <button
                           type="button"
-                          className="text-gray-400 hover:text-red-600"
+                          className="text-tertiary hover:text-red-600"
                           onClick={(e) => {
                             e.stopPropagation();
                             if (task?.id && task?.name) {
@@ -2623,7 +2619,7 @@ function MitigationViewContent({
                     task.evidences.edges.length > 0 && (
                       <>
                         <div
-                          className="flex items-center justify-between px-4 py-2 border-t border-gray-200 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                          className="flex items-center justify-between px-4 py-2 border-t border-mid-b bg-invert-bg cursor-pointer hover:bg-secondary-bg"
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent task selection
                             if (task.id) toggleEvidenceList(task.id);
@@ -2631,7 +2627,7 @@ function MitigationViewContent({
                         >
                           <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4 text-blue-500" />
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs text-secondary">
                               {task.evidences.edges.length}{" "}
                               {task.evidences.edges.length === 1
                                 ? "Evidence"
@@ -2639,14 +2635,14 @@ function MitigationViewContent({
                             </span>
                           </div>
                           {expandedEvidenceTaskId === task.id ? (
-                            <ChevronUp className="w-4 h-4 text-gray-500" />
+                            <ChevronUp className="w-4 h-4 text-secondary" />
                           ) : (
-                            <ChevronDown className="w-4 h-4 text-gray-500" />
+                            <ChevronDown className="w-4 h-4 text-secondary" />
                           )}
                         </div>
 
                         {expandedEvidenceTaskId === task.id && (
-                          <div className="bg-white border-t border-gray-200 p-3 space-y-2.5">
+                          <div className="bg-white border-t border-mid-b p-3 space-y-2.5">
                             {task.evidences.edges.map((edge) => {
                               if (!edge) return null;
                               const evidence = edge.node;
@@ -2655,17 +2651,17 @@ function MitigationViewContent({
                               return (
                                 <div
                                   key={evidence.id}
-                                  className="flex items-center justify-between p-3 rounded-md border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all bg-gray-50"
+                                  className="flex items-center justify-between p-3 rounded-md border border-mid-b hover:border-blue-300 hover:shadow-sm transition-all bg-invert-bg"
                                 >
                                   <div className="flex items-center gap-3">
-                                    <div className="bg-white p-2 rounded-md border border-gray-200">
+                                    <div className="bg-white p-2 rounded-md border border-mid-b">
                                       {getFileIcon(
                                         evidence.mimeType,
                                         evidence.type
                                       )}
                                     </div>
                                     <div>
-                                      <div className="text-sm font-medium text-gray-800 flex items-center gap-2">
+                                      <div className="text-sm font-medium text-primary flex items-center gap-2">
                                         {evidence.filename}
                                         {evidence.state === "REQUESTED" && (
                                           <Badge
@@ -2676,14 +2672,14 @@ function MitigationViewContent({
                                           </Badge>
                                         )}
                                       </div>
-                                      <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
+                                      <div className="text-xs text-secondary flex items-center gap-2 mt-0.5">
                                         {evidence.state === "REQUESTED" ? (
                                           <span className="italic text-yellow-600">
                                             Waiting for fulfillment
                                             {evidence.description && (
                                               <>
                                                 <span className="mx-1">•</span>
-                                                <span className="text-gray-600 not-italic">
+                                                <span className="text-secondary not-italic">
                                                   {evidence.description}
                                                 </span>
                                               </>
@@ -2691,7 +2687,7 @@ function MitigationViewContent({
                                           </span>
                                         ) : evidence.type === "FILE" ? (
                                           <>
-                                            <span className="font-medium text-gray-600">
+                                            <span className="font-medium text-secondary">
                                               {formatFileSize(evidence.size)}
                                             </span>
                                             <span>•</span>
@@ -2802,7 +2798,7 @@ function MitigationViewContent({
               ))}
 
               {tasks.length === 0 && (
-                <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="text-center py-12 bg-invert-bg rounded-lg border border-mid-b">
                   <p>No tasks yet. Click &quot;Add Task&quot; to create one.</p>
                 </div>
               )}
@@ -2843,7 +2839,7 @@ function MitigationViewContent({
                         {risksData.mitigation.risks.edges.map(({ node }) => (
                           <tr
                             key={node.id}
-                            className="border-b hover:bg-gray-50"
+                            className="border-b hover:bg-invert-bg"
                             onClick={() =>
                               navigate(
                                 `/organizations/${organizationId}/risks/${node.id}`
@@ -2883,7 +2879,7 @@ function MitigationViewContent({
                     </table>
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-secondary">
                     No risks linked to this mitigation yet.
                   </div>
                 )}
@@ -2906,7 +2902,7 @@ function MitigationViewContent({
                   <SheetTitle className="text-xl font-semibold">
                     {selectedTask.name}
                   </SheetTitle>
-                  <SheetClose className="rounded-full p-1 hover:bg-gray-100">
+                  <SheetClose className="rounded-full p-1 hover:bg-secondary-bg">
                     <X className="h-5 w-5" />
                   </SheetClose>
                 </div>
@@ -2929,7 +2925,7 @@ function MitigationViewContent({
                     </div>
                     {!isEditingDuration ? (
                       <div
-                        className="text-sm text-gray-500 flex items-center hover:bg-gray-100 px-2 py-1 rounded-md cursor-pointer"
+                        className="text-sm text-secondary flex items-center hover:bg-secondary-bg px-2 py-1 rounded-md cursor-pointer"
                         onClick={() =>
                           startEditingDuration(selectedTask.timeEstimate)
                         }
@@ -2954,7 +2950,7 @@ function MitigationViewContent({
                             className="w-12 p-1 text-xs border rounded"
                             placeholder="0"
                           />
-                          <span className="text-xs text-gray-500">d</span>
+                          <span className="text-xs text-secondary">d</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <input
@@ -2968,7 +2964,7 @@ function MitigationViewContent({
                             className="w-12 p-1 text-xs border rounded"
                             placeholder="0"
                           />
-                          <span className="text-xs text-gray-500">h</span>
+                          <span className="text-xs text-secondary">h</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <input
@@ -2982,7 +2978,7 @@ function MitigationViewContent({
                             className="w-12 p-1 text-xs border rounded"
                             placeholder="0"
                           />
-                          <span className="text-xs text-gray-500">m</span>
+                          <span className="text-xs text-secondary">m</span>
                         </div>
                         <button
                           className="p-1 text-sm text-blue-600 hover:text-blue-800"
@@ -2991,7 +2987,7 @@ function MitigationViewContent({
                           Save
                         </button>
                         <button
-                          className="p-1 text-sm text-gray-500 hover:text-gray-700"
+                          className="p-1 text-sm text-secondary hover:text-primary"
                           onClick={() => setIsEditingDuration(false)}
                         >
                           Cancel
@@ -3004,10 +3000,10 @@ function MitigationViewContent({
                 {/* Task description */}
                 {selectedTask.description && (
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-600">
+                    <h3 className="text-sm font-medium text-secondary">
                       Description
                     </h3>
-                    <div className="prose prose-sm max-w-none p-3 bg-gray-50 rounded-md border border-gray-100">
+                    <div className="prose prose-sm max-w-none p-3 bg-invert-bg rounded-md border border-low-b">
                       <ReactMarkdown>{selectedTask.description}</ReactMarkdown>
                     </div>
                   </div>
@@ -3015,11 +3011,11 @@ function MitigationViewContent({
 
                 {/* Assigned person */}
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-gray-600">
+                  <h3 className="text-sm font-medium text-secondary">
                     Assignment
                   </h3>
                   {selectedTask.assignedTo ? (
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md border border-gray-100">
+                    <div className="flex items-center justify-between p-3 bg-invert-bg rounded-md border border-low-b">
                       <div className="flex items-center gap-3">
                         <div className="bg-blue-100 text-blue-700 rounded-full p-2">
                           <User className="w-5 h-5" />
@@ -3028,7 +3024,7 @@ function MitigationViewContent({
                           <p className="font-medium">
                             {selectedTask.assignedTo.fullName}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-secondary">
                             {selectedTask.assignedTo.primaryEmailAddress}
                           </p>
                         </div>
@@ -3044,8 +3040,8 @@ function MitigationViewContent({
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md border border-gray-100">
-                      <p className="text-gray-500">
+                    <div className="flex items-center justify-between p-3 bg-invert-bg rounded-md border border-low-b">
+                      <p className="text-secondary">
                         No one is assigned to this task
                       </p>
                       <Popover>
@@ -3115,7 +3111,7 @@ function MitigationViewContent({
                                         <p className="font-medium">
                                           {edge.node.fullName}
                                         </p>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-xs text-secondary">
                                           {edge.node.primaryEmailAddress}
                                         </p>
                                       </div>
@@ -3134,7 +3130,7 @@ function MitigationViewContent({
                 {/* Evidence section */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-gray-600">
+                    <h3 className="text-sm font-medium text-secondary">
                       Evidence
                     </h3>
                     <Button
@@ -3161,14 +3157,14 @@ function MitigationViewContent({
                         return (
                           <div
                             key={evidence.id}
-                            className="flex items-center justify-between p-3 rounded-md border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all bg-gray-50"
+                            className="flex items-center justify-between p-3 rounded-md border border-mid-b hover:border-blue-300 hover:shadow-sm transition-all bg-invert-bg"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="bg-white p-2 rounded-md border border-gray-200">
+                              <div className="bg-white p-2 rounded-md border border-mid-b">
                                 {getFileIcon(evidence.mimeType, evidence.type)}
                               </div>
                               <div>
-                                <div className="text-sm font-medium text-gray-800 flex items-center gap-2">
+                                <div className="text-sm font-medium text-primary flex items-center gap-2">
                                   {evidence.filename}
                                   {evidence.state === "REQUESTED" && (
                                     <Badge
@@ -3179,14 +3175,14 @@ function MitigationViewContent({
                                     </Badge>
                                   )}
                                 </div>
-                                <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
+                                <div className="text-xs text-secondary flex items-center gap-2 mt-0.5">
                                   {evidence.state === "REQUESTED" ? (
                                     <span className="italic text-yellow-600">
                                       Waiting for fulfillment
                                       {evidence.description && (
                                         <>
                                           <span className="mx-1">•</span>
-                                          <span className="text-gray-600 not-italic">
+                                          <span className="text-secondary not-italic">
                                             {evidence.description}
                                           </span>
                                         </>
@@ -3194,7 +3190,7 @@ function MitigationViewContent({
                                     </span>
                                   ) : evidence.type === "FILE" ? (
                                     <>
-                                      <span className="font-medium text-gray-600">
+                                      <span className="font-medium text-secondary">
                                         {formatFileSize(evidence.size)}
                                       </span>
                                       <span>•</span>
@@ -3296,12 +3292,12 @@ function MitigationViewContent({
                         );
                       })
                     ) : (
-                      <div className="text-center py-6 bg-gray-50 rounded-md border border-dashed border-gray-200">
-                        <FileIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">
+                      <div className="text-center py-6 bg-invert-bg rounded-md border border-dashed border-mid-b">
+                        <FileIcon className="w-8 h-8 text-tertiary mx-auto mb-2" />
+                        <p className="text-sm text-secondary">
                           No evidence attached yet
                         </p>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs text-tertiary mt-1">
                           Upload files or add links to provide evidence
                         </p>
                       </div>
@@ -3492,7 +3488,7 @@ function MitigationViewContent({
               <span>{previewEvidence?.filename}</span>
               <button
                 onClick={() => setIsPreviewModalOpen(false)}
-                className="rounded-full p-1 hover:bg-gray-100"
+                className="rounded-full p-1 hover:bg-secondary-bg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -3502,11 +3498,11 @@ function MitigationViewContent({
               from here.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col items-center justify-center min-h-[300px] bg-gray-50 rounded-md p-4">
+          <div className="flex flex-col items-center justify-center min-h-[300px] bg-invert-bg rounded-md p-4">
             {isLoadingFileUrl ? (
               <div className="flex flex-col items-center gap-2">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                <p className="text-gray-500">Loading preview...</p>
+                <p className="text-secondary">Loading preview...</p>
               </div>
             ) : previewEvidence?.fileUrl ? (
               previewEvidence.mimeType.startsWith("image/") ? (
@@ -3523,8 +3519,8 @@ function MitigationViewContent({
                 />
               ) : (
                 <div className="flex flex-col items-center gap-4">
-                  <FileGeneric className="w-16 h-16 text-gray-400" />
-                  <p className="text-gray-600">
+                  <FileGeneric className="w-16 h-16 text-tertiary" />
+                  <p className="text-secondary">
                     Preview not available for this file type
                   </p>
                   <Button
@@ -3540,8 +3536,8 @@ function MitigationViewContent({
               )
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <FileGeneric className="w-12 h-12 text-gray-400" />
-                <p className="text-gray-500">Failed to load preview</p>
+                <FileGeneric className="w-12 h-12 text-tertiary" />
+                <p className="text-secondary">Failed to load preview</p>
               </div>
             )}
           </div>

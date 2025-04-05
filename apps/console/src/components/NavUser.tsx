@@ -49,13 +49,9 @@ export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              isActive
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
+            <SidebarMenuButton size="lg" variant="outline">
               <Avatar className="h-9 w-9">
-                <AvatarFallback className="bg-slate-400 text-gray-100">
+                <AvatarFallback className="bg-highlight-bg">
                   {currentUser.fullName.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -63,7 +59,7 @@ export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
                 <span className="truncate font-semibold">
                   {currentUser.fullName}
                 </span>
-                <span className="truncate text-xs text-sidebar-foreground/70">
+                <span className="truncate text-xs text-secondary/70">
                   {currentUser.email}
                 </span>
               </div>
@@ -78,7 +74,7 @@ export function NavUser({ viewer }: { viewer: NavUser_viewer$key }) {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-8 w-8 bg-highlight-bg">
                   <AvatarFallback>
                     {currentUser.fullName.substring(0, 2).toUpperCase()}
                   </AvatarFallback>

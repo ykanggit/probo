@@ -246,7 +246,7 @@ function VendorListContent({
       keep track of their risk and compliance status."
     >
       <div className="space-y-6">
-        <div className="rounded-xl border bg-card p-4">
+        <div className="rounded-xl border bg-level-1 p-4">
           <div className="flex items-center gap-2 mb-4">
             <Store className="h-5 w-5" />
             <h3 className="font-medium">Add a vendor</h3>
@@ -276,12 +276,12 @@ function VendorListContent({
                 {filteredVendors.length > 0 ? (
                   <div
                     style={{ borderRadius: "0.3rem" }}
-                    className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-popover shadow-md z-10"
+                    className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-invert-bg shadow-md z-10"
                   >
                     {filteredVendors.map((vendor: VendorItem) => (
                       <button
                         key={vendor.id}
-                        className="w-full px-3 py-2 text-left hover:bg-accent"
+                        className="w-full px-3 py-2 text-left bg-invert-bg hover:bg-h-subtle-bg"
                         onClick={() => {
                           createVendor({
                             variables: {
@@ -314,10 +314,10 @@ function VendorListContent({
                 ) : (
                   <div
                     style={{ borderRadius: "0.3rem" }}
-                    className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] border bg-popover shadow-md z-10"
+                    className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] border bg-level-0 shadow-md z-10"
                   >
                     <button
-                      className="w-full px-3 py-2 text-left hover:bg-accent flex items-center gap-2"
+                      className="w-full px-3 py-2 text-left hover:bg-accent-bg flex items-center gap-2"
                       onClick={() => {
                         createVendor({
                           variables: {
@@ -360,7 +360,7 @@ function VendorListContent({
               to={`/organizations/${organizationId}/vendors/${vendor?.id}`}
               className="block"
             >
-              <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">
+              <div className="flex items-center justify-between p-4 rounded-xl border bg-level-1 hover:bg-accent-bg/5 transition-colors">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
@@ -369,8 +369,8 @@ function VendorListContent({
                     <p className="font-medium">{vendor?.name}</p>
                     {vendor?.description && (
                       <>
-                        <span className="text-muted-foreground">•</span>
-                        <p className="text-sm text-muted-foreground">
+                        <span className="text-tertiary">•</span>
+                        <p className="text-sm text-tertiary">
                           {vendor.description}
                         </p>
                       </>
@@ -382,10 +382,10 @@ function VendorListContent({
                     variant="secondary"
                     className={
                       vendor.riskTier === "CRITICAL"
-                        ? "bg-red-100 text-red-900 rounded-full px-3 py-0.5 text-xs font-medium"
+                        ? "bg-danger-bg text-danger rounded-full px-3 py-0.5 text-xs font-medium"
                         : vendor?.riskTier === "SIGNIFICANT"
-                        ? "bg-yellow-100 text-yellow-900 rounded-full px-3 py-0.5 text-xs font-medium"
-                        : "bg-green-100 text-green-900 rounded-full px-3 py-0.5 text-xs font-medium"
+                        ? "bg-warning-bg text-warning rounded-full px-3 py-0.5 text-xs font-medium"
+                        : "bg-success-bg text-success rounded-full px-3 py-0.5 text-xs font-medium"
                     }
                   >
                     {vendor.riskTier}
@@ -393,7 +393,7 @@ function VendorListContent({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:bg-transparent hover:[&>svg]:text-destructive"
+                    className="h-8 w-8 text-tertiary hover:bg-transparent hover:[&>svg]:text-danger"
                     onClick={(e) => {
                       e.preventDefault(); // Prevent navigation
                       if (
@@ -421,7 +421,7 @@ function VendorListContent({
                   >
                     <Trash2 className="h-4 w-4 transition-colors" />
                   </Button>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  <ChevronRight className="h-4 w-4 text-tertiary" />
                 </div>
               </div>
             </Link>

@@ -287,27 +287,27 @@ function RiskListViewContent({
             <div className="w-full overflow-auto">
               <table className="w-full caption-bottom text-sm">
                 <thead className="[&_tr]:border-b">
-                  <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-1/2">
+                  <tr className="border-b transition-colors hover:bg-h-subtle-bg data-[state=selected]:bg-subtle-bg">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/2">
                       Name
                     </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-1/4">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/4">
                       Probability
                     </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-1/4">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/4">
                       Impact
                     </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-[80px]">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-[80px]">
                       Action
                     </th>
                   </tr>
                 </thead>
                 <tbody className="[&_tr:last-child]:border-0">
                   {risks.length === 0 ? (
-                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                    <tr className="border-b transition-colors hover:bg-h-subtle-bg data-[state=selected]:bg-subtle-bg">
                       <td
                         colSpan={4}
-                        className="text-center p-4 align-middle text-muted-foreground"
+                        className="text-center p-4 align-middle text-tertiary"
                       >
                         No risks found. Create a new risk to get started.
                       </td>
@@ -316,7 +316,7 @@ function RiskListViewContent({
                     risks.map((risk) => (
                       <tr
                         key={risk.id}
-                        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted cursor-pointer"
+                        className="border-b transition-colors hover:bg-h-subtle-bg data-[state=selected]:bg-subtle-bg cursor-pointer"
                       >
                         <td className="p-0 align-middle font-medium w-1/2">
                           <Link
@@ -350,7 +350,7 @@ function RiskListViewContent({
                               setRiskToDelete({ id: risk.id, name: risk.name });
                             }}
                           >
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <Trash2 className="h-4 w-4 text-danger" />
                           </Button>
                         </td>
                       </tr>

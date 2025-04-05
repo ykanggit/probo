@@ -12,7 +12,7 @@ export function EditPolicyViewSkeleton() {
       title="Edit Policy"
       description="Edit an existing policy"
     >
-      <div className="bg-muted animate-pulse rounded-lg h-[600px]" />
+      <div className="bg-subtle-bg animate-pulse rounded-lg h-[600px]" />
     </PageTemplateSkeleton>
   );
 }

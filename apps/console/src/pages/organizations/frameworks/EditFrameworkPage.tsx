@@ -12,7 +12,7 @@ export function EditFrameworkViewSkeleton() {
       title="Update Framework"
       description="Update the framework details"
     >
-      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+      <div className="max-w-2xl aspect-square bg-subtle-bg rounded-xl animate-pulse" />
     </PageTemplateSkeleton>
   );
 }

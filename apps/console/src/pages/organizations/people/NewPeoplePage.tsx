@@ -12,7 +12,7 @@ export function NewPeopleViewSkeleton() {
       title="New Person"
       description="Add a new person interacting with organization"
     >
-      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+      <div className="max-w-2xl aspect-square bg-subtle-bg rounded-xl animate-pulse" />
     </PageTemplateSkeleton>
   );
 }

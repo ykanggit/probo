@@ -39,7 +39,7 @@
   margin-bottom: 1rem;
 }
 
-.policy-content ul, 
+.policy-content ul,
 .policy-content ol {
   margin-left: 1.5rem;
   margin-bottom: 1rem;
@@ -67,24 +67,24 @@
 }
 
 .policy-content blockquote {
-  border-left: 4px solid hsl(var(--border));
+  border-left: 4px solid hsl(var(--solid-b));
   padding-left: 1rem;
   margin-left: 0;
   margin-right: 0;
   font-style: italic;
-  color: hsl(var(--muted-foreground));
+  color: hsl(var(--tertiary));
 }
 
 .policy-content code {
   font-family: monospace;
-  background-color: hsl(var(--muted));
+  background-color: hsl(var(--invert-bg));
   padding: 0.2rem 0.4rem;
   border-radius: 0.25rem;
   font-size: 0.875em;
 }
 
 .policy-content pre {
-  background-color: hsl(var(--muted));
+  background-color: hsl(var(--invert-bg));
   padding: 1rem;
   border-radius: 0.5rem;
   overflow-x: auto;
@@ -105,12 +105,12 @@
 
 .policy-content th,
 .policy-content td {
-  border: 1px solid hsl(var(--border));
+  border: 1px solid hsl(var(--solid-b));
   padding: 0.5rem;
 }
 
 .policy-content th {
-  background-color: hsl(var(--muted));
+  background-color: hsl(var(--invert-bg));
   font-weight: 600;
 }
 
@@ -122,6 +122,6 @@
 
 .policy-content hr {
   border: 0;
-  border-top: 1px solid hsl(var(--border));
+  border-top: 1px solid hsl(var(--solid-b));
   margin: 1.5rem 0;
-} 
+}

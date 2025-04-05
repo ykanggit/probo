@@ -267,15 +267,15 @@ function MitigationListContent({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "complete":
-        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+        return <CheckCircle2 className="h-5 w-5 text-success" />;
       case "in-progress":
-        return <Clock className="h-5 w-5 text-blue-500" />;
+        return <Clock className="h-5 w-5 text-info" />;
       case "not-started":
-        return <AlertCircle className="h-5 w-5 text-gray-200" />;
+        return <AlertCircle className="h-5 w-5 text-disabled" />;
       case "incomplete":
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
+        return <AlertCircle className="h-5 w-5 text-danger" />;
       case "not-applicable":
-        return <X className="h-5 w-5 text-gray-300" />;
+        return <X className="h-5 w-5 text-quaternary" />;
       default:
         return null;
     }
@@ -332,7 +332,7 @@ function MitigationListContent({
       actions={
         <div className="flex gap-4">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => fileInputRef.current?.click()}
             disabled={isImporting}
           >
@@ -359,13 +359,13 @@ function MitigationListContent({
       <div className="mb-8">
         <div className="flex items-center justify-between mb-1">
           <h3 className="text-lg font-medium">Mitigation Implementation</h3>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-tertiary">
             {globalProgress}% complete
           </span>
         </div>
 
         {/* Progress bar container */}
-        <div className="w-full h-5 rounded-full overflow-hidden bg-muted mb-2">
+        <div className="w-full h-5 rounded-full overflow-hidden bg-subtle-bg mb-2">
           {/* Segmented progress bar */}
           <div className="flex h-full">
             {/* Complete segment */}
@@ -404,7 +404,7 @@ function MitigationListContent({
             {/* Not applicable segment */}
             {globalStatusCounts["not-applicable"] > 0 && (
               <div
-                className="bg-gray-600 h-full"
+                className="bg-primary-bg h-full"
                 style={{
                   width: `${
                     (globalStatusCounts["not-applicable"] / totalMitigations) *
@@ -416,7 +416,7 @@ function MitigationListContent({
             {/* Not started segment */}
             {globalStatusCounts["not-started"] > 0 && (
               <div
-                className="bg-gray-200 h-full"
+                className="bg-secondary h-full"
                 style={{
                   width: `${
                     (globalStatusCounts["not-started"] / totalMitigations) * 100
@@ -448,16 +448,16 @@ function MitigationListContent({
             </div>
           )}
           {globalStatusCounts["not-applicable"] > 0 && (
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <div className="w-3 h-3 rounded-full bg-gray-600"></div>
+            <div className="flex items-center gap-1.5 text-tertiary">
+              <div className="w-3 h-3 rounded-full bg-primary"></div>
               <span>
                 Not Applicable ({globalStatusCounts["not-applicable"]})
               </span>
             </div>
           )}
           {globalStatusCounts["not-started"] > 0 && (
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <div className="w-3 h-3 rounded-full bg-gray-200"></div>
+            <div className="flex items-center gap-1.5 text-tertiary">
+              <div className="w-3 h-3 rounded-full bg-secondary"></div>
               <span>Not Started ({globalStatusCounts["not-started"]})</span>
             </div>
           )}
@@ -476,14 +476,14 @@ function MitigationListContent({
             >
               <Card className="border-0 shadow-none">
                 <CardHeader
-                  className="bg-muted/50 cursor-pointer"
+                  className="bg-subtle-bg/50 cursor-pointer"
                   onClick={() => toggleCategory(category.id)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <CardTitle>{category.name}</CardTitle>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-sm text-tertiary">
                       <span>
                         {category.doneCount} / {category.totalCount}
                       </span>
@@ -502,7 +502,7 @@ function MitigationListContent({
                       <div className="w-full">
                         <table className="w-full">
                           <thead>
-                            <tr className="bg-muted/30 text-sm font-medium text-muted-foreground">
+                            <tr className="bg-subtle-bg/30 text-sm font-medium text-tertiary">
                               <th className="w-24 px-4 py-2 text-left">
                                 Importance
                               </th>
@@ -518,7 +518,7 @@ function MitigationListContent({
                             {category.mitigations.map((mitigation) => (
                               <tr
                                 key={mitigation.id || Math.random().toString()}
-                                className="hover:bg-muted/50 cursor-pointer"
+                                className="hover:bg-h-subtle-bg cursor-pointer"
                                 onClick={() => {
                                   if (mitigation?.id) {
                                     // Store this category in the hash
@@ -570,7 +570,7 @@ function MitigationListContent({
                         </table>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center p-6 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center p-6 text-center text-tertiary">
                         No mitigations in this category
                       </div>
                     )}

@@ -451,42 +451,42 @@ export function Control({
   };
 
   const getImportanceColor = (importance: string | undefined): string => {
-    if (!importance) return "bg-gray-100 text-gray-800";
+    if (!importance) return "bg-secondary-bg text-secondary";
 
     switch (importance) {
       case "LOW":
-        return "bg-blue-100 text-blue-800";
+        return "bg-success-bg text-success";
       case "MEDIUM":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-info-bg text-info";
       case "HIGH":
-        return "bg-orange-100 text-orange-800";
+        return "bg-warning-bg text-warning";
       case "CRITICAL":
-        return "bg-red-100 text-red-800";
+        return "bg-danger-bg text-danger";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-secondary-bg text-secondary";
     }
   };
 
   const getStateColor = (state: string | undefined): string => {
-    if (!state) return "bg-gray-100 text-gray-800";
+    if (!state) return "bg-secondary-bg text-secondary";
 
     switch (state) {
       case "NOT_STARTED":
-        return "bg-gray-100 text-gray-800";
+        return "bg-secondary-bg text-secondary";
       case "IN_PROGRESS":
-        return "bg-blue-100 text-blue-800";
+        return "bg-info-bg text-info";
       case "IMPLEMENTED":
-        return "bg-green-100 text-green-800";
+        return "bg-success-bg text-success";
       case "NOT_APPLICABLE":
-        return "bg-purple-100 text-purple-800";
+        return "bg-warning-bg text-warning";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-secondary-bg text-secondary";
     }
   };
 
   return (
     <div className="w-auto p-5 flex items-start gap-5">
-      <div className="font-mono text-lg px-1 py-0.25 rounded-sm bg-lime-3 border border-lime-6 text-lime-11 font-bold">
+      <div className="font-mono text-lg px-1 py-0.25 rounded-sm bg-active-bg border-mid-b border font-bold">
         {control.referenceId}
       </div>
       <div className="flex-1">
@@ -494,7 +494,7 @@ export function Control({
 
         {/* Control Description */}
         {control.description && (
-          <div className="mt-4 text-gray-600">{control.description}</div>
+          <div className="mt-4 text-tertiary">{control.description}</div>
         )}
 
         {/* Security Measures Section */}
@@ -516,7 +516,7 @@ export function Control({
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-tertiary" />
                     <Input
                       placeholder="Search security measures by name or description..."
                       value={mitigationSearchQuery}
@@ -550,20 +550,20 @@ export function Control({
               <div className="flex-1 overflow-hidden">
                 {isLoadingMitigations ? (
                   <div className="flex items-center justify-center h-full">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                    <Loader2 className="w-8 h-8 animate-spin text-info" />
                     <span className="ml-2">Loading security measures...</span>
                   </div>
                 ) : (
                   <div className="max-h-[50vh] overflow-y-auto pr-2">
                     {filteredMitigations().length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
+                      <div className="text-center py-8 text-secondary">
                         No security measures found. Try adjusting your search or
                         select a different category.
                       </div>
                     ) : (
-                      <table className="w-full">
+                      <table className="w-full bg-level-1">
                         <thead className="sticky top-0 bg-white">
-                          <tr className="border-b text-left text-sm text-gray-500 bg-gray-50">
+                          <tr className="border-b text-left text-sm text-secondary bg-invert-bg">
                             <th className="py-3 px-4 font-medium">Name</th>
                             <th className="py-3 px-4 font-medium">
                               Importance
@@ -580,14 +580,14 @@ export function Control({
                             return (
                               <tr
                                 key={mitigation.id}
-                                className="border-b hover:bg-gray-50"
+                                className="border-b hover:bg-invert-bg"
                               >
                                 <td className="py-3 px-4">
                                   <div className="font-medium">
                                     {mitigation.name}
                                   </div>
                                   {mitigation.description && (
-                                    <div className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                                    <div className="text-xs text-secondary line-clamp-1 mt-0.5">
                                       {mitigation.description}
                                     </div>
                                   )}
@@ -619,7 +619,7 @@ export function Control({
                                         handleUnlinkMitigation(mitigation.id)
                                       }
                                       disabled={isUnlinkingMitigation}
-                                      className="text-xs h-7 text-red-500 border-red-200 hover:bg-red-50"
+                                      className="text-xs h-7 text-danger border-danger-b hover:bg-h-danger-bg"
                                     >
                                       {isUnlinkingMitigation ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -630,13 +630,13 @@ export function Control({
                                     </Button>
                                   ) : (
                                     <Button
-                                      variant="outline"
+                                      variant="secondary"
                                       size="sm"
                                       onClick={() =>
                                         handleLinkMitigation(mitigation.id)
                                       }
                                       disabled={isLinkingMitigation}
-                                      className="text-xs h-7 text-blue-500 border-blue-200 hover:bg-blue-50"
+                                      className="text-xs h-7  text-info border-info-b hover:bg-h-info-bg"
                                     >
                                       {isLinkingMitigation ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -668,7 +668,7 @@ export function Control({
           {/* Linked Mitigations List */}
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-medium text-gray-600">
+              <h3 className="text-xl font-medium text-secondary">
                 Security measures
               </h3>
               <Button
@@ -684,7 +684,7 @@ export function Control({
 
             {isLoadingMitigations ? (
               <div className="flex items-center justify-center h-24">
-                <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                <Loader2 className="w-6 h-6 animate-spin text-info" />
                 <span className="ml-2">Loading security measures...</span>
               </div>
             ) : linkedMitigationsData?.control?.mitigations?.edges &&
@@ -692,7 +692,7 @@ export function Control({
               <div className="overflow-x-auto border rounded-md">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b text-left text-sm text-gray-500 bg-gray-50">
+                    <tr className="border-b text-left text-sm text-secondary bg-invert-bg">
                       <th className="py-3 px-4 font-medium">Name</th>
                       <th className="py-3 px-4 font-medium">Importance</th>
                       <th className="py-3 px-4 font-medium">State</th>
@@ -705,12 +705,12 @@ export function Control({
                     {getLinkedMitigations().map((mitigation) => (
                       <tr
                         key={mitigation.id}
-                        className="border-b hover:bg-gray-50"
+                        className="border-b hover:bg-invert-bg"
                       >
                         <td className="py-3 px-4">
                           <div className="font-medium">{mitigation.name}</div>
                           {mitigation.description && (
-                            <div className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                            <div className="text-xs text-secondary line-clamp-1 mt-0.5">
                               {mitigation.description}
                             </div>
                           )}
@@ -754,7 +754,7 @@ export function Control({
                                 handleUnlinkMitigation(mitigation.id)
                               }
                               disabled={isUnlinkingMitigation}
-                              className="text-xs h-7 text-red-500 border-red-200 hover:bg-red-50"
+                              className="text-xs h-7 text-danger border-danger-b hover:bg-h-danger-bg"
                             >
                               Unlink
                             </Button>
@@ -766,7 +766,7 @@ export function Control({
                 </table>
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500 border rounded-md">
+              <div className="text-center py-8 text-secondary border rounded-md">
                 No security measures linked to this control yet. Click
                 &quot;Link Security Measures&quot; to connect some.
               </div>

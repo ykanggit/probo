@@ -65,7 +65,7 @@ function EditableField({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <HelpCircle className="h-4 w-4 text-gray-400" />
+        <HelpCircle className="h-4 w-4 text-tertiary" />
         <Label className="text-sm">{label}</Label>
       </div>
       <div className="space-y-2">
@@ -75,7 +75,7 @@ function EditableField({
           onChange={(e) => onChange(e.target.value)}
           required={required}
         />
-        {helpText && <p className="text-sm text-gray-500">{helpText}</p>}
+        {helpText && <p className="text-sm text-secondary">{helpText}</p>}
       </div>
     </div>
   );

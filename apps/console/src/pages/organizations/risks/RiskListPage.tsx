@@ -11,7 +11,10 @@ export function RiskViewSkeleton() {
     <PageTemplateSkeleton>
       <div className="space-y-2">
         {[1, 2].map((i) => (
-          <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
+          <div key={i} className="h-20 bg-level-1 rounded-xl">
+            <div className="h10 animate-pulse rounded-lg" />
+            <div className="h10 animate-pulse rounded-lg" />
+          </div>
         ))}
       </div>
     </PageTemplateSkeleton>

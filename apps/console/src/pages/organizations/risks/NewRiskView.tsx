@@ -277,7 +277,7 @@ export default function NewRiskView() {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-tertiary">
                 Select a template to prefill the form or create a custom risk.
               </p>
             </div>

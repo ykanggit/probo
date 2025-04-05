@@ -29,8 +29,8 @@ const BreadCrumbNavLink = ({
         {({ isActive }) => (
           <BreadcrumbPage
             className={cn(
-              "text-gray-300",
-              isActive && "text-gray-700",
+              "text-quaternary",
+              isActive && "text-primary",
               className
             )}
           >

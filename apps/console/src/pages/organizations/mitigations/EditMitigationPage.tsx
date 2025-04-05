@@ -12,7 +12,7 @@ export function EditMitigationViewSkeleton() {
       title="Edit Mitigation"
       description="Edit a mitigation. You will be able to link it to control and risks"
     >
-      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+      <div className="max-w-2xl aspect-square bg-subtle-bg rounded-xl animate-pulse" />
     </PageTemplateSkeleton>
   );
 }

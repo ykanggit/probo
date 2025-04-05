@@ -170,8 +170,8 @@ function EditMitigationViewContent({
                   className={cn(
                     "rounded-full cursor-pointer px-4 py-1 text-sm transition-colors",
                     formData.importance === "MANDATORY"
-                      ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                      : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                      ? "bg-danger-bg text-danger ring ring-danger-b"
+                      : "bg-invert-bg hover:bg-h-invert-bg"
                   )}
                 >
                   Mandatory
@@ -182,8 +182,8 @@ function EditMitigationViewContent({
                   className={cn(
                     "rounded-full cursor-pointer px-4 py-1 text-sm transition-colors",
                     formData.importance === "PREFERRED"
-                      ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                      : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                      ? "bg-warning-bg text-warning ring ring-warning-b"
+                      : "bg-invert-bg hover:bg-h-invert-bg"
                   )}
                 >
                   Preferred
@@ -194,8 +194,8 @@ function EditMitigationViewContent({
                   className={cn(
                     "rounded-full cursor-pointer px-4 py-1 text-sm transition-colors",
                     formData.importance === "ADVANCED"
-                      ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                      : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                      ? "bg-info-bg text-info ring ring-info-b"
+                      : "bg-invert-bg hover:bg-h-invert-bg"
                   )}
                 >
                   Advanced

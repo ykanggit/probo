@@ -11,18 +11,20 @@ export function PeopleListViewSkeleton() {
     <PageTemplateSkeleton
       title="People"
       description="Keep track of your company's workforce and their progress towards completing tasks assigned to them."
-      actions={<div className="bg-muted animate-pulse h-9 w-1/6 rounded-lg" />}
+      actions={
+        <div className="bg-subtle-bg animate-pulse h-9 w-1/6 rounded-lg" />
+      }
     >
       <div className="space-y-6">
-        <div className="rounded-xl border bg-card p-4 space-y-2">
-          <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-          <div className="h-10 w-full bg-muted animate-pulse rounded" />
+        <div className="rounded-xl border bg-level-1 p-4 space-y-2">
+          <div className="h-5 w-32 bg-subtle-bg animate-pulse rounded" />
+          <div className="h-10 w-full bg-subtle-bg animate-pulse rounded" />
         </div>
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-[72px] bg-muted animate-pulse rounded-xl"
+              className="h-[72px] bg-subtle-bg animate-pulse rounded-xl"
             />
           ))}
         </div>

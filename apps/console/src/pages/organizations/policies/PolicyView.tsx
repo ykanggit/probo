@@ -151,7 +151,7 @@ function PolicyViewContent({
     <PageTemplate
       title={policy.name ?? ""}
       description={
-        <div className="flex items-center gap-2 text-muted-foreground">
+        <div className="flex items-center gap-2 text-tertiary">
           <Badge variant={policy.status === "ACTIVE" ? "default" : "outline"}>
             {policy.status === "ACTIVE" ? "Active" : "Draft"}
           </Badge>
@@ -176,7 +176,7 @@ function PolicyViewContent({
       }
       actions={
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="secondary" asChild>
             <Link
               to={`/organizations/${organizationId}/policies/${policy.id}/edit`}
             >
@@ -185,8 +185,6 @@ function PolicyViewContent({
             </Link>
           </Button>
           <Button
-            variant="outline"
-            size="sm"
             onClick={() => {
               // Logic to download policy content as PDF or text
               const element = document.createElement("a");
@@ -219,10 +217,10 @@ function PolicyViewContent({
                     <Badge
                       className={`px-3 py-1 rounded-md font-medium ${
                         policy.status === "ACTIVE"
-                          ? "bg-green-100 text-green-700 hover:bg-green-200"
+                          ? "bg-success-bg text-success hover:bg-h-success-bg"
                           : policy.status === "DRAFT"
-                          ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          ? "bg-warning-bg text-warning hover:bg-h-warning-bg"
+                          : "bg-secondary-bg text-secondary hover:bg-h-secondary-bg"
                       }`}
                     >
                       {policy.status === "ACTIVE"
@@ -237,7 +235,7 @@ function PolicyViewContent({
 
               <h1 className="text-3xl font-bold mb-3">{policy.name}</h1>
 
-              <p className="text-muted-foreground mb-6">
+              <p className="text-tertiary mb-6">
                 {getDescription(policy.content)}
               </p>
 
@@ -247,33 +245,33 @@ function PolicyViewContent({
                 onValueChange={setActiveTab}
                 className="mb-6"
               >
-                <TabsList className="border-b w-full rounded-none bg-transparent p-0 h-auto">
+                <TabsList className="border-b w-full rounded-none p-0 h-auto">
                   <TabsTrigger
                     value="content"
-                    className={`rounded-none border-b-2 border-transparent px-4 py-2 font-medium ${
+                    className={`px-4 py-2 font-medium ${
                       activeTab === "content"
                         ? "border-primary text-primary"
-                        : "text-muted-foreground"
+                        : "text-tertiary"
                     }`}
                   >
                     Policy Content
                   </TabsTrigger>
                   <TabsTrigger
                     value="history"
-                    className={`rounded-none border-b-2 border-transparent px-4 py-2 font-medium ${
+                    className={`px-4 py-2 font-medium ${
                       activeTab === "history"
                         ? "border-primary text-primary"
-                        : "text-muted-foreground"
+                        : "text-tertiary"
                     }`}
                   >
                     Version History
                   </TabsTrigger>
                   <TabsTrigger
                     value="approvals"
-                    className={`rounded-none border-b-2 border-transparent px-4 py-2 font-medium ${
+                    className={`px-4 py-2 font-medium ${
                       activeTab === "approvals"
                         ? "border-primary text-primary"
-                        : "text-muted-foreground"
+                        : "text-tertiary"
                     }`}
                   >
                     Approvals
@@ -293,7 +291,7 @@ function PolicyViewContent({
 
                 <TabsContent value="history" className="pt-6">
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">
+                    <p className="text-tertiary">
                       Version history will be available soon.
                     </p>
                   </div>
@@ -301,7 +299,7 @@ function PolicyViewContent({
 
                 <TabsContent value="approvals" className="pt-6">
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">
+                    <p className="text-tertiary">
                       Approval workflow will be available soon.
                     </p>
                   </div>
@@ -318,7 +316,7 @@ function PolicyViewContent({
 
               <div className="space-y-6">
                 <div>
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <div className="flex items-center gap-2 text-tertiary mb-1">
                     <FileText className="h-4 w-4" />
                     <span className="text-sm">Last Updated</span>
                   </div>
@@ -326,7 +324,7 @@ function PolicyViewContent({
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <div className="flex items-center gap-2 text-tertiary mb-1">
                     <FileText className="h-4 w-4" />
                     <span className="text-sm">Review Due</span>
                   </div>
@@ -338,7 +336,7 @@ function PolicyViewContent({
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <div className="flex items-center gap-2 text-tertiary mb-1">
                     <User className="h-4 w-4" />
                     <span className="text-sm">Owner</span>
                   </div>
@@ -364,10 +362,10 @@ function PolicyViewContent({
             </Link>
           </Button>
 
-          <Card className="border shadow-sm mt-6 bg-red-50">
+          <Card className="border shadow-sm mt-6 bg-danger-bg">
             <CardContent className="p-6">
-              <h3 className="text-red-500 font-semibold mb-3">Danger Zone</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <h3 className="text-danger font-semibold mb-3">Danger Zone</h3>
+              <p className="text-sm text-tertiary mb-4">
                 Permanently delete this policy and all of its data. This action
                 cannot be undone.
               </p>

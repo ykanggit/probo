@@ -30,7 +30,7 @@ export function EditableField({
         </Label>
         {helpText && (
           <div className="relative flex items-center">
-            <HelpCircle className="h-4 w-4 text-muted-foreground" />
+            <HelpCircle className="h-4 w-4 text-tertiary" />
             <span className="sr-only">{helpText}</span>
           </div>
         )}

@@ -14,21 +14,21 @@ export function FrameworkListViewSkeleton() {
       description="Manage your compliance frameworks"
       actions={
         <div className="flex gap-4 w-1/3">
-          <div className="bg-muted animate-pulse h-9 w-1/2 rounded-lg" />
-          <div className="bg-muted animate-pulse h-9 w-1/2 rounded-lg" />
+          <div className="bg-subtle-bg animate-pulse h-9 w-1/2 rounded-lg" />
+          <div className="bg-subtle-bg animate-pulse h-9 w-1/2 rounded-lg" />
         </div>
       }
     >
       <div className="grid gap-6 md:grid-cols-2">
         {[1, 2].map((i) => (
-          <Card key={i} className="bg-card/50">
+          <Card key={i}>
             <CardContent className="p-6">
               <div className="relative mb-6">
-                <div className="bg-muted w-24 h-24 rounded-full animate-pulse mb-4" />
-                <div className="h-6 w-48 bg-muted animate-pulse rounded mb-2" />
-                <div className="h-20 w-full bg-muted animate-pulse rounded" />
+                <div className="bg-subtle-bg w-24 h-24 rounded-full animate-pulse mb-4" />
+                <div className="h-6 w-48 bg-subtle-bg animate-pulse rounded mb-2" />
+                <div className="h-20 w-full bg-subtle-bg animate-pulse rounded" />
               </div>
-              <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+              <div className="h-4 w-32 bg-subtle-bg animate-pulse rounded" />
             </CardContent>
           </Card>
         ))}

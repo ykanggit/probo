@@ -11,7 +11,7 @@ export function VendorViewSkeleton() {
     <PageTemplateSkeleton>
       <div className="space-y-2">
         {[1, 2].map((i) => (
-          <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
+          <div key={i} className="h-20 subtle-bg animate-pulse rounded-lg" />
         ))}
       </div>
     </PageTemplateSkeleton>

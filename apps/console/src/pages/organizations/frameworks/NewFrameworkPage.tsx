@@ -12,7 +12,7 @@ export function NewFrameworkViewSkeleton() {
       title="Create Framework"
       description="Create a new framework to organize your mitigations"
     >
-      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+      <div className="max-w-2xl aspect-square bg-subtle-bg rounded-xl animate-pulse" />
     </PageTemplateSkeleton>
   );
 }

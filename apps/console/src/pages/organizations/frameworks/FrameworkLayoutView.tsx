@@ -133,7 +133,7 @@ function FrameworkLayoutViewContent({
       description={framework.description || ""}
       actions={
         <div className="flex gap-4">
-          <Button variant="outline" asChild>
+          <Button variant="secondary" asChild>
             <Link
               to={`/organizations/${organizationId}/frameworks/${framework.id}/edit`}
             >

@@ -73,7 +73,7 @@ function EditableField({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <HelpCircle className="h-4 w-4 text-gray-400" />
+        <HelpCircle className="h-4 w-4 text-tertiary" />
         <Label className="text-sm">{label}</Label>
       </div>
       <div className="space-y-2">
@@ -82,7 +82,7 @@ function EditableField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
-        {helpText && <p className="text-sm text-gray-500">{helpText}</p>}
+        {helpText && <p className="text-sm text-secondary">{helpText}</p>}
       </div>
     </div>
   );
@@ -164,7 +164,7 @@ function PeopleViewContent({
   return (
     <PageTemplate title={formData.fullName}>
       <div className="space-y-6">
-        <div className="mx-auto max-w-4xl space-y-6">
+        <div className="max-w-4xl space-y-6">
           <EditableField
             label="Full Name"
             value={formData.fullName}
@@ -182,7 +182,7 @@ function PeopleViewContent({
 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <HelpCircle className="h-4 w-4 text-gray-400" />
+              <HelpCircle className="h-4 w-4 text-tertiary" />
               <Label className="text-sm">Additional Email Addresses</Label>
             </div>
             <div className="space-y-2">
@@ -229,7 +229,7 @@ function PeopleViewContent({
             <div className="space-y-4">
               <div className="space-y-2">
                 <h2 className="text-lg font-medium">Additional Information</h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-secondary">
                   Additional details about the person
                 </p>
               </div>
@@ -237,7 +237,7 @@ function PeopleViewContent({
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <HelpCircle className="h-4 w-4 text-gray-400" />
+                    <HelpCircle className="h-4 w-4 text-tertiary" />
                     <Label className="text-sm">Kind</Label>
                   </div>
                   <Select
@@ -266,7 +266,7 @@ function PeopleViewContent({
             </Button>
             <Button
               onClick={handleSave}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              className="bg-primary text-invert hover:bg-primary/90"
               disabled={!hasChanges}
             >
               Save Changes

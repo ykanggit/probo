@@ -15,7 +15,10 @@ export function SettingsViewSkeleton() {
       <div className="space-y-6">
         <div className="space-y-2">
           {[1, 2].map((i) => (
-            <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
+            <div
+              key={i}
+              className="h-64 bg-subtle-bg animate-pulse rounded-lg"
+            />
           ))}
         </div>
       </div>

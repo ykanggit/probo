@@ -77,7 +77,7 @@ function EditableField({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <HelpCircle className="h-4 w-4 text-gray-400" />
+        <HelpCircle className="h-4 w-4 text-tertiary" />
         <Label className="text-sm">{label}</Label>
       </div>
       <div className="space-y-2">
@@ -86,7 +86,7 @@ function EditableField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
-        {helpText && <p className="text-sm text-gray-500">{helpText}</p>}
+        {helpText && <p className="text-sm text-secondary">{helpText}</p>}
       </div>
     </div>
   );
@@ -218,7 +218,7 @@ function VendorViewContent({
           <div className="space-y-4">
             <div className="space-y-2">
               <h2 className="text-lg font-medium">Service Information</h2>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-secondary">
                 Basic information about the vendor service
               </p>
             </div>
@@ -242,7 +242,7 @@ function VendorViewContent({
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <HelpCircle className="h-4 w-4 text-gray-400" />
+                  <HelpCircle className="h-4 w-4 text-tertiary" />
                   <Label className="text-sm">Service Criticality</Label>
                 </div>
                 <div className="flex gap-2">
@@ -253,8 +253,8 @@ function VendorViewContent({
                     className={cn(
                       "rounded-full px-4 py-1 text-sm transition-colors",
                       formData.serviceCriticality === "LOW"
-                        ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        ? "bg-success-bg text-success ring ring-success-b"
+                        : "bg-invert-bg"
                     )}
                   >
                     Low
@@ -266,8 +266,8 @@ function VendorViewContent({
                     className={cn(
                       "rounded-full px-4 py-1 text-sm transition-colors",
                       formData.serviceCriticality === "MEDIUM"
-                        ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        ? "bg-warning-bg text-warning ring ring-warning-b"
+                        : "bg-invert-bg"
                     )}
                   >
                     Medium
@@ -279,14 +279,14 @@ function VendorViewContent({
                     className={cn(
                       "rounded-full px-4 py-1 text-sm transition-colors",
                       formData.serviceCriticality === "HIGH"
-                        ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        ? "bg-danger-bg text-danger ring ring-danger-b"
+                        : "bg-invert-bg"
                     )}
                   >
                     High
                   </button>
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-secondary">
                   {formData.serviceCriticality === "HIGH" &&
                     "Critical service - downtime severely impacts end-users"}
                   {formData.serviceCriticality === "MEDIUM" &&
@@ -298,7 +298,7 @@ function VendorViewContent({
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <HelpCircle className="h-4 w-4 text-gray-400" />
+                  <HelpCircle className="h-4 w-4 text-tertiary" />
                   <Label className="text-sm">Risk Tier</Label>
                 </div>
                 <div className="flex gap-2">
@@ -307,8 +307,8 @@ function VendorViewContent({
                     className={cn(
                       "rounded-full px-4 py-1 text-sm transition-colors",
                       formData.riskTier === "CRITICAL"
-                        ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        ? "bg-danger-bg text-danger ring ring-danger-b"
+                        : "bg-invert-bg"
                     )}
                   >
                     Critical
@@ -318,8 +318,8 @@ function VendorViewContent({
                     className={cn(
                       "rounded-full px-4 py-1 text-sm transition-colors",
                       formData.riskTier === "SIGNIFICANT"
-                        ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        ? "bg-warning-bg text-warning ring ring-warning-b"
+                        : "bg-invert-bg"
                     )}
                   >
                     Significant
@@ -329,14 +329,14 @@ function VendorViewContent({
                     className={cn(
                       "rounded-full px-4 py-1 text-sm transition-colors",
                       formData.riskTier === "GENERAL"
-                        ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                        ? "bg-info-bg text-info ring ring-info-b"
+                        : "bg-invert-bg"
                     )}
                   >
                     General
                   </button>
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-secondary">
                   {formData.riskTier === "CRITICAL" &&
                     "Handles sensitive data, critical for platform operation"}
                   {formData.riskTier === "SIGNIFICANT" &&
@@ -376,7 +376,7 @@ function VendorViewContent({
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-primary text-invert hover:bg-primary/90"
             disabled={!hasChanges}
           >
             Save Changes

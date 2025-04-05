@@ -5,7 +5,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <div className="flex flex-1">
-        <div className="flex flex-1 flex-col bg-muted/40">
+        <div className="flex flex-1 flex-col bg-subtle-bg/40">
           <div className="flex flex-1 items-center justify-center">
             <main className="w-full max-w-md p-6">{children}</main>
           </div>
@@ -25,7 +25,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                   Navigate compliance with
                   <br />
                   confidence thanks to{" "}
-                  <span className="text-lime-400">probo</span>
+                  <span className="text-accent">probo</span>
                 </h1>
               </div>
             </div>

@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/collapsible";
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuButton,
@@ -63,9 +62,6 @@ export function NavMain() {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-gray-500 pl-3">
-        Compliance
-      </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const active = isItemActive(item) || item.isActive;

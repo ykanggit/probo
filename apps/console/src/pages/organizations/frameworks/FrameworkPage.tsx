@@ -13,11 +13,11 @@ export function FrameworkViewSkeleton() {
         <Card key={i}>
           <CardContent className="p-6">
             <div className="relative mb-6">
-              <div className="bg-muted w-24 h-24 rounded-full animate-pulse mb-4" />
-              <div className="h-6 w-48 bg-muted animate-pulse rounded mb-2" />
-              <div className="h-20 w-full bg-muted animate-pulse rounded" />
+              <div className="bg-subtle-bg w-24 h-24 rounded-full animate-pulse mb-4" />
+              <div className="h-6 w-48 bg-subtle-bg animate-pulse rounded mb-2" />
+              <div className="h-20 w-full bg-subtle-bg animate-pulse rounded" />
             </div>
-            <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+            <div className="h-4 w-32 bg-subtle-bg animate-pulse rounded" />
           </CardContent>
         </Card>
       ))}

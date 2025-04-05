@@ -49,7 +49,7 @@ function EditableField({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <HelpCircle className="h-4 w-4 text-gray-400" />
+        <HelpCircle className="h-4 w-4 text-tertiary" />
         <Label className="text-sm">{label}</Label>
       </div>
       <div className="space-y-2">
@@ -59,7 +59,7 @@ function EditableField({
           onChange={(e) => onChange(e.target.value)}
           required={required}
         />
-        {helpText && <p className="text-sm text-gray-500">{helpText}</p>}
+        {helpText && <p className="text-sm text-secondary">{helpText}</p>}
       </div>
     </div>
   );
@@ -175,7 +175,7 @@ function NewPeopleViewContent() {
 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <HelpCircle className="h-4 w-4 text-gray-400" />
+              <HelpCircle className="h-4 w-4 text-tertiary" />
               <Label className="text-sm">Additional Email Addresses</Label>
             </div>
             <div className="space-y-2">
@@ -224,7 +224,7 @@ function NewPeopleViewContent() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <h2 className="text-lg font-medium">Additional Information</h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-secondary">
                   Additional details about the person
                 </p>
               </div>
@@ -232,7 +232,7 @@ function NewPeopleViewContent() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <HelpCircle className="h-4 w-4 text-gray-400" />
+                    <HelpCircle className="h-4 w-4 text-tertiary" />
                     <Label className="text-sm">Kind</Label>
                   </div>
                   <div className="flex gap-2">
@@ -243,7 +243,7 @@ function NewPeopleViewContent() {
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.kind === "EMPLOYEE"
                           ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-secondary-bg text-primary hover:bg-h-secondary-bg"
                       )}
                     >
                       Employee
@@ -255,7 +255,7 @@ function NewPeopleViewContent() {
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.kind === "CONTRACTOR"
                           ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-secondary-bg text-primary hover:bg-h-secondary-bg"
                       )}
                     >
                       Contractor
@@ -269,7 +269,7 @@ function NewPeopleViewContent() {
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.kind === "SERVICE_ACCOUNT"
                           ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          : "bg-secondary-bg text-primary hover:bg-h-secondary-bg"
                       )}
                     >
                       Service Account
@@ -286,7 +286,7 @@ function NewPeopleViewContent() {
           </Button>
           <Button
             type="submit"
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-primary text-invert hover:bg-primary/90"
           >
             Create Person
           </Button>

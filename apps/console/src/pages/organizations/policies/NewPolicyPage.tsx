@@ -12,7 +12,7 @@ export function NewPolicyViewSkeleton() {
       title="New Policy"
       description="Add a new policy for your organization"
     >
-      <div className="bg-muted animate-pulse rounded-lg h-[600px]" />
+      <div className="bg-subtle-bg animate-pulse rounded-lg h-[600px]" />
     </PageTemplateSkeleton>
   );
 }

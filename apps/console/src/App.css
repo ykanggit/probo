@@ -1,5 +1,18 @@
 @import "tailwindcss";
-@import "./styles/colors.css";
+@import "@radix-ui/colors/blue.css";
+@import "@radix-ui/colors/blue-dark.css";
+@import "@radix-ui/colors/olive.css";
+@import "@radix-ui/colors/olive-alpha.css";
+@import "@radix-ui/colors/olive-dark.css";
+@import "@radix-ui/colors/olive-dark-alpha.css";
+@import "@radix-ui/colors/lime.css";
+@import "@radix-ui/colors/lime-dark.css";
+@import "@radix-ui/colors/red.css";
+@import "@radix-ui/colors/red-dark.css";
+@import "@radix-ui/colors/red-dark-alpha.css";
+@import "@radix-ui/colors/orange.css";
+@import "@radix-ui/colors/orange-dark.css";
+
 @import "./styles/policy-content.css";
 
 @plugin 'tailwindcss-animate';
@@ -8,41 +21,107 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
+  /* Legacy */
+  /* --color-border: hsl(var(--border)); -> solid-b
+  --color-input: hsl(var(--input)); -> solid-b
+  --color-ring: hsl(var(--ring)); -> active-b
+  --color-background: hsl(var(--background)); -> level-0
+  --color-foreground: hsl(var(--foreground)); -> primary
 
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary: hsl(var(--primary)); -> primary
+  --color-primary-foreground: hsl(var(--primary-foreground)); -> invert
 
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary: hsl(var(--secondary)); -> invert
+  --color-secondary-foreground: hsl(var(--secondary-foreground)); -> secondary
 
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive: hsl(var(--destructive)); -> danger-bg
+  --color-destructive-foreground: hsl(var(--destructive-foreground)); -> danger
 
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted: hsl(var(--muted)); -> invert-bg
+  --color-muted-foreground: hsl(var(--muted-foreground)); -> tertiary
 
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent: hsl(var(--accent)); -> accent-bg
+  --color-accent-foreground: hsl(var(--accent-foreground)); -> accent
 
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover: hsl(var(--popover)); -> level-0
+  --color-popover-foreground: hsl(var(--popover-foreground)); -> primary
 
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card: hsl(var(--card)); -> level-0
+  --color-card-foreground: hsl(var(--card-foreground)); -> primary
 
-  --color-sidebar: hsl(var(--sidebar-background));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar: hsl(var(--sidebar-background)); -> level-0
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground)); -> secondary
+  --color-sidebar-primary: hsl(var(--sidebar-primary)); -> not used
   --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
   --color-sidebar-accent: hsl(var(--sidebar-accent));
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --color-sidebar-border: hsl(var(--sidebar-border)); -> solid-b
+  --color-sidebar-ring: hsl(var(--sidebar-ring)); -> active-b */
+
+  /* New */
+  /* Surfaces */
+  --color-level-0: var(--level-0);
+  --color-level-1: var(--level-1);
+  --color-level-2: var(--level-2);
+  --color-level-3: var(--level-3);
+
+  /* Text colors */
+  --color-primary: var(--primary);
+  --color-invert: var(--invert);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-quaternary: var(--quaternary);
+  --color-disabled: var(--disabled);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-info: var(--info);
+  --color-warning: var(--warning);
+
+  /* Background colors */
+  --color-primary-bg: var(--primary-bg);
+  --color-invert-bg: var(--invert-bg);
+  --color-secondary-bg: var(--secondary-bg);
+  --color-tertiary-bg: var(--tertiary-bg);
+  --color-subtle-bg: var(--subtle-bg);
+  --color-highlight-bg: var(--highlight-bg);
+  --color-accent-bg: var(--accent-bg);
+  --color-active-bg: var(--active-bg);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-plain-bg: var(--danger-plain-bg);
+  --color-success-bg: var(--success-bg);
+  --color-info-bg: var(--info-bg);
+  --color-warning-bg: var(--warning-bg);
+  /* Hover */
+  --color-h-primary-bg: var(--h-primary-bg);
+  --color-h-invert-bg: var(--h-invert-bg);
+  --color-h-secondary-bg: var(--h-secondary-bg);
+  --color-h-tertiary-bg: var(--h-tertiary-bg);
+  --color-h-subtle-bg: var(--h-subtle-bg);
+  --color-h-highlight-bg: var(--h-highlight-bg);
+  --color-h-accent-bg: var(--h-accent-bg);
+  --color-h-active-bg: var(--h-active-bg);
+  /* Pressed */
+  --color-p-primary-bg: var(--p-primary-bg);
+  --color-p-invert-bg: var(--p-invert-bg);
+  --color-p-secondary-bg: var(--p-secondary-bg);
+  --color-p-tertiary-bg: var(--p-tertiary-bg);
+  --color-p-subtle-bg: var(--p-subtle-bg);
+  --color-p-highlight-bg: var(--p-highlight-bg);
+  --color-p-accent-bg: var(--p-accent-bg);
+  --color-p-active-bg: var(--p-active-bg);
+
+  /* Borders */
+  --color-solid-b: var(--solid-b);
+  --color-low-b: var(--low-b);
+  --color-mid-b: var(--mid-b);
+  --color-strong-b: var(--strong-b);
+  --color-active-b: var(--active-b);
+  --color-accent-b: var(--accent-b);
+  --color-danger-b: var(--danger-b);
+  --color-success-b: var(--success-b);
+  --color-warning-b: var(--warning-b);
+  --color-info-b: var(--info-b);
 }
 
 /*
@@ -59,12 +138,13 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
+    border-color: var(--color-mid-b, currentColor);
   }
 }
 
 @layer base {
-  :root {
+  /* Legacy */
+  /* :root {
     --background: 0 0% 100%;
     --foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
@@ -122,14 +202,122 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  } */
+
+  /* New */
+  :root {
+    /* Surfaces */
+    --level-0: #FAFAF5;
+    --level-1: #FFFFFF;
+    --level-2: #FFFFFF;
+    --level-3: var(--olive-12);
+
+    /* Text colors */
+    --primary: var(--olive-12);
+    --invert: var(--olive-1);
+    --secondary: var(--olive-11);
+    --tertiary: var(--olive-10);
+    --quaternary: var(--olive-8);
+    --disabled: var(--olive-7);
+    --accent: var(--lime-10);
+    --danger: var(--red-11);
+    --success: var(--lime-11);
+    --info: var(--blue-11);
+    --warning: var(--orange-11);
+
+    /* Background colors */
+    --primary-bg: var(--olive-12);
+    --invert-bg: #ffffff;
+    --secondary-bg: var(--olive-1);
+    --tertiary-bg: transparent;
+    --subtle-bg: var(--olive-a2);
+    --highlight-bg: var(--olive-a3);
+    --accent-bg: var(--olive-12);
+    --active-bg: var(--lime-4);
+    --danger-bg: var(--red-3);
+    --danger-plain-bg: var(--red-10);
+    --success-bg: var(--lime-3);
+    --info-bg: var(--blue-3);
+    --warning-bg: var(--orange-3);
+    /* Hover */
+    --h-primary-bg: #273025;
+    --h-invert-bg: var(--olive-2);
+    --h-secondary-bg: var(--olive-2);
+    --h-tertiary-bg: var(--olive-a2);
+    --h-subtle-bg: var(--olive-a3);
+    --h-highlight-bg: var(--olive-a4);
+    --h-accent-bg: #1E2C1C;
+    --h-active-bg: var(--lime-5);
+    /* Pressed */
+    --p-primary-bg: #30392E;
+    --p-invert-bg: var(--olive-3);
+    --p-secondary-bg: var(--olive-3);
+    --p-tertiary-bg: var(--olive-a3);
+    --p-subtle-bg: var(--olive-a4);
+    --p-highlight-bg: var(--olive-a5);
+    --p-accent-bg: #293A25;
+    --p-active-bg: var(--lime-6);
+
+    /* Borders */
+    --solid-b: var(--olive-4);
+    --low-b: var(--olive-a4);
+    --mid-b: var(--olive-a7);
+    --strong-b: var(--olive-a8);
+    --active-b: var(--olive-12);
+    --accent-b: var(--lime-11);
+    --danger-b: var(--red-10);
+    --success-b: var(--lime-10);
+    --warning-b: var(--orange-10);
+    --info-b: var(--blue-10);
+  }
+
+  .dark {
+    /* Surfaces */
+    --level-0: var(--olive-1);
+    --level-1: var(--olive-2);
+    --level-2: var(--olive-3);
+    --level-3: var(--olive-7);
+
+    /* Text colors */
+    --success: var(--lime-a11);
+
+    /* Background colors */
+    --primary-bg: var(--lime-10);
+    --invert-bg: var(--olive-1);
+    --secondary-bg: var(--olive-a3);
+    --active-bg: var(--olive-a4);
+    --accent-bg: var(--lime-10);
+    --danger-bg: var(--red-a3);
+    --danger-plain-bg: var(--red-a10);
+    --success-bg: var(--lime-a3);
+    --info-bg: var(--blue-a3);
+    --warning-bg: var(--orange-a3);
+    /* Hover */
+    --h-primary-bg: #C4F042E1;
+    --h-secondary-bg: var(--olive-a3);
+    --h-highlight-bg: var(--olive-a5);
+    --h-accent-bg: var(--lime-a9);
+    --h-active-bg: var(--olive-a5);
+    /* Pressed */
+    --p-primary-bg: #C4F042D7;
+    --p-secondary-bg: var(--olive-a4);
+    --p-highlight-bg: var(--olive-a6);
+    --p-accent-bg: var(--lime-a10);
+    --p-active-bg: var(--olive-a6);
+
+    /* Borders */
+    --solid-b: var(--olive-5);
+    --mid-b: var(--olive-a5);
+    --active-b: var(--olive-a12);
+    --warning-b: var(--orange-a10);
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-solid-b;
   }
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased bg-level-0 text-primary;
   }
 }

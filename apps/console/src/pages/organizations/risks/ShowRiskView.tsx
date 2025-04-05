@@ -415,7 +415,7 @@ function ShowRiskViewContent({
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <h3 className="text-sm font-medium text-gray-500">
+                <h3 className="text-sm font-medium text-secondary">
                   Probability
                 </h3>
                 <p className="mt-1 text-lg">
@@ -423,19 +423,19 @@ function ShowRiskViewContent({
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500">Impact</h3>
+                <h3 className="text-sm font-medium text-secondary">Impact</h3>
                 <p className="mt-1 text-lg">
                   {(risk.impact! * 100).toFixed(0)}%
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500">Severity</h3>
+                <h3 className="text-sm font-medium text-secondary">Severity</h3>
                 <p className="mt-1">
                   <Badge className={severity.class}>{severity.level}</Badge>
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500">Created</h3>
+                <h3 className="text-sm font-medium text-secondary">Created</h3>
                 <p className="mt-1 text-sm">{formatDate(risk.createdAt!)}</p>
               </div>
             </div>
@@ -490,7 +490,7 @@ function ShowRiskViewContent({
                             disabled={isUnlinkingMitigation}
                             title="Unlink mitigation"
                           >
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <Trash2 className="h-4 w-4 text-danger" />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -499,7 +499,7 @@ function ShowRiskViewContent({
                 </Table>
               </div>
             ) : (
-              <div className="text-center py-10 text-gray-500">
+              <div className="text-center py-10 text-secondary">
                 <p>No mitigations associated with this risk.</p>
               </div>
             )}
@@ -510,13 +510,13 @@ function ShowRiskViewContent({
               <CardContent className="pt-6">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">
+                    <h3 className="text-sm font-medium text-secondary">
                       Full Description
                     </h3>
                     <p className="mt-1">{risk.description}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">
+                    <h3 className="text-sm font-medium text-secondary">
                       Last Updated
                     </h3>
                     <p className="mt-1">{formatDate(risk.updatedAt!)}</p>
@@ -578,7 +578,7 @@ function ShowRiskViewContent({
               <div className="flex flex-row space-x-2">
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-tertiary" />
                     <Input
                       placeholder="Search mitigations..."
                       className="pl-8"
@@ -629,7 +629,7 @@ function ShowRiskViewContent({
                       return (
                         <div
                           key={mitigation.id}
-                          className="p-4 hover:bg-gray-50"
+                          className="p-4 hover:bg-invert-bg"
                         >
                           <div className="flex justify-between">
                             <div>

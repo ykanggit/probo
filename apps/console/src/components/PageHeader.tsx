@@ -57,7 +57,7 @@ export function PageHeading({
 const PageHeadingSkeleton: FC = () => {
   return (
     <div className="py-[3px] w-2/5">
-      <div className="bg-muted animate rounded-lg h-7.5" />
+      <div className="bg-subtle-bg animate rounded-lg h-7.5" />
     </div>
   );
 };
@@ -70,12 +70,7 @@ export function PageDescription({
   children: ReactNode;
 }) {
   return (
-    <div
-      className={cn(
-        "text-md text-muted-foreground whitespace-pre-wrap",
-        className
-      )}
-    >
+    <div className={cn("text-md text-tertiary text-left", className)}>
       {children}
     </div>
   );
@@ -84,7 +79,7 @@ export function PageDescription({
 export function PageDescriptionSkeleton() {
   return (
     <div className="py-[5px]">
-      <div className="bg-muted animate rounded-md w-100 h-4.5" />
+      <div className="bg-subtle-bg animate rounded-md w-100 h-4.5" />
     </div>
   );
 }

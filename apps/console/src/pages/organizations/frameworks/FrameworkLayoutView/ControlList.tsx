@@ -22,6 +22,7 @@ export const controlListFragment = graphql`
 
 interface ControlListProps {
   fragmentKey: ControlList_List$key;
+  className?: string;
 }
 
 export function ControlList(props: ControlListProps) {
@@ -30,7 +31,7 @@ export function ControlList(props: ControlListProps) {
     frameworkId: string;
     controlId?: string;
   }>();
-  const { fragmentKey } = props;
+  const { className, fragmentKey } = props;
   const { controls } = useFragment<ControlList_List$key>(
     controlListFragment,
     fragmentKey
@@ -41,15 +42,20 @@ export function ControlList(props: ControlListProps) {
   }
 
   return (
-    <aside className="shrink-0 w-70 border-r border-gray-100 h-full overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-xs">
+    <aside
+      className={cn(
+        "shrink-0 w-70 border-r h-full overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-level-0 [&::-webkit-scrollbar-thumb]:bg-highlight-bg [&::-webkit-scrollbar-thumb]:rounded-xs",
+        className
+      )}
+    >
       {controls.edges.map(({ node: control }, i) => (
         <NavLink
           key={control.id}
           to={`/organizations/${organizationId}/frameworks/${frameworkId}/controls/${control.id}`}
           className={({ isActive }) =>
             cn(
-              "block pl-8 pr-4 py-4 hover:bg-gray-50 border-b border-gray-100",
-              (isActive || (i === 0 && !controlId)) && "bg-gray-50"
+              "block pl-8 pr-4 py-4 border-b hover:bg-h-subtle-bg",
+              (isActive || (i === 0 && !controlId)) && "bg-subtle-bg"
             )
           }
         >
@@ -58,8 +64,8 @@ export function ControlList(props: ControlListProps) {
               <>
                 <div
                   className={cn(
-                    "inline-block font-mono text-sm px-1 py-0.25 rounded-sm bg-lime-2 border border-lime-4 text-lime-9 font-semibold",
-                    isActive && "font-bold bg-lime-3 border-lime-6 text-lime-11"
+                    "inline-block font-mono text-sm px-1 py-0.25 rounded-sm bg-highlight-bg border font-semibold",
+                    isActive && "font-bold bg-active-bg border-mid-b"
                   )}
                 >
                   {control.referenceId}

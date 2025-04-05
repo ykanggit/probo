@@ -74,7 +74,7 @@ export default function RegisterPage() {
       <div className="space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Sign up</h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-secondary dark:text-tertiary">
             Enter your information to create an account
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function RegisterPage() {
         </form>
 
         <div className="text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-secondary dark:text-tertiary">
             Already have an account?{" "}
             <Link to="/login" className="underline">
               Log in here

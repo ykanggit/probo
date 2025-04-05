@@ -313,10 +313,10 @@ function SettingsViewContent({
                     />
                   ) : (
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg border">
-                      <Upload className="h-5 w-5 text-muted-foreground" />
+                      <Upload className="h-5 w-5 text-tertiary" />
                     </div>
                   )}
-                  <span className="text-muted-foreground">
+                  <span className="text-tertiary">
                     Upload a logo to be displayed at the top of your trust page
                   </span>
                 </div>
@@ -344,8 +344,8 @@ function SettingsViewContent({
               <label className="text-sm font-medium">Organization name</label>
               <div className="flex items-center justify-between rounded-lg border p-3 shadow-xs">
                 <div className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-muted-foreground">
+                  <Building2 className="h-5 w-5 text-tertiary" />
+                  <span className="text-tertiary">
                     Set the name of the organization
                   </span>
                 </div>
@@ -389,11 +389,11 @@ function SettingsViewContent({
             <div className="space-y-4">
               {users.length === 0 ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center">
-                  <div className="rounded-full bg-muted p-3">
-                    <Building2 className="h-6 w-6 text-muted-foreground" />
+                  <div className="rounded-full bg-subtle-bg p-3">
+                    <Building2 className="h-6 w-6 text-tertiary" />
                   </div>
                   <h3 className="mt-4 text-lg font-medium">No members found</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
+                  <p className="mt-2 text-sm text-tertiary">
                     You haven&apos;t added any members to your workspace yet.
                   </p>
                 </div>
@@ -413,15 +413,13 @@ function SettingsViewContent({
                         <span className="text-sm font-medium">
                           {user.fullName}
                         </span>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-tertiary">
                           {user.email}
                         </span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">
-                        Owner
-                      </span>
+                      <span className="text-sm text-tertiary">Owner</span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">

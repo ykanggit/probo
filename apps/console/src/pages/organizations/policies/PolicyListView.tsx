@@ -92,20 +92,20 @@ function PolicyCard({
     : "No description available";
 
   return (
-    <Card className="relative overflow-hidden border bg-card transition-all hover:shadow-md h-full flex flex-col">
+    <Card className="relative overflow-hidden border transition-all hover:shadow-md h-full flex flex-col">
       <CardContent className="p-6 flex-grow">
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-start mb-3">
             <h3 className="font-semibold text-xl">{title}</h3>
             {status && (
               <Badge
-                className={`${
+                variant={
                   status === "ACTIVE"
-                    ? "bg-green-100 text-green-700 hover:bg-green-200"
+                    ? "success"
                     : status === "DRAFT"
-                    ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                    ? "warning"
+                    : "secondary"
+                }
               >
                 {status === "ACTIVE"
                   ? "Security"
@@ -116,11 +116,11 @@ function PolicyCard({
             )}
           </div>
 
-          <p className="text-muted-foreground text-sm line-clamp-3 mb-4">
+          <p className="text-tertiary text-sm line-clamp-3 mb-4">
             {description}
           </p>
 
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-auto">
+          <div className="flex items-center gap-2 text-sm text-tertiary mt-auto">
             <Clock className="h-4 w-4" />
             <span>
               Last updated: {format(formattedUpdatedAt, "yyyy-MM-dd")}
@@ -235,7 +235,7 @@ function PolicyListViewContent({
       {/* Search and filter mitigations */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tertiary" />
           <Input
             placeholder="Search policies..."
             className="pl-10"
@@ -261,7 +261,7 @@ function PolicyListViewContent({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="secondary" className="flex items-center gap-2">
                 <ArrowUpDown className="h-4 w-4" />
                 Sort
               </Button>
@@ -291,7 +291,7 @@ function PolicyListViewContent({
       </div>
 
       {/* Results summary */}
-      <div className="mb-4 text-sm text-muted-foreground">
+      <div className="mb-4 text-sm text-tertiary">
         Showing {filteredPolicies.length} of {policies.length} policies
       </div>
 
@@ -315,10 +315,10 @@ function PolicyListViewContent({
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 border rounded-lg bg-muted/20">
-            <FileText className="mx-auto h-8 w-8 text-muted-foreground mb-3" />
+          <div className="text-center py-12 border rounded-lg bg-subtle-bg/20">
+            <FileText className="mx-auto h-8 w-8 text-tertiary mb-3" />
             <h3 className="text-lg font-medium">No policies found</h3>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-tertiary mb-4">
               {searchQuery || statusFilter !== "ALL"
                 ? "Try adjusting your search or filters"
                 : "Create your first policy to get started"}

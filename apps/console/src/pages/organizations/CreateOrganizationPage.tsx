@@ -10,7 +10,7 @@ export function CreateOrganizationViewSkeleton() {
       title="Create Organization"
       description="Create a new organization to manage your compliance and security needs."
     >
-      <div className="max-w-2xl aspect-square bg-muted rounded-xl animate-pulse" />
+      <div className="max-w-2xl aspect-square bg-subtle-bg rounded-xl animate-pulse" />
     </PageTemplateSkeleton>
   );
 }

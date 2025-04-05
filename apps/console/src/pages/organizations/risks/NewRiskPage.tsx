@@ -10,7 +10,7 @@ export function NewRiskViewSkeleton() {
   return (
     <PageTemplateSkeleton>
       <div className="space-y-2">
-        <div className="h-96 bg-muted animate-pulse rounded-lg" />
+        <div className="h-96 bg-subtle-bg animate-pulse rounded-lg" />
       </div>
     </PageTemplateSkeleton>
   );

@@ -139,12 +139,12 @@ function FrameworkListViewContent({
             className="hidden"
           />
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={handleImportClick}
             disabled={isUploading}
           >
             <Upload className="mr-2 h-4 w-4" />
-            Import Framework
+            Import
           </Button>
           <Button asChild>
             <Link to={`/organizations/${organizationId}/frameworks/new`}>
@@ -161,10 +161,10 @@ function FrameworkListViewContent({
             <table className="w-full caption-bottom text-sm">
               <tbody className="[&_tr:last-child]:border-0">
                 {frameworks.length === 0 ? (
-                  <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                  <tr className="border-b transition-colors hover:bg-h-subte-bg/50 data-[state=selected]:bg-subtle-bg">
                     <td
                       colSpan={4}
-                      className="text-center p-4 align-middle text-muted-foreground"
+                      className="text-center p-4 align-middle text-tertiary"
                     >
                       No frameworks found. Create or import one to get started.
                     </td>
@@ -173,7 +173,7 @@ function FrameworkListViewContent({
                   frameworks.map((framework) => (
                     <tr
                       key={framework.id}
-                      className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted cursor-pointer"
+                      className="border-b transition-colors hover:bg-h-subtle-bg/50 data-[state=selected]:bg-subtle-bg cursor-pointer"
                     >
                       <td className="p-4 align-middle">
                         <Link

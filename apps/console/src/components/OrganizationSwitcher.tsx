@@ -101,27 +101,28 @@ export function OrganizationSwitcher({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
+              variant="ghost"
               className={cn(
-                "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-2.5",
-                !currentOrganization && "border border-dashed border-gray-300"
+                "gap-2.5",
+                !currentOrganization && "border border-dashed"
               )}
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-slate-400 text-gray-100">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-highlight-bg">
                 {currentOrganization ? (
                   <LogoComponent org={currentOrganization} className="size-8" />
                 ) : (
-                  <div className="size-8 bg-slate-400 rounded-sm" />
+                  <div className="size-8 bg-highlight-bg rounded-sm" />
                 )}
               </div>
-              <div className="grid text-left leading-tight">
+              <div className="grid text-left leading-tight text-primary">
                 {currentOrganization ? (
                   <>
-                    <span className="truncate font-medium text-lg leading-5 text-gray-900">
+                    <span className="truncate font-medium text-lg leading-5">
                       {currentOrganization.name}
                     </span>
                   </>
                 ) : (
-                  <span className="truncate text-gray-500 font-medium">
+                  <span className="truncate text-secondary font-medium">
                     Select Organization
                   </span>
                 )}
@@ -135,7 +136,7 @@ export function OrganizationSwitcher({
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}
           >
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
+            <DropdownMenuLabel className="text-xs text-tertiary">
               Organizations
             </DropdownMenuLabel>
             {hasOrganizations &&
@@ -144,10 +145,10 @@ export function OrganizationSwitcher({
                   key={edge.node.id}
                   onClick={() => handleOrganizationSwitch(edge.node)}
                   className={`gap-2 p-2 ${
-                    edge.node.id === organizationId ? "bg-muted" : ""
+                    edge.node.id === organizationId ? "bg-subtle-bg" : ""
                   }`}
                 >
-                  <div className="flex size-6 items-center justify-center rounded-sm">
+                  <div className="flex size-6 items-center justify-center rounded-sm bg-highlight-bg">
                     <LogoComponent
                       org={edge.node}
                       className="size-4 shrink-0"
@@ -163,10 +164,10 @@ export function OrganizationSwitcher({
                 to="/organizations/new"
                 className="gap-2 p-2 cursor-pointer"
               >
-                <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                <div className="flex size-6 items-center justify-center rounded-md border bg-secondary-bg">
                   <Plus className="size-4" />
                 </div>
-                <div className="font-medium text-muted-foreground">
+                <div className="font-medium text-tertiary">
                   Add organization
                 </div>
               </Link>

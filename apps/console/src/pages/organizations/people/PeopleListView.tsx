@@ -179,12 +179,7 @@ function PeopleListContent({
       description="Keep track of your company's workforce and their progress
       towards completing tasks assigned to them."
       actions={
-        <Button
-          asChild
-          variant="outline"
-          style={{ borderRadius: "0.5rem" }}
-          className="gap-2"
-        >
+        <Button asChild variant="secondary" className="gap-2">
           <Link to={`/organizations/${organizationId}/people/new`}>
             <UserPlus className="h-4 w-4" />
             Add a person
@@ -200,7 +195,7 @@ function PeopleListContent({
               to={`/organizations/${organizationId}/people/${person?.id}`}
               className="block"
             >
-              <div className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors">
+              <div className="flex items-center justify-between p-4 rounded-xl border bg-level-1 hover:bg-accent-bg/5 transition-colors">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>{person?.fullName?.[0]}</AvatarFallback>
@@ -209,8 +204,8 @@ function PeopleListContent({
                     <p className="font-medium">{person?.fullName}</p>
                     {person?.primaryEmailAddress && (
                       <>
-                        <span className="text-muted-foreground">•</span>
-                        <p className="text-sm text-muted-foreground">
+                        <span className="text-tertiary">•</span>
+                        <p className="text-sm text-tertiary">
                           {person.primaryEmailAddress}
                         </p>
                       </>
@@ -218,10 +213,7 @@ function PeopleListContent({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="bg-lime-9 text-white rounded-full px-3 py-0.5 text-xs font-medium"
-                  >
+                  <Badge className="px-3 py-0.5 text-xs font-medium">
                     {person?.kind === "EMPLOYEE"
                       ? "Employee"
                       : person?.kind === "CONTRACTOR"
@@ -233,7 +225,7 @@ function PeopleListContent({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:bg-transparent hover:[&>svg]:text-destructive"
+                    className="h-8 w-8 text-tertiary hover:bg-transparent hover:[&>svg]:text-danger"
                     onClick={(e) => {
                       e.preventDefault();
                       if (
@@ -254,7 +246,7 @@ function PeopleListContent({
                   >
                     <Trash2 className="h-4 w-4 transition-colors" />
                   </Button>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  <ChevronRight className="h-4 w-4 text-tertiary" />
                 </div>
               </div>
             </Link>
