@@ -137,6 +137,19 @@ function MitigationListContent({
     return initialHashCategory ? [initialHashCategory] : [];
   });
 
+  // Scroll to expanded category when page loads with a category in the fragment
+  useEffect(() => {
+    if (initialHashCategory) {
+      // Small delay to ensure the DOM is fully rendered
+      setTimeout(() => {
+        const element = document.getElementById(initialHashCategory);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
+  }, [initialHashCategory]);
+
   // Listen for hash changes (like when using back button)
   useEffect(() => {
     const handleHashChange = () => {
@@ -468,6 +481,7 @@ function MitigationListContent({
           return (
             <div
               key={category.id}
+              id={category.id}
               className="border rounded-lg overflow-hidden"
             >
               <Card className="border-0 shadow-none">
