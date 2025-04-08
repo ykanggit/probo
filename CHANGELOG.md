@@ -13,6 +13,11 @@ All notable changes to this project will be documented in this file.
 
 - Evidence can now be requested.
 
+### Fixed
+
+- Fix unfoldable mitigation category when open via the URI fragment.
+- Fix ctrl+click on mitigation does not open new tab.
+
 ## [0.3.0] - 2025-04-01
 
 ### Added
