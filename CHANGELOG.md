@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - Add import control <> mitigation mapping.
 - Add mitigation tasks import.
+- Add auto-scroll to opened category.
 
 ### Changed
 
