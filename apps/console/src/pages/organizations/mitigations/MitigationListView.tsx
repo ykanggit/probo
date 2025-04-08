@@ -7,7 +7,7 @@ import {
   useMutation,
   ConnectionHandler,
 } from "react-relay";
-import { useParams, useNavigate, Link } from "react-router";
+import { useParams, Link } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import {
   ChevronRight,
@@ -115,7 +115,6 @@ function MitigationListContent({
     queryRef
   ) as unknown as OrganizationData;
 
-  const navigate = useNavigate();
   const { organizationId } = useParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -127,29 +126,26 @@ function MitigationListContent({
     );
 
   // Monitor URL hash for changes and update state accordingly
-  const [hashValue, setHashValue] = useState(window.location.hash);
-
-  // Get the active category from the hash
-  const hashCategory = hashValue.substring(1)
-    ? decodeURIComponent(hashValue.substring(1))
-    : "";
+  const [initialHashCategory] = useState(() =>
+    window.location.hash.substring(1)
+      ? decodeURIComponent(window.location.hash.substring(1))
+      : ""
+  );
 
   // Keep track of manually expanded categories
   const [expandedCategories, setExpandedCategories] = useState<string[]>(() => {
-    return hashCategory ? [hashCategory] : [];
+    return initialHashCategory ? [initialHashCategory] : [];
   });
-
-  // When hash changes, update expanded categories to include the hash category
-  useEffect(() => {
-    if (hashCategory && !expandedCategories.includes(hashCategory)) {
-      setExpandedCategories((prev) => [...prev, hashCategory]);
-    }
-  }, [hashCategory, expandedCategories]);
 
   // Listen for hash changes (like when using back button)
   useEffect(() => {
     const handleHashChange = () => {
-      setHashValue(window.location.hash);
+      const newHash = window.location.hash.substring(1)
+        ? decodeURIComponent(window.location.hash.substring(1))
+        : "";
+      if (newHash && !expandedCategories.includes(newHash)) {
+        setExpandedCategories((prev) => [...prev, newHash]);
+      }
     };
 
     window.addEventListener("hashchange", handleHashChange);
@@ -157,7 +153,7 @@ function MitigationListContent({
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
     };
-  }, []);
+  }, [expandedCategories]);
 
   const mitigations =
     data.organization.mitigations?.edges.map((edge) => edge.node) ?? [];
@@ -519,33 +515,6 @@ function MitigationListContent({
                               <tr
                                 key={mitigation.id || Math.random().toString()}
                                 className="hover:bg-h-subtle-bg cursor-pointer"
-                                onClick={() => {
-                                  if (mitigation?.id) {
-                                    // Store this category in the hash
-                                    const encoded = encodeURIComponent(
-                                      category.id
-                                    );
-                                    window.location.hash = encoded;
-                                    setHashValue("#" + encoded);
-
-                                    // Make sure this category is expanded in the local state
-                                    if (
-                                      !expandedCategories.includes(category.id)
-                                    ) {
-                                      setExpandedCategories((prev) => [
-                                        ...prev,
-                                        category.id,
-                                      ]);
-                                    }
-
-                                    // Use a small timeout to ensure the hash change is processed
-                                    setTimeout(() => {
-                                      navigate(
-                                        `/organizations/${organizationId}/mitigations/${mitigation.id}`
-                                      );
-                                    }, 100);
-                                  }
-                                }}
                               >
                                 <td className="w-24 px-4 py-3 align-middle">
                                   <Badge variant="outline" className="text-xs">
@@ -560,9 +529,12 @@ function MitigationListContent({
                                   </div>
                                 </td>
                                 <td className="px-4 py-3 align-middle">
-                                  <div className="font-medium">
+                                  <Link
+                                    to={`/organizations/${organizationId}/mitigations/${mitigation.id}`}
+                                    className="font-medium block"
+                                  >
                                     {mitigation.name}
-                                  </div>
+                                  </Link>
                                 </td>
                               </tr>
                             ))}
