@@ -6,8 +6,6 @@ All notable changes to this project will be documented in this file.
 
 ### BREAKING CHANGES
 
-### BREAKING CHANGES
-
 - **BREAKING:** Renamed GraphQL mutations for control-mitigation mappings:
   - `createControlMapping` → `createControlMitigationMapping`
   - `deleteControlMapping` → `deleteControlMitigationMapping`
@@ -29,6 +27,10 @@ All notable changes to this project will be documented in this file.
   - New GraphQL mutations `uploadVendorComplianceReport` and `deleteVendorComplianceReport`
   - New `complianceReports` field on the Vendor type
   - Support for uploading, viewing, and managing vendor compliance documentation
+- Added pre-configured frameworks:
+  - Added ISO/IEC 27001:2022 and SOC 2 framework templates
+  - Improved framework import interface with dropdown menu for template selection
+  - Support for one-click import of standard compliance frameworks
 
 ### Changed
 
