@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c1cd34e6543447b414b10f63225883c2>>
+ * @generated SignedSource<<7c4ad77e70fa42cf8257113897a607ec>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,15 +9,15 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type DeleteControlMappingInput = {
+export type DeleteControlMitigationMappingInput = {
   controlId: string;
   mitigationId: string;
 };
 export type ControlDeleteMitigationMappingMutation$variables = {
-  input: DeleteControlMappingInput;
+  input: DeleteControlMitigationMappingInput;
 };
 export type ControlDeleteMitigationMappingMutation$data = {
-  readonly deleteControlMapping: {
+  readonly deleteControlMitigationMapping: {
     readonly success: boolean;
   };
 };
@@ -44,9 +44,9 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "DeleteControlMappingPayload",
+    "concreteType": "DeleteControlMitigationMappingPayload",
     "kind": "LinkedField",
-    "name": "deleteControlMapping",
+    "name": "deleteControlMitigationMapping",
     "plural": false,
     "selections": [
       {
@@ -78,16 +78,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "31dcbb70c0b32e78dcb3fd2a2dc1a58b",
+    "cacheID": "3d09a29c8ae06a97d098e565a7f2d172",
     "id": null,
     "metadata": {},
     "name": "ControlDeleteMitigationMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlDeleteMitigationMappingMutation(\n  $input: DeleteControlMappingInput!\n) {\n  deleteControlMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation ControlDeleteMitigationMappingMutation(\n  $input: DeleteControlMitigationMappingInput!\n) {\n  deleteControlMitigationMapping(input: $input) {\n    success\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "6070b58009682dfa712e445363f0ebf5";
+(node as any).hash = "6905236aeeb313e5deed3e569a0c7c54";
 
 export default node;

@@ -56,6 +56,66 @@ func (c Control) CursorKey(orderBy ControlOrderField) page.CursorKey {
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
+func (c *Controls) LoadByPolicyID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	policyID gid.GID,
+	cursor *page.Cursor[ControlOrderField],
+) error {
+	q := `
+WITH ctrl AS (
+	SELECT
+		c.id,
+		c.reference_id,
+		c.framework_id,
+		c.tenant_id,
+		c.name,
+		c.description,
+		c.created_at,
+		c.updated_at
+	FROM
+		controls c
+	INNER JOIN
+		controls_policies cp ON c.id = cp.control_id
+	WHERE
+		cp.policy_id = @policy_id
+)
+SELECT
+	id,
+	reference_id,
+	framework_id,
+	tenant_id,
+	name,
+	description,
+	created_at,
+	updated_at
+FROM
+	ctrl
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.NamedArgs{"policy_id": policyID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query controls: %w", err)
+	}
+
+	controls, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Control])
+	if err != nil {
+		return fmt.Errorf("cannot collect controls: %w", err)
+	}
+
+	*c = controls
+
+	return nil
+}
+
 func (c *Controls) LoadByMitigationID(
 	ctx context.Context,
 	conn pg.Conn,

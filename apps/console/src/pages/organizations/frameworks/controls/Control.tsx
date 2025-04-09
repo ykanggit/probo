@@ -93,9 +93,9 @@ const organizationMitigationsQuery = graphql`
 // Mutation to create a mapping between a control and a mitigation
 const createMitigationMappingMutation = graphql`
   mutation ControlCreateMitigationMappingMutation(
-    $input: CreateControlMappingInput!
+    $input: CreateControlMitigationMappingInput!
   ) {
-    createControlMapping(input: $input) {
+    createControlMitigationMapping(input: $input) {
       success
     }
   }
@@ -104,9 +104,9 @@ const createMitigationMappingMutation = graphql`
 // Mutation to delete a mapping between a control and a mitigation
 const deleteMitigationMappingMutation = graphql`
   mutation ControlDeleteMitigationMappingMutation(
-    $input: DeleteControlMappingInput!
+    $input: DeleteControlMitigationMappingInput!
   ) {
-    deleteControlMapping(input: $input) {
+    deleteControlMitigationMapping(input: $input) {
       success
     }
   }

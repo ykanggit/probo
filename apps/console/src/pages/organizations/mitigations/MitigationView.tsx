@@ -394,9 +394,9 @@ const linkedControlsQuery = graphql`
 
 const createControlMappingMutation = graphql`
   mutation MitigationViewCreateControlMappingMutation(
-    $input: CreateControlMappingInput!
+    $input: CreateControlMitigationMappingInput!
   ) {
-    createControlMapping(input: $input) {
+    createControlMitigationMapping(input: $input) {
       success
     }
   }
@@ -404,9 +404,9 @@ const createControlMappingMutation = graphql`
 
 const deleteControlMappingMutation = graphql`
   mutation MitigationViewDeleteControlMappingMutation(
-    $input: DeleteControlMappingInput!
+    $input: DeleteControlMitigationMappingInput!
   ) {
-    deleteControlMapping(input: $input) {
+    deleteControlMitigationMapping(input: $input) {
       success
     }
   }

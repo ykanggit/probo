@@ -271,3 +271,67 @@ RETURNING
 
 	return nil
 }
+
+func (p *Policies) LoadByControlID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	controlID gid.GID,
+	cursor *page.Cursor[PolicyOrderField],
+) error {
+	q := `
+WITH plcs AS (
+	SELECT
+		p.id,
+		p.tenant_id,
+		p.organization_id,
+		p.owner_id,
+		p.name,
+		p.content,
+		p.status,
+		p.review_date,
+		p.created_at,
+		p.updated_at
+	FROM
+		policies p
+	INNER JOIN
+		controls_policies cp ON p.id = cp.policy_id
+	WHERE
+		cp.control_id = @control_id
+)
+SELECT
+	id,
+	tenant_id,
+	organization_id,
+	owner_id,
+	name,
+	content,
+	status,
+	review_date,
+	created_at,
+	updated_at
+FROM
+	plcs
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"control_id": controlID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query policies: %w", err)
+	}
+
+	policies, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Policy])
+	if err != nil {
+		return fmt.Errorf("cannot collect policies: %w", err)
+	}
+
+	*p = policies
+
+	return nil
+}

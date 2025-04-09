@@ -448,6 +448,14 @@ type Control implements Node {
     orderBy: MitigationOrder
   ): MitigationConnection! @goField(forceResolver: true)
 
+  policies(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: PolicyOrder
+  ): PolicyConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -530,6 +538,15 @@ type Policy implements Node {
   content: String!
   reviewDate: Datetime
   owner: People! @goField(forceResolver: true)
+
+  controls(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: ControlOrder
+  ): ControlConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -727,12 +744,18 @@ type Mutation {
   importMitigation(input: ImportMitigationInput!): ImportMitigationPayload!
 
   # Control mutations
-  createControlMapping(
-    input: CreateControlMappingInput!
-  ): CreateControlMappingPayload!
-  deleteControlMapping(
-    input: DeleteControlMappingInput!
-  ): DeleteControlMappingPayload!
+  createControlMitigationMapping(
+    input: CreateControlMitigationMappingInput!
+  ): CreateControlMitigationMappingPayload!
+  createControlPolicyMapping(
+    input: CreateControlPolicyMappingInput!
+  ): CreateControlPolicyMappingPayload!
+  deleteControlMitigationMapping(
+    input: DeleteControlMitigationMappingInput!
+  ): DeleteControlMitigationMappingPayload!
+  deleteControlPolicyMapping(
+    input: DeleteControlPolicyMappingInput!
+  ): DeleteControlPolicyMappingPayload!
 
   # Task mutations
   createTask(input: CreateTaskInput!): CreateTaskPayload!
@@ -897,14 +920,24 @@ input UnassignTaskInput {
   taskId: ID!
 }
 
-input CreateControlMappingInput {
+input CreateControlMitigationMappingInput {
   controlId: ID!
   mitigationId: ID!
 }
 
-input DeleteControlMappingInput {
+input CreateControlPolicyMappingInput {
+  controlId: ID!
+  policyId: ID!
+}
+
+input DeleteControlMitigationMappingInput {
   controlId: ID!
   mitigationId: ID!
+}
+
+input DeleteControlPolicyMappingInput {
+  controlId: ID!
+  policyId: ID!
 }
 
 input CreateRiskInput {
@@ -1088,11 +1121,19 @@ type UnassignTaskPayload {
   task: Task!
 }
 
-type CreateControlMappingPayload {
+type CreateControlMitigationMappingPayload {
   success: Boolean!
 }
 
-type DeleteControlMappingPayload {
+type CreateControlPolicyMappingPayload {
+  success: Boolean!
+}
+
+type DeleteControlMitigationMappingPayload {
+  success: Boolean!
+}
+
+type DeleteControlPolicyMappingPayload {
   success: Boolean!
 }
 

@@ -42,6 +42,7 @@ type Control struct {
 	Name        string                `json:"name"`
 	Description string                `json:"description"`
 	Mitigations *MitigationConnection `json:"mitigations"`
+	Policies    *PolicyConnection     `json:"policies"`
 	CreatedAt   time.Time             `json:"createdAt"`
 	UpdatedAt   time.Time             `json:"updatedAt"`
 }
@@ -59,12 +60,21 @@ type ControlEdge struct {
 	Node   *Control       `json:"node"`
 }
 
-type CreateControlMappingInput struct {
+type CreateControlMitigationMappingInput struct {
 	ControlID    gid.GID `json:"controlId"`
 	MitigationID gid.GID `json:"mitigationId"`
 }
 
-type CreateControlMappingPayload struct {
+type CreateControlMitigationMappingPayload struct {
+	Success bool `json:"success"`
+}
+
+type CreateControlPolicyMappingInput struct {
+	ControlID gid.GID `json:"controlId"`
+	PolicyID  gid.GID `json:"policyId"`
+}
+
+type CreateControlPolicyMappingPayload struct {
 	Success bool `json:"success"`
 }
 
@@ -188,12 +198,21 @@ type CreateVendorPayload struct {
 	VendorEdge *VendorEdge `json:"vendorEdge"`
 }
 
-type DeleteControlMappingInput struct {
+type DeleteControlMitigationMappingInput struct {
 	ControlID    gid.GID `json:"controlId"`
 	MitigationID gid.GID `json:"mitigationId"`
 }
 
-type DeleteControlMappingPayload struct {
+type DeleteControlMitigationMappingPayload struct {
+	Success bool `json:"success"`
+}
+
+type DeleteControlPolicyMappingInput struct {
+	ControlID gid.GID `json:"controlId"`
+	PolicyID  gid.GID `json:"policyId"`
+}
+
+type DeleteControlPolicyMappingPayload struct {
 	Success bool `json:"success"`
 }
 
@@ -458,6 +477,7 @@ type Policy struct {
 	Content    string                `json:"content"`
 	ReviewDate *time.Time            `json:"reviewDate,omitempty"`
 	Owner      *People               `json:"owner"`
+	Controls   *ControlConnection    `json:"controls"`
 	CreatedAt  time.Time             `json:"createdAt"`
 	UpdatedAt  time.Time             `json:"updatedAt"`
 }

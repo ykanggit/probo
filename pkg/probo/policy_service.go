@@ -168,3 +168,24 @@ func (s *PolicyService) ListByOrganizationID(
 
 	return page.NewPage(policies, cursor), nil
 }
+
+func (s *PolicyService) ListForControlID(
+	ctx context.Context,
+	controlID gid.GID,
+	cursor *page.Cursor[coredata.PolicyOrderField],
+) (*page.Page[*coredata.Policy, coredata.PolicyOrderField], error) {
+	var policies coredata.Policies
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return policies.LoadByControlID(ctx, conn, s.svc.scope, controlID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(policies, cursor), nil
+}

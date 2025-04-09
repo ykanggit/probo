@@ -55,6 +55,27 @@ type (
 	}
 )
 
+func (s ControlService) ListForPolicyID(
+	ctx context.Context,
+	policyID gid.GID,
+	cursor *page.Cursor[coredata.ControlOrderField],
+) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
+	var controls coredata.Controls
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return controls.LoadByPolicyID(ctx, conn, s.svc.scope, policyID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot list controls: %w", err)
+	}
+
+	return page.NewPage(controls, cursor), nil
+}
+
 func (s ControlService) ListForMitigationID(
 	ctx context.Context,
 	mitigationID gid.GID,
@@ -76,7 +97,7 @@ func (s ControlService) ListForMitigationID(
 	return page.NewPage(controls, cursor), nil
 }
 
-func (s ControlService) CreateMapping(
+func (s ControlService) CreateMitigationMapping(
 	ctx context.Context,
 	controlID gid.GID,
 	mitigationID gid.GID,
@@ -96,7 +117,7 @@ func (s ControlService) CreateMapping(
 	)
 }
 
-func (s ControlService) DeleteMapping(
+func (s ControlService) DeleteMitigationMapping(
 	ctx context.Context,
 	controlID gid.GID,
 	mitigationID gid.GID,
@@ -112,6 +133,46 @@ func (s ControlService) DeleteMapping(
 		ctx,
 		func(conn pg.Conn) error {
 			return controlMitigation.Delete(ctx, conn, s.svc.scope)
+		},
+	)
+}
+
+func (s ControlService) CreatePolicyMapping(
+	ctx context.Context,
+	controlID gid.GID,
+	policyID gid.GID,
+) error {
+	controlPolicy := &coredata.ControlPolicy{
+		ControlID: controlID,
+		PolicyID:  policyID,
+		TenantID:  s.svc.scope.GetTenantID(),
+		CreatedAt: time.Now(),
+	}
+
+	return s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return controlPolicy.Insert(ctx, conn, s.svc.scope)
+		},
+	)
+}
+
+func (s ControlService) DeletePolicyMapping(
+	ctx context.Context,
+	controlID gid.GID,
+	policyID gid.GID,
+) error {
+	controlPolicy := &coredata.ControlPolicy{
+		ControlID: controlID,
+		PolicyID:  policyID,
+		TenantID:  s.svc.scope.GetTenantID(),
+		CreatedAt: time.Now(),
+	}
+
+	return s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return controlPolicy.Delete(ctx, conn, s.svc.scope)
 		},
 	)
 }

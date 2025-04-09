@@ -44,6 +44,31 @@ func (r *controlResolver) Mitigations(ctx context.Context, obj *types.Control, f
 	return types.NewMitigationConnection(page), nil
 }
 
+// Policies is the resolver for the policies field.
+func (r *controlResolver) Policies(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.PolicyOrderField]{
+		Field:     coredata.PolicyOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.PolicyOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Policies.ListForControlID(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list policies: %w", err)
+	}
+
+	return types.NewPolicyConnection(page), nil
+}
+
 // FileURL is the resolver for the fileUrl field.
 func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*string, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
@@ -521,30 +546,58 @@ func (r *mutationResolver) ImportMitigation(ctx context.Context, input types.Imp
 	}, nil
 }
 
-// CreateControlMapping is the resolver for the createControlMapping field.
-func (r *mutationResolver) CreateControlMapping(ctx context.Context, input types.CreateControlMappingInput) (*types.CreateControlMappingPayload, error) {
+// CreateControlMitigationMapping is the resolver for the createControlMitigationMapping field.
+func (r *mutationResolver) CreateControlMitigationMapping(ctx context.Context, input types.CreateControlMitigationMappingInput) (*types.CreateControlMitigationMappingPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
 
-	err := svc.Controls.CreateMapping(ctx, input.ControlID, input.MitigationID)
+	err := svc.Controls.CreateMitigationMapping(ctx, input.ControlID, input.MitigationID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create control mapping: %w", err)
+		panic(fmt.Errorf("cannot create control mitigation mapping: %w", err))
 	}
 
-	return &types.CreateControlMappingPayload{
+	return &types.CreateControlMitigationMappingPayload{
 		Success: true,
 	}, nil
 }
 
-// DeleteControlMapping is the resolver for the deleteControlMapping field.
-func (r *mutationResolver) DeleteControlMapping(ctx context.Context, input types.DeleteControlMappingInput) (*types.DeleteControlMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
+// CreateControlPolicyMapping is the resolver for the createControlPolicyMapping field.
+func (r *mutationResolver) CreateControlPolicyMapping(ctx context.Context, input types.CreateControlPolicyMappingInput) (*types.CreateControlPolicyMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.PolicyID.TenantID())
 
-	err := svc.Controls.DeleteMapping(ctx, input.ControlID, input.MitigationID)
+	err := svc.Controls.CreatePolicyMapping(ctx, input.ControlID, input.PolicyID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot delete control mapping: %w", err)
+		panic(fmt.Errorf("cannot create control policy mapping: %w", err))
 	}
 
-	return &types.DeleteControlMappingPayload{
+	return &types.CreateControlPolicyMappingPayload{
+		Success: true,
+	}, nil
+}
+
+// DeleteControlMitigationMapping is the resolver for the deleteControlMitigationMapping field.
+func (r *mutationResolver) DeleteControlMitigationMapping(ctx context.Context, input types.DeleteControlMitigationMappingInput) (*types.DeleteControlMitigationMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
+
+	err := svc.Controls.DeleteMitigationMapping(ctx, input.ControlID, input.MitigationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete control mitigation mapping: %w", err))
+	}
+
+	return &types.DeleteControlMitigationMappingPayload{
+		Success: true,
+	}, nil
+}
+
+// DeleteControlPolicyMapping is the resolver for the deleteControlPolicyMapping field.
+func (r *mutationResolver) DeleteControlPolicyMapping(ctx context.Context, input types.DeleteControlPolicyMappingInput) (*types.DeleteControlPolicyMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.PolicyID.TenantID())
+
+	err := svc.Controls.DeletePolicyMapping(ctx, input.ControlID, input.PolicyID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete control policy mapping: %w", err))
+	}
+
+	return &types.DeleteControlPolicyMappingPayload{
 		Success: true,
 	}, nil
 }
@@ -1065,6 +1118,31 @@ func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.P
 	}
 
 	return types.NewPeople(owner), nil
+}
+
+// Controls is the resolver for the controls field.
+func (r *policyResolver) Controls(ctx context.Context, obj *types.Policy, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
+		Field:     coredata.ControlOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ControlOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Controls.ListForPolicyID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list policy controls: %w", err))
+	}
+
+	return types.NewControlConnection(page), nil
 }
 
 // Node is the resolver for the node field.

@@ -4,11 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### BREAKING CHANGES
+
+### BREAKING CHANGES
+
+- **BREAKING:** Renamed GraphQL mutations for control-mitigation mappings:
+  - `createControlMapping` → `createControlMitigationMapping`
+  - `deleteControlMapping` → `deleteControlMitigationMapping`
+  - Input and payload types have been updated accordingly
+
 ### Added
 
 - Add import control <> mitigation mapping.
 - Add mitigation tasks import.
 - Add auto-scroll to opened category.
+- Added support for mapping controls to policies:
+  - New GraphQL mutations `createControlPolicyMapping` and `deleteControlPolicyMapping`
+  - Controls can now be associated with both mitigations and policies
+  - New bidirectional relationships:
+    - Control objects now expose a `policies` field to list associated policies
+    - Policy objects now expose a `controls` field to list associated controls
 
 ### Changed
 

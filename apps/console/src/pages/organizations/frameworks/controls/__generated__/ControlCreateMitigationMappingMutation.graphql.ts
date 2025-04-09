@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7598a6cf0314f71bab809d65acc60237>>
+ * @generated SignedSource<<2eea3e72c7001db14095958b3bcd750a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,15 +9,15 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type CreateControlMappingInput = {
+export type CreateControlMitigationMappingInput = {
   controlId: string;
   mitigationId: string;
 };
 export type ControlCreateMitigationMappingMutation$variables = {
-  input: CreateControlMappingInput;
+  input: CreateControlMitigationMappingInput;
 };
 export type ControlCreateMitigationMappingMutation$data = {
-  readonly createControlMapping: {
+  readonly createControlMitigationMapping: {
     readonly success: boolean;
   };
 };
@@ -44,9 +44,9 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "CreateControlMappingPayload",
+    "concreteType": "CreateControlMitigationMappingPayload",
     "kind": "LinkedField",
-    "name": "createControlMapping",
+    "name": "createControlMitigationMapping",
     "plural": false,
     "selections": [
       {
@@ -78,16 +78,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "57ab0bf99dd6ed3d2e980c51f185b9c0",
+    "cacheID": "955241a049e81cd7faed45d69ce3b145",
     "id": null,
     "metadata": {},
     "name": "ControlCreateMitigationMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlCreateMitigationMappingMutation(\n  $input: CreateControlMappingInput!\n) {\n  createControlMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation ControlCreateMitigationMappingMutation(\n  $input: CreateControlMitigationMappingInput!\n) {\n  createControlMitigationMapping(input: $input) {\n    success\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "17ef8f09acabf19168dad896e4225e3d";
+(node as any).hash = "ffbcf187d7f2d3c65a2d1fb5c6a180bb";
 
 export default node;
