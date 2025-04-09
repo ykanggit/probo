@@ -38,6 +38,7 @@ All notable changes to this project will be documented in this file.
 
 - Fix unfoldable mitigation category when open via the URI fragment.
 - Fix ctrl+click on mitigation does not open new tab.
+- Fix error handling in framework view when no controls are available.
 
 ## [0.3.0] - 2025-04-01
 

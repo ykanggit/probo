@@ -42,8 +42,12 @@ function FrameworkViewContent({
     queryRef
   );
 
-  if (!data.node.firstControl) {
-    return null;
+  if (!data?.node) {
+    return <div>Framework not found</div>;
+  }
+
+  if (!data.node.firstControl?.edges?.length) {
+    return <div>No controls found for this framework</div>;
   }
 
   return <Control controlKey={data.node.firstControl.edges[0].node} />;
