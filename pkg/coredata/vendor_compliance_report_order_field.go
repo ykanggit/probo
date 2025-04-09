@@ -14,21 +14,28 @@
 
 package coredata
 
-const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MitigationEntityType
-	TaskEntityType
-	EvidenceEntityType
-	_ControlStateTransitionEntityType // UNUSED
-	_TaskStateTransitionEntityType    // UNUSED
-	VendorEntityType
-	PeopleEntityType
-	VendorComplianceReportEntityType
-	PolicyEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
+type (
+	VendorComplianceReportOrderField string
 )
+
+const (
+	VendorComplianceReportOrderFieldReportDate VendorComplianceReportOrderField = "REPORT_DATE"
+	VendorComplianceReportOrderFieldCreatedAt  VendorComplianceReportOrderField = "CREATED_AT"
+)
+
+func (p VendorComplianceReportOrderField) Column() string {
+	return string(p)
+}
+
+func (p VendorComplianceReportOrderField) String() string {
+	return string(p)
+}
+
+func (p VendorComplianceReportOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *VendorComplianceReportOrderField) UnmarshalText(text []byte) error {
+	*p = VendorComplianceReportOrderField(text)
+	return nil
+}

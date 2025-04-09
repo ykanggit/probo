@@ -281,6 +281,14 @@ type DeleteTaskPayload struct {
 	DeletedTaskID gid.GID `json:"deletedTaskId"`
 }
 
+type DeleteVendorComplianceReportInput struct {
+	ReportID gid.GID `json:"reportId"`
+}
+
+type DeleteVendorComplianceReportPayload struct {
+	DeletedVendorComplianceReportID gid.GID `json:"deletedVendorComplianceReportId"`
+}
+
 type DeleteVendorInput struct {
 	VendorID gid.GID `json:"vendorId"`
 }
@@ -679,6 +687,18 @@ type UpdateVendorPayload struct {
 	Vendor *Vendor `json:"vendor"`
 }
 
+type UploadVendorComplianceReportInput struct {
+	VendorID   gid.GID        `json:"vendorId"`
+	ReportDate time.Time      `json:"reportDate"`
+	ValidUntil *time.Time     `json:"validUntil,omitempty"`
+	ReportName string         `json:"reportName"`
+	File       graphql.Upload `json:"file"`
+}
+
+type UploadVendorComplianceReportPayload struct {
+	VendorComplianceReportEdge *VendorComplianceReportEdge `json:"vendorComplianceReportEdge"`
+}
+
 type User struct {
 	ID        gid.GID   `json:"id"`
 	FullName  string    `json:"fullName"`
@@ -701,22 +721,48 @@ type UserEdge struct {
 }
 
 type Vendor struct {
-	ID                   gid.GID                     `json:"id"`
-	Name                 string                      `json:"name"`
-	Description          string                      `json:"description"`
-	ServiceStartAt       time.Time                   `json:"serviceStartAt"`
-	ServiceTerminationAt *time.Time                  `json:"serviceTerminationAt,omitempty"`
-	ServiceCriticality   coredata.ServiceCriticality `json:"serviceCriticality"`
-	RiskTier             coredata.RiskTier           `json:"riskTier"`
-	StatusPageURL        *string                     `json:"statusPageUrl,omitempty"`
-	TermsOfServiceURL    *string                     `json:"termsOfServiceUrl,omitempty"`
-	PrivacyPolicyURL     *string                     `json:"privacyPolicyUrl,omitempty"`
-	CreatedAt            time.Time                   `json:"createdAt"`
-	UpdatedAt            time.Time                   `json:"updatedAt"`
+	ID                   gid.GID                           `json:"id"`
+	Name                 string                            `json:"name"`
+	Description          string                            `json:"description"`
+	ComplianceReports    *VendorComplianceReportConnection `json:"complianceReports"`
+	ServiceStartAt       time.Time                         `json:"serviceStartAt"`
+	ServiceTerminationAt *time.Time                        `json:"serviceTerminationAt,omitempty"`
+	ServiceCriticality   coredata.ServiceCriticality       `json:"serviceCriticality"`
+	RiskTier             coredata.RiskTier                 `json:"riskTier"`
+	StatusPageURL        *string                           `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL    *string                           `json:"termsOfServiceUrl,omitempty"`
+	PrivacyPolicyURL     *string                           `json:"privacyPolicyUrl,omitempty"`
+	CreatedAt            time.Time                         `json:"createdAt"`
+	UpdatedAt            time.Time                         `json:"updatedAt"`
 }
 
 func (Vendor) IsNode()             {}
 func (this Vendor) GetID() gid.GID { return this.ID }
+
+type VendorComplianceReport struct {
+	ID         gid.GID    `json:"id"`
+	Vendor     *Vendor    `json:"vendor"`
+	ReportDate time.Time  `json:"reportDate"`
+	ValidUntil *time.Time `json:"validUntil,omitempty"`
+	ReportName string     `json:"reportName"`
+	FileURL    string     `json:"fileUrl"`
+	FileSize   int        `json:"fileSize"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	UpdatedAt  time.Time  `json:"updatedAt"`
+}
+
+func (VendorComplianceReport) IsNode()             {}
+func (this VendorComplianceReport) GetID() gid.GID { return this.ID }
+
+type VendorComplianceReportConnection struct {
+	Edges    []*VendorComplianceReportEdge `json:"edges"`
+	PageInfo *PageInfo                     `json:"pageInfo"`
+}
+
+type VendorComplianceReportEdge struct {
+	Cursor page.CursorKey          `json:"cursor"`
+	Node   *VendorComplianceReport `json:"node"`
+}
 
 type VendorConnection struct {
 	Edges    []*VendorEdge `json:"edges"`

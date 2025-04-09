@@ -24,6 +24,11 @@ All notable changes to this project will be documented in this file.
   - New bidirectional relationships:
     - Control objects now expose a `policies` field to list associated policies
     - Policy objects now expose a `controls` field to list associated controls
+- Added vendor compliance reports:
+  - New GraphQL types `VendorComplianceReport` and related connection types
+  - New GraphQL mutations `uploadVendorComplianceReport` and `deleteVendorComplianceReport`
+  - New `complianceReports` field on the Vendor type
+  - Support for uploading, viewing, and managing vendor compliance documentation
 
 ### Changed
 

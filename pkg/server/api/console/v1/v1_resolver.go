@@ -866,6 +866,43 @@ func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.Delet
 	}, nil
 }
 
+// UploadVendorComplianceReport is the resolver for the uploadVendorComplianceReport field.
+func (r *mutationResolver) UploadVendorComplianceReport(ctx context.Context, input types.UploadVendorComplianceReportInput) (*types.UploadVendorComplianceReportPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.VendorID.TenantID())
+
+	vendorComplianceReport, err := svc.VendorComplianceReports.Upload(
+		ctx,
+		input.VendorID,
+		&probo.VendorComplianceReportCreateRequest{
+			File:       input.File.File,
+			ReportDate: input.ReportDate,
+			ValidUntil: input.ValidUntil,
+			ReportName: input.ReportName,
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("failed to upload vendor compliance report: %w", err))
+	}
+
+	return &types.UploadVendorComplianceReportPayload{
+		VendorComplianceReportEdge: types.NewVendorComplianceReportEdge(vendorComplianceReport, coredata.VendorComplianceReportOrderFieldCreatedAt),
+	}, nil
+}
+
+// DeleteVendorComplianceReport is the resolver for the deleteVendorComplianceReport field.
+func (r *mutationResolver) DeleteVendorComplianceReport(ctx context.Context, input types.DeleteVendorComplianceReportInput) (*types.DeleteVendorComplianceReportPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.ReportID.TenantID())
+
+	err := svc.VendorComplianceReports.Delete(ctx, input.ReportID)
+	if err != nil {
+		panic(fmt.Errorf("failed to delete vendor compliance report: %w", err))
+	}
+
+	return &types.DeleteVendorComplianceReportPayload{
+		DeletedVendorComplianceReportID: input.ReportID,
+	}, nil
+}
+
 // CreatePolicy is the resolver for the createPolicy field.
 func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
@@ -1218,6 +1255,12 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 			panic(fmt.Errorf("cannot get risk: %w", err))
 		}
 		return types.NewRisk(risk), nil
+	case coredata.VendorComplianceReportEntityType:
+		vendorComplianceReport, err := svc.VendorComplianceReports.Get(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get vendor compliance report: %w", err))
+		}
+		return types.NewVendorComplianceReport(vendorComplianceReport), nil
 	default:
 	}
 
@@ -1305,6 +1348,55 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 	return types.NewEvidenceConnection(page), nil
 }
 
+// ComplianceReports is the resolver for the complianceReports field.
+func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) (*types.VendorComplianceReportConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.VendorComplianceReportOrderField]{
+		Field:     coredata.VendorComplianceReportOrderFieldReportDate,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.VendorComplianceReportOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.VendorComplianceReports.ListForVendorID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("failed to list vendor compliance reports: %w", err))
+	}
+
+	return types.NewVendorComplianceReportConnection(page), nil
+}
+
+// Vendor is the resolver for the vendor field.
+func (r *vendorComplianceReportResolver) Vendor(ctx context.Context, obj *types.VendorComplianceReport) (*types.Vendor, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	vendor, err := svc.Vendors.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get vendor: %w", err))
+	}
+
+	return types.NewVendor(vendor), nil
+}
+
+// FileURL is the resolver for the fileUrl field.
+func (r *vendorComplianceReportResolver) FileURL(ctx context.Context, obj *types.VendorComplianceReport) (string, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	fileURL, err := svc.VendorComplianceReports.GenerateFileURL(ctx, obj.ID, 1*time.Hour)
+	if err != nil {
+		panic(fmt.Errorf("failed to generate file URL: %w", err))
+	}
+
+	return fileURL, nil
+}
+
 // Organizations is the resolver for the organizations field.
 func (r *viewerResolver) Organizations(ctx context.Context, obj *types.Viewer, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder) (*types.OrganizationConnection, error) {
 	user := UserFromContext(ctx)
@@ -1360,6 +1452,14 @@ func (r *Resolver) Risk() schema.RiskResolver { return &riskResolver{r} }
 // Task returns schema.TaskResolver implementation.
 func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 
+// Vendor returns schema.VendorResolver implementation.
+func (r *Resolver) Vendor() schema.VendorResolver { return &vendorResolver{r} }
+
+// VendorComplianceReport returns schema.VendorComplianceReportResolver implementation.
+func (r *Resolver) VendorComplianceReport() schema.VendorComplianceReportResolver {
+	return &vendorComplianceReportResolver{r}
+}
+
 // Viewer returns schema.ViewerResolver implementation.
 func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
 
@@ -1373,4 +1473,6 @@ type policyResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type riskResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
+type vendorResolver struct{ *Resolver }
+type vendorComplianceReportResolver struct{ *Resolver }
 type viewerResolver struct{ *Resolver }

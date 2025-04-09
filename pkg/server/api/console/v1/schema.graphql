@@ -226,6 +226,20 @@ enum EvidenceOrderField
   CREATED_AT
 }
 
+enum VendorComplianceReportOrderField
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.VendorComplianceReportOrderField"
+  ) {
+  REPORT_DATE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorComplianceReportOrderFieldReportDate"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorComplianceReportOrderFieldCreatedAt"
+    )
+}
+
 enum OrganizationOrderField {
   NAME
   CREATED_AT
@@ -311,6 +325,14 @@ input EvidenceOrder
   ) {
   direction: OrderDirection!
   field: EvidenceOrderField!
+}
+
+input VendorComplianceReportOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.VendorComplianceReportOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: VendorComplianceReportOrderField!
 }
 
 input OrganizationOrder {
@@ -406,6 +428,15 @@ type Vendor implements Node {
   id: ID!
   name: String!
   description: String!
+
+  complianceReports(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: VendorComplianceReportOrder
+  ): VendorComplianceReportConnection! @goField(forceResolver: true)
+
   serviceStartAt: Datetime!
   serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality!
@@ -413,6 +444,20 @@ type Vendor implements Node {
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type VendorComplianceReport implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  reportDate: Datetime!
+  validUntil: Datetime
+  reportName: String!
+
+  fileUrl: String! @goField(forceResolver: true)
+  fileSize: Int!
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -699,6 +744,16 @@ type RiskEdge {
   node: Risk!
 }
 
+type VendorComplianceReportConnection {
+  edges: [VendorComplianceReportEdge!]!
+  pageInfo: PageInfo!
+}
+
+type VendorComplianceReportEdge {
+  cursor: CursorKey!
+  node: VendorComplianceReport!
+}
+
 # Root Types
 type Query {
   node(id: ID!): Node!
@@ -776,6 +831,14 @@ type Mutation {
   fulfillEvidence(input: FulfillEvidenceInput!): FulfillEvidencePayload!
   createEvidence(input: CreateEvidenceInput!): CreateEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
+
+  # Vendor Compliance Report mutations
+  uploadVendorComplianceReport(
+    input: UploadVendorComplianceReportInput!
+  ): UploadVendorComplianceReportPayload!
+  deleteVendorComplianceReport(
+    input: DeleteVendorComplianceReportInput!
+  ): DeleteVendorComplianceReportPayload!
 
   # Policy mutations
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
@@ -999,6 +1062,18 @@ input DeleteEvidenceInput {
   evidenceId: ID!
 }
 
+input UploadVendorComplianceReportInput {
+  vendorId: ID!
+  reportDate: Datetime!
+  validUntil: Datetime
+  reportName: String!
+  file: Upload!
+}
+
+input DeleteVendorComplianceReportInput {
+  reportId: ID!
+}
+
 input CreatePolicyInput {
   organizationId: ID!
   name: String!
@@ -1171,6 +1246,14 @@ type CreateEvidencePayload {
 
 type DeleteEvidencePayload {
   deletedEvidenceId: ID!
+}
+
+type UploadVendorComplianceReportPayload {
+  vendorComplianceReportEdge: VendorComplianceReportEdge!
+}
+
+type DeleteVendorComplianceReportPayload {
+  deletedVendorComplianceReportId: ID!
 }
 
 type CreatePolicyPayload {

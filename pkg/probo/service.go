@@ -38,16 +38,17 @@ type (
 
 		scope coredata.Scoper
 
-		Frameworks    *FrameworkService
-		Mitigations   *MitigationService
-		Tasks         *TaskService
-		Evidences     *EvidenceService
-		Organizations *OrganizationService
-		Vendors       *VendorService
-		Peoples       *PeopleService
-		Policies      *PolicyService
-		Controls      *ControlService
-		Risks         *RiskService
+		Frameworks              *FrameworkService
+		Mitigations             *MitigationService
+		Tasks                   *TaskService
+		Evidences               *EvidenceService
+		Organizations           *OrganizationService
+		Vendors                 *VendorService
+		Peoples                 *PeopleService
+		Policies                *PolicyService
+		Controls                *ControlService
+		Risks                   *RiskService
+		VendorComplianceReports *VendorComplianceReportService
 	}
 )
 
@@ -88,6 +89,6 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.Organizations = &OrganizationService{svc: tenantService}
 	tenantService.Controls = &ControlService{svc: tenantService}
 	tenantService.Risks = &RiskService{svc: tenantService}
-
+	tenantService.VendorComplianceReports = &VendorComplianceReportService{svc: tenantService}
 	return tenantService
 }
