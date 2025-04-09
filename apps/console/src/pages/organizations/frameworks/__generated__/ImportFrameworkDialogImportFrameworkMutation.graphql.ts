@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c9bf877d405180bb5fe0211022bd846f>>
+ * @generated SignedSource<<2b831625a3ae5e59ef58f138f56c9bda>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,11 +13,11 @@ export type ImportFrameworkInput = {
   file: any;
   organizationId: string;
 };
-export type FrameworkListViewImportFrameworkMutation$variables = {
+export type ImportFrameworkDialogImportFrameworkMutation$variables = {
   connections: ReadonlyArray<string>;
   input: ImportFrameworkInput;
 };
-export type FrameworkListViewImportFrameworkMutation$data = {
+export type ImportFrameworkDialogImportFrameworkMutation$data = {
   readonly importFramework: {
     readonly frameworkEdge: {
       readonly node: {
@@ -27,9 +27,9 @@ export type FrameworkListViewImportFrameworkMutation$data = {
     };
   };
 };
-export type FrameworkListViewImportFrameworkMutation = {
-  response: FrameworkListViewImportFrameworkMutation$data;
-  variables: FrameworkListViewImportFrameworkMutation$variables;
+export type ImportFrameworkDialogImportFrameworkMutation = {
+  response: ImportFrameworkDialogImportFrameworkMutation$data;
+  variables: ImportFrameworkDialogImportFrameworkMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -94,7 +94,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "FrameworkListViewImportFrameworkMutation",
+    "name": "ImportFrameworkDialogImportFrameworkMutation",
     "selections": [
       {
         "alias": null,
@@ -119,7 +119,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "FrameworkListViewImportFrameworkMutation",
+    "name": "ImportFrameworkDialogImportFrameworkMutation",
     "selections": [
       {
         "alias": null,
@@ -152,16 +152,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "04a42349410d12247fcbf3bd99b0b625",
+    "cacheID": "3ff0540d8fa361dfc521ef8267c3d853",
     "id": null,
     "metadata": {},
-    "name": "FrameworkListViewImportFrameworkMutation",
+    "name": "ImportFrameworkDialogImportFrameworkMutation",
     "operationKind": "mutation",
-    "text": "mutation FrameworkListViewImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n      }\n    }\n  }\n}\n"
+    "text": "mutation ImportFrameworkDialogImportFrameworkMutation(\n  $input: ImportFrameworkInput!\n) {\n  importFramework(input: $input) {\n    frameworkEdge {\n      node {\n        id\n        name\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "9fb0921f16ca755b8130fcd8603e8933";
+(node as any).hash = "14ca8dd8ef307731893baaf35eaaba65";
 
 export default node;

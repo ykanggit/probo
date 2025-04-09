@@ -45,6 +45,7 @@ type (
 
 	ImportFrameworkRequest struct {
 		Framework struct {
+			ID       string `json:"id"`
 			Name     string `json:"name"`
 			Controls []struct {
 				ID          string `json:"id"`
@@ -191,11 +192,14 @@ func (s FrameworkService) Import(
 		return nil, fmt.Errorf("cannot create global id: %w", err)
 	}
 
+	fmt.Printf("Importing framework: %+v\n", req.Framework)
+	fmt.Printf("Importing controls: %+v\n", req.Framework.Controls)
+
 	now := time.Now()
 	framework := &coredata.Framework{
 		ID:             frameworkID,
 		OrganizationID: organizationID,
-		ReferenceID:    req.Framework.Name,
+		ReferenceID:    req.Framework.ID,
 		Name:           req.Framework.Name,
 		CreatedAt:      now,
 		UpdatedAt:      now,

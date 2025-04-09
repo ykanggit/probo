@@ -1,22 +1,16 @@
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense } from "react";
 import {
   graphql,
   PreloadedQuery,
   usePreloadedQuery,
   useQueryLoader,
-  useMutation,
-  ConnectionHandler,
 } from "react-relay";
 import { Card } from "@/components/ui/card";
 import { Link, useParams } from "react-router";
 import type { FrameworkListViewQuery as FrameworkListViewQueryType } from "./__generated__/FrameworkListViewQuery.graphql";
-import { Button } from "@/components/ui/button";
-import { Plus, Upload } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
-import { FrameworkListViewImportFrameworkMutation as FrameworkListViewImportFrameworkMutationType } from "./__generated__/FrameworkListViewImportFrameworkMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
 import { FrameworkListViewSkeleton } from "./FrameworkListPage";
+import { FrameworkImportDropdown } from "./ImportFrameworkDialog";
 
 const FrameworkListViewQuery = graphql`
   query FrameworkListViewQuery($organizationId: ID!) {
@@ -36,124 +30,21 @@ const FrameworkListViewQuery = graphql`
   }
 `;
 
-const FrameworkListViewImportFrameworkMutation = graphql`
-  mutation FrameworkListViewImportFrameworkMutation(
-    $input: ImportFrameworkInput!
-    $connections: [ID!]!
-  ) {
-    importFramework(input: $input) {
-      frameworkEdge @prependEdge(connections: $connections) {
-        node {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
-
 function FrameworkListViewContent({
   queryRef,
 }: {
   queryRef: PreloadedQuery<FrameworkListViewQueryType>;
 }) {
-  const data = usePreloadedQuery<FrameworkListViewQueryType>(
-    FrameworkListViewQuery,
-    queryRef
-  );
+  const data = usePreloadedQuery(FrameworkListViewQuery, queryRef);
   const { organizationId } = useParams();
   const frameworks =
-    data.organization.frameworks?.edges.map((edge) => edge?.node) ?? [];
-
-  const [importFramework] =
-    useMutation<FrameworkListViewImportFrameworkMutationType>(
-      FrameworkListViewImportFrameworkMutation
-    );
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-
-  const handleImportClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-
-    importFramework({
-      variables: {
-        connections: [
-          ConnectionHandler.getConnectionID(
-            organizationId!,
-            "FrameworkListView_frameworks"
-          ),
-        ],
-        input: {
-          organizationId: organizationId!,
-          file: null,
-        },
-      },
-      uploadables: {
-        "input.file": file,
-      },
-      onCompleted: () => {
-        setIsUploading(false);
-        toast({
-          title: "Framework imported",
-          description: "Framework has been imported successfully.",
-          variant: "default",
-        });
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-      },
-      onError: (error) => {
-        setIsUploading(false);
-        toast({
-          title: "Error importing framework",
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
-  };
+    data.organization?.frameworks?.edges?.map((edge) => edge?.node) ?? [];
 
   return (
     <PageTemplate
       title="Frameworks"
       description="Manage your compliance frameworks"
-      actions={
-        <div className="flex gap-4">
-          <Input
-            id="framework-file"
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            disabled={isUploading}
-            accept=".json"
-            className="hidden"
-          />
-          <Button
-            variant="secondary"
-            onClick={handleImportClick}
-            disabled={isUploading}
-          >
-            <Upload className="mr-2 h-4 w-4" />
-            Import
-          </Button>
-          <Button asChild>
-            <Link to={`/organizations/${organizationId}/frameworks/new`}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Framework
-            </Link>
-          </Button>
-        </div>
-      }
+      actions={<FrameworkImportDropdown />}
     >
       <div className="space-y-6">
         <Card>
@@ -196,17 +87,13 @@ function FrameworkListViewContent({
 }
 
 export default function FrameworkListView() {
+  const { organizationId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<FrameworkListViewQueryType>(
     FrameworkListViewQuery
   );
 
-  const { organizationId } = useParams();
-
-  useEffect(() => {
-    loadQuery({ organizationId: organizationId! });
-  }, [loadQuery, organizationId]);
-
   if (!queryRef) {
+    loadQuery({ organizationId: organizationId! });
     return <FrameworkListViewSkeleton />;
   }
 
