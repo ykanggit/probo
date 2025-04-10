@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Simplified policy data model by removing version field and optimistic concurrency 
+- Refactored policy update flow to load-modify-save pattern
+
 ## [0.4.1] - 2025-04-09
 
 ### Changed

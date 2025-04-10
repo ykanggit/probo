@@ -105,22 +105,42 @@ func (s *PolicyService) Update(
 	ctx context.Context,
 	req UpdatePolicyRequest,
 ) (*coredata.Policy, error) {
-	params := coredata.UpdatePolicyParams{
-		ExpectedVersion: req.ExpectedVersion,
-		Name:            req.Name,
-		Content:         req.Content,
-		Status:          req.Status,
-		ReviewDate:      &req.ReviewDate,
-		OwnerID:         req.OwnerID,
-	}
-
-	policy := &coredata.Policy{ID: req.ID}
+	policy := &coredata.Policy{}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return policy.Update(ctx, conn, s.svc.scope, params)
-		})
+			if err := policy.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
+				return fmt.Errorf("cannot load policy %q: %w", req.ID, err)
+			}
+
+			if req.Name != nil {
+				policy.Name = *req.Name
+			}
+
+			if req.Content != nil {
+				policy.Content = *req.Content
+			}
+
+			if req.Status != nil {
+				policy.Status = *req.Status
+			}
+
+			if req.ReviewDate != nil {
+				policy.ReviewDate = req.ReviewDate
+			}
+
+			if req.OwnerID != nil {
+				policy.OwnerID = *req.OwnerID
+			}
+
+			if err := policy.Update(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot update policy: %w", err)
+			}
+
+			return nil
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

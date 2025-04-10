@@ -23,19 +23,9 @@ type (
 		ReviewDate     *time.Time   `db:"review_date"`
 		CreatedAt      time.Time    `db:"created_at"`
 		UpdatedAt      time.Time    `db:"updated_at"`
-		Version        int          `db:"version"`
 	}
 
 	Policies []*Policy
-
-	UpdatePolicyParams struct {
-		ExpectedVersion int
-		Name            *string
-		Content         *string
-		Status          *PolicyStatus
-		ReviewDate      **time.Time
-		OwnerID         *gid.GID
-	}
 )
 
 func (p Policy) CursorKey(orderBy PolicyOrderField) page.CursorKey {
@@ -65,8 +55,7 @@ SELECT
     content,
     review_date,
     created_at,
-    updated_at,
-    version
+    updated_at
 FROM
     policies
 WHERE
@@ -112,8 +101,7 @@ SELECT
     content,
     review_date,
     created_at,
-    updated_at,
-    version
+    updated_at
 FROM
     policies
 WHERE
@@ -160,8 +148,7 @@ INSERT INTO
         content,
         review_date,
         created_at,
-        updated_at,
-        version
+        updated_at
     )
 VALUES (
     @tenant_id,
@@ -173,8 +160,7 @@ VALUES (
     @content,
     @review_date,
     @created_at,
-    @updated_at,
-    @version
+    @updated_at
 );
 `
 
@@ -189,7 +175,6 @@ VALUES (
 		"review_date":     p.ReviewDate,
 		"created_at":      p.CreatedAt,
 		"updated_at":      p.UpdatedAt,
-		"version":         p.Version,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -217,57 +202,37 @@ func (p *Policy) Update(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	params UpdatePolicyParams,
 ) error {
 	q := `
-UPDATE policies SET
-    name = COALESCE(@name, name),
-    status = COALESCE(@status, status),
-    content = COALESCE(@content, content),
-    review_date = COALESCE(@review_date, review_date),
-    owner_id = COALESCE(@owner_id, owner_id),
-    updated_at = @updated_at,
-    version = version + 1
+UPDATE
+	policies
+SET
+	name = @name,
+	status = @status,
+	content = @content,
+	review_date = @review_date,
+	owner_id = @owner_id,
+	updated_at = @updated_at
 WHERE %s
     AND id = @policy_id
-    AND version = @expected_version
-RETURNING 
-    id,
-    organization_id,
-    owner_id,
-    name,
-    content,
-    review_date,
-    created_at,
-    updated_at,
-	status,
-    version
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
-		"policy_id":        p.ID,
-		"expected_version": params.ExpectedVersion,
-		"updated_at":       time.Now(),
-		"name":             params.Name,
-		"content":          params.Content,
-		"status":           params.Status,
-		"review_date":      params.ReviewDate,
-		"owner_id":         params.OwnerID,
+		"policy_id":   p.ID,
+		"updated_at":  time.Now(),
+		"name":        p.Name,
+		"content":     p.Content,
+		"status":      p.Status,
+		"review_date": p.ReviewDate,
+		"owner_id":    p.OwnerID,
 	}
 	maps.Copy(args, scope.SQLArguments())
 
-	rows, err := conn.Query(ctx, q, args)
+	_, err := conn.Exec(ctx, q, args)
 	if err != nil {
-		return fmt.Errorf("cannot query policies: %w", err)
+		return fmt.Errorf("cannot update policy: %w", err)
 	}
-
-	policy, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Policy])
-	if err != nil {
-		return fmt.Errorf("cannot collect policy: %w", err)
-	}
-
-	*p = policy
 
 	return nil
 }
