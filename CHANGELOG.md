@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.1] - 2025-04-09
+
+### Changed
+
+- Update ISO 27001 and SOC2 framework definition.
+
 ## [0.4.0] - 2025-04-09
 
 ### BREAKING CHANGES
