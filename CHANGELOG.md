@@ -4,15 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.4.2] - 2025-04-09
-
 ### Added
 
 - Add vendor compliance reports UI
+- Controls can now be linked to policies, enabling better organization of compliance documentation and clearer traceability between policies and security controls
+- New UI for viewing and managing policies related to a specific control
+
+## [0.4.2] - 2025-04-09
 
 ### Changed
 
-- Simplified policy data model by removing version field and optimistic concurrency 
+- Simplified policy data model by removing version field and optimistic concurrency
 - Refactored policy update flow to load-modify-save pattern
 
 ### Fixed

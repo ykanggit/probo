@@ -266,7 +266,6 @@ WITH plcs AS (
 )
 SELECT
 	id,
-	tenant_id,
 	organization_id,
 	owner_id,
 	name,
