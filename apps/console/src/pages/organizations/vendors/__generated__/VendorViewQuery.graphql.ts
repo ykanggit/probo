@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<61507551e23b8cc70b401cab8ae4e575>>
+ * @generated SignedSource<<e84da0f625c9ae5495a0cb0c99c88c81>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,6 +16,19 @@ export type VendorViewQuery$variables = {
 };
 export type VendorViewQuery$data = {
   readonly node: {
+    readonly complianceReports?: {
+      readonly edges: ReadonlyArray<{
+        readonly node: {
+          readonly createdAt: string;
+          readonly fileSize: number;
+          readonly fileUrl: string;
+          readonly id: string;
+          readonly reportDate: string;
+          readonly reportName: string;
+          readonly validUntil: string | null | undefined;
+        };
+      }>;
+    };
     readonly createdAt?: string;
     readonly description?: string;
     readonly id?: string;
@@ -133,7 +146,115 @@ v13 = {
   "kind": "ScalarField",
   "name": "updatedAt",
   "storageKey": null
-};
+},
+v14 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v15 = [
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "VendorComplianceReportEdge",
+    "kind": "LinkedField",
+    "name": "edges",
+    "plural": true,
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": "VendorComplianceReport",
+        "kind": "LinkedField",
+        "name": "node",
+        "plural": false,
+        "selections": [
+          (v2/*: any*/),
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "reportName",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "reportDate",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "validUntil",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "fileUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "fileSize",
+            "storageKey": null
+          },
+          (v12/*: any*/),
+          (v14/*: any*/)
+        ],
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "cursor",
+        "storageKey": null
+      }
+    ],
+    "storageKey": null
+  },
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "PageInfo",
+    "kind": "LinkedField",
+    "name": "pageInfo",
+    "plural": false,
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "endCursor",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "hasNextPage",
+        "storageKey": null
+      }
+    ],
+    "storageKey": null
+  }
+],
+v16 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 100
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": (v0/*: any*/),
@@ -163,7 +284,17 @@ return {
               (v10/*: any*/),
               (v11/*: any*/),
               (v12/*: any*/),
-              (v13/*: any*/)
+              (v13/*: any*/),
+              {
+                "alias": "complianceReports",
+                "args": null,
+                "concreteType": "VendorComplianceReportConnection",
+                "kind": "LinkedField",
+                "name": "__VendorView_complianceReports_connection",
+                "plural": false,
+                "selections": (v15/*: any*/),
+                "storageKey": null
+              }
             ],
             "type": "Vendor",
             "abstractKey": null
@@ -189,13 +320,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "__typename",
-            "storageKey": null
-          },
+          (v14/*: any*/),
           (v2/*: any*/),
           {
             "kind": "InlineFragment",
@@ -210,7 +335,26 @@ return {
               (v10/*: any*/),
               (v11/*: any*/),
               (v12/*: any*/),
-              (v13/*: any*/)
+              (v13/*: any*/),
+              {
+                "alias": null,
+                "args": (v16/*: any*/),
+                "concreteType": "VendorComplianceReportConnection",
+                "kind": "LinkedField",
+                "name": "complianceReports",
+                "plural": false,
+                "selections": (v15/*: any*/),
+                "storageKey": "complianceReports(first:100)"
+              },
+              {
+                "alias": null,
+                "args": (v16/*: any*/),
+                "filters": null,
+                "handle": "connection",
+                "key": "VendorView_complianceReports",
+                "kind": "LinkedHandle",
+                "name": "complianceReports"
+              }
             ],
             "type": "Vendor",
             "abstractKey": null
@@ -221,16 +365,28 @@ return {
     ]
   },
   "params": {
-    "cacheID": "40428ff15eb094ffe4cb5ffb5d135cc1",
+    "cacheID": "9d2e53dfbc545614d651819697eda6e6",
     "id": null,
-    "metadata": {},
+    "metadata": {
+      "connection": [
+        {
+          "count": null,
+          "cursor": null,
+          "direction": "forward",
+          "path": [
+            "node",
+            "complianceReports"
+          ]
+        }
+      ]
+    },
     "name": "VendorViewQuery",
     "operationKind": "query",
-    "text": "query VendorViewQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
+    "text": "query VendorViewQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      createdAt\n      updatedAt\n      complianceReports(first: 100) {\n        edges {\n          node {\n            id\n            reportName\n            reportDate\n            validUntil\n            fileUrl\n            fileSize\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "dbef9acdc02dd7e8cd546c0bb8793b9a";
+(node as any).hash = "110583f1567e472ba6b4a6064be056e9";
 
 export default node;

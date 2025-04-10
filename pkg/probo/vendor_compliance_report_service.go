@@ -186,10 +186,16 @@ func (s VendorComplianceReportService) Delete(
 ) error {
 	vendorComplianceReport := &coredata.VendorComplianceReport{ID: vendorComplianceReportID}
 
-	return s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
 			return vendorComplianceReport.Delete(ctx, conn, s.svc.scope)
 		},
 	)
+
+	if err != nil {
+		return fmt.Errorf("cannot delete vendor compliance report: %w", err)
+	}
+
+	return nil
 }

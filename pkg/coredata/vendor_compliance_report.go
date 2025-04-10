@@ -63,6 +63,7 @@ func (vcs *VendorComplianceReports) LoadForVendorID(
 	q := `
 SELECT
 	id,
+	vendor_id,
 	report_date,
 	valid_until,
 	report_name,
@@ -199,7 +200,8 @@ func (vcr *VendorComplianceReport) Delete(
 	scope Scoper,
 ) error {
 	q := `
-DELETE FROM
+DELETE
+FROM
 	vendor_compliance_reports
 WHERE
 	%s
@@ -208,7 +210,8 @@ WHERE
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.NamedArgs{"id": vcr.ID}
+	args := pgx.StrictNamedArgs{"id": vcr.ID}
+	maps.Copy(args, scope.SQLArguments())
 
 	_, err := conn.Exec(ctx, q, args)
 	return err

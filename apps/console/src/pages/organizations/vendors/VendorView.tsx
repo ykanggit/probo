@@ -12,9 +12,12 @@ import {
   usePreloadedQuery,
   useQueryLoader,
   useMutation,
+  ConnectionHandler,
 } from "react-relay";
-import { Suspense, useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback, useRef } from "react";
 import type { VendorViewQuery as VendorViewQueryType } from "./__generated__/VendorViewQuery.graphql";
+import type { VendorViewDeleteComplianceReportMutation as DeleteComplianceReportMutationType } from "./__generated__/VendorViewDeleteComplianceReportMutation.graphql";
+import type { VendorViewUploadComplianceReportMutation as UploadComplianceReportMutationType } from "./__generated__/VendorViewUploadComplianceReportMutation.graphql";
 import { useParams } from "react-router";
 import { cn } from "@/lib/utils";
 import { PageTemplate } from "@/components/PageTemplate";
@@ -36,6 +39,20 @@ const vendorViewQuery = graphql`
         privacyPolicyUrl
         createdAt
         updatedAt
+        complianceReports(first: 100)
+          @connection(key: "VendorView_complianceReports") {
+          edges {
+            node {
+              id
+              reportName
+              reportDate
+              validUntil
+              fileUrl
+              fileSize
+              createdAt
+            }
+          }
+        }
       }
     }
   }
@@ -56,6 +73,38 @@ const updateVendorMutation = graphql`
         termsOfServiceUrl
         privacyPolicyUrl
         updatedAt
+      }
+    }
+  }
+`;
+
+const deleteComplianceReportMutation = graphql`
+  mutation VendorViewDeleteComplianceReportMutation(
+    $input: DeleteVendorComplianceReportInput!
+    $connections: [ID!]!
+  ) {
+    deleteVendorComplianceReport(input: $input) {
+      deletedVendorComplianceReportId @deleteEdge(connections: $connections)
+    }
+  }
+`;
+
+const uploadComplianceReportMutation = graphql`
+  mutation VendorViewUploadComplianceReportMutation(
+    $input: UploadVendorComplianceReportInput!
+    $connections: [ID!]!
+  ) {
+    uploadVendorComplianceReport(input: $input) {
+      vendorComplianceReportEdge @appendEdge(connections: $connections) {
+        node {
+          id
+          reportName
+          reportDate
+          validUntil
+          fileUrl
+          fileSize
+          createdAt
+        }
       }
     }
   }
@@ -105,6 +154,129 @@ function formatDateForAPI(dateStr: string): string {
   return date.toISOString();
 }
 
+interface ComplianceReport {
+  id: string;
+  reportName: string;
+  reportDate: string;
+  validUntil: string | null | undefined;
+  fileUrl: string;
+  fileSize: number;
+  createdAt: string;
+}
+
+function ComplianceReportsTable({
+  reports,
+  onDelete,
+  onUpload,
+}: {
+  reports: ComplianceReport[];
+  onDelete: (id: string) => void;
+  onUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Truncate filename to a reasonable length if needed
+  const truncateFilename = (filename: string, maxLength = 40) => {
+    if (filename.length <= maxLength) return filename;
+    const extension = filename.split(".").pop();
+    const name = filename.substring(0, maxLength - extension!.length - 3);
+    return `${name}...${extension}`;
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <h2 className="text-lg font-medium">Compliance Reports</h2>
+        <p className="text-sm text-secondary">
+          Upload and manage compliance reports for this vendor
+        </p>
+      </div>
+      <div className="rounded-md border">
+        <div className="overflow-hidden">
+          <table className="w-full table-fixed">
+            <thead>
+              <tr className="border-b">
+                <th className="w-2/5 px-4 py-2 text-left text-sm font-medium">
+                  Report Name
+                </th>
+                <th className="w-1/5 px-4 py-2 text-left text-sm font-medium">
+                  Report Date
+                </th>
+                <th className="w-1/5 px-4 py-2 text-left text-sm font-medium">
+                  Valid Until
+                </th>
+                <th className="w-1/5 px-4 py-2 text-left text-sm font-medium">
+                  File Size
+                </th>
+                <th className="w-1/5 px-4 py-2 text-left text-sm font-medium">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {reports.map((report) => (
+                <tr key={report.id} className="border-b">
+                  <td className="px-4 py-2">
+                    <a
+                      href={report.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-primary hover:underline"
+                      title={report.reportName}
+                    >
+                      <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+                        {truncateFilename(report.reportName)}
+                      </div>
+                    </a>
+                  </td>
+                  <td className="px-4 py-2 text-sm">
+                    {new Date(report.reportDate).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-2 text-sm">
+                    {report.validUntil
+                      ? new Date(report.validUntil).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                  <td className="px-4 py-2 text-sm">
+                    {(report.fileSize / 1024 / 1024).toFixed(2)} MB
+                  </td>
+                  <td className="px-4 py-2">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => onDelete(report.id)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="mt-4">
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={onUpload}
+          accept=".pdf"
+        />
+        <Button
+          onClick={() => fileInputRef.current?.click()}
+          className="bg-primary text-invert hover:bg-primary/90"
+        >
+          Upload New Report
+        </Button>
+        <p className="mt-2 text-sm text-secondary">
+          Only PDF files up to 10MB are allowed
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function VendorViewContent({
   queryRef,
 }: {
@@ -115,7 +287,6 @@ function VendorViewContent({
   const [formData, setFormData] = useState({
     name: data.node.name || "",
     description: data.node.description || "",
-    // Format dates properly for datetime-local input
     serviceStartAt: formatDateForInput(data.node.serviceStartAt),
     serviceTerminationAt: formatDateForInput(data.node.serviceTerminationAt),
     serviceCriticality: data.node.serviceCriticality,
@@ -124,7 +295,15 @@ function VendorViewContent({
     termsOfServiceUrl: data.node.termsOfServiceUrl || "",
     privacyPolicyUrl: data.node.privacyPolicyUrl || "",
   });
-  const [commit] = useMutation(updateVendorMutation);
+  const [updateVendor] = useMutation(updateVendorMutation);
+  const [deleteVendorComplianceReport] =
+    useMutation<DeleteComplianceReportMutationType>(
+      deleteComplianceReportMutation
+    );
+  const [uploadVendorComplianceReport] =
+    useMutation<UploadComplianceReportMutationType>(
+      uploadComplianceReportMutation
+    );
   const [, loadQuery] = useQueryLoader<VendorViewQueryType>(vendorViewQuery);
   const { toast } = useToast();
 
@@ -139,7 +318,7 @@ function VendorViewContent({
         : null,
     };
 
-    commit({
+    updateVendor({
       variables: {
         input: {
           id: data.node.id,
@@ -173,7 +352,7 @@ function VendorViewContent({
         }
       },
     });
-  }, [commit, data.node.id, formData, loadQuery, toast]);
+  }, [updateVendor, data.node.id, formData, loadQuery, toast]);
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
     setFormData((prev) => ({
@@ -198,6 +377,110 @@ function VendorViewContent({
     });
     setEditedFields(new Set());
   };
+
+  const handleDeleteReport = useCallback(
+    (reportId: string) => {
+      deleteVendorComplianceReport({
+        variables: {
+          connections: [
+            ConnectionHandler.getConnectionID(
+              data.node.id!,
+              "VendorView_complianceReports"
+            ),
+          ],
+          input: {
+            reportId,
+          },
+        },
+        onCompleted: () => {
+          toast({
+            title: "Success",
+            description: "Compliance report deleted successfully",
+            variant: "default",
+          });
+          loadQuery({ vendorId: data.node.id! });
+        },
+        onError: (error) => {
+          toast({
+            title: "Error",
+            description: error.message || "Failed to delete compliance report",
+            variant: "destructive",
+          });
+        },
+      });
+    },
+    [deleteVendorComplianceReport, data.node.id, loadQuery, toast]
+  );
+
+  const handleUploadReport = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      // Validate file type
+      if (file.type !== "application/pdf") {
+        toast({
+          title: "Error",
+          description: "Only PDF files are allowed",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "File size must be less than 10MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const reportDate = new Date().toISOString();
+
+        uploadVendorComplianceReport({
+          variables: {
+            connections: [
+              ConnectionHandler.getConnectionID(
+                data.node.id!,
+                "VendorView_complianceReports"
+              ),
+            ],
+            input: {
+              vendorId: data.node.id!,
+              reportDate,
+              reportName: file.name,
+              file: null,
+            },
+          },
+          uploadables: {
+            "input.file": file,
+          },
+          onCompleted: () => {
+            toast({
+              title: "Success",
+              description: "Compliance report uploaded successfully",
+              variant: "default",
+            });
+            loadQuery({ vendorId: data.node.id! });
+          },
+          onError: (error) => {
+            toast({
+              title: "Error",
+              description:
+                error.message || "Failed to upload compliance report",
+              variant: "destructive",
+            });
+          },
+        });
+      };
+      reader.readAsDataURL(file);
+    },
+    [uploadVendorComplianceReport, data.node.id, loadQuery, toast]
+  );
 
   return (
     <PageTemplate title={formData.name}>
@@ -370,6 +653,17 @@ function VendorViewContent({
             </div>
           </div>
         </Card>
+
+        <Card className="p-6">
+          <ComplianceReportsTable
+            reports={
+              data.node.complianceReports?.edges.map((edge) => edge.node) ?? []
+            }
+            onDelete={handleDeleteReport}
+            onUpload={handleUploadReport}
+          />
+        </Card>
+
         <div className="mt-6 flex justify-end gap-2">
           <Button variant="outline" onClick={handleCancel}>
             Cancel
