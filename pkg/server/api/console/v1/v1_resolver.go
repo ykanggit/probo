@@ -7,6 +7,7 @@ package console_v1
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -459,6 +460,17 @@ func (r *mutationResolver) ImportFramework(ctx context.Context, input types.Impo
 
 	framework, err := svc.Frameworks.Import(ctx, input.OrganizationID, req)
 	if err != nil {
+		var errFrameworkReferenceIDAlreadyExists *coredata.ErrFrameworkReferenceIDAlreadyExists
+		if errors.As(err, &errFrameworkReferenceIDAlreadyExists) {
+			return nil, &gqlerror.Error{
+				Err:     err,
+				Message: fmt.Sprintf("framework %q already exists", req.Framework.Name),
+				Extensions: map[string]any{
+					"frameworkReferenceId": errFrameworkReferenceIDAlreadyExists.ReferenceID,
+				},
+			}
+		}
+
 		return nil, fmt.Errorf("cannot import framework: %w", err)
 	}
 

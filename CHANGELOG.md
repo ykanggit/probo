@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - Simplified policy data model by removing version field and optimistic concurrency 
 - Refactored policy update flow to load-modify-save pattern
 
+### Fixed
+
+- Added user-friendly error messages when importing frameworks that already exist
+
 ## [0.4.1] - 2025-04-09
 
 ### Changed
