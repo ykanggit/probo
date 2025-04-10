@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix cannot create vendor when the name is too similar to suggested one
+
 ## [0.5.0] - 2025-04-10
 
 ### Added

@@ -272,83 +272,73 @@ function VendorListContent({
             />
 
             {searchTerm.trim() !== "" && (
-              <>
-                {filteredVendors.length > 0 ? (
-                  <div
-                    style={{ borderRadius: "0.3rem" }}
-                    className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-invert-bg shadow-md z-10"
-                  >
-                    {filteredVendors.map((vendor: VendorItem) => (
-                      <button
-                        key={vendor.id}
-                        className="w-full px-3 py-2 text-left bg-invert-bg hover:bg-h-subtle-bg"
-                        onClick={() => {
-                          createVendor({
-                            variables: {
-                              connections: [vendorsConnection.vendors.__id],
-                              input: {
-                                organizationId: data.organization.id,
-                                name: vendor.name,
-                                description: "",
-                                serviceStartAt: new Date().toISOString(),
-                                serviceCriticality: "LOW",
-                                riskTier: "GENERAL",
-                              },
-                            },
-                            onCompleted() {
-                              setSearchTerm("");
-                              setFilteredVendors([]);
-                              toast({
-                                title: "Vendor added",
-                                description:
-                                  "The vendor has been added successfully",
-                              });
-                            },
+              <div
+                style={{ borderRadius: "0.3rem" }}
+                className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-invert-bg shadow-md z-10"
+              >
+                {filteredVendors.map((vendor: VendorItem) => (
+                  <button
+                    key={vendor.id}
+                    className="w-full px-3 py-2 text-left bg-invert-bg hover:bg-h-subtle-bg"
+                    onClick={() => {
+                      createVendor({
+                        variables: {
+                          connections: [vendorsConnection.vendors.__id],
+                          input: {
+                            organizationId: data.organization.id,
+                            name: vendor.name,
+                            description: "",
+                            serviceStartAt: new Date().toISOString(),
+                            serviceCriticality: "LOW",
+                            riskTier: "GENERAL",
+                          },
+                        },
+                        onCompleted() {
+                          setSearchTerm("");
+                          setFilteredVendors([]);
+                          toast({
+                            title: "Vendor added",
+                            description:
+                              "The vendor has been added successfully",
                           });
-                        }}
-                      >
-                        {vendor.name}
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div
-                    style={{ borderRadius: "0.3rem" }}
-                    className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] border bg-level-0 shadow-md z-10"
+                        },
+                      });
+                    }}
                   >
-                    <button
-                      className="w-full px-3 py-2 text-left hover:bg-accent-bg flex items-center gap-2"
-                      onClick={() => {
-                        createVendor({
-                          variables: {
-                            connections: [vendorsConnection.vendors.__id],
-                            input: {
-                              organizationId: data.organization.id,
-                              name: searchTerm.trim(),
-                              description: "",
-                              serviceStartAt: new Date().toISOString(),
-                              serviceCriticality: "LOW",
-                              riskTier: "GENERAL",
-                            },
-                          },
-                          onCompleted() {
-                            setSearchTerm("");
-                            setFilteredVendors([]);
-                            toast({
-                              title: "Vendor created",
-                              description:
-                                "The new vendor has been created successfully",
-                            });
-                          },
+                    {vendor.name}
+                  </button>
+                ))}
+                <button
+                  className="w-full px-3 py-2 text-left hover:bg-h-subtle-bg flex items-center gap-2 border-t"
+                  onClick={() => {
+                    createVendor({
+                      variables: {
+                        connections: [vendorsConnection.vendors.__id],
+                        input: {
+                          organizationId: data.organization.id,
+                          name: searchTerm.trim(),
+                          description: "",
+                          serviceStartAt: new Date().toISOString(),
+                          serviceCriticality: "LOW",
+                          riskTier: "GENERAL",
+                        },
+                      },
+                      onCompleted() {
+                        setSearchTerm("");
+                        setFilteredVendors([]);
+                        toast({
+                          title: "Vendor created",
+                          description:
+                            "The new vendor has been created successfully",
                         });
-                      }}
-                    >
-                      <span className="font-medium">Create new vendor:</span>{" "}
-                      {searchTerm}
-                    </button>
-                  </div>
-                )}
-              </>
+                      },
+                    });
+                  }}
+                >
+                  <span className="font-medium">Create new vendor:</span>{" "}
+                  {searchTerm}
+                </button>
+              </div>
             )}
           </div>
         </div>
