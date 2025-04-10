@@ -192,9 +192,6 @@ func (s FrameworkService) Import(
 		return nil, fmt.Errorf("cannot create global id: %w", err)
 	}
 
-	fmt.Printf("Importing framework: %+v\n", req.Framework)
-	fmt.Printf("Importing controls: %+v\n", req.Framework.Controls)
-
 	now := time.Now()
 	framework := &coredata.Framework{
 		ID:             frameworkID,
