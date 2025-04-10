@@ -3486,12 +3486,6 @@ function MitigationViewContent({
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>{previewEvidence?.filename}</span>
-              <button
-                onClick={() => setIsPreviewModalOpen(false)}
-                className="rounded-full p-1 hover:bg-secondary-bg"
-              >
-                <X className="w-5 h-5" />
-              </button>
             </DialogTitle>
             <DialogDescription>
               Preview of the evidence file. You can view or download the file

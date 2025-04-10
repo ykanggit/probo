@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Fix cannot create vendor when the name is too similar to suggested one
+- Fix UI show double button to close evidence preview modal.
 
 ## [0.5.0] - 2025-04-10
 
