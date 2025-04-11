@@ -403,5 +403,24 @@
     ],
     "trustPageUrl": "https://trustcenter.linear.app/",
     "subprocessorsListUrl": "https://linear.app/dpa"
+  },
+  {
+    "name": "Hubspot",
+    "legalName": "Hubspot, Inc.",
+    "headquarterAddress": "2 Canal Park Cambridge, MA 02141. United States",
+    "websiteUrl": "https://hubspot.com",
+    "privacyPolicyUrl": "https://legal.hubspot.com/privacy-policy",
+    "securityPageUrl": "https://legal.hubspot.com/security/",
+    "dataProcessingAgreementUrl": "https://legal.hubspot.com/dpa",
+    "termsOfServiceUrl": "https://legal.hubspot.com/terms-of-service",
+    "description": "Hubspot is a cloud-based marketing and sales platform that enables businesses to manage their marketing and sales activities.",
+    "category": "Marketing and Sales",
+    "subprocessorsListUrl": "https://legal.hubspot.com/sub-processors-page",
+    "certifications": [
+      "GDPR",
+      "SOC3",
+      "SOC 2 Type 2"
+    ],
+    "statusPageUrl": "https://status.hubspot.com/"
   }
 ]
