@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Update vendors catalog.
+
 ## [0.6.0] - 2025-04-10
 
 ### Added
