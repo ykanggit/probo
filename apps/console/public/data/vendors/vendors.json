@@ -377,9 +377,31 @@
       "ISO/IEC 27017:2015",
       "ISO/IEC 27018:2019",
       "SOC 2 Type 2",
-      "SOC 1",
-      "SOC 3"
+      "SOC 1 Type 2",
+      "SOC 3",
+      "HIPAA"
     ],
-    "statusPageUrl": "https://status.heroku.com/"
+    "statusPageUrl": "https://status.heroku.com/",
+    "trustPageUrl": "https://www.heroku.com/compliance"
+  },
+  {
+    "name": "Linear",
+    "headquarterAddress": "San Francisco, California 94103, US",
+    "legalName": "Linear, Inc.",
+    "websiteUrl": "https://linear.app",
+    "privacyPolicyUrl": "https://linear.app/privacy",
+    "termsOfServiceUrl": "https://linear.app/terms",
+    "description": "Linear is a cloud-based project management platform that enables teams to manage their projects and tasks.",
+    "category": "Project Management",
+    "statusPageUrl": "https://linearstatus.com/",
+    "dataProcessingAgreementUrl": "https://linear.app/dpa",
+    "securityPageUrl": "https://linear.app/security",
+    "certifications": [
+      "SOC 2 Type 2",
+      "HIPAA",
+      "GDPR"
+    ],
+    "trustPageUrl": "https://trustcenter.linear.app/",
+    "subprocessorsListUrl": "https://linear.app/dpa"
   }
 ]
