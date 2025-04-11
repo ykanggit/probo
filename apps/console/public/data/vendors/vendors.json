@@ -422,5 +422,24 @@
       "SOC 2 Type 2"
     ],
     "statusPageUrl": "https://status.hubspot.com/"
+  },
+  {
+    "name": "Langfuse",
+    "legalName": "Langfuse, Inc.",
+    "headquarterAddress": "Berlin, Germany",
+    "websiteUrl": "https://langfuse.com",
+    "privacyPolicyUrl": "https://langfuse.com/privacy",
+    "termsOfServiceUrl": "https://langfuse.com/terms",
+    "statusPageUrl": "https://status.langfuse.com/",
+    "securityPageUrl": "https://langfuse.com/docs/data-security-privacy",
+    "description": "Langfuse is a cloud-based language model platform that enables businesses to build, test, and deploy language models.",
+    "dataProcessingAgreementUrl": "https://static.langfuse.com/legal/2025-02-17-Public-Langfuse%20DPA.docx.pdf",
+    "category": "Language Model",
+    "certifications": [
+      "ISO/IEC 27001:2022",
+      "SOC 2 Type 2",
+      "GDPR",
+      "HIPAA"
+    ]
   }
 ]
