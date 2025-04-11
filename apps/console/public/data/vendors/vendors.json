@@ -357,5 +357,29 @@
     "trustPageUrl": "https://www.okta.com/trust-center/",
     "statusPageUrl": "https://status.auth0.com/",
     "dataProcessingAgreementUrl": "https://www.okta.com/trustandcompliance/#data-processing-addendum"
+  },
+  {
+    "name": "Heroku",
+    "headquarterAddress": "415 Mission Street Suite 300 San Francisco, CA 94105",
+    "legalName": "Heroku, Inc.",
+    "websiteUrl": "https://heroku.com",
+    "privacyPolicyUrl": "https://www.salesforce.com/company/legal/privacy/",
+    "termsOfServiceUrl": "https://www.salesforce.com/company/legal/sfdc-website-terms-of-service/",
+    "dataProcessingAgreementUrl": "https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/Agreements/data-processing-addendum.pdf",
+    "subprocessorsListUrl": "https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/misc/salesforce-infrastructure-and-subprocessors.pdf",
+    "securityPageUrl": "https://www.heroku.com/policy/security",
+    "serviceLevelAgreementUrl": "https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/Salesforce_MSA.pdf",
+    "description": "Heroku is a cloud-based platform for building, deploying, and scaling applications.",
+    "category": "Cloud Platform",
+    "certifications": [
+      "PCI-DSS",
+      "ISO/IEC 27001:2013",
+      "ISO/IEC 27017:2015",
+      "ISO/IEC 27018:2019",
+      "SOC 2 Type 2",
+      "SOC 1",
+      "SOC 3"
+    ],
+    "statusPageUrl": "https://status.heroku.com/"
   }
 ]
