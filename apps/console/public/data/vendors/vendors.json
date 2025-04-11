@@ -344,7 +344,7 @@
       "SOC 2 Type 2",
       "ISO/IEC 27001:2022",
       "GDPR",
-      "CSA STAR"
+      "CSA STAR",
       "ISO/IEC 27018:2019",
       "CCPA",
       "HIPAA",
@@ -396,11 +396,7 @@
     "statusPageUrl": "https://linearstatus.com/",
     "dataProcessingAgreementUrl": "https://linear.app/dpa",
     "securityPageUrl": "https://linear.app/security",
-    "certifications": [
-      "SOC 2 Type 2",
-      "HIPAA",
-      "GDPR"
-    ],
+    "certifications": ["SOC 2 Type 2", "HIPAA", "GDPR"],
     "trustPageUrl": "https://trustcenter.linear.app/",
     "subprocessorsListUrl": "https://linear.app/dpa"
   },
@@ -416,11 +412,7 @@
     "description": "Hubspot is a cloud-based marketing and sales platform that enables businesses to manage their marketing and sales activities.",
     "category": "Marketing and Sales",
     "subprocessorsListUrl": "https://legal.hubspot.com/sub-processors-page",
-    "certifications": [
-      "GDPR",
-      "SOC 3",
-      "SOC 2 Type 2"
-    ],
+    "certifications": ["GDPR", "SOC 3", "SOC 2 Type 2"],
     "statusPageUrl": "https://status.hubspot.com/"
   },
   {
@@ -435,12 +427,7 @@
     "description": "Langfuse is a cloud-based language model platform that enables businesses to build, test, and deploy language models.",
     "dataProcessingAgreementUrl": "https://static.langfuse.com/legal/2025-02-17-Public-Langfuse%20DPA.docx.pdf",
     "category": "Language Model",
-    "certifications": [
-      "ISO/IEC 27001:2022",
-      "SOC 2 Type 2",
-      "GDPR",
-      "HIPAA"
-    ]
+    "certifications": ["ISO/IEC 27001:2022", "SOC 2 Type 2", "GDPR", "HIPAA"]
   },
   {
     "name": "Google Workspace",
