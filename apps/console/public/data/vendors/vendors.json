@@ -240,7 +240,7 @@
       "GDPR",
       "ISO/IEC 27017:2015",
       "ISO/IEC 27018:2019",
-      "SOC3",
+      "SOC 3",
       "CCPA",
       "CSA",
       "SIG",
@@ -418,7 +418,7 @@
     "subprocessorsListUrl": "https://legal.hubspot.com/sub-processors-page",
     "certifications": [
       "GDPR",
-      "SOC3",
+      "SOC 3",
       "SOC 2 Type 2"
     ],
     "statusPageUrl": "https://status.hubspot.com/"
@@ -441,5 +441,33 @@
       "GDPR",
       "HIPAA"
     ]
+  },
+  {
+    "name": "Google Workspace",
+    "legalName": "Google LLC",
+    "headquarterAddress": "1600 Amphitheatre Parkway, Mountain View, CA 94043, US",
+    "websiteUrl": "https://workspace.google.com",
+    "privacyPolicyUrl": "https://policies.google.com/privacy",
+    "termsOfServiceUrl": "https://policies.google.com/terms",
+    "description": "Google Workspace is a cloud-based productivity suite that enables businesses to manage their email, calendar, and documents.",
+    "subprocessorsListUrl": "https://workspace.google.com/terms/subprocessors/",
+    "dataProcessingAgreementUrl": "https://workspace.google.com/terms/09242021/dpa_terms/",
+    "statusPageUrl": "https://www.google.com/appsstatus/dashboard/",
+    "securityPageUrl": "https://workspace.google.com/security/",
+    "category": "Productivity",
+    "certifications": [
+      "ISO/IEC 27001:2022",
+      "ISO/IEC 27017:2015",
+      "ISO/IEC 27018:2019",
+      "ISO/IEC 27701:2019",
+      "SOC 2 Type 2",
+      "SOC 3",
+      "GDPR",
+      "FedRAMP",
+      "HIPAA",
+      "BSI C5",
+      "MTCS"
+    ],
+    "trustPageUrl": "https://cloud.google.com/compliance"
   }
 ]
