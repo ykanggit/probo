@@ -305,5 +305,57 @@
     "trustPageUrl": "https://security.supabase.com/",
     "dataProcessingAgreementUrl": "https://supabase.com/legal/dpa",
     "statusPageUrl": "https://status.supabase.com/"
+  },
+  {
+    "name": "Segment",
+    "headquarterAddress": "100 California St #700, San Francisco, CA 94111",
+    "legalName": "Segment, Inc.",
+    "websiteUrl": "https://segment.com",
+    "privacyPolicyUrl": "https://www.twilio.com/en-us/legal/privacy",
+    "termsOfServiceUrl": "https://www.twilio.com/en-us/legal/tos",
+    "serviceLevelAgreementUrl": "https://www.twilio.com/en-us/legal/service-level-agreement/segment-data-ingestion-api",
+    "description": "Segment is a cloud-based customer data platform that enables businesses to collect, clean, and analyze customer data from across their systems.",
+    "category": "Customer Data Platform",
+    "certifications": [
+      "SOC 2 Type 2",
+      "ISO/IEC 27001:2022",
+      "GDPR",
+      "ISO/IEC 27018:2019",
+      "ISO/IEC 27017:2015",
+      "CCPA",
+      "HIPAA"
+    ],
+    "subprocessorsListUrl": "https://www.twilio.com/en-us/legal/sub-processors",
+    "securityPageUrl": "https://www.twilio.com/en-us/legal/security",
+    "trustPageUrl": "https://security.segment.com/",
+    "statusPageUrl": "https://status.segment.com/",
+    "dataProcessingAgreementUrl": "https://www.twilio.com/en-us/legal/data-protection-addendum"
+  },
+  {
+    "name": "Auth0",
+    "headquarterAddress": "10900 NE 8th St. Bellevue, WA 98004, US",
+    "legalName": "Auth0, Inc.",
+    "websiteUrl": "https://auth0.com",
+    "privacyPolicyUrl": "https://www.okta.com/privacy-policy/",
+    "termsOfServiceUrl": "https://www.okta.com/terms-of-service/",
+    "description": "Auth0 is a cloud-based identity and access management platform that enables businesses to secure their applications and data.",
+    "category": "Identity and Access Management",
+    "certifications": [
+      "SOC 2 Type 2",
+      "ISO/IEC 27001:2022",
+      "GDPR",
+      "CSA STAR"
+      "ISO/IEC 27018:2019",
+      "CCPA",
+      "HIPAA",
+      "HITECH",
+      "PCI DSS",
+      "PSD2",
+      "FAPI"
+    ],
+    "securityPageUrl": "https://www.okta.com/security-center/",
+    "trustPageUrl": "https://www.okta.com/trust-center/",
+    "statusPageUrl": "https://status.auth0.com/",
+    "dataProcessingAgreementUrl": "https://www.okta.com/trustandcompliance/#data-processing-addendum"
   }
 ]
