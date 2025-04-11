@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<38a771b621d1e813bc7dbdd6d5bcf323>>
+ * @generated SignedSource<<d8ebd7f4de7a9e2e314f93e5e6b61e25>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,16 +12,25 @@ import { ConcreteRequest } from 'relay-runtime';
 export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
 export type ServiceCriticality = "HIGH" | "LOW" | "MEDIUM";
 export type CreateVendorInput = {
-  description: string;
+  category?: string | null | undefined;
+  certifications?: ReadonlyArray<string> | null | undefined;
+  dataProcessingAgreementUrl?: string | null | undefined;
+  description?: string | null | undefined;
+  headquarterAddress?: string | null | undefined;
+  legalName?: string | null | undefined;
   name: string;
   organizationId: string;
   privacyPolicyUrl?: string | null | undefined;
   riskTier: RiskTier;
+  securityPageUrl?: string | null | undefined;
   serviceCriticality: ServiceCriticality;
+  serviceLevelAgreementUrl?: string | null | undefined;
   serviceStartAt: string;
   serviceTerminationAt?: string | null | undefined;
   statusPageUrl?: string | null | undefined;
   termsOfServiceUrl?: string | null | undefined;
+  trustPageUrl?: string | null | undefined;
+  websiteUrl?: string | null | undefined;
 };
 export type VendorListViewCreateVendorMutation$variables = {
   connections: ReadonlyArray<string>;
@@ -32,7 +41,7 @@ export type VendorListViewCreateVendorMutation$data = {
     readonly vendorEdge: {
       readonly node: {
         readonly createdAt: string;
-        readonly description: string;
+        readonly description: string | null | undefined;
         readonly id: string;
         readonly name: string;
         readonly riskTier: RiskTier;

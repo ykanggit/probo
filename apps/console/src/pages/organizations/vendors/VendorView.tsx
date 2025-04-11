@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, X } from "lucide-react";
 import {
   graphql,
   PreloadedQuery,
@@ -18,6 +18,7 @@ import { Suspense, useEffect, useState, useCallback, useRef } from "react";
 import type { VendorViewQuery as VendorViewQueryType } from "./__generated__/VendorViewQuery.graphql";
 import type { VendorViewDeleteComplianceReportMutation as DeleteComplianceReportMutationType } from "./__generated__/VendorViewDeleteComplianceReportMutation.graphql";
 import type { VendorViewUploadComplianceReportMutation as UploadComplianceReportMutationType } from "./__generated__/VendorViewUploadComplianceReportMutation.graphql";
+import type { VendorViewUpdateVendorMutation } from "./__generated__/VendorViewUpdateVendorMutation.graphql";
 import { useParams } from "react-router";
 import { cn } from "@/lib/utils";
 import { PageTemplate } from "@/components/PageTemplate";
@@ -37,6 +38,14 @@ const vendorViewQuery = graphql`
         statusPageUrl
         termsOfServiceUrl
         privacyPolicyUrl
+        serviceLevelAgreementUrl
+        dataProcessingAgreementUrl
+        securityPageUrl
+        trustPageUrl
+        certifications
+        headquarterAddress
+        legalName
+        websiteUrl
         createdAt
         updatedAt
         complianceReports(first: 100)
@@ -72,6 +81,14 @@ const updateVendorMutation = graphql`
         statusPageUrl
         termsOfServiceUrl
         privacyPolicyUrl
+        serviceLevelAgreementUrl
+        dataProcessingAgreementUrl
+        securityPageUrl
+        trustPageUrl
+        certifications
+        headquarterAddress
+        legalName
+        websiteUrl
         updatedAt
       }
     }
@@ -277,6 +294,55 @@ function ComplianceReportsTable({
   );
 }
 
+function TagList({
+  tags,
+  onAdd,
+  onRemove,
+}: {
+  tags: readonly string[];
+  onAdd: (tag: string) => void;
+  onRemove: (tag: string) => void;
+}) {
+  const [newTag, setNewTag] = useState("");
+
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && newTag.trim()) {
+      e.preventDefault();
+      onAdd(newTag.trim());
+      setNewTag("");
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <div
+            key={tag}
+            className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm"
+          >
+            <span>{tag}</span>
+            <button
+              onClick={() => onRemove(tag)}
+              className="text-primary hover:text-primary/80"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        ))}
+      </div>
+      <Input
+        type="text"
+        value={newTag}
+        onChange={(e) => setNewTag(e.target.value)}
+        onKeyDown={handleAddTag}
+        placeholder="Type and press Enter to add a certification"
+        className="mt-2"
+      />
+    </div>
+  );
+}
+
 function VendorViewContent({
   queryRef,
 }: {
@@ -294,8 +360,17 @@ function VendorViewContent({
     statusPageUrl: data.node.statusPageUrl || "",
     termsOfServiceUrl: data.node.termsOfServiceUrl || "",
     privacyPolicyUrl: data.node.privacyPolicyUrl || "",
+    serviceLevelAgreementUrl: data.node.serviceLevelAgreementUrl || "",
+    dataProcessingAgreementUrl: data.node.dataProcessingAgreementUrl || "",
+    securityPageUrl: data.node.securityPageUrl || "",
+    trustPageUrl: data.node.trustPageUrl || "",
+    certifications: data.node.certifications || [],
+    headquarterAddress: data.node.headquarterAddress || "",
+    legalName: data.node.legalName || "",
+    websiteUrl: data.node.websiteUrl || "",
   });
-  const [updateVendor] = useMutation(updateVendorMutation);
+  const [updateVendor] =
+    useMutation<VendorViewUpdateVendorMutation>(updateVendorMutation);
   const [deleteVendorComplianceReport] =
     useMutation<DeleteComplianceReportMutationType>(
       deleteComplianceReportMutation
@@ -321,7 +396,7 @@ function VendorViewContent({
     updateVendor({
       variables: {
         input: {
-          id: data.node.id,
+          id: data.node.id!,
           ...formattedData,
         },
       },
@@ -362,7 +437,6 @@ function VendorViewContent({
     setEditedFields((prev) => new Set(prev).add(field));
   };
 
-  // Update the cancel handler to also format dates
   const handleCancel = () => {
     setFormData({
       name: data.node.name || "",
@@ -374,6 +448,14 @@ function VendorViewContent({
       statusPageUrl: data.node.statusPageUrl || "",
       termsOfServiceUrl: data.node.termsOfServiceUrl || "",
       privacyPolicyUrl: data.node.privacyPolicyUrl || "",
+      serviceLevelAgreementUrl: data.node.serviceLevelAgreementUrl || "",
+      dataProcessingAgreementUrl: data.node.dataProcessingAgreementUrl || "",
+      securityPageUrl: data.node.securityPageUrl || "",
+      trustPageUrl: data.node.trustPageUrl || "",
+      certifications: data.node.certifications || [],
+      headquarterAddress: data.node.headquarterAddress || "",
+      legalName: data.node.legalName || "",
+      websiteUrl: data.node.websiteUrl || "",
     });
     setEditedFields(new Set());
   };
@@ -495,6 +577,24 @@ function VendorViewContent({
           label="Description"
           value={formData.description}
           onChange={(value) => handleFieldChange("description", value)}
+        />
+
+        <EditableField
+          label="Legal Name"
+          value={formData.legalName}
+          onChange={(value) => handleFieldChange("legalName", value)}
+        />
+
+        <EditableField
+          label="Headquarter Address"
+          value={formData.headquarterAddress}
+          onChange={(value) => handleFieldChange("headquarterAddress", value)}
+        />
+
+        <EditableField
+          label="Website URL"
+          value={formData.websiteUrl}
+          onChange={(value) => handleFieldChange("websiteUrl", value)}
         />
 
         <Card className="p-6">
@@ -628,16 +728,29 @@ function VendorViewContent({
                     "General vendor with minimal risk"}
                 </p>
               </div>
+            </div>
+          </div>
+        </Card>
 
+        <Card className="p-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-lg font-medium">URLs</h2>
+              <p className="text-sm text-secondary">
+                Important URLs related to the vendor
+              </p>
+            </div>
+
+            <div className="space-y-4">
               <EditableField
                 label="Status Page URL"
-                value={formData.statusPageUrl || ""}
+                value={formData.statusPageUrl}
                 onChange={(value) => handleFieldChange("statusPageUrl", value)}
               />
 
               <EditableField
                 label="Terms of Service URL"
-                value={formData.termsOfServiceUrl || ""}
+                value={formData.termsOfServiceUrl}
                 onChange={(value) =>
                   handleFieldChange("termsOfServiceUrl", value)
                 }
@@ -645,11 +758,76 @@ function VendorViewContent({
 
               <EditableField
                 label="Privacy Policy URL"
-                value={formData.privacyPolicyUrl || ""}
+                value={formData.privacyPolicyUrl}
                 onChange={(value) =>
                   handleFieldChange("privacyPolicyUrl", value)
                 }
               />
+
+              <EditableField
+                label="Service Level Agreement URL"
+                value={formData.serviceLevelAgreementUrl}
+                onChange={(value) =>
+                  handleFieldChange("serviceLevelAgreementUrl", value)
+                }
+              />
+
+              <EditableField
+                label="Data Processing Agreement URL"
+                value={formData.dataProcessingAgreementUrl}
+                onChange={(value) =>
+                  handleFieldChange("dataProcessingAgreementUrl", value)
+                }
+              />
+
+              <EditableField
+                label="Security Page URL"
+                value={formData.securityPageUrl}
+                onChange={(value) =>
+                  handleFieldChange("securityPageUrl", value)
+                }
+              />
+
+              <EditableField
+                label="Trust Page URL"
+                value={formData.trustPageUrl}
+                onChange={(value) => handleFieldChange("trustPageUrl", value)}
+              />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-lg font-medium">Certifications</h2>
+              <p className="text-sm text-secondary">
+                List of certifications held by the vendor
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="h-4 w-4 text-tertiary" />
+                  <Label className="text-sm">Certifications</Label>
+                </div>
+                <TagList
+                  tags={[...formData.certifications]}
+                  onAdd={(tag) =>
+                    handleFieldChange("certifications", [
+                      ...formData.certifications,
+                      tag,
+                    ])
+                  }
+                  onRemove={(tag) =>
+                    handleFieldChange(
+                      "certifications",
+                      formData.certifications.filter((t) => t !== tag)
+                    )
+                  }
+                />
+              </div>
             </div>
           </div>
         </Card>

@@ -31,30 +31,47 @@ type (
 	}
 
 	CreateVendorRequest struct {
-		OrganizationID       gid.GID
-		Name                 string
-		Description          string
-		ServiceStartAt       time.Time
-		ServiceTerminationAt *time.Time
-		ServiceCriticality   coredata.ServiceCriticality
-		RiskTier             coredata.RiskTier
-		StatusPageURL        *string
-		TermsOfServiceURL    *string
-		PrivacyPolicyURL     *string
+		OrganizationID             gid.GID
+		Name                       string
+		Description                *string
+		HeadquarterAddress         *string
+		LegalName                  *string
+		WebsiteURL                 *string
+		Category                   *string
+		PrivacyPolicyURL           *string
+		ServiceLevelAgreementURL   *string
+		DataProcessingAgreementURL *string
+		Certifications             []string
+		SecurityPageURL            *string
+		TrustPageURL               *string
+		TermsOfServiceURL          *string
+		StatusPageURL              *string
+		ServiceStartAt             time.Time
+		ServiceTerminationAt       *time.Time
+		ServiceCriticality         coredata.ServiceCriticality
+		RiskTier                   coredata.RiskTier
 	}
 
 	UpdateVendorRequest struct {
-		ID                   gid.GID
-		ExpectedVersion      int
-		Name                 *string
-		Description          *string
-		ServiceStartAt       *time.Time
-		ServiceTerminationAt *time.Time
-		ServiceCriticality   *coredata.ServiceCriticality
-		RiskTier             *coredata.RiskTier
-		StatusPageURL        *string
-		TermsOfServiceURL    *string
-		PrivacyPolicyURL     *string
+		ID                         gid.GID
+		Name                       *string
+		Description                *string
+		HeadquarterAddress         *string
+		LegalName                  *string
+		WebsiteURL                 *string
+		TermsOfServiceURL          *string
+		Category                   *string
+		PrivacyPolicyURL           *string
+		ServiceLevelAgreementURL   *string
+		DataProcessingAgreementURL *string
+		Certifications             []string
+		SecurityPageURL            *string
+		TrustPageURL               *string
+		StatusPageURL              *string
+		ServiceStartAt             *time.Time
+		ServiceTerminationAt       *time.Time
+		ServiceCriticality         *coredata.ServiceCriticality
+		RiskTier                   *coredata.RiskTier
 	}
 )
 
@@ -103,7 +120,7 @@ func (s VendorService) Update(
 			}
 
 			if req.Description != nil {
-				vendor.Description = *req.Description
+				vendor.Description = req.Description
 			}
 
 			if req.ServiceStartAt != nil {
@@ -133,6 +150,60 @@ func (s VendorService) Update(
 			if req.PrivacyPolicyURL != nil {
 				vendor.PrivacyPolicyURL = req.PrivacyPolicyURL
 			}
+
+			if req.ServiceLevelAgreementURL != nil {
+				vendor.ServiceLevelAgreementURL = req.ServiceLevelAgreementURL
+			}
+
+			if req.DataProcessingAgreementURL != nil {
+				vendor.DataProcessingAgreementURL = req.DataProcessingAgreementURL
+			}
+
+			if req.Category != nil {
+				vendor.Category = *req.Category
+			}
+
+			if req.SecurityPageURL != nil {
+				vendor.SecurityPageURL = req.SecurityPageURL
+			}
+
+			if req.TrustPageURL != nil {
+				vendor.TrustPageURL = req.TrustPageURL
+			}
+
+			if req.HeadquarterAddress != nil {
+				vendor.HeadquarterAddress = req.HeadquarterAddress
+			}
+
+			if req.LegalName != nil {
+				vendor.LegalName = req.LegalName
+			}
+
+			if req.WebsiteURL != nil {
+				vendor.WebsiteURL = req.WebsiteURL
+			}
+
+			if req.TermsOfServiceURL != nil {
+				vendor.TermsOfServiceURL = req.TermsOfServiceURL
+			}
+
+			if req.Certifications != nil {
+				vendor.Certifications = req.Certifications
+			}
+
+			if req.StatusPageURL != nil {
+				vendor.StatusPageURL = req.StatusPageURL
+			}
+
+			if req.SecurityPageURL != nil {
+				vendor.SecurityPageURL = req.SecurityPageURL
+			}
+
+			if req.TrustPageURL != nil {
+				vendor.TrustPageURL = req.TrustPageURL
+			}
+
+			vendor.UpdatedAt = time.Now()
 
 			if err := vendor.Update(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot update vendor: %w", err)
@@ -194,19 +265,33 @@ func (s VendorService) Create(
 
 	organization := &coredata.Organization{}
 	vendor := &coredata.Vendor{
-		ID:                   vendorID,
-		OrganizationID:       req.OrganizationID,
-		Name:                 req.Name,
-		CreatedAt:            now,
-		UpdatedAt:            now,
-		Description:          req.Description,
-		ServiceStartAt:       req.ServiceStartAt,
-		ServiceTerminationAt: req.ServiceTerminationAt,
-		ServiceCriticality:   req.ServiceCriticality,
-		RiskTier:             req.RiskTier,
-		StatusPageURL:        req.StatusPageURL,
-		TermsOfServiceURL:    req.TermsOfServiceURL,
-		PrivacyPolicyURL:     req.PrivacyPolicyURL,
+		ID:                         vendorID,
+		OrganizationID:             req.OrganizationID,
+		Name:                       req.Name,
+		CreatedAt:                  now,
+		UpdatedAt:                  now,
+		Description:                req.Description,
+		ServiceStartAt:             req.ServiceStartAt,
+		ServiceTerminationAt:       req.ServiceTerminationAt,
+		HeadquarterAddress:         req.HeadquarterAddress,
+		LegalName:                  req.LegalName,
+		WebsiteURL:                 req.WebsiteURL,
+		PrivacyPolicyURL:           req.PrivacyPolicyURL,
+		ServiceLevelAgreementURL:   req.ServiceLevelAgreementURL,
+		DataProcessingAgreementURL: req.DataProcessingAgreementURL,
+		Certifications:             req.Certifications,
+		SecurityPageURL:            req.SecurityPageURL,
+		TrustPageURL:               req.TrustPageURL,
+		StatusPageURL:              req.StatusPageURL,
+		TermsOfServiceURL:          req.TermsOfServiceURL,
+		ServiceCriticality:         req.ServiceCriticality,
+		RiskTier:                   req.RiskTier,
+	}
+
+	if req.Category != nil {
+		vendor.Category = *req.Category
+	} else {
+		vendor.Category = "Other"
 	}
 
 	err = s.svc.pg.WithTx(

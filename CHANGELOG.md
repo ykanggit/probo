@@ -4,10 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+
+### Added
+
+- Added vendors.json data file under Creative Commons Attribution-ShareAlike 4.0 license`
+- New vendor data management system with comprehensive vendor information
+- Pre-populated vendor database with 12 common SaaS vendors and their certifications
+- Vendor details page with extended fields for improved vendor management:
+    - Legal name and headquarters address
+    - Website URL
+    - Certification tracking with tag-based interface
+    - Links to important vendor documents (SLA, DPA, security pages)
+    - Support for multiple compliance certifications per vendor
+
 ### Fixed
 
 - Fix cannot create vendor when the name is too similar to suggested one
-- Fix UI show double button to close evidence preview modal.
+- Fix UI showing double button to close evidence preview modal
+- Fix cannot delete vendor with compliance reports (added cascade delete constraint)
 
 ## [0.5.0] - 2025-04-10
 

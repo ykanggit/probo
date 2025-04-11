@@ -31,19 +31,28 @@ var ErrConcurrentModification = errors.New("concurrent modification")
 
 type (
 	Vendor struct {
-		ID                   gid.GID            `db:"id"`
-		OrganizationID       gid.GID            `db:"organization_id"`
-		Name                 string             `db:"name"`
-		Description          string             `db:"description"`
-		ServiceStartAt       time.Time          `db:"service_start_at"`
-		ServiceTerminationAt *time.Time         `db:"service_termination_at"`
-		ServiceCriticality   ServiceCriticality `db:"service_criticality"`
-		RiskTier             RiskTier           `db:"risk_tier"`
-		StatusPageURL        *string            `db:"status_page_url"`
-		TermsOfServiceURL    *string            `db:"terms_of_service_url"`
-		PrivacyPolicyURL     *string            `db:"privacy_policy_url"`
-		CreatedAt            time.Time          `db:"created_at"`
-		UpdatedAt            time.Time          `db:"updated_at"`
+		ID                         gid.GID            `db:"id"`
+		OrganizationID             gid.GID            `db:"organization_id"`
+		Name                       string             `db:"name"`
+		Description                *string            `db:"description"`
+		Category                   string             `db:"category"`
+		ServiceStartAt             time.Time          `db:"service_start_at"`
+		ServiceTerminationAt       *time.Time         `db:"service_termination_at"`
+		HeadquarterAddress         *string            `db:"headquarter_address"`
+		LegalName                  *string            `db:"legal_name"`
+		WebsiteURL                 *string            `db:"website_url"`
+		PrivacyPolicyURL           *string            `db:"privacy_policy_url"`
+		ServiceLevelAgreementURL   *string            `db:"service_level_agreement_url"`
+		DataProcessingAgreementURL *string            `db:"data_processing_agreement_url"`
+		Certifications             []string           `db:"certifications"`
+		ServiceCriticality         ServiceCriticality `db:"service_criticality"`
+		RiskTier                   RiskTier           `db:"risk_tier"`
+		StatusPageURL              *string            `db:"status_page_url"`
+		TermsOfServiceURL          *string            `db:"terms_of_service_url"`
+		SecurityPageURL            *string            `db:"security_page_url"`
+		TrustPageURL               *string            `db:"trust_page_url"`
+		CreatedAt                  time.Time          `db:"created_at"`
+		UpdatedAt                  time.Time          `db:"updated_at"`
 	}
 
 	Vendors []*Vendor
@@ -72,13 +81,22 @@ SELECT
     organization_id,
     name,
     description,
+    category,
+    headquarter_address,
+    legal_name,
+    website_url,
     service_start_at,
     service_termination_at,
+    privacy_policy_url,
+    service_level_agreement_url,
+    data_processing_agreement_url,
+    certifications,
     service_criticality,
     risk_tier,
     status_page_url,
     terms_of_service_url,
-    privacy_policy_url,
+    security_page_url,
+    trust_page_url,
     created_at,
     updated_at
 FROM
@@ -123,13 +141,22 @@ INSERT INTO
         organization_id,
         name,
         description,
+        category,
+        headquarter_address,
+        legal_name,
+        website_url,
+        privacy_policy_url,
+        service_level_agreement_url,
+        data_processing_agreement_url,
+        certifications,
         service_start_at,
         service_termination_at,
         service_criticality,
         risk_tier,
         status_page_url,
         terms_of_service_url,
-        privacy_policy_url,
+        security_page_url,
+        trust_page_url,
         created_at,
         updated_at
     )
@@ -139,33 +166,51 @@ VALUES (
     @organization_id,
     @name,
     @description,
+    @category,
+    @headquarter_address,
+    @legal_name,
+    @website_url,
+    @privacy_policy_url,
+    @service_level_agreement_url,
+    @data_processing_agreement_url,
+    @certifications,
     @service_start_at,
     @service_termination_at,
     @service_criticality,
     @risk_tier,
     @status_page_url,
     @terms_of_service_url,
-    @privacy_policy_url,
+    @security_page_url,
+    @trust_page_url,
     @created_at,
     @updated_at
 )
 `
 
 	args := pgx.StrictNamedArgs{
-		"tenant_id":              scope.GetTenantID(),
-		"vendor_id":              v.ID,
-		"organization_id":        v.OrganizationID,
-		"name":                   v.Name,
-		"description":            v.Description,
-		"service_start_at":       v.ServiceStartAt,
-		"service_termination_at": v.ServiceTerminationAt,
-		"service_criticality":    v.ServiceCriticality,
-		"risk_tier":              v.RiskTier,
-		"status_page_url":        v.StatusPageURL,
-		"terms_of_service_url":   v.TermsOfServiceURL,
-		"privacy_policy_url":     v.PrivacyPolicyURL,
-		"created_at":             v.CreatedAt,
-		"updated_at":             v.UpdatedAt,
+		"tenant_id":                     scope.GetTenantID(),
+		"vendor_id":                     v.ID,
+		"organization_id":               v.OrganizationID,
+		"name":                          v.Name,
+		"description":                   v.Description,
+		"category":                      v.Category,
+		"headquarter_address":           v.HeadquarterAddress,
+		"legal_name":                    v.LegalName,
+		"website_url":                   v.WebsiteURL,
+		"privacy_policy_url":            v.PrivacyPolicyURL,
+		"service_level_agreement_url":   v.ServiceLevelAgreementURL,
+		"data_processing_agreement_url": v.DataProcessingAgreementURL,
+		"certifications":                v.Certifications,
+		"service_start_at":              v.ServiceStartAt,
+		"service_termination_at":        v.ServiceTerminationAt,
+		"service_criticality":           v.ServiceCriticality,
+		"risk_tier":                     v.RiskTier,
+		"status_page_url":               v.StatusPageURL,
+		"terms_of_service_url":          v.TermsOfServiceURL,
+		"security_page_url":             v.SecurityPageURL,
+		"trust_page_url":                v.TrustPageURL,
+		"created_at":                    v.CreatedAt,
+		"updated_at":                    v.UpdatedAt,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -202,13 +247,22 @@ SELECT
     organization_id,
     name,
     description,
+    category,
+    headquarter_address,
+    legal_name,
+    website_url,
+    privacy_policy_url,
+    service_level_agreement_url,
+    data_processing_agreement_url,
+    certifications,
     service_start_at,
     service_termination_at,
     service_criticality,
     risk_tier,
     status_page_url,
     terms_of_service_url,
-    privacy_policy_url,
+    security_page_url,
+    trust_page_url,
     created_at,
     updated_at
 FROM
@@ -253,9 +307,18 @@ SET
 	service_termination_at = @service_termination_at,
 	service_criticality = @service_criticality,
 	risk_tier = @risk_tier,
+	category = @category,
+	headquarter_address = @headquarter_address,
+	legal_name = @legal_name,
+	website_url = @website_url,
+	privacy_policy_url = @privacy_policy_url,
+	service_level_agreement_url = @service_level_agreement_url,
+	data_processing_agreement_url = @data_processing_agreement_url,
+	certifications = @certifications,
 	status_page_url = @status_page_url,
 	terms_of_service_url = @terms_of_service_url,
-	privacy_policy_url = @privacy_policy_url,
+	security_page_url = @security_page_url,
+	trust_page_url = @trust_page_url,
 	updated_at = @updated_at
 WHERE %s
     AND id = @vendor_id
@@ -263,17 +326,26 @@ WHERE %s
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
-		"vendor_id":              v.ID,
-		"updated_at":             time.Now(),
-		"name":                   v.Name,
-		"description":            v.Description,
-		"service_start_at":       v.ServiceStartAt,
-		"service_termination_at": v.ServiceTerminationAt,
-		"service_criticality":    v.ServiceCriticality,
-		"risk_tier":              v.RiskTier,
-		"status_page_url":        v.StatusPageURL,
-		"terms_of_service_url":   v.TermsOfServiceURL,
-		"privacy_policy_url":     v.PrivacyPolicyURL,
+		"vendor_id":                     v.ID,
+		"updated_at":                    time.Now(),
+		"name":                          v.Name,
+		"description":                   v.Description,
+		"service_start_at":              v.ServiceStartAt,
+		"service_termination_at":        v.ServiceTerminationAt,
+		"service_criticality":           v.ServiceCriticality,
+		"risk_tier":                     v.RiskTier,
+		"category":                      v.Category,
+		"headquarter_address":           v.HeadquarterAddress,
+		"legal_name":                    v.LegalName,
+		"website_url":                   v.WebsiteURL,
+		"privacy_policy_url":            v.PrivacyPolicyURL,
+		"service_level_agreement_url":   v.ServiceLevelAgreementURL,
+		"data_processing_agreement_url": v.DataProcessingAgreementURL,
+		"certifications":                v.Certifications,
+		"status_page_url":               v.StatusPageURL,
+		"terms_of_service_url":          v.TermsOfServiceURL,
+		"security_page_url":             v.SecurityPageURL,
+		"trust_page_url":                v.TrustPageURL,
 	}
 
 	maps.Copy(args, scope.SQLArguments())

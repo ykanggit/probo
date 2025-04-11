@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7b424e7690762d554e28421c32fdee78>>
+ * @generated SignedSource<<dce76b1271e95cbf0d70b18be492a389>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,7 +18,7 @@ export type VendorListView_vendors$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly createdAt: string;
-        readonly description: string;
+        readonly description: string | null | undefined;
         readonly id: string;
         readonly name: string;
         readonly riskTier: RiskTier;

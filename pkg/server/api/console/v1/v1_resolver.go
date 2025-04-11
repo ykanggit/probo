@@ -355,18 +355,30 @@ func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeleteP
 func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
 
-	vendor, err := svc.Vendors.Create(ctx, probo.CreateVendorRequest{
-		OrganizationID:       input.OrganizationID,
-		Name:                 input.Name,
-		Description:          input.Description,
-		ServiceStartAt:       input.ServiceStartAt,
-		ServiceTerminationAt: input.ServiceTerminationAt,
-		ServiceCriticality:   input.ServiceCriticality,
-		RiskTier:             input.RiskTier,
-		StatusPageURL:        input.StatusPageURL,
-		TermsOfServiceURL:    input.TermsOfServiceURL,
-		PrivacyPolicyURL:     input.PrivacyPolicyURL,
-	})
+	vendor, err := svc.Vendors.Create(
+		ctx,
+		probo.CreateVendorRequest{
+			OrganizationID:             input.OrganizationID,
+			Name:                       input.Name,
+			Description:                input.Description,
+			ServiceStartAt:             input.ServiceStartAt,
+			ServiceTerminationAt:       input.ServiceTerminationAt,
+			ServiceCriticality:         input.ServiceCriticality,
+			RiskTier:                   input.RiskTier,
+			StatusPageURL:              input.StatusPageURL,
+			TermsOfServiceURL:          input.TermsOfServiceURL,
+			PrivacyPolicyURL:           input.PrivacyPolicyURL,
+			ServiceLevelAgreementURL:   input.ServiceLevelAgreementURL,
+			LegalName:                  input.LegalName,
+			HeadquarterAddress:         input.HeadquarterAddress,
+			WebsiteURL:                 input.WebsiteURL,
+			Category:                   input.Category,
+			DataProcessingAgreementURL: input.DataProcessingAgreementURL,
+			Certifications:             input.Certifications,
+			SecurityPageURL:            input.SecurityPageURL,
+			TrustPageURL:               input.TrustPageURL,
+		},
+	)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create vendor: %w", err)
 	}
@@ -380,16 +392,25 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
 	vendor, err := svc.Vendors.Update(ctx, probo.UpdateVendorRequest{
-		ID:                   input.ID,
-		Name:                 input.Name,
-		Description:          input.Description,
-		ServiceStartAt:       input.ServiceStartAt,
-		ServiceTerminationAt: input.ServiceTerminationAt,
-		ServiceCriticality:   input.ServiceCriticality,
-		RiskTier:             input.RiskTier,
-		StatusPageURL:        input.StatusPageURL,
-		TermsOfServiceURL:    input.TermsOfServiceURL,
-		PrivacyPolicyURL:     input.PrivacyPolicyURL,
+		ID:                         input.ID,
+		Name:                       input.Name,
+		Description:                input.Description,
+		ServiceStartAt:             input.ServiceStartAt,
+		ServiceTerminationAt:       input.ServiceTerminationAt,
+		ServiceCriticality:         input.ServiceCriticality,
+		RiskTier:                   input.RiskTier,
+		StatusPageURL:              input.StatusPageURL,
+		TermsOfServiceURL:          input.TermsOfServiceURL,
+		PrivacyPolicyURL:           input.PrivacyPolicyURL,
+		ServiceLevelAgreementURL:   input.ServiceLevelAgreementURL,
+		DataProcessingAgreementURL: input.DataProcessingAgreementURL,
+		SecurityPageURL:            input.SecurityPageURL,
+		TrustPageURL:               input.TrustPageURL,
+		HeadquarterAddress:         input.HeadquarterAddress,
+		LegalName:                  input.LegalName,
+		WebsiteURL:                 input.WebsiteURL,
+		Category:                   input.Category,
+		Certifications:             input.Certifications,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update vendor: %w", err)

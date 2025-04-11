@@ -427,7 +427,7 @@ type People implements Node {
 type Vendor implements Node {
   id: ID!
   name: String!
-  description: String!
+  description: String
 
   complianceReports(
     first: Int
@@ -444,6 +444,14 @@ type Vendor implements Node {
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
+  serviceLevelAgreementUrl: String
+  dataProcessingAgreementUrl: String
+  certifications: [String!]!
+  securityPageUrl: String
+  trustPageUrl: String
+  headquarterAddress: String
+  legalName: String
+  websiteUrl: String
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -864,14 +872,23 @@ input DeleteOrganizationInput {
 input CreateVendorInput {
   organizationId: ID!
   name: String!
-  description: String!
+  description: String
+  headquarterAddress: String
+  legalName: String
+  websiteUrl: String
+  privacyPolicyUrl: String
+  category: String
+  serviceLevelAgreementUrl: String
+  dataProcessingAgreementUrl: String
+  certifications: [String!]
+  securityPageUrl: String
+  trustPageUrl: String
+  statusPageUrl: String
+  termsOfServiceUrl: String
   serviceStartAt: Datetime!
   serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality!
   riskTier: RiskTier!
-  statusPageUrl: String
-  termsOfServiceUrl: String
-  privacyPolicyUrl: String
 }
 
 input UpdateVendorInput {
@@ -885,6 +902,15 @@ input UpdateVendorInput {
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
+  serviceLevelAgreementUrl: String
+  dataProcessingAgreementUrl: String
+  websiteUrl: String
+  legalName: String
+  headquarterAddress: String
+  category: String
+  certifications: [String!]
+  securityPageUrl: String
+  trustPageUrl: String
 }
 
 input DeleteVendorInput {

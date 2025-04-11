@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7568e87d53b6e76d1db4e3029430f118>>
+ * @generated SignedSource<<0e66de0cfba2c27bbf78dcb8e846ad8d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,16 +12,25 @@ import { ConcreteRequest } from 'relay-runtime';
 export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
 export type ServiceCriticality = "HIGH" | "LOW" | "MEDIUM";
 export type UpdateVendorInput = {
+  category?: string | null | undefined;
+  certifications?: ReadonlyArray<string> | null | undefined;
+  dataProcessingAgreementUrl?: string | null | undefined;
   description?: string | null | undefined;
+  headquarterAddress?: string | null | undefined;
   id: string;
+  legalName?: string | null | undefined;
   name?: string | null | undefined;
   privacyPolicyUrl?: string | null | undefined;
   riskTier?: RiskTier | null | undefined;
+  securityPageUrl?: string | null | undefined;
   serviceCriticality?: ServiceCriticality | null | undefined;
+  serviceLevelAgreementUrl?: string | null | undefined;
   serviceStartAt?: string | null | undefined;
   serviceTerminationAt?: string | null | undefined;
   statusPageUrl?: string | null | undefined;
   termsOfServiceUrl?: string | null | undefined;
+  trustPageUrl?: string | null | undefined;
+  websiteUrl?: string | null | undefined;
 };
 export type VendorViewUpdateVendorMutation$variables = {
   input: UpdateVendorInput;
@@ -29,17 +38,25 @@ export type VendorViewUpdateVendorMutation$variables = {
 export type VendorViewUpdateVendorMutation$data = {
   readonly updateVendor: {
     readonly vendor: {
-      readonly description: string;
+      readonly certifications: ReadonlyArray<string>;
+      readonly dataProcessingAgreementUrl: string | null | undefined;
+      readonly description: string | null | undefined;
+      readonly headquarterAddress: string | null | undefined;
       readonly id: string;
+      readonly legalName: string | null | undefined;
       readonly name: string;
       readonly privacyPolicyUrl: string | null | undefined;
       readonly riskTier: RiskTier;
+      readonly securityPageUrl: string | null | undefined;
       readonly serviceCriticality: ServiceCriticality;
+      readonly serviceLevelAgreementUrl: string | null | undefined;
       readonly serviceStartAt: string;
       readonly serviceTerminationAt: string | null | undefined;
       readonly statusPageUrl: string | null | undefined;
       readonly termsOfServiceUrl: string | null | undefined;
+      readonly trustPageUrl: string | null | undefined;
       readonly updatedAt: string;
+      readonly websiteUrl: string | null | undefined;
     };
   };
 };
@@ -153,6 +170,62 @@ v1 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
+            "name": "serviceLevelAgreementUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "dataProcessingAgreementUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "securityPageUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "trustPageUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "certifications",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "headquarterAddress",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "legalName",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "websiteUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
           }
@@ -181,16 +254,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "1a49efe0fe5e3da519e1b15a8f81cc1e",
+    "cacheID": "8ed69675626a00cac2cc79aa570f123d",
     "id": null,
     "metadata": {},
     "name": "VendorViewUpdateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "15ffa38b13259f9c7c6511aa72d07247";
+(node as any).hash = "517efd79b3eb1781ed562368a2ed1ecc";
 
 export default node;

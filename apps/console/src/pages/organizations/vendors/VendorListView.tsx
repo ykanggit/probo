@@ -24,6 +24,24 @@ import { VendorListViewDeleteVendorMutation } from "./__generated__/VendorListVi
 import { VendorListViewPaginationQuery } from "./__generated__/VendorListViewPaginationQuery.graphql";
 import { VendorListView_vendors$key } from "./__generated__/VendorListView_vendors.graphql";
 
+interface VendorData {
+  name: string;
+  headquarterAddress: string;
+  legalName: string;
+  websiteUrl: string;
+  privacyPolicyUrl: string;
+  serviceLevelAgreementUrl?: string;
+  category: string;
+  dataProcessingAgreementUrl?: string;
+  description: string;
+  categories: string[];
+  certifications: string[];
+  securityPageUrl?: string;
+  trustPageUrl?: string;
+  statusPageUrl?: string;
+  termsOfServiceUrl?: string;
+}
+
 const ITEMS_PER_PAGE = 25;
 
 const vendorListViewQuery = graphql`
@@ -111,38 +129,6 @@ const deleteVendorMutation = graphql`
   }
 `;
 
-// Define a proper type for the vendor items
-interface VendorItem {
-  id: string;
-  name: string;
-  createdAt: string;
-}
-
-// TODO: Remove this once we have a real list of vendors
-const vendorsList: VendorItem[] = [
-  { id: "1", name: "Amazon Web Services", createdAt: new Date().toISOString() },
-  {
-    id: "2",
-    name: "Google Cloud Platform",
-    createdAt: new Date().toISOString(),
-  },
-  { id: "3", name: "Microsoft Azure", createdAt: new Date().toISOString() },
-  { id: "4", name: "Salesforce", createdAt: new Date().toISOString() },
-  { id: "5", name: "Slack", createdAt: new Date().toISOString() },
-  { id: "6", name: "Zoom", createdAt: new Date().toISOString() },
-  { id: "7", name: "Dropbox", createdAt: new Date().toISOString() },
-  { id: "8", name: "Trello", createdAt: new Date().toISOString() },
-  { id: "9", name: "Asana", createdAt: new Date().toISOString() },
-  { id: "10", name: "Notion", createdAt: new Date().toISOString() },
-  { id: "11", name: "GitHub", createdAt: new Date().toISOString() },
-  { id: "12", name: "GitLab", createdAt: new Date().toISOString() },
-  { id: "13", name: "Bitbucket", createdAt: new Date().toISOString() },
-  { id: "14", name: "Docker", createdAt: new Date().toISOString() },
-  { id: "15", name: "Kubernetes", createdAt: new Date().toISOString() },
-  { id: "16", name: "Jenkins", createdAt: new Date().toISOString() },
-  { id: "17", name: "CircleCI", createdAt: new Date().toISOString() },
-];
-
 function LoadAboveButton({
   isLoading,
   hasMore,
@@ -210,12 +196,39 @@ function VendorListContent({
   const [, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredVendors, setFilteredVendors] = useState<VendorItem[]>([]);
+  const [filteredVendors, setFilteredVendors] = useState<VendorData[]>([]);
+  const [vendorsData, setVendorsData] = useState<VendorData[]>([]);
+  const [isLoadingVendors, setIsLoadingVendors] = useState(false);
   const [createVendor] =
     useMutation<VendorListViewCreateVendorMutation>(createVendorMutation);
   const [deleteVendor] =
     useMutation<VendorListViewDeleteVendorMutation>(deleteVendorMutation);
   const { organizationId } = useParams();
+
+  useEffect(() => {
+    const loadVendorsData = async () => {
+      try {
+        setIsLoadingVendors(true);
+        const response = await fetch("/data/vendors/vendors.json");
+        if (!response.ok) {
+          throw new Error("Failed to load vendors data");
+        }
+        const data = await response.json();
+        setVendorsData(data);
+      } catch (error) {
+        console.error("Error loading vendors data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load vendors data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingVendors(false);
+      }
+    };
+
+    loadVendorsData();
+  }, [toast]);
 
   const {
     data: vendorsConnection,
@@ -234,7 +247,7 @@ function VendorListContent({
     vendorsConnection.vendors.edges.map((edge) => edge.node) ?? [];
   const pageInfo = vendorsConnection.vendors.pageInfo;
 
-  const fuse = new Fuse(vendorsList, {
+  const fuse = new Fuse<VendorData>(vendorsData, {
     keys: ["name"],
     threshold: 0.3,
   });
@@ -269,16 +282,22 @@ function VendorListContent({
                   setFilteredVendors(results);
                 }
               }}
+              disabled={isLoadingVendors}
             />
+            {isLoadingVendors && (
+              <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              </div>
+            )}
 
             {searchTerm.trim() !== "" && (
               <div
                 style={{ borderRadius: "0.3rem" }}
                 className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-invert-bg shadow-md z-10"
               >
-                {filteredVendors.map((vendor: VendorItem) => (
+                {filteredVendors.map((vendor) => (
                   <button
-                    key={vendor.id}
+                    key={vendor.name}
                     className="w-full px-3 py-2 text-left bg-invert-bg hover:bg-h-subtle-bg"
                     onClick={() => {
                       createVendor({
@@ -287,7 +306,21 @@ function VendorListContent({
                           input: {
                             organizationId: data.organization.id,
                             name: vendor.name,
-                            description: "",
+                            description: vendor.description,
+                            headquarterAddress: vendor.headquarterAddress,
+                            legalName: vendor.legalName,
+                            websiteUrl: vendor.websiteUrl,
+                            category: vendor.category,
+                            privacyPolicyUrl: vendor.privacyPolicyUrl,
+                            serviceLevelAgreementUrl:
+                              vendor.serviceLevelAgreementUrl,
+                            dataProcessingAgreementUrl:
+                              vendor.dataProcessingAgreementUrl,
+                            certifications: vendor.certifications,
+                            securityPageUrl: vendor.securityPageUrl,
+                            trustPageUrl: vendor.trustPageUrl,
+                            statusPageUrl: vendor.statusPageUrl,
+                            termsOfServiceUrl: vendor.termsOfServiceUrl,
                             serviceStartAt: new Date().toISOString(),
                             serviceCriticality: "LOW",
                             riskTier: "GENERAL",

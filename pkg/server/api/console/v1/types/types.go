@@ -182,16 +182,25 @@ type CreateTaskPayload struct {
 }
 
 type CreateVendorInput struct {
-	OrganizationID       gid.GID                     `json:"organizationId"`
-	Name                 string                      `json:"name"`
-	Description          string                      `json:"description"`
-	ServiceStartAt       time.Time                   `json:"serviceStartAt"`
-	ServiceTerminationAt *time.Time                  `json:"serviceTerminationAt,omitempty"`
-	ServiceCriticality   coredata.ServiceCriticality `json:"serviceCriticality"`
-	RiskTier             coredata.RiskTier           `json:"riskTier"`
-	StatusPageURL        *string                     `json:"statusPageUrl,omitempty"`
-	TermsOfServiceURL    *string                     `json:"termsOfServiceUrl,omitempty"`
-	PrivacyPolicyURL     *string                     `json:"privacyPolicyUrl,omitempty"`
+	OrganizationID             gid.GID                     `json:"organizationId"`
+	Name                       string                      `json:"name"`
+	Description                *string                     `json:"description,omitempty"`
+	HeadquarterAddress         *string                     `json:"headquarterAddress,omitempty"`
+	LegalName                  *string                     `json:"legalName,omitempty"`
+	WebsiteURL                 *string                     `json:"websiteUrl,omitempty"`
+	PrivacyPolicyURL           *string                     `json:"privacyPolicyUrl,omitempty"`
+	Category                   *string                     `json:"category,omitempty"`
+	ServiceLevelAgreementURL   *string                     `json:"serviceLevelAgreementUrl,omitempty"`
+	DataProcessingAgreementURL *string                     `json:"dataProcessingAgreementUrl,omitempty"`
+	Certifications             []string                    `json:"certifications,omitempty"`
+	SecurityPageURL            *string                     `json:"securityPageUrl,omitempty"`
+	TrustPageURL               *string                     `json:"trustPageUrl,omitempty"`
+	StatusPageURL              *string                     `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL          *string                     `json:"termsOfServiceUrl,omitempty"`
+	ServiceStartAt             time.Time                   `json:"serviceStartAt"`
+	ServiceTerminationAt       *time.Time                  `json:"serviceTerminationAt,omitempty"`
+	ServiceCriticality         coredata.ServiceCriticality `json:"serviceCriticality"`
+	RiskTier                   coredata.RiskTier           `json:"riskTier"`
 }
 
 type CreateVendorPayload struct {
@@ -671,16 +680,25 @@ type UpdateTaskPayload struct {
 }
 
 type UpdateVendorInput struct {
-	ID                   gid.GID                      `json:"id"`
-	Name                 *string                      `json:"name,omitempty"`
-	Description          *string                      `json:"description,omitempty"`
-	ServiceStartAt       *time.Time                   `json:"serviceStartAt,omitempty"`
-	ServiceTerminationAt *time.Time                   `json:"serviceTerminationAt,omitempty"`
-	ServiceCriticality   *coredata.ServiceCriticality `json:"serviceCriticality,omitempty"`
-	RiskTier             *coredata.RiskTier           `json:"riskTier,omitempty"`
-	StatusPageURL        *string                      `json:"statusPageUrl,omitempty"`
-	TermsOfServiceURL    *string                      `json:"termsOfServiceUrl,omitempty"`
-	PrivacyPolicyURL     *string                      `json:"privacyPolicyUrl,omitempty"`
+	ID                         gid.GID                      `json:"id"`
+	Name                       *string                      `json:"name,omitempty"`
+	Description                *string                      `json:"description,omitempty"`
+	ServiceStartAt             *time.Time                   `json:"serviceStartAt,omitempty"`
+	ServiceTerminationAt       *time.Time                   `json:"serviceTerminationAt,omitempty"`
+	ServiceCriticality         *coredata.ServiceCriticality `json:"serviceCriticality,omitempty"`
+	RiskTier                   *coredata.RiskTier           `json:"riskTier,omitempty"`
+	StatusPageURL              *string                      `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL          *string                      `json:"termsOfServiceUrl,omitempty"`
+	PrivacyPolicyURL           *string                      `json:"privacyPolicyUrl,omitempty"`
+	ServiceLevelAgreementURL   *string                      `json:"serviceLevelAgreementUrl,omitempty"`
+	DataProcessingAgreementURL *string                      `json:"dataProcessingAgreementUrl,omitempty"`
+	WebsiteURL                 *string                      `json:"websiteUrl,omitempty"`
+	LegalName                  *string                      `json:"legalName,omitempty"`
+	HeadquarterAddress         *string                      `json:"headquarterAddress,omitempty"`
+	Category                   *string                      `json:"category,omitempty"`
+	Certifications             []string                     `json:"certifications,omitempty"`
+	SecurityPageURL            *string                      `json:"securityPageUrl,omitempty"`
+	TrustPageURL               *string                      `json:"trustPageUrl,omitempty"`
 }
 
 type UpdateVendorPayload struct {
@@ -721,19 +739,27 @@ type UserEdge struct {
 }
 
 type Vendor struct {
-	ID                   gid.GID                           `json:"id"`
-	Name                 string                            `json:"name"`
-	Description          string                            `json:"description"`
-	ComplianceReports    *VendorComplianceReportConnection `json:"complianceReports"`
-	ServiceStartAt       time.Time                         `json:"serviceStartAt"`
-	ServiceTerminationAt *time.Time                        `json:"serviceTerminationAt,omitempty"`
-	ServiceCriticality   coredata.ServiceCriticality       `json:"serviceCriticality"`
-	RiskTier             coredata.RiskTier                 `json:"riskTier"`
-	StatusPageURL        *string                           `json:"statusPageUrl,omitempty"`
-	TermsOfServiceURL    *string                           `json:"termsOfServiceUrl,omitempty"`
-	PrivacyPolicyURL     *string                           `json:"privacyPolicyUrl,omitempty"`
-	CreatedAt            time.Time                         `json:"createdAt"`
-	UpdatedAt            time.Time                         `json:"updatedAt"`
+	ID                         gid.GID                           `json:"id"`
+	Name                       string                            `json:"name"`
+	Description                *string                           `json:"description,omitempty"`
+	ComplianceReports          *VendorComplianceReportConnection `json:"complianceReports"`
+	ServiceStartAt             time.Time                         `json:"serviceStartAt"`
+	ServiceTerminationAt       *time.Time                        `json:"serviceTerminationAt,omitempty"`
+	ServiceCriticality         coredata.ServiceCriticality       `json:"serviceCriticality"`
+	RiskTier                   coredata.RiskTier                 `json:"riskTier"`
+	StatusPageURL              *string                           `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL          *string                           `json:"termsOfServiceUrl,omitempty"`
+	PrivacyPolicyURL           *string                           `json:"privacyPolicyUrl,omitempty"`
+	ServiceLevelAgreementURL   *string                           `json:"serviceLevelAgreementUrl,omitempty"`
+	DataProcessingAgreementURL *string                           `json:"dataProcessingAgreementUrl,omitempty"`
+	Certifications             []string                          `json:"certifications"`
+	SecurityPageURL            *string                           `json:"securityPageUrl,omitempty"`
+	TrustPageURL               *string                           `json:"trustPageUrl,omitempty"`
+	HeadquarterAddress         *string                           `json:"headquarterAddress,omitempty"`
+	LegalName                  *string                           `json:"legalName,omitempty"`
+	WebsiteURL                 *string                           `json:"websiteUrl,omitempty"`
+	CreatedAt                  time.Time                         `json:"createdAt"`
+	UpdatedAt                  time.Time                         `json:"updatedAt"`
 }
 
 func (Vendor) IsNode()             {}
