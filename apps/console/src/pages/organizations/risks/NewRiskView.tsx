@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { ConnectionHandler, graphql, useMutation } from "react-relay";
 import {
@@ -21,74 +21,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 
-// Risk template library - static definitions of common risks
-const riskTemplates = [
-  {
-    id: "data-breach",
-    name: "Data Breach",
-    description:
-      "Unauthorized access to sensitive data resulting in data disclosure, theft, or corruption.",
-    probability: "HIGH",
-    impact: "HIGH",
-  },
-  {
-    id: "service-outage",
-    name: "Service Outage",
-    description:
-      "System downtime or degradation affecting availability of services to customers.",
-    probability: "MEDIUM",
-    impact: "HIGH",
-  },
-  {
-    id: "compliance-violation",
-    name: "Compliance Violation",
-    description:
-      "Failure to meet regulatory requirements resulting in penalties or legal action.",
-    probability: "MEDIUM",
-    impact: "VERY_HIGH",
-  },
-  {
-    id: "insider-threat",
-    name: "Insider Threat",
-    description:
-      "Malicious actions by employees or contractors with privileged access to systems or data.",
-    probability: "LOW",
-    impact: "HIGH",
-  },
-  {
-    id: "third-party-risk",
-    name: "Third-Party Risk",
-    description:
-      "Vulnerabilities introduced through vendors, suppliers, or partners with access to systems or data.",
-    probability: "MEDIUM",
-    impact: "MEDIUM",
-  },
-  {
-    id: "ransomware",
-    name: "Ransomware Attack",
-    description:
-      "Malware that encrypts data and demands payment for decryption keys.",
-    probability: "MEDIUM",
-    impact: "VERY_HIGH",
-  },
-  {
-    id: "ddos",
-    name: "DDoS Attack",
-    description:
-      "Distributed denial of service attack overwhelming systems and preventing legitimate access.",
-    probability: "MEDIUM",
-    impact: "HIGH",
-  },
-  {
-    id: "credential-compromise",
-    name: "Credential Compromise",
-    description:
-      "Unauthorized access to accounts due to weak, stolen, or improperly secured credentials.",
-    probability: "HIGH",
-    impact: "HIGH",
-  },
-];
+interface RiskTemplate {
+  name: string;
+  description: string;
+  variations: {
+    context: string;
+    impact: number;
+    likelihood: number;
+    recommendedTreatment: string;
+  }[];
+}
 
 const createRiskMutation = graphql`
   mutation NewRiskViewCreateRiskMutation(
@@ -101,8 +45,10 @@ const createRiskMutation = graphql`
           id
           name
           description
-          probability
-          impact
+          inherentLikelihood
+          inherentImpact
+          residualLikelihood
+          residualImpact
           createdAt
           updatedAt
         }
@@ -116,16 +62,40 @@ export default function NewRiskView() {
   const { organizationId } = useParams<{ organizationId: string }>();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [probability, setProbability] = useState<string>("MEDIUM");
-  const [impact, setImpact] = useState<string>("MEDIUM");
+  const [inherentLikelihood, setinherentLikelihood] =
+    useState<string>("MEDIUM");
+  const [inherentImpact, setinherentImpact] = useState<string>("MEDIUM");
+  const [residualLikelihood, setResidualLikelihood] =
+    useState<string>("MEDIUM");
+  const [residualImpact, setResidualImpact] = useState<string>("MEDIUM");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [riskTemplates, setRiskTemplates] = useState<RiskTemplate[]>([]);
   const { toast } = useToast();
 
-  const [commitMutation, isInFlight] = useMutation(createRiskMutation);
+  const [createRisk, isInFlight] = useMutation(createRiskMutation);
+
+  useEffect(() => {
+    const loadRiskTemplates = async () => {
+      try {
+        const response = await fetch("/data/risks/risks.json");
+        const data = await response.json();
+        setRiskTemplates(data);
+      } catch (error) {
+        console.error("Error loading risk templates:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load risk templates. Please try again.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    loadRiskTemplates();
+  }, [toast]);
 
   // Map string values to float values
-  const probabilityToFloat = (value: string): number => {
+  const likelihoodToFloat = (value: string): number => {
     switch (value) {
       case "VERY_LOW":
         return 0.1;
@@ -167,18 +137,46 @@ export default function NewRiskView() {
       // Clear form if "Select a template" is chosen
       setName("");
       setDescription("");
-      setProbability("MEDIUM");
-      setImpact("MEDIUM");
+      setinherentLikelihood("MEDIUM");
+      setinherentImpact("MEDIUM");
+      setResidualLikelihood("MEDIUM");
+      setResidualImpact("MEDIUM");
       return;
     }
 
-    const template = riskTemplates.find((t) => t.id === templateId);
+    const template = riskTemplates[parseInt(templateId)];
     if (template) {
       setName(template.name);
       setDescription(template.description);
-      setProbability(template.probability);
-      setImpact(template.impact);
+      // Convert numeric values to string values for the select components
+      const likelihoodValue = floatTolikelihood(
+        template.variations[0].likelihood
+      );
+      const impactValue = floatToImpact(template.variations[0].impact);
+      setinherentLikelihood(likelihoodValue);
+      setinherentImpact(impactValue);
+      // Set residual values to be the same as initial values by default
+      setResidualLikelihood(likelihoodValue);
+      setResidualImpact(impactValue);
     }
+  };
+
+  // Helper function to convert float likelihood to string
+  const floatTolikelihood = (value: number): string => {
+    if (value <= 0.2) return "VERY_LOW";
+    if (value <= 0.4) return "LOW";
+    if (value <= 0.6) return "MEDIUM";
+    if (value <= 0.8) return "HIGH";
+    return "VERY_HIGH";
+  };
+
+  // Helper function to convert float impact to string
+  const floatToImpact = (value: number): string => {
+    if (value <= 0.2) return "VERY_LOW";
+    if (value <= 0.4) return "LOW";
+    if (value <= 0.6) return "MEDIUM";
+    if (value <= 0.8) return "HIGH";
+    return "VERY_HIGH";
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -199,11 +197,13 @@ export default function NewRiskView() {
       organizationId: organizationId!,
       name,
       description,
-      probability: probabilityToFloat(probability),
-      impact: impactToFloat(impact),
+      inherentLikelihood: likelihoodToFloat(inherentLikelihood),
+      inherentImpact: impactToFloat(inherentImpact),
+      residualLikelihood: likelihoodToFloat(residualLikelihood),
+      residualImpact: impactToFloat(residualImpact),
     };
 
-    commitMutation({
+    createRisk({
       variables: {
         input,
         connections: [
@@ -268,10 +268,10 @@ export default function NewRiskView() {
                 <SelectTrigger id="template">
                   <SelectValue placeholder="Select a risk template" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[300px] overflow-y-auto">
                   <SelectItem value="none">Select a template</SelectItem>
-                  {riskTemplates.map((template) => (
-                    <SelectItem key={template.id} value={template.id}>
+                  {riskTemplates.map((template, index) => (
+                    <SelectItem key={index} value={index.toString()}>
                       {template.name}
                     </SelectItem>
                   ))}
@@ -306,12 +306,15 @@ export default function NewRiskView() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="probability">Probability</Label>
-                <Select value={probability} onValueChange={setProbability}>
-                  <SelectTrigger id="probability">
-                    <SelectValue placeholder="Select probability" />
+                <Label htmlFor="inherentLikelihood">Initial Likelihood</Label>
+                <Select
+                  value={inherentLikelihood}
+                  onValueChange={setinherentLikelihood}
+                >
+                  <SelectTrigger id="inherentLikelihood">
+                    <SelectValue placeholder="Select inherentLikelihood" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-[300px] overflow-y-auto">
                     <SelectItem value="VERY_LOW">Very Low</SelectItem>
                     <SelectItem value="LOW">Low</SelectItem>
                     <SelectItem value="MEDIUM">Medium</SelectItem>
@@ -322,12 +325,15 @@ export default function NewRiskView() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="impact">Impact</Label>
-                <Select value={impact} onValueChange={setImpact}>
-                  <SelectTrigger id="impact">
-                    <SelectValue placeholder="Select impact" />
+                <Label htmlFor="inherentImpact">Initial Impact</Label>
+                <Select
+                  value={inherentImpact}
+                  onValueChange={setinherentImpact}
+                >
+                  <SelectTrigger id="inherentImpact">
+                    <SelectValue placeholder="Select inherentImpact" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-[300px] overflow-y-auto">
                     <SelectItem value="VERY_LOW">Very Low</SelectItem>
                     <SelectItem value="LOW">Low</SelectItem>
                     <SelectItem value="MEDIUM">Medium</SelectItem>
@@ -335,6 +341,57 @@ export default function NewRiskView() {
                     <SelectItem value="VERY_HIGH">Very High</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            <Separator className="my-4" />
+
+            <div>
+              <h3 className="text-lg font-medium mb-2">Residual Risk</h3>
+              <p className="text-sm text-tertiary mb-4">
+                Estimate the risk after treatment measures have been applied
+              </p>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="residualLikelihood">
+                    Residual Likelihood
+                  </Label>
+                  <Select
+                    value={residualLikelihood}
+                    onValueChange={setResidualLikelihood}
+                  >
+                    <SelectTrigger id="residualLikelihood">
+                      <SelectValue placeholder="Select residual likelihood" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px] overflow-y-auto">
+                      <SelectItem value="VERY_LOW">Very Low</SelectItem>
+                      <SelectItem value="LOW">Low</SelectItem>
+                      <SelectItem value="MEDIUM">Medium</SelectItem>
+                      <SelectItem value="HIGH">High</SelectItem>
+                      <SelectItem value="VERY_HIGH">Very High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="residualImpact">Residual Impact</Label>
+                  <Select
+                    value={residualImpact}
+                    onValueChange={setResidualImpact}
+                  >
+                    <SelectTrigger id="residualImpact">
+                      <SelectValue placeholder="Select residual impact" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px] overflow-y-auto">
+                      <SelectItem value="VERY_LOW">Very Low</SelectItem>
+                      <SelectItem value="LOW">Low</SelectItem>
+                      <SelectItem value="MEDIUM">Medium</SelectItem>
+                      <SelectItem value="HIGH">High</SelectItem>
+                      <SelectItem value="VERY_HIGH">Very High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 

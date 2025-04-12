@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f8cd1d0374c4a6de2b577c7fcb35c984>>
+ * @generated SignedSource<<5301e57ef0b2621712f4c8ca693afdeb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -192,14 +192,28 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
-                            "name": "probability",
+                            "name": "inherentLikelihood",
                             "storageKey": null
                           },
                           {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
-                            "name": "impact",
+                            "name": "inherentImpact",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "residualLikelihood",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "residualImpact",
                             "storageKey": null
                           },
                           {
@@ -310,12 +324,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "78d7871004210dec73a83511b147856f",
+    "cacheID": "56ddd15a8a41c48c01bf0be667569473",
     "id": null,
     "metadata": {},
     "name": "RiskListViewQuery",
     "operationKind": "query",
-    "text": "query RiskListViewQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...RiskListView_risks_pbnwq\n  }\n}\n\nfragment RiskListView_risks_pbnwq on Organization {\n  risks(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        probability\n        impact\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query RiskListViewQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...RiskListView_risks_pbnwq\n  }\n}\n\nfragment RiskListView_risks_pbnwq on Organization {\n  risks(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        inherentLikelihood\n        inherentImpact\n        residualLikelihood\n        residualImpact\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();

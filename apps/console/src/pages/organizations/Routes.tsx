@@ -22,6 +22,7 @@ import { EditPolicyPage } from "./policies/EditPolicyPage";
 import { NewPolicyPage } from "./policies/NewPolicyPage";
 import { PolicyListPage } from "./policies/PolicyListPage";
 import { PolicyPage } from "./policies/PolicyPage";
+import { EditRiskPage } from "./risks/EditRiskPage";
 import { NewRiskPage } from "./risks/NewRiskPage";
 import { RiskListPage } from "./risks/RiskListPage";
 import ShowRiskView from "./risks/ShowRiskView";
@@ -62,6 +63,7 @@ export function OrganizationsRoutes() {
         <Route path="risks" element={<RiskListPage />} />
         <Route path="risks/new" element={<NewRiskPage />} />
         <Route path="risks/:riskId" element={<ShowRiskView />} />
+        <Route path="risks/:riskId/edit" element={<EditRiskPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

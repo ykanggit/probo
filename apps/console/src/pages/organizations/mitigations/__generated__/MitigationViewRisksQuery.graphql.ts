@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7ecc796e34bf88aa378e81249110be90>>
+ * @generated SignedSource<<b7154e691d26fef3b8f64ec3a39304fd>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -21,9 +21,9 @@ export type MitigationViewRisksQuery$data = {
           readonly createdAt: string;
           readonly description: string;
           readonly id: string;
-          readonly impact: number;
+          readonly inherentImpact: number;
+          readonly inherentLikelihood: number;
           readonly name: string;
-          readonly probability: number;
           readonly updatedAt: string;
         };
       }>;
@@ -100,14 +100,14 @@ v4 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "probability",
+            "name": "inherentLikelihood",
             "storageKey": null
           },
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "impact",
+            "name": "inherentImpact",
             "storageKey": null
           },
           {
@@ -259,7 +259,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "61c985f00c12fb3cdab3e345a8c65957",
+    "cacheID": "6e8982bef70e90ee745d6985c82c597e",
     "id": null,
     "metadata": {
       "connection": [
@@ -276,11 +276,11 @@ return {
     },
     "name": "MitigationViewRisksQuery",
     "operationKind": "query",
-    "text": "query MitigationViewRisksQuery(\n  $mitigationId: ID!\n) {\n  mitigation: node(id: $mitigationId) {\n    __typename\n    id\n    ... on Mitigation {\n      risks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            probability\n            impact\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query MitigationViewRisksQuery(\n  $mitigationId: ID!\n) {\n  mitigation: node(id: $mitigationId) {\n    __typename\n    id\n    ... on Mitigation {\n      risks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            inherentLikelihood\n            inherentImpact\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "e05802ec519933edce3d0f3487742e3d";
+(node as any).hash = "0fe825c558627da60c1025efa825f91e";
 
 export default node;

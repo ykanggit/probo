@@ -31,19 +31,23 @@ type (
 	}
 
 	CreateRiskRequest struct {
-		OrganizationID gid.GID
-		Name           string
-		Description    string
-		Probability    float64
-		Impact         float64
+		OrganizationID     gid.GID
+		Name               string
+		Description        string
+		InherentLikelihood float64
+		InherentImpact     float64
+		ResidualLikelihood *float64
+		ResidualImpact     *float64
 	}
 
 	UpdateRiskRequest struct {
-		ID          gid.GID
-		Name        *string
-		Description *string
-		Probability *float64
-		Impact      *float64
+		ID                 gid.GID
+		Name               *string
+		Description        *string
+		InherentLikelihood *float64
+		InherentImpact     *float64
+		ResidualLikelihood *float64
+		ResidualImpact     *float64
 	}
 )
 
@@ -68,20 +72,56 @@ func (s RiskService) ListForMitigationID(
 	return page.NewPage(risks, cursor), nil
 }
 
-func (s RiskService) CreateMapping(
+func (s RiskService) CreatePolicyMapping(
+	ctx context.Context,
+	riskID gid.GID,
+	policyID gid.GID,
+) error {
+	riskPolicy := &coredata.RiskPolicy{
+		RiskID:    riskID,
+		PolicyID:  policyID,
+		TenantID:  s.svc.scope.GetTenantID(),
+		CreatedAt: time.Now(),
+	}
+
+	return s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return riskPolicy.Insert(ctx, conn, s.svc.scope)
+		},
+	)
+}
+
+func (s RiskService) DeletePolicyMapping(
+	ctx context.Context,
+	riskID gid.GID,
+	policyID gid.GID,
+) error {
+	riskPolicy := &coredata.RiskPolicy{
+		RiskID:    riskID,
+		PolicyID:  policyID,
+		TenantID:  s.svc.scope.GetTenantID(),
+		CreatedAt: time.Now(),
+	}
+
+	return s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return riskPolicy.Delete(ctx, conn, s.svc.scope)
+		},
+	)
+}
+
+func (s RiskService) CreateMitigationMapping(
 	ctx context.Context,
 	riskID gid.GID,
 	mitigationID gid.GID,
-	probability float64,
-	impact float64,
 ) error {
 	riskMitigation := &coredata.RiskMitigation{
 		RiskID:       riskID,
 		MitigationID: mitigationID,
 		TenantID:     s.svc.scope.GetTenantID(),
 		CreatedAt:    time.Now(),
-		Probability:  probability,
-		Impact:       impact,
 	}
 
 	return s.svc.pg.WithConn(
@@ -92,7 +132,7 @@ func (s RiskService) CreateMapping(
 	)
 }
 
-func (s RiskService) DeleteMapping(
+func (s RiskService) DeleteMitigationMapping(
 	ctx context.Context,
 	riskID gid.GID,
 	mitigationID gid.GID,
@@ -123,14 +163,24 @@ func (s RiskService) Create(
 	}
 
 	risk := &coredata.Risk{
-		ID:             riskID,
-		OrganizationID: req.OrganizationID,
-		Name:           req.Name,
-		Description:    req.Description,
-		Probability:    req.Probability,
-		Impact:         req.Impact,
-		CreatedAt:      now,
-		UpdatedAt:      now,
+		ID:                 riskID,
+		OrganizationID:     req.OrganizationID,
+		Name:               req.Name,
+		Description:        req.Description,
+		InherentLikelihood: req.InherentLikelihood,
+		InherentImpact:     req.InherentImpact,
+		ResidualLikelihood: req.InherentLikelihood,
+		ResidualImpact:     req.InherentImpact,
+		CreatedAt:          now,
+		UpdatedAt:          now,
+	}
+
+	if req.ResidualLikelihood != nil {
+		risk.ResidualLikelihood = *req.ResidualLikelihood
+	}
+
+	if req.ResidualImpact != nil {
+		risk.ResidualImpact = *req.ResidualImpact
 	}
 
 	err = s.svc.pg.WithConn(
@@ -188,12 +238,20 @@ func (s RiskService) Update(
 				risk.Description = *req.Description
 			}
 
-			if req.Probability != nil {
-				risk.Probability = *req.Probability
+			if req.InherentLikelihood != nil {
+				risk.InherentLikelihood = *req.InherentLikelihood
 			}
 
-			if req.Impact != nil {
-				risk.Impact = *req.Impact
+			if req.InherentImpact != nil {
+				risk.InherentImpact = *req.InherentImpact
+			}
+
+			if req.ResidualLikelihood != nil {
+				risk.ResidualLikelihood = *req.ResidualLikelihood
+			}
+
+			if req.ResidualImpact != nil {
+				risk.ResidualImpact = *req.ResidualImpact
 			}
 
 			risk.UpdatedAt = time.Now()

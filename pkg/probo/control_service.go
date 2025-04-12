@@ -177,7 +177,6 @@ func (s ControlService) DeletePolicyMapping(
 	)
 }
 
-// Create creates a new control
 func (s ControlService) Create(
 	ctx context.Context,
 	req CreateControlRequest,
@@ -208,7 +207,6 @@ func (s ControlService) Create(
 	return control, nil
 }
 
-// Get retrieves a control by ID
 func (s ControlService) Get(
 	ctx context.Context,
 	controlID gid.GID,
@@ -229,7 +227,6 @@ func (s ControlService) Get(
 	return control, nil
 }
 
-// Update updates an existing control
 func (s ControlService) Update(
 	ctx context.Context,
 	req UpdateControlRequest,
@@ -254,7 +251,6 @@ func (s ControlService) Update(
 	return control, nil
 }
 
-// Delete removes a control
 func (s ControlService) Delete(
 	ctx context.Context,
 	controlID gid.GID,
@@ -269,7 +265,6 @@ func (s ControlService) Delete(
 	)
 }
 
-// ListForFrameworkID retrieves all controls for a framework
 func (s ControlService) ListForFrameworkID(
 	ctx context.Context,
 	frameworkID gid.GID,
@@ -297,41 +292,23 @@ func (s ControlService) ListForFrameworkID(
 	return page.NewPage(controls, cursor), nil
 }
 
-func (s ControlService) ConnectToMitigation(
+func (s ControlService) ListForRiskID(
 	ctx context.Context,
-	req ConnectControlToMitigationRequest,
-) error {
-	now := time.Now()
+	riskID gid.GID,
+	cursor *page.Cursor[coredata.ControlOrderField],
+) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
+	var controls coredata.Controls
 
-	controlMitigation := &coredata.ControlMitigation{
-		ControlID:    req.ControlID,
-		MitigationID: req.MitigationID,
-		TenantID:     s.svc.scope.GetTenantID(),
-		CreatedAt:    now,
-	}
-
-	return s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return controlMitigation.Insert(ctx, conn, s.svc.scope)
+			return controls.LoadByRiskID(ctx, conn, s.svc.scope, riskID, cursor)
 		},
 	)
-}
 
-// DisconnectFromMitigation removes the link between a control and a mitigation
-func (s ControlService) DisconnectFromMitigation(
-	ctx context.Context,
-	req DisconnectControlFromMitigationRequest,
-) error {
-	controlMitigation := &coredata.ControlMitigation{
-		ControlID:    req.ControlID,
-		MitigationID: req.MitigationID,
+	if err != nil {
+		return nil, fmt.Errorf("cannot list controls: %w", err)
 	}
 
-	return s.svc.pg.WithConn(
-		ctx,
-		func(conn pg.Conn) error {
-			return controlMitigation.Delete(ctx, conn, s.svc.scope)
-		},
-	)
+	return page.NewPage(controls, cursor), nil
 }

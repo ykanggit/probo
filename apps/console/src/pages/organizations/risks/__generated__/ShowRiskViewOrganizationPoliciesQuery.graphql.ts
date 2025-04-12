@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<da6cda7380aec978f37e3adc35942e03>>
+ * @generated SignedSource<<86be887d4ec59050fd69900fd80863a2>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,29 +9,27 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type ShowRiskViewOrganizationMitigationsQuery$variables = {
+export type PolicyStatus = "ACTIVE" | "DRAFT";
+export type ShowRiskViewOrganizationPoliciesQuery$variables = {
   organizationId: string;
 };
-export type ShowRiskViewOrganizationMitigationsQuery$data = {
+export type ShowRiskViewOrganizationPoliciesQuery$data = {
   readonly organization: {
     readonly id: string;
-    readonly mitigations?: {
+    readonly policies?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
-          readonly category: string;
-          readonly description: string;
           readonly id: string;
           readonly name: string;
-          readonly state: MitigationState;
+          readonly status: PolicyStatus;
         };
       }>;
     };
   };
 };
-export type ShowRiskViewOrganizationMitigationsQuery = {
-  response: ShowRiskViewOrganizationMitigationsQuery$data;
-  variables: ShowRiskViewOrganizationMitigationsQuery$variables;
+export type ShowRiskViewOrganizationPoliciesQuery = {
+  response: ShowRiskViewOrganizationPoliciesQuery$data;
+  variables: ShowRiskViewOrganizationPoliciesQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -67,7 +65,7 @@ v4 = [
   {
     "alias": null,
     "args": null,
-    "concreteType": "MitigationEdge",
+    "concreteType": "PolicyEdge",
     "kind": "LinkedField",
     "name": "edges",
     "plural": true,
@@ -75,7 +73,7 @@ v4 = [
       {
         "alias": null,
         "args": null,
-        "concreteType": "Mitigation",
+        "concreteType": "Policy",
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
@@ -92,21 +90,7 @@ v4 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "description",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "category",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "state",
+            "name": "status",
             "storageKey": null
           },
           (v3/*: any*/)
@@ -161,7 +145,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ShowRiskViewOrganizationMitigationsQuery",
+    "name": "ShowRiskViewOrganizationPoliciesQuery",
     "selections": [
       {
         "alias": "organization",
@@ -176,11 +160,11 @@ return {
             "kind": "InlineFragment",
             "selections": [
               {
-                "alias": "mitigations",
+                "alias": "policies",
                 "args": null,
-                "concreteType": "MitigationConnection",
+                "concreteType": "PolicyConnection",
                 "kind": "LinkedField",
-                "name": "__Organization__mitigations_connection",
+                "name": "__Organization__policies_connection",
                 "plural": false,
                 "selections": (v4/*: any*/),
                 "storageKey": null
@@ -200,7 +184,7 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ShowRiskViewOrganizationMitigationsQuery",
+    "name": "ShowRiskViewOrganizationPoliciesQuery",
     "selections": [
       {
         "alias": "organization",
@@ -218,21 +202,21 @@ return {
               {
                 "alias": null,
                 "args": (v5/*: any*/),
-                "concreteType": "MitigationConnection",
+                "concreteType": "PolicyConnection",
                 "kind": "LinkedField",
-                "name": "mitigations",
+                "name": "policies",
                 "plural": false,
                 "selections": (v4/*: any*/),
-                "storageKey": "mitigations(first:100)"
+                "storageKey": "policies(first:100)"
               },
               {
                 "alias": null,
                 "args": (v5/*: any*/),
                 "filters": null,
                 "handle": "connection",
-                "key": "Organization__mitigations",
+                "key": "Organization__policies",
                 "kind": "LinkedHandle",
-                "name": "mitigations"
+                "name": "policies"
               }
             ],
             "type": "Organization",
@@ -244,7 +228,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a73345064022bd2f11ef2f971cd898b5",
+    "cacheID": "a229f1f805e79f8de378305e021d7fea",
     "id": null,
     "metadata": {
       "connection": [
@@ -254,18 +238,18 @@ return {
           "direction": "forward",
           "path": [
             "organization",
-            "mitigations"
+            "policies"
           ]
         }
       ]
     },
-    "name": "ShowRiskViewOrganizationMitigationsQuery",
+    "name": "ShowRiskViewOrganizationPoliciesQuery",
     "operationKind": "query",
-    "text": "query ShowRiskViewOrganizationMitigationsQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      mitigations(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ShowRiskViewOrganizationPoliciesQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            name\n            status\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "76ce05cd9f5a367595eb31b5df24a679";
+(node as any).hash = "26cbf19cd716aee7413931357b9c5354";
 
 export default node;

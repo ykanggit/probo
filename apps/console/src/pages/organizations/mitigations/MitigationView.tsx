@@ -449,8 +449,8 @@ const mitigationRisksQuery = graphql`
               id
               name
               description
-              probability
-              impact
+              inherentLikelihood
+              inherentImpact
               createdAt
               updatedAt
             }
@@ -491,8 +491,9 @@ type RiskNode = {
   id: string;
   name: string;
   description: string;
-  probability: number;
+  likelihood: number;
   impact: number;
+  severity: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -1846,12 +1847,7 @@ function MitigationViewContent({
   }, [controlSearchQuery, getControls]);
 
   // Helper function to get risk severity color
-  const getRiskSeverityColor = (
-    probability: number,
-    impact: number
-  ): string => {
-    const severity = probability * impact;
-
+  const getRiskSeverityColor = (severity: number): string => {
     if (severity >= 0.75) return "bg-red-100 text-red-800";
     if (severity >= 0.5) return "bg-orange-100 text-orange-800";
     if (severity >= 0.25) return "bg-yellow-100 text-yellow-800";
@@ -1859,17 +1855,15 @@ function MitigationViewContent({
   };
 
   // Helper function to get risk severity text
-  const getRiskSeverityText = (probability: number, impact: number): string => {
-    const severity = probability * impact;
-
+  const getRiskSeverityText = (severity: number): string => {
     if (severity >= 0.75) return "Critical";
     if (severity >= 0.5) return "High";
     if (severity >= 0.25) return "Medium";
     return "Low";
   };
 
-  // Format probability as text
-  const formatProbability = (value: number): string => {
+  // Format likelihood as text
+  const formatlikelihood = (value: number): string => {
     if (value <= 0.1) return "Very Low";
     if (value <= 0.3) return "Low";
     if (value <= 0.5) return "Medium";
@@ -2825,7 +2819,7 @@ function MitigationViewContent({
                             Risk Name
                           </th>
                           <th className="text-left font-medium text-sm py-2 px-4">
-                            Probability
+                            likelihood
                           </th>
                           <th className="text-left font-medium text-sm py-2 px-4">
                             Impact
@@ -2852,7 +2846,7 @@ function MitigationViewContent({
                             </td>
                             <td className="py-3 px-4">
                               <div className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs inline-block">
-                                {formatProbability(node.probability)}
+                                {formatlikelihood(node.likelihood)}
                               </div>
                             </td>
                             <td className="py-3 px-4">
@@ -2863,14 +2857,10 @@ function MitigationViewContent({
                             <td className="py-3 px-4">
                               <div
                                 className={`${getRiskSeverityColor(
-                                  node.probability,
-                                  node.impact
+                                  node.severity
                                 )} px-2 py-0.5 rounded-full text-xs inline-block`}
                               >
-                                {getRiskSeverityText(
-                                  node.probability,
-                                  node.impact
-                                )}
+                                {getRiskSeverityText(node.severity)}
                               </div>
                             </td>
                           </tr>

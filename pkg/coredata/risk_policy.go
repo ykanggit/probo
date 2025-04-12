@@ -26,48 +26,48 @@ import (
 )
 
 type (
-	RiskMitigation struct {
-		RiskID       gid.GID      `db:"risk_id"`
-		MitigationID gid.GID      `db:"mitigation_id"`
-		TenantID     gid.TenantID `db:"tenant_id"`
-		CreatedAt    time.Time    `db:"created_at"`
+	RiskPolicy struct {
+		RiskID    gid.GID      `db:"risk_id"`
+		PolicyID  gid.GID      `db:"policy_id"`
+		TenantID  gid.TenantID `db:"tenant_id"`
+		CreatedAt time.Time    `db:"created_at"`
 	}
 
-	RiskMitigations []*RiskMitigation
+	RiskPolicies []*RiskPolicy
 )
 
-func (rm RiskMitigation) Insert(
+func (rp RiskPolicy) Insert(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
 ) error {
 	q := `
 INSERT INTO
-    risks_mitigations (
+    risks_policies (
         risk_id,
-        mitigation_id,
+        policy_id,
         tenant_id,
         created_at
     )
 VALUES (
     @risk_id,
-    @mitigation_id,
+    @policy_id,
     @tenant_id,
     @created_at
 );
 `
 
 	args := pgx.StrictNamedArgs{
-		"risk_id":       rm.RiskID,
-		"mitigation_id": rm.MitigationID,
-		"tenant_id":     scope.GetTenantID(),
-		"created_at":    rm.CreatedAt,
+		"risk_id":    rp.RiskID,
+		"policy_id":  rp.PolicyID,
+		"tenant_id":  scope.GetTenantID(),
+		"created_at": rp.CreatedAt,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
 }
 
-func (rm RiskMitigation) Delete(
+func (rp RiskPolicy) Delete(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -75,18 +75,18 @@ func (rm RiskMitigation) Delete(
 	q := `
 DELETE
 FROM
-    risks_mitigations
+    risks_policies
 WHERE
     %s
     AND risk_id = @risk_id
-    AND mitigation_id = @mitigation_id;
+    AND policy_id = @policy_id;
 `
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
-		"risk_id":       rm.RiskID,
-		"mitigation_id": rm.MitigationID,
+		"risk_id":   rp.RiskID,
+		"policy_id": rp.PolicyID,
 	}
 	maps.Copy(args, scope.SQLArguments())
 

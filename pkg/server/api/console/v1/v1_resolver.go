@@ -723,11 +723,13 @@ func (r *mutationResolver) CreateRisk(ctx context.Context, input types.CreateRis
 	risk, err := svc.Risks.Create(
 		ctx,
 		probo.CreateRiskRequest{
-			OrganizationID: input.OrganizationID,
-			Name:           input.Name,
-			Description:    input.Description,
-			Probability:    input.Probability,
-			Impact:         input.Impact,
+			OrganizationID:     input.OrganizationID,
+			Name:               input.Name,
+			Description:        input.Description,
+			InherentLikelihood: input.InherentLikelihood,
+			InherentImpact:     input.InherentImpact,
+			ResidualLikelihood: input.ResidualLikelihood,
+			ResidualImpact:     input.ResidualImpact,
 		},
 	)
 	if err != nil {
@@ -746,11 +748,13 @@ func (r *mutationResolver) UpdateRisk(ctx context.Context, input types.UpdateRis
 	risk, err := svc.Risks.Update(
 		ctx,
 		probo.UpdateRiskRequest{
-			ID:          input.ID,
-			Name:        input.Name,
-			Description: input.Description,
-			Probability: input.Probability,
-			Impact:      input.Impact,
+			ID:                 input.ID,
+			Name:               input.Name,
+			Description:        input.Description,
+			InherentLikelihood: input.InherentLikelihood,
+			InherentImpact:     input.InherentImpact,
+			ResidualLikelihood: input.ResidualLikelihood,
+			ResidualImpact:     input.ResidualImpact,
 		},
 	)
 	if err != nil {
@@ -776,30 +780,58 @@ func (r *mutationResolver) DeleteRisk(ctx context.Context, input types.DeleteRis
 	}, nil
 }
 
-// CreateRiskMapping is the resolver for the createRiskMapping field.
-func (r *mutationResolver) CreateRiskMapping(ctx context.Context, input types.CreateRiskMappingInput) (*types.CreateRiskMappingPayload, error) {
+// CreateRiskMitigationMapping is the resolver for the createRiskMitigationMapping field.
+func (r *mutationResolver) CreateRiskMitigationMapping(ctx context.Context, input types.CreateRiskMitigationMappingInput) (*types.CreateRiskMitigationMappingPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
 
-	err := svc.Risks.CreateMapping(ctx, input.RiskID, input.MitigationID, input.Probability, input.Impact)
+	err := svc.Risks.CreateMitigationMapping(ctx, input.RiskID, input.MitigationID)
 	if err != nil {
-		panic(fmt.Errorf("cannot create risk mapping: %w", err))
+		panic(fmt.Errorf("cannot create risk mitigation mapping: %w", err))
 	}
 
-	return &types.CreateRiskMappingPayload{
+	return &types.CreateRiskMitigationMappingPayload{
 		Success: true,
 	}, nil
 }
 
-// DeleteRiskMapping is the resolver for the deleteRiskMapping field.
-func (r *mutationResolver) DeleteRiskMapping(ctx context.Context, input types.DeleteRiskMappingInput) (*types.DeleteRiskMappingPayload, error) {
+// DeleteRiskMitigationMapping is the resolver for the deleteRiskMitigationMapping field.
+func (r *mutationResolver) DeleteRiskMitigationMapping(ctx context.Context, input types.DeleteRiskMitigationMappingInput) (*types.DeleteRiskMitigationMappingPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
 
-	err := svc.Risks.DeleteMapping(ctx, input.RiskID, input.MitigationID)
+	err := svc.Risks.DeleteMitigationMapping(ctx, input.RiskID, input.MitigationID)
 	if err != nil {
-		panic(fmt.Errorf("cannot delete risk mapping: %w", err))
+		panic(fmt.Errorf("cannot delete risk mitigation mapping: %w", err))
 	}
 
-	return &types.DeleteRiskMappingPayload{
+	return &types.DeleteRiskMitigationMappingPayload{
+		Success: true,
+	}, nil
+}
+
+// CreateRiskPolicyMapping is the resolver for the createRiskPolicyMapping field.
+func (r *mutationResolver) CreateRiskPolicyMapping(ctx context.Context, input types.CreateRiskPolicyMappingInput) (*types.CreateRiskPolicyMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+
+	err := svc.Risks.CreatePolicyMapping(ctx, input.RiskID, input.PolicyID)
+	if err != nil {
+		panic(fmt.Errorf("cannot create risk policy mapping: %w", err))
+	}
+
+	return &types.CreateRiskPolicyMappingPayload{
+		Success: true,
+	}, nil
+}
+
+// DeleteRiskPolicyMapping is the resolver for the deleteRiskPolicyMapping field.
+func (r *mutationResolver) DeleteRiskPolicyMapping(ctx context.Context, input types.DeleteRiskPolicyMappingInput) (*types.DeleteRiskPolicyMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+
+	err := svc.Risks.DeletePolicyMapping(ctx, input.RiskID, input.PolicyID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete risk policy mapping: %w", err))
+	}
+
+	return &types.DeleteRiskPolicyMappingPayload{
 		Success: true,
 	}, nil
 }
@@ -1336,6 +1368,56 @@ func (r *riskResolver) Mitigations(ctx context.Context, obj *types.Risk, first *
 	return types.NewMitigationConnection(page), nil
 }
 
+// Policies is the resolver for the policies field.
+func (r *riskResolver) Policies(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.PolicyOrderField]{
+		Field:     coredata.PolicyOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.PolicyOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Policies.ListForRiskID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list risk policies: %w", err))
+	}
+
+	return types.NewPolicyConnection(page), nil
+}
+
+// Controls is the resolver for the controls field.
+func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
+		Field:     coredata.ControlOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ControlOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Controls.ListForRiskID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list risk controls: %w", err))
+	}
+
+	return types.NewControlConnection(page), nil
+}
+
 // AssignedTo is the resolver for the assignedTo field.
 func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
@@ -1509,3 +1591,36 @@ type taskResolver struct{ *Resolver }
 type vendorResolver struct{ *Resolver }
 type vendorComplianceReportResolver struct{ *Resolver }
 type viewerResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *mutationResolver) CreateRiskControlMapping(ctx context.Context, input types.CreateRiskControlMappingInput) (*types.CreateRiskControlMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+
+	err := svc.Risks.CreateControlMapping(ctx, input.RiskID, input.ControlID)
+	if err != nil {
+		panic(fmt.Errorf("cannot create risk control mapping: %w", err))
+	}
+
+	return &types.CreateRiskControlMappingPayload{
+		Success: true,
+	}, nil
+}
+func (r *mutationResolver) DeleteRiskControlMapping(ctx context.Context, input types.DeleteRiskControlMappingInput) (*types.DeleteRiskControlMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+
+	err := svc.Risks.DeleteControlMapping(ctx, input.RiskID, input.ControlID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete risk control mapping: %w", err))
+	}
+
+	return &types.DeleteRiskControlMappingPayload{
+		Success: true,
+	}, nil
+}
+*/

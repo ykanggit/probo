@@ -28,14 +28,16 @@ import (
 
 type (
 	Risk struct {
-		ID             gid.GID
-		OrganizationID gid.GID
-		Name           string
-		Description    string
-		Probability    float64
-		Impact         float64
-		CreatedAt      time.Time
-		UpdatedAt      time.Time
+		ID                 gid.GID   `db:"id"`
+		OrganizationID     gid.GID   `db:"organization_id"`
+		Name               string    `db:"name"`
+		Description        string    `db:"description"`
+		InherentLikelihood float64   `db:"inherent_likelihood"`
+		InherentImpact     float64   `db:"inherent_impact"`
+		ResidualLikelihood float64   `db:"residual_likelihood"`
+		ResidualImpact     float64   `db:"residual_impact"`
+		CreatedAt          time.Time `db:"created_at"`
+		UpdatedAt          time.Time `db:"updated_at"`
 	}
 
 	Risks []*Risk
@@ -48,6 +50,14 @@ func (r *Risk) CursorKey(orderBy RiskOrderField) page.CursorKey {
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
+}
+
+func (r *Risk) InherentSeverity() float64 {
+	return r.InherentLikelihood * r.InherentImpact
+}
+
+func (r *Risk) ResidualSeverity() float64 {
+	return r.ResidualLikelihood * r.ResidualImpact
 }
 
 func (r *Risks) LoadByMitigationID(
@@ -65,8 +75,10 @@ WITH rsks AS (
 		r.tenant_id,
 		r.name,
 		r.description,
-		r.probability,
-		r.impact,
+		r.inherent_likelihood,
+		r.inherent_impact,
+		r.residual_likelihood,
+		r.residual_impact,
 		r.created_at,
 		r.updated_at
 	FROM
@@ -81,8 +93,10 @@ SELECT
 	organization_id,
 	name,
 	description,
-	probability,
-	impact,
+	inherent_likelihood,
+	inherent_impact,
+	residual_likelihood,
+	residual_impact,
 	created_at,
 	updated_at
 FROM
@@ -123,8 +137,10 @@ SELECT
 	organization_id,
 	name,
 	description,
-	probability,
-	impact,
+	inherent_likelihood,
+	inherent_impact,
+	residual_likelihood,
+	residual_impact,
 	created_at,
 	updated_at
 FROM risks
@@ -164,8 +180,10 @@ SELECT
 	organization_id,
 	name,
 	description,
-	probability,
-	impact,
+	inherent_likelihood,
+	inherent_impact,
+	residual_likelihood,
+	residual_impact,
 	created_at,
 	updated_at
 FROM risks
@@ -199,20 +217,22 @@ func (r *Risk) Insert(
 	scope Scoper,
 ) error {
 	q := `
-INSERT INTO risks (id, tenant_id, organization_id, name, description, probability, impact, created_at, updated_at)
-VALUES (@id, @tenant_id, @organization_id, @name, @description, @probability, @impact, @created_at, @updated_at)
+INSERT INTO risks (id, tenant_id, organization_id, name, description, inherent_likelihood, inherent_impact, residual_likelihood, residual_impact, created_at, updated_at)
+VALUES (@id, @tenant_id, @organization_id, @name, @description, @inherent_likelihood, @inherent_impact, @residual_likelihood, @residual_impact, @created_at, @updated_at)
 `
 
 	args := pgx.StrictNamedArgs{
-		"id":              r.ID,
-		"tenant_id":       scope.GetTenantID(),
-		"organization_id": r.OrganizationID,
-		"name":            r.Name,
-		"description":     r.Description,
-		"probability":     r.Probability,
-		"impact":          r.Impact,
-		"created_at":      r.CreatedAt,
-		"updated_at":      r.UpdatedAt,
+		"id":                  r.ID,
+		"tenant_id":           scope.GetTenantID(),
+		"organization_id":     r.OrganizationID,
+		"name":                r.Name,
+		"description":         r.Description,
+		"inherent_likelihood": r.InherentLikelihood,
+		"inherent_impact":     r.InherentImpact,
+		"residual_likelihood": r.ResidualLikelihood,
+		"residual_impact":     r.ResidualImpact,
+		"created_at":          r.CreatedAt,
+		"updated_at":          r.UpdatedAt,
 	}
 
 	_, err := conn.Exec(ctx, q, args)
@@ -229,20 +249,25 @@ UPDATE risks
 SET
 	name = @name,
 	description = @description,
-	probability = @probability,
-	impact = @impact,
+	inherent_likelihood = @inherent_likelihood,
+	inherent_impact = @inherent_impact,
+	residual_likelihood = @residual_likelihood,
+	residual_impact = @residual_impact,
 	updated_at = @updated_at
 WHERE %s
-	AND tenant_id = @tenant_id
+	AND id = @risk_id
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
-		"name":        r.Name,
-		"description": r.Description,
-		"probability": r.Probability,
-		"impact":      r.Impact,
-		"updated_at":  r.UpdatedAt,
+		"risk_id":             r.ID,
+		"name":                r.Name,
+		"description":         r.Description,
+		"inherent_likelihood": r.InherentLikelihood,
+		"inherent_impact":     r.InherentImpact,
+		"residual_likelihood": r.ResidualLikelihood,
+		"residual_impact":     r.ResidualImpact,
+		"updated_at":          r.UpdatedAt,
 	}
 	maps.Copy(args, scope.SQLArguments())
 

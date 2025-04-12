@@ -45,12 +45,16 @@ func NewRiskEdge(r *coredata.Risk, orderBy coredata.RiskOrderField) *RiskEdge {
 
 func NewRisk(r *coredata.Risk) *Risk {
 	return &Risk{
-		ID:          r.ID,
-		Name:        r.Name,
-		Description: r.Description,
-		Probability: r.Probability,
-		Impact:      r.Impact,
-		CreatedAt:   r.CreatedAt,
-		UpdatedAt:   r.UpdatedAt,
+		ID:                 r.ID,
+		Name:               r.Name,
+		Description:        r.Description,
+		InherentLikelihood: r.InherentLikelihood,
+		InherentImpact:     r.InherentImpact,
+		InherentSeverity:   r.InherentSeverity(),
+		ResidualLikelihood: r.ResidualLikelihood,
+		ResidualImpact:     r.ResidualImpact,
+		ResidualSeverity:   r.ResidualSeverity(),
+		CreatedAt:          r.CreatedAt,
+		UpdatedAt:          r.UpdatedAt,
 	}
 }

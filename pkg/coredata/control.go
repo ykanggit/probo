@@ -175,6 +175,72 @@ WHERE %s
 	return nil
 }
 
+func (c *Controls) LoadByRiskID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	riskID gid.GID,
+	cursor *page.Cursor[ControlOrderField],
+) error {
+	q := `
+WITH ctrl AS (
+	SELECT DISTINCT
+		c.id,
+		c.reference_id,
+		c.framework_id,
+		c.tenant_id,
+		c.name,
+		c.description,
+		c.created_at,
+		c.updated_at
+	FROM
+		controls c
+	LEFT JOIN
+		controls_policies cp ON c.id = cp.control_id
+	LEFT JOIN
+		risks_policies rp ON cp.policy_id = rp.policy_id
+	LEFT JOIN
+		controls_mitigations cm ON c.id = cm.control_id
+	LEFT JOIN
+		risks_mitigations rm ON (rm.mitigation_id = cm.mitigation_id)
+	WHERE
+		rp.risk_id = @risk_id OR rm.risk_id = @risk_id
+)
+SELECT
+	id,
+	reference_id,
+	framework_id,
+    tenant_id,
+	name,
+	description,
+	created_at,
+	updated_at
+FROM
+	ctrl
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.NamedArgs{"risk_id": riskID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query controls: %w", err)
+	}
+
+	controls, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Control])
+	if err != nil {
+		return fmt.Errorf("cannot collect controls: %w", err)
+	}
+
+	*c = controls
+
+	return nil
+}
+
 func (c *Controls) LoadByFrameworkID(
 	ctx context.Context,
 	conn pg.Conn,

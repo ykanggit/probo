@@ -209,3 +209,24 @@ func (s *PolicyService) ListForControlID(
 
 	return page.NewPage(policies, cursor), nil
 }
+
+func (s *PolicyService) ListForRiskID(
+	ctx context.Context,
+	riskID gid.GID,
+	cursor *page.Cursor[coredata.PolicyOrderField],
+) (*page.Page[*coredata.Policy, coredata.PolicyOrderField], error) {
+	var policies coredata.Policies
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return policies.LoadByRiskID(ctx, conn, s.svc.scope, riskID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(policies, cursor), nil
+}

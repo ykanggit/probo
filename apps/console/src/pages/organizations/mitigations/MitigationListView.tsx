@@ -16,6 +16,8 @@ import {
   CheckCircle2,
   Clock,
   X,
+  HelpCircle,
+  ExternalLink,
 } from "lucide-react";
 import { PageTemplate } from "@/components/PageTemplate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +26,17 @@ import { MitigationListViewSkeleton } from "./MitigationListPage";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { MitigationListViewImportMitigationMutation as MitigationListViewImportMitigationMutationType } from "./__generated__/MitigationListViewImportMitigationMutation.graphql";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const mitigationListViewQuery = graphql`
   query MitigationListViewQuery($organizationId: ID!, $first: Int) {
@@ -543,12 +556,113 @@ function MitigationListContent({
                                   </div>
                                 </td>
                                 <td className="px-4 py-3 align-middle">
-                                  <Link
-                                    to={`/organizations/${organizationId}/mitigations/${mitigation.id}`}
-                                    className="font-medium block"
-                                  >
-                                    {mitigation.name}
-                                  </Link>
+                                  <div className="flex items-center gap-3">
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Link
+                                            to={`/organizations/${organizationId}/mitigations/${mitigation.id}`}
+                                            className="font-medium group flex items-center relative"
+                                          >
+                                            <span className="mr-1">
+                                              {mitigation.name}
+                                            </span>
+                                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-bg scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                                          </Link>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom">
+                                          <p className="text-xs">
+                                            Click to view details
+                                          </p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+
+                                    {/* Enhanced popover for description info */}
+                                    <Popover>
+                                      <PopoverTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          className="p-0 h-6 w-6 rounded-full hover:bg-primary-bg"
+                                          aria-label="Learn more about this mitigation"
+                                        >
+                                          <HelpCircle className="h-5 w-5 text-primary hover:text-primary" />
+                                        </Button>
+                                      </PopoverTrigger>
+                                      <PopoverContent
+                                        className="w-80 p-4 shadow-md"
+                                        align="start"
+                                        sideOffset={5}
+                                      >
+                                        <div className="space-y-3">
+                                          <div className="flex justify-between items-start">
+                                            <h4 className="font-bold text-md">
+                                              {mitigation.name}
+                                            </h4>
+                                            <Badge
+                                              variant="outline"
+                                              className="text-xs"
+                                            >
+                                              {mitigation.importance}
+                                            </Badge>
+                                          </div>
+
+                                          {mitigation.description && (
+                                            <div className="text-sm">
+                                              <p className="font-semibold mb-1">
+                                                Why is this important:
+                                              </p>
+                                              <p>
+                                                {mitigation.description.startsWith(
+                                                  "##"
+                                                )
+                                                  ? mitigation.description
+                                                      .split("\n")
+                                                      .find((line) =>
+                                                        line.startsWith(
+                                                          "## Why"
+                                                        )
+                                                      )
+                                                      ?.replace("## Why?", "")
+                                                      ?.replace("## Why", "")
+                                                      ?.trim() ||
+                                                    mitigation.description.split(
+                                                      "\n"
+                                                    )[1] ||
+                                                    ""
+                                                  : mitigation.description.substring(
+                                                      0,
+                                                      180
+                                                    ) +
+                                                    (mitigation.description
+                                                      .length > 180
+                                                      ? "..."
+                                                      : "")}
+                                              </p>
+                                            </div>
+                                          )}
+
+                                          <div className="pt-2 flex justify-end">
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              className="text-xs gap-1"
+                                              asChild
+                                            >
+                                              <Link
+                                                to={`/organizations/${organizationId}/mitigations/${mitigation.id}`}
+                                              >
+                                                <span>
+                                                  Implementation guide
+                                                </span>
+                                                <ExternalLink className="h-3 w-3" />
+                                              </Link>
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      </PopoverContent>
+                                    </Popover>
+                                  </div>
                                 </td>
                               </tr>
                             ))}

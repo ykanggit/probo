@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<16f4621b72343a04c88df9d0b137c9fd>>
+ * @generated SignedSource<<0ecdbc802635f485dd265dac34b04386>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,23 +9,21 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type CreateRiskMappingInput = {
-  impact: number;
-  mitigationId: string;
-  probability: number;
+export type CreateRiskPolicyMappingInput = {
+  policyId: string;
   riskId: string;
 };
-export type ShowRiskViewCreateRiskMappingMutation$variables = {
-  input: CreateRiskMappingInput;
+export type ShowRiskViewCreateRiskPolicyMappingMutation$variables = {
+  input: CreateRiskPolicyMappingInput;
 };
-export type ShowRiskViewCreateRiskMappingMutation$data = {
-  readonly createRiskMapping: {
+export type ShowRiskViewCreateRiskPolicyMappingMutation$data = {
+  readonly createRiskPolicyMapping: {
     readonly success: boolean;
   };
 };
-export type ShowRiskViewCreateRiskMappingMutation = {
-  response: ShowRiskViewCreateRiskMappingMutation$data;
-  variables: ShowRiskViewCreateRiskMappingMutation$variables;
+export type ShowRiskViewCreateRiskPolicyMappingMutation = {
+  response: ShowRiskViewCreateRiskPolicyMappingMutation$data;
+  variables: ShowRiskViewCreateRiskPolicyMappingMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -46,9 +44,9 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "CreateRiskMappingPayload",
+    "concreteType": "CreateRiskPolicyMappingPayload",
     "kind": "LinkedField",
-    "name": "createRiskMapping",
+    "name": "createRiskPolicyMapping",
     "plural": false,
     "selections": [
       {
@@ -67,7 +65,7 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "ShowRiskViewCreateRiskMappingMutation",
+    "name": "ShowRiskViewCreateRiskPolicyMappingMutation",
     "selections": (v1/*: any*/),
     "type": "Mutation",
     "abstractKey": null
@@ -76,20 +74,20 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "ShowRiskViewCreateRiskMappingMutation",
+    "name": "ShowRiskViewCreateRiskPolicyMappingMutation",
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "32dfd9049a8c6c1d404528bac1316346",
+    "cacheID": "7aac9b6766d79dcc4785f72b6f6805a8",
     "id": null,
     "metadata": {},
-    "name": "ShowRiskViewCreateRiskMappingMutation",
+    "name": "ShowRiskViewCreateRiskPolicyMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation ShowRiskViewCreateRiskMappingMutation(\n  $input: CreateRiskMappingInput!\n) {\n  createRiskMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation ShowRiskViewCreateRiskPolicyMappingMutation(\n  $input: CreateRiskPolicyMappingInput!\n) {\n  createRiskPolicyMapping(input: $input) {\n    success\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "02f82b14cc6cf7c2e39dad4613e9d191";
+(node as any).hash = "5a10339ed779d863662406775e38ea7b";
 
 export default node;

@@ -1,0 +1,254 @@
+[
+  {
+    "name": "Data Breach via Phishing",
+    "description": "Phishing attacks targeting employees can lead to unauthorized access to sensitive data, such as credentials, which can result in a data breach.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.75,
+        "likelihood": 0.8,
+        "recommendedTreatment": "Transfer"
+      }
+    ]
+  },
+  {
+    "name": "Ransomware Locking Critical Systems",
+    "description": "Attackers can encrypt critical business data and systems, demanding ransom to restore access. This disrupts operations and can result in financial loss.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 1.0,
+        "likelihood": 0.3,
+        "recommendedTreatment": "Transfer"
+      }
+    ]
+  },
+  {
+    "name": "Malicious or Negligent employee",
+    "description": "An employee could leak sensitive data or compromise systems, leading to data loss or operational damage.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.5,
+        "recommendedTreatment": "Reduce"
+      }
+    ]
+  },
+  {
+    "name": "Theft of Intellectual Property (IP)",
+    "description": "Attackers, including competitors, could steal intellectual property, including designs, algorithms, or trade secrets, harming competitive advantage.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.15,
+        "recommendedTreatment": "Accept"
+      }
+    ]
+  },
+  {
+    "name": "Exploitation of Unpatched Vulnerabilities",
+    "description": "Failure to apply security patches on time leaves systems vulnerable to known exploits, allowing attackers to compromise or control critical systems.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.8,
+        "recommendedTreatment": "Transfer"
+      }
+    ]
+  },
+  {
+    "name": "Distributed Denial-of-Service (DDoS) Attack",
+    "description": "A DDoS attack overwhelms your online services with fake traffic, making them unavailable to customers, causing operational downtime and reputational damage.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.3,
+        "recommendedTreatment": "Reduce"
+      }
+    ]
+  },
+  {
+    "name": "Third-Party Vendor Breach Compromising Startup Data",
+    "description": "If a third-party vendor with access to your systems is breached, your sensitive data may be exposed due to poor security on the vendor's side.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.1,
+        "likelihood": 0.15,
+        "recommendedTreatment": "Accept"
+      }
+    ]
+  },
+  {
+    "name": "Loss of data due to poor or nonexistant Backup Strategy",
+    "description": "Inadequate or nonexistent backups can lead to permanent data loss, potentially halting operations for extended periods.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.5,
+        "recommendedTreatment": "Reduce"
+      }
+    ]
+  },
+  {
+    "name": "Account Compromise via Weak Authentication",
+    "description": "Weak passwords or lack of multi-factor authentication (MFA) can lead to unauthorized access to accounts and critical business systems.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.8,
+        "recommendedTreatment": "Transfer"
+      }
+    ]
+  },
+  {
+    "name": "Reputational Damage from Customer Data Leak",
+    "description": "A breach that exposes sensitive customer data can cause significant reputational damage, reducing trust and potentially leading to lost revenue.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.75,
+        "likelihood": 0.5,
+        "recommendedTreatment": "Transfer"
+      }
+    ]
+  },
+  {
+    "name": "Regulatory Non-Compliance Leading to Penalties",
+    "description": "Failure to meet legal standards for data protection (e.g., GDPR) can result in fines and legal action following a breach or violation.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.75,
+        "likelihood": 0.3,
+        "recommendedTreatment": "Reduce"
+      }
+    ]
+  },
+  {
+    "name": "Fraud via Social Engineering (Impersonation or BEC)",
+    "description": "Social engineering tactics such as impersonating executives or vendors can trick employees into making fraudulent payments, causing financial loss.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.15,
+        "recommendedTreatment": "Accept"
+      }
+    ]
+  },
+  {
+    "name": "Device Theft Leading to Data Exposure",
+    "description": "Loss or theft of employee devices without proper encryption or remote wipe capabilities can result in exposure of sensitive company data.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.25,
+        "likelihood": 0.5,
+        "recommendedTreatment": "Reduce"
+      }
+    ]
+  },
+  {
+    "name": "Cloud Misconfiguration Causing Data Exposure",
+    "description": "Misconfigured cloud environments can accidentally expose sensitive data (e.g., public-facing storage buckets), leading to data leaks.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.5,
+        "recommendedTreatment": "Reduce"
+      }
+    ]
+  },
+  {
+    "name": "API Exploits Leading to Data Breaches",
+    "description": "Poorly secured or vulnerable APIs can be exploited, allowing attackers to access, manipulate, or steal sensitive data from the backend.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 1.0,
+        "likelihood": 0.5,
+        "recommendedTreatment": "Transfer"
+      }
+    ]
+  },
+  {
+    "name": "Employee Mishandling of Data Leading to Privacy Violations",
+    "description": "Untrained or negligent employees could mishandle sensitive data, resulting in accidental exposure or privacy law violations.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.8,
+        "recommendedTreatment": "Transfer"
+      }
+    ]
+  },
+  {
+    "name": "Account Hijacking of Social Media Platforms",
+    "description": "If attackers hijack your startup's social media accounts, they could post harmful content or engage in fraudulent activities, damaging the brand.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.25,
+        "likelihood": 0.3,
+        "recommendedTreatment": "Reduce"
+      }
+    ]
+  },
+  {
+    "name": "Weak Encryption Causing Data Exposure",
+    "description": "Insufficient encryption of sensitive data can lead to exposure in the event of interception or theft, making the data easily accessible to attackers.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.8,
+        "recommendedTreatment": "Transfer"
+      }
+    ]
+  },
+  {
+    "name": "Ineffective change management process",
+    "description": "Without proper control over changes to systems of softwares, unauthorized or untested changes could introduce vulnerabilities",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.8,
+        "recommendedTreatment": "Transfer"
+      }
+    ]
+  },
+  {
+    "name": "Insufficient incidient response plan",
+    "description": "A poorly defined or tested response plan can lead to a slow or inadequate response from the team in reaction to a security breach.",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.25,
+        "likelihood": 1.0,
+        "recommendedTreatment": "Reduce"
+      }
+    ]
+  },
+  {
+    "name": "Inadequate logging & monitoring",
+    "description": "Without proper logging and monitoring, suspicious activities or security incidents may go unnoticed",
+    "variations": [
+      {
+        "context": "B2B SaaS SMB",
+        "impact": 0.5,
+        "likelihood": 0.5,
+        "recommendedTreatment": "Reduce"
+      }
+    ]
+  }
+]

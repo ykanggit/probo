@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6488a6430dca9def82544e0ac0ca0db8>>
+ * @generated SignedSource<<63841b5a52846eba02cc6d442cfd4133>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,10 +11,12 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type CreateRiskInput = {
   description: string;
-  impact: number;
+  inherentImpact: number;
+  inherentLikelihood: number;
   name: string;
   organizationId: string;
-  probability: number;
+  residualImpact?: number | null | undefined;
+  residualLikelihood?: number | null | undefined;
 };
 export type NewRiskViewCreateRiskMutation$variables = {
   connections: ReadonlyArray<string>;
@@ -27,9 +29,11 @@ export type NewRiskViewCreateRiskMutation$data = {
         readonly createdAt: string;
         readonly description: string;
         readonly id: string;
-        readonly impact: number;
+        readonly inherentImpact: number;
+        readonly inherentLikelihood: number;
         readonly name: string;
-        readonly probability: number;
+        readonly residualImpact: number;
+        readonly residualLikelihood: number;
         readonly updatedAt: string;
       };
     };
@@ -99,14 +103,28 @@ v3 = {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "probability",
+          "name": "inherentLikelihood",
           "storageKey": null
         },
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "impact",
+          "name": "inherentImpact",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "residualLikelihood",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "residualImpact",
           "storageKey": null
         },
         {
@@ -195,16 +213,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "345bb376e4168b3b964b8a7ffa4ccbb9",
+    "cacheID": "86d84d72c424807216edf39eb8f0c34f",
     "id": null,
     "metadata": {},
     "name": "NewRiskViewCreateRiskMutation",
     "operationKind": "mutation",
-    "text": "mutation NewRiskViewCreateRiskMutation(\n  $input: CreateRiskInput!\n) {\n  createRisk(input: $input) {\n    riskEdge {\n      node {\n        id\n        name\n        description\n        probability\n        impact\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation NewRiskViewCreateRiskMutation(\n  $input: CreateRiskInput!\n) {\n  createRisk(input: $input) {\n    riskEdge {\n      node {\n        id\n        name\n        description\n        inherentLikelihood\n        inherentImpact\n        residualLikelihood\n        residualImpact\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3cf30aab7c80cc9308343c6ec1577c5a";
+(node as any).hash = "7ad6c27c192e419839b8105eb2ca9ae7";
 
 export default node;

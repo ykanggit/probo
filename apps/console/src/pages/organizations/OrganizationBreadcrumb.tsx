@@ -18,6 +18,7 @@ import { OrganizationBreadcrumbBreadcrumbVendorOverviewQuery } from "./__generat
 import { OrganizationBreadcrumbOrganizationQuery } from "./__generated__/OrganizationBreadcrumbOrganizationQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbMitigationViewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbMitigationViewQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbControlQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbControlQuery.graphql";
+import { OrganizationBreadcrumbBreadcrumbRiskShowQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbRiskShowQuery.graphql";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 const New = () => {
@@ -418,6 +419,38 @@ function BreadcrumbRiskList() {
   );
 }
 
+function BreadcrumbRiskShow() {
+  const { organizationId, riskId } = useParams();
+  const data = useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbRiskShowQuery>(
+    graphql`
+      query OrganizationBreadcrumbBreadcrumbRiskShowQuery($riskId: ID!) {
+        risk: node(id: $riskId) {
+          id
+          ... on Risk {
+            name
+          }
+        }
+      }
+    `,
+    { riskId: riskId! },
+    { fetchPolicy: "store-or-network" }
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/risks/${riskId}`}
+        >
+          {data.risk?.name}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
 export function BreadCrumb() {
   return (
     <Routes>
@@ -445,6 +478,16 @@ export function BreadCrumb() {
         </Route>
         <Route path="risks" element={<BreadcrumbRiskList />}>
           <Route path="new" element={<New />} />
+          <Route
+            path=":riskId"
+            element={
+              <Suspense>
+                <BreadcrumbRiskShow />
+              </Suspense>
+            }
+          >
+            <Route path="edit" element={<Edit />} />
+          </Route>
         </Route>
         <Route path="frameworks" element={<BreadcrumbFrameworkList />}>
           <Route

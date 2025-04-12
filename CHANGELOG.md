@@ -16,17 +16,35 @@ All notable changes to this project will be documented in this file.
 - New vendor data management system with comprehensive vendor information
 - Pre-populated vendor database with 12 common SaaS vendors and their certifications
 - Vendor details page with extended fields for improved vendor management:
-    - Legal name and headquarters address
-    - Website URL
-    - Certification tracking with tag-based interface
-    - Links to important vendor documents (SLA, DPA, security pages)
-    - Support for multiple compliance certifications per vendor
+  - Legal name and headquarters address
+  - Website URL
+  - Certification tracking with tag-based interface
+  - Links to important vendor documents (SLA, DPA, security pages)
+  - Support for multiple compliance certifications per vendor
+- Enhanced risk management with inherent and residual risk assessment capabilities
+  - Added new fields to track both inherent and residual likelihood/impact values
+  - Introduced risk severity calculation as the product of likelihood and impact
+  - Added visual risk matrix to view risk distribution by severity
+- New risk-policy mapping functionality allowing risks to be linked to policies
+- New risk-control mapping functionality enabling risks to be linked to controls
+- Added edit functionality for risks with a new edit page
+- Pre-populated risk templates from a JSON data source
+
+### Changed
+
+- Updated risk creation form to include both inherent and residual risk parameters
+- Improved risk list view with risk matrix visualization
+- Enhanced breadcrumb navigation for risk detail pages
+- Refactored risk-mitigation mapping to remove redundant probability/impact fields
+- Renamed probability field to likelihood for better alignment with risk management terminology
 
 ### Fixed
 
 - Fix cannot create vendor when the name is too similar to suggested one
 - Fix UI showing double button to close evidence preview modal
 - Fix cannot delete vendor with compliance reports (added cascade delete constraint)
+- Improved license file formatting in vendors and risks data directories
+- Fixed URL in attribution text (`getprobo.com` → `www.getprobo.com`)
 
 ## [0.5.0] - 2025-04-10
 

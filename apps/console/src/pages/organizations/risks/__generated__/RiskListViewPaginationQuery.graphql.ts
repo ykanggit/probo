@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e9f2db8dc7c26cc332a75299317684b7>>
+ * @generated SignedSource<<ada1e6614842f2accf7bbe92a4e845a4>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -190,14 +190,28 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
-                            "name": "probability",
+                            "name": "inherentLikelihood",
                             "storageKey": null
                           },
                           {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
-                            "name": "impact",
+                            "name": "inherentImpact",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "residualLikelihood",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "residualImpact",
                             "storageKey": null
                           },
                           {
@@ -308,16 +322,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "33b15ec024ff6f9963d539be971aef7b",
+    "cacheID": "afcf1c15c2ed7722673da85d53acfef3",
     "id": null,
     "metadata": {},
     "name": "RiskListViewPaginationQuery",
     "operationKind": "query",
-    "text": "query RiskListViewPaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...RiskListView_risks_pbnwq\n    id\n  }\n}\n\nfragment RiskListView_risks_pbnwq on Organization {\n  risks(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        probability\n        impact\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query RiskListViewPaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...RiskListView_risks_pbnwq\n    id\n  }\n}\n\nfragment RiskListView_risks_pbnwq on Organization {\n  risks(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        inherentLikelihood\n        inherentImpact\n        residualLikelihood\n        residualImpact\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "59f58f0b1c17242dea5e762b6337bf98";
+(node as any).hash = "7da0a3d5e4fb09ce7f6b7ddf233702ab";
 
 export default node;

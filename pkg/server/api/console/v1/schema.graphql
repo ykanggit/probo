@@ -608,8 +608,12 @@ type Risk implements Node {
   id: ID!
   name: String!
   description: String!
-  probability: Float!
-  impact: Float!
+  inherentLikelihood: Float!
+  inherentImpact: Float!
+  inherentSeverity: Float!
+  residualLikelihood: Float!
+  residualImpact: Float!
+  residualSeverity: Float!
 
   mitigations(
     first: Int
@@ -618,6 +622,22 @@ type Risk implements Node {
     before: CursorKey
     orderBy: MitigationOrder
   ): MitigationConnection! @goField(forceResolver: true)
+
+  policies(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: PolicyOrder
+  ): PolicyConnection! @goField(forceResolver: true)
+
+  controls(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: ControlOrder
+  ): ControlConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -831,8 +851,19 @@ type Mutation {
   createRisk(input: CreateRiskInput!): CreateRiskPayload!
   updateRisk(input: UpdateRiskInput!): UpdateRiskPayload!
   deleteRisk(input: DeleteRiskInput!): DeleteRiskPayload!
-  createRiskMapping(input: CreateRiskMappingInput!): CreateRiskMappingPayload!
-  deleteRiskMapping(input: DeleteRiskMappingInput!): DeleteRiskMappingPayload!
+  createRiskMitigationMapping(
+    input: CreateRiskMitigationMappingInput!
+  ): CreateRiskMitigationMappingPayload!
+  deleteRiskMitigationMapping(
+    input: DeleteRiskMitigationMappingInput!
+  ): DeleteRiskMitigationMappingPayload!
+
+  createRiskPolicyMapping(
+    input: CreateRiskPolicyMappingInput!
+  ): CreateRiskPolicyMappingPayload!
+  deleteRiskPolicyMapping(
+    input: DeleteRiskPolicyMappingInput!
+  ): DeleteRiskPolicyMappingPayload!
 
   # Evidence mutations
   requestEvidence(input: RequestEvidenceInput!): RequestEvidencePayload!
@@ -1033,32 +1064,44 @@ input CreateRiskInput {
   organizationId: ID!
   name: String!
   description: String!
-  probability: Float!
-  impact: Float!
+  inherentLikelihood: Float!
+  inherentImpact: Float!
+  residualLikelihood: Float
+  residualImpact: Float
 }
 
 input UpdateRiskInput {
   id: ID!
   name: String
   description: String
-  probability: Float
-  impact: Float
+  inherentLikelihood: Float
+  inherentImpact: Float
+  residualLikelihood: Float
+  residualImpact: Float
 }
 
 input DeleteRiskInput {
   riskId: ID!
 }
 
-input CreateRiskMappingInput {
+input CreateRiskMitigationMappingInput {
   riskId: ID!
   mitigationId: ID!
-  probability: Float!
-  impact: Float!
 }
 
-input DeleteRiskMappingInput {
+input DeleteRiskMitigationMappingInput {
   riskId: ID!
   mitigationId: ID!
+}
+
+input CreateRiskPolicyMappingInput {
+  riskId: ID!
+  policyId: ID!
+}
+
+input DeleteRiskPolicyMappingInput {
+  riskId: ID!
+  policyId: ID!
 }
 
 input RequestEvidenceInput {
@@ -1250,11 +1293,19 @@ type DeleteRiskPayload {
   deletedRiskId: ID!
 }
 
-type CreateRiskMappingPayload {
+type CreateRiskMitigationMappingPayload {
   success: Boolean!
 }
 
-type DeleteRiskMappingPayload {
+type DeleteRiskMitigationMappingPayload {
+  success: Boolean!
+}
+
+type CreateRiskPolicyMappingPayload {
+  success: Boolean!
+}
+
+type DeleteRiskPolicyMappingPayload {
   success: Boolean!
 }
 
