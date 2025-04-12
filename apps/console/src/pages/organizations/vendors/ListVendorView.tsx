@@ -17,12 +17,12 @@ import { Link } from "react-router";
 import Fuse from "fuse.js";
 import { useToast } from "@/hooks/use-toast";
 import { PageTemplate } from "@/components/PageTemplate";
-import { VendorListViewSkeleton } from "./VendorListPage";
-import { VendorListViewQuery as VendorListViewQueryType } from "./__generated__/VendorListViewQuery.graphql";
-import { VendorListViewCreateVendorMutation } from "./__generated__/VendorListViewCreateVendorMutation.graphql";
-import { VendorListViewDeleteVendorMutation } from "./__generated__/VendorListViewDeleteVendorMutation.graphql";
-import { VendorListViewPaginationQuery } from "./__generated__/VendorListViewPaginationQuery.graphql";
-import { VendorListView_vendors$key } from "./__generated__/VendorListView_vendors.graphql";
+import { ListVendorViewSkeleton } from "./ListVendorPage";
+import { ListVendorViewCreateVendorMutation } from "./__generated__/ListVendorViewCreateVendorMutation.graphql";
+import { ListVendorViewPaginationQuery } from "./__generated__/ListVendorViewPaginationQuery.graphql";
+import { ListVendorView_vendors$key } from "./__generated__/ListVendorView_vendors.graphql";
+import { ListVendorViewQuery } from "./__generated__/ListVendorViewQuery.graphql";
+import { ListVendorViewDeleteVendorMutation } from "./__generated__/ListVendorViewDeleteVendorMutation.graphql";
 
 interface VendorData {
   name: string;
@@ -44,8 +44,8 @@ interface VendorData {
 
 const ITEMS_PER_PAGE = 25;
 
-const vendorListViewQuery = graphql`
-  query VendorListViewQuery(
+const listVendorViewQuery = graphql`
+  query ListVendorViewQuery(
     $organizationId: ID!
     $first: Int
     $after: CursorKey
@@ -55,15 +55,15 @@ const vendorListViewQuery = graphql`
     organization: node(id: $organizationId) {
       id
 
-      ...VendorListView_vendors
+      ...ListVendorView_vendors
         @arguments(first: $first, after: $after, last: $last, before: $before)
     }
   }
 `;
 
 const vendorListFragment = graphql`
-  fragment VendorListView_vendors on Organization
-  @refetchable(queryName: "VendorListViewPaginationQuery")
+  fragment ListVendorView_vendors on Organization
+  @refetchable(queryName: "ListVendorViewPaginationQuery")
   @argumentDefinitions(
     first: { type: "Int" }
     after: { type: "CursorKey" }
@@ -99,7 +99,7 @@ const vendorListFragment = graphql`
 `;
 
 const createVendorMutation = graphql`
-  mutation VendorListViewCreateVendorMutation(
+  mutation ListVendorViewCreateVendorMutation(
     $input: CreateVendorInput!
     $connections: [ID!]!
   ) {
@@ -119,7 +119,7 @@ const createVendorMutation = graphql`
 `;
 
 const deleteVendorMutation = graphql`
-  mutation VendorListViewDeleteVendorMutation(
+  mutation ListVendorViewDeleteVendorMutation(
     $input: DeleteVendorInput!
     $connections: [ID!]!
   ) {
@@ -183,14 +183,14 @@ function LoadBelowButton({
   );
 }
 
-function VendorListContent({
+function ListVendorContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<VendorListViewQueryType>;
+  queryRef: PreloadedQuery<ListVendorViewQuery>;
 }) {
   const { toast } = useToast();
-  const data = usePreloadedQuery<VendorListViewQueryType>(
-    vendorListViewQuery,
+  const data = usePreloadedQuery<ListVendorViewQuery>(
+    listVendorViewQuery,
     queryRef
   );
   const [, setSearchParams] = useSearchParams();
@@ -200,9 +200,9 @@ function VendorListContent({
   const [vendorsData, setVendorsData] = useState<VendorData[]>([]);
   const [isLoadingVendors, setIsLoadingVendors] = useState(false);
   const [createVendor] =
-    useMutation<VendorListViewCreateVendorMutation>(createVendorMutation);
+    useMutation<ListVendorViewCreateVendorMutation>(createVendorMutation);
   const [deleteVendor] =
-    useMutation<VendorListViewDeleteVendorMutation>(deleteVendorMutation);
+    useMutation<ListVendorViewDeleteVendorMutation>(deleteVendorMutation);
   const { organizationId } = useParams();
 
   useEffect(() => {
@@ -239,8 +239,8 @@ function VendorListContent({
     isLoadingNext,
     isLoadingPrevious,
   } = usePaginationFragment<
-    VendorListViewPaginationQuery,
-    VendorListView_vendors$key
+    ListVendorViewPaginationQuery,
+    ListVendorView_vendors$key
   >(vendorListFragment, data.organization);
 
   const vendors =
@@ -390,14 +390,6 @@ function VendorListContent({
                   </Avatar>
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{vendor?.name}</p>
-                    {vendor?.description && (
-                      <>
-                        <span className="text-tertiary">•</span>
-                        <p className="text-sm text-tertiary">
-                          {vendor.description}
-                        </p>
-                      </>
-                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -484,10 +476,10 @@ function VendorListContent({
   );
 }
 
-export default function VendorListView() {
+export default function ListVendorView() {
   const [searchParams] = useSearchParams();
   const [queryRef, loadQuery] =
-    useQueryLoader<VendorListViewQueryType>(vendorListViewQuery);
+    useQueryLoader<ListVendorViewQuery>(listVendorViewQuery);
 
   const { organizationId } = useParams();
 
@@ -505,12 +497,12 @@ export default function VendorListView() {
   }, [loadQuery, organizationId]);
 
   if (!queryRef) {
-    return <VendorListViewSkeleton />;
+    return <ListVendorViewSkeleton />;
   }
 
   return (
-    <Suspense fallback={<VendorListViewSkeleton />}>
-      <VendorListContent queryRef={queryRef} />
+    <Suspense fallback={<ListVendorViewSkeleton />}>
+      <ListVendorContent queryRef={queryRef} />
     </Suspense>
   );
 }

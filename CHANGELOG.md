@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Added business owner and security owner fields to vendors
+
+### Changed
+
+- Improved vendor detail page with organized sections
+  - Split information into logical sections (Basic Information, Ownership, Risk & Service, Documentation)
+  - Better visual organization of vendor information
+
 ## [0.8.0] - 2025-04-12
 
 ### Added

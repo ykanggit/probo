@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d8ebd7f4de7a9e2e314f93e5e6b61e25>>
+ * @generated SignedSource<<178462391e73ba2adb212005c3813f33>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,6 +12,7 @@ import { ConcreteRequest } from 'relay-runtime';
 export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
 export type ServiceCriticality = "HIGH" | "LOW" | "MEDIUM";
 export type CreateVendorInput = {
+  businessOwnerId?: string | null | undefined;
   category?: string | null | undefined;
   certifications?: ReadonlyArray<string> | null | undefined;
   dataProcessingAgreementUrl?: string | null | undefined;
@@ -22,6 +23,7 @@ export type CreateVendorInput = {
   organizationId: string;
   privacyPolicyUrl?: string | null | undefined;
   riskTier: RiskTier;
+  securityOwnerId?: string | null | undefined;
   securityPageUrl?: string | null | undefined;
   serviceCriticality: ServiceCriticality;
   serviceLevelAgreementUrl?: string | null | undefined;
@@ -32,11 +34,11 @@ export type CreateVendorInput = {
   trustPageUrl?: string | null | undefined;
   websiteUrl?: string | null | undefined;
 };
-export type VendorListViewCreateVendorMutation$variables = {
+export type ListVendorViewCreateVendorMutation$variables = {
   connections: ReadonlyArray<string>;
   input: CreateVendorInput;
 };
-export type VendorListViewCreateVendorMutation$data = {
+export type ListVendorViewCreateVendorMutation$data = {
   readonly createVendor: {
     readonly vendorEdge: {
       readonly node: {
@@ -50,9 +52,9 @@ export type VendorListViewCreateVendorMutation$data = {
     };
   };
 };
-export type VendorListViewCreateVendorMutation = {
-  response: VendorListViewCreateVendorMutation$data;
-  variables: VendorListViewCreateVendorMutation$variables;
+export type ListVendorViewCreateVendorMutation = {
+  response: ListVendorViewCreateVendorMutation$data;
+  variables: ListVendorViewCreateVendorMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -145,7 +147,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "VendorListViewCreateVendorMutation",
+    "name": "ListVendorViewCreateVendorMutation",
     "selections": [
       {
         "alias": null,
@@ -170,7 +172,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "VendorListViewCreateVendorMutation",
+    "name": "ListVendorViewCreateVendorMutation",
     "selections": [
       {
         "alias": null,
@@ -203,16 +205,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "cedd0394889a1b00d329ed9f30dcb3b9",
+    "cacheID": "6b3c93935ce5b90fead6aadd70992667",
     "id": null,
     "metadata": {},
-    "name": "VendorListViewCreateVendorMutation",
+    "name": "ListVendorViewCreateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorListViewCreateVendorMutation(\n  $input: CreateVendorInput!\n) {\n  createVendor(input: $input) {\n    vendorEdge {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n      }\n    }\n  }\n}\n"
+    "text": "mutation ListVendorViewCreateVendorMutation(\n  $input: CreateVendorInput!\n) {\n  createVendor(input: $input) {\n    vendorEdge {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "9be60a8a66ae0214cf280252be1c6b7b";
+(node as any).hash = "d75423060ceec238c1cc6b38f79be4e1";
 
 export default node;

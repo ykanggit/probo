@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { HelpCircle, X } from "lucide-react";
+import { HelpCircle, X, User } from "lucide-react";
 import {
   graphql,
   PreloadedQuery,
@@ -23,9 +23,10 @@ import { useParams } from "react-router";
 import { cn } from "@/lib/utils";
 import { PageTemplate } from "@/components/PageTemplate";
 import { VendorViewSkeleton } from "./VendorPage";
+import PeopleSelector from "@/components/PeopleSelector";
 
 const vendorViewQuery = graphql`
-  query VendorViewQuery($vendorId: ID!) {
+  query VendorViewQuery($vendorId: ID!, $organizationId: ID!) {
     node(id: $vendorId) {
       ... on Vendor {
         id
@@ -46,6 +47,14 @@ const vendorViewQuery = graphql`
         headquarterAddress
         legalName
         websiteUrl
+        businessOwner {
+          id
+          fullName
+        }
+        securityOwner {
+          id
+          fullName
+        }
         createdAt
         updatedAt
         complianceReports(first: 100)
@@ -63,6 +72,9 @@ const vendorViewQuery = graphql`
           }
         }
       }
+    }
+    organization: node(id: $organizationId) {
+      ...PeopleSelector_organization
     }
   }
 `;
@@ -89,6 +101,14 @@ const updateVendorMutation = graphql`
         headquarterAddress
         legalName
         websiteUrl
+        businessOwner {
+          id
+          fullName
+        }
+        securityOwner {
+          id
+          fullName
+        }
         updatedAt
       }
     }
@@ -133,12 +153,14 @@ function EditableField({
   onChange,
   type = "text",
   helpText,
+  disabled = false,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   type?: string;
   helpText?: string;
+  disabled?: boolean;
 }) {
   return (
     <div className="space-y-2">
@@ -151,6 +173,7 @@ function EditableField({
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
         />
         {helpText && <p className="text-sm text-secondary">{helpText}</p>}
       </div>
@@ -348,6 +371,7 @@ function VendorViewContent({
 }: {
   queryRef: PreloadedQuery<VendorViewQueryType>;
 }) {
+  const { organizationId } = useParams();
   const data = usePreloadedQuery(vendorViewQuery, queryRef);
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
@@ -368,6 +392,8 @@ function VendorViewContent({
     headquarterAddress: data.node.headquarterAddress || "",
     legalName: data.node.legalName || "",
     websiteUrl: data.node.websiteUrl || "",
+    businessOwnerId: data.node.businessOwner?.id || null,
+    securityOwnerId: data.node.securityOwner?.id || null,
   });
   const [updateVendor] =
     useMutation<VendorViewUpdateVendorMutation>(updateVendorMutation);
@@ -391,6 +417,8 @@ function VendorViewContent({
       serviceTerminationAt: formData.serviceTerminationAt
         ? formatDateForAPI(formData.serviceTerminationAt)
         : null,
+      businessOwnerId: formData.businessOwnerId || undefined,
+      securityOwnerId: formData.securityOwnerId || undefined,
     };
 
     updateVendor({
@@ -407,6 +435,7 @@ function VendorViewContent({
           variant: "default",
         });
         setEditedFields(new Set());
+        loadQuery({ vendorId: data.node.id!, organizationId: organizationId! });
       },
       onError: (error) => {
         if (error.message?.includes("concurrent modification")) {
@@ -417,7 +446,10 @@ function VendorViewContent({
             variant: "destructive",
           });
 
-          loadQuery({ vendorId: data.node.id! });
+          loadQuery({
+            vendorId: data.node.id!,
+            organizationId: organizationId!,
+          });
         } else {
           toast({
             title: "Error",
@@ -427,7 +459,7 @@ function VendorViewContent({
         }
       },
     });
-  }, [updateVendor, data.node.id, formData, loadQuery, toast]);
+  }, [updateVendor, data.node.id, formData, loadQuery, toast, organizationId]);
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
     setFormData((prev) => ({
@@ -456,6 +488,8 @@ function VendorViewContent({
       headquarterAddress: data.node.headquarterAddress || "",
       legalName: data.node.legalName || "",
       websiteUrl: data.node.websiteUrl || "",
+      businessOwnerId: data.node.businessOwner?.id || null,
+      securityOwnerId: data.node.securityOwner?.id || null,
     });
     setEditedFields(new Set());
   };
@@ -480,7 +514,10 @@ function VendorViewContent({
             description: "Compliance report deleted successfully",
             variant: "default",
           });
-          loadQuery({ vendorId: data.node.id! });
+          loadQuery({
+            vendorId: data.node.id!,
+            organizationId: organizationId!,
+          });
         },
         onError: (error) => {
           toast({
@@ -491,7 +528,13 @@ function VendorViewContent({
         },
       });
     },
-    [deleteVendorComplianceReport, data.node.id, loadQuery, toast]
+    [
+      deleteVendorComplianceReport,
+      data.node.id,
+      loadQuery,
+      toast,
+      organizationId,
+    ]
   );
 
   const handleUploadReport = useCallback(
@@ -547,7 +590,10 @@ function VendorViewContent({
               description: "Compliance report uploaded successfully",
               variant: "default",
             });
-            loadQuery({ vendorId: data.node.id! });
+            loadQuery({
+              vendorId: data.node.id!,
+              organizationId: organizationId!,
+            });
           },
           onError: (error) => {
             toast({
@@ -561,48 +607,121 @@ function VendorViewContent({
       };
       reader.readAsDataURL(file);
     },
-    [uploadVendorComplianceReport, data.node.id, loadQuery, toast]
+    [
+      uploadVendorComplianceReport,
+      data.node.id,
+      loadQuery,
+      toast,
+      organizationId,
+    ]
   );
 
   return (
     <PageTemplate title={formData.name}>
       <div className="max-w-2xl space-y-6">
-        <EditableField
-          label="Name"
-          value={formData.name}
-          onChange={(value) => handleFieldChange("name", value)}
-        />
+        <Card className="p-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-lg font-medium">Basic Information</h2>
+              <p className="text-sm text-secondary">
+                General information about the vendor
+              </p>
+            </div>
 
-        <EditableField
-          label="Description"
-          value={formData.description}
-          onChange={(value) => handleFieldChange("description", value)}
-        />
+            <div className="space-y-4">
+              <EditableField
+                label="Name"
+                value={formData.name}
+                onChange={(value) => handleFieldChange("name", value)}
+              />
 
-        <EditableField
-          label="Legal Name"
-          value={formData.legalName}
-          onChange={(value) => handleFieldChange("legalName", value)}
-        />
+              <EditableField
+                label="Description"
+                value={formData.description}
+                onChange={(value) => handleFieldChange("description", value)}
+              />
 
-        <EditableField
-          label="Headquarter Address"
-          value={formData.headquarterAddress}
-          onChange={(value) => handleFieldChange("headquarterAddress", value)}
-        />
+              <EditableField
+                label="Legal Name"
+                value={formData.legalName}
+                onChange={(value) => handleFieldChange("legalName", value)}
+              />
 
-        <EditableField
-          label="Website URL"
-          value={formData.websiteUrl}
-          onChange={(value) => handleFieldChange("websiteUrl", value)}
-        />
+              <EditableField
+                label="Headquarter Address"
+                value={formData.headquarterAddress}
+                onChange={(value) =>
+                  handleFieldChange("headquarterAddress", value)
+                }
+              />
+
+              <EditableField
+                label="Website URL"
+                value={formData.websiteUrl}
+                onChange={(value) => handleFieldChange("websiteUrl", value)}
+              />
+            </div>
+          </div>
+        </Card>
 
         <Card className="p-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <h2 className="text-lg font-medium">Service Information</h2>
+              <h2 className="text-lg font-medium">Ownership Information</h2>
               <p className="text-sm text-secondary">
-                Basic information about the vendor service
+                Individuals responsible for this vendor
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-tertiary" />
+                  <Label className="text-sm">Business Owner</Label>
+                </div>
+                <PeopleSelector
+                  organizationRef={data.organization}
+                  selectedPersonId={formData.businessOwnerId}
+                  onSelect={(value) =>
+                    handleFieldChange("businessOwnerId", value)
+                  }
+                  placeholder="Select business owner (optional)"
+                />
+                <p className="text-sm text-secondary">
+                  The person responsible for business decisions related to this
+                  vendor
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-tertiary" />
+                  <Label className="text-sm">Security Owner</Label>
+                </div>
+                <PeopleSelector
+                  organizationRef={data.organization}
+                  selectedPersonId={formData.securityOwnerId}
+                  onSelect={(value) =>
+                    handleFieldChange("securityOwnerId", value)
+                  }
+                  placeholder="Select security owner (optional)"
+                />
+                <p className="text-sm text-secondary">
+                  The person responsible for security oversight of this vendor
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-lg font-medium">
+                Risk & Service Information
+              </h2>
+              <p className="text-sm text-secondary">
+                Information about service criticality and risk
               </p>
             </div>
 
@@ -735,7 +854,7 @@ function VendorViewContent({
         <Card className="p-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <h2 className="text-lg font-medium">URLs</h2>
+              <h2 className="text-lg font-medium">Documentation & Links</h2>
               <p className="text-sm text-secondary">
                 Important URLs related to the vendor
               </p>
@@ -860,13 +979,13 @@ function VendorViewContent({
 }
 
 export default function VendorView() {
-  const { vendorId } = useParams();
+  const { vendorId, organizationId } = useParams();
   const [queryRef, loadQuery] =
     useQueryLoader<VendorViewQueryType>(vendorViewQuery);
 
   useEffect(() => {
-    loadQuery({ vendorId: vendorId! });
-  }, [loadQuery, vendorId]);
+    loadQuery({ vendorId: vendorId!, organizationId: organizationId! });
+  }, [loadQuery, vendorId, organizationId]);
 
   if (!queryRef) {
     return <VendorViewSkeleton />;

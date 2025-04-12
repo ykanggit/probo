@@ -212,6 +212,8 @@ type CreateVendorInput struct {
 	ServiceTerminationAt       *time.Time                  `json:"serviceTerminationAt,omitempty"`
 	ServiceCriticality         coredata.ServiceCriticality `json:"serviceCriticality"`
 	RiskTier                   coredata.RiskTier           `json:"riskTier"`
+	BusinessOwnerID            *gid.GID                    `json:"businessOwnerId,omitempty"`
+	SecurityOwnerID            *gid.GID                    `json:"securityOwnerId,omitempty"`
 }
 
 type CreateVendorPayload struct {
@@ -731,6 +733,8 @@ type UpdateVendorInput struct {
 	Certifications             []string                     `json:"certifications,omitempty"`
 	SecurityPageURL            *string                      `json:"securityPageUrl,omitempty"`
 	TrustPageURL               *string                      `json:"trustPageUrl,omitempty"`
+	BusinessOwnerID            *gid.GID                     `json:"businessOwnerId,omitempty"`
+	SecurityOwnerID            *gid.GID                     `json:"securityOwnerId,omitempty"`
 }
 
 type UpdateVendorPayload struct {
@@ -775,6 +779,8 @@ type Vendor struct {
 	Name                       string                            `json:"name"`
 	Description                *string                           `json:"description,omitempty"`
 	ComplianceReports          *VendorComplianceReportConnection `json:"complianceReports"`
+	BusinessOwner              *People                           `json:"businessOwner,omitempty"`
+	SecurityOwner              *People                           `json:"securityOwner,omitempty"`
 	ServiceStartAt             time.Time                         `json:"serviceStartAt"`
 	ServiceTerminationAt       *time.Time                        `json:"serviceTerminationAt,omitempty"`
 	ServiceCriticality         coredata.ServiceCriticality       `json:"serviceCriticality"`

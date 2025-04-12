@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a46552774a4d24ce7d1849d7485fb323>>
+ * @generated SignedSource<<c376281753e99a7cada0872375288f35>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,18 +12,18 @@ import { ConcreteRequest } from 'relay-runtime';
 export type DeleteVendorInput = {
   vendorId: string;
 };
-export type VendorListViewDeleteVendorMutation$variables = {
+export type ListVendorViewDeleteVendorMutation$variables = {
   connections: ReadonlyArray<string>;
   input: DeleteVendorInput;
 };
-export type VendorListViewDeleteVendorMutation$data = {
+export type ListVendorViewDeleteVendorMutation$data = {
   readonly deleteVendor: {
     readonly deletedVendorId: string;
   };
 };
-export type VendorListViewDeleteVendorMutation = {
-  response: VendorListViewDeleteVendorMutation$data;
-  variables: VendorListViewDeleteVendorMutation$variables;
+export type ListVendorViewDeleteVendorMutation = {
+  response: ListVendorViewDeleteVendorMutation$data;
+  variables: ListVendorViewDeleteVendorMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -59,7 +59,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "VendorListViewDeleteVendorMutation",
+    "name": "ListVendorViewDeleteVendorMutation",
     "selections": [
       {
         "alias": null,
@@ -84,7 +84,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "VendorListViewDeleteVendorMutation",
+    "name": "ListVendorViewDeleteVendorMutation",
     "selections": [
       {
         "alias": null,
@@ -117,16 +117,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "7edee61297200dec1695f6b2325cd7f0",
+    "cacheID": "7aa26c31ccb2b601700560ad66e84b6f",
     "id": null,
     "metadata": {},
-    "name": "VendorListViewDeleteVendorMutation",
+    "name": "ListVendorViewDeleteVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorListViewDeleteVendorMutation(\n  $input: DeleteVendorInput!\n) {\n  deleteVendor(input: $input) {\n    deletedVendorId\n  }\n}\n"
+    "text": "mutation ListVendorViewDeleteVendorMutation(\n  $input: DeleteVendorInput!\n) {\n  deleteVendor(input: $input) {\n    deletedVendorId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "85387685fd75c8b99fb9e9195d4a903f";
+(node as any).hash = "9d443dea5c3e78e04dbfc6632b063c8d";
 
 export default node;

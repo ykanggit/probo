@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<dce76b1271e95cbf0d70b18be492a389>>
+ * @generated SignedSource<<b85fbf05b6b7f76bd8ceb87383bfd4b3>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,7 +11,7 @@
 import { ReaderFragment } from 'relay-runtime';
 export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
 import { FragmentRefs } from "relay-runtime";
-export type VendorListView_vendors$data = {
+export type ListVendorView_vendors$data = {
   readonly id: string;
   readonly vendors: {
     readonly __id: string;
@@ -32,11 +32,11 @@ export type VendorListView_vendors$data = {
       readonly startCursor: string | null | undefined;
     };
   };
-  readonly " $fragmentType": "VendorListView_vendors";
+  readonly " $fragmentType": "ListVendorView_vendors";
 };
-export type VendorListView_vendors$key = {
-  readonly " $data"?: VendorListView_vendors$data;
-  readonly " $fragmentSpreads": FragmentRefs<"VendorListView_vendors">;
+export type ListVendorView_vendors$key = {
+  readonly " $data"?: ListVendorView_vendors$data;
+  readonly " $fragmentSpreads": FragmentRefs<"ListVendorView_vendors">;
 };
 
 const node: ReaderFragment = (function(){
@@ -98,14 +98,14 @@ return {
       "fragmentPathInResult": [
         "node"
       ],
-      "operation": require('./VendorListViewPaginationQuery.graphql'),
+      "operation": require('./ListVendorViewPaginationQuery.graphql'),
       "identifierInfo": {
         "identifierField": "id",
         "identifierQueryVariableName": "id"
       }
     }
   },
-  "name": "VendorListView_vendors",
+  "name": "ListVendorView_vendors",
   "selections": [
     {
       "alias": "vendors",
@@ -257,6 +257,6 @@ return {
 };
 })();
 
-(node as any).hash = "96466253eae17f60ffdf08ad59719e83";
+(node as any).hash = "6e3badec3308017fd318d4bd1dc41b44";
 
 export default node;

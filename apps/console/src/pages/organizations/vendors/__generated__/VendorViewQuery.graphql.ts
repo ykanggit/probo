@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f69485d1f583f57e60850e2bc6428763>>
+ * @generated SignedSource<<62c3cb3473246b0326ff4cbd4cc4f940>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,13 +9,19 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+import { FragmentRefs } from "relay-runtime";
 export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
 export type ServiceCriticality = "HIGH" | "LOW" | "MEDIUM";
 export type VendorViewQuery$variables = {
+  organizationId: string;
   vendorId: string;
 };
 export type VendorViewQuery$data = {
   readonly node: {
+    readonly businessOwner?: {
+      readonly fullName: string;
+      readonly id: string;
+    } | null | undefined;
     readonly certifications?: ReadonlyArray<string>;
     readonly complianceReports?: {
       readonly edges: ReadonlyArray<{
@@ -39,6 +45,10 @@ export type VendorViewQuery$data = {
     readonly name?: string;
     readonly privacyPolicyUrl?: string | null | undefined;
     readonly riskTier?: RiskTier;
+    readonly securityOwner?: {
+      readonly fullName: string;
+      readonly id: string;
+    } | null | undefined;
     readonly securityPageUrl?: string | null | undefined;
     readonly serviceCriticality?: ServiceCriticality;
     readonly serviceLevelAgreementUrl?: string | null | undefined;
@@ -50,6 +60,9 @@ export type VendorViewQuery$data = {
     readonly updatedAt?: string;
     readonly websiteUrl?: string | null | undefined;
   };
+  readonly organization: {
+    readonly " $fragmentSpreads": FragmentRefs<"PeopleSelector_organization">;
+  };
 };
 export type VendorViewQuery = {
   response: VendorViewQuery$data;
@@ -57,168 +70,234 @@ export type VendorViewQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "defaultValue": null,
-    "kind": "LocalArgument",
-    "name": "vendorId"
-  }
-],
-v1 = [
+var v0 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "organizationId"
+},
+v1 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "vendorId"
+},
+v2 = [
   {
     "kind": "Variable",
     "name": "id",
     "variableName": "vendorId"
   }
 ],
-v2 = {
+v3 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v3 = {
+v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "name",
   "storageKey": null
 },
-v4 = {
+v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "description",
   "storageKey": null
 },
-v5 = {
+v6 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "serviceStartAt",
   "storageKey": null
 },
-v6 = {
+v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "serviceTerminationAt",
   "storageKey": null
 },
-v7 = {
+v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "serviceCriticality",
   "storageKey": null
 },
-v8 = {
+v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "riskTier",
   "storageKey": null
 },
-v9 = {
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "statusPageUrl",
   "storageKey": null
 },
-v10 = {
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "termsOfServiceUrl",
   "storageKey": null
 },
-v11 = {
+v12 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "privacyPolicyUrl",
   "storageKey": null
 },
-v12 = {
+v13 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "serviceLevelAgreementUrl",
   "storageKey": null
 },
-v13 = {
+v14 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "dataProcessingAgreementUrl",
   "storageKey": null
 },
-v14 = {
+v15 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "securityPageUrl",
   "storageKey": null
 },
-v15 = {
+v16 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "trustPageUrl",
   "storageKey": null
 },
-v16 = {
+v17 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "certifications",
   "storageKey": null
 },
-v17 = {
+v18 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "headquarterAddress",
   "storageKey": null
 },
-v18 = {
+v19 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "legalName",
   "storageKey": null
 },
-v19 = {
+v20 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "websiteUrl",
   "storageKey": null
 },
-v20 = {
+v21 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "fullName",
+  "storageKey": null
+},
+v22 = [
+  (v3/*: any*/),
+  (v21/*: any*/)
+],
+v23 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "People",
+  "kind": "LinkedField",
+  "name": "businessOwner",
+  "plural": false,
+  "selections": (v22/*: any*/),
+  "storageKey": null
+},
+v24 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "People",
+  "kind": "LinkedField",
+  "name": "securityOwner",
+  "plural": false,
+  "selections": (v22/*: any*/),
+  "storageKey": null
+},
+v25 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "createdAt",
   "storageKey": null
 },
-v21 = {
+v26 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "updatedAt",
   "storageKey": null
 },
-v22 = {
+v27 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v23 = [
+v28 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "cursor",
+  "storageKey": null
+},
+v29 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "PageInfo",
+  "kind": "LinkedField",
+  "name": "pageInfo",
+  "plural": false,
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "endCursor",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "hasNextPage",
+      "storageKey": null
+    }
+  ],
+  "storageKey": null
+},
+v30 = [
   {
     "alias": null,
     "args": null,
@@ -235,7 +314,7 @@ v23 = [
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/),
+          (v3/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -271,64 +350,56 @@ v23 = [
             "name": "fileSize",
             "storageKey": null
           },
-          (v20/*: any*/),
-          (v22/*: any*/)
+          (v25/*: any*/),
+          (v27/*: any*/)
         ],
         "storageKey": null
       },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "cursor",
-        "storageKey": null
-      }
+      (v28/*: any*/)
     ],
     "storageKey": null
   },
+  (v29/*: any*/)
+],
+v31 = [
   {
-    "alias": null,
-    "args": null,
-    "concreteType": "PageInfo",
-    "kind": "LinkedField",
-    "name": "pageInfo",
-    "plural": false,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "endCursor",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "hasNextPage",
-        "storageKey": null
-      }
-    ],
-    "storageKey": null
+    "kind": "Variable",
+    "name": "id",
+    "variableName": "organizationId"
   }
 ],
-v24 = [
+v32 = {
+  "kind": "Literal",
+  "name": "first",
+  "value": 100
+},
+v33 = [
+  (v32/*: any*/)
+],
+v34 = [
+  (v32/*: any*/),
   {
     "kind": "Literal",
-    "name": "first",
-    "value": 100
+    "name": "orderBy",
+    "value": {
+      "direction": "ASC",
+      "field": "FULL_NAME"
+    }
   }
 ];
 return {
   "fragment": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/)
+    ],
     "kind": "Fragment",
     "metadata": null,
     "name": "VendorViewQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v1/*: any*/),
+        "args": (v2/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
@@ -337,7 +408,6 @@ return {
           {
             "kind": "InlineFragment",
             "selections": [
-              (v2/*: any*/),
               (v3/*: any*/),
               (v4/*: any*/),
               (v5/*: any*/),
@@ -356,7 +426,10 @@ return {
               (v18/*: any*/),
               (v19/*: any*/),
               (v20/*: any*/),
-              (v21/*: any*/),
+              (v23/*: any*/),
+              (v24/*: any*/),
+              (v25/*: any*/),
+              (v26/*: any*/),
               {
                 "alias": "complianceReports",
                 "args": null,
@@ -364,12 +437,28 @@ return {
                 "kind": "LinkedField",
                 "name": "__VendorView_complianceReports_connection",
                 "plural": false,
-                "selections": (v23/*: any*/),
+                "selections": (v30/*: any*/),
                 "storageKey": null
               }
             ],
             "type": "Vendor",
             "abstractKey": null
+          }
+        ],
+        "storageKey": null
+      },
+      {
+        "alias": "organization",
+        "args": (v31/*: any*/),
+        "concreteType": null,
+        "kind": "LinkedField",
+        "name": "node",
+        "plural": false,
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "PeopleSelector_organization"
           }
         ],
         "storageKey": null
@@ -380,24 +469,26 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v1/*: any*/),
+      (v0/*: any*/)
+    ],
     "kind": "Operation",
     "name": "VendorViewQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v1/*: any*/),
+        "args": (v2/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v22/*: any*/),
-          (v2/*: any*/),
+          (v27/*: any*/),
+          (v3/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
-              (v3/*: any*/),
               (v4/*: any*/),
               (v5/*: any*/),
               (v6/*: any*/),
@@ -415,20 +506,23 @@ return {
               (v18/*: any*/),
               (v19/*: any*/),
               (v20/*: any*/),
-              (v21/*: any*/),
+              (v23/*: any*/),
+              (v24/*: any*/),
+              (v25/*: any*/),
+              (v26/*: any*/),
               {
                 "alias": null,
-                "args": (v24/*: any*/),
+                "args": (v33/*: any*/),
                 "concreteType": "VendorComplianceReportConnection",
                 "kind": "LinkedField",
                 "name": "complianceReports",
                 "plural": false,
-                "selections": (v23/*: any*/),
+                "selections": (v30/*: any*/),
                 "storageKey": "complianceReports(first:100)"
               },
               {
                 "alias": null,
-                "args": (v24/*: any*/),
+                "args": (v33/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "VendorView_complianceReports",
@@ -441,11 +535,87 @@ return {
           }
         ],
         "storageKey": null
+      },
+      {
+        "alias": "organization",
+        "args": (v31/*: any*/),
+        "concreteType": null,
+        "kind": "LinkedField",
+        "name": "node",
+        "plural": false,
+        "selections": [
+          (v27/*: any*/),
+          (v3/*: any*/),
+          {
+            "kind": "InlineFragment",
+            "selections": [
+              {
+                "alias": null,
+                "args": (v34/*: any*/),
+                "concreteType": "PeopleConnection",
+                "kind": "LinkedField",
+                "name": "peoples",
+                "plural": false,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "PeopleEdge",
+                    "kind": "LinkedField",
+                    "name": "edges",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "People",
+                        "kind": "LinkedField",
+                        "name": "node",
+                        "plural": false,
+                        "selections": [
+                          (v3/*: any*/),
+                          (v21/*: any*/),
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "primaryEmailAddress",
+                            "storageKey": null
+                          },
+                          (v27/*: any*/)
+                        ],
+                        "storageKey": null
+                      },
+                      (v28/*: any*/)
+                    ],
+                    "storageKey": null
+                  },
+                  (v29/*: any*/)
+                ],
+                "storageKey": "peoples(first:100,orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
+              },
+              {
+                "alias": null,
+                "args": (v34/*: any*/),
+                "filters": [
+                  "orderBy"
+                ],
+                "handle": "connection",
+                "key": "PeopleSelector_organization_peoples",
+                "kind": "LinkedHandle",
+                "name": "peoples"
+              }
+            ],
+            "type": "Organization",
+            "abstractKey": null
+          }
+        ],
+        "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "2bef9911b76d74ced85cf4430410a297",
+    "cacheID": "337beb9fa1d1d29bcd974229385d8e7a",
     "id": null,
     "metadata": {
       "connection": [
@@ -462,11 +632,11 @@ return {
     },
     "name": "VendorViewQuery",
     "operationKind": "query",
-    "text": "query VendorViewQuery(\n  $vendorId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      createdAt\n      updatedAt\n      complianceReports(first: 100) {\n        edges {\n          node {\n            id\n            reportName\n            reportDate\n            validUntil\n            fileUrl\n            fileSize\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query VendorViewQuery(\n  $vendorId: ID!\n  $organizationId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      createdAt\n      updatedAt\n      complianceReports(first: 100) {\n        edges {\n          node {\n            id\n            reportName\n            reportDate\n            validUntil\n            fileUrl\n            fileSize\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "f3f95bc0c893b61e83940c1cc0c33922";
+(node as any).hash = "4a621712e4dfaebf9ad42232ba7f713a";
 
 export default node;

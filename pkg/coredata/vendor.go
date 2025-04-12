@@ -47,6 +47,8 @@ type (
 		Certifications             []string           `db:"certifications"`
 		ServiceCriticality         ServiceCriticality `db:"service_criticality"`
 		RiskTier                   RiskTier           `db:"risk_tier"`
+		BusinessOwnerID            *gid.GID           `db:"business_owner_id"`
+		SecurityOwnerID            *gid.GID           `db:"security_owner_id"`
 		StatusPageURL              *string            `db:"status_page_url"`
 		TermsOfServiceURL          *string            `db:"terms_of_service_url"`
 		SecurityPageURL            *string            `db:"security_page_url"`
@@ -93,6 +95,8 @@ SELECT
     certifications,
     service_criticality,
     risk_tier,
+	business_owner_id,
+	security_owner_id,
     status_page_url,
     terms_of_service_url,
     security_page_url,
@@ -153,6 +157,8 @@ INSERT INTO
         service_termination_at,
         service_criticality,
         risk_tier,
+        business_owner_id,
+		security_owner_id,
         status_page_url,
         terms_of_service_url,
         security_page_url,
@@ -178,6 +184,8 @@ VALUES (
     @service_termination_at,
     @service_criticality,
     @risk_tier,
+    @business_owner_id,
+	@security_owner_id,
     @status_page_url,
     @terms_of_service_url,
     @security_page_url,
@@ -205,6 +213,8 @@ VALUES (
 		"service_termination_at":        v.ServiceTerminationAt,
 		"service_criticality":           v.ServiceCriticality,
 		"risk_tier":                     v.RiskTier,
+		"business_owner_id":             v.BusinessOwnerID,
+		"security_owner_id":             v.SecurityOwnerID,
 		"status_page_url":               v.StatusPageURL,
 		"terms_of_service_url":          v.TermsOfServiceURL,
 		"security_page_url":             v.SecurityPageURL,
@@ -259,6 +269,8 @@ SELECT
     service_termination_at,
     service_criticality,
     risk_tier,
+	business_owner_id,
+	security_owner_id,
     status_page_url,
     terms_of_service_url,
     security_page_url,
@@ -319,6 +331,8 @@ SET
 	terms_of_service_url = @terms_of_service_url,
 	security_page_url = @security_page_url,
 	trust_page_url = @trust_page_url,
+	business_owner_id = @business_owner_id,
+	security_owner_id = @security_owner_id,
 	updated_at = @updated_at
 WHERE %s
     AND id = @vendor_id
@@ -346,6 +360,8 @@ WHERE %s
 		"terms_of_service_url":          v.TermsOfServiceURL,
 		"security_page_url":             v.SecurityPageURL,
 		"trust_page_url":                v.TrustPageURL,
+		"business_owner_id":             v.BusinessOwnerID,
+		"security_owner_id":             v.SecurityOwnerID,
 	}
 
 	maps.Copy(args, scope.SQLArguments())

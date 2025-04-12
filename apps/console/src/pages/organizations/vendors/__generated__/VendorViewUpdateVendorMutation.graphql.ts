@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0e66de0cfba2c27bbf78dcb8e846ad8d>>
+ * @generated SignedSource<<e8b13d28eed7587f5fbefcc073c53dc4>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,6 +12,7 @@ import { ConcreteRequest } from 'relay-runtime';
 export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
 export type ServiceCriticality = "HIGH" | "LOW" | "MEDIUM";
 export type UpdateVendorInput = {
+  businessOwnerId?: string | null | undefined;
   category?: string | null | undefined;
   certifications?: ReadonlyArray<string> | null | undefined;
   dataProcessingAgreementUrl?: string | null | undefined;
@@ -22,6 +23,7 @@ export type UpdateVendorInput = {
   name?: string | null | undefined;
   privacyPolicyUrl?: string | null | undefined;
   riskTier?: RiskTier | null | undefined;
+  securityOwnerId?: string | null | undefined;
   securityPageUrl?: string | null | undefined;
   serviceCriticality?: ServiceCriticality | null | undefined;
   serviceLevelAgreementUrl?: string | null | undefined;
@@ -38,6 +40,10 @@ export type VendorViewUpdateVendorMutation$variables = {
 export type VendorViewUpdateVendorMutation$data = {
   readonly updateVendor: {
     readonly vendor: {
+      readonly businessOwner: {
+        readonly fullName: string;
+        readonly id: string;
+      } | null | undefined;
       readonly certifications: ReadonlyArray<string>;
       readonly dataProcessingAgreementUrl: string | null | undefined;
       readonly description: string | null | undefined;
@@ -47,6 +53,10 @@ export type VendorViewUpdateVendorMutation$data = {
       readonly name: string;
       readonly privacyPolicyUrl: string | null | undefined;
       readonly riskTier: RiskTier;
+      readonly securityOwner: {
+        readonly fullName: string;
+        readonly id: string;
+      } | null | undefined;
       readonly securityPageUrl: string | null | undefined;
       readonly serviceCriticality: ServiceCriticality;
       readonly serviceLevelAgreementUrl: string | null | undefined;
@@ -73,7 +83,24 @@ var v0 = [
     "name": "input"
   }
 ],
-v1 = [
+v1 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v2 = [
+  (v1/*: any*/),
+  {
+    "alias": null,
+    "args": null,
+    "kind": "ScalarField",
+    "name": "fullName",
+    "storageKey": null
+  }
+],
+v3 = [
   {
     "alias": null,
     "args": [
@@ -96,13 +123,7 @@ v1 = [
         "name": "vendor",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "id",
-            "storageKey": null
-          },
+          (v1/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -225,6 +246,26 @@ v1 = [
           {
             "alias": null,
             "args": null,
+            "concreteType": "People",
+            "kind": "LinkedField",
+            "name": "businessOwner",
+            "plural": false,
+            "selections": (v2/*: any*/),
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "People",
+            "kind": "LinkedField",
+            "name": "securityOwner",
+            "plural": false,
+            "selections": (v2/*: any*/),
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
             "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
@@ -242,7 +283,7 @@ return {
     "kind": "Fragment",
     "metadata": null,
     "name": "VendorViewUpdateVendorMutation",
-    "selections": (v1/*: any*/),
+    "selections": (v3/*: any*/),
     "type": "Mutation",
     "abstractKey": null
   },
@@ -251,19 +292,19 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
     "name": "VendorViewUpdateVendorMutation",
-    "selections": (v1/*: any*/)
+    "selections": (v3/*: any*/)
   },
   "params": {
-    "cacheID": "8ed69675626a00cac2cc79aa570f123d",
+    "cacheID": "d582aaaddaa73ef8e0fdef172364c64e",
     "id": null,
     "metadata": {},
     "name": "VendorViewUpdateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "517efd79b3eb1781ed562368a2ed1ecc";
+(node as any).hash = "627ef1694ebc04845b019bb65dd72c97";
 
 export default node;

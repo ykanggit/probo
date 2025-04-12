@@ -526,6 +526,7 @@ type ComplexityRoot struct {
 	}
 
 	Vendor struct {
+		BusinessOwner              func(childComplexity int) int
 		Certifications             func(childComplexity int) int
 		ComplianceReports          func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) int
 		CreatedAt                  func(childComplexity int) int
@@ -537,6 +538,7 @@ type ComplexityRoot struct {
 		Name                       func(childComplexity int) int
 		PrivacyPolicyURL           func(childComplexity int) int
 		RiskTier                   func(childComplexity int) int
+		SecurityOwner              func(childComplexity int) int
 		SecurityPageURL            func(childComplexity int) int
 		ServiceCriticality         func(childComplexity int) int
 		ServiceLevelAgreementURL   func(childComplexity int) int
@@ -679,6 +681,8 @@ type TaskResolver interface {
 }
 type VendorResolver interface {
 	ComplianceReports(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) (*types.VendorComplianceReportConnection, error)
+	BusinessOwner(ctx context.Context, obj *types.Vendor) (*types.People, error)
+	SecurityOwner(ctx context.Context, obj *types.Vendor) (*types.People, error)
 }
 type VendorComplianceReportResolver interface {
 	Vendor(ctx context.Context, obj *types.VendorComplianceReport) (*types.Vendor, error)
@@ -2633,6 +2637,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserEdge.Node(childComplexity), true
 
+	case "Vendor.businessOwner":
+		if e.complexity.Vendor.BusinessOwner == nil {
+			break
+		}
+
+		return e.complexity.Vendor.BusinessOwner(childComplexity), true
+
 	case "Vendor.certifications":
 		if e.complexity.Vendor.Certifications == nil {
 			break
@@ -2714,6 +2725,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Vendor.RiskTier(childComplexity), true
+
+	case "Vendor.securityOwner":
+		if e.complexity.Vendor.SecurityOwner == nil {
+			break
+		}
+
+		return e.complexity.Vendor.SecurityOwner(childComplexity), true
 
 	case "Vendor.securityPageUrl":
 		if e.complexity.Vendor.SecurityPageURL == nil {
@@ -3550,6 +3568,9 @@ type Vendor implements Node {
     orderBy: VendorComplianceReportOrder
   ): VendorComplianceReportConnection! @goField(forceResolver: true)
 
+  businessOwner: People @goField(forceResolver: true)
+  securityOwner: People @goField(forceResolver: true)
+
   serviceStartAt: Datetime!
   serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality!
@@ -4036,6 +4057,8 @@ input CreateVendorInput {
   serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality!
   riskTier: RiskTier!
+  businessOwnerId: ID
+  securityOwnerId: ID
 }
 
 input UpdateVendorInput {
@@ -4058,6 +4081,8 @@ input UpdateVendorInput {
   certifications: [String!]
   securityPageUrl: String
   trustPageUrl: String
+  businessOwnerId: ID
+  securityOwnerId: ID
 }
 
 input DeleteVendorInput {
@@ -18974,6 +18999,10 @@ func (ec *executionContext) fieldContext_UpdateVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessOwner":
+				return ec.fieldContext_Vendor_businessOwner(ctx, field)
+			case "securityOwner":
+				return ec.fieldContext_Vendor_securityOwner(ctx, field)
 			case "serviceStartAt":
 				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
 			case "serviceTerminationAt":
@@ -19675,6 +19704,120 @@ func (ec *executionContext) fieldContext_Vendor_complianceReports(ctx context.Co
 	if fc.Args, err = ec.field_Vendor_complianceReports_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_businessOwner(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_businessOwner(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Vendor().BusinessOwner(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalOPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_businessOwner(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_securityOwner(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_securityOwner(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Vendor().SecurityOwner(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalOPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_securityOwner(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -20485,6 +20628,10 @@ func (ec *executionContext) fieldContext_VendorComplianceReport_vendor(_ context
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessOwner":
+				return ec.fieldContext_Vendor_businessOwner(ctx, field)
+			case "securityOwner":
+				return ec.fieldContext_Vendor_securityOwner(ctx, field)
 			case "serviceStartAt":
 				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
 			case "serviceTerminationAt":
@@ -21238,6 +21385,10 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessOwner":
+				return ec.fieldContext_Vendor_businessOwner(ctx, field)
+			case "securityOwner":
+				return ec.fieldContext_Vendor_securityOwner(ctx, field)
 			case "serviceStartAt":
 				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
 			case "serviceTerminationAt":
@@ -24069,7 +24220,7 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "description", "headquarterAddress", "legalName", "websiteUrl", "privacyPolicyUrl", "category", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "certifications", "securityPageUrl", "trustPageUrl", "statusPageUrl", "termsOfServiceUrl", "serviceStartAt", "serviceTerminationAt", "serviceCriticality", "riskTier"}
+	fieldsInOrder := [...]string{"organizationId", "name", "description", "headquarterAddress", "legalName", "websiteUrl", "privacyPolicyUrl", "category", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "certifications", "securityPageUrl", "trustPageUrl", "statusPageUrl", "termsOfServiceUrl", "serviceStartAt", "serviceTerminationAt", "serviceCriticality", "riskTier", "businessOwnerId", "securityOwnerId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -24209,6 +24360,20 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.RiskTier = data
+		case "businessOwnerId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("businessOwnerId"))
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BusinessOwnerID = data
+		case "securityOwnerId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("securityOwnerId"))
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SecurityOwnerID = data
 		}
 	}
 
@@ -25538,7 +25703,7 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartAt", "serviceTerminationAt", "serviceCriticality", "riskTier", "statusPageUrl", "termsOfServiceUrl", "privacyPolicyUrl", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "websiteUrl", "legalName", "headquarterAddress", "category", "certifications", "securityPageUrl", "trustPageUrl"}
+	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartAt", "serviceTerminationAt", "serviceCriticality", "riskTier", "statusPageUrl", "termsOfServiceUrl", "privacyPolicyUrl", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "websiteUrl", "legalName", "headquarterAddress", "category", "certifications", "securityPageUrl", "trustPageUrl", "businessOwnerId", "securityOwnerId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25678,6 +25843,20 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.TrustPageURL = data
+		case "businessOwnerId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("businessOwnerId"))
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BusinessOwnerID = data
+		case "securityOwnerId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("securityOwnerId"))
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SecurityOwnerID = data
 		}
 	}
 
@@ -30612,6 +30791,72 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "businessOwner":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Vendor_businessOwner(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "securityOwner":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Vendor_securityOwner(ctx, field, obj)
 				return res
 			}
 

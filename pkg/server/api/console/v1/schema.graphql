@@ -457,6 +457,9 @@ type Vendor implements Node {
     orderBy: VendorComplianceReportOrder
   ): VendorComplianceReportConnection! @goField(forceResolver: true)
 
+  businessOwner: People @goField(forceResolver: true)
+  securityOwner: People @goField(forceResolver: true)
+
   serviceStartAt: Datetime!
   serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality!
@@ -943,6 +946,8 @@ input CreateVendorInput {
   serviceTerminationAt: Datetime
   serviceCriticality: ServiceCriticality!
   riskTier: RiskTier!
+  businessOwnerId: ID
+  securityOwnerId: ID
 }
 
 input UpdateVendorInput {
@@ -965,6 +970,8 @@ input UpdateVendorInput {
   certifications: [String!]
   securityPageUrl: String
   trustPageUrl: String
+  businessOwnerId: ID
+  securityOwnerId: ID
 }
 
 input DeleteVendorInput {

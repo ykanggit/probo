@@ -26,7 +26,7 @@ import { EditRiskPage } from "./risks/EditRiskPage";
 import { NewRiskPage } from "./risks/NewRiskPage";
 import { ListRiskPage } from "./risks/ListRiskPage";
 import ShowRiskView from "./risks/ShowRiskView";
-import { VendorListPage } from "./vendors/VendorListPage";
+import { ListVendorPage } from "./vendors/ListVendorPage";
 import { VendorPage } from "./vendors/VendorPage";
 
 export function OrganizationsRoutes() {
@@ -37,7 +37,7 @@ export function OrganizationsRoutes() {
         <Route path="people" element={<PeopleListPage />} />
         <Route path="people/new" element={<NewPeoplePage />} />
         <Route path="people/:peopleId" element={<PeoplePage />} />
-        <Route path="vendors" element={<VendorListPage />} />
+        <Route path="vendors" element={<ListVendorPage />} />
         <Route path="frameworks" element={<FrameworkListPage />} />
         <Route path="frameworks/new" element={<NewFrameworkPage />} />
         <Route path="frameworks/:frameworkId/*">

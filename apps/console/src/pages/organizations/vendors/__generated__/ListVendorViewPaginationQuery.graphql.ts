@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e166844caf05e2dfc32321c2547cbf32>>
+ * @generated SignedSource<<49f537ed24daee25a89fb244341ba874>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,21 +10,21 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type VendorListViewPaginationQuery$variables = {
+export type ListVendorViewPaginationQuery$variables = {
   after?: string | null | undefined;
   before?: string | null | undefined;
   first?: number | null | undefined;
   id: string;
   last?: number | null | undefined;
 };
-export type VendorListViewPaginationQuery$data = {
+export type ListVendorViewPaginationQuery$data = {
   readonly node: {
-    readonly " $fragmentSpreads": FragmentRefs<"VendorListView_vendors">;
+    readonly " $fragmentSpreads": FragmentRefs<"ListVendorView_vendors">;
   };
 };
-export type VendorListViewPaginationQuery = {
-  response: VendorListViewPaginationQuery$data;
-  variables: VendorListViewPaginationQuery$variables;
+export type ListVendorViewPaginationQuery = {
+  response: ListVendorViewPaginationQuery$data;
+  variables: ListVendorViewPaginationQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -119,7 +119,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "VendorListViewPaginationQuery",
+    "name": "ListVendorViewPaginationQuery",
     "selections": [
       {
         "alias": null,
@@ -137,7 +137,7 @@ return {
               (v9/*: any*/)
             ],
             "kind": "FragmentSpread",
-            "name": "VendorListView_vendors"
+            "name": "ListVendorView_vendors"
           }
         ],
         "storageKey": null
@@ -156,7 +156,7 @@ return {
       (v3/*: any*/)
     ],
     "kind": "Operation",
-    "name": "VendorListViewPaginationQuery",
+    "name": "ListVendorViewPaginationQuery",
     "selections": [
       {
         "alias": null,
@@ -320,16 +320,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "f447e5171c495d86e5132c58b2afc8c8",
+    "cacheID": "f48cd9d88c871edac4c400dc2fa20e9a",
     "id": null,
     "metadata": {},
-    "name": "VendorListViewPaginationQuery",
+    "name": "ListVendorViewPaginationQuery",
     "operationKind": "query",
-    "text": "query VendorListViewPaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...VendorListView_vendors_pbnwq\n    id\n  }\n}\n\nfragment VendorListView_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query ListVendorViewPaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ListVendorView_vendors_pbnwq\n    id\n  }\n}\n\nfragment ListVendorView_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "96466253eae17f60ffdf08ad59719e83";
+(node as any).hash = "6e3badec3308017fd318d4bd1dc41b44";
 
 export default node;

@@ -50,6 +50,8 @@ type (
 		ServiceTerminationAt       *time.Time
 		ServiceCriticality         coredata.ServiceCriticality
 		RiskTier                   coredata.RiskTier
+		BusinessOwnerID            *gid.GID
+		SecurityOwnerID            *gid.GID
 	}
 
 	UpdateVendorRequest struct {
@@ -72,6 +74,8 @@ type (
 		ServiceTerminationAt       *time.Time
 		ServiceCriticality         *coredata.ServiceCriticality
 		RiskTier                   *coredata.RiskTier
+		BusinessOwnerID            *gid.GID
+		SecurityOwnerID            *gid.GID
 	}
 )
 
@@ -201,6 +205,14 @@ func (s VendorService) Update(
 
 			if req.TrustPageURL != nil {
 				vendor.TrustPageURL = req.TrustPageURL
+			}
+
+			if req.BusinessOwnerID != nil {
+				vendor.BusinessOwnerID = req.BusinessOwnerID
+			}
+
+			if req.SecurityOwnerID != nil {
+				vendor.SecurityOwnerID = req.SecurityOwnerID
 			}
 
 			vendor.UpdatedAt = time.Now()

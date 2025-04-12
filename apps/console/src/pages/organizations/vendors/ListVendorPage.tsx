@@ -4,9 +4,9 @@ import { lazy } from "@probo/react-lazy";
 import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
 
-const VendorListView = lazy(() => import("./VendorListView"));
+const VendorListView = lazy(() => import("./ListVendorView"));
 
-export function VendorListViewSkeleton() {
+export function ListVendorViewSkeleton() {
   return (
     <PageTemplateSkeleton
       title="Vendors"
@@ -34,11 +34,11 @@ export function VendorListViewSkeleton() {
   );
 }
 
-export function VendorListPage() {
+export function ListVendorPage() {
   const location = useLocation();
 
   return (
-    <Suspense key={location.pathname} fallback={<VendorListViewSkeleton />}>
+    <Suspense key={location.pathname} fallback={<ListVendorViewSkeleton />}>
       <ErrorBoundaryWithLocation>
         <VendorListView />
       </ErrorBoundaryWithLocation>

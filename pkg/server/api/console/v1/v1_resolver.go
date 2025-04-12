@@ -377,6 +377,8 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 			Certifications:             input.Certifications,
 			SecurityPageURL:            input.SecurityPageURL,
 			TrustPageURL:               input.TrustPageURL,
+			BusinessOwnerID:            input.BusinessOwnerID,
+			SecurityOwnerID:            input.SecurityOwnerID,
 		},
 	)
 	if err != nil {
@@ -411,6 +413,8 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 		WebsiteURL:                 input.WebsiteURL,
 		Category:                   input.Category,
 		Certifications:             input.Certifications,
+		BusinessOwnerID:            input.BusinessOwnerID,
+		SecurityOwnerID:            input.SecurityOwnerID,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update vendor: %w", err)
@@ -1511,6 +1515,48 @@ func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendo
 	}
 
 	return types.NewVendorComplianceReportConnection(page), nil
+}
+
+// BusinessOwner is the resolver for the businessOwner field.
+func (r *vendorResolver) BusinessOwner(ctx context.Context, obj *types.Vendor) (*types.People, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	vendor, err := svc.Vendors.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get vendor: %w", err))
+	}
+
+	if vendor.BusinessOwnerID == nil {
+		return nil, nil
+	}
+
+	people, err := svc.Peoples.Get(ctx, *vendor.BusinessOwnerID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get business owner: %w", err))
+	}
+
+	return types.NewPeople(people), nil
+}
+
+// SecurityOwner is the resolver for the securityOwner field.
+func (r *vendorResolver) SecurityOwner(ctx context.Context, obj *types.Vendor) (*types.People, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	vendor, err := svc.Vendors.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get vendor: %w", err))
+	}
+
+	if vendor.SecurityOwnerID == nil {
+		return nil, nil
+	}
+
+	people, err := svc.Peoples.Get(ctx, *vendor.SecurityOwnerID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get security owner: %w", err))
+	}
+
+	return types.NewPeople(people), nil
 }
 
 // Vendor is the resolver for the vendor field.
