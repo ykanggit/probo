@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.0] - 2025-04-12
+
 ### Added
 
 - Enhanced risk management with inherent and residual risk assessment capabilities
