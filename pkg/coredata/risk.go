@@ -28,16 +28,17 @@ import (
 
 type (
 	Risk struct {
-		ID                 gid.GID   `db:"id"`
-		OrganizationID     gid.GID   `db:"organization_id"`
-		Name               string    `db:"name"`
-		Description        string    `db:"description"`
-		InherentLikelihood float64   `db:"inherent_likelihood"`
-		InherentImpact     float64   `db:"inherent_impact"`
-		ResidualLikelihood float64   `db:"residual_likelihood"`
-		ResidualImpact     float64   `db:"residual_impact"`
-		CreatedAt          time.Time `db:"created_at"`
-		UpdatedAt          time.Time `db:"updated_at"`
+		ID                 gid.GID       `db:"id"`
+		OrganizationID     gid.GID       `db:"organization_id"`
+		Name               string        `db:"name"`
+		Description        string        `db:"description"`
+		Treatment          RiskTreatment `db:"treatment"`
+		InherentLikelihood float64       `db:"inherent_likelihood"`
+		InherentImpact     float64       `db:"inherent_impact"`
+		ResidualLikelihood float64       `db:"residual_likelihood"`
+		ResidualImpact     float64       `db:"residual_impact"`
+		CreatedAt          time.Time     `db:"created_at"`
+		UpdatedAt          time.Time     `db:"updated_at"`
 	}
 
 	Risks []*Risk
@@ -72,9 +73,9 @@ WITH rsks AS (
 	SELECT
 		r.id,
 		r.organization_id,
-		r.tenant_id,
 		r.name,
 		r.description,
+		r.treatment,
 		r.inherent_likelihood,
 		r.inherent_impact,
 		r.residual_likelihood,
@@ -93,6 +94,7 @@ SELECT
 	organization_id,
 	name,
 	description,
+	treatment,
 	inherent_likelihood,
 	inherent_impact,
 	residual_likelihood,
@@ -137,6 +139,7 @@ SELECT
 	organization_id,
 	name,
 	description,
+	treatment,
 	inherent_likelihood,
 	inherent_impact,
 	residual_likelihood,
@@ -180,6 +183,7 @@ SELECT
 	organization_id,
 	name,
 	description,
+	treatment,
 	inherent_likelihood,
 	inherent_impact,
 	residual_likelihood,
@@ -217,8 +221,8 @@ func (r *Risk) Insert(
 	scope Scoper,
 ) error {
 	q := `
-INSERT INTO risks (id, tenant_id, organization_id, name, description, inherent_likelihood, inherent_impact, residual_likelihood, residual_impact, created_at, updated_at)
-VALUES (@id, @tenant_id, @organization_id, @name, @description, @inherent_likelihood, @inherent_impact, @residual_likelihood, @residual_impact, @created_at, @updated_at)
+INSERT INTO risks (id, tenant_id, organization_id, name, description, treatment, inherent_likelihood, inherent_impact, residual_likelihood, residual_impact, created_at, updated_at)
+VALUES (@id, @tenant_id, @organization_id, @name, @description, @treatment, @inherent_likelihood, @inherent_impact, @residual_likelihood, @residual_impact, @created_at, @updated_at)
 `
 
 	args := pgx.StrictNamedArgs{
@@ -227,6 +231,7 @@ VALUES (@id, @tenant_id, @organization_id, @name, @description, @inherent_likeli
 		"organization_id":     r.OrganizationID,
 		"name":                r.Name,
 		"description":         r.Description,
+		"treatment":           r.Treatment,
 		"inherent_likelihood": r.InherentLikelihood,
 		"inherent_impact":     r.InherentImpact,
 		"residual_likelihood": r.ResidualLikelihood,
@@ -249,6 +254,7 @@ UPDATE risks
 SET
 	name = @name,
 	description = @description,
+	treatment = @treatment,
 	inherent_likelihood = @inherent_likelihood,
 	inherent_impact = @inherent_impact,
 	residual_likelihood = @residual_likelihood,
@@ -263,6 +269,7 @@ WHERE %s
 		"risk_id":             r.ID,
 		"name":                r.Name,
 		"description":         r.Description,
+		"treatment":           r.Treatment,
 		"inherent_likelihood": r.InherentLikelihood,
 		"inherent_impact":     r.InherentImpact,
 		"residual_likelihood": r.ResidualLikelihood,

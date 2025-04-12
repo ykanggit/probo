@@ -15,12 +15,12 @@ import {
   useState,
   useTransition,
 } from "react";
-import type { RiskListViewQuery } from "./__generated__/RiskListViewQuery.graphql";
+import type { ListRiskViewQuery } from "./__generated__/ListRiskViewQuery.graphql";
 import { useParams, useSearchParams } from "react-router";
 import { PageTemplate } from "@/components/PageTemplate";
-import { RiskViewSkeleton } from "./RiskListPage";
-import { RiskListViewPaginationQuery } from "./__generated__/RiskListViewPaginationQuery.graphql";
-import { RiskListView_risks$key } from "./__generated__/RiskListView_risks.graphql";
+import { RiskViewSkeleton } from "./ListRiskPage";
+import { ListRiskViewPaginationQuery } from "./__generated__/ListRiskViewPaginationQuery.graphql";
+import { ListRiskView_risks$key } from "./__generated__/ListRiskView_risks.graphql";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router";
@@ -34,7 +34,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { RiskListViewDeleteMutation } from "./__generated__/RiskListViewDeleteMutation.graphql";
+import { ListRiskViewDeleteMutation } from "./__generated__/ListRiskViewDeleteMutation.graphql";
 import {
   Popover,
   PopoverContent,
@@ -45,8 +45,8 @@ import { Label } from "@/components/ui/label";
 
 const defaultPageSize = 25;
 
-const riskListViewQuery = graphql`
-  query RiskListViewQuery(
+const listRiskViewQuery = graphql`
+  query ListRiskViewQuery(
     $organizationId: ID!
     $first: Int
     $after: CursorKey
@@ -56,15 +56,15 @@ const riskListViewQuery = graphql`
     organization: node(id: $organizationId) {
       id
 
-      ...RiskListView_risks
+      ...ListRiskView_risks
         @arguments(first: $first, after: $after, last: $last, before: $before)
     }
   }
 `;
 
-const riskListFragment = graphql`
-  fragment RiskListView_risks on Organization
-  @refetchable(queryName: "RiskListViewPaginationQuery")
+const listRiskViewFragment = graphql`
+  fragment ListRiskView_risks on Organization
+  @refetchable(queryName: "ListRiskViewPaginationQuery")
   @argumentDefinitions(
     first: { type: "Int" }
     after: { type: "CursorKey" }
@@ -72,7 +72,7 @@ const riskListFragment = graphql`
     before: { type: "CursorKey" }
   ) {
     risks(first: $first, after: $after, last: $last, before: $before)
-      @connection(key: "RiskListView_risks") {
+      @connection(key: "ListRiskView_risks") {
       __id
       edges {
         node {
@@ -82,6 +82,7 @@ const riskListFragment = graphql`
           inherentImpact
           residualLikelihood
           residualImpact
+          treatment
           description
           createdAt
           updatedAt
@@ -98,7 +99,7 @@ const riskListFragment = graphql`
 `;
 
 const deleteRiskMutation = graphql`
-  mutation RiskListViewDeleteMutation(
+  mutation ListRiskViewDeleteMutation(
     $input: DeleteRiskInput!
     $connections: [ID!]!
   ) {
@@ -111,6 +112,18 @@ const deleteRiskMutation = graphql`
 // Helper function to convert float values to percentage
 const floatToPercentage = (value: number): string => {
   return `${Math.round(value * 100)}%`;
+};
+
+// Helper function to format treatment value
+const formatTreatment = (treatment: string): string => {
+  const treatmentMap: Record<string, string> = {
+    MITIGATED: "Mitigate",
+    ACCEPTED: "Accept",
+    AVOIDED: "Avoid",
+    TRANSFERRED: "Transfer",
+  };
+
+  return treatmentMap[treatment] || treatment;
 };
 
 function LoadAboveButton({
@@ -389,12 +402,12 @@ function RiskMatrix({
   );
 }
 
-function RiskListViewContent({
+function ListRiskViewContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<RiskListViewQuery>;
+  queryRef: PreloadedQuery<ListRiskViewQuery>;
 }) {
-  const data = usePreloadedQuery(riskListViewQuery, queryRef);
+  const data = usePreloadedQuery(listRiskViewQuery, queryRef);
   const [, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
   const { organizationId } = useParams<{ organizationId: string }>();
@@ -412,7 +425,7 @@ function RiskListViewContent({
 
   // Setup delete mutation
   const [commitDeleteMutation] =
-    useMutation<RiskListViewDeleteMutation>(deleteRiskMutation);
+    useMutation<ListRiskViewDeleteMutation>(deleteRiskMutation);
 
   const {
     data: risksConnection,
@@ -423,9 +436,9 @@ function RiskListViewContent({
     isLoadingNext,
     isLoadingPrevious,
   } = usePaginationFragment<
-    RiskListViewPaginationQuery,
-    RiskListView_risks$key
-  >(riskListFragment, data.organization);
+    ListRiskViewPaginationQuery,
+    ListRiskView_risks$key
+  >(listRiskViewFragment, data.organization);
 
   const risks = risksConnection?.risks?.edges?.map((edge) => edge.node) || [];
   const pageInfo = risksConnection?.risks?.pageInfo;
@@ -553,10 +566,13 @@ function RiskListViewContent({
                     <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/2">
                       Name
                     </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/4">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/6">
+                      Treatment
+                    </th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/6">
                       Inherent Severity
                     </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/4">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/6">
                       Residual Severity
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-[120px]">
@@ -568,7 +584,7 @@ function RiskListViewContent({
                   {risks.length === 0 ? (
                     <tr className="border-b transition-colors hover:bg-h-subtle-bg data-[state=selected]:bg-subtle-bg">
                       <td
-                        colSpan={4}
+                        colSpan={5}
                         className="text-center p-4 align-middle text-tertiary"
                       >
                         No risks found. Create a new risk to get started.
@@ -588,7 +604,15 @@ function RiskListViewContent({
                             {risk.name}
                           </Link>
                         </td>
-                        <td className="p-0 align-middle w-1/4 whitespace-nowrap">
+                        <td className="p-0 align-middle w-1/6 whitespace-nowrap">
+                          <Link
+                            to={`/organizations/${organizationId}/risks/${risk.id}`}
+                            className="block p-4 h-full w-full"
+                          >
+                            {formatTreatment(risk.treatment)}
+                          </Link>
+                        </td>
+                        <td className="p-0 align-middle w-1/6 whitespace-nowrap">
                           <Link
                             to={`/organizations/${organizationId}/risks/${risk.id}`}
                             className="block p-4 h-full w-full"
@@ -598,7 +622,7 @@ function RiskListViewContent({
                             )}
                           </Link>
                         </td>
-                        <td className="p-0 align-middle w-1/4 whitespace-nowrap">
+                        <td className="p-0 align-middle w-1/6 whitespace-nowrap">
                           <Link
                             to={`/organizations/${organizationId}/risks/${risk.id}`}
                             className="block p-4 h-full w-full"
@@ -698,10 +722,10 @@ function RiskListViewContent({
   );
 }
 
-export default function RiskListView() {
+export default function ListRiskView() {
   const [searchParams] = useSearchParams();
   const [queryRef, loadQuery] =
-    useQueryLoader<RiskListViewQuery>(riskListViewQuery);
+    useQueryLoader<ListRiskViewQuery>(listRiskViewQuery);
 
   const { organizationId } = useParams();
 
@@ -724,7 +748,7 @@ export default function RiskListView() {
 
   return (
     <Suspense fallback={<RiskViewSkeleton />}>
-      <RiskListViewContent queryRef={queryRef} />
+      <ListRiskViewContent queryRef={queryRef} />
     </Suspense>
   );
 }

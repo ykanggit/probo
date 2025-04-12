@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c2e3450de2b84e18c9ade3ac1bed3b69>>
+ * @generated SignedSource<<9a0b8102088652729e5c161730fe26a9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,8 +9,9 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
+export type RiskTreatment = "ACCEPTED" | "AVOIDED" | "MITIGATED" | "TRANSFERRED";
 import { FragmentRefs } from "relay-runtime";
-export type RiskListView_risks$data = {
+export type ListRiskView_risks$data = {
   readonly id: string;
   readonly risks: {
     readonly __id: string;
@@ -24,6 +25,7 @@ export type RiskListView_risks$data = {
         readonly name: string;
         readonly residualImpact: number;
         readonly residualLikelihood: number;
+        readonly treatment: RiskTreatment;
         readonly updatedAt: string;
       };
     }>;
@@ -34,11 +36,11 @@ export type RiskListView_risks$data = {
       readonly startCursor: string | null | undefined;
     };
   };
-  readonly " $fragmentType": "RiskListView_risks";
+  readonly " $fragmentType": "ListRiskView_risks";
 };
-export type RiskListView_risks$key = {
-  readonly " $data"?: RiskListView_risks$data;
-  readonly " $fragmentSpreads": FragmentRefs<"RiskListView_risks">;
+export type ListRiskView_risks$key = {
+  readonly " $data"?: ListRiskView_risks$data;
+  readonly " $fragmentSpreads": FragmentRefs<"ListRiskView_risks">;
 };
 
 const node: ReaderFragment = (function(){
@@ -100,21 +102,21 @@ return {
       "fragmentPathInResult": [
         "node"
       ],
-      "operation": require('./RiskListViewPaginationQuery.graphql'),
+      "operation": require('./ListRiskViewPaginationQuery.graphql'),
       "identifierInfo": {
         "identifierField": "id",
         "identifierQueryVariableName": "id"
       }
     }
   },
-  "name": "RiskListView_risks",
+  "name": "ListRiskView_risks",
   "selections": [
     {
       "alias": "risks",
       "args": null,
       "concreteType": "RiskConnection",
       "kind": "LinkedField",
-      "name": "__RiskListView_risks_connection",
+      "name": "__ListRiskView_risks_connection",
       "plural": false,
       "selections": [
         {
@@ -167,6 +169,13 @@ return {
                   "args": null,
                   "kind": "ScalarField",
                   "name": "residualImpact",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "treatment",
                   "storageKey": null
                 },
                 {
@@ -271,6 +280,6 @@ return {
 };
 })();
 
-(node as any).hash = "7da0a3d5e4fb09ce7f6b7ddf233702ab";
+(node as any).hash = "a5f7d6424459d2a3b471bb0a4f0a4169";
 
 export default node;

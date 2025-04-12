@@ -4,7 +4,7 @@ import { lazy } from "@probo/react-lazy";
 import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
 
-const RiskListView = lazy(() => import("./RiskListView"));
+const RiskListView = lazy(() => import("./ListRiskView"));
 
 export function RiskViewSkeleton() {
   return (
@@ -21,7 +21,7 @@ export function RiskViewSkeleton() {
   );
 }
 
-export function RiskListPage() {
+export function ListRiskPage() {
   const location = useLocation();
 
   return (

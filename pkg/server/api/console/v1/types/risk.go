@@ -48,6 +48,7 @@ func NewRisk(r *coredata.Risk) *Risk {
 		ID:                 r.ID,
 		Name:               r.Name,
 		Description:        r.Description,
+		Treatment:          r.Treatment,
 		InherentLikelihood: r.InherentLikelihood,
 		InherentImpact:     r.InherentImpact,
 		InherentSeverity:   r.InherentSeverity(),

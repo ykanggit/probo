@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c9530c22837ce495259b6d3ac404da87>>
+ * @generated SignedSource<<92886e4193283cb894a864edc361a575>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type RiskTreatment = "ACCEPTED" | "AVOIDED" | "MITIGATED" | "TRANSFERRED";
 export type UpdateRiskInput = {
   description?: string | null | undefined;
   id: string;
@@ -17,6 +18,7 @@ export type UpdateRiskInput = {
   name?: string | null | undefined;
   residualImpact?: number | null | undefined;
   residualLikelihood?: number | null | undefined;
+  treatment?: RiskTreatment | null | undefined;
 };
 export type EditRiskViewUpdateRiskMutation$variables = {
   input: UpdateRiskInput;
@@ -31,6 +33,7 @@ export type EditRiskViewUpdateRiskMutation$data = {
       readonly name: string;
       readonly residualImpact: number;
       readonly residualLikelihood: number;
+      readonly treatment: RiskTreatment;
       readonly updatedAt: string;
     };
   };
@@ -124,6 +127,13 @@ v1 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
+            "name": "treatment",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
           }
@@ -152,16 +162,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "1fb9a7f1a9a6dc2fd8b1c3235336324b",
+    "cacheID": "e1bdac5dea224d79834ac952692a9bda",
     "id": null,
     "metadata": {},
     "name": "EditRiskViewUpdateRiskMutation",
     "operationKind": "mutation",
-    "text": "mutation EditRiskViewUpdateRiskMutation(\n  $input: UpdateRiskInput!\n) {\n  updateRisk(input: $input) {\n    risk {\n      id\n      name\n      description\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation EditRiskViewUpdateRiskMutation(\n  $input: UpdateRiskInput!\n) {\n  updateRisk(input: $input) {\n    risk {\n      id\n      name\n      description\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      treatment\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "75f21269b0c81f77ce4e3547010059ee";
+(node as any).hash = "6394ecc50b1e1f039b11ecdcf2724571";
 
 export default node;

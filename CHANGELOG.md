@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- New risk treatment strategy options: Mitigate, Accept, Avoid, Transfer
+
 ## [0.7.0] - 2025-04-12
 
 ### Added

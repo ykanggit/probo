@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<349d62a3a4ed3ea1d83c12f0c61437dd>>
+ * @generated SignedSource<<4d228ebd230765e4ef84981f18bcd705>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,18 +12,18 @@ import { ConcreteRequest } from 'relay-runtime';
 export type DeleteRiskInput = {
   riskId: string;
 };
-export type RiskListViewDeleteMutation$variables = {
+export type ListRiskViewDeleteMutation$variables = {
   connections: ReadonlyArray<string>;
   input: DeleteRiskInput;
 };
-export type RiskListViewDeleteMutation$data = {
+export type ListRiskViewDeleteMutation$data = {
   readonly deleteRisk: {
     readonly deletedRiskId: string;
   };
 };
-export type RiskListViewDeleteMutation = {
-  response: RiskListViewDeleteMutation$data;
-  variables: RiskListViewDeleteMutation$variables;
+export type ListRiskViewDeleteMutation = {
+  response: ListRiskViewDeleteMutation$data;
+  variables: ListRiskViewDeleteMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -59,7 +59,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "RiskListViewDeleteMutation",
+    "name": "ListRiskViewDeleteMutation",
     "selections": [
       {
         "alias": null,
@@ -84,7 +84,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "RiskListViewDeleteMutation",
+    "name": "ListRiskViewDeleteMutation",
     "selections": [
       {
         "alias": null,
@@ -117,16 +117,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "525011737d0920883b3942d2603dc31f",
+    "cacheID": "d6c6ab49ae59bc29ee4b1a33c4a36181",
     "id": null,
     "metadata": {},
-    "name": "RiskListViewDeleteMutation",
+    "name": "ListRiskViewDeleteMutation",
     "operationKind": "mutation",
-    "text": "mutation RiskListViewDeleteMutation(\n  $input: DeleteRiskInput!\n) {\n  deleteRisk(input: $input) {\n    deletedRiskId\n  }\n}\n"
+    "text": "mutation ListRiskViewDeleteMutation(\n  $input: DeleteRiskInput!\n) {\n  deleteRisk(input: $input) {\n    deletedRiskId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "4aee92e5abfd6733b44588bf01276560";
+(node as any).hash = "0c83d35fb68cb67f5980df027c0d1051";
 
 export default node;

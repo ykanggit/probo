@@ -149,6 +149,26 @@ enum EvidenceType
   LINK @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeLink")
 }
 
+enum RiskTreatment
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskTreatment") {
+  MITIGATED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTreatmentMitigated"
+    )
+  ACCEPTED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTreatmentAccepted"
+    )
+  AVOIDED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTreatmentAvoided"
+    )
+  TRANSFERRED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTreatmentTransferred"
+    )
+}
+
 # Order Field Enums
 enum UserOrderField
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.UserOrderField") {
@@ -608,6 +628,7 @@ type Risk implements Node {
   id: ID!
   name: String!
   description: String!
+  treatment: RiskTreatment!
   inherentLikelihood: Float!
   inherentImpact: Float!
   inherentSeverity: Float!
@@ -1064,6 +1085,7 @@ input CreateRiskInput {
   organizationId: ID!
   name: String!
   description: String!
+  treatment: RiskTreatment!
   inherentLikelihood: Float!
   inherentImpact: Float!
   residualLikelihood: Float
@@ -1074,6 +1096,7 @@ input UpdateRiskInput {
   id: ID!
   name: String
   description: String
+  treatment: RiskTreatment
   inherentLikelihood: Float
   inherentImpact: Float
   residualLikelihood: Float

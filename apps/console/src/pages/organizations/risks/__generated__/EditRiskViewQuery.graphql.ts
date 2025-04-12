@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c0da8faf6e1669e8cf890804a805b2d1>>
+ * @generated SignedSource<<5ae729150c7f534725306ecd1cf786af>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type RiskTreatment = "ACCEPTED" | "AVOIDED" | "MITIGATED" | "TRANSFERRED";
 export type EditRiskViewQuery$variables = {
   riskId: string;
 };
@@ -21,6 +22,7 @@ export type EditRiskViewQuery$data = {
     readonly name?: string;
     readonly residualImpact?: number;
     readonly residualLikelihood?: number;
+    readonly treatment?: RiskTreatment;
   };
 };
 export type EditRiskViewQuery = {
@@ -91,6 +93,13 @@ v8 = {
   "kind": "ScalarField",
   "name": "residualImpact",
   "storageKey": null
+},
+v9 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "treatment",
+  "storageKey": null
 };
 return {
   "fragment": {
@@ -116,7 +125,8 @@ return {
               (v5/*: any*/),
               (v6/*: any*/),
               (v7/*: any*/),
-              (v8/*: any*/)
+              (v8/*: any*/),
+              (v9/*: any*/)
             ],
             "type": "Risk",
             "abstractKey": null
@@ -158,7 +168,8 @@ return {
               (v5/*: any*/),
               (v6/*: any*/),
               (v7/*: any*/),
-              (v8/*: any*/)
+              (v8/*: any*/),
+              (v9/*: any*/)
             ],
             "type": "Risk",
             "abstractKey": null
@@ -169,16 +180,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "0cf5e4b47335aeb1fe04520d137942d1",
+    "cacheID": "cd7c9a0e53b9c1a2291e488756da9908",
     "id": null,
     "metadata": {},
     "name": "EditRiskViewQuery",
     "operationKind": "query",
-    "text": "query EditRiskViewQuery(\n  $riskId: ID!\n) {\n  risk: node(id: $riskId) {\n    __typename\n    ... on Risk {\n      id\n      name\n      description\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n    }\n    id\n  }\n}\n"
+    "text": "query EditRiskViewQuery(\n  $riskId: ID!\n) {\n  risk: node(id: $riskId) {\n    __typename\n    ... on Risk {\n      id\n      name\n      description\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      treatment\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d057f56759426d63136cef80269dc8a3";
+(node as any).hash = "cce4cb6856fe45d8ab37fe690ac8c720";
 
 export default node;

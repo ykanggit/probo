@@ -147,13 +147,14 @@ type CreatePolicyPayload struct {
 }
 
 type CreateRiskInput struct {
-	OrganizationID     gid.GID  `json:"organizationId"`
-	Name               string   `json:"name"`
-	Description        string   `json:"description"`
-	InherentLikelihood float64  `json:"inherentLikelihood"`
-	InherentImpact     float64  `json:"inherentImpact"`
-	ResidualLikelihood *float64 `json:"residualLikelihood,omitempty"`
-	ResidualImpact     *float64 `json:"residualImpact,omitempty"`
+	OrganizationID     gid.GID                `json:"organizationId"`
+	Name               string                 `json:"name"`
+	Description        string                 `json:"description"`
+	Treatment          coredata.RiskTreatment `json:"treatment"`
+	InherentLikelihood float64                `json:"inherentLikelihood"`
+	InherentImpact     float64                `json:"inherentImpact"`
+	ResidualLikelihood *float64               `json:"residualLikelihood,omitempty"`
+	ResidualImpact     *float64               `json:"residualImpact,omitempty"`
 }
 
 type CreateRiskMitigationMappingInput struct {
@@ -554,20 +555,21 @@ type RequestEvidencePayload struct {
 }
 
 type Risk struct {
-	ID                 gid.GID               `json:"id"`
-	Name               string                `json:"name"`
-	Description        string                `json:"description"`
-	InherentLikelihood float64               `json:"inherentLikelihood"`
-	InherentImpact     float64               `json:"inherentImpact"`
-	InherentSeverity   float64               `json:"inherentSeverity"`
-	ResidualLikelihood float64               `json:"residualLikelihood"`
-	ResidualImpact     float64               `json:"residualImpact"`
-	ResidualSeverity   float64               `json:"residualSeverity"`
-	Mitigations        *MitigationConnection `json:"mitigations"`
-	Policies           *PolicyConnection     `json:"policies"`
-	Controls           *ControlConnection    `json:"controls"`
-	CreatedAt          time.Time             `json:"createdAt"`
-	UpdatedAt          time.Time             `json:"updatedAt"`
+	ID                 gid.GID                `json:"id"`
+	Name               string                 `json:"name"`
+	Description        string                 `json:"description"`
+	Treatment          coredata.RiskTreatment `json:"treatment"`
+	InherentLikelihood float64                `json:"inherentLikelihood"`
+	InherentImpact     float64                `json:"inherentImpact"`
+	InherentSeverity   float64                `json:"inherentSeverity"`
+	ResidualLikelihood float64                `json:"residualLikelihood"`
+	ResidualImpact     float64                `json:"residualImpact"`
+	ResidualSeverity   float64                `json:"residualSeverity"`
+	Mitigations        *MitigationConnection  `json:"mitigations"`
+	Policies           *PolicyConnection      `json:"policies"`
+	Controls           *ControlConnection     `json:"controls"`
+	CreatedAt          time.Time              `json:"createdAt"`
+	UpdatedAt          time.Time              `json:"updatedAt"`
 }
 
 func (Risk) IsNode()             {}
@@ -680,13 +682,14 @@ type UpdatePolicyPayload struct {
 }
 
 type UpdateRiskInput struct {
-	ID                 gid.GID  `json:"id"`
-	Name               *string  `json:"name,omitempty"`
-	Description        *string  `json:"description,omitempty"`
-	InherentLikelihood *float64 `json:"inherentLikelihood,omitempty"`
-	InherentImpact     *float64 `json:"inherentImpact,omitempty"`
-	ResidualLikelihood *float64 `json:"residualLikelihood,omitempty"`
-	ResidualImpact     *float64 `json:"residualImpact,omitempty"`
+	ID                 gid.GID                 `json:"id"`
+	Name               *string                 `json:"name,omitempty"`
+	Description        *string                 `json:"description,omitempty"`
+	Treatment          *coredata.RiskTreatment `json:"treatment,omitempty"`
+	InherentLikelihood *float64                `json:"inherentLikelihood,omitempty"`
+	InherentImpact     *float64                `json:"inherentImpact,omitempty"`
+	ResidualLikelihood *float64                `json:"residualLikelihood,omitempty"`
+	ResidualImpact     *float64                `json:"residualImpact,omitempty"`
 }
 
 type UpdateRiskPayload struct {

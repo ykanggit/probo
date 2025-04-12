@@ -425,6 +425,7 @@ type ComplexityRoot struct {
 		ResidualImpact     func(childComplexity int) int
 		ResidualLikelihood func(childComplexity int) int
 		ResidualSeverity   func(childComplexity int) int
+		Treatment          func(childComplexity int) int
 		UpdatedAt          func(childComplexity int) int
 	}
 
@@ -2338,6 +2339,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Risk.ResidualSeverity(childComplexity), true
 
+	case "Risk.treatment":
+		if e.complexity.Risk.Treatment == nil {
+			break
+		}
+
+		return e.complexity.Risk.Treatment(childComplexity), true
+
 	case "Risk.updatedAt":
 		if e.complexity.Risk.UpdatedAt == nil {
 			break
@@ -3225,6 +3233,26 @@ enum EvidenceType
   LINK @goEnum(value: "github.com/getprobo/probo/pkg/coredata.EvidenceTypeLink")
 }
 
+enum RiskTreatment
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskTreatment") {
+  MITIGATED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTreatmentMitigated"
+    )
+  ACCEPTED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTreatmentAccepted"
+    )
+  AVOIDED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTreatmentAvoided"
+    )
+  TRANSFERRED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskTreatmentTransferred"
+    )
+}
+
 # Order Field Enums
 enum UserOrderField
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.UserOrderField") {
@@ -3684,6 +3712,7 @@ type Risk implements Node {
   id: ID!
   name: String!
   description: String!
+  treatment: RiskTreatment!
   inherentLikelihood: Float!
   inherentImpact: Float!
   inherentSeverity: Float!
@@ -4140,6 +4169,7 @@ input CreateRiskInput {
   organizationId: ID!
   name: String!
   description: String!
+  treatment: RiskTreatment!
   inherentLikelihood: Float!
   inherentImpact: Float!
   residualLikelihood: Float
@@ -4150,6 +4180,7 @@ input UpdateRiskInput {
   id: ID!
   name: String
   description: String
+  treatment: RiskTreatment
   inherentLikelihood: Float
   inherentImpact: Float
   residualLikelihood: Float
@@ -16772,6 +16803,50 @@ func (ec *executionContext) fieldContext_Risk_description(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Risk_treatment(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Risk_treatment(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Treatment, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.RiskTreatment)
+	fc.Result = res
+	return ec.marshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Risk_treatment(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Risk",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type RiskTreatment does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Risk_inherentLikelihood(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Risk_inherentLikelihood(ctx, field)
 	if err != nil {
@@ -17500,6 +17575,8 @@ func (ec *executionContext) fieldContext_RiskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Risk_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Risk_description(ctx, field)
+			case "treatment":
+				return ec.fieldContext_Risk_treatment(ctx, field)
 			case "inherentLikelihood":
 				return ec.fieldContext_Risk_inherentLikelihood(ctx, field)
 			case "inherentImpact":
@@ -18681,6 +18758,8 @@ func (ec *executionContext) fieldContext_UpdateRiskPayload_risk(_ context.Contex
 				return ec.fieldContext_Risk_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Risk_description(ctx, field)
+			case "treatment":
+				return ec.fieldContext_Risk_treatment(ctx, field)
 			case "inherentLikelihood":
 				return ec.fieldContext_Risk_inherentLikelihood(ctx, field)
 			case "inherentImpact":
@@ -23710,7 +23789,7 @@ func (ec *executionContext) unmarshalInputCreateRiskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "description", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact"}
+	fieldsInOrder := [...]string{"organizationId", "name", "description", "treatment", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -23738,6 +23817,13 @@ func (ec *executionContext) unmarshalInputCreateRiskInput(ctx context.Context, o
 				return it, err
 			}
 			it.Description = data
+		case "treatment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("treatment"))
+			data, err := ec.unmarshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Treatment = data
 		case "inherentLikelihood":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inherentLikelihood"))
 			data, err := ec.unmarshalNFloat2float64(ctx, v)
@@ -25233,7 +25319,7 @@ func (ec *executionContext) unmarshalInputUpdateRiskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact"}
+	fieldsInOrder := [...]string{"id", "name", "description", "treatment", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25261,6 +25347,13 @@ func (ec *executionContext) unmarshalInputUpdateRiskInput(ctx context.Context, o
 				return it, err
 			}
 			it.Description = data
+		case "treatment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("treatment"))
+			data, err := ec.unmarshalORiskTreatment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Treatment = data
 		case "inherentLikelihood":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inherentLikelihood"))
 			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
@@ -29294,6 +29387,11 @@ func (ec *executionContext) _Risk(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "treatment":
+			out.Values[i] = ec._Risk_treatment(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "inherentLikelihood":
 			out.Values[i] = ec._Risk_inherentLikelihood(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -32999,6 +33097,37 @@ var (
 	}
 )
 
+func (ec *executionContext) unmarshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx context.Context, v any) (coredata.RiskTreatment, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx context.Context, sel ast.SelectionSet, v coredata.RiskTreatment) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment = map[string]coredata.RiskTreatment{
+		"MITIGATED":   coredata.RiskTreatmentMitigated,
+		"ACCEPTED":    coredata.RiskTreatmentAccepted,
+		"AVOIDED":     coredata.RiskTreatmentAvoided,
+		"TRANSFERRED": coredata.RiskTreatmentTransferred,
+	}
+	marshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment = map[coredata.RiskTreatment]string{
+		coredata.RiskTreatmentMitigated:   "MITIGATED",
+		coredata.RiskTreatmentAccepted:    "ACCEPTED",
+		coredata.RiskTreatmentAvoided:     "AVOIDED",
+		coredata.RiskTreatmentTransferred: "TRANSFERRED",
+	}
+)
+
 func (ec *executionContext) unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx context.Context, v any) (coredata.ServiceCriticality, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality[tmp]
@@ -34314,6 +34443,38 @@ var (
 		coredata.RiskTierCritical:    "CRITICAL",
 		coredata.RiskTierSignificant: "SIGNIFICANT",
 		coredata.RiskTierGeneral:     "GENERAL",
+	}
+)
+
+func (ec *executionContext) unmarshalORiskTreatment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx context.Context, v any) (*coredata.RiskTreatment, error) {
+	if v == nil {
+		return nil, nil
+	}
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalORiskTreatment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalORiskTreatment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx context.Context, sel ast.SelectionSet, v *coredata.RiskTreatment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalString(marshalORiskTreatment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment[*v])
+	return res
+}
+
+var (
+	unmarshalORiskTreatment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment = map[string]coredata.RiskTreatment{
+		"MITIGATED":   coredata.RiskTreatmentMitigated,
+		"ACCEPTED":    coredata.RiskTreatmentAccepted,
+		"AVOIDED":     coredata.RiskTreatmentAvoided,
+		"TRANSFERRED": coredata.RiskTreatmentTransferred,
+	}
+	marshalORiskTreatment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment = map[coredata.RiskTreatment]string{
+		coredata.RiskTreatmentMitigated:   "MITIGATED",
+		coredata.RiskTreatmentAccepted:    "ACCEPTED",
+		coredata.RiskTreatmentAvoided:     "AVOIDED",
+		coredata.RiskTreatmentTransferred: "TRANSFERRED",
 	}
 )
 

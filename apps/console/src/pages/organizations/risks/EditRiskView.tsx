@@ -34,6 +34,7 @@ import { Suspense } from "react";
 import { EditRiskViewSkeleton } from "./EditRiskPage";
 import type { EditRiskViewQuery } from "./__generated__/EditRiskViewQuery.graphql";
 import type { EditRiskViewUpdateRiskMutation } from "./__generated__/EditRiskViewUpdateRiskMutation.graphql";
+import type { RiskTreatment } from "./__generated__/EditRiskViewUpdateRiskMutation.graphql";
 
 // Query to get risk details
 const editRiskViewQuery = graphql`
@@ -47,6 +48,7 @@ const editRiskViewQuery = graphql`
         inherentImpact
         residualLikelihood
         residualImpact
+        treatment
       }
     }
   }
@@ -64,6 +66,7 @@ const updateRiskMutation = graphql`
         inherentImpact
         residualLikelihood
         residualImpact
+        treatment
         updatedAt
       }
     }
@@ -94,6 +97,7 @@ function EditRiskViewContent({
   const [residualLikelihood, setResidualLikelihood] =
     useState<string>("MEDIUM");
   const [residualImpact, setResidualImpact] = useState<string>("MEDIUM");
+  const [treatment, setTreatment] = useState<RiskTreatment>("MITIGATED");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [updateRisk, isInFlight] =
@@ -161,6 +165,7 @@ function EditRiskViewContent({
       setInherentImpact(floatToImpact(risk.inherentImpact || 0.5));
       setResidualLikelihood(floatToLikelihood(risk.residualLikelihood || 0.5));
       setResidualImpact(floatToImpact(risk.residualImpact || 0.5));
+      setTreatment(risk.treatment || "MITIGATED");
     }
   }, [risk]);
 
@@ -186,6 +191,7 @@ function EditRiskViewContent({
       inherentImpact: impactToFloat(inherentImpact),
       residualLikelihood: likelihoodToFloat(residualLikelihood),
       residualImpact: impactToFloat(residualImpact),
+      treatment,
     };
 
     updateRisk({
@@ -308,6 +314,29 @@ function EditRiskViewContent({
 
             <Separator />
 
+            <div className="space-y-2">
+              <Label htmlFor="treatment">Treatment Strategy</Label>
+              <Select
+                value={treatment}
+                onValueChange={(value: RiskTreatment) => setTreatment(value)}
+              >
+                <SelectTrigger id="treatment">
+                  <SelectValue placeholder="Select a treatment strategy" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px] overflow-y-auto">
+                  <SelectItem value="AVOIDED">Avoid</SelectItem>
+                  <SelectItem value="MITIGATED">Mitigate</SelectItem>
+                  <SelectItem value="TRANSFERRED">Transfer</SelectItem>
+                  <SelectItem value="ACCEPTED">Accept</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-tertiary">
+                Choose how you plan to address this risk
+              </p>
+            </div>
+
+            <Separator />
+
             <div>
               <h3 className="text-lg font-medium mb-2">Residual Risk</h3>
               <p className="text-sm text-tertiary mb-4">
@@ -356,6 +385,8 @@ function EditRiskViewContent({
                 </div>
               </div>
             </div>
+
+            <Separator />
 
             <div className="flex justify-end gap-3">
               <Button

@@ -726,6 +726,7 @@ func (r *mutationResolver) CreateRisk(ctx context.Context, input types.CreateRis
 			OrganizationID:     input.OrganizationID,
 			Name:               input.Name,
 			Description:        input.Description,
+			Treatment:          input.Treatment,
 			InherentLikelihood: input.InherentLikelihood,
 			InherentImpact:     input.InherentImpact,
 			ResidualLikelihood: input.ResidualLikelihood,
@@ -751,6 +752,7 @@ func (r *mutationResolver) UpdateRisk(ctx context.Context, input types.UpdateRis
 			ID:                 input.ID,
 			Name:               input.Name,
 			Description:        input.Description,
+			Treatment:          input.Treatment,
 			InherentLikelihood: input.InherentLikelihood,
 			InherentImpact:     input.InherentImpact,
 			ResidualLikelihood: input.ResidualLikelihood,
@@ -1591,36 +1593,3 @@ type taskResolver struct{ *Resolver }
 type vendorResolver struct{ *Resolver }
 type vendorComplianceReportResolver struct{ *Resolver }
 type viewerResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *mutationResolver) CreateRiskControlMapping(ctx context.Context, input types.CreateRiskControlMappingInput) (*types.CreateRiskControlMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
-
-	err := svc.Risks.CreateControlMapping(ctx, input.RiskID, input.ControlID)
-	if err != nil {
-		panic(fmt.Errorf("cannot create risk control mapping: %w", err))
-	}
-
-	return &types.CreateRiskControlMappingPayload{
-		Success: true,
-	}, nil
-}
-func (r *mutationResolver) DeleteRiskControlMapping(ctx context.Context, input types.DeleteRiskControlMappingInput) (*types.DeleteRiskControlMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
-
-	err := svc.Risks.DeleteControlMapping(ctx, input.RiskID, input.ControlID)
-	if err != nil {
-		panic(fmt.Errorf("cannot delete risk control mapping: %w", err))
-	}
-
-	return &types.DeleteRiskControlMappingPayload{
-		Success: true,
-	}, nil
-}
-*/

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<63841b5a52846eba02cc6d442cfd4133>>
+ * @generated SignedSource<<cb8ffabeb71c2aa60fdef5f2abfc1f42>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type RiskTreatment = "ACCEPTED" | "AVOIDED" | "MITIGATED" | "TRANSFERRED";
 export type CreateRiskInput = {
   description: string;
   inherentImpact: number;
@@ -17,6 +18,7 @@ export type CreateRiskInput = {
   organizationId: string;
   residualImpact?: number | null | undefined;
   residualLikelihood?: number | null | undefined;
+  treatment: RiskTreatment;
 };
 export type NewRiskViewCreateRiskMutation$variables = {
   connections: ReadonlyArray<string>;
@@ -34,6 +36,7 @@ export type NewRiskViewCreateRiskMutation$data = {
         readonly name: string;
         readonly residualImpact: number;
         readonly residualLikelihood: number;
+        readonly treatment: RiskTreatment;
         readonly updatedAt: string;
       };
     };
@@ -131,6 +134,13 @@ v3 = {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
+          "name": "treatment",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
           "name": "createdAt",
           "storageKey": null
         },
@@ -213,16 +223,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "86d84d72c424807216edf39eb8f0c34f",
+    "cacheID": "9f296661d12f36362aeecd2a1fd4aa63",
     "id": null,
     "metadata": {},
     "name": "NewRiskViewCreateRiskMutation",
     "operationKind": "mutation",
-    "text": "mutation NewRiskViewCreateRiskMutation(\n  $input: CreateRiskInput!\n) {\n  createRisk(input: $input) {\n    riskEdge {\n      node {\n        id\n        name\n        description\n        inherentLikelihood\n        inherentImpact\n        residualLikelihood\n        residualImpact\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation NewRiskViewCreateRiskMutation(\n  $input: CreateRiskInput!\n) {\n  createRisk(input: $input) {\n    riskEdge {\n      node {\n        id\n        name\n        description\n        inherentLikelihood\n        inherentImpact\n        residualLikelihood\n        residualImpact\n        treatment\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "7ad6c27c192e419839b8105eb2ca9ae7";
+(node as any).hash = "7f70a20771d9f05f62e952a59c5484e3";
 
 export default node;

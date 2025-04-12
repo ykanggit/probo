@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5301e57ef0b2621712f4c8ca693afdeb>>
+ * @generated SignedSource<<677eff2bfb212e672f0d95b56adeebe7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,22 +10,22 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type RiskListViewQuery$variables = {
+export type ListRiskViewQuery$variables = {
   after?: string | null | undefined;
   before?: string | null | undefined;
   first?: number | null | undefined;
   last?: number | null | undefined;
   organizationId: string;
 };
-export type RiskListViewQuery$data = {
+export type ListRiskViewQuery$data = {
   readonly organization: {
     readonly id: string;
-    readonly " $fragmentSpreads": FragmentRefs<"RiskListView_risks">;
+    readonly " $fragmentSpreads": FragmentRefs<"ListRiskView_risks">;
   };
 };
-export type RiskListViewQuery = {
-  response: RiskListViewQuery$data;
-  variables: RiskListViewQuery$variables;
+export type ListRiskViewQuery = {
+  response: ListRiskViewQuery$data;
+  variables: ListRiskViewQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -108,7 +108,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "RiskListViewQuery",
+    "name": "ListRiskViewQuery",
     "selections": [
       {
         "alias": "organization",
@@ -122,7 +122,7 @@ return {
           {
             "args": (v7/*: any*/),
             "kind": "FragmentSpread",
-            "name": "RiskListView_risks"
+            "name": "ListRiskView_risks"
           }
         ],
         "storageKey": null
@@ -141,7 +141,7 @@ return {
       (v1/*: any*/)
     ],
     "kind": "Operation",
-    "name": "RiskListViewQuery",
+    "name": "ListRiskViewQuery",
     "selections": [
       {
         "alias": "organization",
@@ -214,6 +214,13 @@ return {
                             "args": null,
                             "kind": "ScalarField",
                             "name": "residualImpact",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "treatment",
                             "storageKey": null
                           },
                           {
@@ -310,7 +317,7 @@ return {
                 "args": (v7/*: any*/),
                 "filters": null,
                 "handle": "connection",
-                "key": "RiskListView_risks",
+                "key": "ListRiskView_risks",
                 "kind": "LinkedHandle",
                 "name": "risks"
               }
@@ -324,16 +331,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "56ddd15a8a41c48c01bf0be667569473",
+    "cacheID": "fcdb0ca740c0a11d5e4961407baadffa",
     "id": null,
     "metadata": {},
-    "name": "RiskListViewQuery",
+    "name": "ListRiskViewQuery",
     "operationKind": "query",
-    "text": "query RiskListViewQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...RiskListView_risks_pbnwq\n  }\n}\n\nfragment RiskListView_risks_pbnwq on Organization {\n  risks(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        inherentLikelihood\n        inherentImpact\n        residualLikelihood\n        residualImpact\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query ListRiskViewQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...ListRiskView_risks_pbnwq\n  }\n}\n\nfragment ListRiskView_risks_pbnwq on Organization {\n  risks(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        inherentLikelihood\n        inherentImpact\n        residualLikelihood\n        residualImpact\n        treatment\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "0fff20fd656047e6df52818ccf0a0f3b";
+(node as any).hash = "8f1ba48e6663d5f1e473aa52b70c7a67";
 
 export default node;

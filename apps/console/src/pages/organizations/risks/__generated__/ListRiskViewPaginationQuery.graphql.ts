@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ada1e6614842f2accf7bbe92a4e845a4>>
+ * @generated SignedSource<<121c9ad6ab399476692b98d1838f70d7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,21 +10,21 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type RiskListViewPaginationQuery$variables = {
+export type ListRiskViewPaginationQuery$variables = {
   after?: string | null | undefined;
   before?: string | null | undefined;
   first?: number | null | undefined;
   id: string;
   last?: number | null | undefined;
 };
-export type RiskListViewPaginationQuery$data = {
+export type ListRiskViewPaginationQuery$data = {
   readonly node: {
-    readonly " $fragmentSpreads": FragmentRefs<"RiskListView_risks">;
+    readonly " $fragmentSpreads": FragmentRefs<"ListRiskView_risks">;
   };
 };
-export type RiskListViewPaginationQuery = {
-  response: RiskListViewPaginationQuery$data;
-  variables: RiskListViewPaginationQuery$variables;
+export type ListRiskViewPaginationQuery = {
+  response: ListRiskViewPaginationQuery$data;
+  variables: ListRiskViewPaginationQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -107,7 +107,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "RiskListViewPaginationQuery",
+    "name": "ListRiskViewPaginationQuery",
     "selections": [
       {
         "alias": null,
@@ -120,7 +120,7 @@ return {
           {
             "args": (v6/*: any*/),
             "kind": "FragmentSpread",
-            "name": "RiskListView_risks"
+            "name": "ListRiskView_risks"
           }
         ],
         "storageKey": null
@@ -139,7 +139,7 @@ return {
       (v3/*: any*/)
     ],
     "kind": "Operation",
-    "name": "RiskListViewPaginationQuery",
+    "name": "ListRiskViewPaginationQuery",
     "selections": [
       {
         "alias": null,
@@ -212,6 +212,13 @@ return {
                             "args": null,
                             "kind": "ScalarField",
                             "name": "residualImpact",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "treatment",
                             "storageKey": null
                           },
                           {
@@ -308,7 +315,7 @@ return {
                 "args": (v6/*: any*/),
                 "filters": null,
                 "handle": "connection",
-                "key": "RiskListView_risks",
+                "key": "ListRiskView_risks",
                 "kind": "LinkedHandle",
                 "name": "risks"
               }
@@ -322,16 +329,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "afcf1c15c2ed7722673da85d53acfef3",
+    "cacheID": "402fdc7c2f504ba8640e2ecd2f8f2cb8",
     "id": null,
     "metadata": {},
-    "name": "RiskListViewPaginationQuery",
+    "name": "ListRiskViewPaginationQuery",
     "operationKind": "query",
-    "text": "query RiskListViewPaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...RiskListView_risks_pbnwq\n    id\n  }\n}\n\nfragment RiskListView_risks_pbnwq on Organization {\n  risks(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        inherentLikelihood\n        inherentImpact\n        residualLikelihood\n        residualImpact\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query ListRiskViewPaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ListRiskView_risks_pbnwq\n    id\n  }\n}\n\nfragment ListRiskView_risks_pbnwq on Organization {\n  risks(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        name\n        inherentLikelihood\n        inherentImpact\n        residualLikelihood\n        residualImpact\n        treatment\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "7da0a3d5e4fb09ce7f6b7ddf233702ab";
+(node as any).hash = "a5f7d6424459d2a3b471bb0a4f0a4169";
 
 export default node;

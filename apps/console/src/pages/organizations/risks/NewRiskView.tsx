@@ -49,6 +49,7 @@ const createRiskMutation = graphql`
           inherentImpact
           residualLikelihood
           residualImpact
+          treatment
           createdAt
           updatedAt
         }
@@ -68,6 +69,7 @@ export default function NewRiskView() {
   const [residualLikelihood, setResidualLikelihood] =
     useState<string>("MEDIUM");
   const [residualImpact, setResidualImpact] = useState<string>("MEDIUM");
+  const [treatment, setTreatment] = useState<string>("MITIGATED");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [riskTemplates, setRiskTemplates] = useState<RiskTemplate[]>([]);
@@ -141,6 +143,7 @@ export default function NewRiskView() {
       setinherentImpact("MEDIUM");
       setResidualLikelihood("MEDIUM");
       setResidualImpact("MEDIUM");
+      setTreatment("MITIGATED");
       return;
     }
 
@@ -158,6 +161,11 @@ export default function NewRiskView() {
       // Set residual values to be the same as initial values by default
       setResidualLikelihood(likelihoodValue);
       setResidualImpact(impactValue);
+
+      // Set recommended treatment if available
+      if (template.variations[0].recommendedTreatment) {
+        setTreatment(template.variations[0].recommendedTreatment.toUpperCase());
+      }
     }
   };
 
@@ -201,6 +209,7 @@ export default function NewRiskView() {
       inherentImpact: impactToFloat(inherentImpact),
       residualLikelihood: likelihoodToFloat(residualLikelihood),
       residualImpact: impactToFloat(residualImpact),
+      treatment,
     };
 
     createRisk({
@@ -209,7 +218,7 @@ export default function NewRiskView() {
         connections: [
           ConnectionHandler.getConnectionID(
             organizationId!,
-            "RiskListView_risks"
+            "ListRiskView_risks"
           ),
         ],
       },
@@ -342,6 +351,24 @@ export default function NewRiskView() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="treatment">Treatment Strategy</Label>
+              <Select value={treatment} onValueChange={setTreatment}>
+                <SelectTrigger id="treatment">
+                  <SelectValue placeholder="Select a treatment strategy" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px] overflow-y-auto">
+                  <SelectItem value="AVOIDED">Avoid</SelectItem>
+                  <SelectItem value="MITIGATED">Mitigate</SelectItem>
+                  <SelectItem value="TRANSFERRED">Transfer</SelectItem>
+                  <SelectItem value="ACCEPTED">Accept</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-tertiary">
+                Choose how you plan to address this risk
+              </p>
             </div>
 
             <Separator className="my-4" />
