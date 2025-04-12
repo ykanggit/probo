@@ -254,9 +254,6 @@ function ShowRiskViewContent({
   const [organizationPoliciesData, setOrganizationPoliciesData] =
     useState<ShowRiskViewOrganizationPoliciesQuery$data | null>(null);
   const [policySearchQuery, setPolicySearchQuery] = useState("");
-  const [policyCategoryFilter, setPolicyCategoryFilter] = useState<
-    string | null
-  >(null);
   const [isLoadingPolicies, setIsLoadingPolicies] = useState(false);
   const [linkingPolicies, setLinkingPolicies] = useState<
     Record<string, boolean>
@@ -299,7 +296,6 @@ function ShowRiskViewContent({
   useEffect(() => {
     if (!isPolicyDialogOpen) {
       setPolicySearchQuery("");
-      setPolicyCategoryFilter(null);
       setLinkingPolicies({});
       setUnlinkingPolicies({});
     }
@@ -421,42 +417,17 @@ function ShowRiskViewContent({
     );
   }, [organizationPoliciesData]);
 
-  const getPolicyCategories = useCallback(() => {
-    const policies = getPolicies();
-    const categories = new Set<string>();
-
-    policies.forEach((policy) => {
-      if (policy.category) {
-        categories.add(policy.category);
-      }
-    });
-
-    return Array.from(categories).sort();
-  }, [getPolicies]);
-
   const filteredPolicies = useCallback(() => {
     const policies = getPolicies();
-    if (!policySearchQuery && !policyCategoryFilter) return policies;
+    if (!policySearchQuery) return policies;
 
     return policies.filter((policy) => {
-      // Filter by search query
-      const matchesSearch =
+      return (
         !policySearchQuery ||
-        policy.name.toLowerCase().includes(policySearchQuery.toLowerCase()) ||
-        (policy.description &&
-          policy.description
-            .toLowerCase()
-            .includes(policySearchQuery.toLowerCase()));
-
-      // Filter by category
-      const matchesCategory =
-        !policyCategoryFilter ||
-        policyCategoryFilter === "all" ||
-        policy.category === policyCategoryFilter;
-
-      return matchesSearch && matchesCategory;
+        policy.name.toLowerCase().includes(policySearchQuery.toLowerCase())
+      );
     });
-  }, [getPolicies, policySearchQuery, policyCategoryFilter]);
+  }, [getPolicies, policySearchQuery]);
 
   // Handle linking a mitigation to this risk
   const handleLinkMitigation = useCallback(
@@ -875,33 +846,31 @@ function ShowRiskViewContent({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {risk.mitigations?.edges.map(
-                      ({ node: mitigation }: { node: any }) => (
-                        <TableRow key={mitigation.id}>
-                          <TableCell>
-                            <Link
-                              to={`/organizations/${organizationId}/mitigations/${mitigation.id}`}
-                              className="font-medium text-blue-600 hover:underline"
-                            >
-                              {mitigation.name}
-                            </Link>
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleUnlinkMitigation(mitigation)}
-                              disabled={
-                                unlinkingMitigations[mitigation.id] || false
-                              }
-                              title="Unlink mitigation"
-                            >
-                              <Trash2 className="h-4 w-4 text-danger" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    )}
+                    {risk.mitigations?.edges.map(({ node: mitigation }) => (
+                      <TableRow key={mitigation.id}>
+                        <TableCell>
+                          <Link
+                            to={`/organizations/${organizationId}/mitigations/${mitigation.id}`}
+                            className="font-medium text-blue-600 hover:underline"
+                          >
+                            {mitigation.name}
+                          </Link>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleUnlinkMitigation(mitigation)}
+                            disabled={
+                              unlinkingMitigations[mitigation.id] || false
+                            }
+                            title="Unlink mitigation"
+                          >
+                            <Trash2 className="h-4 w-4 text-danger" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </div>
@@ -1065,7 +1034,7 @@ function ShowRiskViewContent({
                     {filteredMitigations().map((mitigation) => {
                       // For each render, recalculate linked status directly against the current risk data
                       const isLinked = risk.mitigations?.edges?.some(
-                        (edge: any) => edge.node.id === mitigation.id
+                        (edge) => edge.node.id === mitigation.id
                       );
                       const isLinking =
                         linkingMitigations[mitigation.id] || false;
@@ -1158,24 +1127,6 @@ function ShowRiskViewContent({
                     />
                   </div>
                 </div>
-                <Select
-                  value={policyCategoryFilter || "all"}
-                  onValueChange={(value) =>
-                    setPolicyCategoryFilter(value === "all" ? null : value)
-                  }
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {getPolicyCategories().map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="border rounded-md max-h-96 overflow-y-auto">
@@ -1201,15 +1152,6 @@ function ShowRiskViewContent({
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
                               <h3 className="font-medium">{policy.name}</h3>
-                              {policy.category && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs font-normal"
-                                >
-                                  <Tag className="h-3 w-3 mr-1" />
-                                  {policy.category}
-                                </Badge>
-                              )}
                             </div>
                             {isLinked ? (
                               <Button
