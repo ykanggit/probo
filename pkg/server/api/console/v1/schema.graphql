@@ -636,6 +636,8 @@ type Risk implements Node {
   residualImpact: Float!
   residualSeverity: Float!
 
+  owner: People @goField(forceResolver: true)
+
   mitigations(
     first: Int
     after: CursorKey
@@ -1085,6 +1087,7 @@ input CreateRiskInput {
   organizationId: ID!
   name: String!
   description: String!
+  ownerId: ID
   treatment: RiskTreatment!
   inherentLikelihood: Float!
   inherentImpact: Float!
@@ -1096,6 +1099,7 @@ input UpdateRiskInput {
   id: ID!
   name: String
   description: String
+  ownerId: ID
   treatment: RiskTreatment
   inherentLikelihood: Float
   inherentImpact: Float

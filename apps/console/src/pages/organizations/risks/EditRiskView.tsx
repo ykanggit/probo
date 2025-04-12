@@ -32,13 +32,15 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Suspense } from "react";
 import { EditRiskViewSkeleton } from "./EditRiskPage";
+import PeopleSelector from "@/components/PeopleSelector";
+import { User } from "lucide-react";
 import type { EditRiskViewQuery } from "./__generated__/EditRiskViewQuery.graphql";
 import type { EditRiskViewUpdateRiskMutation } from "./__generated__/EditRiskViewUpdateRiskMutation.graphql";
 import type { RiskTreatment } from "./__generated__/EditRiskViewUpdateRiskMutation.graphql";
 
 // Query to get risk details
 const editRiskViewQuery = graphql`
-  query EditRiskViewQuery($riskId: ID!) {
+  query EditRiskViewQuery($riskId: ID!, $organizationId: ID!) {
     risk: node(id: $riskId) {
       ... on Risk {
         id
@@ -49,7 +51,14 @@ const editRiskViewQuery = graphql`
         residualLikelihood
         residualImpact
         treatment
+        owner {
+          id
+          fullName
+        }
       }
+    }
+    organization: node(id: $organizationId) {
+      ...PeopleSelector_organization
     }
   }
 `;
@@ -68,6 +77,10 @@ const updateRiskMutation = graphql`
         residualImpact
         treatment
         updatedAt
+        owner {
+          id
+          fullName
+        }
       }
     }
   }
@@ -98,6 +111,7 @@ function EditRiskViewContent({
     useState<string>("MEDIUM");
   const [residualImpact, setResidualImpact] = useState<string>("MEDIUM");
   const [treatment, setTreatment] = useState<RiskTreatment>("MITIGATED");
+  const [ownerId, setOwnerId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [updateRisk, isInFlight] =
@@ -166,6 +180,7 @@ function EditRiskViewContent({
       setResidualLikelihood(floatToLikelihood(risk.residualLikelihood || 0.5));
       setResidualImpact(floatToImpact(risk.residualImpact || 0.5));
       setTreatment(risk.treatment || "MITIGATED");
+      setOwnerId(risk.owner?.id || null);
     }
   }, [risk]);
 
@@ -192,6 +207,7 @@ function EditRiskViewContent({
       residualLikelihood: likelihoodToFloat(residualLikelihood),
       residualImpact: impactToFloat(residualImpact),
       treatment,
+      ownerId: ownerId || undefined,
     };
 
     updateRisk({
@@ -260,6 +276,20 @@ function EditRiskViewContent({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={5}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="owner" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Risk Owner
+              </Label>
+              <PeopleSelector
+                organizationRef={data.organization}
+                selectedPersonId={ownerId}
+                onSelect={setOwnerId}
+                placeholder="Select risk owner (optional)"
+                required={false}
               />
             </div>
 
@@ -411,15 +441,18 @@ function EditRiskViewContent({
 
 // Main component that loads the query
 export function EditRiskView() {
-  const { riskId } = useParams<{ riskId: string }>();
+  const { riskId, organizationId } = useParams<{
+    riskId: string;
+    organizationId: string;
+  }>();
   const [queryRef, loadQuery] =
     useQueryLoader<EditRiskViewQuery>(editRiskViewQuery);
 
   useEffect(() => {
-    if (riskId) {
-      loadQuery({ riskId });
+    if (riskId && organizationId) {
+      loadQuery({ riskId, organizationId });
     }
-  }, [loadQuery, riskId]);
+  }, [loadQuery, riskId, organizationId]);
 
   if (!queryRef) {
     return <EditRiskViewSkeleton />;

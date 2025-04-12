@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - New risk treatment strategy options: Mitigate, Accept, Avoid, Transfer
+- Risk ownership functionality
 
 ## [0.7.0] - 2025-04-12
 

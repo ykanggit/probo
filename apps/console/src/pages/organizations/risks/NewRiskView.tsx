@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import { ConnectionHandler, graphql, useMutation } from "react-relay";
+import {
+  ConnectionHandler,
+  graphql,
+  useMutation,
+  useQueryLoader,
+  usePreloadedQuery,
+  PreloadedQuery,
+} from "react-relay";
 import {
   Card,
   CardContent,
@@ -22,6 +29,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import PeopleSelector from "@/components/PeopleSelector";
+import { User } from "lucide-react";
+import { Suspense } from "react";
+import type { NewRiskViewQuery } from "./__generated__/NewRiskViewQuery.graphql";
+import type { NewRiskViewCreateRiskMutation } from "./__generated__/NewRiskViewCreateRiskMutation.graphql";
 
 interface RiskTemplate {
   name: string;
@@ -33,6 +45,14 @@ interface RiskTemplate {
     recommendedTreatment: string;
   }[];
 }
+
+const newRiskQuery = graphql`
+  query NewRiskViewQuery($organizationId: ID!) {
+    organization: node(id: $organizationId) {
+      ...PeopleSelector_organization
+    }
+  }
+`;
 
 const createRiskMutation = graphql`
   mutation NewRiskViewCreateRiskMutation(
@@ -58,9 +78,14 @@ const createRiskMutation = graphql`
   }
 `;
 
-export default function NewRiskView() {
+function NewRiskForm({
+  queryRef,
+}: {
+  queryRef: PreloadedQuery<NewRiskViewQuery>;
+}) {
   const navigate = useNavigate();
   const { organizationId } = useParams<{ organizationId: string }>();
+  const data = usePreloadedQuery<NewRiskViewQuery>(newRiskQuery, queryRef);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [inherentLikelihood, setinherentLikelihood] =
@@ -70,6 +95,7 @@ export default function NewRiskView() {
     useState<string>("MEDIUM");
   const [residualImpact, setResidualImpact] = useState<string>("MEDIUM");
   const [treatment, setTreatment] = useState<string>("MITIGATED");
+  const [ownerId, setOwnerId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [riskTemplates, setRiskTemplates] = useState<RiskTemplate[]>([]);
@@ -210,6 +236,7 @@ export default function NewRiskView() {
       residualLikelihood: likelihoodToFloat(residualLikelihood),
       residualImpact: impactToFloat(residualImpact),
       treatment,
+      ownerId: ownerId || undefined,
     };
 
     createRisk({
@@ -310,6 +337,20 @@ export default function NewRiskView() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={5}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="owner" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Risk Owner
+              </Label>
+              <PeopleSelector
+                organizationRef={data.organization}
+                selectedPersonId={ownerId}
+                onSelect={setOwnerId}
+                placeholder="Select risk owner (optional)"
+                required={false}
               />
             </div>
 
@@ -440,5 +481,26 @@ export default function NewRiskView() {
         </CardContent>
       </Card>
     </PageTemplate>
+  );
+}
+
+export default function NewRiskView() {
+  const { organizationId } = useParams<{ organizationId: string }>();
+  const [queryRef, loadQuery] = useQueryLoader<NewRiskViewQuery>(newRiskQuery);
+
+  useEffect(() => {
+    if (organizationId) {
+      loadQuery({ organizationId });
+    }
+  }, [organizationId, loadQuery]);
+
+  if (!queryRef) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewRiskForm queryRef={queryRef} />
+    </Suspense>
   );
 }

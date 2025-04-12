@@ -16,7 +16,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, Search, Tag, Edit, ShieldCheck } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Search,
+  Tag,
+  Edit,
+  ShieldCheck,
+  Shield,
+  Handshake,
+  Ban,
+  User,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -62,6 +73,11 @@ const showRiskViewQuery = graphql`
       ... on Risk {
         name
         description
+        treatment
+        owner {
+          id
+          fullName
+        }
         inherentLikelihood
         inherentImpact
         residualLikelihood
@@ -756,6 +772,55 @@ function ShowRiskViewContent({
                 <p className="mt-1">
                   <Badge className={severity.class}>{severity.level}</Badge>
                 </p>
+              </div>
+            </div>
+
+            {/* Treatment and Owner section */}
+            <div className="mt-6 border-t pt-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-secondary">
+                    Treatment
+                  </h3>
+                  <div className="mt-1 text-lg capitalize flex items-center">
+                    {risk.treatment === "MITIGATED" && (
+                      <Shield className="h-5 w-5 mr-2 text-blue-500" />
+                    )}
+                    {risk.treatment === "TRANSFERRED" && (
+                      <Handshake className="h-5 w-5 mr-2 text-purple-500" />
+                    )}
+                    {risk.treatment === "AVOIDED" && (
+                      <Ban className="h-5 w-5 mr-2 text-red-500" />
+                    )}
+                    {risk.treatment === "ACCEPTED" && (
+                      <ShieldCheck className="h-5 w-5 mr-2 text-green-500" />
+                    )}
+                    <span>
+                      {risk.treatment ? risk.treatment.toLowerCase() : "N/A"}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-secondary">
+                    Risk Owner
+                  </h3>
+                  <div className="mt-1 text-lg flex items-center">
+                    <User className="h-5 w-5 mr-2 text-gray-500" />
+                    <span>
+                      {risk.owner ? (
+                        <Link
+                          to={`/organizations/${organizationId}/people/${risk.owner.id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {risk.owner.fullName}
+                        </Link>
+                      ) : (
+                        "Unassigned"
+                      )}
+                    </span>
+                  </div>
+                </div>
+                <div></div>
               </div>
             </div>
 

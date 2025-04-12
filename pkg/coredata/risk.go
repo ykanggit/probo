@@ -33,6 +33,7 @@ type (
 		Name               string        `db:"name"`
 		Description        string        `db:"description"`
 		Treatment          RiskTreatment `db:"treatment"`
+		OwnerID            *gid.GID      `db:"owner_id"`
 		InherentLikelihood float64       `db:"inherent_likelihood"`
 		InherentImpact     float64       `db:"inherent_impact"`
 		ResidualLikelihood float64       `db:"residual_likelihood"`
@@ -75,6 +76,7 @@ WITH rsks AS (
 		r.organization_id,
 		r.name,
 		r.description,
+		r.owner_id,
 		r.treatment,
 		r.inherent_likelihood,
 		r.inherent_impact,
@@ -94,6 +96,7 @@ SELECT
 	organization_id,
 	name,
 	description,
+	owner_id,
 	treatment,
 	inherent_likelihood,
 	inherent_impact,
@@ -139,6 +142,7 @@ SELECT
 	organization_id,
 	name,
 	description,
+	owner_id,
 	treatment,
 	inherent_likelihood,
 	inherent_impact,
@@ -183,6 +187,7 @@ SELECT
 	organization_id,
 	name,
 	description,
+	owner_id,
 	treatment,
 	inherent_likelihood,
 	inherent_impact,
@@ -221,8 +226,8 @@ func (r *Risk) Insert(
 	scope Scoper,
 ) error {
 	q := `
-INSERT INTO risks (id, tenant_id, organization_id, name, description, treatment, inherent_likelihood, inherent_impact, residual_likelihood, residual_impact, created_at, updated_at)
-VALUES (@id, @tenant_id, @organization_id, @name, @description, @treatment, @inherent_likelihood, @inherent_impact, @residual_likelihood, @residual_impact, @created_at, @updated_at)
+INSERT INTO risks (id, tenant_id, organization_id, name, description, owner_id, treatment, inherent_likelihood, inherent_impact, residual_likelihood, residual_impact, created_at, updated_at)
+VALUES (@id, @tenant_id, @organization_id, @name, @description, @owner_id, @treatment, @inherent_likelihood, @inherent_impact, @residual_likelihood, @residual_impact, @created_at, @updated_at)
 `
 
 	args := pgx.StrictNamedArgs{
@@ -231,6 +236,7 @@ VALUES (@id, @tenant_id, @organization_id, @name, @description, @treatment, @inh
 		"organization_id":     r.OrganizationID,
 		"name":                r.Name,
 		"description":         r.Description,
+		"owner_id":            r.OwnerID,
 		"treatment":           r.Treatment,
 		"inherent_likelihood": r.InherentLikelihood,
 		"inherent_impact":     r.InherentImpact,
@@ -254,6 +260,7 @@ UPDATE risks
 SET
 	name = @name,
 	description = @description,
+	owner_id = @owner_id,
 	treatment = @treatment,
 	inherent_likelihood = @inherent_likelihood,
 	inherent_impact = @inherent_impact,
@@ -269,6 +276,7 @@ WHERE %s
 		"risk_id":             r.ID,
 		"name":                r.Name,
 		"description":         r.Description,
+		"owner_id":            r.OwnerID,
 		"treatment":           r.Treatment,
 		"inherent_likelihood": r.InherentLikelihood,
 		"inherent_impact":     r.InherentImpact,

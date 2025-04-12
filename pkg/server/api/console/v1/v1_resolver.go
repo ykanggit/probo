@@ -727,6 +727,7 @@ func (r *mutationResolver) CreateRisk(ctx context.Context, input types.CreateRis
 			Name:               input.Name,
 			Description:        input.Description,
 			Treatment:          input.Treatment,
+			OwnerID:            input.OwnerID,
 			InherentLikelihood: input.InherentLikelihood,
 			InherentImpact:     input.InherentImpact,
 			ResidualLikelihood: input.ResidualLikelihood,
@@ -753,6 +754,7 @@ func (r *mutationResolver) UpdateRisk(ctx context.Context, input types.UpdateRis
 			Name:               input.Name,
 			Description:        input.Description,
 			Treatment:          input.Treatment,
+			OwnerID:            input.OwnerID,
 			InherentLikelihood: input.InherentLikelihood,
 			InherentImpact:     input.InherentImpact,
 			ResidualLikelihood: input.ResidualLikelihood,
@@ -1343,6 +1345,27 @@ func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
 		ID:   session.ID,
 		User: types.NewUser(user),
 	}, nil
+}
+
+// Owner is the resolver for the owner field.
+func (r *riskResolver) Owner(ctx context.Context, obj *types.Risk) (*types.People, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+
+	risk, err := svc.Risks.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get risk: %w", err))
+	}
+
+	if risk.OwnerID == nil {
+		return nil, nil
+	}
+
+	owner, err := svc.Peoples.Get(ctx, *risk.OwnerID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get owner: %w", err))
+	}
+
+	return types.NewPeople(owner), nil
 }
 
 // Mitigations is the resolver for the mitigations field.

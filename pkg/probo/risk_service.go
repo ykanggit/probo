@@ -35,6 +35,7 @@ type (
 		Name               string
 		Description        string
 		Treatment          coredata.RiskTreatment
+		OwnerID            *gid.GID
 		InherentLikelihood float64
 		InherentImpact     float64
 		ResidualLikelihood *float64
@@ -46,6 +47,7 @@ type (
 		Name               *string
 		Description        *string
 		Treatment          *coredata.RiskTreatment
+		OwnerID            *gid.GID
 		InherentLikelihood *float64
 		InherentImpact     *float64
 		ResidualLikelihood *float64
@@ -169,6 +171,7 @@ func (s RiskService) Create(
 		OrganizationID:     req.OrganizationID,
 		Name:               req.Name,
 		Description:        req.Description,
+		OwnerID:            req.OwnerID,
 		InherentLikelihood: req.InherentLikelihood,
 		InherentImpact:     req.InherentImpact,
 		Treatment:          req.Treatment,
@@ -259,6 +262,10 @@ func (s RiskService) Update(
 
 			if req.Treatment != nil {
 				risk.Treatment = *req.Treatment
+			}
+
+			if req.OwnerID != nil {
+				risk.OwnerID = req.OwnerID
 			}
 
 			risk.UpdatedAt = time.Now()

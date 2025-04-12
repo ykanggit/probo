@@ -421,6 +421,7 @@ type ComplexityRoot struct {
 		InherentSeverity   func(childComplexity int) int
 		Mitigations        func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) int
 		Name               func(childComplexity int) int
+		Owner              func(childComplexity int) int
 		Policies           func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) int
 		ResidualImpact     func(childComplexity int) int
 		ResidualLikelihood func(childComplexity int) int
@@ -667,6 +668,7 @@ type QueryResolver interface {
 	Viewer(ctx context.Context) (*types.Viewer, error)
 }
 type RiskResolver interface {
+	Owner(ctx context.Context, obj *types.Risk) (*types.People, error)
 	Mitigations(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error)
 	Policies(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error)
 	Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
@@ -2306,6 +2308,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Risk.Name(childComplexity), true
 
+	case "Risk.owner":
+		if e.complexity.Risk.Owner == nil {
+			break
+		}
+
+		return e.complexity.Risk.Owner(childComplexity), true
+
 	case "Risk.policies":
 		if e.complexity.Risk.Policies == nil {
 			break
@@ -3720,6 +3729,8 @@ type Risk implements Node {
   residualImpact: Float!
   residualSeverity: Float!
 
+  owner: People @goField(forceResolver: true)
+
   mitigations(
     first: Int
     after: CursorKey
@@ -4169,6 +4180,7 @@ input CreateRiskInput {
   organizationId: ID!
   name: String!
   description: String!
+  ownerId: ID
   treatment: RiskTreatment!
   inherentLikelihood: Float!
   inherentImpact: Float!
@@ -4180,6 +4192,7 @@ input UpdateRiskInput {
   id: ID!
   name: String
   description: String
+  ownerId: ID
   treatment: RiskTreatment
   inherentLikelihood: Float
   inherentImpact: Float
@@ -17111,6 +17124,63 @@ func (ec *executionContext) fieldContext_Risk_residualSeverity(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Risk_owner(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Risk_owner(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Risk().Owner(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalOPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Risk_owner(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Risk",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Risk_mitigations(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Risk_mitigations(ctx, field)
 	if err != nil {
@@ -17589,6 +17659,8 @@ func (ec *executionContext) fieldContext_RiskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Risk_residualImpact(ctx, field)
 			case "residualSeverity":
 				return ec.fieldContext_Risk_residualSeverity(ctx, field)
+			case "owner":
+				return ec.fieldContext_Risk_owner(ctx, field)
 			case "mitigations":
 				return ec.fieldContext_Risk_mitigations(ctx, field)
 			case "policies":
@@ -18772,6 +18844,8 @@ func (ec *executionContext) fieldContext_UpdateRiskPayload_risk(_ context.Contex
 				return ec.fieldContext_Risk_residualImpact(ctx, field)
 			case "residualSeverity":
 				return ec.fieldContext_Risk_residualSeverity(ctx, field)
+			case "owner":
+				return ec.fieldContext_Risk_owner(ctx, field)
 			case "mitigations":
 				return ec.fieldContext_Risk_mitigations(ctx, field)
 			case "policies":
@@ -23789,7 +23863,7 @@ func (ec *executionContext) unmarshalInputCreateRiskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "description", "treatment", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact"}
+	fieldsInOrder := [...]string{"organizationId", "name", "description", "ownerId", "treatment", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -23817,6 +23891,13 @@ func (ec *executionContext) unmarshalInputCreateRiskInput(ctx context.Context, o
 				return it, err
 			}
 			it.Description = data
+		case "ownerId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerId"))
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OwnerID = data
 		case "treatment":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("treatment"))
 			data, err := ec.unmarshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx, v)
@@ -25319,7 +25400,7 @@ func (ec *executionContext) unmarshalInputUpdateRiskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "treatment", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact"}
+	fieldsInOrder := [...]string{"id", "name", "description", "ownerId", "treatment", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25347,6 +25428,13 @@ func (ec *executionContext) unmarshalInputUpdateRiskInput(ctx context.Context, o
 				return it, err
 			}
 			it.Description = data
+		case "ownerId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerId"))
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OwnerID = data
 		case "treatment":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("treatment"))
 			data, err := ec.unmarshalORiskTreatment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx, v)
@@ -29422,6 +29510,39 @@ func (ec *executionContext) _Risk(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "owner":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Risk_owner(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "mitigations":
 			field := field
 

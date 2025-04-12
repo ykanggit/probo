@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a6b1be8aa499bb8709a4d4e04edb01b7>>
+ * @generated SignedSource<<486518520656d7e1392a34ee1877fe22>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,6 +11,7 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type MitigationState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type PolicyStatus = "ACTIVE" | "DRAFT";
+export type RiskTreatment = "ACCEPTED" | "AVOIDED" | "MITIGATED" | "TRANSFERRED";
 export type ShowRiskViewQuery$variables = {
   riskId: string;
 };
@@ -45,6 +46,10 @@ export type ShowRiskViewQuery$data = {
       }>;
     };
     readonly name?: string;
+    readonly owner?: {
+      readonly fullName: string;
+      readonly id: string;
+    } | null | undefined;
     readonly policies?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
@@ -57,6 +62,7 @@ export type ShowRiskViewQuery$data = {
     };
     readonly residualImpact?: number;
     readonly residualLikelihood?: number;
+    readonly treatment?: RiskTreatment;
     readonly updatedAt?: string;
   };
 };
@@ -105,59 +111,85 @@ v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "inherentLikelihood",
+  "name": "treatment",
   "storageKey": null
 },
 v6 = {
   "alias": null,
   "args": null,
-  "kind": "ScalarField",
-  "name": "inherentImpact",
+  "concreteType": "People",
+  "kind": "LinkedField",
+  "name": "owner",
+  "plural": false,
+  "selections": [
+    (v2/*: any*/),
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "fullName",
+      "storageKey": null
+    }
+  ],
   "storageKey": null
 },
 v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "residualLikelihood",
+  "name": "inherentLikelihood",
   "storageKey": null
 },
 v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "residualImpact",
+  "name": "inherentImpact",
   "storageKey": null
 },
 v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "createdAt",
+  "name": "residualLikelihood",
   "storageKey": null
 },
 v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "updatedAt",
+  "name": "residualImpact",
   "storageKey": null
 },
 v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "__typename",
+  "name": "createdAt",
   "storageKey": null
 },
 v12 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "cursor",
+  "name": "updatedAt",
   "storageKey": null
 },
 v13 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v14 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "cursor",
+  "storageKey": null
+},
+v15 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -182,7 +214,7 @@ v13 = {
   ],
   "storageKey": null
 },
-v14 = [
+v16 = [
   {
     "alias": null,
     "args": null,
@@ -209,7 +241,7 @@ v14 = [
             "name": "category",
             "storageKey": null
           },
-          (v9/*: any*/),
+          (v11/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -217,17 +249,17 @@ v14 = [
             "name": "state",
             "storageKey": null
           },
-          (v11/*: any*/)
+          (v13/*: any*/)
         ],
         "storageKey": null
       },
-      (v12/*: any*/)
+      (v14/*: any*/)
     ],
     "storageKey": null
   },
-  (v13/*: any*/)
+  (v15/*: any*/)
 ],
-v15 = [
+v17 = [
   {
     "alias": null,
     "args": null,
@@ -253,18 +285,18 @@ v15 = [
             "name": "status",
             "storageKey": null
           },
-          (v9/*: any*/),
-          (v11/*: any*/)
+          (v11/*: any*/),
+          (v13/*: any*/)
         ],
         "storageKey": null
       },
-      (v12/*: any*/)
+      (v14/*: any*/)
     ],
     "storageKey": null
   },
-  (v13/*: any*/)
+  (v15/*: any*/)
 ],
-v16 = [
+v18 = [
   {
     "alias": null,
     "args": null,
@@ -291,18 +323,18 @@ v16 = [
           },
           (v3/*: any*/),
           (v4/*: any*/),
-          (v9/*: any*/),
-          (v11/*: any*/)
+          (v11/*: any*/),
+          (v13/*: any*/)
         ],
         "storageKey": null
       },
-      (v12/*: any*/)
+      (v14/*: any*/)
     ],
     "storageKey": null
   },
-  (v13/*: any*/)
+  (v15/*: any*/)
 ],
-v17 = [
+v19 = [
   {
     "kind": "Literal",
     "name": "first",
@@ -336,6 +368,8 @@ return {
               (v8/*: any*/),
               (v9/*: any*/),
               (v10/*: any*/),
+              (v11/*: any*/),
+              (v12/*: any*/),
               {
                 "alias": "mitigations",
                 "args": null,
@@ -343,7 +377,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__Risk__mitigations_connection",
                 "plural": false,
-                "selections": (v14/*: any*/),
+                "selections": (v16/*: any*/),
                 "storageKey": null
               },
               {
@@ -353,7 +387,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__Risk__policies_connection",
                 "plural": false,
-                "selections": (v15/*: any*/),
+                "selections": (v17/*: any*/),
                 "storageKey": null
               },
               {
@@ -363,7 +397,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__Risk__controls_connection",
                 "plural": false,
-                "selections": (v16/*: any*/),
+                "selections": (v18/*: any*/),
                 "storageKey": null
               }
             ],
@@ -391,7 +425,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v11/*: any*/),
+          (v13/*: any*/),
           (v2/*: any*/),
           {
             "kind": "InlineFragment",
@@ -404,19 +438,21 @@ return {
               (v8/*: any*/),
               (v9/*: any*/),
               (v10/*: any*/),
+              (v11/*: any*/),
+              (v12/*: any*/),
               {
                 "alias": null,
-                "args": (v17/*: any*/),
+                "args": (v19/*: any*/),
                 "concreteType": "MitigationConnection",
                 "kind": "LinkedField",
                 "name": "mitigations",
                 "plural": false,
-                "selections": (v14/*: any*/),
+                "selections": (v16/*: any*/),
                 "storageKey": "mitigations(first:100)"
               },
               {
                 "alias": null,
-                "args": (v17/*: any*/),
+                "args": (v19/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "Risk__mitigations",
@@ -425,17 +461,17 @@ return {
               },
               {
                 "alias": null,
-                "args": (v17/*: any*/),
+                "args": (v19/*: any*/),
                 "concreteType": "PolicyConnection",
                 "kind": "LinkedField",
                 "name": "policies",
                 "plural": false,
-                "selections": (v15/*: any*/),
+                "selections": (v17/*: any*/),
                 "storageKey": "policies(first:100)"
               },
               {
                 "alias": null,
-                "args": (v17/*: any*/),
+                "args": (v19/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "Risk__policies",
@@ -444,17 +480,17 @@ return {
               },
               {
                 "alias": null,
-                "args": (v17/*: any*/),
+                "args": (v19/*: any*/),
                 "concreteType": "ControlConnection",
                 "kind": "LinkedField",
                 "name": "controls",
                 "plural": false,
-                "selections": (v16/*: any*/),
+                "selections": (v18/*: any*/),
                 "storageKey": "controls(first:100)"
               },
               {
                 "alias": null,
-                "args": (v17/*: any*/),
+                "args": (v19/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "Risk__controls",
@@ -471,7 +507,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "4463fac13f91564f513bfdabcc3e0063",
+    "cacheID": "8867786ee5bfa23bfd16d52d0023beeb",
     "id": null,
     "metadata": {
       "connection": [
@@ -506,11 +542,11 @@ return {
     },
     "name": "ShowRiskViewQuery",
     "operationKind": "query",
-    "text": "query ShowRiskViewQuery(\n  $riskId: ID!\n) {\n  node(id: $riskId) {\n    __typename\n    id\n    ... on Risk {\n      name\n      description\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      createdAt\n      updatedAt\n      mitigations(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            createdAt\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            name\n            status\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      controls(first: 100) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            description\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ShowRiskViewQuery(\n  $riskId: ID!\n) {\n  node(id: $riskId) {\n    __typename\n    id\n    ... on Risk {\n      name\n      description\n      treatment\n      owner {\n        id\n        fullName\n      }\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      createdAt\n      updatedAt\n      mitigations(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            createdAt\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            name\n            status\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      controls(first: 100) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            description\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "68db9a4877abc338711844de6da38cb7";
+(node as any).hash = "264f7dd097e487eda41cdc4d04a14274";
 
 export default node;

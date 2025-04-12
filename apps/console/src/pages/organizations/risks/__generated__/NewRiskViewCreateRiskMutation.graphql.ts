@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<cb8ffabeb71c2aa60fdef5f2abfc1f42>>
+ * @generated SignedSource<<f5de62a6351fe2691ad8aff671be4aad>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,6 +16,7 @@ export type CreateRiskInput = {
   inherentLikelihood: number;
   name: string;
   organizationId: string;
+  ownerId?: string | null | undefined;
   residualImpact?: number | null | undefined;
   residualLikelihood?: number | null | undefined;
   treatment: RiskTreatment;

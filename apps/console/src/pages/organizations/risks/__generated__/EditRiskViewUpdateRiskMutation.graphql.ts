@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<92886e4193283cb894a864edc361a575>>
+ * @generated SignedSource<<feef659391195d68121d9db49de0ffc6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,6 +16,7 @@ export type UpdateRiskInput = {
   inherentImpact?: number | null | undefined;
   inherentLikelihood?: number | null | undefined;
   name?: string | null | undefined;
+  ownerId?: string | null | undefined;
   residualImpact?: number | null | undefined;
   residualLikelihood?: number | null | undefined;
   treatment?: RiskTreatment | null | undefined;
@@ -31,6 +32,10 @@ export type EditRiskViewUpdateRiskMutation$data = {
       readonly inherentImpact: number;
       readonly inherentLikelihood: number;
       readonly name: string;
+      readonly owner: {
+        readonly fullName: string;
+        readonly id: string;
+      } | null | undefined;
       readonly residualImpact: number;
       readonly residualLikelihood: number;
       readonly treatment: RiskTreatment;
@@ -51,7 +56,14 @@ var v0 = [
     "name": "input"
   }
 ],
-v1 = [
+v1 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v2 = [
   {
     "alias": null,
     "args": [
@@ -74,13 +86,7 @@ v1 = [
         "name": "risk",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "id",
-            "storageKey": null
-          },
+          (v1/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -136,6 +142,25 @@ v1 = [
             "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "People",
+            "kind": "LinkedField",
+            "name": "owner",
+            "plural": false,
+            "selections": [
+              (v1/*: any*/),
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "fullName",
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -150,7 +175,7 @@ return {
     "kind": "Fragment",
     "metadata": null,
     "name": "EditRiskViewUpdateRiskMutation",
-    "selections": (v1/*: any*/),
+    "selections": (v2/*: any*/),
     "type": "Mutation",
     "abstractKey": null
   },
@@ -159,19 +184,19 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
     "name": "EditRiskViewUpdateRiskMutation",
-    "selections": (v1/*: any*/)
+    "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "e1bdac5dea224d79834ac952692a9bda",
+    "cacheID": "31fc731869a56e3bdc73aae7c114a385",
     "id": null,
     "metadata": {},
     "name": "EditRiskViewUpdateRiskMutation",
     "operationKind": "mutation",
-    "text": "mutation EditRiskViewUpdateRiskMutation(\n  $input: UpdateRiskInput!\n) {\n  updateRisk(input: $input) {\n    risk {\n      id\n      name\n      description\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      treatment\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation EditRiskViewUpdateRiskMutation(\n  $input: UpdateRiskInput!\n) {\n  updateRisk(input: $input) {\n    risk {\n      id\n      name\n      description\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      treatment\n      updatedAt\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "6394ecc50b1e1f039b11ecdcf2724571";
+(node as any).hash = "777e70d85a1de9db8b625b1f5b109c7e";
 
 export default node;
