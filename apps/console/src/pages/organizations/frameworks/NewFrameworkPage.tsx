@@ -10,7 +10,7 @@ export function NewFrameworkViewSkeleton() {
   return (
     <PageTemplateSkeleton
       title="Create Framework"
-      description="Create a new framework to organize your mitigations"
+      description="Create a new framework to organize your mesures"
     >
       <div className="max-w-2xl aspect-square bg-subtle-bg rounded-xl animate-pulse" />
     </PageTemplateSkeleton>

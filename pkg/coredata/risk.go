@@ -62,11 +62,11 @@ func (r *Risk) ResidualSeverity() float64 {
 	return r.ResidualLikelihood * r.ResidualImpact
 }
 
-func (r *Risks) LoadByMitigationID(
+func (r *Risks) LoadByMesureID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	mitigationID gid.GID,
+	mesureID gid.GID,
 	cursor *page.Cursor[RiskOrderField],
 ) error {
 	q := `
@@ -87,9 +87,9 @@ WITH rsks AS (
 	FROM
 		risks r
 	INNER JOIN
-		risks_mitigations rm ON r.id = rm.risk_id
+		risks_mesures rm ON r.id = rm.risk_id
 	WHERE
-		rm.mitigation_id = @mitigation_id
+		rm.mesure_id = @mesure_id
 )
 SELECT
 	id,
@@ -111,7 +111,7 @@ WHERE %s
 `
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.NamedArgs{"mitigation_id": mitigationID}
+	args := pgx.NamedArgs{"mesure_id": mesureID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)

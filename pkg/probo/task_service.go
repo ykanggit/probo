@@ -32,7 +32,7 @@ type (
 	}
 
 	CreateTaskRequest struct {
-		MitigationID gid.GID
+		MesureID     gid.GID
 		Name         string
 		Description  string
 		TimeEstimate *time.Duration
@@ -65,7 +65,7 @@ func (s TaskService) Create(
 
 	task := &coredata.Task{
 		ID:           taskID,
-		MitigationID: req.MitigationID,
+		MesureID:     req.MesureID,
 		Name:         req.Name,
 		Description:  req.Description,
 		TimeEstimate: req.TimeEstimate,
@@ -215,9 +215,9 @@ func (s TaskService) Delete(
 	return nil
 }
 
-func (s TaskService) ListForMitigationID(
+func (s TaskService) ListForMesureID(
 	ctx context.Context,
-	mitigationID gid.GID,
+	mesureID gid.GID,
 	cursor *page.Cursor[coredata.TaskOrderField],
 ) (*page.Page[*coredata.Task, coredata.TaskOrderField], error) {
 	var tasks coredata.Tasks
@@ -225,11 +225,11 @@ func (s TaskService) ListForMitigationID(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return tasks.LoadByMitigationID(
+			return tasks.LoadByMesureID(
 				ctx,
 				conn,
 				s.svc.scope,
-				mitigationID,
+				mesureID,
 				cursor,
 			)
 		},

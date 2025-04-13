@@ -116,11 +116,11 @@ WHERE %s
 	return nil
 }
 
-func (c *Controls) LoadByMitigationID(
+func (c *Controls) LoadByMesureID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	mitigationID gid.GID,
+	mesureID gid.GID,
 	cursor *page.Cursor[ControlOrderField],
 ) error {
 	q := `
@@ -137,9 +137,9 @@ WITH ctrl AS (
 	FROM
 		controls c
 	INNER JOIN
-		controls_mitigations cm ON c.id = cm.control_id
+		controls_mesures cm ON c.id = cm.control_id
 	WHERE
-		cm.mitigation_id = @mitigation_id
+		cm.mesure_id = @mesure_id
 )
 SELECT
 	id,
@@ -157,7 +157,7 @@ WHERE %s
 `
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.NamedArgs{"mitigation_id": mitigationID}
+	args := pgx.NamedArgs{"mesure_id": mesureID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -200,9 +200,9 @@ WITH ctrl AS (
 	LEFT JOIN
 		risks_policies rp ON cp.policy_id = rp.policy_id
 	LEFT JOIN
-		controls_mitigations cm ON c.id = cm.control_id
+		controls_mesures cm ON c.id = cm.control_id
 	LEFT JOIN
-		risks_mitigations rm ON (rm.mitigation_id = cm.mitigation_id)
+		risks_mesures rm ON (rm.mesure_id = cm.mesure_id)
 	WHERE
 		rp.risk_id = @risk_id OR rm.risk_id = @risk_id
 )

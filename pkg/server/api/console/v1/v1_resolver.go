@@ -20,16 +20,16 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
-// Mitigations is the resolver for the mitigations field.
-func (r *controlResolver) Mitigations(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error) {
+// Mesures is the resolver for the mesures field.
+func (r *controlResolver) Mesures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MesureOrderBy) (*types.MesureConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
-	pageOrderBy := page.OrderBy[coredata.MitigationOrderField]{
-		Field:     coredata.MitigationOrderFieldCreatedAt,
+	pageOrderBy := page.OrderBy[coredata.MesureOrderField]{
+		Field:     coredata.MesureOrderFieldCreatedAt,
 		Direction: page.OrderDirectionDesc,
 	}
 	if orderBy != nil {
-		pageOrderBy = page.OrderBy[coredata.MitigationOrderField]{
+		pageOrderBy = page.OrderBy[coredata.MesureOrderField]{
 			Field:     orderBy.Field,
 			Direction: orderBy.Direction,
 		}
@@ -37,12 +37,12 @@ func (r *controlResolver) Mitigations(ctx context.Context, obj *types.Control, f
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Mitigations.ListForControlID(ctx, obj.ID, cursor)
+	page, err := svc.Mesures.ListForControlID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list mitigations: %w", err)
+		return nil, fmt.Errorf("cannot list mesures: %w", err)
 	}
 
-	return types.NewMitigationConnection(page), nil
+	return types.NewMesureConnection(page), nil
 }
 
 // Policies is the resolver for the policies field.
@@ -113,7 +113,7 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 }
 
 // Tasks is the resolver for the tasks field.
-func (r *mitigationResolver) Tasks(ctx context.Context, obj *types.Mitigation, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error) {
+func (r *mesureResolver) Tasks(ctx context.Context, obj *types.Mesure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.TaskOrderField]{
@@ -129,16 +129,16 @@ func (r *mitigationResolver) Tasks(ctx context.Context, obj *types.Mitigation, f
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Tasks.ListForMitigationID(ctx, obj.ID, cursor)
+	page, err := svc.Tasks.ListForMesureID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list mitigation tasks: %w", err)
+		return nil, fmt.Errorf("cannot list mesure tasks: %w", err)
 	}
 
 	return types.NewTaskConnection(page), nil
 }
 
 // Risks is the resolver for the risks field.
-func (r *mitigationResolver) Risks(ctx context.Context, obj *types.Mitigation, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error) {
+func (r *mesureResolver) Risks(ctx context.Context, obj *types.Mesure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.RiskOrderField]{
@@ -154,16 +154,16 @@ func (r *mitigationResolver) Risks(ctx context.Context, obj *types.Mitigation, f
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Risks.ListForMitigationID(ctx, obj.ID, cursor)
+	page, err := svc.Risks.ListForMesureID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list mitigation risks: %w", err)
+		return nil, fmt.Errorf("cannot list mesure risks: %w", err)
 	}
 
 	return types.NewRiskConnection(page), nil
 }
 
 // Controls is the resolver for the controls field.
-func (r *mitigationResolver) Controls(ctx context.Context, obj *types.Mitigation, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+func (r *mesureResolver) Controls(ctx context.Context, obj *types.Mesure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
@@ -179,9 +179,9 @@ func (r *mitigationResolver) Controls(ctx context.Context, obj *types.Mitigation
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Controls.ListForMitigationID(ctx, obj.ID, cursor)
+	page, err := svc.Controls.ListForMesureID(ctx, obj.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list mitigation controls: %w", err)
+		return nil, fmt.Errorf("cannot list mesure controls: %w", err)
 	}
 
 	return types.NewControlConnection(page), nil
@@ -518,11 +518,11 @@ func (r *mutationResolver) DeleteFramework(ctx context.Context, input types.Dele
 	}, nil
 }
 
-// // CreateMitigation is the resolver for the createMitigation field.
-func (r *mutationResolver) CreateMitigation(ctx context.Context, input types.CreateMitigationInput) (*types.CreateMitigationPayload, error) {
+// // CreateMesure is the resolver for the createMesure field.
+func (r *mutationResolver) CreateMesure(ctx context.Context, input types.CreateMesureInput) (*types.CreateMesurePayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
 
-	mitigation, err := svc.Mitigations.Create(ctx, probo.CreateMitigationRequest{
+	mesure, err := svc.Mesures.Create(ctx, probo.CreateMesureRequest{
 		OrganizationID: input.OrganizationID,
 		Name:           input.Name,
 		Description:    input.Description,
@@ -530,19 +530,19 @@ func (r *mutationResolver) CreateMitigation(ctx context.Context, input types.Cre
 		Importance:     input.Importance,
 	})
 	if err != nil {
-		panic(fmt.Errorf("cannot create mitigation: %w", err))
+		panic(fmt.Errorf("cannot create mesure: %w", err))
 	}
 
-	return &types.CreateMitigationPayload{
-		MitigationEdge: types.NewMitigationEdge(mitigation, coredata.MitigationOrderFieldCreatedAt),
+	return &types.CreateMesurePayload{
+		MesureEdge: types.NewMesureEdge(mesure, coredata.MesureOrderFieldCreatedAt),
 	}, nil
 }
 
-// UpdateMitigation is the resolver for the updateMitigation field.
-func (r *mutationResolver) UpdateMitigation(ctx context.Context, input types.UpdateMitigationInput) (*types.UpdateMitigationPayload, error) {
+// UpdateMesure is the resolver for the updateMesure field.
+func (r *mutationResolver) UpdateMesure(ctx context.Context, input types.UpdateMesureInput) (*types.UpdateMesurePayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
 
-	mitigation, err := svc.Mitigations.Update(ctx, probo.UpdateMitigationRequest{
+	mesure, err := svc.Mesures.Update(ctx, probo.UpdateMesureRequest{
 		ID:          input.ID,
 		Name:        input.Name,
 		Description: input.Description,
@@ -551,48 +551,48 @@ func (r *mutationResolver) UpdateMitigation(ctx context.Context, input types.Upd
 		State:       input.State,
 	})
 	if err != nil {
-		panic(fmt.Errorf("cannot update mitigation: %w", err))
+		panic(fmt.Errorf("cannot update mesure: %w", err))
 	}
 
-	return &types.UpdateMitigationPayload{
-		Mitigation: types.NewMitigation(mitigation),
+	return &types.UpdateMesurePayload{
+		Mesure: types.NewMesure(mesure),
 	}, nil
 }
 
-// ImportMitigation is the resolver for the importMitigation field.
-func (r *mutationResolver) ImportMitigation(ctx context.Context, input types.ImportMitigationInput) (*types.ImportMitigationPayload, error) {
+// ImportMesure is the resolver for the importMesure field.
+func (r *mutationResolver) ImportMesure(ctx context.Context, input types.ImportMesureInput) (*types.ImportMesurePayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
 
-	var req probo.ImportMitigationRequest
-	if err := json.NewDecoder(input.File.File).Decode(&req.Mitigations); err != nil {
-		return nil, fmt.Errorf("cannot unmarshal mitigation: %w", err)
+	var req probo.ImportMesureRequest
+	if err := json.NewDecoder(input.File.File).Decode(&req.Mesures); err != nil {
+		return nil, fmt.Errorf("cannot unmarshal mesure: %w", err)
 	}
 
-	mitigations, err := svc.Mitigations.Import(ctx, input.OrganizationID, req)
+	mesures, err := svc.Mesures.Import(ctx, input.OrganizationID, req)
 	if err != nil {
-		return nil, fmt.Errorf("cannot import mitigation: %w", err)
+		return nil, fmt.Errorf("cannot import mesure: %w", err)
 	}
 
-	mitigationEdges := make([]*types.MitigationEdge, len(mitigations.Data))
-	for i, mitigation := range mitigations.Data {
-		mitigationEdges[i] = types.NewMitigationEdge(mitigation, coredata.MitigationOrderFieldCreatedAt)
+	mesureEdges := make([]*types.MesureEdge, len(mesures.Data))
+	for i, mesure := range mesures.Data {
+		mesureEdges[i] = types.NewMesureEdge(mesure, coredata.MesureOrderFieldCreatedAt)
 	}
 
-	return &types.ImportMitigationPayload{
-		MitigationEdges: mitigationEdges,
+	return &types.ImportMesurePayload{
+		MesureEdges: mesureEdges,
 	}, nil
 }
 
-// CreateControlMitigationMapping is the resolver for the createControlMitigationMapping field.
-func (r *mutationResolver) CreateControlMitigationMapping(ctx context.Context, input types.CreateControlMitigationMappingInput) (*types.CreateControlMitigationMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
+// CreateControlMesureMapping is the resolver for the createControlMesureMapping field.
+func (r *mutationResolver) CreateControlMesureMapping(ctx context.Context, input types.CreateControlMesureMappingInput) (*types.CreateControlMesureMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.MesureID.TenantID())
 
-	err := svc.Controls.CreateMitigationMapping(ctx, input.ControlID, input.MitigationID)
+	err := svc.Controls.CreateMesureMapping(ctx, input.ControlID, input.MesureID)
 	if err != nil {
-		panic(fmt.Errorf("cannot create control mitigation mapping: %w", err))
+		panic(fmt.Errorf("cannot create control mesure mapping: %w", err))
 	}
 
-	return &types.CreateControlMitigationMappingPayload{
+	return &types.CreateControlMesureMappingPayload{
 		Success: true,
 	}, nil
 }
@@ -611,16 +611,16 @@ func (r *mutationResolver) CreateControlPolicyMapping(ctx context.Context, input
 	}, nil
 }
 
-// DeleteControlMitigationMapping is the resolver for the deleteControlMitigationMapping field.
-func (r *mutationResolver) DeleteControlMitigationMapping(ctx context.Context, input types.DeleteControlMitigationMappingInput) (*types.DeleteControlMitigationMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
+// DeleteControlMesureMapping is the resolver for the deleteControlMesureMapping field.
+func (r *mutationResolver) DeleteControlMesureMapping(ctx context.Context, input types.DeleteControlMesureMappingInput) (*types.DeleteControlMesureMappingPayload, error) {
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.MesureID.TenantID())
 
-	err := svc.Controls.DeleteMitigationMapping(ctx, input.ControlID, input.MitigationID)
+	err := svc.Controls.DeleteMesureMapping(ctx, input.ControlID, input.MesureID)
 	if err != nil {
-		panic(fmt.Errorf("cannot delete control mitigation mapping: %w", err))
+		panic(fmt.Errorf("cannot delete control mesure mapping: %w", err))
 	}
 
-	return &types.DeleteControlMitigationMappingPayload{
+	return &types.DeleteControlMesureMappingPayload{
 		Success: true,
 	}, nil
 }
@@ -641,10 +641,10 @@ func (r *mutationResolver) DeleteControlPolicyMapping(ctx context.Context, input
 
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.MitigationID.TenantID())
+	svc := r.GetTenantServiceIfAuthorized(ctx, input.MesureID.TenantID())
 
 	task, err := svc.Tasks.Create(ctx, probo.CreateTaskRequest{
-		MitigationID: input.MitigationID,
+		MesureID:     input.MesureID,
 		Name:         input.Name,
 		Description:  input.Description,
 		TimeEstimate: input.TimeEstimate,
@@ -788,30 +788,30 @@ func (r *mutationResolver) DeleteRisk(ctx context.Context, input types.DeleteRis
 	}, nil
 }
 
-// CreateRiskMitigationMapping is the resolver for the createRiskMitigationMapping field.
-func (r *mutationResolver) CreateRiskMitigationMapping(ctx context.Context, input types.CreateRiskMitigationMappingInput) (*types.CreateRiskMitigationMappingPayload, error) {
+// CreateRiskMesureMapping is the resolver for the createRiskMesureMapping field.
+func (r *mutationResolver) CreateRiskMesureMapping(ctx context.Context, input types.CreateRiskMesureMappingInput) (*types.CreateRiskMesureMappingPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
 
-	err := svc.Risks.CreateMitigationMapping(ctx, input.RiskID, input.MitigationID)
+	err := svc.Risks.CreateMesureMapping(ctx, input.RiskID, input.MesureID)
 	if err != nil {
-		panic(fmt.Errorf("cannot create risk mitigation mapping: %w", err))
+		panic(fmt.Errorf("cannot create risk mesure mapping: %w", err))
 	}
 
-	return &types.CreateRiskMitigationMappingPayload{
+	return &types.CreateRiskMesureMappingPayload{
 		Success: true,
 	}, nil
 }
 
-// DeleteRiskMitigationMapping is the resolver for the deleteRiskMitigationMapping field.
-func (r *mutationResolver) DeleteRiskMitigationMapping(ctx context.Context, input types.DeleteRiskMitigationMappingInput) (*types.DeleteRiskMitigationMappingPayload, error) {
+// DeleteRiskMesureMapping is the resolver for the deleteRiskMesureMapping field.
+func (r *mutationResolver) DeleteRiskMesureMapping(ctx context.Context, input types.DeleteRiskMesureMappingInput) (*types.DeleteRiskMesureMappingPayload, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
 
-	err := svc.Risks.DeleteMitigationMapping(ctx, input.RiskID, input.MitigationID)
+	err := svc.Risks.DeleteMesureMapping(ctx, input.RiskID, input.MesureID)
 	if err != nil {
-		panic(fmt.Errorf("cannot delete risk mitigation mapping: %w", err))
+		panic(fmt.Errorf("cannot delete risk mesure mapping: %w", err))
 	}
 
-	return &types.DeleteRiskMitigationMappingPayload{
+	return &types.DeleteRiskMesureMappingPayload{
 		Success: true,
 	}, nil
 }
@@ -1162,16 +1162,16 @@ func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organiza
 	return types.NewPolicyConnection(page), nil
 }
 
-// Mitigations is the resolver for the mitigations field.
-func (r *organizationResolver) Mitigations(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error) {
+// Mesures is the resolver for the mesures field.
+func (r *organizationResolver) Mesures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MesureOrderBy) (*types.MesureConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
-	pageOrderBy := page.OrderBy[coredata.MitigationOrderField]{
-		Field:     coredata.MitigationOrderFieldCreatedAt,
+	pageOrderBy := page.OrderBy[coredata.MesureOrderField]{
+		Field:     coredata.MesureOrderFieldCreatedAt,
 		Direction: page.OrderDirectionDesc,
 	}
 	if orderBy != nil {
-		pageOrderBy = page.OrderBy[coredata.MitigationOrderField]{
+		pageOrderBy = page.OrderBy[coredata.MesureOrderField]{
 			Field:     orderBy.Field,
 			Direction: orderBy.Direction,
 		}
@@ -1179,12 +1179,12 @@ func (r *organizationResolver) Mitigations(ctx context.Context, obj *types.Organ
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Mitigations.ListForOrganizationID(ctx, obj.ID, cursor)
+	page, err := svc.Mesures.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
-		panic(fmt.Errorf("cannot list organization mitigations: %w", err))
+		panic(fmt.Errorf("cannot list organization mesures: %w", err))
 	}
 
-	return types.NewMitigationConnection(page), nil
+	return types.NewMesureConnection(page), nil
 }
 
 // Risks is the resolver for the risks field.
@@ -1288,13 +1288,13 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 		}
 
 		return types.NewFramework(framework), nil
-	case coredata.MitigationEntityType:
-		mitigation, err := svc.Mitigations.Get(ctx, id)
+	case coredata.MesureEntityType:
+		mesure, err := svc.Mesures.Get(ctx, id)
 		if err != nil {
-			panic(fmt.Errorf("cannot get mitigation: %w", err))
+			panic(fmt.Errorf("cannot get mesure: %w", err))
 		}
 
-		return types.NewMitigation(mitigation), nil
+		return types.NewMesure(mesure), nil
 	case coredata.TaskEntityType:
 		task, err := svc.Tasks.Get(ctx, id)
 		if err != nil {
@@ -1372,16 +1372,16 @@ func (r *riskResolver) Owner(ctx context.Context, obj *types.Risk) (*types.Peopl
 	return types.NewPeople(owner), nil
 }
 
-// Mitigations is the resolver for the mitigations field.
-func (r *riskResolver) Mitigations(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MitigationOrderBy) (*types.MitigationConnection, error) {
+// Mesures is the resolver for the mesures field.
+func (r *riskResolver) Mesures(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MesureOrderBy) (*types.MesureConnection, error) {
 	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
 
-	pageOrderBy := page.OrderBy[coredata.MitigationOrderField]{
-		Field:     coredata.MitigationOrderFieldCreatedAt,
+	pageOrderBy := page.OrderBy[coredata.MesureOrderField]{
+		Field:     coredata.MesureOrderFieldCreatedAt,
 		Direction: page.OrderDirectionDesc,
 	}
 	if orderBy != nil {
-		pageOrderBy = page.OrderBy[coredata.MitigationOrderField]{
+		pageOrderBy = page.OrderBy[coredata.MesureOrderField]{
 			Field:     orderBy.Field,
 			Direction: orderBy.Direction,
 		}
@@ -1389,12 +1389,12 @@ func (r *riskResolver) Mitigations(ctx context.Context, obj *types.Risk, first *
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Mitigations.ListForRiskID(ctx, obj.ID, cursor)
+	page, err := svc.Mesures.ListForRiskID(ctx, obj.ID, cursor)
 	if err != nil {
-		panic(fmt.Errorf("cannot list risk mitigations: %w", err))
+		panic(fmt.Errorf("cannot list risk mesures: %w", err))
 	}
 
-	return types.NewMitigationConnection(page), nil
+	return types.NewMesureConnection(page), nil
 }
 
 // Policies is the resolver for the policies field.
@@ -1617,8 +1617,8 @@ func (r *Resolver) Evidence() schema.EvidenceResolver { return &evidenceResolver
 // Framework returns schema.FrameworkResolver implementation.
 func (r *Resolver) Framework() schema.FrameworkResolver { return &frameworkResolver{r} }
 
-// Mitigation returns schema.MitigationResolver implementation.
-func (r *Resolver) Mitigation() schema.MitigationResolver { return &mitigationResolver{r} }
+// Mesure returns schema.MesureResolver implementation.
+func (r *Resolver) Mesure() schema.MesureResolver { return &mesureResolver{r} }
 
 // Mutation returns schema.MutationResolver implementation.
 func (r *Resolver) Mutation() schema.MutationResolver { return &mutationResolver{r} }
@@ -1652,7 +1652,7 @@ func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
 type controlResolver struct{ *Resolver }
 type evidenceResolver struct{ *Resolver }
 type frameworkResolver struct{ *Resolver }
-type mitigationResolver struct{ *Resolver }
+type mesureResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type policyResolver struct{ *Resolver }

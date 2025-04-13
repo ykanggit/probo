@@ -55,9 +55,9 @@ type (
 	}
 )
 
-func (s RiskService) ListForMitigationID(
+func (s RiskService) ListForMesureID(
 	ctx context.Context,
-	mitigationID gid.GID,
+	mesureID gid.GID,
 	cursor *page.Cursor[coredata.RiskOrderField],
 ) (*page.Page[*coredata.Risk, coredata.RiskOrderField], error) {
 	var risks coredata.Risks
@@ -65,7 +65,7 @@ func (s RiskService) ListForMitigationID(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return risks.LoadByMitigationID(ctx, conn, s.svc.scope, mitigationID, cursor)
+			return risks.LoadByMesureID(ctx, conn, s.svc.scope, mesureID, cursor)
 		},
 	)
 
@@ -116,42 +116,42 @@ func (s RiskService) DeletePolicyMapping(
 	)
 }
 
-func (s RiskService) CreateMitigationMapping(
+func (s RiskService) CreateMesureMapping(
 	ctx context.Context,
 	riskID gid.GID,
-	mitigationID gid.GID,
+	mesureID gid.GID,
 ) error {
-	riskMitigation := &coredata.RiskMitigation{
-		RiskID:       riskID,
-		MitigationID: mitigationID,
-		TenantID:     s.svc.scope.GetTenantID(),
-		CreatedAt:    time.Now(),
+	riskMesure := &coredata.RiskMesure{
+		RiskID:    riskID,
+		MesureID:  mesureID,
+		TenantID:  s.svc.scope.GetTenantID(),
+		CreatedAt: time.Now(),
 	}
 
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return riskMitigation.Insert(ctx, conn, s.svc.scope)
+			return riskMesure.Insert(ctx, conn, s.svc.scope)
 		},
 	)
 }
 
-func (s RiskService) DeleteMitigationMapping(
+func (s RiskService) DeleteMesureMapping(
 	ctx context.Context,
 	riskID gid.GID,
-	mitigationID gid.GID,
+	mesureID gid.GID,
 ) error {
-	riskMitigation := &coredata.RiskMitigation{
-		RiskID:       riskID,
-		MitigationID: mitigationID,
-		TenantID:     s.svc.scope.GetTenantID(),
-		CreatedAt:    time.Now(),
+	riskMesure := &coredata.RiskMesure{
+		RiskID:    riskID,
+		MesureID:  mesureID,
+		TenantID:  s.svc.scope.GetTenantID(),
+		CreatedAt: time.Now(),
 	}
 
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return riskMitigation.Delete(ctx, conn, s.svc.scope)
+			return riskMesure.Delete(ctx, conn, s.svc.scope)
 		},
 	)
 }

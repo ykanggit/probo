@@ -16,7 +16,7 @@ import { OrganizationBreadcrumbBreadcrumbPeopleOverviewQuery } from "./__generat
 import { OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbVendorOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbVendorOverviewQuery.graphql";
 import { OrganizationBreadcrumbOrganizationQuery } from "./__generated__/OrganizationBreadcrumbOrganizationQuery.graphql";
-import { OrganizationBreadcrumbBreadcrumbMitigationViewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbMitigationViewQuery.graphql";
+import { OrganizationBreadcrumbBreadcrumbMesureViewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbMesureViewQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbControlQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbControlQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbRiskShowQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbRiskShowQuery.graphql";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -314,15 +314,15 @@ function BreadcrumbPolicyOverview() {
   );
 }
 
-function BreadcrumbMitigationList() {
+function BreadcrumbMesureList() {
   const { organizationId } = useParams();
 
   return (
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbNavLink to={`/organizations/${organizationId}/mitigations`}>
-          Mitigations
+        <BreadcrumbNavLink to={`/organizations/${organizationId}/mesures`}>
+          Mesures
         </BreadcrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
@@ -330,24 +330,22 @@ function BreadcrumbMitigationList() {
   );
 }
 
-function BreadcrumbMitigationView() {
-  const { organizationId, mitigationId } = useParams();
+function BreadcrumbMesureView() {
+  const { organizationId, mesureId } = useParams();
   const data =
-    useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbMitigationViewQuery>(
+    useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbMesureViewQuery>(
       graphql`
-        query OrganizationBreadcrumbBreadcrumbMitigationViewQuery(
-          $mitigationId: ID!
-        ) {
-          mitigation: node(id: $mitigationId) {
+        query OrganizationBreadcrumbBreadcrumbMesureViewQuery($mesureId: ID!) {
+          mesure: node(id: $mesureId) {
             id
-            ... on Mitigation {
+            ... on Mesure {
               name
               category
             }
           }
         }
       `,
-      { mitigationId: mitigationId! }
+      { mesureId: mesureId! }
     );
 
   return (
@@ -355,17 +353,17 @@ function BreadcrumbMitigationView() {
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbNavLink
-          to={`/organizations/${organizationId}/mitigations#${data.mitigation.category}`}
+          to={`/organizations/${organizationId}/mesures#${data.mesure.category}`}
         >
-          {data.mitigation.category}
+          {data.mesure.category}
         </BreadcrumbNavLink>
       </BreadcrumbItem>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbNavLink
-          to={`/organizations/${organizationId}/mitigations/${mitigationId}`}
+          to={`/organizations/${organizationId}/mesures/${mesureId}`}
         >
-          {data.mitigation.name}
+          {data.mesure.name}
         </BreadcrumbNavLink>
       </BreadcrumbItem>
       <Outlet />
@@ -463,13 +461,13 @@ export function BreadCrumb() {
           </ErrorBoundary>
         }
       >
-        <Route path="mitigations" element={<BreadcrumbMitigationList />}>
+        <Route path="mesures" element={<BreadcrumbMesureList />}>
           <Route path="new" element={<New />} />
           <Route
-            path=":mitigationId"
+            path=":mesureId"
             element={
               <Suspense>
-                <BreadcrumbMitigationView />
+                <BreadcrumbMesureView />
               </Suspense>
             }
           >

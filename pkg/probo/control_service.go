@@ -76,9 +76,9 @@ func (s ControlService) ListForPolicyID(
 	return page.NewPage(controls, cursor), nil
 }
 
-func (s ControlService) ListForMitigationID(
+func (s ControlService) ListForMesureID(
 	ctx context.Context,
-	mitigationID gid.GID,
+	mesureID gid.GID,
 	cursor *page.Cursor[coredata.ControlOrderField],
 ) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
@@ -86,7 +86,7 @@ func (s ControlService) ListForMitigationID(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return controls.LoadByMitigationID(ctx, conn, s.svc.scope, mitigationID, cursor)
+			return controls.LoadByMesureID(ctx, conn, s.svc.scope, mesureID, cursor)
 		},
 	)
 
@@ -97,42 +97,42 @@ func (s ControlService) ListForMitigationID(
 	return page.NewPage(controls, cursor), nil
 }
 
-func (s ControlService) CreateMitigationMapping(
+func (s ControlService) CreateMesureMapping(
 	ctx context.Context,
 	controlID gid.GID,
-	mitigationID gid.GID,
+	mesureID gid.GID,
 ) error {
-	controlMitigation := &coredata.ControlMitigation{
-		ControlID:    controlID,
-		MitigationID: mitigationID,
-		TenantID:     s.svc.scope.GetTenantID(),
-		CreatedAt:    time.Now(),
+	controlMesure := &coredata.ControlMesure{
+		ControlID: controlID,
+		MesureID:  mesureID,
+		TenantID:  s.svc.scope.GetTenantID(),
+		CreatedAt: time.Now(),
 	}
 
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return controlMitigation.Insert(ctx, conn, s.svc.scope)
+			return controlMesure.Insert(ctx, conn, s.svc.scope)
 		},
 	)
 }
 
-func (s ControlService) DeleteMitigationMapping(
+func (s ControlService) DeleteMesureMapping(
 	ctx context.Context,
 	controlID gid.GID,
-	mitigationID gid.GID,
+	mesureID gid.GID,
 ) error {
-	controlMitigation := &coredata.ControlMitigation{
-		ControlID:    controlID,
-		MitigationID: mitigationID,
-		TenantID:     s.svc.scope.GetTenantID(),
-		CreatedAt:    time.Now(),
+	controlMesure := &coredata.ControlMesure{
+		ControlID: controlID,
+		MesureID:  mesureID,
+		TenantID:  s.svc.scope.GetTenantID(),
+		CreatedAt: time.Now(),
 	}
 
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return controlMitigation.Delete(ctx, conn, s.svc.scope)
+			return controlMesure.Delete(ctx, conn, s.svc.scope)
 		},
 	)
 }

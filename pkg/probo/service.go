@@ -39,7 +39,7 @@ type (
 		scope coredata.Scoper
 
 		Frameworks              *FrameworkService
-		Mitigations             *MitigationService
+		Mesures                 *MesureService
 		Tasks                   *TaskService
 		Evidences               *EvidenceService
 		Organizations           *OrganizationService
@@ -80,7 +80,7 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	}
 
 	tenantService.Frameworks = &FrameworkService{svc: tenantService}
-	tenantService.Mitigations = &MitigationService{svc: tenantService}
+	tenantService.Mesures = &MesureService{svc: tenantService}
 	tenantService.Tasks = &TaskService{svc: tenantService}
 	tenantService.Evidences = &EvidenceService{svc: tenantService}
 	tenantService.Peoples = &PeopleService{svc: tenantService}

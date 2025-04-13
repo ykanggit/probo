@@ -26,13 +26,13 @@ import {
 } from "react-relay";
 import { useParams, Link } from "react-router";
 import {
-  ControlLinkedMitigationsQuery$data,
-  ControlLinkedMitigationsQuery,
-} from "./__generated__/ControlLinkedMitigationsQuery.graphql";
+  ControlLinkedMesuresQuery$data,
+  ControlLinkedMesuresQuery,
+} from "./__generated__/ControlLinkedMesuresQuery.graphql";
 import {
-  ControlOrganizationMitigationsQuery$data,
-  ControlOrganizationMitigationsQuery,
-} from "./__generated__/ControlOrganizationMitigationsQuery.graphql";
+  ControlOrganizationMesuresQuery$data,
+  ControlOrganizationMesuresQuery,
+} from "./__generated__/ControlOrganizationMesuresQuery.graphql";
 import { ControlFragment_Control$key } from "./__generated__/ControlFragment_Control.graphql";
 import {
   ControlLinkedPoliciesQuery$data,
@@ -52,13 +52,13 @@ const controlFragment = graphql`
   }
 `;
 
-// New query to fetch linked mitigations
-const linkedMitigationsQuery = graphql`
-  query ControlLinkedMitigationsQuery($controlId: ID!) {
+// New query to fetch linked mesures
+const linkedMesuresQuery = graphql`
+  query ControlLinkedMesuresQuery($controlId: ID!) {
     control: node(id: $controlId) {
       id
       ... on Control {
-        mitigations(first: 100) @connection(key: "Control__mitigations") {
+        mesures(first: 100) @connection(key: "Control__mesures") {
           edges {
             node {
               id
@@ -75,13 +75,13 @@ const linkedMitigationsQuery = graphql`
   }
 `;
 
-// Query to fetch all mitigations for the organization
-const organizationMitigationsQuery = graphql`
-  query ControlOrganizationMitigationsQuery($organizationId: ID!) {
+// Query to fetch all mesures for the organization
+const organizationMesuresQuery = graphql`
+  query ControlOrganizationMesuresQuery($organizationId: ID!) {
     organization: node(id: $organizationId) {
       id
       ... on Organization {
-        mitigations(first: 100) @connection(key: "Organization__mitigations") {
+        mesures(first: 100) @connection(key: "Organization__mesures") {
           edges {
             node {
               id
@@ -142,23 +142,23 @@ const organizationPoliciesQuery = graphql`
   }
 `;
 
-// Mutation to create a mapping between a control and a mitigation
-const createMitigationMappingMutation = graphql`
-  mutation ControlCreateMitigationMappingMutation(
-    $input: CreateControlMitigationMappingInput!
+// Mutation to create a mapping between a control and a mesure
+const createMesureMappingMutation = graphql`
+  mutation ControlCreateMesureMappingMutation(
+    $input: CreateControlMesureMappingInput!
   ) {
-    createControlMitigationMapping(input: $input) {
+    createControlMesureMapping(input: $input) {
       success
     }
   }
 `;
 
-// Mutation to delete a mapping between a control and a mitigation
-const deleteMitigationMappingMutation = graphql`
-  mutation ControlDeleteMitigationMappingMutation(
-    $input: DeleteControlMitigationMappingInput!
+// Mutation to delete a mapping between a control and a mesure
+const deleteMesureMappingMutation = graphql`
+  mutation ControlDeleteMesureMappingMutation(
+    $input: DeleteControlMesureMappingInput!
   ) {
-    deleteControlMitigationMapping(input: $input) {
+    deleteControlMesureMapping(input: $input) {
       success
     }
   }
@@ -199,17 +199,17 @@ export function Control({
   const { toast } = useToast();
   const environment = useRelayEnvironment();
 
-  // State for mitigation mapping
-  const [isMitigationMappingDialogOpen, setIsMitigationMappingDialogOpen] =
+  // State for mesure mapping
+  const [isMesureMappingDialogOpen, setIsMesureMappingDialogOpen] =
     useState(false);
-  const [linkedMitigationsData, setLinkedMitigationsData] =
-    useState<ControlLinkedMitigationsQuery$data | null>(null);
-  const [organizationMitigationsData, setOrganizationMitigationsData] =
-    useState<ControlOrganizationMitigationsQuery$data | null>(null);
-  const [mitigationSearchQuery, setMitigationSearchQuery] = useState("");
-  const [isLoadingMitigations, setIsLoadingMitigations] = useState(false);
-  const [isLinkingMitigation, setIsLinkingMitigation] = useState(false);
-  const [isUnlinkingMitigation, setIsUnlinkingMitigation] = useState(false);
+  const [linkedMesuresData, setLinkedMesuresData] =
+    useState<ControlLinkedMesuresQuery$data | null>(null);
+  const [organizationMesuresData, setOrganizationMesuresData] =
+    useState<ControlOrganizationMesuresQuery$data | null>(null);
+  const [mesureSearchQuery, setMesureSearchQuery] = useState("");
+  const [isLoadingMesures, setIsLoadingMesures] = useState(false);
+  const [isLinkingMesure, setIsLinkingMesure] = useState(false);
+  const [isUnlinkingMesure, setIsUnlinkingMesure] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
 
   // Policy state
@@ -225,85 +225,73 @@ export function Control({
   const [isUnlinkingPolicy, setIsUnlinkingPolicy] = useState(false);
 
   // Create mutation hooks
-  const [commitCreateMitigationMapping] = useMutation(
-    createMitigationMappingMutation
-  );
-  const [commitDeleteMitigationMapping] = useMutation(
-    deleteMitigationMappingMutation
-  );
+  const [commitCreateMesureMapping] = useMutation(createMesureMappingMutation);
+  const [commitDeleteMesureMapping] = useMutation(deleteMesureMappingMutation);
   const [commitCreatePolicyMapping] = useMutation(createPolicyMappingMutation);
   const [commitDeletePolicyMapping] = useMutation(deletePolicyMappingMutation);
 
-  // Load initial linked mitigations data
+  // Load initial linked mesures data
   useEffect(() => {
     if (control.id) {
-      setIsLoadingMitigations(true);
-      fetchQuery<ControlLinkedMitigationsQuery>(
-        environment,
-        linkedMitigationsQuery,
-        {
-          controlId: control.id,
-        }
-      ).subscribe({
+      setIsLoadingMesures(true);
+      fetchQuery<ControlLinkedMesuresQuery>(environment, linkedMesuresQuery, {
+        controlId: control.id,
+      }).subscribe({
         next: (data) => {
-          setLinkedMitigationsData(data);
-          setIsLoadingMitigations(false);
+          setLinkedMesuresData(data);
+          setIsLoadingMesures(false);
         },
         error: (error: Error) => {
-          console.error("Error loading initial mitigations:", error);
-          setIsLoadingMitigations(false);
+          console.error("Error loading initial mesures:", error);
+          setIsLoadingMesures(false);
         },
       });
     }
   }, [control.id, environment]);
 
-  // Load mitigations data
-  const loadMitigationsData = useCallback(() => {
+  // Load mesures data
+  const loadMesuresData = useCallback(() => {
     if (!organizationId || !control.id) return;
 
-    setIsLoadingMitigations(true);
+    setIsLoadingMesures(true);
 
-    // Fetch all mitigations for the organization
-    fetchQuery<ControlOrganizationMitigationsQuery>(
+    // Fetch all mesures for the organization
+    fetchQuery<ControlOrganizationMesuresQuery>(
       environment,
-      organizationMitigationsQuery,
+      organizationMesuresQuery,
       {
         organizationId,
       }
     ).subscribe({
       next: (data) => {
-        setOrganizationMitigationsData(data);
+        setOrganizationMesuresData(data);
       },
       complete: () => {
-        // Fetch linked mitigations for this control
-        fetchQuery<ControlLinkedMitigationsQuery>(
-          environment,
-          linkedMitigationsQuery,
-          {
-            controlId: control.id,
-          }
-        ).subscribe({
+        // Fetch linked mesures for this control
+        fetchQuery<ControlLinkedMesuresQuery>(environment, linkedMesuresQuery, {
+          controlId: control.id,
+        }).subscribe({
           next: (data) => {
-            setLinkedMitigationsData(data);
-            setIsLoadingMitigations(false);
+            setLinkedMesuresData(data);
+            setIsLoadingMesures(false);
           },
           error: (error: Error) => {
-            console.error("Error fetching linked mitigations:", error);
-            setIsLoadingMitigations(false);
+            console.error("Error fetching linked mesures:", error);
+            setIsLoadingMesures(false);
             toast({
               title: "Error",
-              description: "Failed to load linked mitigations.",
+              description: "Failed to load linked mesures.",
               variant: "destructive",
             });
           },
         });
       },
       error: (error: Error) => {
-        console.error("Error fetching organization mitigations:", error);
-        setIsLoadingMitigations(false);
+        console.error("Error fetching organization mesures:", error);
+        setIsLoadingMesures(false);
         toast({
           title: "Error",
-          description: "Failed to load mitigations.",
+          description: "Failed to load mesures.",
           variant: "destructive",
         });
       },
@@ -311,197 +299,190 @@ export function Control({
   }, [control.id, environment, organizationId, toast]);
 
   // Helper functions
-  const getMitigations = useCallback(() => {
-    if (!organizationMitigationsData?.organization?.mitigations?.edges)
-      return [];
-    return organizationMitigationsData.organization.mitigations.edges.map(
+  const getMesures = useCallback(() => {
+    if (!organizationMesuresData?.organization?.mesures?.edges) return [];
+    return organizationMesuresData.organization.mesures.edges.map(
       (edge) => edge.node
     );
-  }, [organizationMitigationsData]);
+  }, [organizationMesuresData]);
 
-  const getLinkedMitigations = useCallback(() => {
-    if (!linkedMitigationsData?.control?.mitigations?.edges) return [];
-    return linkedMitigationsData.control.mitigations.edges.map(
-      (edge) => edge.node
-    );
-  }, [linkedMitigationsData]);
+  const getLinkedMesures = useCallback(() => {
+    if (!linkedMesuresData?.control?.mesures?.edges) return [];
+    return linkedMesuresData.control.mesures.edges.map((edge) => edge.node);
+  }, [linkedMesuresData]);
 
-  const isMitigationLinked = useCallback(
-    (mitigationId: string) => {
-      const linkedMitigations = getLinkedMitigations();
-      return linkedMitigations.some(
-        (mitigation) => mitigation.id === mitigationId
-      );
+  const isMesureLinked = useCallback(
+    (mesureId: string) => {
+      const linkedMesures = getLinkedMesures();
+      return linkedMesures.some((mesure) => mesure.id === mesureId);
     },
-    [getLinkedMitigations]
+    [getLinkedMesures]
   );
 
-  const getMitigationCategories = useCallback(() => {
-    const mitigations = getMitigations();
+  const getMesureCategories = useCallback(() => {
+    const mesures = getMesures();
     const categories = new Set<string>();
 
-    mitigations.forEach((mitigation) => {
-      if (mitigation.category) {
-        categories.add(mitigation.category);
+    mesures.forEach((mesure) => {
+      if (mesure.category) {
+        categories.add(mesure.category);
       }
     });
 
     return Array.from(categories).sort();
-  }, [getMitigations]);
+  }, [getMesures]);
 
-  const filteredMitigations = useCallback(() => {
-    const mitigations = getMitigations();
-    if (!mitigationSearchQuery && !categoryFilter) return mitigations;
+  const filteredMesures = useCallback(() => {
+    const mesures = getMesures();
+    if (!mesureSearchQuery && !categoryFilter) return mesures;
 
-    return mitigations.filter((mitigation) => {
+    return mesures.filter((mesure) => {
       // Filter by search query
       const matchesSearch =
-        !mitigationSearchQuery ||
-        mitigation.name
-          .toLowerCase()
-          .includes(mitigationSearchQuery.toLowerCase()) ||
-        (mitigation.description &&
-          mitigation.description
+        !mesureSearchQuery ||
+        mesure.name.toLowerCase().includes(mesureSearchQuery.toLowerCase()) ||
+        (mesure.description &&
+          mesure.description
             .toLowerCase()
-            .includes(mitigationSearchQuery.toLowerCase()));
+            .includes(mesureSearchQuery.toLowerCase()));
 
       // Filter by category
       const matchesCategory =
         !categoryFilter ||
         categoryFilter === "all" ||
-        mitigation.category === categoryFilter;
+        mesure.category === categoryFilter;
 
       return matchesSearch && matchesCategory;
     });
-  }, [categoryFilter, getMitigations, mitigationSearchQuery]);
+  }, [categoryFilter, getMesures, mesureSearchQuery]);
 
   // Handle link/unlink functions
-  const handleLinkMitigation = useCallback(
-    (mitigationId: string) => {
+  const handleLinkMesure = useCallback(
+    (mesureId: string) => {
       if (!control.id) return;
 
-      setIsLinkingMitigation(true);
+      setIsLinkingMesure(true);
 
-      commitCreateMitigationMapping({
+      commitCreateMesureMapping({
         variables: {
           input: {
             controlId: control.id,
-            mitigationId: mitigationId,
+            mesureId: mesureId,
           },
         },
         onCompleted: (_, errors) => {
-          setIsLinkingMitigation(false);
+          setIsLinkingMesure(false);
 
           if (errors) {
-            console.error("Error linking mitigation:", errors);
+            console.error("Error linking mesure:", errors);
             toast({
               title: "Error",
-              description: "Failed to link mitigation. Please try again.",
+              description: "Failed to link mesure. Please try again.",
               variant: "destructive",
             });
             return;
           }
 
-          // Refresh linked mitigations data
-          fetchQuery<ControlLinkedMitigationsQuery>(
+          // Refresh linked mesures data
+          fetchQuery<ControlLinkedMesuresQuery>(
             environment,
-            linkedMitigationsQuery,
+            linkedMesuresQuery,
             {
               controlId: control.id,
             }
           ).subscribe({
             next: (data) => {
-              setLinkedMitigationsData(data);
+              setLinkedMesuresData(data);
             },
             error: (error: Error) => {
-              console.error("Error refreshing linked mitigations:", error);
+              console.error("Error refreshing linked mesures:", error);
             },
           });
 
           toast({
             title: "Success",
-            description: "Mitigation successfully linked to control.",
+            description: "Mesure successfully linked to control.",
           });
         },
         onError: (error) => {
-          setIsLinkingMitigation(false);
-          console.error("Error linking mitigation:", error);
+          setIsLinkingMesure(false);
+          console.error("Error linking mesure:", error);
           toast({
             title: "Error",
-            description: "Failed to link mitigation. Please try again.",
+            description: "Failed to link mesure. Please try again.",
             variant: "destructive",
           });
         },
       });
     },
-    [commitCreateMitigationMapping, control.id, environment, toast]
+    [commitCreateMesureMapping, control.id, environment, toast]
   );
 
-  const handleUnlinkMitigation = useCallback(
-    (mitigationId: string) => {
+  const handleUnlinkMesure = useCallback(
+    (mesureId: string) => {
       if (!control.id) return;
 
-      setIsUnlinkingMitigation(true);
+      setIsUnlinkingMesure(true);
 
-      commitDeleteMitigationMapping({
+      commitDeleteMesureMapping({
         variables: {
           input: {
             controlId: control.id,
-            mitigationId: mitigationId,
+            mesureId: mesureId,
           },
         },
         onCompleted: (_, errors) => {
-          setIsUnlinkingMitigation(false);
+          setIsUnlinkingMesure(false);
 
           if (errors) {
-            console.error("Error unlinking mitigation:", errors);
+            console.error("Error unlinking mesure:", errors);
             toast({
               title: "Error",
-              description: "Failed to unlink mitigation. Please try again.",
+              description: "Failed to unlink mesure. Please try again.",
               variant: "destructive",
             });
             return;
           }
 
-          // Refresh linked mitigations data
-          fetchQuery<ControlLinkedMitigationsQuery>(
+          // Refresh linked mesures data
+          fetchQuery<ControlLinkedMesuresQuery>(
             environment,
-            linkedMitigationsQuery,
+            linkedMesuresQuery,
             {
               controlId: control.id,
             }
           ).subscribe({
             next: (data) => {
-              setLinkedMitigationsData(data);
+              setLinkedMesuresData(data);
             },
             error: (error: Error) => {
-              console.error("Error refreshing linked mitigations:", error);
+              console.error("Error refreshing linked mesures:", error);
             },
           });
 
           toast({
             title: "Success",
-            description: "Mitigation successfully unlinked from control.",
+            description: "Mesure successfully unlinked from control.",
           });
         },
         onError: (error) => {
-          setIsUnlinkingMitigation(false);
-          console.error("Error unlinking mitigation:", error);
+          setIsUnlinkingMesure(false);
+          console.error("Error unlinking mesure:", error);
           toast({
             title: "Error",
-            description: "Failed to unlink mitigation. Please try again.",
+            description: "Failed to unlink mesure. Please try again.",
             variant: "destructive",
           });
         },
       });
     },
-    [commitDeleteMitigationMapping, control.id, environment, toast]
+    [commitDeleteMesureMapping, control.id, environment, toast]
   );
 
-  const handleOpenMitigationMappingDialog = useCallback(() => {
-    loadMitigationsData();
-    setIsMitigationMappingDialogOpen(true);
-  }, [loadMitigationsData]);
+  const handleOpenMesureMappingDialog = useCallback(() => {
+    loadMesuresData();
+    setIsMesureMappingDialogOpen(true);
+  }, [loadMesuresData]);
 
   // Load initial linked policies data
   useEffect(() => {
@@ -824,10 +805,10 @@ export function Control({
 
         {/* Security Measures Section */}
         <div className="mt-8">
-          {/* Mitigation Mapping Dialog */}
+          {/* Mesure Mapping Dialog */}
           <Dialog
-            open={isMitigationMappingDialogOpen}
-            onOpenChange={setIsMitigationMappingDialogOpen}
+            open={isMesureMappingDialogOpen}
+            onOpenChange={setIsMesureMappingDialogOpen}
           >
             <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
               <DialogHeader>
@@ -844,8 +825,8 @@ export function Control({
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-tertiary" />
                     <Input
                       placeholder="Search security measures by name or description..."
-                      value={mitigationSearchQuery}
-                      onChange={(e) => setMitigationSearchQuery(e.target.value)}
+                      value={mesureSearchQuery}
+                      onChange={(e) => setMesureSearchQuery(e.target.value)}
                       className="w-full pl-10"
                     />
                   </div>
@@ -862,7 +843,7 @@ export function Control({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All categories</SelectItem>
-                      {getMitigationCategories().map((category) => (
+                      {getMesureCategories().map((category) => (
                         <SelectItem key={category} value={category}>
                           {category}
                         </SelectItem>
@@ -873,14 +854,14 @@ export function Control({
               </div>
 
               <div className="flex-1 overflow-hidden">
-                {isLoadingMitigations ? (
+                {isLoadingMesures ? (
                   <div className="flex items-center justify-center h-full">
                     <Loader2 className="w-8 h-8 animate-spin text-info" />
                     <span className="ml-2">Loading security measures...</span>
                   </div>
                 ) : (
                   <div className="max-h-[50vh] overflow-y-auto pr-2">
-                    {filteredMitigations().length === 0 ? (
+                    {filteredMesures().length === 0 ? (
                       <div className="text-center py-8 text-secondary">
                         No security measures found. Try adjusting your search or
                         select a different category.
@@ -900,39 +881,39 @@ export function Control({
                           </tr>
                         </thead>
                         <tbody>
-                          {filteredMitigations().map((mitigation) => {
-                            const isLinked = isMitigationLinked(mitigation.id);
+                          {filteredMesures().map((mesure) => {
+                            const isLinked = isMesureLinked(mesure.id);
                             return (
                               <tr
-                                key={mitigation.id}
+                                key={mesure.id}
                                 className="border-b hover:bg-invert-bg"
                               >
                                 <td className="py-3 px-4">
                                   <div className="font-medium">
-                                    {mitigation.name}
+                                    {mesure.name}
                                   </div>
-                                  {mitigation.description && (
+                                  {mesure.description && (
                                     <div className="text-xs text-secondary line-clamp-1 mt-0.5">
-                                      {mitigation.description}
+                                      {mesure.description}
                                     </div>
                                   )}
                                 </td>
                                 <td className="py-3 px-4">
                                   <div
                                     className={`px-2 py-0.5 rounded-full text-xs ${getImportanceColor(
-                                      mitigation.importance
+                                      mesure.importance
                                     )} inline-block`}
                                   >
-                                    {formatImportance(mitigation.importance)}
+                                    {formatImportance(mesure.importance)}
                                   </div>
                                 </td>
                                 <td className="py-3 px-4">
                                   <div
                                     className={`px-2 py-0.5 rounded-full text-xs ${getStateColor(
-                                      mitigation.state
+                                      mesure.state
                                     )} inline-block`}
                                   >
-                                    {formatState(mitigation.state)}
+                                    {formatState(mesure.state)}
                                   </div>
                                 </td>
                                 <td className="py-3 px-4 text-right whitespace-nowrap">
@@ -941,12 +922,12 @@ export function Control({
                                       variant="outline"
                                       size="sm"
                                       onClick={() =>
-                                        handleUnlinkMitigation(mitigation.id)
+                                        handleUnlinkMesure(mesure.id)
                                       }
-                                      disabled={isUnlinkingMitigation}
+                                      disabled={isUnlinkingMesure}
                                       className="text-xs h-7 text-danger border-danger-b hover:bg-h-danger-bg"
                                     >
-                                      {isUnlinkingMitigation ? (
+                                      {isUnlinkingMesure ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
                                       ) : (
                                         <X className="w-4 h-4" />
@@ -958,12 +939,12 @@ export function Control({
                                       variant="secondary"
                                       size="sm"
                                       onClick={() =>
-                                        handleLinkMitigation(mitigation.id)
+                                        handleLinkMesure(mesure.id)
                                       }
-                                      disabled={isLinkingMitigation}
+                                      disabled={isLinkingMesure}
                                       className="text-xs h-7  text-info border-info-b hover:bg-h-info-bg"
                                     >
-                                      {isLinkingMitigation ? (
+                                      {isLinkingMesure ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
                                       ) : (
                                         <LinkIcon className="w-4 h-4" />
@@ -983,14 +964,14 @@ export function Control({
               </div>
 
               <DialogFooter className="mt-4">
-                <Button onClick={() => setIsMitigationMappingDialogOpen(false)}>
+                <Button onClick={() => setIsMesureMappingDialogOpen(false)}>
                   Close
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
 
-          {/* Linked Mitigations List */}
+          {/* Linked Mesures List */}
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-medium text-secondary">
@@ -1000,20 +981,20 @@ export function Control({
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-1"
-                onClick={handleOpenMitigationMappingDialog}
+                onClick={handleOpenMesureMappingDialog}
               >
                 <LinkIcon className="w-4 h-4" />
                 <span>Link Security Measures</span>
               </Button>
             </div>
 
-            {isLoadingMitigations ? (
+            {isLoadingMesures ? (
               <div className="flex items-center justify-center h-24">
                 <Loader2 className="w-6 h-6 animate-spin text-info" />
                 <span className="ml-2">Loading security measures...</span>
               </div>
-            ) : linkedMitigationsData?.control?.mitigations?.edges &&
-              linkedMitigationsData.control.mitigations.edges.length > 0 ? (
+            ) : linkedMesuresData?.control?.mesures?.edges &&
+              linkedMesuresData.control.mesures.edges.length > 0 ? (
               <div className="overflow-x-auto border rounded-md">
                 <table className="w-full">
                   <thead>
@@ -1027,35 +1008,35 @@ export function Control({
                     </tr>
                   </thead>
                   <tbody>
-                    {getLinkedMitigations().map((mitigation) => (
+                    {getLinkedMesures().map((mesure) => (
                       <tr
-                        key={mitigation.id}
+                        key={mesure.id}
                         className="border-b hover:bg-invert-bg"
                       >
                         <td className="py-3 px-4">
-                          <div className="font-medium">{mitigation.name}</div>
-                          {mitigation.description && (
+                          <div className="font-medium">{mesure.name}</div>
+                          {mesure.description && (
                             <div className="text-xs text-secondary line-clamp-1 mt-0.5">
-                              {mitigation.description}
+                              {mesure.description}
                             </div>
                           )}
                         </td>
                         <td className="py-3 px-4">
                           <div
                             className={`px-2 py-0.5 rounded-full text-xs ${getImportanceColor(
-                              mitigation.importance
+                              mesure.importance
                             )} inline-block`}
                           >
-                            {formatImportance(mitigation.importance)}
+                            {formatImportance(mesure.importance)}
                           </div>
                         </td>
                         <td className="py-3 px-4">
                           <div
                             className={`px-2 py-0.5 rounded-full text-xs ${getStateColor(
-                              mitigation.state
+                              mesure.state
                             )} inline-block`}
                           >
-                            {formatState(mitigation.state)}
+                            {formatState(mesure.state)}
                           </div>
                         </td>
                         <td className="py-3 px-4 text-right whitespace-nowrap">
@@ -1067,7 +1048,7 @@ export function Control({
                               className="text-xs h-7"
                             >
                               <Link
-                                to={`/organizations/${organizationId}/mitigations/${mitigation.id}`}
+                                to={`/organizations/${organizationId}/mesures/${mesure.id}`}
                               >
                                 View
                               </Link>
@@ -1075,10 +1056,8 @@ export function Control({
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() =>
-                                handleUnlinkMitigation(mitigation.id)
-                              }
-                              disabled={isUnlinkingMitigation}
+                              onClick={() => handleUnlinkMesure(mesure.id)}
+                              disabled={isUnlinkingMesure}
                               className="text-xs h-7 text-danger border-danger-b hover:bg-h-danger-bg"
                             >
                               Unlink

@@ -17,7 +17,7 @@ package coredata
 const (
 	OrganizationEntityType uint16 = iota
 	FrameworkEntityType
-	MitigationEntityType
+	MesureEntityType
 	TaskEntityType
 	EvidenceEntityType
 	_ControlStateTransitionEntityType // UNUSED

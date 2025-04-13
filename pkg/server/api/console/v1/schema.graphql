@@ -39,23 +39,23 @@ enum OrderDirection
   DESC @goEnum(value: "github.com/getprobo/probo/pkg/page.OrderDirectionDesc")
 }
 
-enum MitigationState
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.MitigationState") {
+enum MesureState
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.MesureState") {
   NOT_STARTED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MitigationStateNotStarted"
+      value: "github.com/getprobo/probo/pkg/coredata.MesureStateNotStarted"
     )
   IN_PROGRESS
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MitigationStateInProgress"
+      value: "github.com/getprobo/probo/pkg/coredata.MesureStateInProgress"
     )
   NOT_APPLICABLE
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MitigationStateNotApplicable"
+      value: "github.com/getprobo/probo/pkg/coredata.MesureStateNotApplicable"
     )
   IMPLEMENTED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MitigationStateImplemented"
+      value: "github.com/getprobo/probo/pkg/coredata.MesureStateImplemented"
     )
 }
 
@@ -91,21 +91,19 @@ enum PeopleKind
     )
 }
 
-enum MitigationImportance
-  @goModel(
-    model: "github.com/getprobo/probo/pkg/coredata.MitigationImportance"
-  ) {
+enum MesureImportance
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.MesureImportance") {
   MANDATORY
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MitigationImportanceMandatory"
+      value: "github.com/getprobo/probo/pkg/coredata.MesureImportanceMandatory"
     )
   PREFERRED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MitigationImportancePreferred"
+      value: "github.com/getprobo/probo/pkg/coredata.MesureImportancePreferred"
     )
   ADVANCED
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MitigationImportanceAdvanced"
+      value: "github.com/getprobo/probo/pkg/coredata.MesureImportanceAdvanced"
     )
 }
 
@@ -213,13 +211,11 @@ enum ControlOrderField
     )
 }
 
-enum MitigationOrderField
-  @goModel(
-    model: "github.com/getprobo/probo/pkg/coredata.MitigationOrderField"
-  ) {
+enum MesureOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.MesureOrderField") {
   CREATED_AT
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MitigationOrderFieldCreatedAt"
+      value: "github.com/getprobo/probo/pkg/coredata.MesureOrderFieldCreatedAt"
     )
 }
 
@@ -307,12 +303,12 @@ input ControlOrder
   field: ControlOrderField!
 }
 
-input MitigationOrder
+input MesureOrder
   @goModel(
-    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.MitigationOrderBy"
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.MesureOrderBy"
   ) {
   direction: OrderDirection!
-  field: MitigationOrderField!
+  field: MesureOrderField!
 }
 
 input TaskOrder
@@ -406,13 +402,13 @@ type Organization implements Node {
     orderBy: PolicyOrder
   ): PolicyConnection! @goField(forceResolver: true)
 
-  mitigations(
+  mesures(
     first: Int
     after: CursorKey
     last: Int
     before: CursorKey
-    orderBy: MitigationOrder
-  ): MitigationConnection! @goField(forceResolver: true)
+    orderBy: MesureOrder
+  ): MesureConnection! @goField(forceResolver: true)
 
   risks(
     first: Int
@@ -516,13 +512,13 @@ type Control implements Node {
   name: String!
   description: String!
 
-  mitigations(
+  mesures(
     first: Int
     after: CursorKey
     last: Int
     before: CursorKey
-    orderBy: MitigationOrder
-  ): MitigationConnection! @goField(forceResolver: true)
+    orderBy: MesureOrder
+  ): MesureConnection! @goField(forceResolver: true)
 
   policies(
     first: Int
@@ -536,13 +532,13 @@ type Control implements Node {
   updatedAt: Datetime!
 }
 
-type Mitigation implements Node {
+type Mesure implements Node {
   id: ID!
   category: String!
   name: String!
   description: String!
-  state: MitigationState!
-  importance: MitigationImportance!
+  state: MesureState!
+  importance: MesureImportance!
 
   tasks(
     first: Int
@@ -641,13 +637,13 @@ type Risk implements Node {
 
   owner: People @goField(forceResolver: true)
 
-  mitigations(
+  mesures(
     first: Int
     after: CursorKey
     last: Int
     before: CursorKey
-    orderBy: MitigationOrder
-  ): MitigationConnection! @goField(forceResolver: true)
+    orderBy: MesureOrder
+  ): MesureConnection! @goField(forceResolver: true)
 
   policies(
     first: Int
@@ -748,14 +744,14 @@ type ControlEdge {
   node: Control!
 }
 
-type MitigationConnection {
-  edges: [MitigationEdge!]!
+type MesureConnection {
+  edges: [MesureEdge!]!
   pageInfo: PageInfo!
 }
 
-type MitigationEdge {
+type MesureEdge {
   cursor: CursorKey!
-  node: Mitigation!
+  node: Mesure!
 }
 
 type TaskConnection {
@@ -847,21 +843,21 @@ type Mutation {
   importFramework(input: ImportFrameworkInput!): ImportFrameworkPayload!
   deleteFramework(input: DeleteFrameworkInput!): DeleteFrameworkPayload!
 
-  # Mitigation mutations
-  createMitigation(input: CreateMitigationInput!): CreateMitigationPayload!
-  updateMitigation(input: UpdateMitigationInput!): UpdateMitigationPayload!
-  importMitigation(input: ImportMitigationInput!): ImportMitigationPayload!
+  # Mesure mutations
+  createMesure(input: CreateMesureInput!): CreateMesurePayload!
+  updateMesure(input: UpdateMesureInput!): UpdateMesurePayload!
+  importMesure(input: ImportMesureInput!): ImportMesurePayload!
 
   # Control mutations
-  createControlMitigationMapping(
-    input: CreateControlMitigationMappingInput!
-  ): CreateControlMitigationMappingPayload!
+  createControlMesureMapping(
+    input: CreateControlMesureMappingInput!
+  ): CreateControlMesureMappingPayload!
   createControlPolicyMapping(
     input: CreateControlPolicyMappingInput!
   ): CreateControlPolicyMappingPayload!
-  deleteControlMitigationMapping(
-    input: DeleteControlMitigationMappingInput!
-  ): DeleteControlMitigationMappingPayload!
+  deleteControlMesureMapping(
+    input: DeleteControlMesureMappingInput!
+  ): DeleteControlMesureMappingPayload!
   deleteControlPolicyMapping(
     input: DeleteControlPolicyMappingInput!
   ): DeleteControlPolicyMappingPayload!
@@ -877,12 +873,12 @@ type Mutation {
   createRisk(input: CreateRiskInput!): CreateRiskPayload!
   updateRisk(input: UpdateRiskInput!): UpdateRiskPayload!
   deleteRisk(input: DeleteRiskInput!): DeleteRiskPayload!
-  createRiskMitigationMapping(
-    input: CreateRiskMitigationMappingInput!
-  ): CreateRiskMitigationMappingPayload!
-  deleteRiskMitigationMapping(
-    input: DeleteRiskMitigationMappingInput!
-  ): DeleteRiskMitigationMappingPayload!
+  createRiskMesureMapping(
+    input: CreateRiskMesureMappingInput!
+  ): CreateRiskMesureMappingPayload!
+  deleteRiskMesureMapping(
+    input: DeleteRiskMesureMappingInput!
+  ): DeleteRiskMesureMappingPayload!
 
   createRiskPolicyMapping(
     input: CreateRiskPolicyMappingInput!
@@ -1019,30 +1015,30 @@ input DeleteFrameworkInput {
   frameworkId: ID!
 }
 
-input CreateMitigationInput {
+input CreateMesureInput {
   organizationId: ID!
   name: String!
   description: String!
   category: String!
-  importance: MitigationImportance!
+  importance: MesureImportance!
 }
 
-input UpdateMitigationInput {
+input UpdateMesureInput {
   id: ID!
   name: String
   description: String
   category: String
-  state: MitigationState
-  importance: MitigationImportance
+  state: MesureState
+  importance: MesureImportance
 }
 
-input ImportMitigationInput {
+input ImportMesureInput {
   organizationId: ID!
   file: Upload!
 }
 
 input CreateTaskInput {
-  mitigationId: ID!
+  mesureId: ID!
   name: String!
   description: String!
   timeEstimate: Duration
@@ -1070,9 +1066,9 @@ input UnassignTaskInput {
   taskId: ID!
 }
 
-input CreateControlMitigationMappingInput {
+input CreateControlMesureMappingInput {
   controlId: ID!
-  mitigationId: ID!
+  mesureId: ID!
 }
 
 input CreateControlPolicyMappingInput {
@@ -1080,9 +1076,9 @@ input CreateControlPolicyMappingInput {
   policyId: ID!
 }
 
-input DeleteControlMitigationMappingInput {
+input DeleteControlMesureMappingInput {
   controlId: ID!
-  mitigationId: ID!
+  mesureId: ID!
 }
 
 input DeleteControlPolicyMappingInput {
@@ -1118,14 +1114,14 @@ input DeleteRiskInput {
   riskId: ID!
 }
 
-input CreateRiskMitigationMappingInput {
+input CreateRiskMesureMappingInput {
   riskId: ID!
-  mitigationId: ID!
+  mesureId: ID!
 }
 
-input DeleteRiskMitigationMappingInput {
+input DeleteRiskMesureMappingInput {
   riskId: ID!
-  mitigationId: ID!
+  mesureId: ID!
 }
 
 input CreateRiskPolicyMappingInput {
@@ -1267,16 +1263,16 @@ type DeleteFrameworkPayload {
   deletedFrameworkId: ID!
 }
 
-type CreateMitigationPayload {
-  mitigationEdge: MitigationEdge!
+type CreateMesurePayload {
+  mesureEdge: MesureEdge!
 }
 
-type UpdateMitigationPayload {
-  mitigation: Mitigation!
+type UpdateMesurePayload {
+  mesure: Mesure!
 }
 
-type ImportMitigationPayload {
-  mitigationEdges: [MitigationEdge!]!
+type ImportMesurePayload {
+  mesureEdges: [MesureEdge!]!
 }
 
 type CreateTaskPayload {
@@ -1299,7 +1295,7 @@ type UnassignTaskPayload {
   task: Task!
 }
 
-type CreateControlMitigationMappingPayload {
+type CreateControlMesureMappingPayload {
   success: Boolean!
 }
 
@@ -1307,7 +1303,7 @@ type CreateControlPolicyMappingPayload {
   success: Boolean!
 }
 
-type DeleteControlMitigationMappingPayload {
+type DeleteControlMesureMappingPayload {
   success: Boolean!
 }
 
@@ -1327,11 +1323,11 @@ type DeleteRiskPayload {
   deletedRiskId: ID!
 }
 
-type CreateRiskMitigationMappingPayload {
+type CreateRiskMesureMappingPayload {
   success: Boolean!
 }
 
-type DeleteRiskMitigationMappingPayload {
+type DeleteRiskMesureMappingPayload {
   success: Boolean!
 }
 

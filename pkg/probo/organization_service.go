@@ -66,7 +66,7 @@ func (s OrganizationService) Create(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := organization.Insert(ctx, conn); err != nil {
-				return fmt.Errorf("cannot insert mitigation: %w", err)
+				return fmt.Errorf("cannot insert organization: %w", err)
 			}
 
 			return nil

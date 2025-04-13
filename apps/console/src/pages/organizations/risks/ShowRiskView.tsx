@@ -54,11 +54,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  ShowRiskViewOrganizationMitigationsQuery,
-  ShowRiskViewOrganizationMitigationsQuery$data,
-} from "./__generated__/ShowRiskViewOrganizationMitigationsQuery.graphql";
-import { ShowRiskViewCreateRiskMitigationMappingMutation } from "./__generated__/ShowRiskViewCreateRiskMitigationMappingMutation.graphql";
-import { ShowRiskViewDeleteRiskMitigationMappingMutation } from "./__generated__/ShowRiskViewDeleteRiskMitigationMappingMutation.graphql";
+  ShowRiskViewOrganizationMesuresQuery,
+  ShowRiskViewOrganizationMesuresQuery$data,
+} from "./__generated__/ShowRiskViewOrganizationMesuresQuery.graphql";
+import { ShowRiskViewCreateRiskMesureMappingMutation } from "./__generated__/ShowRiskViewCreateRiskMesureMappingMutation.graphql";
+import { ShowRiskViewDeleteRiskMesureMappingMutation } from "./__generated__/ShowRiskViewDeleteRiskMesureMappingMutation.graphql";
 import {
   ShowRiskViewOrganizationPoliciesQuery,
   ShowRiskViewOrganizationPoliciesQuery$data,
@@ -84,7 +84,7 @@ const showRiskViewQuery = graphql`
         residualImpact
         createdAt
         updatedAt
-        mitigations(first: 100) @connection(key: "Risk__mitigations") {
+        mesures(first: 100) @connection(key: "Risk__mesures") {
           edges {
             node {
               id
@@ -122,13 +122,13 @@ const showRiskViewQuery = graphql`
   }
 `;
 
-// Add query to fetch all mitigations for the organization
-const organizationMitigationsQuery = graphql`
-  query ShowRiskViewOrganizationMitigationsQuery($organizationId: ID!) {
+// Add query to fetch all mesures for the organization
+const organizationMesuresQuery = graphql`
+  query ShowRiskViewOrganizationMesuresQuery($organizationId: ID!) {
     organization: node(id: $organizationId) {
       id
       ... on Organization {
-        mitigations(first: 100) @connection(key: "Organization__mitigations") {
+        mesures(first: 100) @connection(key: "Organization__mesures") {
           edges {
             node {
               id
@@ -164,23 +164,23 @@ const organizationPoliciesQuery = graphql`
   }
 `;
 
-// Add mutation to create risk-mitigation mapping
-const createRiskMitigationMappingMutation = graphql`
-  mutation ShowRiskViewCreateRiskMitigationMappingMutation(
-    $input: CreateRiskMitigationMappingInput!
+// Add mutation to create risk-mesure mapping
+const createRiskMesureMappingMutation = graphql`
+  mutation ShowRiskViewCreateRiskMesureMappingMutation(
+    $input: CreateRiskMesureMappingInput!
   ) {
-    createRiskMitigationMapping(input: $input) {
+    createRiskMesureMapping(input: $input) {
       success
     }
   }
 `;
 
-// Add mutation to delete risk-mitigation mapping
-const deleteRiskMitigationMappingMutation = graphql`
-  mutation ShowRiskViewDeleteRiskMitigationMappingMutation(
-    $input: DeleteRiskMitigationMappingInput!
+// Add mutation to delete risk-mesure mapping
+const deleteRiskMesureMappingMutation = graphql`
+  mutation ShowRiskViewDeleteRiskMesureMappingMutation(
+    $input: DeleteRiskMesureMappingInput!
   ) {
-    deleteRiskMitigationMapping(input: $input) {
+    deleteRiskMesureMapping(input: $input) {
       success
     }
   }
@@ -238,8 +238,8 @@ function ShowRiskViewContent({
     risk.inherentImpact!
   );
 
-  // Fix typing for mitigations
-  const mitigations = risk.mitigations?.edges?.map((edge) => edge.node) || [];
+  // Fix typing for mesures
+  const mesures = risk.mesures?.edges?.map((edge) => edge.node) || [];
   const residualSeverity = getRiskSeverity(
     risk.residualLikelihood!,
     risk.residualImpact!
@@ -251,17 +251,17 @@ function ShowRiskViewContent({
   // Fix typing for controls
   const controls = risk.controls?.edges?.map((edge) => edge.node) || [];
 
-  // Add state for mitigation mapping dialog
-  const [isMitigationDialogOpen, setIsMitigationDialogOpen] = useState(false);
-  const [organizationMitigationsData, setOrganizationMitigationsData] =
-    useState<ShowRiskViewOrganizationMitigationsQuery$data | null>(null);
-  const [mitigationSearchQuery, setMitigationSearchQuery] = useState("");
+  // Add state for mesure mapping dialog
+  const [isMesureDialogOpen, setIsMesureDialogOpen] = useState(false);
+  const [organizationMesuresData, setOrganizationMesuresData] =
+    useState<ShowRiskViewOrganizationMesuresQuery$data | null>(null);
+  const [mesureSearchQuery, setMesureSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const [isLoadingMitigations, setIsLoadingMitigations] = useState(false);
-  const [linkingMitigations, setLinkingMitigations] = useState<
-    Record<string, boolean>
-  >({});
-  const [unlinkingMitigations, setUnlinkingMitigations] = useState<
+  const [isLoadingMesures, setIsLoadingMesures] = useState(false);
+  const [linkingMesures, setLinkingMesures] = useState<Record<string, boolean>>(
+    {}
+  );
+  const [unlinkingMesures, setUnlinkingMesures] = useState<
     Record<string, boolean>
   >({});
 
@@ -279,13 +279,13 @@ function ShowRiskViewContent({
   >({});
 
   // Setup mutation hooks
-  const [createRiskMitigationMapping] =
-    useMutation<ShowRiskViewCreateRiskMitigationMappingMutation>(
-      createRiskMitigationMappingMutation
+  const [createRiskMesureMapping] =
+    useMutation<ShowRiskViewCreateRiskMesureMappingMutation>(
+      createRiskMesureMappingMutation
     );
-  const [deleteRiskMitigationMapping] =
-    useMutation<ShowRiskViewDeleteRiskMitigationMappingMutation>(
-      deleteRiskMitigationMappingMutation
+  const [deleteRiskMesureMapping] =
+    useMutation<ShowRiskViewDeleteRiskMesureMappingMutation>(
+      deleteRiskMesureMappingMutation
     );
 
   // Setup policy mutation hooks
@@ -300,13 +300,13 @@ function ShowRiskViewContent({
 
   // Clear filters when dialog closes
   useEffect(() => {
-    if (!isMitigationDialogOpen) {
-      setMitigationSearchQuery("");
+    if (!isMesureDialogOpen) {
+      setMesureSearchQuery("");
       setCategoryFilter(null);
-      setLinkingMitigations({});
-      setUnlinkingMitigations({});
+      setLinkingMesures({});
+      setUnlinkingMesures({});
     }
-  }, [isMitigationDialogOpen]);
+  }, [isMesureDialogOpen]);
 
   // Clear filters when policy dialog closes
   useEffect(() => {
@@ -317,30 +317,30 @@ function ShowRiskViewContent({
     }
   }, [isPolicyDialogOpen]);
 
-  // Load mitigations data when needed
-  const loadMitigationsData = useCallback(() => {
+  // Load mesures data when needed
+  const loadMesuresData = useCallback(() => {
     if (!organizationId || !risk.id) return;
 
-    setIsLoadingMitigations(true);
+    setIsLoadingMesures(true);
 
-    // Fetch all mitigations for the organization
-    fetchQuery<ShowRiskViewOrganizationMitigationsQuery>(
+    // Fetch all mesures for the organization
+    fetchQuery<ShowRiskViewOrganizationMesuresQuery>(
       environment,
-      organizationMitigationsQuery,
+      organizationMesuresQuery,
       {
         organizationId,
       }
     ).subscribe({
       next: (data) => {
-        setOrganizationMitigationsData(data);
-        setIsLoadingMitigations(false);
+        setOrganizationMesuresData(data);
+        setIsLoadingMesures(false);
       },
       error: (error: Error) => {
-        console.error("Error fetching organization mitigations:", error);
-        setIsLoadingMitigations(false);
+        console.error("Error fetching organization mesures:", error);
+        setIsLoadingMesures(false);
         toast({
           title: "Error",
-          description: "Failed to load mitigations.",
+          description: "Failed to load mesures.",
           variant: "destructive",
         });
       },
@@ -378,52 +378,49 @@ function ShowRiskViewContent({
   }, [risk.id, environment, organizationId, toast]);
 
   // Helper functions
-  const getMitigations = useCallback(() => {
-    if (!organizationMitigationsData?.organization?.mitigations?.edges)
-      return [];
-    return organizationMitigationsData.organization.mitigations.edges.map(
+  const getMesures = useCallback(() => {
+    if (!organizationMesuresData?.organization?.mesures?.edges) return [];
+    return organizationMesuresData.organization.mesures.edges.map(
       (edge) => edge.node
     );
-  }, [organizationMitigationsData]);
+  }, [organizationMesuresData]);
 
-  const getMitigationCategories = useCallback(() => {
-    const mitigations = getMitigations();
+  const getMesureCategories = useCallback(() => {
+    const mesures = getMesures();
     const categories = new Set<string>();
 
-    mitigations.forEach((mitigation) => {
-      if (mitigation.category) {
-        categories.add(mitigation.category);
+    mesures.forEach((mesure) => {
+      if (mesure.category) {
+        categories.add(mesure.category);
       }
     });
 
     return Array.from(categories).sort();
-  }, [getMitigations]);
+  }, [getMesures]);
 
-  const filteredMitigations = useCallback(() => {
-    const mitigations = getMitigations();
-    if (!mitigationSearchQuery && !categoryFilter) return mitigations;
+  const filteredMesures = useCallback(() => {
+    const mesures = getMesures();
+    if (!mesureSearchQuery && !categoryFilter) return mesures;
 
-    return mitigations.filter((mitigation) => {
+    return mesures.filter((mesure) => {
       // Filter by search query
       const matchesSearch =
-        !mitigationSearchQuery ||
-        mitigation.name
-          .toLowerCase()
-          .includes(mitigationSearchQuery.toLowerCase()) ||
-        (mitigation.description &&
-          mitigation.description
+        !mesureSearchQuery ||
+        mesure.name.toLowerCase().includes(mesureSearchQuery.toLowerCase()) ||
+        (mesure.description &&
+          mesure.description
             .toLowerCase()
-            .includes(mitigationSearchQuery.toLowerCase()));
+            .includes(mesureSearchQuery.toLowerCase()));
 
       // Filter by category
       const matchesCategory =
         !categoryFilter ||
         categoryFilter === "all" ||
-        mitigation.category === categoryFilter;
+        mesure.category === categoryFilter;
 
       return matchesSearch && matchesCategory;
     });
-  }, [getMitigations, mitigationSearchQuery, categoryFilter]);
+  }, [getMesures, mesureSearchQuery, categoryFilter]);
 
   // Helper functions for policies
   const getPolicies = useCallback(() => {
@@ -445,38 +442,38 @@ function ShowRiskViewContent({
     });
   }, [getPolicies, policySearchQuery]);
 
-  // Handle linking a mitigation to this risk
-  const handleLinkMitigation = useCallback(
+  // Handle linking a mesure to this risk
+  const handleLinkMesure = useCallback(
     (
-      mitigation: NonNullable<
+      mesure: NonNullable<
         NonNullable<
-          ShowRiskViewOrganizationMitigationsQuery$data["organization"]
-        >["mitigations"]
+          ShowRiskViewOrganizationMesuresQuery$data["organization"]
+        >["mesures"]
       >["edges"][0]["node"]
     ) => {
       if (!risk.id) return;
 
-      // Track this specific mitigation as linking
-      setLinkingMitigations((prev) => ({ ...prev, [mitigation.id]: true }));
+      // Track this specific mesure as linking
+      setLinkingMesures((prev) => ({ ...prev, [mesure.id]: true }));
 
-      createRiskMitigationMapping({
+      createRiskMesureMapping({
         variables: {
           input: {
             riskId: risk.id,
-            mitigationId: mitigation.id,
+            mesureId: mesure.id,
           },
         },
         onCompleted: (_, errors) => {
-          setLinkingMitigations((prev) => ({
+          setLinkingMesures((prev) => ({
             ...prev,
-            [mitigation.id]: false,
+            [mesure.id]: false,
           }));
 
           if (errors && errors.length > 0) {
-            console.error("Error linking mitigation:", errors);
+            console.error("Error linking mesure:", errors);
             toast({
               title: "Error",
-              description: "Failed to link mitigation. Please try again.",
+              description: "Failed to link mesure. Please try again.",
               variant: "destructive",
             });
             return;
@@ -497,58 +494,58 @@ function ShowRiskViewContent({
 
           toast({
             title: "Success",
-            description: `Linked mitigation "${mitigation.name}" to this risk.`,
+            description: `Linked mesure "${mesure.name}" to this risk.`,
           });
         },
         onError: (error) => {
-          setLinkingMitigations((prev) => ({
+          setLinkingMesures((prev) => ({
             ...prev,
-            [mitigation.id]: false,
+            [mesure.id]: false,
           }));
-          console.error("Error linking mitigation:", error);
+          console.error("Error linking mesure:", error);
           toast({
             title: "Error",
-            description: "Failed to link mitigation. Please try again.",
+            description: "Failed to link mesure. Please try again.",
             variant: "destructive",
           });
         },
       });
     },
-    [risk.id, createRiskMitigationMapping, toast, environment, loadQuery]
+    [risk.id, createRiskMesureMapping, toast, environment, loadQuery]
   );
 
-  // Handle unlinking a mitigation from this risk
-  const handleUnlinkMitigation = useCallback(
+  // Handle unlinking a mesure from this risk
+  const handleUnlinkMesure = useCallback(
     (
-      mitigation: NonNullable<
+      mesure: NonNullable<
         NonNullable<
-          ShowRiskViewOrganizationMitigationsQuery$data["organization"]
-        >["mitigations"]
+          ShowRiskViewOrganizationMesuresQuery$data["organization"]
+        >["mesures"]
       >["edges"][0]["node"]
     ) => {
       if (!risk.id) return;
 
-      // Track this specific mitigation as unlinking
-      setUnlinkingMitigations((prev) => ({ ...prev, [mitigation.id]: true }));
+      // Track this specific mesure as unlinking
+      setUnlinkingMesures((prev) => ({ ...prev, [mesure.id]: true }));
 
-      deleteRiskMitigationMapping({
+      deleteRiskMesureMapping({
         variables: {
           input: {
             riskId: risk.id,
-            mitigationId: mitigation.id,
+            mesureId: mesure.id,
           },
         },
         onCompleted: (_, errors) => {
-          setUnlinkingMitigations((prev) => ({
+          setUnlinkingMesures((prev) => ({
             ...prev,
-            [mitigation.id]: false,
+            [mesure.id]: false,
           }));
 
           if (errors && errors.length > 0) {
-            console.error("Error unlinking mitigation:", errors);
+            console.error("Error unlinking mesure:", errors);
             toast({
               title: "Error",
-              description: "Failed to unlink mitigation. Please try again.",
+              description: "Failed to unlink mesure. Please try again.",
               variant: "destructive",
             });
             return;
@@ -569,24 +566,24 @@ function ShowRiskViewContent({
 
           toast({
             title: "Success",
-            description: `Unlinked mitigation "${mitigation.name}" from this risk.`,
+            description: `Unlinked mesure "${mesure.name}" from this risk.`,
           });
         },
         onError: (error) => {
-          setUnlinkingMitigations((prev) => ({
+          setUnlinkingMesures((prev) => ({
             ...prev,
-            [mitigation.id]: false,
+            [mesure.id]: false,
           }));
-          console.error("Error unlinking mitigation:", error);
+          console.error("Error unlinking mesure:", error);
           toast({
             title: "Error",
-            description: "Failed to unlink mitigation. Please try again.",
+            description: "Failed to unlink mesure. Please try again.",
             variant: "destructive",
           });
         },
       });
     },
-    [risk.id, deleteRiskMitigationMapping, toast, environment, loadQuery]
+    [risk.id, deleteRiskMesureMapping, toast, environment, loadQuery]
   );
 
   // Handle linking a policy to this risk
@@ -871,8 +868,8 @@ function ShowRiskViewContent({
                     </Badge>
                   </p>
                   <p className="text-xs text-secondary mt-1">
-                    {mitigations.length} mitigation
-                    {mitigations.length !== 1 ? "s" : ""} applied
+                    {mesures.length} mesure
+                    {mesures.length !== 1 ? "s" : ""} applied
                   </p>
                 </div>
               </div>
@@ -880,56 +877,53 @@ function ShowRiskViewContent({
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="mitigations" className="w-full">
+        <Tabs defaultValue="mesures" className="w-full">
           <TabsList>
-            <TabsTrigger value="mitigations">Mitigations</TabsTrigger>
+            <TabsTrigger value="mesures">Mesures</TabsTrigger>
             <TabsTrigger value="policies">Policies</TabsTrigger>
             <TabsTrigger value="controls">Controls</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="mitigations" className="space-y-4">
+          <TabsContent value="mesures" className="space-y-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Risk Mitigations</h2>
+              <h2 className="text-xl font-semibold">Risk Mesures</h2>
               <Button
                 onClick={() => {
-                  setIsMitigationDialogOpen(true);
-                  loadMitigationsData();
+                  setIsMesureDialogOpen(true);
+                  loadMesuresData();
                 }}
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Link Mitigation
+                Link Mesure
               </Button>
             </div>
-            {risk.mitigations?.edges?.length &&
-            risk.mitigations?.edges?.length > 0 ? (
+            {risk.mesures?.edges?.length && risk.mesures?.edges?.length > 0 ? (
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-full">Mitigation</TableHead>
+                      <TableHead className="w-full">Mesure</TableHead>
                       <TableHead className="w-20">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {risk.mitigations?.edges.map(({ node: mitigation }) => (
-                      <TableRow key={mitigation.id}>
+                    {risk.mesures?.edges.map(({ node: mesure }) => (
+                      <TableRow key={mesure.id}>
                         <TableCell>
                           <Link
-                            to={`/organizations/${organizationId}/mitigations/${mitigation.id}`}
+                            to={`/organizations/${organizationId}/mesures/${mesure.id}`}
                             className="font-medium text-blue-600 hover:underline"
                           >
-                            {mitigation.name}
+                            {mesure.name}
                           </Link>
                         </TableCell>
                         <TableCell>
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleUnlinkMitigation(mitigation)}
-                            disabled={
-                              unlinkingMitigations[mitigation.id] || false
-                            }
-                            title="Unlink mitigation"
+                            onClick={() => handleUnlinkMesure(mesure)}
+                            disabled={unlinkingMesures[mesure.id] || false}
+                            title="Unlink mesure"
                           >
                             <Trash2 className="h-4 w-4 text-danger" />
                           </Button>
@@ -941,7 +935,7 @@ function ShowRiskViewContent({
               </div>
             ) : (
               <div className="text-center py-10 text-secondary">
-                <p>No mitigations associated with this risk.</p>
+                <p>No mesures associated with this risk.</p>
               </div>
             )}
           </TabsContent>
@@ -1039,18 +1033,15 @@ function ShowRiskViewContent({
           </TabsContent>
         </Tabs>
 
-        {/* Dialog for linking mitigations */}
-        <Dialog
-          open={isMitigationDialogOpen}
-          onOpenChange={setIsMitigationDialogOpen}
-        >
+        {/* Dialog for linking mesures */}
+        <Dialog open={isMesureDialogOpen} onOpenChange={setIsMesureDialogOpen}>
           <DialogContent className="max-w-3xl">
             <DialogHeader>
               <div className="flex justify-between items-center">
                 <div>
-                  <DialogTitle>Manage Risk Mitigations</DialogTitle>
+                  <DialogTitle>Manage Risk Mesures</DialogTitle>
                   <DialogDescription>
-                    Link or unlink mitigations to manage this risk.
+                    Link or unlink mesures to manage this risk.
                   </DialogDescription>
                 </div>
               </div>
@@ -1062,10 +1053,10 @@ function ShowRiskViewContent({
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-tertiary" />
                     <Input
-                      placeholder="Search mitigations..."
+                      placeholder="Search mesures..."
                       className="pl-8"
-                      value={mitigationSearchQuery}
-                      onChange={(e) => setMitigationSearchQuery(e.target.value)}
+                      value={mesureSearchQuery}
+                      onChange={(e) => setMesureSearchQuery(e.target.value)}
                     />
                   </div>
                 </div>
@@ -1080,7 +1071,7 @@ function ShowRiskViewContent({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    {getMitigationCategories().map((category) => (
+                    {getMesureCategories().map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>
@@ -1090,37 +1081,35 @@ function ShowRiskViewContent({
               </div>
 
               <div className="border rounded-md max-h-96 overflow-y-auto">
-                {isLoadingMitigations ? (
-                  <div className="p-4 text-center">Loading mitigations...</div>
-                ) : filteredMitigations().length === 0 ? (
-                  <div className="p-4 text-center">No mitigations found.</div>
+                {isLoadingMesures ? (
+                  <div className="p-4 text-center">Loading mesures...</div>
+                ) : filteredMesures().length === 0 ? (
+                  <div className="p-4 text-center">No mesures found.</div>
                 ) : (
                   <div className="divide-y">
-                    {filteredMitigations().map((mitigation) => {
+                    {filteredMesures().map((mesure) => {
                       // For each render, recalculate linked status directly against the current risk data
-                      const isLinked = risk.mitigations?.edges?.some(
-                        (edge) => edge.node.id === mitigation.id
+                      const isLinked = risk.mesures?.edges?.some(
+                        (edge) => edge.node.id === mesure.id
                       );
-                      const isLinking =
-                        linkingMitigations[mitigation.id] || false;
-                      const isUnlinking =
-                        unlinkingMitigations[mitigation.id] || false;
+                      const isLinking = linkingMesures[mesure.id] || false;
+                      const isUnlinking = unlinkingMesures[mesure.id] || false;
 
                       return (
                         <div
-                          key={mitigation.id}
+                          key={mesure.id}
                           className="relative p-4 hover:bg-blue-50 transition-colors duration-150"
                         >
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-medium">{mitigation.name}</h3>
-                              {mitigation.category && (
+                              <h3 className="font-medium">{mesure.name}</h3>
+                              {mesure.category && (
                                 <Badge
                                   variant="outline"
                                   className="text-xs font-normal"
                                 >
                                   <Tag className="h-3 w-3 mr-1" />
-                                  {mitigation.category}
+                                  {mesure.category}
                                 </Badge>
                               )}
                             </div>
@@ -1129,9 +1118,7 @@ function ShowRiskViewContent({
                                 size="sm"
                                 variant="outline"
                                 disabled={isUnlinking}
-                                onClick={() =>
-                                  handleUnlinkMitigation(mitigation)
-                                }
+                                onClick={() => handleUnlinkMesure(mesure)}
                                 className="text-red-600 border-red-200 hover:bg-red-50"
                               >
                                 {isUnlinking ? "Unlinking..." : "Unlink"}
@@ -1140,7 +1127,7 @@ function ShowRiskViewContent({
                               <Button
                                 size="sm"
                                 disabled={isLinking}
-                                onClick={() => handleLinkMitigation(mitigation)}
+                                onClick={() => handleLinkMesure(mesure)}
                               >
                                 {isLinking ? "Linking..." : "Link"}
                               </Button>
@@ -1157,7 +1144,7 @@ function ShowRiskViewContent({
             <DialogFooter>
               <Button
                 variant="outline"
-                onClick={() => setIsMitigationDialogOpen(false)}
+                onClick={() => setIsMesureDialogOpen(false)}
               >
                 Close
               </Button>
