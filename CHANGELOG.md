@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.10.0] - 2025-04-14
+
 ### Changed
 
 - Improve UI of the risk matrix
