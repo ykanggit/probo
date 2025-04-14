@@ -155,7 +155,7 @@ function getNavItems(organizationId?: string): NavItem[] {
       icon: BookOpen,
     },
     {
-      title: "Peoples",
+      title: "People",
       url: `/organizations/${organizationId}/people`,
       icon: Users,
     },
