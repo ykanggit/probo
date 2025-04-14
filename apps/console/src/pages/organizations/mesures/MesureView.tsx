@@ -88,7 +88,10 @@ import { MesureViewAssignTaskMutation as MesureViewAssignTaskMutationType } from
 import { MesureViewUnassignTaskMutation as MesureViewUnassignTaskMutationType } from "./__generated__/MesureViewUnassignTaskMutation.graphql";
 import { MesureViewUpdateMesureStateMutation as MesureViewUpdateMesureStateMutationType } from "./__generated__/MesureViewUpdateMesureStateMutation.graphql";
 import { MesureViewQuery as MesureViewQueryType } from "./__generated__/MesureViewQuery.graphql";
-import { MesureViewOrganizationQuery$data } from "./__generated__/MesureViewOrganizationQuery.graphql";
+import {
+  MesureViewOrganizationQuery,
+  MesureViewOrganizationQuery$data,
+} from "./__generated__/MesureViewOrganizationQuery.graphql";
 import {
   MesureViewFrameworksQuery,
   MesureViewFrameworksQuery$data,
@@ -99,6 +102,10 @@ import {
 } from "./__generated__/MesureViewLinkedControlsQuery.graphql";
 import { MesureViewCreateEvidenceMutation as MesureViewCreateEvidenceMutationType } from "./__generated__/MesureViewCreateEvidenceMutation.graphql";
 import { MesureViewFulfillEvidenceMutation as MesureViewFulfillEvidenceMutationType } from "./__generated__/MesureViewFulfillEvidenceMutation.graphql";
+import { MesureViewCreateControlMappingMutation } from "./__generated__/MesureViewCreateControlMappingMutation.graphql";
+import { MesureViewDeleteControlMappingMutation } from "./__generated__/MesureViewDeleteControlMappingMutation.graphql";
+import { MesureViewRisksQuery$data } from "./__generated__/MesureViewRisksQuery.graphql";
+import { MesureViewRisksQuery } from "./__generated__/MesureViewRisksQuery.graphql";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -448,6 +455,10 @@ const mesureRisksQuery = graphql`
               description
               inherentLikelihood
               inherentImpact
+              inherentSeverity
+              residualLikelihood
+              residualImpact
+              residualSeverity
               createdAt
               updatedAt
             }
@@ -457,55 +468,6 @@ const mesureRisksQuery = graphql`
     }
   }
 `;
-
-// Define type for framework structure
-type FrameworkEdge = {
-  node: {
-    id: string;
-    name: string;
-    controls: {
-      edges: Array<{
-        node: {
-          id: string;
-          referenceId: string;
-          name: string;
-          description?: string;
-        };
-      }>;
-    };
-  };
-};
-
-type ControlNode = {
-  id: string;
-  referenceId: string;
-  name: string;
-  description?: string;
-};
-
-// Define Risk type
-type RiskNode = {
-  id: string;
-  name: string;
-  description: string;
-  likelihood: number;
-  impact: number;
-  severity: number;
-  createdAt: string;
-  updatedAt: string;
-};
-
-// Define the risks data type
-type MesureRisksData = {
-  mesure?: {
-    id: string;
-    risks?: {
-      edges: Array<{
-        node: RiskNode;
-      }>;
-    };
-  };
-};
 
 function MesureViewContent({
   queryRef,
@@ -548,18 +510,22 @@ function MesureViewContent({
   const [isUnlinkingControl, setIsUnlinkingControl] = useState(false);
 
   // Create mutation hooks for control mapping
-  const [commitCreateControlMapping] = useMutation(
-    createControlMappingMutation
-  );
-  const [commitDeleteControlMapping] = useMutation(
-    deleteControlMappingMutation
-  );
+  const [commitCreateControlMapping] =
+    useMutation<MesureViewCreateControlMappingMutation>(
+      createControlMappingMutation
+    );
+  const [commitDeleteControlMapping] =
+    useMutation<MesureViewDeleteControlMappingMutation>(
+      deleteControlMappingMutation
+    );
 
   useEffect(() => {
     if (organizationId) {
-      fetchQuery(environment, organizationQuery, { organizationId }).subscribe({
-        next: (data: unknown) => {
-          setOrganizationData(data as MesureViewOrganizationQuery$data);
+      fetchQuery<MesureViewOrganizationQuery>(environment, organizationQuery, {
+        organizationId,
+      }).subscribe({
+        next: (data) => {
+          setOrganizationData(data);
         },
         error: (error: Error) => {
           console.error("Error fetching organization:", error);
@@ -571,9 +537,13 @@ function MesureViewContent({
   // Load linked controls when component mounts
   useEffect(() => {
     if (mesureId) {
-      fetchQuery(environment, linkedControlsQuery, { mesureId }).subscribe({
-        next: (data: unknown) => {
-          setLinkedControlsData(data as MesureViewLinkedControlsQuery$data);
+      fetchQuery<MesureViewLinkedControlsQuery>(
+        environment,
+        linkedControlsQuery,
+        { mesureId }
+      ).subscribe({
+        next: (data) => {
+          setLinkedControlsData(data);
         },
         error: (error: Error) => {
           console.error("Error fetching linked controls:", error);
@@ -583,14 +553,18 @@ function MesureViewContent({
   }, [environment, mesureId]);
 
   // Add state for risks data
-  const [risksData, setRisksData] = useState<MesureRisksData | null>(null);
+  const [risksData, setRisksData] = useState<MesureViewRisksQuery$data | null>(
+    null
+  );
 
   // Load risks data when component mounts
   useEffect(() => {
     if (mesureId) {
-      fetchQuery(environment, mesureRisksQuery, { mesureId }).subscribe({
-        next: (data: unknown) => {
-          setRisksData(data as MesureRisksData);
+      fetchQuery<MesureViewRisksQuery>(environment, mesureRisksQuery, {
+        mesureId,
+      }).subscribe({
+        next: (data) => {
+          setRisksData(data);
         },
         error: (error: Error) => {
           console.error("Error fetching risks:", error);
@@ -1626,11 +1600,15 @@ function MesureViewContent({
       },
       complete: () => {
         // Fetch already linked controls for this mesure
-        fetchQuery(environment, linkedControlsQuery, {
-          mesureId,
-        }).subscribe({
-          next: (data: unknown) => {
-            setLinkedControlsData(data as MesureViewLinkedControlsQuery$data);
+        fetchQuery<MesureViewLinkedControlsQuery>(
+          environment,
+          linkedControlsQuery,
+          {
+            mesureId,
+          }
+        ).subscribe({
+          next: (data) => {
+            setLinkedControlsData(data);
             setIsLoadingControls(false);
           },
           error: (error: Error) => {
@@ -1660,11 +1638,10 @@ function MesureViewContent({
     if (!frameworksData?.organization?.frameworks?.edges) return [];
 
     // Get controls from the selected framework
-    const frameworks = frameworksData.organization.frameworks
-      .edges as Array<FrameworkEdge>;
+    const frameworks = frameworksData.organization.frameworks.edges;
     if (selectedFrameworkId) {
       const selectedFramework = frameworks.find(
-        (edge: FrameworkEdge) => edge.node.id === selectedFrameworkId
+        (edge) => edge.node.id === selectedFrameworkId
       );
 
       if (selectedFramework?.node?.controls?.edges) {
@@ -1673,7 +1650,7 @@ function MesureViewContent({
     }
 
     // If no framework is selected or it doesn't have controls, return controls from all frameworks
-    return frameworks.flatMap((framework: FrameworkEdge) =>
+    return frameworks.flatMap((framework) =>
       framework.node.controls.edges.map((edge) => edge.node)
     );
   }, [frameworksData, selectedFrameworkId]);
@@ -1688,9 +1665,7 @@ function MesureViewContent({
   const isControlLinked = useCallback(
     (controlId: string) => {
       const linkedControls = getLinkedControls();
-      return linkedControls.some(
-        (control: ControlNode) => control.id === controlId
-      );
+      return linkedControls.some((control) => control.id === controlId);
     },
     [getLinkedControls]
   );
@@ -1824,7 +1799,7 @@ function MesureViewContent({
 
     const lowerQuery = controlSearchQuery.toLowerCase();
     return controls.filter(
-      (control: ControlNode) =>
+      (control) =>
         control.referenceId.toLowerCase().includes(lowerQuery) ||
         control.name.toLowerCase().includes(lowerQuery) ||
         (control.description &&
@@ -1849,7 +1824,7 @@ function MesureViewContent({
   };
 
   // Format likelihood as text
-  const formatlikelihood = (value: number): string => {
+  const formatLikelihood = (value: number): string => {
     if (value <= 0.1) return "Very Low";
     if (value <= 0.3) return "Low";
     if (value <= 0.5) return "Medium";
@@ -2144,7 +2119,7 @@ function MesureViewContent({
                         </tr>
                       </thead>
                       <tbody>
-                        {getLinkedControls().map((control: ControlNode) => (
+                        {getLinkedControls().map((control) => (
                           <tr
                             key={control.id}
                             className="border-b hover:bg-invert-bg"
@@ -2832,21 +2807,21 @@ function MesureViewContent({
                             </td>
                             <td className="py-3 px-4">
                               <div className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs inline-block">
-                                {formatlikelihood(node.likelihood)}
+                                {formatLikelihood(node.inherentLikelihood)}
                               </div>
                             </td>
                             <td className="py-3 px-4">
                               <div className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full text-xs inline-block">
-                                {formatImpact(node.impact)}
+                                {formatImpact(node.inherentImpact)}
                               </div>
                             </td>
                             <td className="py-3 px-4">
                               <div
                                 className={`${getRiskSeverityColor(
-                                  node.severity
+                                  node.inherentSeverity
                                 )} px-2 py-0.5 rounded-full text-xs inline-block`}
                               >
-                                {getRiskSeverityText(node.severity)}
+                                {getRiskSeverityText(node.inherentSeverity)}
                               </div>
                             </td>
                           </tr>

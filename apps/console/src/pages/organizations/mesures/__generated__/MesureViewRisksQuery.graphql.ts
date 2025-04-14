@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a6bd25e3b378dcc7ac26ba611a054fbe>>
+ * @generated SignedSource<<016c2795072dd550f7353660e6f36afe>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -23,7 +23,11 @@ export type MesureViewRisksQuery$data = {
           readonly id: string;
           readonly inherentImpact: number;
           readonly inherentLikelihood: number;
+          readonly inherentSeverity: number;
           readonly name: string;
+          readonly residualImpact: number;
+          readonly residualLikelihood: number;
+          readonly residualSeverity: number;
           readonly updatedAt: string;
         };
       }>;
@@ -108,6 +112,34 @@ v4 = [
             "args": null,
             "kind": "ScalarField",
             "name": "inherentImpact",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "inherentSeverity",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "residualLikelihood",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "residualImpact",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "residualSeverity",
             "storageKey": null
           },
           {
@@ -259,7 +291,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b8095743d31791d2084177fde0203ed4",
+    "cacheID": "d61a109844cdf35d2e6ffe92a2c9b629",
     "id": null,
     "metadata": {
       "connection": [
@@ -276,11 +308,11 @@ return {
     },
     "name": "MesureViewRisksQuery",
     "operationKind": "query",
-    "text": "query MesureViewRisksQuery(\n  $mesureId: ID!\n) {\n  mesure: node(id: $mesureId) {\n    __typename\n    id\n    ... on Mesure {\n      risks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            inherentLikelihood\n            inherentImpact\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query MesureViewRisksQuery(\n  $mesureId: ID!\n) {\n  mesure: node(id: $mesureId) {\n    __typename\n    id\n    ... on Mesure {\n      risks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            inherentLikelihood\n            inherentImpact\n            inherentSeverity\n            residualLikelihood\n            residualImpact\n            residualSeverity\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "0609b3e58837ae65fb4df484b967060a";
+(node as any).hash = "9f8d865c3f979dc21ec52526f283bf4a";
 
 export default node;
