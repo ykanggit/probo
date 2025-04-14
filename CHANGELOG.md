@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.10.1] - 2025-04-14
+
 ### Fixed
 
 - Fix grammar for "people" in the navigation bar
