@@ -210,10 +210,30 @@ const deleteRiskPolicyMappingMutation = graphql`
 
 function getRiskSeverity(likelihood: number, impact: number) {
   const score = likelihood * impact;
-  if (score >= 0.75) return { level: "High", class: "bg-red-100 text-red-800" };
-  if (score >= 0.4)
-    return { level: "Medium", class: "bg-yellow-100 text-yellow-800" };
-  return { level: "Low", class: "bg-green-100 text-green-800" };
+  if (score >= 0.75)
+    return { level: "Catastrophic", class: "bg-red-100 text-red-800" };
+  if (score >= 0.5)
+    return { level: "Critical", class: "bg-orange-100 text-orange-800" };
+  if (score >= 0.25)
+    return { level: "Marginal", class: "bg-yellow-100 text-yellow-800" };
+  return { level: "Negligible", class: "bg-green-100 text-green-800" };
+}
+
+// Add helper functions to convert numerical values to labels
+function getLikelihoodLabel(likelihood: number): string {
+  if (likelihood >= 0.8) return "Very High";
+  if (likelihood >= 0.6) return "High";
+  if (likelihood >= 0.4) return "Medium";
+  if (likelihood >= 0.2) return "Low";
+  return "Very Low";
+}
+
+function getImpactLabel(impact: number): string {
+  if (impact >= 0.8) return "Critical";
+  if (impact >= 0.6) return "Major";
+  if (impact >= 0.4) return "Moderate";
+  if (impact >= 0.2) return "Minor";
+  return "Insignificant";
 }
 
 function ShowRiskViewContent({
@@ -755,13 +775,13 @@ function ShowRiskViewContent({
                   Likelihood
                 </h3>
                 <p className="mt-1 text-lg">
-                  {(risk.inherentLikelihood! * 100).toFixed(0)}%
+                  {getLikelihoodLabel(risk.inherentLikelihood!)}
                 </p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-secondary">Impact</h3>
                 <p className="mt-1 text-lg">
-                  {(risk.inherentImpact! * 100).toFixed(0)}%
+                  {getImpactLabel(risk.inherentImpact!)}
                 </p>
               </div>
               <div>
@@ -830,16 +850,12 @@ function ShowRiskViewContent({
                     Residual Likelihood
                   </h3>
                   <p className="mt-1 text-lg">
-                    {(risk.residualLikelihood! * 100).toFixed(0)}%
+                    {getLikelihoodLabel(risk.residualLikelihood!)}
                   </p>
                   <p className="text-xs text-secondary mt-1">
                     {risk.residualLikelihood !== risk.inherentLikelihood
-                      ? `Reduced by ${(
-                          (risk.inherentLikelihood! -
-                            risk.residualLikelihood!) *
-                          100
-                        ).toFixed(0)}%`
-                      : "No reduction"}
+                      ? `Mitigated`
+                      : "No mitigation"}
                   </p>
                 </div>
                 <div>
@@ -847,15 +863,12 @@ function ShowRiskViewContent({
                     Residual Impact
                   </h3>
                   <p className="mt-1 text-lg">
-                    {(risk.residualImpact! * 100).toFixed(0)}%
+                    {getImpactLabel(risk.residualImpact!)}
                   </p>
                   <p className="text-xs text-secondary mt-1">
                     {risk.residualImpact !== risk.inherentImpact
-                      ? `Reduced by ${(
-                          (risk.inherentImpact! - risk.residualImpact!) *
-                          100
-                        ).toFixed(0)}%`
-                      : "No reduction"}
+                      ? `Mitigated`
+                      : "No mitigation"}
                   </p>
                 </div>
                 <div>

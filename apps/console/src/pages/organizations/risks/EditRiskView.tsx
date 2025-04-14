@@ -105,11 +105,11 @@ function EditRiskViewContent({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [inherentLikelihood, setInherentLikelihood] =
-    useState<string>("MEDIUM");
-  const [inherentImpact, setInherentImpact] = useState<string>("MEDIUM");
+    useState<string>("OCCASIONAL");
+  const [inherentImpact, setInherentImpact] = useState<string>("MODERATE");
   const [residualLikelihood, setResidualLikelihood] =
-    useState<string>("MEDIUM");
-  const [residualImpact, setResidualImpact] = useState<string>("MEDIUM");
+    useState<string>("OCCASIONAL");
+  const [residualImpact, setResidualImpact] = useState<string>("MODERATE");
   const [treatment, setTreatment] = useState<RiskTreatment>("MITIGATED");
   const [ownerId, setOwnerId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -119,34 +119,34 @@ function EditRiskViewContent({
 
   // Helper function to convert float to likelihood string
   const floatToLikelihood = (value: number): string => {
-    if (value <= 0.2) return "VERY_LOW";
-    if (value <= 0.4) return "LOW";
-    if (value <= 0.6) return "MEDIUM";
-    if (value <= 0.8) return "HIGH";
-    return "VERY_HIGH";
+    if (value <= 0.2) return "IMPROBABLE";
+    if (value <= 0.4) return "REMOTE";
+    if (value <= 0.6) return "OCCASIONAL";
+    if (value <= 0.8) return "PROBABLE";
+    return "FREQUENT";
   };
 
   // Helper function to convert float to impact string
   const floatToImpact = (value: number): string => {
-    if (value <= 0.2) return "VERY_LOW";
+    if (value <= 0.2) return "NEGLIGIBLE";
     if (value <= 0.4) return "LOW";
-    if (value <= 0.6) return "MEDIUM";
-    if (value <= 0.8) return "HIGH";
-    return "VERY_HIGH";
+    if (value <= 0.6) return "MODERATE";
+    if (value <= 0.8) return "SIGNIFICANT";
+    return "CATASTROPHIC";
   };
 
   // Map string values to float values
   const likelihoodToFloat = (value: string): number => {
     switch (value) {
-      case "VERY_LOW":
+      case "IMPROBABLE":
         return 0.1;
-      case "LOW":
+      case "REMOTE":
         return 0.3;
-      case "MEDIUM":
+      case "OCCASIONAL":
         return 0.5;
-      case "HIGH":
+      case "PROBABLE":
         return 0.7;
-      case "VERY_HIGH":
+      case "FREQUENT":
         return 0.9;
       default:
         return 0.5;
@@ -155,15 +155,15 @@ function EditRiskViewContent({
 
   const impactToFloat = (value: string): number => {
     switch (value) {
-      case "VERY_LOW":
+      case "NEGLIGIBLE":
         return 0.1;
       case "LOW":
         return 0.3;
-      case "MEDIUM":
+      case "MODERATE":
         return 0.5;
-      case "HIGH":
+      case "SIGNIFICANT":
         return 0.7;
-      case "VERY_HIGH":
+      case "CATASTROPHIC":
         return 0.9;
       default:
         return 0.5;
@@ -308,15 +308,15 @@ function EditRiskViewContent({
                     value={inherentLikelihood}
                     onValueChange={setInherentLikelihood}
                   >
-                    <SelectTrigger id="inherentLikelihood">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select likelihood" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-[300px] overflow-y-auto">
-                      <SelectItem value="VERY_LOW">Very Low</SelectItem>
-                      <SelectItem value="LOW">Low</SelectItem>
-                      <SelectItem value="MEDIUM">Medium</SelectItem>
-                      <SelectItem value="HIGH">High</SelectItem>
-                      <SelectItem value="VERY_HIGH">Very High</SelectItem>
+                    <SelectContent>
+                      <SelectItem value="IMPROBABLE">Improbable</SelectItem>
+                      <SelectItem value="REMOTE">Remote</SelectItem>
+                      <SelectItem value="OCCASIONAL">Occasional</SelectItem>
+                      <SelectItem value="PROBABLE">Probable</SelectItem>
+                      <SelectItem value="FREQUENT">Frequent</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -327,15 +327,15 @@ function EditRiskViewContent({
                     value={inherentImpact}
                     onValueChange={setInherentImpact}
                   >
-                    <SelectTrigger id="inherentImpact">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select impact" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-[300px] overflow-y-auto">
-                      <SelectItem value="VERY_LOW">Very Low</SelectItem>
+                    <SelectContent>
+                      <SelectItem value="NEGLIGIBLE">Negligible</SelectItem>
                       <SelectItem value="LOW">Low</SelectItem>
-                      <SelectItem value="MEDIUM">Medium</SelectItem>
-                      <SelectItem value="HIGH">High</SelectItem>
-                      <SelectItem value="VERY_HIGH">Very High</SelectItem>
+                      <SelectItem value="MODERATE">Moderate</SelectItem>
+                      <SelectItem value="SIGNIFICANT">Significant</SelectItem>
+                      <SelectItem value="CATASTROPHIC">Catastrophic</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -382,15 +382,15 @@ function EditRiskViewContent({
                     value={residualLikelihood}
                     onValueChange={setResidualLikelihood}
                   >
-                    <SelectTrigger id="residualLikelihood">
-                      <SelectValue placeholder="Select residual likelihood" />
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select likelihood" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-[300px] overflow-y-auto">
-                      <SelectItem value="VERY_LOW">Very Low</SelectItem>
-                      <SelectItem value="LOW">Low</SelectItem>
-                      <SelectItem value="MEDIUM">Medium</SelectItem>
-                      <SelectItem value="HIGH">High</SelectItem>
-                      <SelectItem value="VERY_HIGH">Very High</SelectItem>
+                    <SelectContent>
+                      <SelectItem value="IMPROBABLE">Improbable</SelectItem>
+                      <SelectItem value="REMOTE">Remote</SelectItem>
+                      <SelectItem value="OCCASIONAL">Occasional</SelectItem>
+                      <SelectItem value="PROBABLE">Probable</SelectItem>
+                      <SelectItem value="FREQUENT">Frequent</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -401,15 +401,15 @@ function EditRiskViewContent({
                     value={residualImpact}
                     onValueChange={setResidualImpact}
                   >
-                    <SelectTrigger id="residualImpact">
-                      <SelectValue placeholder="Select residual impact" />
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select impact" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-[300px] overflow-y-auto">
-                      <SelectItem value="VERY_LOW">Very Low</SelectItem>
+                    <SelectContent>
+                      <SelectItem value="NEGLIGIBLE">Negligible</SelectItem>
                       <SelectItem value="LOW">Low</SelectItem>
-                      <SelectItem value="MEDIUM">Medium</SelectItem>
-                      <SelectItem value="HIGH">High</SelectItem>
-                      <SelectItem value="VERY_HIGH">Very High</SelectItem>
+                      <SelectItem value="MODERATE">Moderate</SelectItem>
+                      <SelectItem value="SIGNIFICANT">Significant</SelectItem>
+                      <SelectItem value="CATASTROPHIC">Catastrophic</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
