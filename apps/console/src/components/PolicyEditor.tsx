@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -37,6 +37,75 @@ import {
 } from "@lexical/list";
 
 import "./PolicyEditor.css";
+
+// Custom plugin to preserve scroll position
+function ScrollPlugin() {
+  const [editor] = useLexicalComposerContext();
+  const scrollRef = useRef<number>(0);
+  const editorRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    return editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
+      // Skip if there are no changes
+      if (dirtyElements.size === 0 && dirtyLeaves.size === 0) {
+        return;
+      }
+
+      // Only run after the DOM has been updated
+      setTimeout(() => {
+        if (!editorRef.current) {
+          const rootElement = editor.getRootElement();
+          if (rootElement) {
+            // Find the actual contentEditable element
+            const contentEditables = rootElement.getElementsByClassName(
+              "policy-editor-input"
+            );
+            if (contentEditables.length > 0) {
+              editorRef.current = contentEditables[0] as HTMLElement;
+            }
+          }
+        }
+
+        if (editorRef.current) {
+          // After updates, restore the scroll position
+          editorRef.current.scrollTop = scrollRef.current;
+        }
+      }, 0);
+    });
+  }, [editor]);
+
+  useEffect(() => {
+    if (!editorRef.current) {
+      const rootElement = editor.getRootElement();
+      if (rootElement) {
+        const contentEditables = rootElement.getElementsByClassName(
+          "policy-editor-input"
+        );
+        if (contentEditables.length > 0) {
+          editorRef.current = contentEditables[0] as HTMLElement;
+        }
+      }
+    }
+
+    const saveScrollPosition = () => {
+      if (editorRef.current) {
+        scrollRef.current = editorRef.current.scrollTop;
+      }
+    };
+
+    if (editorRef.current) {
+      editorRef.current.addEventListener("scroll", saveScrollPosition);
+    }
+
+    return () => {
+      if (editorRef.current) {
+        editorRef.current.removeEventListener("scroll", saveScrollPosition);
+      }
+    };
+  }, [editor]);
+
+  return null;
+}
 
 // Theme for the editor
 const theme = {
@@ -247,6 +316,7 @@ function HtmlImportPlugin({
   setEditor: (editor: LexicalEditor) => void;
 }) {
   const [editor] = useLexicalComposerContext();
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
     console.log(
@@ -258,8 +328,9 @@ function HtmlImportPlugin({
         : "empty"
     );
 
-    if (editor) {
+    if (editor && !isInitializedRef.current) {
       setEditor(editor);
+      isInitializedRef.current = true;
 
       editor.update(() => {
         try {
@@ -307,6 +378,12 @@ export default function PolicyEditor({
   onChange,
 }: PolicyEditorProps) {
   const [editor, setEditor] = useState<LexicalEditor | null>(null);
+  const initialContentRef = useRef(initialContent);
+
+  // Update reference if initialContent changes
+  useEffect(() => {
+    initialContentRef.current = initialContent;
+  }, [initialContent]);
 
   console.log("PolicyEditor rendering with initialContent:", initialContent);
 
@@ -370,9 +447,10 @@ export default function PolicyEditor({
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
             <OnChangePlugin onChange={handleEditorChange} />
             <HtmlImportPlugin
-              initialHtml={initialContent}
+              initialHtml={initialContentRef.current}
               setEditor={setEditor}
             />
+            <ScrollPlugin />
           </div>
         </div>
       </LexicalComposer>
