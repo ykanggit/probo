@@ -221,19 +221,19 @@ function getRiskSeverity(likelihood: number, impact: number) {
 
 // Add helper functions to convert numerical values to labels
 function getLikelihoodLabel(likelihood: number): string {
-  if (likelihood >= 0.8) return "Very High";
-  if (likelihood >= 0.6) return "High";
-  if (likelihood >= 0.4) return "Medium";
-  if (likelihood >= 0.2) return "Low";
-  return "Very Low";
+  if (likelihood >= 0.8) return "Frequent";
+  if (likelihood >= 0.6) return "Probable";
+  if (likelihood >= 0.4) return "Occasional";
+  if (likelihood >= 0.2) return "Remote";
+  return "Improbable";
 }
 
 function getImpactLabel(impact: number): string {
-  if (impact >= 0.8) return "Critical";
-  if (impact >= 0.6) return "Major";
+  if (impact >= 0.8) return "Catastrophic";
+  if (impact >= 0.6) return "Significant";
   if (impact >= 0.4) return "Moderate";
-  if (impact >= 0.2) return "Minor";
-  return "Insignificant";
+  if (impact >= 0.2) return "Low";
+  return "Negligible";
 }
 
 function ShowRiskViewContent({
