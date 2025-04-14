@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Fix grammar for "people" in the navigation bar
+- Fix editor change cursor position at each keystroke
+- Fix editor does not display list icon
 
 ## [0.10.0] - 2025-04-14
 
