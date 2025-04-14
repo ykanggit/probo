@@ -127,6 +127,8 @@ const theme = {
     ol: "editor-list-ol",
     ul: "editor-list-ul",
     listitem: "editor-listitem",
+    listitemChecked: "editor-listitem--checked",
+    listitemUnchecked: "editor-listitem--unchecked",
   },
   image: "editor-image",
   link: "editor-link",

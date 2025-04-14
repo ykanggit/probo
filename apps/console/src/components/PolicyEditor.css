@@ -137,15 +137,69 @@
 .editor-list-ol {
   padding: 0;
   margin: 0 0 0 16px;
+  list-style-type: decimal;
+  display: block;
+  counter-reset: li;
 }
 
 .editor-list-ul {
   padding: 0;
   margin: 0 0 0 16px;
+  list-style-type: disc;
+  display: block;
 }
 
 .editor-listitem {
   margin: 8px 0 0 0;
+  display: list-item;
+  position: relative;
+  padding-left: 8px;
+}
+
+/* Ensure list items display consistently across browsers */
+li.editor-listitem::marker {
+  font-weight: normal;
+  color: inherit;
+}
+
+/* Specifically for ordered lists */
+ol.editor-list-ol > .editor-listitem {
+  list-style-type: decimal;
+  list-style-position: outside;
+}
+
+/* For nested ordered lists */
+ol.editor-list-ol ol.editor-list-ol > .editor-listitem {
+  list-style-type: lower-alpha;
+}
+
+.editor-listitem--checked,
+.editor-listitem--unchecked {
+  position: relative;
+  margin-left: 0;
+  padding-left: 24px;
+  list-style-type: none;
+}
+
+.editor-listitem--checked:before,
+.editor-listitem--unchecked:before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  left: 0;
+  top: 2px;
+  background-size: 16px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.editor-listitem--checked:before {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>');
+}
+
+.editor-listitem--unchecked:before {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>');
 }
 
 .editor-nested-listitem {
