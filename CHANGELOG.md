@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- New vendors in the built-in vendors list
+
 ### Changed
 
 - More explicit scale, legend and score for risk matrix
