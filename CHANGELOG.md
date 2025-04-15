@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.11.0] - 2025-04-15
+
 ### Added
 
 - New vendors in the built-in vendors list
