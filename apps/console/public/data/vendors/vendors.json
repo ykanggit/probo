@@ -751,7 +751,7 @@
     "headquarterAddress": "Västriku tn 2, 50403, Tartu, Estonia",
     "websiteUrl": "https://plausible.io/",
     "description": "Open-source, privacy-focused web analytics platform that provides simple and lightweight tracking without cookies.",
-    "category": "Authentication and User Management",
+    "category": "Platform and user analytics",
     "certifications": [
       "GDPR", 
       "CCPA", 
