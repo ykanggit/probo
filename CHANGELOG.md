@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- More explicit scale, legend and score for risk matrix
+
 ## [0.10.1] - 2025-04-14
 
 ### Fixed

@@ -5,8 +5,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.75,
-        "likelihood": 0.8,
+        "impact": 4,
+        "likelihood": 4,
         "recommendedTreatment": "Transfer"
       }
     ]
@@ -17,8 +17,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 1.0,
-        "likelihood": 0.3,
+        "impact": 5,
+        "likelihood": 2,
         "recommendedTreatment": "Transfer"
       }
     ]
@@ -29,8 +29,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.5,
+        "impact": 3,
+        "likelihood": 3,
         "recommendedTreatment": "Reduce"
       }
     ]
@@ -41,8 +41,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.15,
+        "impact": 3,
+        "likelihood": 1,
         "recommendedTreatment": "Accept"
       }
     ]
@@ -53,8 +53,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.8,
+        "impact": 3,
+        "likelihood": 4,
         "recommendedTreatment": "Transfer"
       }
     ]
@@ -65,8 +65,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.3,
+        "impact": 3,
+        "likelihood": 2,
         "recommendedTreatment": "Reduce"
       }
     ]
@@ -77,8 +77,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.1,
-        "likelihood": 0.15,
+        "impact": 1,
+        "likelihood": 1,
         "recommendedTreatment": "Accept"
       }
     ]
@@ -89,8 +89,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.5,
+        "impact": 3,
+        "likelihood": 3,
         "recommendedTreatment": "Reduce"
       }
     ]
@@ -101,8 +101,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.8,
+        "impact": 3,
+        "likelihood": 4,
         "recommendedTreatment": "Transfer"
       }
     ]
@@ -113,8 +113,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.75,
-        "likelihood": 0.5,
+        "impact": 4,
+        "likelihood": 3,
         "recommendedTreatment": "Transfer"
       }
     ]
@@ -125,8 +125,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.75,
-        "likelihood": 0.3,
+        "impact": 4,
+        "likelihood": 2,
         "recommendedTreatment": "Reduce"
       }
     ]
@@ -137,8 +137,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.15,
+        "impact": 3,
+        "likelihood": 1,
         "recommendedTreatment": "Accept"
       }
     ]
@@ -149,8 +149,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.25,
-        "likelihood": 0.5,
+        "impact": 1,
+        "likelihood": 3,
         "recommendedTreatment": "Reduce"
       }
     ]
@@ -161,8 +161,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.5,
+        "impact": 3,
+        "likelihood": 3,
         "recommendedTreatment": "Reduce"
       }
     ]
@@ -173,8 +173,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 1.0,
-        "likelihood": 0.5,
+        "impact": 5,
+        "likelihood": 3,
         "recommendedTreatment": "Transfer"
       }
     ]
@@ -185,8 +185,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.8,
+        "impact": 3,
+        "likelihood": 4,
         "recommendedTreatment": "Transfer"
       }
     ]
@@ -197,8 +197,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.25,
-        "likelihood": 0.3,
+        "impact": 1,
+        "likelihood": 2,
         "recommendedTreatment": "Reduce"
       }
     ]
@@ -209,8 +209,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.8,
+        "impact": 3,
+        "likelihood": 4,
         "recommendedTreatment": "Transfer"
       }
     ]
@@ -221,8 +221,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.8,
+        "impact": 3,
+        "likelihood": 4,
         "recommendedTreatment": "Transfer"
       }
     ]
@@ -233,8 +233,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.25,
-        "likelihood": 1.0,
+        "impact": 1,
+        "likelihood": 5,
         "recommendedTreatment": "Reduce"
       }
     ]
@@ -245,8 +245,8 @@
     "variations": [
       {
         "context": "B2B SaaS SMB",
-        "impact": 0.5,
-        "likelihood": 0.5,
+        "impact": 3,
+        "likelihood": 3,
         "recommendedTreatment": "Reduce"
       }
     ]

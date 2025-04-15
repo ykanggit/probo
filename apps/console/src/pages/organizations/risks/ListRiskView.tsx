@@ -109,17 +109,11 @@ const deleteRiskMutation = graphql`
   }
 `;
 
-// Helper function to convert float values to percentage
-// This is kept for potential future use, like tooltips
-const floatToPercentage = (value: number): string => {
-  return `${Math.round(value * 100)}%`;
-};
-
 // Helper function to convert risk score to severity label
 const riskScoreToSeverity = (score: number): string => {
-  if (score >= 0.75) return "Catastrophic";
-  if (score >= 0.5) return "Critical";
-  if (score >= 0.25) return "Marginal";
+  if (score >= 20) return "Catastrophic";
+  if (score >= 12) return "Critical";
+  if (score >= 5) return "Marginal";
   return "Negligible";
 };
 
@@ -207,6 +201,7 @@ const emptyRiskMatrixColors = {
 function RiskMatrix({
   risks,
   isResidual = false,
+  organizationId,
 }: {
   risks: Array<{
     id: string;
@@ -217,24 +212,13 @@ function RiskMatrix({
     residualImpact?: number;
   }>;
   isResidual?: boolean;
+  organizationId: string;
 }): JSX.Element {
-  // Define impact ranges for the vertical axis (rows)
-  const impactRanges: [number, number][] = [
-    [0.8, 1], // Highest impact - top row
-    [0.6, 0.8], // High impact
-    [0.4, 0.6], // Medium impact
-    [0.2, 0.4], // Low impact
-    [0, 0.2], // Lowest impact - bottom row
-  ];
+  // Define impact values for the vertical axis (rows) - from highest (5) to lowest (1)
+  const impactValues: number[] = [5, 4, 3, 2, 1];
 
-  // Define likelihood ranges for the horizontal axis (columns)
-  const likelihoodRanges: [number, number][] = [
-    [0, 0.2], // Lowest likelihood - leftmost column
-    [0.2, 0.4], // Low likelihood
-    [0.4, 0.6], // Medium likelihood
-    [0.6, 0.8], // High likelihood
-    [0.8, 1], // Highest likelihood - rightmost column
-  ];
+  // Define likelihood values for the horizontal axis (columns) - from lowest (1) to highest (5)
+  const likelihoodValues: number[] = [1, 2, 3, 4, 5];
 
   const impactLabels = [
     "Catastrophic",
@@ -253,10 +237,7 @@ function RiskMatrix({
   ];
 
   // Function to get cell content with risks that fall in this cell
-  const getCellContent = (
-    impactRange: [number, number],
-    likelihoodRange: [number, number]
-  ) => {
+  const getCellContent = (impactValue: number, likelihoodValue: number) => {
     return risks.filter((risk) => {
       const likelihood = isResidual
         ? risk.residualLikelihood ?? risk.inherentLikelihood
@@ -265,12 +246,7 @@ function RiskMatrix({
         ? risk.residualImpact ?? risk.inherentImpact
         : risk.inherentImpact;
 
-      return (
-        likelihood > likelihoodRange[0] &&
-        likelihood <= likelihoodRange[1] &&
-        impact > impactRange[0] &&
-        impact <= impactRange[1]
-      );
+      return likelihood === likelihoodValue && impact === impactValue;
     });
   };
 
@@ -280,54 +256,63 @@ function RiskMatrix({
   const getCellColor = (row: number, col: number, isEmpty: boolean): string => {
     const colorSet = isEmpty ? emptyRiskMatrixColors : riskMatrixColors;
 
-    // Top row (highest impact - Catastrophic)
-    if (row === 0) {
-      if (col <= 1) return colorSet.medium; // Yellow for first two cells
-      return colorSet.high; // Red for the rest
-    }
+    // Hard-coded color matrix where each element [row][col] represents a specific cell
+    // This follows the 5x5 grid with rows representing impact (5 to 1) and columns representing likelihood (1 to 5)
+    const colorMatrix = [
+      // Impact 5 (Catastrophic) - first row
+      [
+        colorSet.medium,
+        colorSet.medium,
+        colorSet.high,
+        colorSet.high,
+        colorSet.high,
+      ],
+      // Impact 4 (Significant) - second row
+      [
+        colorSet.low,
+        colorSet.medium,
+        colorSet.medium,
+        colorSet.high,
+        colorSet.high,
+      ],
+      // Impact 3 (Moderate) - third row
+      [
+        colorSet.low,
+        colorSet.low,
+        colorSet.medium,
+        colorSet.medium,
+        colorSet.high,
+      ],
+      // Impact 2 (Low) - fourth row
+      [
+        colorSet.low,
+        colorSet.low,
+        colorSet.low,
+        colorSet.medium,
+        colorSet.medium,
+      ],
+      // Impact 1 (Negligible) - fifth row
+      [colorSet.low, colorSet.low, colorSet.low, colorSet.low, colorSet.medium],
+    ];
 
-    // Second row (Significant impact)
-    if (row === 1) {
-      if (col === 0) return colorSet.low; // Green for first cell
-      if (col <= 2) return colorSet.medium; // Yellow for next two
-      return colorSet.high; // Red for the rest
-    }
-
-    // Middle row (Moderate impact)
-    if (row === 2) {
-      if (col === 0) return colorSet.low; // Green for first cell
-      if (col <= 3) return colorSet.medium; // Yellow for next three
-      return colorSet.high; // Red for last cell
-    }
-
-    // Fourth row (Low impact)
-    if (row === 3) {
-      if (col <= 1) return colorSet.low; // Green for first two
-      return colorSet.medium; // Yellow for the rest
-    }
-
-    // Bottom row (lowest impact - Negligible)
-    if (row === 4) {
-      if (col <= 3) return colorSet.low; // Green for first four
-      return colorSet.medium; // Yellow for last cell
-    }
-
-    return "bg-gray-100";
+    return colorMatrix[row][col];
   };
 
   // Instead of using refs and tippy, we'll use a component with popover
   const RiskCell = ({
     rowIndex,
     colIndex,
-    impactRange,
-    likelihoodRange,
+    impactValue,
+    likelihoodValue,
+    organizationId,
   }: {
     rowIndex: number;
     colIndex: number;
-    impactRange: [number, number];
-    likelihoodRange: [number, number];
+    impactValue: number;
+    likelihoodValue: number;
+    organizationId: string;
   }) => {
-    const cellRisks = getCellContent(impactRange, likelihoodRange);
+    const cellRisks = getCellContent(impactValue, likelihoodValue);
     const isEmpty = cellRisks.length === 0;
     const cellColor = getCellColor(rowIndex, colIndex, isEmpty);
 
@@ -354,17 +339,109 @@ function RiskMatrix({
             </div>
           </td>
         </PopoverTrigger>
-        <PopoverContent className="w-64 p-3" align="center">
-          <div className="font-medium mb-2">
-            {cellRisks.length} Risk{cellRisks.length > 1 ? "s" : ""}:
+        <PopoverContent className="w-72 p-4" align="center">
+          <div className="font-semibold text-lg mb-2">
+            {cellRisks.length} Risk{cellRisks.length > 1 ? "s" : ""}
           </div>
-          <ul className="list-disc pl-4 space-y-1">
-            {cellRisks.map((risk) => (
-              <li key={risk.id} className="text-sm">
-                {risk.name}
-              </li>
-            ))}
-          </ul>
+
+          <div className="bg-gray-50 p-3 rounded-md mb-3 space-y-1">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="text-sm">
+                <span className="text-muted-foreground">Impact:</span>{" "}
+                <span className="font-medium">{impactValue}</span>
+              </div>
+              <div className="text-sm">
+                <span className="text-muted-foreground">Likelihood:</span>{" "}
+                <span className="font-medium">{likelihoodValue}</span>
+              </div>
+            </div>
+
+            <div className="text-sm pt-1 border-t border-gray-200 mt-1">
+              <span className="text-muted-foreground">Risk Score:</span>
+              <span className="font-bold ml-1">
+                {impactValue * likelihoodValue}
+              </span>
+              <span
+                className="ml-2 px-2 py-0.5 text-xs rounded-full font-medium inline-block"
+                style={{
+                  backgroundColor:
+                    impactValue * likelihoodValue >= 20
+                      ? "#ef4444"
+                      : impactValue * likelihoodValue >= 12
+                      ? "#f59e0b"
+                      : impactValue * likelihoodValue >= 5
+                      ? "#10b981"
+                      : "#94a3b8",
+                  color:
+                    impactValue * likelihoodValue >= 12 ? "white" : "inherit",
+                }}
+              >
+                {impactValue * likelihoodValue >= 20
+                  ? "Catastrophic"
+                  : impactValue * likelihoodValue >= 12
+                  ? "Critical"
+                  : impactValue * likelihoodValue >= 5
+                  ? "Marginal"
+                  : "Negligible"}
+              </span>
+            </div>
+          </div>
+
+          {cellRisks.length > 0 && (
+            <>
+              <div className="text-sm font-medium mb-1">Items:</div>
+              <ul className="space-y-1.5 max-h-48 overflow-y-auto">
+                {cellRisks.map((risk) => (
+                  <li
+                    key={risk.id}
+                    className="text-sm border-l-2 pl-2"
+                    style={{
+                      borderColor:
+                        (isResidual
+                          ? (risk.residualImpact || risk.inherentImpact) *
+                            (risk.residualLikelihood || risk.inherentLikelihood)
+                          : risk.inherentImpact * risk.inherentLikelihood) >= 20
+                          ? "#ef4444"
+                          : (isResidual
+                              ? (risk.residualImpact || risk.inherentImpact) *
+                                (risk.residualLikelihood ||
+                                  risk.inherentLikelihood)
+                              : risk.inherentImpact *
+                                risk.inherentLikelihood) >= 12
+                          ? "#f59e0b"
+                          : (isResidual
+                              ? (risk.residualImpact || risk.inherentImpact) *
+                                (risk.residualLikelihood ||
+                                  risk.inherentLikelihood)
+                              : risk.inherentImpact *
+                                risk.inherentLikelihood) >= 5
+                          ? "#10b981"
+                          : "#94a3b8",
+                    }}
+                  >
+                    <Link
+                      to={`/organizations/${organizationId}/risks/${risk.id}`}
+                      className="hover:underline hover:text-primary transition-colors flex items-center w-full py-1 rounded hover:bg-gray-100 px-1"
+                    >
+                      <span className="truncate">{risk.name}</span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="w-3.5 h-3.5 ml-auto flex-shrink-0 text-muted-foreground"
+                      >
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </PopoverContent>
       </Popover>
     );
@@ -387,18 +464,19 @@ function RiskMatrix({
             </div>
             <table className="w-full border-collapse table-fixed">
               <tbody>
-                {impactRanges.map((impactRange, rowIndex) => (
+                {impactValues.map((impactValue, rowIndex) => (
                   <tr key={rowIndex}>
-                    <th className="p-1 text-xs text-center border-0 font-medium w-14 h-14">
-                      {impactLabels[rowIndex]}
+                    <th className="p-1 text-xs text-right border-0 font-medium w-14 h-14">
+                      {impactLabels[rowIndex]} ({impactValue})
                     </th>
-                    {likelihoodRanges.map((likelihoodRange, colIndex) => (
+                    {likelihoodValues.map((likelihoodValue, colIndex) => (
                       <RiskCell
                         key={colIndex}
                         rowIndex={rowIndex}
                         colIndex={colIndex}
-                        impactRange={impactRange}
-                        likelihoodRange={likelihoodRange}
+                        impactValue={impactValue}
+                        likelihoodValue={likelihoodValue}
+                        organizationId={organizationId}
                       />
                     ))}
                   </tr>
@@ -412,7 +490,7 @@ function RiskMatrix({
                       key={index}
                       className="p-1 text-xs text-center border-t font-medium w-14"
                     >
-                      {label}
+                      {label} ({likelihoodValues[index]})
                     </th>
                   ))}
                 </tr>
@@ -583,7 +661,11 @@ function ListRiskViewContent({
                   </Label>
                 </div>
               </div>
-              <RiskMatrix risks={risks} isResidual={showResidualRisk} />
+              <RiskMatrix
+                risks={risks}
+                isResidual={showResidualRisk}
+                organizationId={organizationId || ""}
+              />
             </div>
           </CardContent>
         </Card>
@@ -648,9 +730,36 @@ function ListRiskViewContent({
                             to={`/organizations/${organizationId}/risks/${risk.id}`}
                             className="block p-4 h-full w-full"
                           >
-                            {riskScoreToSeverity(
-                              risk.inherentLikelihood * risk.inherentImpact
-                            )}
+                            <span
+                              className="px-2 py-0.5 text-xs rounded-full font-medium inline-block"
+                              style={{
+                                backgroundColor:
+                                  risk.inherentLikelihood *
+                                    risk.inherentImpact >=
+                                  20
+                                    ? "#ef4444"
+                                    : risk.inherentLikelihood *
+                                        risk.inherentImpact >=
+                                      12
+                                    ? "#f59e0b"
+                                    : risk.inherentLikelihood *
+                                        risk.inherentImpact >=
+                                      5
+                                    ? "#10b981"
+                                    : "#94a3b8",
+                                color:
+                                  risk.inherentLikelihood *
+                                    risk.inherentImpact >=
+                                  12
+                                    ? "white"
+                                    : "inherit",
+                              }}
+                            >
+                              {riskScoreToSeverity(
+                                risk.inherentLikelihood * risk.inherentImpact
+                              )}{" "}
+                              ({risk.inherentLikelihood * risk.inherentImpact})
+                            </span>
                           </Link>
                         </td>
                         <td className="p-0 align-middle w-1/6 whitespace-nowrap">
@@ -658,11 +767,41 @@ function ListRiskViewContent({
                             to={`/organizations/${organizationId}/risks/${risk.id}`}
                             className="block p-4 h-full w-full"
                           >
-                            {risk.residualLikelihood && risk.residualImpact
-                              ? riskScoreToSeverity(
+                            {risk.residualLikelihood && risk.residualImpact ? (
+                              <span
+                                className="px-2 py-0.5 text-xs rounded-full font-medium inline-block"
+                                style={{
+                                  backgroundColor:
+                                    risk.residualLikelihood *
+                                      risk.residualImpact >=
+                                    20
+                                      ? "#ef4444"
+                                      : risk.residualLikelihood *
+                                          risk.residualImpact >=
+                                        12
+                                      ? "#f59e0b"
+                                      : risk.residualLikelihood *
+                                          risk.residualImpact >=
+                                        5
+                                      ? "#10b981"
+                                      : "#94a3b8",
+                                  color:
+                                    risk.residualLikelihood *
+                                      risk.residualImpact >=
+                                    12
+                                      ? "white"
+                                      : "inherit",
+                                }}
+                              >
+                                {riskScoreToSeverity(
                                   risk.residualLikelihood * risk.residualImpact
+                                )}{" "}
+                                ({risk.residualLikelihood * risk.residualImpact}
                                 )
-                              : "Not set"}
+                              </span>
+                            ) : (
+                              "Not set"
+                            )}
                           </Link>
                         </td>
                         <td className="p-4 align-middle w-[120px]">

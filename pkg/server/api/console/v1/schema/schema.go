@@ -3739,12 +3739,12 @@ type Risk implements Node {
   name: String!
   description: String!
   treatment: RiskTreatment!
-  inherentLikelihood: Float!
-  inherentImpact: Float!
-  inherentSeverity: Float!
-  residualLikelihood: Float!
-  residualImpact: Float!
-  residualSeverity: Float!
+  inherentLikelihood: Int!
+  inherentImpact: Int!
+  inherentSeverity: Int!
+  residualLikelihood: Int!
+  residualImpact: Int!
+  residualSeverity: Int!
 
   owner: People @goField(forceResolver: true)
 
@@ -4203,10 +4203,10 @@ input CreateRiskInput {
   description: String!
   ownerId: ID
   treatment: RiskTreatment!
-  inherentLikelihood: Float!
-  inherentImpact: Float!
-  residualLikelihood: Float
-  residualImpact: Float
+  inherentLikelihood: Int!
+  inherentImpact: Int!
+  residualLikelihood: Int
+  residualImpact: Int
 }
 
 input UpdateRiskInput {
@@ -4215,10 +4215,10 @@ input UpdateRiskInput {
   description: String
   ownerId: ID
   treatment: RiskTreatment
-  inherentLikelihood: Float
-  inherentImpact: Float
-  residualLikelihood: Float
-  residualImpact: Float
+  inherentLikelihood: Int
+  inherentImpact: Int
+  residualLikelihood: Int
+  residualImpact: Int
 }
 
 input DeleteRiskInput {
@@ -16907,9 +16907,9 @@ func (ec *executionContext) _Risk_inherentLikelihood(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Risk_inherentLikelihood(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16919,7 +16919,7 @@ func (ec *executionContext) fieldContext_Risk_inherentLikelihood(_ context.Conte
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -16951,9 +16951,9 @@ func (ec *executionContext) _Risk_inherentImpact(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Risk_inherentImpact(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16963,7 +16963,7 @@ func (ec *executionContext) fieldContext_Risk_inherentImpact(_ context.Context, 
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -16995,9 +16995,9 @@ func (ec *executionContext) _Risk_inherentSeverity(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Risk_inherentSeverity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17007,7 +17007,7 @@ func (ec *executionContext) fieldContext_Risk_inherentSeverity(_ context.Context
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -17039,9 +17039,9 @@ func (ec *executionContext) _Risk_residualLikelihood(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Risk_residualLikelihood(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17051,7 +17051,7 @@ func (ec *executionContext) fieldContext_Risk_residualLikelihood(_ context.Conte
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -17083,9 +17083,9 @@ func (ec *executionContext) _Risk_residualImpact(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Risk_residualImpact(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17095,7 +17095,7 @@ func (ec *executionContext) fieldContext_Risk_residualImpact(_ context.Context, 
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -17127,9 +17127,9 @@ func (ec *executionContext) _Risk_residualSeverity(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Risk_residualSeverity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17139,7 +17139,7 @@ func (ec *executionContext) fieldContext_Risk_residualSeverity(_ context.Context
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -24054,28 +24054,28 @@ func (ec *executionContext) unmarshalInputCreateRiskInput(ctx context.Context, o
 			it.Treatment = data
 		case "inherentLikelihood":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inherentLikelihood"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.InherentLikelihood = data
 		case "inherentImpact":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inherentImpact"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.InherentImpact = data
 		case "residualLikelihood":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("residualLikelihood"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ResidualLikelihood = data
 		case "residualImpact":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("residualImpact"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25605,28 +25605,28 @@ func (ec *executionContext) unmarshalInputUpdateRiskInput(ctx context.Context, o
 			it.Treatment = data
 		case "inherentLikelihood":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inherentLikelihood"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.InherentLikelihood = data
 		case "inherentImpact":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inherentImpact"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.InherentImpact = data
 		case "residualLikelihood":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("residualLikelihood"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ResidualLikelihood = data
 		case "residualImpact":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("residualImpact"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -32508,21 +32508,6 @@ var (
 	}
 )
 
-func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v any) (float64, error) {
-	res, err := graphql.UnmarshalFloatContext(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
-	res := graphql.MarshalFloatContext(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return graphql.WrapContextMarshaler(ctx, res)
-}
-
 func (ec *executionContext) marshalNFramework2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v *types.Framework) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -34553,22 +34538,6 @@ func (ec *executionContext) unmarshalOEvidenceOrder2ᚖgithubᚗcomᚋgetprobo�
 	}
 	res, err := ec.unmarshalInputEvidenceOrder(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v any) (*float64, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalFloatContext(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalFloatContext(*v)
-	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) unmarshalOFrameworkOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐFrameworkOrderBy(ctx context.Context, v any) (*types.FrameworkOrderBy, error) {

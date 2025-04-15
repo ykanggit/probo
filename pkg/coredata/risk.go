@@ -34,10 +34,10 @@ type (
 		Description        string        `db:"description"`
 		Treatment          RiskTreatment `db:"treatment"`
 		OwnerID            *gid.GID      `db:"owner_id"`
-		InherentLikelihood float64       `db:"inherent_likelihood"`
-		InherentImpact     float64       `db:"inherent_impact"`
-		ResidualLikelihood float64       `db:"residual_likelihood"`
-		ResidualImpact     float64       `db:"residual_impact"`
+		InherentLikelihood int           `db:"inherent_likelihood"`
+		InherentImpact     int           `db:"inherent_impact"`
+		ResidualLikelihood int           `db:"residual_likelihood"`
+		ResidualImpact     int           `db:"residual_impact"`
 		CreatedAt          time.Time     `db:"created_at"`
 		UpdatedAt          time.Time     `db:"updated_at"`
 	}
@@ -54,11 +54,11 @@ func (r *Risk) CursorKey(orderBy RiskOrderField) page.CursorKey {
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
-func (r *Risk) InherentSeverity() float64 {
+func (r *Risk) InherentSeverity() int {
 	return r.InherentLikelihood * r.InherentImpact
 }
 
-func (r *Risk) ResidualSeverity() float64 {
+func (r *Risk) ResidualSeverity() int {
 	return r.ResidualLikelihood * r.ResidualImpact
 }
 

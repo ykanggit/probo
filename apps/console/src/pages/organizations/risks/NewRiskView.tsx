@@ -87,12 +87,10 @@ function NewRiskForm({
   const data = usePreloadedQuery<NewRiskViewQuery>(newRiskQuery, queryRef);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [inherentLikelihood, setinherentLikelihood] =
-    useState<string>("OCCASIONAL");
-  const [inherentImpact, setinherentImpact] = useState<string>("MODERATE");
-  const [residualLikelihood, setResidualLikelihood] =
-    useState<string>("OCCASIONAL");
-  const [residualImpact, setResidualImpact] = useState<string>("MODERATE");
+  const [inherentLikelihood, setInherentLikelihood] = useState<number>(3);
+  const [inherentImpact, setInherentImpact] = useState<number>(3);
+  const [residualLikelihood, setResidualLikelihood] = useState<number>(3);
+  const [residualImpact, setResidualImpact] = useState<number>(3);
   const [treatment, setTreatment] = useState<string>("MITIGATED");
   const [ownerId, setOwnerId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -121,41 +119,6 @@ function NewRiskForm({
     loadRiskTemplates();
   }, [toast]);
 
-  // Map string values to float values
-  const likelihoodToFloat = (value: string): number => {
-    switch (value) {
-      case "IMPROBABLE":
-        return 0.1;
-      case "REMOTE":
-        return 0.3;
-      case "OCCASIONAL":
-        return 0.5;
-      case "PROBABLE":
-        return 0.7;
-      case "FREQUENT":
-        return 0.9;
-      default:
-        return 0.5;
-    }
-  };
-
-  const impactToFloat = (value: string): number => {
-    switch (value) {
-      case "NEGLIGIBLE":
-        return 0.1;
-      case "LOW":
-        return 0.3;
-      case "MODERATE":
-        return 0.5;
-      case "SIGNIFICANT":
-        return 0.7;
-      case "CATASTROPHIC":
-        return 0.9;
-      default:
-        return 0.5;
-    }
-  };
-
   // Handle template selection and prefill form
   const handleTemplateChange = (templateId: string) => {
     setSelectedTemplate(templateId);
@@ -164,10 +127,10 @@ function NewRiskForm({
       // Clear form if "Select a template" is chosen
       setName("");
       setDescription("");
-      setinherentLikelihood("OCCASIONAL");
-      setinherentImpact("MODERATE");
-      setResidualLikelihood("OCCASIONAL");
-      setResidualImpact("MODERATE");
+      setInherentLikelihood(3);
+      setInherentImpact(3);
+      setResidualLikelihood(3);
+      setResidualImpact(3);
       setTreatment("MITIGATED");
       return;
     }
@@ -176,40 +139,25 @@ function NewRiskForm({
     if (template) {
       setName(template.name);
       setDescription(template.description);
-      // Convert numeric values to string values for the select components
-      const likelihoodValue = floatTolikelihood(
-        template.variations[0].likelihood
-      );
-      const impactValue = floatToImpact(template.variations[0].impact);
-      setinherentLikelihood(likelihoodValue);
-      setinherentImpact(impactValue);
+
+      // Convert template values to 1-5 scale
+      const likelihoodValue =
+        Math.round(template.variations[0].likelihood * 5) || 3;
+      const impactValue = Math.round(template.variations[0].impact * 5) || 3;
+
+      // Ensure values are in 1-5 range
+      setInherentLikelihood(Math.min(Math.max(likelihoodValue, 1), 5));
+      setInherentImpact(Math.min(Math.max(impactValue, 1), 5));
+
       // Set residual values to be the same as initial values by default
-      setResidualLikelihood(likelihoodValue);
-      setResidualImpact(impactValue);
+      setResidualLikelihood(Math.min(Math.max(likelihoodValue, 1), 5));
+      setResidualImpact(Math.min(Math.max(impactValue, 1), 5));
 
       // Set recommended treatment if available
       if (template.variations[0].recommendedTreatment) {
         setTreatment(template.variations[0].recommendedTreatment.toUpperCase());
       }
     }
-  };
-
-  // Helper function to convert float likelihood to string
-  const floatTolikelihood = (value: number): string => {
-    if (value <= 0.2) return "IMPROBABLE";
-    if (value <= 0.4) return "REMOTE";
-    if (value <= 0.6) return "OCCASIONAL";
-    if (value <= 0.8) return "PROBABLE";
-    return "FREQUENT";
-  };
-
-  // Helper function to convert float impact to string
-  const floatToImpact = (value: number): string => {
-    if (value <= 0.2) return "NEGLIGIBLE";
-    if (value <= 0.4) return "LOW";
-    if (value <= 0.6) return "MODERATE";
-    if (value <= 0.8) return "SIGNIFICANT";
-    return "CATASTROPHIC";
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -230,10 +178,10 @@ function NewRiskForm({
       organizationId: organizationId!,
       name,
       description,
-      inherentLikelihood: likelihoodToFloat(inherentLikelihood),
-      inherentImpact: impactToFloat(inherentImpact),
-      residualLikelihood: likelihoodToFloat(residualLikelihood),
-      residualImpact: impactToFloat(residualImpact),
+      inherentLikelihood,
+      inherentImpact,
+      residualLikelihood,
+      residualImpact,
       treatment,
       ownerId: ownerId || undefined,
     };
@@ -355,39 +303,43 @@ function NewRiskForm({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="inherentLikelihood">Initial Likelihood</Label>
+                <Label htmlFor="inherentLikelihood">
+                  Initial Likelihood (1-5)
+                </Label>
                 <Select
-                  value={inherentLikelihood}
-                  onValueChange={setinherentLikelihood}
+                  value={inherentLikelihood.toString()}
+                  onValueChange={(value) =>
+                    setInherentLikelihood(parseInt(value))
+                  }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select likelihood" />
+                    <SelectValue placeholder="Select likelihood level" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="IMPROBABLE">Improbable</SelectItem>
-                    <SelectItem value="REMOTE">Remote</SelectItem>
-                    <SelectItem value="OCCASIONAL">Occasional</SelectItem>
-                    <SelectItem value="PROBABLE">Probable</SelectItem>
-                    <SelectItem value="FREQUENT">Frequent</SelectItem>
+                    <SelectItem value="1">1 - Improbable</SelectItem>
+                    <SelectItem value="2">2 - Remote</SelectItem>
+                    <SelectItem value="3">3 - Occasional</SelectItem>
+                    <SelectItem value="4">4 - Probable</SelectItem>
+                    <SelectItem value="5">5 - Frequent</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="inherentImpact">Initial Impact</Label>
+                <Label htmlFor="inherentImpact">Initial Impact (1-5)</Label>
                 <Select
-                  value={inherentImpact}
-                  onValueChange={setinherentImpact}
+                  value={inherentImpact.toString()}
+                  onValueChange={(value) => setInherentImpact(parseInt(value))}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select impact" />
+                    <SelectValue placeholder="Select impact level" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="NEGLIGIBLE">Negligible</SelectItem>
-                    <SelectItem value="LOW">Low</SelectItem>
-                    <SelectItem value="MODERATE">Moderate</SelectItem>
-                    <SelectItem value="SIGNIFICANT">Significant</SelectItem>
-                    <SelectItem value="CATASTROPHIC">Catastrophic</SelectItem>
+                    <SelectItem value="1">1 - Negligible</SelectItem>
+                    <SelectItem value="2">2 - Low</SelectItem>
+                    <SelectItem value="3">3 - Moderate</SelectItem>
+                    <SelectItem value="4">4 - Significant</SelectItem>
+                    <SelectItem value="5">5 - Catastrophic</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -422,40 +374,44 @@ function NewRiskForm({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="residualLikelihood">
-                    Residual Likelihood
+                    Residual Likelihood (1-5)
                   </Label>
                   <Select
-                    value={residualLikelihood}
-                    onValueChange={setResidualLikelihood}
+                    value={residualLikelihood.toString()}
+                    onValueChange={(value) =>
+                      setResidualLikelihood(parseInt(value))
+                    }
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select likelihood" />
+                      <SelectValue placeholder="Select likelihood level" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="IMPROBABLE">Improbable</SelectItem>
-                      <SelectItem value="REMOTE">Remote</SelectItem>
-                      <SelectItem value="OCCASIONAL">Occasional</SelectItem>
-                      <SelectItem value="PROBABLE">Probable</SelectItem>
-                      <SelectItem value="FREQUENT">Frequent</SelectItem>
+                      <SelectItem value="1">1 - Improbable</SelectItem>
+                      <SelectItem value="2">2 - Remote</SelectItem>
+                      <SelectItem value="3">3 - Occasional</SelectItem>
+                      <SelectItem value="4">4 - Probable</SelectItem>
+                      <SelectItem value="5">5 - Frequent</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="residualImpact">Residual Impact</Label>
+                  <Label htmlFor="residualImpact">Residual Impact (1-5)</Label>
                   <Select
-                    value={residualImpact}
-                    onValueChange={setResidualImpact}
+                    value={residualImpact.toString()}
+                    onValueChange={(value) =>
+                      setResidualImpact(parseInt(value))
+                    }
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select impact" />
+                      <SelectValue placeholder="Select impact level" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="NEGLIGIBLE">Negligible</SelectItem>
-                      <SelectItem value="LOW">Low</SelectItem>
-                      <SelectItem value="MODERATE">Moderate</SelectItem>
-                      <SelectItem value="SIGNIFICANT">Significant</SelectItem>
-                      <SelectItem value="CATASTROPHIC">Catastrophic</SelectItem>
+                      <SelectItem value="1">1 - Negligible</SelectItem>
+                      <SelectItem value="2">2 - Low</SelectItem>
+                      <SelectItem value="3">3 - Moderate</SelectItem>
+                      <SelectItem value="4">4 - Significant</SelectItem>
+                      <SelectItem value="5">5 - Catastrophic</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

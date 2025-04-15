@@ -36,10 +36,10 @@ type (
 		Description        string
 		Treatment          coredata.RiskTreatment
 		OwnerID            *gid.GID
-		InherentLikelihood float64
-		InherentImpact     float64
-		ResidualLikelihood *float64
-		ResidualImpact     *float64
+		InherentLikelihood int
+		InherentImpact     int
+		ResidualLikelihood *int
+		ResidualImpact     *int
 	}
 
 	UpdateRiskRequest struct {
@@ -48,10 +48,10 @@ type (
 		Description        *string
 		Treatment          *coredata.RiskTreatment
 		OwnerID            *gid.GID
-		InherentLikelihood *float64
-		InherentImpact     *float64
-		ResidualLikelihood *float64
-		ResidualImpact     *float64
+		InherentLikelihood *int
+		InherentImpact     *int
+		ResidualLikelihood *int
+		ResidualImpact     *int
 	}
 )
 

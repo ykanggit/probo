@@ -210,30 +210,102 @@ const deleteRiskPolicyMappingMutation = graphql`
 
 function getRiskSeverity(likelihood: number, impact: number) {
   const score = likelihood * impact;
-  if (score >= 0.75)
-    return { level: "Catastrophic", class: "bg-red-100 text-red-800" };
-  if (score >= 0.5)
-    return { level: "Critical", class: "bg-orange-100 text-orange-800" };
-  if (score >= 0.25)
-    return { level: "Marginal", class: "bg-yellow-100 text-yellow-800" };
-  return { level: "Negligible", class: "bg-green-100 text-green-800" };
+  if (score >= 20)
+    return {
+      level: "Catastrophic",
+      score: score,
+      style: {
+        backgroundColor: "#ef4444",
+        color: "white",
+      },
+    };
+  if (score >= 12)
+    return {
+      level: "Critical",
+      score: score,
+      style: {
+        backgroundColor: "#f59e0b",
+        color: "white",
+      },
+    };
+  if (score >= 5)
+    return {
+      level: "Marginal",
+      score: score,
+      style: {
+        backgroundColor: "#10b981",
+        color: "inherit",
+      },
+    };
+  return {
+    level: "Negligible",
+    score: score,
+    style: {
+      backgroundColor: "#94a3b8",
+      color: "inherit",
+    },
+  };
 }
 
 // Add helper functions to convert numerical values to labels
-function getLikelihoodLabel(likelihood: number): string {
-  if (likelihood >= 0.8) return "Frequent";
-  if (likelihood >= 0.6) return "Probable";
-  if (likelihood >= 0.4) return "Occasional";
-  if (likelihood >= 0.2) return "Remote";
-  return "Improbable";
+function getLikelihoodLabel(likelihood: number): {
+  label: string;
+  style: React.CSSProperties;
+} {
+  if (likelihood === 5)
+    return {
+      label: "Frequent (5)",
+      style: { backgroundColor: "#ef4444", color: "white" },
+    };
+  if (likelihood === 4)
+    return {
+      label: "Probable (4)",
+      style: { backgroundColor: "#f59e0b", color: "white" },
+    };
+  if (likelihood === 3)
+    return {
+      label: "Occasional (3)",
+      style: { backgroundColor: "#eab308", color: "black" },
+    };
+  if (likelihood === 2)
+    return {
+      label: "Remote (2)",
+      style: { backgroundColor: "#10b981", color: "black" },
+    };
+  return {
+    label: "Improbable (1)",
+    style: { backgroundColor: "#94a3b8", color: "black" },
+  };
 }
 
-function getImpactLabel(impact: number): string {
-  if (impact >= 0.8) return "Catastrophic";
-  if (impact >= 0.6) return "Significant";
-  if (impact >= 0.4) return "Moderate";
-  if (impact >= 0.2) return "Low";
-  return "Negligible";
+function getImpactLabel(impact: number): {
+  label: string;
+  style: React.CSSProperties;
+} {
+  if (impact === 5)
+    return {
+      label: "Catastrophic (5)",
+      style: { backgroundColor: "#ef4444", color: "white" },
+    };
+  if (impact === 4)
+    return {
+      label: "Significant (4)",
+      style: { backgroundColor: "#f59e0b", color: "white" },
+    };
+  if (impact === 3)
+    return {
+      label: "Moderate (3)",
+      style: { backgroundColor: "#eab308", color: "black" },
+    };
+  if (impact === 2)
+    return {
+      label: "Low (2)",
+      style: { backgroundColor: "#10b981", color: "black" },
+    };
+  return {
+    label: "Negligible (1)",
+    style: { backgroundColor: "#94a3b8", color: "black" },
+  };
 }
 
 function ShowRiskViewContent({
@@ -765,65 +837,43 @@ function ShowRiskViewContent({
     >
       <div className="space-y-6">
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle>Risk Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div>
-                <h3 className="text-sm font-medium text-secondary">
-                  Likelihood
-                </h3>
-                <p className="mt-1 text-lg">
-                  {getLikelihoodLabel(risk.inherentLikelihood!)}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-secondary">Impact</h3>
-                <p className="mt-1 text-lg">
-                  {getImpactLabel(risk.inherentImpact!)}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-secondary">Severity</h3>
-                <p className="mt-1">
-                  <Badge className={severity.class}>{severity.level}</Badge>
-                </p>
-              </div>
-            </div>
-
-            {/* Treatment and Owner section */}
-            <div className="mt-6 border-t pt-4">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div>
-                  <h3 className="text-sm font-medium text-secondary">
-                    Treatment
-                  </h3>
-                  <div className="mt-1 text-lg capitalize flex items-center">
-                    {risk.treatment === "MITIGATED" && (
-                      <Shield className="h-5 w-5 mr-2 text-blue-500" />
-                    )}
-                    {risk.treatment === "TRANSFERRED" && (
-                      <Handshake className="h-5 w-5 mr-2 text-purple-500" />
-                    )}
-                    {risk.treatment === "AVOIDED" && (
-                      <Ban className="h-5 w-5 mr-2 text-red-500" />
-                    )}
-                    {risk.treatment === "ACCEPTED" && (
-                      <ShieldCheck className="h-5 w-5 mr-2 text-green-500" />
-                    )}
-                    <span>
+            <div className="space-y-8">
+              {/* Risk Management Overview */}
+              <div className="flex flex-col md:flex-row gap-5">
+                <div className="flex items-center">
+                  {risk.treatment === "MITIGATED" && (
+                    <Shield className="h-6 w-6 mr-3 text-blue-500" />
+                  )}
+                  {risk.treatment === "TRANSFERRED" && (
+                    <Handshake className="h-6 w-6 mr-3 text-purple-500" />
+                  )}
+                  {risk.treatment === "AVOIDED" && (
+                    <Ban className="h-6 w-6 mr-3 text-red-500" />
+                  )}
+                  {risk.treatment === "ACCEPTED" && (
+                    <ShieldCheck className="h-6 w-6 mr-3 text-green-500" />
+                  )}
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase">
+                      Treatment
+                    </p>
+                    <p className="text-base font-medium capitalize mt-1">
                       {risk.treatment ? risk.treatment.toLowerCase() : "N/A"}
-                    </span>
+                    </p>
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-medium text-secondary">
-                    Risk Owner
-                  </h3>
-                  <div className="mt-1 text-lg flex items-center">
-                    <User className="h-5 w-5 mr-2 text-gray-500" />
-                    <span>
+
+                <div className="flex items-center">
+                  <User className="h-6 w-6 mr-3 text-slate-500" />
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase">
+                      Risk Owner
+                    </p>
+                    <p className="text-base font-medium mt-1 truncate">
                       {risk.owner ? (
                         <Link
                           to={`/organizations/${organizationId}/people/${risk.owner.id}`}
@@ -834,57 +884,127 @@ function ShowRiskViewContent({
                       ) : (
                         "Unassigned"
                       )}
-                    </span>
+                    </p>
                   </div>
                 </div>
-                <div></div>
               </div>
-            </div>
 
-            {/* Residual risk section */}
-            <div className="mt-6 border-t pt-4">
-              <h3 className="text-md font-semibold mb-3">Residual Risk</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div>
-                  <h3 className="text-sm font-medium text-secondary">
-                    Residual Likelihood
-                  </h3>
-                  <p className="mt-1 text-lg">
-                    {getLikelihoodLabel(risk.residualLikelihood!)}
-                  </p>
-                  <p className="text-xs text-secondary mt-1">
-                    {risk.residualLikelihood !== risk.inherentLikelihood
-                      ? `Mitigated`
-                      : "No mitigation"}
-                  </p>
+              {/* Risk Assessment */}
+              <div>
+                <h3 className="text-sm font-medium mb-6">Risk Assessment</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Initial Assessment */}
+                  <div>
+                    <h4 className="text-sm font-medium mb-5 flex items-center">
+                      <span className="w-3 h-3 rounded-full bg-orange-500 mr-2"></span>
+                      Initial Assessment
+                    </h4>
+                    <div className="grid grid-cols-3 gap-6">
+                      <div>
+                        <p className="text-sm text-slate-600 mb-2">
+                          Likelihood
+                        </p>
+                        <div
+                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                          style={
+                            getLikelihoodLabel(risk.inherentLikelihood!).style
+                          }
+                        >
+                          {getLikelihoodLabel(risk.inherentLikelihood!).label}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-600 mb-2">Impact</p>
+                        <div
+                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                          style={getImpactLabel(risk.inherentImpact!).style}
+                        >
+                          {getImpactLabel(risk.inherentImpact!).label}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-600 mb-2">Severity</p>
+                        <div
+                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                          style={severity.style}
+                        >
+                          {severity.level} (
+                          {risk.inherentLikelihood! * risk.inherentImpact!})
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Residual Assessment */}
+                  <div>
+                    <h4 className="text-sm font-medium mb-5 flex items-center">
+                      <span className="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
+                      After Treatment
+                    </h4>
+                    <div className="grid grid-cols-3 gap-6">
+                      <div>
+                        <p className="text-sm text-slate-600 mb-2">
+                          Likelihood
+                        </p>
+                        <div
+                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                          style={
+                            getLikelihoodLabel(risk.residualLikelihood!).style
+                          }
+                        >
+                          {getLikelihoodLabel(risk.residualLikelihood!).label}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-600 mb-2">Impact</p>
+                        <div
+                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                          style={getImpactLabel(risk.residualImpact!).style}
+                        >
+                          {getImpactLabel(risk.residualImpact!).label}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-600 mb-2">Severity</p>
+                        <div
+                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                          style={residualSeverity.style}
+                        >
+                          {residualSeverity.level} (
+                          {risk.residualLikelihood! * risk.residualImpact!})
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-medium text-secondary">
-                    Residual Impact
-                  </h3>
-                  <p className="mt-1 text-lg">
-                    {getImpactLabel(risk.residualImpact!)}
-                  </p>
-                  <p className="text-xs text-secondary mt-1">
-                    {risk.residualImpact !== risk.inherentImpact
-                      ? `Mitigated`
-                      : "No mitigation"}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-secondary">
-                    Residual Severity
-                  </h3>
-                  <p className="mt-1">
-                    <Badge className={residualSeverity.class}>
-                      {residualSeverity.level}
-                    </Badge>
-                  </p>
-                  <p className="text-xs text-secondary mt-1">
-                    {mesures.length} mesure
-                    {mesures.length !== 1 ? "s" : ""} applied
-                  </p>
-                </div>
+
+                {/* Risk Reduction Summary */}
+                {(risk.inherentLikelihood !== risk.residualLikelihood ||
+                  risk.inherentImpact !== risk.residualImpact) && (
+                  <div className="mt-6 text-center pt-4 border-t">
+                    <p className="text-sm text-slate-600">
+                      Risk severity reduced from{" "}
+                      <span className="font-semibold">
+                        {severity.level} (
+                        {risk.inherentLikelihood! * risk.inherentImpact!})
+                      </span>{" "}
+                      to{" "}
+                      <span className="font-semibold">
+                        {residualSeverity.level} (
+                        {risk.residualLikelihood! * risk.residualImpact!})
+                      </span>
+                      {risk.treatment === "MITIGATED" &&
+                        risk.mesures?.edges &&
+                        risk.mesures.edges.length > 0 &&
+                        ` with ${risk.mesures.edges.length} ${
+                          risk.mesures.edges.length === 1
+                            ? "measure"
+                            : "measures"
+                        }`}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
@@ -910,7 +1030,7 @@ function ShowRiskViewContent({
                 Link Mesure
               </Button>
             </div>
-            {risk.mesures?.edges?.length && risk.mesures?.edges?.length > 0 ? (
+            {risk.mesures?.edges && risk.mesures.edges.length > 0 ? (
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>

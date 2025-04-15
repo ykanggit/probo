@@ -152,10 +152,10 @@ type CreateRiskInput struct {
 	Description        string                 `json:"description"`
 	OwnerID            *gid.GID               `json:"ownerId,omitempty"`
 	Treatment          coredata.RiskTreatment `json:"treatment"`
-	InherentLikelihood float64                `json:"inherentLikelihood"`
-	InherentImpact     float64                `json:"inherentImpact"`
-	ResidualLikelihood *float64               `json:"residualLikelihood,omitempty"`
-	ResidualImpact     *float64               `json:"residualImpact,omitempty"`
+	InherentLikelihood int                    `json:"inherentLikelihood"`
+	InherentImpact     int                    `json:"inherentImpact"`
+	ResidualLikelihood *int                   `json:"residualLikelihood,omitempty"`
+	ResidualImpact     *int                   `json:"residualImpact,omitempty"`
 }
 
 type CreateRiskMesureMappingInput struct {
@@ -562,12 +562,12 @@ type Risk struct {
 	Name               string                 `json:"name"`
 	Description        string                 `json:"description"`
 	Treatment          coredata.RiskTreatment `json:"treatment"`
-	InherentLikelihood float64                `json:"inherentLikelihood"`
-	InherentImpact     float64                `json:"inherentImpact"`
-	InherentSeverity   float64                `json:"inherentSeverity"`
-	ResidualLikelihood float64                `json:"residualLikelihood"`
-	ResidualImpact     float64                `json:"residualImpact"`
-	ResidualSeverity   float64                `json:"residualSeverity"`
+	InherentLikelihood int                    `json:"inherentLikelihood"`
+	InherentImpact     int                    `json:"inherentImpact"`
+	InherentSeverity   int                    `json:"inherentSeverity"`
+	ResidualLikelihood int                    `json:"residualLikelihood"`
+	ResidualImpact     int                    `json:"residualImpact"`
+	ResidualSeverity   int                    `json:"residualSeverity"`
 	Owner              *People                `json:"owner,omitempty"`
 	Mesures            *MesureConnection      `json:"mesures"`
 	Policies           *PolicyConnection      `json:"policies"`
@@ -691,10 +691,10 @@ type UpdateRiskInput struct {
 	Description        *string                 `json:"description,omitempty"`
 	OwnerID            *gid.GID                `json:"ownerId,omitempty"`
 	Treatment          *coredata.RiskTreatment `json:"treatment,omitempty"`
-	InherentLikelihood *float64                `json:"inherentLikelihood,omitempty"`
-	InherentImpact     *float64                `json:"inherentImpact,omitempty"`
-	ResidualLikelihood *float64                `json:"residualLikelihood,omitempty"`
-	ResidualImpact     *float64                `json:"residualImpact,omitempty"`
+	InherentLikelihood *int                    `json:"inherentLikelihood,omitempty"`
+	InherentImpact     *int                    `json:"inherentImpact,omitempty"`
+	ResidualLikelihood *int                    `json:"residualLikelihood,omitempty"`
+	ResidualImpact     *int                    `json:"residualImpact,omitempty"`
 }
 
 type UpdateRiskPayload struct {
