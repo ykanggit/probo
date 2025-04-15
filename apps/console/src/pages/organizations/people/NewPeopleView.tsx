@@ -94,7 +94,7 @@ function NewPeopleViewContent() {
         connections: [
           ConnectionHandler.getConnectionID(
             organizationId!,
-            "PeopleListPage_peoples",
+            "PeopleListView_peoples",
             {
               orderBy: {
                 direction: "ASC",
@@ -114,7 +114,7 @@ function NewPeopleViewContent() {
           ),
           ConnectionHandler.getConnectionID(
             organizationId!,
-            "ControlOverviewPage_peoples",
+            "MesureView_peoples",
             {
               orderBy: {
                 direction: "ASC",
