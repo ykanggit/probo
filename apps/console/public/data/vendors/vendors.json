@@ -697,10 +697,7 @@
     "websiteUrl": "https://www.jsdelivr.com",
     "description": "jsDelivr is a free, open-source Content Delivery Network (CDN) for open-source files, providing fast and reliable delivery of JavaScript libraries and other web assets.",
     "category": "Content Delivery Network (CDN)",
-    "certifications": [
-        "GDPR",
-        "CCPA"
-    ],
+    "certifications": ["GDPR", "CCPA"],
     "securityPageUrl": "https://www.jsdelivr.com/documents/security-policy.pdf",
     "privacyPolicyUrl": "https://www.jsdelivr.com/terms/privacy-policy",
     "termsOfServiceUrl": "https://www.jsdelivr.com/terms",
@@ -715,10 +712,7 @@
     "websiteUrl": "https://www.npmjs.com",
     "description": "npm is the world's largest software registry, providing a platform for JavaScript developers to share and manage packages for Node.js and frontend projects.",
     "category": "Package Management / Code Hosting",
-    "certifications": [
-      "GDPR",
-      "CCPA"
-    ],
+    "certifications": ["GDPR", "CCPA"],
     "securityPageUrl": "https://docs.npmjs.com/policies/security/",
     "privacyPolicyUrl": "https://www.npmjs.com/policies/privacy",
     "termsOfServiceUrl": "https://www.npmjs.com/policies/terms",
@@ -731,12 +725,7 @@
     "websiteUrl": "https://clerk.com",
     "description": "Clerk provides a comprehensive suite of embeddable UIs, flexible APIs, and admin dashboards to authenticate and manage users.",
     "category": "Authentication and User Management",
-    "certifications": [
-      "SOC 2 Type 2",
-      "HIPAA",
-      "GDPR",
-      "CCPA"
-    ],
+    "certifications": ["SOC 2 Type 2", "HIPAA", "GDPR", "CCPA"],
     "securityPageUrl": "https://clerk.com/docs/security/overview",
     "privacyPolicyUrl": "https://clerk.com/legal/privacy",
     "termsOfServiceUrl": "https://clerk.com/legal/terms",
@@ -751,11 +740,7 @@
     "websiteUrl": "https://plausible.io/",
     "description": "Open-source, privacy-focused web analytics platform that provides simple and lightweight tracking without cookies.",
     "category": "Platform and user analytics",
-    "certifications": [
-      "GDPR", 
-      "CCPA", 
-      "PECR"
-    ],
+    "certifications": ["GDPR", "CCPA", "PECR"],
     "securityPageUrl": "https://plausible.io/security",
     "privacyPolicyUrl": "https://plausible.io/privacy",
     "termsOfServiceUrl": "https://plausible.io/terms",
@@ -770,9 +755,7 @@
     "websiteUrl": "https://www.latitude.sh",
     "description": "Latitude.sh provides global bare metal cloud infrastructure, enabling developers to deploy and manage physical servers with low latency and high automation.",
     "category": "Bare Metal Cloud Infrastructure",
-    "certifications": [ 
-      "CCPA"
-    ],
+    "certifications": ["CCPA"],
     "securityPageUrl": "https://www.latitude.sh/legal/security",
     "privacyPolicyUrl": "https://www.latitude.sh/legal/privacy",
     "termsOfServiceUrl": "https://www.latitude.sh/legal/terms",
@@ -786,15 +769,36 @@
     "websiteUrl": "https://www.together.ai",
     "description": "Together AI provides a full-stack cloud platform for developers to train, fine-tune, and deploy open-source generative AI models with high-performance infrastructure.",
     "category": "AI Infrastructure / Model Hosting",
-    "certifications": [
-      "SOC 2 Type 1",
-      "HIPAA",
-      "GDPR",
-      "CCPA"
-    ],
+    "certifications": ["SOC 2 Type 1", "HIPAA", "GDPR", "CCPA"],
     "privacyPolicyUrl": "https://www.together.ai/privacy",
     "termsOfServiceUrl": "https://www.together.ai/terms-of-service",
     "trustPageUrl": "https://trust.together.ai",
     "statusPageUrl": "https://status.together.ai/"
+  },
+  {
+    "name": "Mercury",
+    "legalName": "Mercury Technologies Inc.",
+    "headquarterAddress": "660 Mission Street, San Francisco, CA 94103, United States",
+    "websiteUrl": "https://www.mercury.com",
+    "description": "Fintech company that provides banking services to early stage start-up companies. The company is not a bank, but works with banking service providers to provide bank accounts and other financial services.",
+    "category": "Banking Services",
+    "certifications": ["SOC 2 Type 1", "SOC 2 Type 2", "PCI DSS"],
+    "securityPageUrl": "https://mercury.com/security",
+    "privacyPolicyUrl": "https://www.datocms-assets.com/115132/1741892788-v5-mercury-privacy-policy-2025-03-13.pdf",
+    "termsOfServiceUrl": "https://www.datocms-assets.com/115132/1741383503-v7-mercury-terms-of-use-2025-03-07.pdf",
+    "statusPageUrl": "https://status.mercury.com/",
+    "trustPageUrl": "https://trust.mercury.com/"
+  },
+  {
+    "name": "Signal",
+    "legalName": "Signal Messenger LLC",
+    "headquarterAddress": "650 Castro St 120 223Mountain View, CA 94041, United States",
+    "websiteUrl": "https://signal.org",
+    "description": "Signal is a secure messaging app that provides end-to-end encryption for text, voice, and video communications.",
+    "category": "Messaging",
+    "securityPageUrl": "https://signal.org/security",
+    "privacyPolicyUrl": "https://signal.org/legal/#privacy-policy",
+    "termsOfServiceUrl": "https://signal.org/legal/#terms-of-service",
+    "statusPageUrl": "https://status.signal.org/"
   }
 ]
