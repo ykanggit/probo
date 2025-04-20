@@ -178,7 +178,9 @@ func (impl *Implm) Run(
 
 	defaultConnectorRegistry := connector.NewConnectorRegistry()
 	for _, connector := range impl.cfg.Connectors {
-		defaultConnectorRegistry.Register(connector.Name, connector.Config)
+		if err := defaultConnectorRegistry.Register(connector.Name, connector.Config); err != nil {
+			return fmt.Errorf("cannot register connector: %w", err)
+		}
 	}
 
 	usrmgrService, err := usrmgr.NewService(

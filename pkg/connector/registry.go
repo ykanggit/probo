@@ -34,10 +34,14 @@ func NewConnectorRegistry() *ConnectorRegistry {
 	}
 }
 
-func (cr *ConnectorRegistry) Register(connectorID string, connector Connector) {
+func (cr *ConnectorRegistry) Register(connectorID string, connector Connector) error {
 	cr.Lock()
 	defer cr.Unlock()
+	if _, ok := cr.connectors[connectorID]; ok {
+		return fmt.Errorf("connector %q already registered", connectorID)
+	}
 	cr.connectors[connectorID] = connector
+	return nil
 }
 
 func (cr *ConnectorRegistry) Get(connectorID string) (Connector, error) {
