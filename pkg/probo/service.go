@@ -49,6 +49,7 @@ type (
 		Controls                *ControlService
 		Risks                   *RiskService
 		VendorComplianceReports *VendorComplianceReportService
+		Connectors              *ConnectorService
 	}
 )
 
@@ -90,5 +91,6 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.Controls = &ControlService{svc: tenantService}
 	tenantService.Risks = &RiskService{svc: tenantService}
 	tenantService.VendorComplianceReports = &VendorComplianceReportService{svc: tenantService}
+	tenantService.Connectors = &ConnectorService{svc: tenantService}
 	return tenantService
 }

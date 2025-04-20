@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/server/api"
 	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
@@ -29,10 +30,11 @@ import (
 
 // Config holds the configuration for the server
 type Config struct {
-	AllowedOrigins []string
-	Probo          *probo.Service
-	Usrmgr         *usrmgr.Service
-	Auth           console_v1.AuthConfig
+	AllowedOrigins    []string
+	Probo             *probo.Service
+	Usrmgr            *usrmgr.Service
+	Auth              console_v1.AuthConfig
+	ConnectorRegistry *connector.ConnectorRegistry
 }
 
 // Server represents the main server that handles both API and frontend requests
@@ -46,10 +48,11 @@ type Server struct {
 func NewServer(cfg Config) (*Server, error) {
 	// Create API server
 	apiCfg := api.Config{
-		AllowedOrigins: cfg.AllowedOrigins,
-		Probo:          cfg.Probo,
-		Usrmgr:         cfg.Usrmgr,
-		Auth:           cfg.Auth,
+		AllowedOrigins:    cfg.AllowedOrigins,
+		Probo:             cfg.Probo,
+		Usrmgr:            cfg.Usrmgr,
+		Auth:              cfg.Auth,
+		ConnectorRegistry: cfg.ConnectorRegistry,
 	}
 	apiServer, err := api.NewServer(apiCfg)
 	if err != nil {

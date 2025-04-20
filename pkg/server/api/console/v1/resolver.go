@@ -28,6 +28,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo"
@@ -72,7 +73,7 @@ func UserFromContext(ctx context.Context) *coredata.User {
 	return user
 }
 
-func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig) *chi.Mux {
+func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig, connectorRegistry *connector.ConnectorRegistry) *chi.Mux {
 	r := chi.NewMux()
 
 	r.Post("/auth/register", SignUpHandler(usrmgrSvc, authCfg))
@@ -81,6 +82,63 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 	r.Post("/auth/invitation", InvitationConfirmationHandler(usrmgrSvc, authCfg))
 	r.Post("/auth/forget-password", ForgetPasswordHandler(usrmgrSvc, authCfg))
 	r.Post("/auth/reset-password", ResetPasswordHandler(usrmgrSvc, authCfg))
+
+	r.Get("/connectors/initiate", WithSession(usrmgrSvc, authCfg, func(w http.ResponseWriter, r *http.Request) {
+		session := SessionFromContext(r.Context())
+		if session == nil {
+			panic(fmt.Errorf("session not found"))
+		}
+
+		// TODO: check if current user has access to the organization
+
+		connectorID := r.URL.Query().Get("connector_id")
+		organizationID := r.URL.Query().Get("organization_id")
+
+		redirectURL, err := connectorRegistry.Initiate(r.Context(), connectorID, organizationID, r)
+		if err != nil {
+			panic(fmt.Errorf("cannot initiate connector: %w", err))
+		}
+
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+	}))
+
+	r.Get("/connectors/complete", WithSession(usrmgrSvc, authCfg, func(w http.ResponseWriter, r *http.Request) {
+		session := SessionFromContext(r.Context())
+		if session == nil {
+			panic(fmt.Errorf("session not found"))
+		}
+
+		// TODO: check if current user has access to the organization
+
+		connectorID := r.URL.Query().Get("connector_id")
+		organizationIDString := r.URL.Query().Get("organization_id")
+
+		connection, err := connectorRegistry.Complete(r.Context(), connectorID, organizationIDString, r)
+		if err != nil {
+			panic(fmt.Errorf("failed to complete connector: %w", err))
+		}
+
+		organizationID, err := gid.ParseGID(organizationIDString)
+		if err != nil {
+			panic(fmt.Errorf("failed to parse organization id: %w", err))
+		}
+
+		tenantID := session.ID.TenantID()
+		_, err = proboSvc.WithTenant(tenantID).Connectors.CreateOrUpdate(
+			r.Context(),
+			probo.CreateOrUpdateConnectorRequest{
+				OrganizationID: organizationID,
+				Name:           connectorID,
+				Type:           string(connection.Type()),
+				Connection:     connection,
+			},
+		)
+		if err != nil {
+			panic(fmt.Errorf("failed to create or update connector: %w", err))
+		}
+
+		http.Redirect(w, r, "/foo", http.StatusSeeOther)
+	}))
 
 	r.Get("/", playground.Handler("GraphQL", "/api/console/v1/query"))
 	r.Post("/query", graphqlHandler(proboSvc, usrmgrSvc, authCfg))
@@ -139,13 +197,25 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		},
 	)
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return WithSession(usrmgrSvc, authCfg, func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
 		// Hack to capture the panic value, because gqlgen execute resolver in a different goroutine.
 		// And I want use the go.gearno.de/kit/httpserver built in panic recovery.
 		var panicValue any
 		ctx = context.WithValue(ctx, panicValueContextKey, &panicValue)
+
+		srv.ServeHTTP(w, r.WithContext(ctx))
+
+		if panicValue != nil {
+			panic(panicValue)
+		}
+	})
+}
+
+func WithSession(usrmgrSvc *usrmgr.Service, authCfg AuthConfig, next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
 
 		cookieValue, err := securecookie.Get(r, securecookie.DefaultConfig(
 			authCfg.CookieName,
@@ -156,7 +226,7 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 				panic(fmt.Errorf("failed to get session: %w", err))
 			}
 
-			srv.ServeHTTP(w, r)
+			next(w, r)
 			return
 		}
 
@@ -167,7 +237,7 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 				authCfg.CookieSecret,
 			))
 
-			srv.ServeHTTP(w, r)
+			next(w, r)
 			return
 		}
 
@@ -178,7 +248,7 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 				authCfg.CookieSecret,
 			))
 
-			srv.ServeHTTP(w, r)
+			next(w, r)
 			return
 		}
 
@@ -189,7 +259,7 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 				authCfg.CookieSecret,
 			))
 
-			srv.ServeHTTP(w, r)
+			next(w, r)
 			return
 		}
 
@@ -202,16 +272,12 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		ctx = context.WithValue(ctx, userContextKey, user)
 		ctx = context.WithValue(ctx, userTenantContextKey, &tenantIDs)
 
-		srv.ServeHTTP(w, r.WithContext(ctx))
+		next(w, r.WithContext(ctx))
 
-		if panicValue != nil {
-			panic(panicValue)
-		}
-
-		if err := usrmgrSvc.UpdateSession(r.Context(), session); err != nil {
+		// Update session after the handler completes
+		if err := usrmgrSvc.UpdateSession(ctx, session); err != nil {
 			panic(fmt.Errorf("failed to update session: %w", err))
 		}
-
 	}
 }
 

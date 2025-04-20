@@ -18,6 +18,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/probo"
 	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
 	"github.com/getprobo/probo/pkg/usrmgr"
@@ -28,10 +29,11 @@ import (
 
 type (
 	Config struct {
-		AllowedOrigins []string
-		Probo          *probo.Service
-		Usrmgr         *usrmgr.Service
-		Auth           console_v1.AuthConfig
+		AllowedOrigins    []string
+		Probo             *probo.Service
+		Usrmgr            *usrmgr.Service
+		Auth              console_v1.AuthConfig
+		ConnectorRegistry *connector.ConnectorRegistry
 	}
 
 	Server struct {
@@ -101,7 +103,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.Use(cors.Handler(corsOpts))
 
 	// Mount the console API with authentication
-	router.Mount("/console/v1", console_v1.NewMux(s.cfg.Probo, s.cfg.Usrmgr, s.cfg.Auth))
+	router.Mount("/console/v1", console_v1.NewMux(s.cfg.Probo, s.cfg.Usrmgr, s.cfg.Auth, s.cfg.ConnectorRegistry))
 
 	router.ServeHTTP(w, r)
 }
