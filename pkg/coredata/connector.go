@@ -71,6 +71,7 @@ VALUES (
 ON CONFLICT (organization_id, name) DO UPDATE SET
     tenant_id = @tenant_id,
     organization_id = @organization_id,
+    type = @type,
     encrypted_connection = @encrypted_connection,
     updated_at = @updated_at
 RETURNING
