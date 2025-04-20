@@ -42,27 +42,17 @@ const (
 	ProtocolOAuth2 ProtocolType = "oauth2"
 )
 
-func UnmarshalConnection(data []byte) (Connection, error) {
-	var typeContainer struct {
-		Type string `json:"type"`
-	}
+func UnmarshalConnection(prtcl ProtocolType, data []byte) (Connection, error) {
 
-	if err := json.Unmarshal(data, &typeContainer); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal connection type: %w", err)
-	}
-
-	var conn Connection
-
-	switch ProtocolType(typeContainer.Type) {
+	switch prtcl {
 	case ProtocolOAuth2:
-		conn = &OAuth2Connection{}
-	default:
-		return nil, fmt.Errorf("unknown connection type: %s", typeContainer.Type)
+		var conn OAuth2Connection
+		if err := json.Unmarshal(data, &conn); err != nil {
+			return nil, fmt.Errorf("cannot unmarshal oauth2 connection: %w", err)
+		}
+
+		return &conn, nil
 	}
 
-	if err := conn.UnmarshalJSON(data); err != nil {
-		return nil, err
-	}
-
-	return conn, nil
+	return nil, fmt.Errorf("unknown connection type: %s", prtcl)
 }

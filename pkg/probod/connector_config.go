@@ -23,26 +23,26 @@ import (
 
 type (
 	connectorConfig struct {
-		Name   string              `json:"name"`
-		Type   string              `json:"type"`
-		Config connector.Connector `json:"-"`
+		Name   string                 `json:"name"`
+		Type   connector.ProtocolType `json:"type"`
+		Config connector.Connector    `json:"-"`
 	}
 
-	connectorOAuth2Config struct {
+	connectorConfigOAuth2 struct {
 		ClientID     string   `json:"client-id"`
 		ClientSecret string   `json:"client-secret"`
 		RedirectURI  string   `json:"redirect-uri"`
-		Scopes       []string `json:"scopes"`
 		AuthURL      string   `json:"auth-url"`
 		TokenURL     string   `json:"token-url"`
+		Scopes       []string `json:"scopes"`
 	}
 )
 
 func (c *connectorConfig) UnmarshalJSON(data []byte) error {
 	var tmp struct {
-		Name      string          `json:"name"`
-		Type      string          `json:"type"`
-		RawConfig json.RawMessage `json:"config"`
+		Name      string                 `json:"name"`
+		Type      connector.ProtocolType `json:"type"`
+		RawConfig json.RawMessage        `json:"config"`
 	}
 
 	if err := json.Unmarshal(data, &tmp); err != nil {
@@ -53,26 +53,24 @@ func (c *connectorConfig) UnmarshalJSON(data []byte) error {
 	c.Type = tmp.Type
 
 	switch tmp.Type {
-	case "oauth2":
-		var cfg connectorOAuth2Config
-		if err := json.Unmarshal(tmp.RawConfig, &cfg); err != nil {
-			return fmt.Errorf("cannot unmarshal oauth2 config: %w", err)
+	case connector.ProtocolOAuth2:
+		var config connectorConfigOAuth2
+		if err := json.Unmarshal(tmp.RawConfig, &config); err != nil {
+			return fmt.Errorf("cannot unmarshal oauth2 connector config: %w", err)
 		}
 
-		if cfg.ClientID == "" || cfg.ClientSecret == "" || cfg.AuthURL == "" || cfg.TokenURL == "" || cfg.RedirectURI == "" {
-			return fmt.Errorf("oauth2 config: client-id, client-secret, auth-url, token-url and redirect-uri are required")
+		oauth2Connector := connector.OAuth2Connector{
+			ClientID:     config.ClientID,
+			ClientSecret: config.ClientSecret,
+			RedirectURI:  config.RedirectURI,
+			AuthURL:      config.AuthURL,
+			TokenURL:     config.TokenURL,
+			Scopes:       config.Scopes,
 		}
 
-		c.Config = &connector.OAuth2Connector{
-			ClientID:     cfg.ClientID,
-			ClientSecret: cfg.ClientSecret,
-			RedirectURI:  cfg.RedirectURI,
-			Scopes:       cfg.Scopes,
-			AuthURL:      cfg.AuthURL,
-			TokenURL:     cfg.TokenURL,
-		}
+		c.Config = &oauth2Connector
 	default:
-		return fmt.Errorf("unknown %q connector type: %s", tmp.Name, tmp.Type)
+		return fmt.Errorf("unknown connector type: %q", tmp.Type)
 	}
 
 	return nil

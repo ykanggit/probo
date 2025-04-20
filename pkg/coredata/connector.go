@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/getprobo/probo/pkg/connector"
+	"github.com/getprobo/probo/pkg/crypto/cipher"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/jackc/pgx/v5"
 	"go.gearno.de/kit/pg"
@@ -28,14 +29,14 @@ import (
 
 type (
 	Connector struct {
-		ID             gid.GID              `db:"id"`
-		OrganizationID gid.GID              `db:"organization_id"`
-		Name           string               `db:"name"`
-		Type           string               `db:"type"`
-		Connection     connector.Connection `db:"-"`
-		RawConfig      json.RawMessage      `db:"connection"`
-		CreatedAt      time.Time            `db:"created_at"`
-		UpdatedAt      time.Time            `db:"updated_at"`
+		ID                  gid.GID                `db:"id"`
+		OrganizationID      gid.GID                `db:"organization_id"`
+		Name                string                 `db:"name"`
+		Type                connector.ProtocolType `db:"type"`
+		Connection          connector.Connection   `db:"-"`
+		EncryptedConnection []byte                 `db:"encrypted_connection"`
+		CreatedAt           time.Time              `db:"created_at"`
+		UpdatedAt           time.Time              `db:"updated_at"`
 	}
 )
 
@@ -43,6 +44,7 @@ func (c *Connector) Upsert(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
+	encryptionKey cipher.EncryptionKey,
 ) error {
 	q := `
 INSERT INTO
@@ -52,7 +54,7 @@ INSERT INTO
         organization_id,
         name,
         type,
-        connection,
+        encrypted_connection,
         created_at,
         updated_at
     )
@@ -62,37 +64,47 @@ VALUES (
     @organization_id,
     @name,
     @type,
-    @connection,
+    @encrypted_connection,
     @created_at,
     @updated_at
 )
 ON CONFLICT (organization_id, name) DO UPDATE SET
     tenant_id = @tenant_id,
     organization_id = @organization_id,
-    connection = @connection,
+    encrypted_connection = @encrypted_connection,
     updated_at = @updated_at
 RETURNING
     id,
     organization_id,
     name,
     type,
-    connection,
+    encrypted_connection,
 	created_at,
 	updated_at
 `
+
+	connection, err := json.Marshal(c.Connection)
+	if err != nil {
+		return fmt.Errorf("cannot marshal connection: %w", err)
+	}
+
+	encryptedConnection, err := cipher.Encrypt(connection, encryptionKey)
+	if err != nil {
+		return fmt.Errorf("cannot encrypt connection: %w", err)
+	}
 
 	rows, err := conn.Query(
 		ctx,
 		q,
 		pgx.StrictNamedArgs{
-			"id":              c.ID,
-			"tenant_id":       scope.GetTenantID(),
-			"organization_id": c.OrganizationID,
-			"name":            c.Name,
-			"type":            c.Type,
-			"connection":      c.Connection,
-			"created_at":      c.CreatedAt,
-			"updated_at":      c.UpdatedAt,
+			"id":                   c.ID,
+			"tenant_id":            scope.GetTenantID(),
+			"organization_id":      c.OrganizationID,
+			"name":                 c.Name,
+			"type":                 c.Type,
+			"encrypted_connection": encryptedConnection,
+			"created_at":           c.CreatedAt,
+			"updated_at":           c.UpdatedAt,
 		},
 	)
 	if err != nil {
@@ -103,6 +115,16 @@ RETURNING
 	cnnctr, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Connector])
 	if err != nil {
 		return fmt.Errorf("cannot collect connectors: %w", err)
+	}
+
+	decryptedConnection, err := cipher.Decrypt(cnnctr.EncryptedConnection, encryptionKey)
+	if err != nil {
+		return fmt.Errorf("cannot decrypt connection: %w", err)
+	}
+
+	cnnctr.Connection, err = connector.UnmarshalConnection(cnnctr.Type, decryptedConnection)
+	if err != nil {
+		return fmt.Errorf("cannot unmarshal connection: %w", err)
 	}
 
 	*c = cnnctr

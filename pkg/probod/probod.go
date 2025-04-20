@@ -27,6 +27,7 @@ import (
 	"github.com/getprobo/probo/pkg/awsconfig"
 	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/crypto/cipher"
 	"github.com/getprobo/probo/pkg/crypto/passwdhash"
 	"github.com/getprobo/probo/pkg/mailer"
 	"github.com/getprobo/probo/pkg/probo"
@@ -49,13 +50,14 @@ type (
 	}
 
 	config struct {
-		Hostname   string            `json:"hostname"`
-		Pg         pgConfig          `json:"pg"`
-		Api        apiConfig         `json:"api"`
-		Auth       authConfig        `json:"auth"`
-		AWS        awsConfig         `json:"aws"`
-		Mailer     mailerConfig      `json:"mailer"`
-		Connectors []connectorConfig `json:"connectors"`
+		Hostname      string               `json:"hostname"`
+		EncryptionKey cipher.EncryptionKey `json:"encryption-key"`
+		Pg            pgConfig             `json:"pg"`
+		Api           apiConfig            `json:"api"`
+		Auth          authConfig           `json:"auth"`
+		AWS           awsConfig            `json:"aws"`
+		Mailer        mailerConfig         `json:"mailer"`
+		Connectors    []connectorConfig    `json:"connectors"`
 	}
 )
 
@@ -142,7 +144,6 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot get pepper bytes: %w", err)
 	}
 
-	// Validate cookie secret
 	_, err = impl.cfg.Auth.GetCookieSecretBytes()
 	if err != nil {
 		rootSpan.RecordError(err)
@@ -195,7 +196,7 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot create usrmgr service: %w", err)
 	}
 
-	proboService, err := probo.NewService(ctx, pgClient, s3Client, impl.cfg.AWS.Bucket)
+	proboService, err := probo.NewService(ctx, impl.cfg.EncryptionKey, pgClient, s3Client, impl.cfg.AWS.Bucket)
 	if err != nil {
 		return fmt.Errorf("cannot create probo service: %w", err)
 	}

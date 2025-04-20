@@ -33,7 +33,7 @@ type (
 	CreateOrUpdateConnectorRequest struct {
 		OrganizationID gid.GID
 		Name           string
-		Type           string
+		Type           connector.ProtocolType
 		Connection     connector.Connection
 	}
 )
@@ -75,7 +75,7 @@ func (s *ConnectorService) CreateOrUpdate(ctx context.Context, req CreateOrUpdat
 	err = s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			if err := connector.Upsert(ctx, conn, s.svc.scope); err != nil {
+			if err := connector.Upsert(ctx, conn, s.svc.scope, s.svc.encryptionKey); err != nil {
 				return fmt.Errorf("cannot upsert connector: %w", err)
 			}
 

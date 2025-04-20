@@ -20,23 +20,25 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/crypto/cipher"
 	"github.com/getprobo/probo/pkg/gid"
 	"go.gearno.de/kit/pg"
 )
 
 type (
 	Service struct {
-		pg     *pg.Client
-		s3     *s3.Client
-		bucket string
+		pg            *pg.Client
+		s3            *s3.Client
+		bucket        string
+		encryptionKey cipher.EncryptionKey
 	}
 
 	TenantService struct {
-		pg     *pg.Client
-		s3     *s3.Client
-		bucket string
-
-		scope coredata.Scoper
+		pg            *pg.Client
+		s3            *s3.Client
+		bucket        string
+		encryptionKey cipher.EncryptionKey
+		scope         coredata.Scoper
 
 		Frameworks              *FrameworkService
 		Mesures                 *MesureService
@@ -55,6 +57,7 @@ type (
 
 func NewService(
 	ctx context.Context,
+	encryptionKey cipher.EncryptionKey,
 	pgClient *pg.Client,
 	s3Client *s3.Client,
 	bucket string,
@@ -64,9 +67,10 @@ func NewService(
 	}
 
 	svc := &Service{
-		pg:     pgClient,
-		s3:     s3Client,
-		bucket: bucket,
+		pg:            pgClient,
+		s3:            s3Client,
+		bucket:        bucket,
+		encryptionKey: encryptionKey,
 	}
 
 	return svc, nil
@@ -74,10 +78,11 @@ func NewService(
 
 func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService := &TenantService{
-		pg:     s.pg,
-		s3:     s.s3,
-		bucket: s.bucket,
-		scope:  coredata.NewScope(tenantID),
+		pg:            s.pg,
+		s3:            s.s3,
+		bucket:        s.bucket,
+		encryptionKey: s.encryptionKey,
+		scope:         coredata.NewScope(tenantID),
 	}
 
 	tenantService.Frameworks = &FrameworkService{svc: tenantService}

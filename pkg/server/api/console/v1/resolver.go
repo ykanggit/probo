@@ -129,7 +129,7 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 			probo.CreateOrUpdateConnectorRequest{
 				OrganizationID: organizationID,
 				Name:           connectorID,
-				Type:           string(connection.Type()),
+				Type:           connector.ProtocolType(connection.Type()),
 				Connection:     connection,
 			},
 		)
