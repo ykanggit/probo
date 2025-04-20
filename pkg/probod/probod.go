@@ -25,6 +25,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/awsconfig"
+	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/crypto/passwdhash"
 	"github.com/getprobo/probo/pkg/mailer"
@@ -48,12 +49,13 @@ type (
 	}
 
 	config struct {
-		Hostname string       `json:"hostname"`
-		Pg       pgConfig     `json:"pg"`
-		Api      apiConfig    `json:"api"`
-		Auth     authConfig   `json:"auth"`
-		AWS      awsConfig    `json:"aws"`
-		Mailer   mailerConfig `json:"mailer"`
+		Hostname   string            `json:"hostname"`
+		Pg         pgConfig          `json:"pg"`
+		Api        apiConfig         `json:"api"`
+		Auth       authConfig        `json:"auth"`
+		AWS        awsConfig         `json:"aws"`
+		Mailer     mailerConfig      `json:"mailer"`
+		Connectors []connectorConfig `json:"connectors"`
 	}
 )
 
@@ -174,6 +176,11 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot create hashing profile: %w", err)
 	}
 
+	defaultConnectorRegistry := connector.NewConnectorRegistry()
+	for _, connector := range impl.cfg.Connectors {
+		defaultConnectorRegistry.Register(connector.Name, connector.Config)
+	}
+
 	usrmgrService, err := usrmgr.NewService(
 		ctx,
 		pgClient,
@@ -193,9 +200,10 @@ func (impl *Implm) Run(
 
 	serverHandler, err := server.NewServer(
 		server.Config{
-			AllowedOrigins: impl.cfg.Api.Cors.AllowedOrigins,
-			Probo:          proboService,
-			Usrmgr:         usrmgrService,
+			AllowedOrigins:    impl.cfg.Api.Cors.AllowedOrigins,
+			Probo:             proboService,
+			Usrmgr:            usrmgrService,
+			ConnectorRegistry: defaultConnectorRegistry,
 			Auth: console_v1.AuthConfig{
 				CookieName:      impl.cfg.Auth.Cookie.Name,
 				CookieDomain:    impl.cfg.Auth.Cookie.Domain,
