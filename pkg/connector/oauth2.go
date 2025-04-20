@@ -26,6 +26,13 @@ import (
 	"github.com/getprobo/probo/pkg/statelesstoken"
 )
 
+// NOTE: I use client_secret as a salt for the state token, it's an antipattern to
+// avoid having add configuration key for now. In the future, we should use a random
+// string as a salt. It does not compromise security, because the client_secret is
+// private to the connector and not exposed to the client but using the same secret for
+// two different connectors may not expected by other developers and can lead to confusion
+// and bugs.
+
 type (
 	OAuth2Connector struct {
 		ClientID     string
@@ -60,7 +67,7 @@ var (
 
 func (c *OAuth2Connector) Initiate(ctx context.Context, connectorID string, organizationID string, r *http.Request) (string, error) {
 	stateData := OAuth2State{OrganizationID: organizationID, ConnectorID: connectorID}
-	state, err := statelesstoken.NewToken("", OAuth2TokenType, OAuth2TokenTTL, stateData)
+	state, err := statelesstoken.NewToken(c.ClientSecret, OAuth2TokenType, OAuth2TokenTTL, stateData)
 	if err != nil {
 		return "", fmt.Errorf("cannot create state token: %w", err)
 	}
@@ -104,7 +111,7 @@ func (c *OAuth2Connector) Complete(ctx context.Context, connectorID string, orga
 		return nil, fmt.Errorf("no state in request")
 	}
 
-	payload, err := statelesstoken.ValidateToken[OAuth2State]("", OAuth2TokenType, state)
+	payload, err := statelesstoken.ValidateToken[OAuth2State](c.ClientSecret, OAuth2TokenType, state)
 	if err != nil {
 		return nil, fmt.Errorf("cannot validate state token: %w", err)
 	}
