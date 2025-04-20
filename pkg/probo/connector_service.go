@@ -39,6 +39,22 @@ type (
 )
 
 func (s *ConnectorService) CreateOrUpdate(ctx context.Context, req CreateOrUpdateConnectorRequest) (*coredata.Connector, error) {
+	if req.OrganizationID == gid.Nil {
+		return nil, fmt.Errorf("organization ID is required")
+	}
+
+	if req.Name == "" {
+		return nil, fmt.Errorf("connector name is required")
+	}
+
+	if req.Type == "" {
+		return nil, fmt.Errorf("connector type is required")
+	}
+
+	if req.Connection == nil {
+		return nil, fmt.Errorf("connection configuration is required")
+	}
+
 	connectorID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.ConnectorEntityType)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create connector global id: %w", err)
