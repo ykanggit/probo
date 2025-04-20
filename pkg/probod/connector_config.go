@@ -59,6 +59,10 @@ func (c *connectorConfig) UnmarshalJSON(data []byte) error {
 			return fmt.Errorf("cannot unmarshal oauth2 config: %w", err)
 		}
 
+		if cfg.ClientID == "" || cfg.ClientSecret == "" || cfg.AuthURL == "" || cfg.TokenURL == "" || cfg.RedirectURI == "" {
+			return fmt.Errorf("oauth2 config: client-id, client-secret, auth-url, token-url and redirect-uri are required")
+		}
+
 		c.Config = &connector.OAuth2Connector{
 			ClientID:     cfg.ClientID,
 			ClientSecret: cfg.ClientSecret,
