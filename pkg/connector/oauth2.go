@@ -148,7 +148,6 @@ func (c *OAuth2Connector) Complete(ctx context.Context, connectorID string, orga
 	if err != nil {
 		return nil, fmt.Errorf("cannot post token URL: %w", err)
 	}
-
 	defer tokenResp.Body.Close()
 
 	type tokenResponse struct {
@@ -164,8 +163,6 @@ func (c *OAuth2Connector) Complete(ctx context.Context, connectorID string, orga
 	if err != nil {
 		return nil, fmt.Errorf("cannot decode token response: %w", err)
 	}
-
-	fmt.Printf("\n\n\ntoken: %+v\n\n\n", token)
 
 	return &OAuth2Connection{
 		AccessToken:  token.AccessToken,
