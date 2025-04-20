@@ -20,8 +20,8 @@ const (
 	MesureEntityType
 	TaskEntityType
 	EvidenceEntityType
-	_ControlStateTransitionEntityType // UNUSED
-	_TaskStateTransitionEntityType    // UNUSED
+	ConnectorEntityType
+	_TaskStateTransitionEntityType // UNUSED
 	VendorEntityType
 	PeopleEntityType
 	VendorComplianceReportEntityType
