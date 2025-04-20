@@ -84,6 +84,10 @@ RETURNING
 	updated_at
 `
 
+	if c.Connection == nil {
+		return fmt.Errorf("connection is nil")
+	}
+
 	connection, err := json.Marshal(c.Connection)
 	if err != nil {
 		return fmt.Errorf("cannot marshal connection: %w", err)
