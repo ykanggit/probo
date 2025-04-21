@@ -540,7 +540,13 @@ function SettingsViewContent({
                         </div>
                         <div className="flex items-center gap-2">
                           <a
-                            href={`${process.env.API_SERVER_HOST}/api/console/v1/connectors/initiate?organization_id=${encodeURIComponent(organization.id)}&connector_id=${encodeURIComponent(connector.id)}&continue=${encodeURIComponent(window.location.href)}`}
+                            href={(() => {
+                              const url = new URL(`${process.env.API_SERVER_HOST}/api/console/v1/connectors/initiate`);
+                              url.searchParams.append('organization_id', organization.id);
+                              url.searchParams.append('connector_id', connector.id);
+                              url.searchParams.append('continue', window.location.href);
+                              return url.toString();
+                            })()}
                             className="inline-flex items-center justify-center h-9 px-3 text-sm font-medium rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
                           >
                             Connect
