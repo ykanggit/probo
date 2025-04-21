@@ -158,6 +158,10 @@ func (c *OAuth2Connector) Complete(ctx context.Context, connectorID string, orga
 	}
 	defer tokenResp.Body.Close()
 
+	if tokenResp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("token response status: %d", tokenResp.StatusCode)
+	}
+
 	type tokenResponse struct {
 		AccessToken  string    `json:"access_token"`
 		RefreshToken string    `json:"refresh_token"`
