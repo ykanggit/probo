@@ -94,6 +94,8 @@ func (c *Connector) CursorKey(orderBy ConnectorOrderField) page.CursorKey {
 	switch orderBy {
 	case ConnectorOrderFieldCreatedAt:
 		return page.CursorKey{ID: c.ID, Value: c.CreatedAt}
+	case ConnectorOrderFieldName:
+		return page.CursorKey{ID: c.ID, Value: c.Name}
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
