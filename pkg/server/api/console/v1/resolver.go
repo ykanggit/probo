@@ -32,6 +32,7 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo"
+	"github.com/getprobo/probo/pkg/saferedirect"
 	"github.com/getprobo/probo/pkg/securecookie"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/schema"
 	"github.com/getprobo/probo/pkg/usrmgr"
@@ -73,7 +74,7 @@ func UserFromContext(ctx context.Context) *coredata.User {
 	return user
 }
 
-func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig, connectorRegistry *connector.ConnectorRegistry) *chi.Mux {
+func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig, connectorRegistry *connector.ConnectorRegistry, safeRedirect *saferedirect.SafeRedirect) *chi.Mux {
 	r := chi.NewMux()
 
 	r.Post("/auth/register", SignUpHandler(usrmgrSvc, authCfg))
@@ -137,7 +138,7 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 			panic(fmt.Errorf("failed to create or update connector: %w", err))
 		}
 
-		http.Redirect(w, r, "/foo", http.StatusSeeOther)
+		safeRedirect.RedirectFromQuery(w, r, "continue", "/", http.StatusSeeOther)
 	}))
 
 	r.Get("/", playground.Handler("GraphQL", "/api/console/v1/query"))

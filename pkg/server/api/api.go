@@ -20,6 +20,7 @@ import (
 
 	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/probo"
+	"github.com/getprobo/probo/pkg/saferedirect"
 	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
@@ -34,6 +35,7 @@ type (
 		Usrmgr            *usrmgr.Service
 		Auth              console_v1.AuthConfig
 		ConnectorRegistry *connector.ConnectorRegistry
+		SafeRedirect      *saferedirect.SafeRedirect
 	}
 
 	Server struct {
@@ -103,7 +105,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.Use(cors.Handler(corsOpts))
 
 	// Mount the console API with authentication
-	router.Mount("/console/v1", console_v1.NewMux(s.cfg.Probo, s.cfg.Usrmgr, s.cfg.Auth, s.cfg.ConnectorRegistry))
+	router.Mount("/console/v1", console_v1.NewMux(s.cfg.Probo, s.cfg.Usrmgr, s.cfg.Auth, s.cfg.ConnectorRegistry, s.cfg.SafeRedirect))
 
 	router.ServeHTTP(w, r)
 }

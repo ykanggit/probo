@@ -21,6 +21,7 @@ import (
 
 	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/probo"
+	"github.com/getprobo/probo/pkg/saferedirect"
 	"github.com/getprobo/probo/pkg/server/api"
 	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
 	"github.com/getprobo/probo/pkg/server/web"
@@ -35,6 +36,7 @@ type Config struct {
 	Usrmgr            *usrmgr.Service
 	Auth              console_v1.AuthConfig
 	ConnectorRegistry *connector.ConnectorRegistry
+	SafeRedirect      *saferedirect.SafeRedirect
 }
 
 // Server represents the main server that handles both API and frontend requests
@@ -53,6 +55,7 @@ func NewServer(cfg Config) (*Server, error) {
 		Usrmgr:            cfg.Usrmgr,
 		Auth:              cfg.Auth,
 		ConnectorRegistry: cfg.ConnectorRegistry,
+		SafeRedirect:      cfg.SafeRedirect,
 	}
 	apiServer, err := api.NewServer(apiCfg)
 	if err != nil {

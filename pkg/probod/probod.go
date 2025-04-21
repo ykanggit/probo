@@ -31,6 +31,7 @@ import (
 	"github.com/getprobo/probo/pkg/crypto/passwdhash"
 	"github.com/getprobo/probo/pkg/mailer"
 	"github.com/getprobo/probo/pkg/probo"
+	"github.com/getprobo/probo/pkg/saferedirect"
 	"github.com/getprobo/probo/pkg/server"
 	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
 	"github.com/getprobo/probo/pkg/usrmgr"
@@ -207,6 +208,7 @@ func (impl *Implm) Run(
 			Probo:             proboService,
 			Usrmgr:            usrmgrService,
 			ConnectorRegistry: defaultConnectorRegistry,
+			SafeRedirect:      &saferedirect.SafeRedirect{AllowedHost: impl.cfg.Hostname},
 			Auth: console_v1.AuthConfig{
 				CookieName:      impl.cfg.Auth.Cookie.Name,
 				CookieDomain:    impl.cfg.Auth.Cookie.Domain,
