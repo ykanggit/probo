@@ -22,7 +22,7 @@ import (
 
 // Mesures is the resolver for the mesures field.
 func (r *controlResolver) Mesures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MesureOrderBy) (*types.MesureConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.MesureOrderField]{
 		Field:     coredata.MesureOrderFieldCreatedAt,
@@ -47,7 +47,7 @@ func (r *controlResolver) Mesures(ctx context.Context, obj *types.Control, first
 
 // Policies is the resolver for the policies field.
 func (r *controlResolver) Policies(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.PolicyOrderField]{
 		Field:     coredata.PolicyOrderFieldCreatedAt,
@@ -72,7 +72,7 @@ func (r *controlResolver) Policies(ctx context.Context, obj *types.Control, firs
 
 // FileURL is the resolver for the fileUrl field.
 func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*string, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	if obj.Type == coredata.EvidenceTypeLink {
 		return obj.URL, nil
@@ -89,7 +89,7 @@ func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*s
 
 // Controls is the resolver for the controls field.
 func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
 		Field:     coredata.ControlOrderFieldCreatedAt,
@@ -114,7 +114,7 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 
 // Tasks is the resolver for the tasks field.
 func (r *mesureResolver) Tasks(ctx context.Context, obj *types.Mesure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.TaskOrderField]{
 		Field:     coredata.TaskOrderFieldCreatedAt,
@@ -139,7 +139,7 @@ func (r *mesureResolver) Tasks(ctx context.Context, obj *types.Mesure, first *in
 
 // Risks is the resolver for the risks field.
 func (r *mesureResolver) Risks(ctx context.Context, obj *types.Mesure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.RiskOrderField]{
 		Field:     coredata.RiskOrderFieldCreatedAt,
@@ -164,7 +164,7 @@ func (r *mesureResolver) Risks(ctx context.Context, obj *types.Mesure, first *in
 
 // Controls is the resolver for the controls field.
 func (r *mesureResolver) Controls(ctx context.Context, obj *types.Mesure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
 		Field:     coredata.ControlOrderFieldCreatedAt,
@@ -213,7 +213,7 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.C
 
 // UpdateOrganization is the resolver for the updateOrganization field.
 func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.UpdateOrganizationInput) (*types.UpdateOrganizationPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
 	req := probo.UpdateOrganizationRequest{
 		ID:   input.OrganizationID,
@@ -298,7 +298,7 @@ func (r *mutationResolver) RemoveUser(ctx context.Context, input types.RemoveUse
 
 // CreatePeople is the resolver for the createPeople field.
 func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
 	people, err := svc.Peoples.Create(ctx, probo.CreatePeopleRequest{
 		OrganizationID:           input.OrganizationID,
@@ -319,7 +319,7 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 
 // UpdatePeople is the resolver for the updatePeople field.
 func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.UpdatePeoplePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
 
 	people, err := svc.Peoples.Update(ctx, probo.UpdatePeopleRequest{
 		ID:                       input.ID,
@@ -339,7 +339,7 @@ func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdateP
 
 // DeletePeople is the resolver for the deletePeople field.
 func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.PeopleID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.PeopleID.TenantID())
 
 	err := svc.Peoples.Delete(ctx, input.PeopleID)
 	if err != nil {
@@ -353,7 +353,7 @@ func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeleteP
 
 // CreateVendor is the resolver for the createVendor field.
 func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
 	vendor, err := svc.Vendors.Create(
 		ctx,
@@ -391,7 +391,7 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 
 // UpdateVendor is the resolver for the updateVendor field.
 func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.UpdateVendorPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
 
 	vendor, err := svc.Vendors.Update(ctx, probo.UpdateVendorRequest{
 		ID:                         input.ID,
@@ -427,7 +427,7 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 
 // DeleteVendor is the resolver for the deleteVendor field.
 func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.VendorID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.VendorID.TenantID())
 
 	err := svc.Vendors.Delete(ctx, input.VendorID)
 	if err != nil {
@@ -441,7 +441,7 @@ func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteV
 
 // CreateFramework is the resolver for the createFramework field.
 func (r *mutationResolver) CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
 	framework, err := svc.Frameworks.Create(ctx, probo.CreateFrameworkRequest{
 		OrganizationID: input.OrganizationID,
@@ -458,7 +458,7 @@ func (r *mutationResolver) CreateFramework(ctx context.Context, input types.Crea
 
 // UpdateFramework is the resolver for the updateFramework field.
 func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
 
 	framework, err := svc.Frameworks.Update(ctx, probo.UpdateFrameworkRequest{
 		ID:          input.ID,
@@ -476,7 +476,7 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 
 // ImportFramework is the resolver for the importFramework field.
 func (r *mutationResolver) ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
 	req := probo.ImportFrameworkRequest{}
 	if err := json.NewDecoder(input.File.File).Decode(&req.Framework); err != nil {
@@ -506,7 +506,7 @@ func (r *mutationResolver) ImportFramework(ctx context.Context, input types.Impo
 
 // DeleteFramework is the resolver for the deleteFramework field.
 func (r *mutationResolver) DeleteFramework(ctx context.Context, input types.DeleteFrameworkInput) (*types.DeleteFrameworkPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.FrameworkID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.FrameworkID.TenantID())
 
 	err := svc.Frameworks.Delete(ctx, input.FrameworkID)
 	if err != nil {
@@ -520,7 +520,7 @@ func (r *mutationResolver) DeleteFramework(ctx context.Context, input types.Dele
 
 // // CreateMesure is the resolver for the createMesure field.
 func (r *mutationResolver) CreateMesure(ctx context.Context, input types.CreateMesureInput) (*types.CreateMesurePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
 	mesure, err := svc.Mesures.Create(ctx, probo.CreateMesureRequest{
 		OrganizationID: input.OrganizationID,
@@ -540,7 +540,7 @@ func (r *mutationResolver) CreateMesure(ctx context.Context, input types.CreateM
 
 // UpdateMesure is the resolver for the updateMesure field.
 func (r *mutationResolver) UpdateMesure(ctx context.Context, input types.UpdateMesureInput) (*types.UpdateMesurePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
 
 	mesure, err := svc.Mesures.Update(ctx, probo.UpdateMesureRequest{
 		ID:          input.ID,
@@ -561,7 +561,7 @@ func (r *mutationResolver) UpdateMesure(ctx context.Context, input types.UpdateM
 
 // ImportMesure is the resolver for the importMesure field.
 func (r *mutationResolver) ImportMesure(ctx context.Context, input types.ImportMesureInput) (*types.ImportMesurePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
 	var req probo.ImportMesureRequest
 	if err := json.NewDecoder(input.File.File).Decode(&req.Mesures); err != nil {
@@ -585,7 +585,7 @@ func (r *mutationResolver) ImportMesure(ctx context.Context, input types.ImportM
 
 // CreateControlMesureMapping is the resolver for the createControlMesureMapping field.
 func (r *mutationResolver) CreateControlMesureMapping(ctx context.Context, input types.CreateControlMesureMappingInput) (*types.CreateControlMesureMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.MesureID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.MesureID.TenantID())
 
 	err := svc.Controls.CreateMesureMapping(ctx, input.ControlID, input.MesureID)
 	if err != nil {
@@ -599,7 +599,7 @@ func (r *mutationResolver) CreateControlMesureMapping(ctx context.Context, input
 
 // CreateControlPolicyMapping is the resolver for the createControlPolicyMapping field.
 func (r *mutationResolver) CreateControlPolicyMapping(ctx context.Context, input types.CreateControlPolicyMappingInput) (*types.CreateControlPolicyMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.PolicyID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.PolicyID.TenantID())
 
 	err := svc.Controls.CreatePolicyMapping(ctx, input.ControlID, input.PolicyID)
 	if err != nil {
@@ -613,7 +613,7 @@ func (r *mutationResolver) CreateControlPolicyMapping(ctx context.Context, input
 
 // DeleteControlMesureMapping is the resolver for the deleteControlMesureMapping field.
 func (r *mutationResolver) DeleteControlMesureMapping(ctx context.Context, input types.DeleteControlMesureMappingInput) (*types.DeleteControlMesureMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.MesureID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.MesureID.TenantID())
 
 	err := svc.Controls.DeleteMesureMapping(ctx, input.ControlID, input.MesureID)
 	if err != nil {
@@ -627,7 +627,7 @@ func (r *mutationResolver) DeleteControlMesureMapping(ctx context.Context, input
 
 // DeleteControlPolicyMapping is the resolver for the deleteControlPolicyMapping field.
 func (r *mutationResolver) DeleteControlPolicyMapping(ctx context.Context, input types.DeleteControlPolicyMappingInput) (*types.DeleteControlPolicyMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.PolicyID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.PolicyID.TenantID())
 
 	err := svc.Controls.DeletePolicyMapping(ctx, input.ControlID, input.PolicyID)
 	if err != nil {
@@ -641,7 +641,7 @@ func (r *mutationResolver) DeleteControlPolicyMapping(ctx context.Context, input
 
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.MesureID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.MesureID.TenantID())
 
 	task, err := svc.Tasks.Create(ctx, probo.CreateTaskRequest{
 		MesureID:     input.MesureID,
@@ -660,7 +660,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 
 // UpdateTask is the resolver for the updateTask field.
 func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
 
 	task, err := svc.Tasks.Update(ctx, probo.UpdateTaskRequest{
 		TaskID:       input.TaskID,
@@ -680,7 +680,7 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTas
 
 // DeleteTask is the resolver for the deleteTask field.
 func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
 
 	err := svc.Tasks.Delete(ctx, input.TaskID)
 	if err != nil {
@@ -694,7 +694,7 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTas
 
 // AssignTask is the resolver for the assignTask field.
 func (r *mutationResolver) AssignTask(ctx context.Context, input types.AssignTaskInput) (*types.AssignTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
 
 	task, err := svc.Tasks.Assign(ctx, input.TaskID, input.AssignedToID)
 	if err != nil {
@@ -708,7 +708,7 @@ func (r *mutationResolver) AssignTask(ctx context.Context, input types.AssignTas
 
 // UnassignTask is the resolver for the unassignTask field.
 func (r *mutationResolver) UnassignTask(ctx context.Context, input types.UnassignTaskInput) (*types.UnassignTaskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
 
 	task, err := svc.Tasks.Unassign(ctx, input.TaskID)
 	if err != nil {
@@ -722,7 +722,7 @@ func (r *mutationResolver) UnassignTask(ctx context.Context, input types.Unassig
 
 // CreateRisk is the resolver for the createRisk field.
 func (r *mutationResolver) CreateRisk(ctx context.Context, input types.CreateRiskInput) (*types.CreateRiskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
 	risk, err := svc.Risks.Create(
 		ctx,
@@ -750,7 +750,7 @@ func (r *mutationResolver) CreateRisk(ctx context.Context, input types.CreateRis
 
 // UpdateRisk is the resolver for the updateRisk field.
 func (r *mutationResolver) UpdateRisk(ctx context.Context, input types.UpdateRiskInput) (*types.UpdateRiskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
 
 	risk, err := svc.Risks.Update(
 		ctx,
@@ -778,7 +778,7 @@ func (r *mutationResolver) UpdateRisk(ctx context.Context, input types.UpdateRis
 
 // DeleteRisk is the resolver for the deleteRisk field.
 func (r *mutationResolver) DeleteRisk(ctx context.Context, input types.DeleteRiskInput) (*types.DeleteRiskPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
 
 	err := svc.Risks.Delete(ctx, input.RiskID)
 	if err != nil {
@@ -792,7 +792,7 @@ func (r *mutationResolver) DeleteRisk(ctx context.Context, input types.DeleteRis
 
 // CreateRiskMesureMapping is the resolver for the createRiskMesureMapping field.
 func (r *mutationResolver) CreateRiskMesureMapping(ctx context.Context, input types.CreateRiskMesureMappingInput) (*types.CreateRiskMesureMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
 
 	err := svc.Risks.CreateMesureMapping(ctx, input.RiskID, input.MesureID)
 	if err != nil {
@@ -806,7 +806,7 @@ func (r *mutationResolver) CreateRiskMesureMapping(ctx context.Context, input ty
 
 // DeleteRiskMesureMapping is the resolver for the deleteRiskMesureMapping field.
 func (r *mutationResolver) DeleteRiskMesureMapping(ctx context.Context, input types.DeleteRiskMesureMappingInput) (*types.DeleteRiskMesureMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
 
 	err := svc.Risks.DeleteMesureMapping(ctx, input.RiskID, input.MesureID)
 	if err != nil {
@@ -820,7 +820,7 @@ func (r *mutationResolver) DeleteRiskMesureMapping(ctx context.Context, input ty
 
 // CreateRiskPolicyMapping is the resolver for the createRiskPolicyMapping field.
 func (r *mutationResolver) CreateRiskPolicyMapping(ctx context.Context, input types.CreateRiskPolicyMappingInput) (*types.CreateRiskPolicyMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
 
 	err := svc.Risks.CreatePolicyMapping(ctx, input.RiskID, input.PolicyID)
 	if err != nil {
@@ -834,7 +834,7 @@ func (r *mutationResolver) CreateRiskPolicyMapping(ctx context.Context, input ty
 
 // DeleteRiskPolicyMapping is the resolver for the deleteRiskPolicyMapping field.
 func (r *mutationResolver) DeleteRiskPolicyMapping(ctx context.Context, input types.DeleteRiskPolicyMappingInput) (*types.DeleteRiskPolicyMappingPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.RiskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
 
 	err := svc.Risks.DeletePolicyMapping(ctx, input.RiskID, input.PolicyID)
 	if err != nil {
@@ -848,7 +848,7 @@ func (r *mutationResolver) DeleteRiskPolicyMapping(ctx context.Context, input ty
 
 // RequestEvidence is the resolver for the requestEvidence field.
 func (r *mutationResolver) RequestEvidence(ctx context.Context, input types.RequestEvidenceInput) (*types.RequestEvidencePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
 
 	evidence, err := svc.Evidences.Request(
 		ctx,
@@ -870,7 +870,7 @@ func (r *mutationResolver) RequestEvidence(ctx context.Context, input types.Requ
 
 // FulfillEvidence is the resolver for the fulfillEvidence field.
 func (r *mutationResolver) FulfillEvidence(ctx context.Context, input types.FulfillEvidenceInput) (*types.FulfillEvidencePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.EvidenceID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.EvidenceID.TenantID())
 
 	req := probo.FulfilledEvidenceRequest{
 		EvidenceID: input.EvidenceID,
@@ -897,7 +897,7 @@ func (r *mutationResolver) FulfillEvidence(ctx context.Context, input types.Fulf
 
 // CreateEvidence is the resolver for the createEvidence field.
 func (r *mutationResolver) CreateEvidence(ctx context.Context, input types.CreateEvidenceInput) (*types.CreateEvidencePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.TaskID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
 
 	req := probo.CreateEvidenceRequest{
 		TaskID:      input.TaskID,
@@ -929,7 +929,7 @@ func (r *mutationResolver) CreateEvidence(ctx context.Context, input types.Creat
 
 // DeleteEvidence is the resolver for the deleteEvidence field.
 func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.EvidenceID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.EvidenceID.TenantID())
 
 	err := svc.Evidences.Delete(ctx, input.EvidenceID)
 	if err != nil {
@@ -943,7 +943,7 @@ func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.Delet
 
 // UploadVendorComplianceReport is the resolver for the uploadVendorComplianceReport field.
 func (r *mutationResolver) UploadVendorComplianceReport(ctx context.Context, input types.UploadVendorComplianceReportInput) (*types.UploadVendorComplianceReportPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.VendorID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.VendorID.TenantID())
 
 	vendorComplianceReport, err := svc.VendorComplianceReports.Upload(
 		ctx,
@@ -966,7 +966,7 @@ func (r *mutationResolver) UploadVendorComplianceReport(ctx context.Context, inp
 
 // DeleteVendorComplianceReport is the resolver for the deleteVendorComplianceReport field.
 func (r *mutationResolver) DeleteVendorComplianceReport(ctx context.Context, input types.DeleteVendorComplianceReportInput) (*types.DeleteVendorComplianceReportPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.ReportID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.ReportID.TenantID())
 
 	err := svc.VendorComplianceReports.Delete(ctx, input.ReportID)
 	if err != nil {
@@ -980,7 +980,7 @@ func (r *mutationResolver) DeleteVendorComplianceReport(ctx context.Context, inp
 
 // CreatePolicy is the resolver for the createPolicy field.
 func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.OrganizationID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
 	policy, err := svc.Policies.Create(ctx, probo.CreatePolicyRequest{
 		OrganizationID: input.OrganizationID,
@@ -1001,7 +1001,7 @@ func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreateP
 
 // UpdatePolicy is the resolver for the updatePolicy field.
 func (r *mutationResolver) UpdatePolicy(ctx context.Context, input types.UpdatePolicyInput) (*types.UpdatePolicyPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
 
 	policy, err := svc.Policies.Update(ctx, probo.UpdatePolicyRequest{
 		ID:         input.ID,
@@ -1022,7 +1022,7 @@ func (r *mutationResolver) UpdatePolicy(ctx context.Context, input types.UpdateP
 
 // DeletePolicy is the resolver for the deletePolicy field.
 func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeletePolicyInput) (*types.DeletePolicyPayload, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, input.PolicyID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, input.PolicyID.TenantID())
 
 	err := svc.Policies.Delete(ctx, input.PolicyID)
 	if err != nil {
@@ -1036,7 +1036,7 @@ func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeleteP
 
 // LogoURL is the resolver for the logoUrl field.
 func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organization) (*string, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	return svc.Organizations.GenerateLogoURL(ctx, obj.ID, 1*time.Hour)
 }
@@ -1064,9 +1064,34 @@ func (r *organizationResolver) Users(ctx context.Context, obj *types.Organizatio
 	return types.NewUserConnection(page), nil
 }
 
+// Connectors is the resolver for the connectors field.
+func (r *organizationResolver) Connectors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ConnectorOrder) (*types.ConnectorConnection, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ConnectorOrderField]{
+		Field:     coredata.ConnectorOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ConnectorOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Connectors.ListForOrganizationID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list organization connectors: %w", err))
+	}
+
+	return types.NewConnectorConnection(page), nil
+}
+
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) (*types.FrameworkConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.FrameworkOrderField]{
 		Field:     coredata.FrameworkOrderFieldCreatedAt,
@@ -1091,7 +1116,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 
 // Vendors is the resolver for the vendors field.
 func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.VendorOrderField]{
 		Field:     coredata.VendorOrderFieldCreatedAt,
@@ -1116,7 +1141,7 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 
 // Peoples is the resolver for the peoples field.
 func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) (*types.PeopleConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.PeopleOrderField]{
 		Field:     coredata.PeopleOrderFieldCreatedAt,
@@ -1141,7 +1166,7 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 
 // Policies is the resolver for the policies field.
 func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.PolicyOrderField]{
 		Field:     coredata.PolicyOrderFieldName,
@@ -1166,7 +1191,7 @@ func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organiza
 
 // Mesures is the resolver for the mesures field.
 func (r *organizationResolver) Mesures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MesureOrderBy) (*types.MesureConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.MesureOrderField]{
 		Field:     coredata.MesureOrderFieldCreatedAt,
@@ -1191,7 +1216,7 @@ func (r *organizationResolver) Mesures(ctx context.Context, obj *types.Organizat
 
 // Risks is the resolver for the risks field.
 func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.RiskOrderField]{
 		Field:     coredata.RiskOrderFieldCreatedAt,
@@ -1216,7 +1241,7 @@ func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organizatio
 
 // Owner is the resolver for the owner field.
 func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.People, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	policy, err := svc.Policies.Get(ctx, obj.ID)
 	if err != nil {
@@ -1234,7 +1259,7 @@ func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.P
 
 // Controls is the resolver for the controls field.
 func (r *policyResolver) Controls(ctx context.Context, obj *types.Policy, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
 		Field:     coredata.ControlOrderFieldCreatedAt,
@@ -1259,7 +1284,7 @@ func (r *policyResolver) Controls(ctx context.Context, obj *types.Policy, first 
 
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, id.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, id.TenantID())
 
 	switch id.EntityType() {
 	case coredata.OrganizationEntityType:
@@ -1355,7 +1380,7 @@ func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
 
 // Owner is the resolver for the owner field.
 func (r *riskResolver) Owner(ctx context.Context, obj *types.Risk) (*types.People, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	risk, err := svc.Risks.Get(ctx, obj.ID)
 	if err != nil {
@@ -1376,7 +1401,7 @@ func (r *riskResolver) Owner(ctx context.Context, obj *types.Risk) (*types.Peopl
 
 // Mesures is the resolver for the mesures field.
 func (r *riskResolver) Mesures(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MesureOrderBy) (*types.MesureConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.MesureOrderField]{
 		Field:     coredata.MesureOrderFieldCreatedAt,
@@ -1401,7 +1426,7 @@ func (r *riskResolver) Mesures(ctx context.Context, obj *types.Risk, first *int,
 
 // Policies is the resolver for the policies field.
 func (r *riskResolver) Policies(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.PolicyOrderField]{
 		Field:     coredata.PolicyOrderFieldCreatedAt,
@@ -1426,7 +1451,7 @@ func (r *riskResolver) Policies(ctx context.Context, obj *types.Risk, first *int
 
 // Controls is the resolver for the controls field.
 func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
 		Field:     coredata.ControlOrderFieldCreatedAt,
@@ -1451,7 +1476,7 @@ func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int
 
 // AssignedTo is the resolver for the assignedTo field.
 func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	task, err := svc.Tasks.Get(ctx, obj.ID)
 	if err != nil {
@@ -1472,7 +1497,7 @@ func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.
 
 // Evidences is the resolver for the evidences field.
 func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.EvidenceOrderField]{
 		Field:     coredata.EvidenceOrderFieldCreatedAt,
@@ -1496,7 +1521,7 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 
 // ComplianceReports is the resolver for the complianceReports field.
 func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) (*types.VendorComplianceReportConnection, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.VendorComplianceReportOrderField]{
 		Field:     coredata.VendorComplianceReportOrderFieldReportDate,
@@ -1521,7 +1546,7 @@ func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendo
 
 // BusinessOwner is the resolver for the businessOwner field.
 func (r *vendorResolver) BusinessOwner(ctx context.Context, obj *types.Vendor) (*types.People, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	vendor, err := svc.Vendors.Get(ctx, obj.ID)
 	if err != nil {
@@ -1542,7 +1567,7 @@ func (r *vendorResolver) BusinessOwner(ctx context.Context, obj *types.Vendor) (
 
 // SecurityOwner is the resolver for the securityOwner field.
 func (r *vendorResolver) SecurityOwner(ctx context.Context, obj *types.Vendor) (*types.People, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	vendor, err := svc.Vendors.Get(ctx, obj.ID)
 	if err != nil {
@@ -1563,7 +1588,7 @@ func (r *vendorResolver) SecurityOwner(ctx context.Context, obj *types.Vendor) (
 
 // Vendor is the resolver for the vendor field.
 func (r *vendorComplianceReportResolver) Vendor(ctx context.Context, obj *types.VendorComplianceReport) (*types.Vendor, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	vendor, err := svc.Vendors.Get(ctx, obj.ID)
 	if err != nil {
@@ -1575,7 +1600,7 @@ func (r *vendorComplianceReportResolver) Vendor(ctx context.Context, obj *types.
 
 // FileURL is the resolver for the fileUrl field.
 func (r *vendorComplianceReportResolver) FileURL(ctx context.Context, obj *types.VendorComplianceReport) (string, error) {
-	svc := r.GetTenantServiceIfAuthorized(ctx, obj.ID.TenantID())
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	fileURL, err := svc.VendorComplianceReports.GenerateFileURL(ctx, obj.ID, 1*time.Hour)
 	if err != nil {

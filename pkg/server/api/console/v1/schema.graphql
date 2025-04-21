@@ -262,6 +262,20 @@ enum OrganizationOrderField {
   UPDATED_AT
 }
 
+enum ConnectorOrderField
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.ConnectorOrderField"
+  ) {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ConnectorOrderFieldCreatedAt"
+    )
+  NAME
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ConnectorOrderFieldName"
+    )
+}
+
 # Order Input Types
 input UserOrder
   @goModel(
@@ -356,6 +370,11 @@ input OrganizationOrder {
   field: OrganizationOrderField!
 }
 
+input ConnectorOrder {
+  field: ConnectorOrderField!
+  direction: OrderDirection!
+}
+
 # Core Types
 type Organization implements Node {
   id: ID!
@@ -369,6 +388,14 @@ type Organization implements Node {
     before: CursorKey
     orderBy: UserOrder
   ): UserConnection! @goField(forceResolver: true)
+
+  connectors(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: ConnectorOrder
+  ): ConnectorConnection! @goField(forceResolver: true)
 
   frameworks(
     first: Int
@@ -426,6 +453,14 @@ type User implements Node {
   id: ID!
   fullName: String!
   email: String!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type Connector implements Node {
+  id: ID!
+  name: String!
+  type: String!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -803,6 +838,16 @@ type VendorComplianceReportConnection {
 type VendorComplianceReportEdge {
   cursor: CursorKey!
   node: VendorComplianceReport!
+}
+
+type ConnectorConnection {
+  edges: [ConnectorEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ConnectorEdge {
+  cursor: CursorKey!
+  node: Connector!
 }
 
 # Root Types
@@ -1213,6 +1258,12 @@ input RemoveUserInput {
   userId: ID!
 }
 
+input InitiateConnectorInput {
+  organizationId: ID!
+  connectorId: String!
+  continueUrl: String!
+}
+
 # Payload Types
 type CreateOrganizationPayload {
   organizationEdge: OrganizationEdge!
@@ -1388,4 +1439,8 @@ type InviteUserPayload {
 
 type RemoveUserPayload {
   success: Boolean!
+}
+
+type InitiateConnectorPayload {
+  redirectUrl: String!
 }

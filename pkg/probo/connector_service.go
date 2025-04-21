@@ -22,6 +22,7 @@ import (
 	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/page"
 	"go.gearno.de/kit/pg"
 )
 
@@ -38,7 +39,38 @@ type (
 	}
 )
 
-func (s *ConnectorService) CreateOrUpdate(ctx context.Context, req CreateOrUpdateConnectorRequest) (*coredata.Connector, error) {
+func (s *ConnectorService) ListForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+	cursor *page.Cursor[coredata.ConnectorOrderField],
+) (*page.Page[*coredata.Connector, coredata.ConnectorOrderField], error) {
+	var connectors coredata.Connectors
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return connectors.LoadWithoutDecryptedConnectionByOrganizationID(
+				ctx,
+				conn,
+				s.svc.scope,
+				organizationID,
+				cursor,
+				s.svc.encryptionKey,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot list connectors: %w", err)
+	}
+
+	return page.NewPage(connectors, cursor), nil
+}
+
+func (s *ConnectorService) CreateOrUpdate(
+	ctx context.Context,
+	req CreateOrUpdateConnectorRequest,
+) (*coredata.Connector, error) {
 	if req.OrganizationID == gid.Nil {
 		return nil, fmt.Errorf("organization ID is required")
 	}

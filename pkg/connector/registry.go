@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+
+	"github.com/getprobo/probo/pkg/gid"
 )
 
 type (
@@ -54,7 +56,7 @@ func (cr *ConnectorRegistry) Get(connectorID string) (Connector, error) {
 	return connector, nil
 }
 
-func (cr *ConnectorRegistry) Initiate(ctx context.Context, connectorID string, organizationID string, r *http.Request) (string, error) {
+func (cr *ConnectorRegistry) Initiate(ctx context.Context, connectorID string, organizationID gid.GID, r *http.Request) (string, error) {
 	connector, err := cr.Get(connectorID)
 	if err != nil {
 		return "", fmt.Errorf("cannot initiate connector: %w", err)
@@ -63,7 +65,7 @@ func (cr *ConnectorRegistry) Initiate(ctx context.Context, connectorID string, o
 	return connector.Initiate(ctx, connectorID, organizationID, r)
 }
 
-func (cr *ConnectorRegistry) Complete(ctx context.Context, connectorID string, organizationID string, r *http.Request) (Connection, error) {
+func (cr *ConnectorRegistry) Complete(ctx context.Context, connectorID string, organizationID gid.GID, r *http.Request) (Connection, error) {
 	connector, err := cr.Get(connectorID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot complete connector: %w", err)

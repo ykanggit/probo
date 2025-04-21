@@ -23,6 +23,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/statelesstoken"
 )
 
@@ -65,8 +66,8 @@ var (
 	OAuth2TokenTTL  = 10 * time.Minute
 )
 
-func (c *OAuth2Connector) Initiate(ctx context.Context, connectorID string, organizationID string, r *http.Request) (string, error) {
-	stateData := OAuth2State{OrganizationID: organizationID, ConnectorID: connectorID}
+func (c *OAuth2Connector) Initiate(ctx context.Context, connectorID string, organizationID gid.GID, r *http.Request) (string, error) {
+	stateData := OAuth2State{OrganizationID: organizationID.String(), ConnectorID: connectorID}
 	state, err := statelesstoken.NewToken(c.ClientSecret, OAuth2TokenType, OAuth2TokenTTL, stateData)
 	if err != nil {
 		return "", fmt.Errorf("cannot create state token: %w", err)
@@ -78,7 +79,7 @@ func (c *OAuth2Connector) Initiate(ctx context.Context, connectorID string, orga
 	}
 
 	redirectQuery := url.Values{}
-	redirectQuery.Set("organization_id", organizationID)
+	redirectQuery.Set("organization_id", organizationID.String())
 	redirectQuery.Set("connector_id", connectorID)
 
 	redirectURI.RawQuery = redirectQuery.Encode()
@@ -100,7 +101,7 @@ func (c *OAuth2Connector) Initiate(ctx context.Context, connectorID string, orga
 	return u.String(), nil
 }
 
-func (c *OAuth2Connector) Complete(ctx context.Context, connectorID string, organizationID string, r *http.Request) (Connection, error) {
+func (c *OAuth2Connector) Complete(ctx context.Context, connectorID string, organizationID gid.GID, r *http.Request) (Connection, error) {
 	code := r.URL.Query().Get("code")
 	if code == "" {
 		return nil, fmt.Errorf("no code in request")
@@ -116,7 +117,7 @@ func (c *OAuth2Connector) Complete(ctx context.Context, connectorID string, orga
 		return nil, fmt.Errorf("cannot validate state token: %w", err)
 	}
 
-	if payload.Data.OrganizationID != organizationID {
+	if payload.Data.OrganizationID != organizationID.String() {
 		return nil, fmt.Errorf("invalid organization ID")
 	}
 
@@ -130,7 +131,7 @@ func (c *OAuth2Connector) Complete(ctx context.Context, connectorID string, orga
 	}
 
 	redirectQuery := url.Values{}
-	redirectQuery.Set("organization_id", organizationID)
+	redirectQuery.Set("organization_id", organizationID.String())
 	redirectQuery.Set("connector_id", connectorID)
 
 	redirectURI.RawQuery = redirectQuery.Encode()

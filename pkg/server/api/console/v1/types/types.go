@@ -36,6 +36,32 @@ type ConfirmEmailPayload struct {
 	Success bool `json:"success"`
 }
 
+type Connector struct {
+	ID        gid.GID   `json:"id"`
+	Name      string    `json:"name"`
+	Type      string    `json:"type"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+func (Connector) IsNode()             {}
+func (this Connector) GetID() gid.GID { return this.ID }
+
+type ConnectorConnection struct {
+	Edges    []*ConnectorEdge `json:"edges"`
+	PageInfo *PageInfo        `json:"pageInfo"`
+}
+
+type ConnectorEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Connector     `json:"node"`
+}
+
+type ConnectorOrder struct {
+	Field     coredata.ConnectorOrderField `json:"field"`
+	Direction page.OrderDirection          `json:"direction"`
+}
+
 type Control struct {
 	ID          gid.GID           `json:"id"`
 	ReferenceID string            `json:"referenceId"`
@@ -407,6 +433,16 @@ type ImportMesurePayload struct {
 	MesureEdges []*MesureEdge `json:"mesureEdges"`
 }
 
+type InitiateConnectorInput struct {
+	OrganizationID gid.GID `json:"organizationId"`
+	ConnectorID    string  `json:"connectorId"`
+	ContinueURL    string  `json:"continueUrl"`
+}
+
+type InitiateConnectorPayload struct {
+	RedirectURL string `json:"redirectUrl"`
+}
+
 type InviteUserInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 	Email          string  `json:"email"`
@@ -452,6 +488,7 @@ type Organization struct {
 	Name       string               `json:"name"`
 	LogoURL    *string              `json:"logoUrl,omitempty"`
 	Users      *UserConnection      `json:"users"`
+	Connectors *ConnectorConnection `json:"connectors"`
 	Frameworks *FrameworkConnection `json:"frameworks"`
 	Vendors    *VendorConnection    `json:"vendors"`
 	Peoples    *PeopleConnection    `json:"peoples"`

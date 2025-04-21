@@ -23,6 +23,7 @@ import {
   useMutation,
 } from "react-relay";
 import { useParams } from "react-router";
+import { Link } from "react-router";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -41,6 +42,21 @@ import type { SettingsViewRemoveUserMutation as SettingsViewRemoveUserMutationTy
 import { PageTemplate } from "@/components/PageTemplate";
 import { SettingsViewSkeleton } from "./SettingsPage";
 
+// Define the connector type until the generated type is available
+interface Connector {
+  id: string;
+  name: string;
+  type: string;
+  createdAt: string;
+}
+
+interface AvailableConnector {
+  id: string;
+  name: string;
+  type: string;
+  description: string;
+}
+
 const settingsViewQuery = graphql`
   query SettingsViewQuery($organizationID: ID!) {
     organization: node(id: $organizationID) {
@@ -54,6 +70,16 @@ const settingsViewQuery = graphql`
               id
               fullName
               email
+              createdAt
+            }
+          }
+        }
+        connectors(first: 100) {
+          edges {
+            node {
+              id
+              name
+              type
               createdAt
             }
           }
@@ -101,6 +127,7 @@ function SettingsViewContent({
   const data = usePreloadedQuery(settingsViewQuery, queryRef);
   const organization = data.organization;
   const users = organization.users?.edges.map((edge) => edge.node) || [];
+  const connectors = (organization as any).connectors?.edges.map((edge: any) => edge.node) || [];
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -114,6 +141,18 @@ function SettingsViewContent({
   );
   const [isUploading, setIsUploading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
+
+  // Available connectors 
+  const availableConnectors: AvailableConnector[] = [
+    { id: "github", name: "GitHub", type: "oauth2", description: "Connect to GitHub repositories and issues" },
+    { id: "slack", name: "Slack", type: "oauth2", description: "Connect to Slack workspace and channels" },
+  ];
+
+  // Filter out connectors that are already connected
+  const connectedConnectorIds = connectors.map((connector: Connector) => connector.name);
+  const notConnectedConnectors = availableConnectors.filter(
+    connector => !connectedConnectorIds.includes(connector.id)
+  );
 
   const [updateOrganization] =
     useMutation<SettingsViewUpdateOrganizationMutationType>(
@@ -129,7 +168,7 @@ function SettingsViewContent({
   const { organizationId } = useParams();
   const [, loadQuery] =
     useQueryLoader<SettingsViewQueryType>(settingsViewQuery);
-
+    
   const handleUpdateName = () => {
     updateOrganization({
       variables: {
@@ -440,6 +479,96 @@ function SettingsViewContent({
                     </div>
                   </div>
                 ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Integrations</CardTitle>
+              <CardDescription>
+                Connect to third-party services to enhance your workflow
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {connectors.length > 0 && (
+                <div>
+                  <h3 className="mb-4 text-sm font-medium">Connected services</h3>
+                  <div className="space-y-4">
+                    {connectors.map((connector: Connector) => (
+                      <div
+                        key={connector.id}
+                        className="flex items-center justify-between rounded-lg border p-3 shadow-xs"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg border bg-subtle-bg">
+                            <Building2 className="h-5 w-5 text-tertiary" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium">
+                              {connector.name}
+                            </span>
+                            <span className="text-sm text-tertiary">
+                              {connector.type} · Connected on {new Date(connector.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {notConnectedConnectors.length > 0 && (
+                <div>
+                  <h3 className="mb-4 text-sm font-medium">Available services</h3>
+                  <div className="space-y-4">
+                    {notConnectedConnectors.map((connector) => (
+                      <div
+                        key={connector.id}
+                        className="flex items-center justify-between rounded-lg border p-3 shadow-xs"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg border bg-subtle-bg">
+                            <Building2 className="h-5 w-5 text-tertiary" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium">
+                              {connector.name}
+                            </span>
+                            <span className="text-sm text-tertiary">
+                              {connector.description}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={`${process.env.API_SERVER_HOST}/api/console/v1/connectors/initiate?organization_id=${encodeURIComponent(organization.id)}&connector_id=${encodeURIComponent(connector.id)}&continue=${encodeURIComponent(window.location.href)}`}
+                            className="inline-flex items-center justify-center h-9 px-3 text-sm font-medium rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                          >
+                            Connect
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {connectors.length === 0 && notConnectedConnectors.length === 0 && (
+                <div className="flex flex-col items-center justify-center p-8 text-center">
+                  <div className="rounded-full bg-subtle-bg p-3">
+                    <Building2 className="h-6 w-6 text-tertiary" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-medium">No integrations available</h3>
+                  <p className="mt-2 text-sm text-tertiary">
+                    There are currently no integrations available for your workspace.
+                  </p>
+                </div>
               )}
             </div>
           </CardContent>

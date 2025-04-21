@@ -18,11 +18,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"time"
 
 	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/crypto/cipher"
 	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/page"
 	"github.com/jackc/pgx/v5"
 	"go.gearno.de/kit/pg"
 )
@@ -38,7 +40,64 @@ type (
 		CreatedAt           time.Time              `db:"created_at"`
 		UpdatedAt           time.Time              `db:"updated_at"`
 	}
+
+	Connectors []*Connector
 )
+
+func (c *Connectors) LoadWithoutDecryptedConnectionByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+	cursor *page.Cursor[ConnectorOrderField],
+	encryptionKey cipher.EncryptionKey,
+) error {
+	q := `
+SELECT
+    id,
+    organization_id,
+    name,
+    type,
+    encrypted_connection,
+	created_at,
+	updated_at
+FROM
+    connectors
+WHERE
+	%s
+    AND organization_id = @organization_id
+	AND %s
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query connectors: %w", err)
+	}
+
+	connectors, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Connector])
+	if err != nil {
+		return fmt.Errorf("cannot collect connectors: %w", err)
+	}
+
+	*c = connectors
+
+	return nil
+}
+
+func (c *Connector) CursorKey(orderBy ConnectorOrderField) page.CursorKey {
+	switch orderBy {
+	case ConnectorOrderFieldCreatedAt:
+		return page.CursorKey{ID: c.ID, Value: c.CreatedAt}
+	}
+
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
+}
 
 func (c *Connector) Upsert(
 	ctx context.Context,

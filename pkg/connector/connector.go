@@ -19,14 +19,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/getprobo/probo/pkg/gid"
 )
 
 type (
 	ProtocolType string
 
 	Connector interface {
-		Initiate(ctx context.Context, connectorID string, organizationID string, r *http.Request) (string, error)
-		Complete(ctx context.Context, connectorID string, organizationID string, r *http.Request) (Connection, error)
+		Initiate(ctx context.Context, connectorID string, organizationID gid.GID, r *http.Request) (string, error)
+		Complete(ctx context.Context, connectorID string, organizationID gid.GID, r *http.Request) (Connection, error)
 	}
 
 	Connection interface {

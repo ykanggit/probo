@@ -85,15 +85,13 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 	r.Post("/auth/reset-password", ResetPasswordHandler(usrmgrSvc, authCfg))
 
 	r.Get("/connectors/initiate", WithSession(usrmgrSvc, authCfg, func(w http.ResponseWriter, r *http.Request) {
-		session := SessionFromContext(r.Context())
-		if session == nil {
-			panic(fmt.Errorf("session not found"))
+		connectorID := r.URL.Query().Get("connector_id")
+		organizationID, err := gid.ParseGID(r.URL.Query().Get("organization_id"))
+		if err != nil {
+			panic(fmt.Errorf("failed to parse organization id: %w", err))
 		}
 
-		// TODO: check if current user has access to the organization
-
-		connectorID := r.URL.Query().Get("connector_id")
-		organizationID := r.URL.Query().Get("organization_id")
+		_ = GetTenantService(r.Context(), proboSvc, organizationID.TenantID())
 
 		redirectURL, err := connectorRegistry.Initiate(r.Context(), connectorID, organizationID, r)
 		if err != nil {
@@ -104,28 +102,20 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 	}))
 
 	r.Get("/connectors/complete", WithSession(usrmgrSvc, authCfg, func(w http.ResponseWriter, r *http.Request) {
-		session := SessionFromContext(r.Context())
-		if session == nil {
-			panic(fmt.Errorf("session not found"))
-		}
-
-		// TODO: check if current user has access to the organization
-
 		connectorID := r.URL.Query().Get("connector_id")
-		organizationIDString := r.URL.Query().Get("organization_id")
-
-		connection, err := connectorRegistry.Complete(r.Context(), connectorID, organizationIDString, r)
-		if err != nil {
-			panic(fmt.Errorf("failed to complete connector: %w", err))
-		}
-
-		organizationID, err := gid.ParseGID(organizationIDString)
+		organizationID, err := gid.ParseGID(r.URL.Query().Get("organization_id"))
 		if err != nil {
 			panic(fmt.Errorf("failed to parse organization id: %w", err))
 		}
 
-		tenantID := session.ID.TenantID()
-		_, err = proboSvc.WithTenant(tenantID).Connectors.CreateOrUpdate(
+		connection, err := connectorRegistry.Complete(r.Context(), connectorID, organizationID, r)
+		if err != nil {
+			panic(fmt.Errorf("failed to complete connector: %w", err))
+		}
+
+		svc := GetTenantService(r.Context(), proboSvc, organizationID.TenantID())
+
+		_, err = svc.Connectors.CreateOrUpdate(
 			r.Context(),
 			probo.CreateOrUpdateConnectorRequest{
 				OrganizationID: organizationID,
@@ -282,7 +272,7 @@ func WithSession(usrmgrSvc *usrmgr.Service, authCfg AuthConfig, next http.Handle
 	}
 }
 
-func (r *Resolver) GetTenantServiceIfAuthorized(ctx context.Context, tenantID gid.TenantID) *probo.TenantService {
+func GetTenantService(ctx context.Context, svc *probo.Service, tenantID gid.TenantID) *probo.TenantService {
 	tenantIDs, _ := ctx.Value(userTenantContextKey).(*[]gid.TenantID)
 
 	if tenantIDs == nil {
@@ -291,7 +281,7 @@ func (r *Resolver) GetTenantServiceIfAuthorized(ctx context.Context, tenantID gi
 
 	for _, id := range *tenantIDs {
 		if id == tenantID {
-			return r.proboSvc.WithTenant(tenantID)
+			return svc.WithTenant(tenantID)
 		}
 	}
 
