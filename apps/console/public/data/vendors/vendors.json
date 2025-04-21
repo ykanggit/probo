@@ -1351,5 +1351,83 @@
     "termsOfServiceUrl": "https://policies.google.com/terms",
     "trustPageUrl": "https://business.safety.google/",
     "statusPageUrl": "https://ads.google.com/status/publisher/"
+  },
+  {
+    "name": "Namecheap",
+    "legalName": "Namecheap, Inc.",
+    "headquarterAddress": "4600 East Washington Street, Suite 305, Phoenix, AZ 85034, United States",
+    "websiteUrl": "https://www.namecheap.com",
+    "description": "Namecheap is an ICANN-accredited domain registrar and web hosting company offering domain registration, hosting, VPN, and other web services.",
+    "category": "Domain Registration and Web Hosting",
+    "certifications": [
+      "CCPA",
+      "GDPR"
+    ],
+    "privacyPolicyUrl": "https://www.namecheap.com/legal/general/privacy-policy/",
+    "termsOfServiceUrl": "https://www.namecheap.com/legal/",
+    "dataProcessingAgreementUrl": "https://www.namecheap.com/legal/universal/data-processing-addendum/",
+    "statusPageUrl": "https://www.namecheap.com/status-updates/"
+  },
+  {
+    "name": "Porter",
+    "legalName": "Porter Technologies Inc.",
+    "headquarterAddress": "New York City, NY, United States",
+    "websiteUrl": "https://www.porter.run",
+    "description": "Porter is a platform-as-a-service (PaaS) that enables developers to deploy and manage applications in their own AWS, GCP, or Azure cloud accounts with minimal DevOps overhead.",
+    "category": "Platform as a Service (PaaS)",
+    "certifications": [
+      "SOC 2 Type 2",
+      "GDPR",
+      "CCPA"
+    ],
+    "securityPageUrl": "https://docs.porter.run/security-and-compliance/soc2-hipaa",
+    "privacyPolicyUrl": "https://docs.porter.run/terms-and-privacy/privacy-policy",
+    "termsOfServiceUrl": "https://docs.porter.run/terms-and-privacy/terms-of-service",
+    "statusPageUrl": "https://status.porter.run/"
+  },
+  {
+    "name": "Bitwarden",
+    "legalName": "Bitwarden, Inc.",
+    "headquarterAddress": "1 North Calle Cesar Chavez, Suite 102, Santa Barbara, CA 93103",
+    "websiteUrl": "https://bitwarden.com",
+    "description": "Bitwarden is a secure, open-source password manager that enables individuals and organizations to store, manage, and share sensitive data across devices.",
+    "category": "Password Management",
+    "certifications": [
+      "ISO/IEC 27001:2022",
+      "SOC 2 Type 2",
+      "SOC 3",
+      "HIPAA",
+      "GDPR",
+      "CCPA",
+      "CPRA",
+      "Data Privacy Framework (DPF)"
+    ],
+    "securityPageUrl": "https://bitwarden.com/help/security-faqs/",
+    "privacyPolicyUrl": "https://bitwarden.com/privacy/",
+    "termsOfServiceUrl": "https://bitwarden.com/terms/",
+    "subprocessorsListUrl": "https://bitwarden.com/help/subprocessors/",
+    "trustPageUrl": "https://bitwarden.com/compliance/",
+    "statusPageUrl": "https://status.bitwarden.com/"
+  },
+  {
+    "name": "Framer",
+    "legalName": "Framer B.V.",
+    "headquarterAddress": "Rozengracht 207B, 1016 LZ Amsterdam, Netherlands",
+    "websiteUrl": "https://www.framer.com",
+    "description": "Framer is a no-code website builder that enables designers and teams to create and publish professional, responsive websites with built-in CMS, animations, and real-time collaboration tools.",
+    "category": "Website Builder / No-Code Platform",
+    "certifications": [
+      "SOC 2 Type 2",
+      "ISO/IEC 27001:2022",
+      "GDPR",
+      "CCPA",
+      "Privacy Shield"
+    ],
+    "securityPageUrl": "https://www.framer.com/legal/security/",
+    "privacyPolicyUrl": "https://www.framer.com/legal/privacy-statement/",
+    "termsOfServiceUrl": "https://www.framer.com/legal/terms-of-service/",
+    "dataProcessingAgreementUrl": "https://www.framer.com/legal/data-processing-addendum/",
+    "subprocessorsListUrl": "https://www.framer.com/legal/sub-processors/",
+    "statusPageUrl": "https://www.framerstatus.com/"
   }
 ]
