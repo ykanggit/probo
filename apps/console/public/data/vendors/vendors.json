@@ -660,7 +660,7 @@
       "NHS DSPT",
       "PASF",
       "Pinakes",
-      "PiTuKri ISAE 3000 Type II Report",
+      "PiTuKri ISAE 3000 Type 2",
       "TiSAX"
     ],
     "securityPageUrl": "https://aws.amazon.com/security/",
@@ -839,7 +839,13 @@
     "websiteUrl": "https://carta.com",
     "description": "Carta is a financial technology company that provides a platform for managing employee equity compensation.",
     "category": "Employee Equity Compensation",
-    "certifications": ["SOC 1 Type 2", "SOC 2 Type 2", "ISO/IEC 27001:2022", "GDPR", "CCPA"],
+    "certifications": [
+      "SOC 1 Type 2",
+      "SOC 2 Type 2",
+      "ISO/IEC 27001:2022",
+      "GDPR",
+      "CCPA"
+    ],
     "securityPageUrl": "https://carta.com/security",
     "privacyPolicyUrl": "https://carta.com/privacy/",
     "termsOfServiceUrl": "https://carta.com/terms-of-service/",
@@ -856,7 +862,7 @@
     "category": "Sales Intelligence & Engagement",
     "certifications": [
       "ISO 27001",
-      "SOC 2 Type II",
+      "SOC 2 Type 2",
       "GDPR",
       "CCPA",
       "EU-U.S. DPF",
@@ -906,7 +912,7 @@
       "ACSC - Essential 8 Maturity Model",
       "Australia Privacy Act",
       "BaFin"
-      ],
+    ],
     "securityPageUrl": "https://www.atlassian.com/trust/security/security-practices",
     "privacyPolicyUrl": "https://www.atlassian.com/legal/privacy-policy",
     "termsOfServiceUrl": "https://www.atlassian.com/legal/atlassian-customer-agreement",
@@ -926,7 +932,7 @@
     "certifications": [
       "PCI DSS v4.0 SAQ-D",
       "ISO/IEC 27001:2022",
-      "ISO/IEC 27018:2019", 
+      "ISO/IEC 27018:2019",
       "ISO/IEC 27017:2015",
       "SOC 2 Type 2"
     ],
@@ -969,7 +975,7 @@
     "description": "Checkr provides AI-powered background check and screening services to help businesses make informed hiring decisions quickly and fairly.",
     "category": "Employment Screening",
     "certifications": [
-      "SOC 2 Type II",
+      "SOC 2 Type 2",
       "SOC 3",
       "ISO 27001",
       "GDPR",
@@ -994,8 +1000,8 @@
     "description": "Rippling is an all-in-one workforce management platform that unifies HR, IT, payroll, and finance operations into a single system.",
     "category": "Workforce Management",
     "certifications": [
-      "SOC 1 Type I",
-      "SOC 2 Type II",
+      "SOC 1 Type 1",
+      "SOC 2 Type 2",
       "ISO 27001",
       "ISO 27018",
       "CSA STAR Level 2"
@@ -1013,9 +1019,7 @@
     "websiteUrl": "https://www.vouch.us",
     "description": "Vouch is a digital-first insurance platform providing tailored coverage solutions for startups and high-growth companies.",
     "category": "Business Insurance",
-    "certifications": [
-      "CPRA"
-    ],
+    "certifications": ["CPRA"],
     "privacyPolicyUrl": "https://www.vouch.us/legal/privacy-notice",
     "termsOfServiceUrl": "https://www.vouch.us/legal/terms-of-use",
     "dataProcessingAgreementUrl": "https://help.vouchfor.com/docs/support/security/data-processing-addendum/"
@@ -1025,17 +1029,17 @@
     "legalName": "Twilio, Inc.",
     "headquarterAddress": "101 Spear Street, Fifth Floor, San Francisco, CA 94105",
     "websiteUrl": "https://www.twilio.com/",
-    "description": "SendGrid is a cloud-based email delivery platform that enables businesses to send transactional and marketing emails at scale with high deliverability.",
-    "category": "Email Delivery & Marketing",
+    "description": "Twilio is a cloud communications platform that provides APIs for developers to add messaging, voice, video, and email capabilities to applications.",
+    "category": "Cloud Communications Platform",
     "certifications": [
-      "SOC 2 Type II",
+      "SOC 2 Type 2",
       "GDPR",
       "CCPA",
-      "CPRA", 
+      "CPRA",
       "HIPAA",
       "ISO 27001",
       "ISO 27017",
-      "ISO 27018", 
+      "ISO 27018",
       "PCI DSS",
       "PCI DSS v4.0.0"
     ],
@@ -1054,13 +1058,7 @@
     "websiteUrl": "https://qonto.com",
     "description": "Qonto is a European business finance solution offering online banking, invoicing, expense management, and financial tools for SMEs and freelancers.",
     "category": "Business Banking / Financial Services",
-    "certifications": [
-      "ISO 27001",
-      "PCI DSS",
-      "GDPR",
-      "DSP2",
-      "DORA"
-    ],
+    "certifications": ["ISO 27001", "PCI DSS", "GDPR", "DSP2", "DORA"],
     "securityPageUrl": "https://qonto.com/en/security",
     "privacyPolicyUrl": "https://legal.qonto.com/en?_gl=1*eyxi0u*_gcl_au*NDEzMTYzMTE2LjE3NDQ5OTkzOTA.#template-6uiwuhdde",
     "termsOfServiceUrl": "https://legal.qonto.com/en",
@@ -1073,10 +1071,7 @@
     "websiteUrl": "https://www.cursor.com",
     "description": "AI-powered integrated development environment enhancing developer productivity with advanced AI features.",
     "category": "AI Code Editor",
-    "certifications": [
-      "SOC 2 Type 2",
-      "SOC 2 TYPE 1"
-    ],
+    "certifications": ["SOC 2 Type 2", "SOC 2 Type 1"],
     "securityPageUrl": "https://www.cursor.com/security",
     "privacyPolicyUrl": "https://www.cursor.com/privacy",
     "termsOfServiceUrl": "https://www.cursor.com/terms-of-service",
@@ -1091,15 +1086,11 @@
     "websiteUrl": "https://pulley.com",
     "description": "Pulley is an equity management platform that helps startups manage cap tables, issue equity, and ensure compliance with tools for fundraising modeling, 409A valuations, and more.",
     "category": "Equity Management / Cap Table Software",
-    "certifications": [
-      "SOC 2 Type 2",
-      "GDPR",
-      "CCPA"
-    ],
+    "certifications": ["SOC 2 Type 2", "GDPR", "CCPA"],
     "securityPageUrl": "https://pulley.com/security",
     "privacyPolicyUrl": "https://pulley.com/privacy",
     "termsOfServiceUrl": "https://pulley.com/terms",
-    "subprocessorsListUrl": "https://large-walk-bd5.notion.site/6449d3ecd2854af0a313b6e8679b5795?v=d61abc36355842bb939d49544f18dc95",
+    "subprocessorsListUrl": "https://large-walk-bd5.notion.site/6449d3ecd2854af0a313b6e8679b5795?v=d61abc36355842bb939d49544f18dc95"
   },
   {
     "name": "Microsoft Azure",
