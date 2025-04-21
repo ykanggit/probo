@@ -220,31 +220,43 @@ type CreateTaskPayload struct {
 }
 
 type CreateVendorInput struct {
-	OrganizationID             gid.GID                     `json:"organizationId"`
-	Name                       string                      `json:"name"`
-	Description                *string                     `json:"description,omitempty"`
-	HeadquarterAddress         *string                     `json:"headquarterAddress,omitempty"`
-	LegalName                  *string                     `json:"legalName,omitempty"`
-	WebsiteURL                 *string                     `json:"websiteUrl,omitempty"`
-	PrivacyPolicyURL           *string                     `json:"privacyPolicyUrl,omitempty"`
-	Category                   *string                     `json:"category,omitempty"`
-	ServiceLevelAgreementURL   *string                     `json:"serviceLevelAgreementUrl,omitempty"`
-	DataProcessingAgreementURL *string                     `json:"dataProcessingAgreementUrl,omitempty"`
-	Certifications             []string                    `json:"certifications,omitempty"`
-	SecurityPageURL            *string                     `json:"securityPageUrl,omitempty"`
-	TrustPageURL               *string                     `json:"trustPageUrl,omitempty"`
-	StatusPageURL              *string                     `json:"statusPageUrl,omitempty"`
-	TermsOfServiceURL          *string                     `json:"termsOfServiceUrl,omitempty"`
-	ServiceStartAt             time.Time                   `json:"serviceStartAt"`
-	ServiceTerminationAt       *time.Time                  `json:"serviceTerminationAt,omitempty"`
-	ServiceCriticality         coredata.ServiceCriticality `json:"serviceCriticality"`
-	RiskTier                   coredata.RiskTier           `json:"riskTier"`
-	BusinessOwnerID            *gid.GID                    `json:"businessOwnerId,omitempty"`
-	SecurityOwnerID            *gid.GID                    `json:"securityOwnerId,omitempty"`
+	OrganizationID             gid.GID    `json:"organizationId"`
+	Name                       string     `json:"name"`
+	Description                *string    `json:"description,omitempty"`
+	HeadquarterAddress         *string    `json:"headquarterAddress,omitempty"`
+	LegalName                  *string    `json:"legalName,omitempty"`
+	WebsiteURL                 *string    `json:"websiteUrl,omitempty"`
+	PrivacyPolicyURL           *string    `json:"privacyPolicyUrl,omitempty"`
+	Category                   *string    `json:"category,omitempty"`
+	ServiceLevelAgreementURL   *string    `json:"serviceLevelAgreementUrl,omitempty"`
+	DataProcessingAgreementURL *string    `json:"dataProcessingAgreementUrl,omitempty"`
+	Certifications             []string   `json:"certifications,omitempty"`
+	SecurityPageURL            *string    `json:"securityPageUrl,omitempty"`
+	TrustPageURL               *string    `json:"trustPageUrl,omitempty"`
+	StatusPageURL              *string    `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL          *string    `json:"termsOfServiceUrl,omitempty"`
+	ServiceStartAt             time.Time  `json:"serviceStartAt"`
+	ServiceTerminationAt       *time.Time `json:"serviceTerminationAt,omitempty"`
+	BusinessOwnerID            *gid.GID   `json:"businessOwnerId,omitempty"`
+	SecurityOwnerID            *gid.GID   `json:"securityOwnerId,omitempty"`
 }
 
 type CreateVendorPayload struct {
 	VendorEdge *VendorEdge `json:"vendorEdge"`
+}
+
+type CreateVendorRiskAssessmentInput struct {
+	VendorID        gid.GID                  `json:"vendorId"`
+	AssessedBy      gid.GID                  `json:"assessedBy"`
+	ExpiresAt       time.Time                `json:"expiresAt"`
+	DataSensitivity coredata.DataSensitivity `json:"dataSensitivity"`
+	BusinessImpact  coredata.BusinessImpact  `json:"businessImpact"`
+	Notes           *string                  `json:"notes,omitempty"`
+	Attachments     []string                 `json:"attachments,omitempty"`
+}
+
+type CreateVendorRiskAssessmentPayload struct {
+	VendorRiskAssessmentEdge *VendorRiskAssessmentEdge `json:"vendorRiskAssessmentEdge"`
 }
 
 type DeleteControlMesureMappingInput struct {
@@ -744,27 +756,25 @@ type UpdateTaskPayload struct {
 }
 
 type UpdateVendorInput struct {
-	ID                         gid.GID                      `json:"id"`
-	Name                       *string                      `json:"name,omitempty"`
-	Description                *string                      `json:"description,omitempty"`
-	ServiceStartAt             *time.Time                   `json:"serviceStartAt,omitempty"`
-	ServiceTerminationAt       *time.Time                   `json:"serviceTerminationAt,omitempty"`
-	ServiceCriticality         *coredata.ServiceCriticality `json:"serviceCriticality,omitempty"`
-	RiskTier                   *coredata.RiskTier           `json:"riskTier,omitempty"`
-	StatusPageURL              *string                      `json:"statusPageUrl,omitempty"`
-	TermsOfServiceURL          *string                      `json:"termsOfServiceUrl,omitempty"`
-	PrivacyPolicyURL           *string                      `json:"privacyPolicyUrl,omitempty"`
-	ServiceLevelAgreementURL   *string                      `json:"serviceLevelAgreementUrl,omitempty"`
-	DataProcessingAgreementURL *string                      `json:"dataProcessingAgreementUrl,omitempty"`
-	WebsiteURL                 *string                      `json:"websiteUrl,omitempty"`
-	LegalName                  *string                      `json:"legalName,omitempty"`
-	HeadquarterAddress         *string                      `json:"headquarterAddress,omitempty"`
-	Category                   *string                      `json:"category,omitempty"`
-	Certifications             []string                     `json:"certifications,omitempty"`
-	SecurityPageURL            *string                      `json:"securityPageUrl,omitempty"`
-	TrustPageURL               *string                      `json:"trustPageUrl,omitempty"`
-	BusinessOwnerID            *gid.GID                     `json:"businessOwnerId,omitempty"`
-	SecurityOwnerID            *gid.GID                     `json:"securityOwnerId,omitempty"`
+	ID                         gid.GID    `json:"id"`
+	Name                       *string    `json:"name,omitempty"`
+	Description                *string    `json:"description,omitempty"`
+	ServiceStartAt             *time.Time `json:"serviceStartAt,omitempty"`
+	ServiceTerminationAt       *time.Time `json:"serviceTerminationAt,omitempty"`
+	StatusPageURL              *string    `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL          *string    `json:"termsOfServiceUrl,omitempty"`
+	PrivacyPolicyURL           *string    `json:"privacyPolicyUrl,omitempty"`
+	ServiceLevelAgreementURL   *string    `json:"serviceLevelAgreementUrl,omitempty"`
+	DataProcessingAgreementURL *string    `json:"dataProcessingAgreementUrl,omitempty"`
+	WebsiteURL                 *string    `json:"websiteUrl,omitempty"`
+	LegalName                  *string    `json:"legalName,omitempty"`
+	HeadquarterAddress         *string    `json:"headquarterAddress,omitempty"`
+	Category                   *string    `json:"category,omitempty"`
+	Certifications             []string   `json:"certifications,omitempty"`
+	SecurityPageURL            *string    `json:"securityPageUrl,omitempty"`
+	TrustPageURL               *string    `json:"trustPageUrl,omitempty"`
+	BusinessOwnerID            *gid.GID   `json:"businessOwnerId,omitempty"`
+	SecurityOwnerID            *gid.GID   `json:"securityOwnerId,omitempty"`
 }
 
 type UpdateVendorPayload struct {
@@ -809,12 +819,11 @@ type Vendor struct {
 	Name                       string                            `json:"name"`
 	Description                *string                           `json:"description,omitempty"`
 	ComplianceReports          *VendorComplianceReportConnection `json:"complianceReports"`
+	RiskAssessments            *VendorRiskAssessmentConnection   `json:"riskAssessments"`
 	BusinessOwner              *People                           `json:"businessOwner,omitempty"`
 	SecurityOwner              *People                           `json:"securityOwner,omitempty"`
 	ServiceStartAt             time.Time                         `json:"serviceStartAt"`
 	ServiceTerminationAt       *time.Time                        `json:"serviceTerminationAt,omitempty"`
-	ServiceCriticality         coredata.ServiceCriticality       `json:"serviceCriticality"`
-	RiskTier                   coredata.RiskTier                 `json:"riskTier"`
 	StatusPageURL              *string                           `json:"statusPageUrl,omitempty"`
 	TermsOfServiceURL          *string                           `json:"termsOfServiceUrl,omitempty"`
 	PrivacyPolicyURL           *string                           `json:"privacyPolicyUrl,omitempty"`
@@ -866,6 +875,38 @@ type VendorConnection struct {
 type VendorEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Vendor        `json:"node"`
+}
+
+type VendorRiskAssessment struct {
+	ID              gid.GID                  `json:"id"`
+	Vendor          *Vendor                  `json:"vendor"`
+	AssessedAt      time.Time                `json:"assessedAt"`
+	AssessedBy      *People                  `json:"assessedBy"`
+	ExpiresAt       time.Time                `json:"expiresAt"`
+	DataSensitivity coredata.DataSensitivity `json:"dataSensitivity"`
+	BusinessImpact  coredata.BusinessImpact  `json:"businessImpact"`
+	Notes           *string                  `json:"notes,omitempty"`
+	Attachments     []string                 `json:"attachments"`
+	CreatedAt       time.Time                `json:"createdAt"`
+	UpdatedAt       time.Time                `json:"updatedAt"`
+}
+
+func (VendorRiskAssessment) IsNode()             {}
+func (this VendorRiskAssessment) GetID() gid.GID { return this.ID }
+
+type VendorRiskAssessmentConnection struct {
+	Edges    []*VendorRiskAssessmentEdge `json:"edges"`
+	PageInfo *PageInfo                   `json:"pageInfo"`
+}
+
+type VendorRiskAssessmentEdge struct {
+	Cursor page.CursorKey        `json:"cursor"`
+	Node   *VendorRiskAssessment `json:"node"`
+}
+
+type VendorRiskAssessmentOrder struct {
+	Field     coredata.VendorRiskAssessmentOrderField `json:"field"`
+	Direction page.OrderDirection                     `json:"direction"`
 }
 
 type Viewer struct {

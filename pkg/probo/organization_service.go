@@ -64,8 +64,8 @@ func (s OrganizationService) Create(
 
 	err = s.svc.pg.WithConn(
 		ctx,
-		func(conn pg.Conn) error {
-			if err := organization.Insert(ctx, conn); err != nil {
+		func(tx pg.Conn) error {
+			if err := organization.Insert(ctx, tx); err != nil {
 				return fmt.Errorf("cannot insert organization: %w", err)
 			}
 

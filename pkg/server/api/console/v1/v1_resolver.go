@@ -206,6 +206,22 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.C
 	tenantIDs, _ := ctx.Value(userTenantContextKey).(*[]gid.TenantID)
 	*tenantIDs = append(*tenantIDs, organization.ID.TenantID())
 
+	_, err = svc.Peoples.Create(
+		ctx,
+		probo.CreatePeopleRequest{
+			OrganizationID:           organization.ID,
+			UserID:                   &UserFromContext(ctx).ID,
+			FullName:                 UserFromContext(ctx).FullName,
+			PrimaryEmailAddress:      UserFromContext(ctx).EmailAddress,
+			AdditionalEmailAddresses: []string{},
+			Kind:                     coredata.PeopleKindEmployee,
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot create people: %w", err)
+	}
+
 	return &types.CreateOrganizationPayload{
 		OrganizationEdge: types.NewOrganizationEdge(organization, coredata.OrganizationOrderFieldCreatedAt),
 	}, nil
@@ -363,8 +379,6 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 			Description:                input.Description,
 			ServiceStartAt:             input.ServiceStartAt,
 			ServiceTerminationAt:       input.ServiceTerminationAt,
-			ServiceCriticality:         input.ServiceCriticality,
-			RiskTier:                   input.RiskTier,
 			StatusPageURL:              input.StatusPageURL,
 			TermsOfServiceURL:          input.TermsOfServiceURL,
 			PrivacyPolicyURL:           input.PrivacyPolicyURL,
@@ -399,8 +413,6 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 		Description:                input.Description,
 		ServiceStartAt:             input.ServiceStartAt,
 		ServiceTerminationAt:       input.ServiceTerminationAt,
-		ServiceCriticality:         input.ServiceCriticality,
-		RiskTier:                   input.RiskTier,
 		StatusPageURL:              input.StatusPageURL,
 		TermsOfServiceURL:          input.TermsOfServiceURL,
 		PrivacyPolicyURL:           input.PrivacyPolicyURL,
@@ -1034,6 +1046,33 @@ func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeleteP
 	}, nil
 }
 
+// CreateVendorRiskAssessment is the resolver for the createVendorRiskAssessment field.
+func (r *mutationResolver) CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.VendorID.TenantID())
+	user := UserFromContext(ctx)
+
+	expiresAt := time.Now().Add(time.Hour * 24 * 365)
+
+	vendorRiskAssessment, err := svc.Vendors.CreateRiskAssessment(
+		ctx,
+		probo.CreateVendorRiskAssessmentRequest{
+			VendorID:        input.VendorID,
+			AssessedByID:    user.ID,
+			ExpiresAt:       expiresAt,
+			DataSensitivity: input.DataSensitivity,
+			BusinessImpact:  input.BusinessImpact,
+			Notes:           input.Notes,
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("cannot create vendor risk assessment: %w", err))
+	}
+
+	return &types.CreateVendorRiskAssessmentPayload{
+		VendorRiskAssessmentEdge: types.NewVendorRiskAssessmentEdge(vendorRiskAssessment, coredata.VendorRiskAssessmentOrderFieldCreatedAt),
+	}, nil
+}
+
 // LogoURL is the resolver for the logoUrl field.
 func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organization) (*string, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -1544,6 +1583,11 @@ func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendo
 	return types.NewVendorComplianceReportConnection(page), nil
 }
 
+// RiskAssessments is the resolver for the riskAssessments field.
+func (r *vendorResolver) RiskAssessments(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorRiskAssessmentOrder) (*types.VendorRiskAssessmentConnection, error) {
+	panic(fmt.Errorf("not implemented: RiskAssessments - riskAssessments"))
+}
+
 // BusinessOwner is the resolver for the businessOwner field.
 func (r *vendorResolver) BusinessOwner(ctx context.Context, obj *types.Vendor) (*types.People, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -1610,6 +1654,16 @@ func (r *vendorComplianceReportResolver) FileURL(ctx context.Context, obj *types
 	return fileURL, nil
 }
 
+// Vendor is the resolver for the vendor field.
+func (r *vendorRiskAssessmentResolver) Vendor(ctx context.Context, obj *types.VendorRiskAssessment) (*types.Vendor, error) {
+	panic(fmt.Errorf("not implemented: Vendor - vendor"))
+}
+
+// AssessedBy is the resolver for the assessedBy field.
+func (r *vendorRiskAssessmentResolver) AssessedBy(ctx context.Context, obj *types.VendorRiskAssessment) (*types.People, error) {
+	panic(fmt.Errorf("not implemented: AssessedBy - assessedBy"))
+}
+
 // Organizations is the resolver for the organizations field.
 func (r *viewerResolver) Organizations(ctx context.Context, obj *types.Viewer, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder) (*types.OrganizationConnection, error) {
 	user := UserFromContext(ctx)
@@ -1673,6 +1727,11 @@ func (r *Resolver) VendorComplianceReport() schema.VendorComplianceReportResolve
 	return &vendorComplianceReportResolver{r}
 }
 
+// VendorRiskAssessment returns schema.VendorRiskAssessmentResolver implementation.
+func (r *Resolver) VendorRiskAssessment() schema.VendorRiskAssessmentResolver {
+	return &vendorRiskAssessmentResolver{r}
+}
+
 // Viewer returns schema.ViewerResolver implementation.
 func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
 
@@ -1688,4 +1747,5 @@ type riskResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
 type vendorResolver struct{ *Resolver }
 type vendorComplianceReportResolver struct{ *Resolver }
+type vendorRiskAssessmentResolver struct{ *Resolver }
 type viewerResolver struct{ *Resolver }

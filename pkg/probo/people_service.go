@@ -32,7 +32,7 @@ type (
 
 	UpdatePeopleRequest struct {
 		ID                       gid.GID
-		ExpectedVersion          int
+		UserID                   *gid.GID
 		Kind                     *coredata.PeopleKind
 		FullName                 *string
 		PrimaryEmailAddress      *string
@@ -41,6 +41,7 @@ type (
 
 	CreatePeopleRequest struct {
 		OrganizationID           gid.GID
+		UserID                   *gid.GID
 		FullName                 string
 		PrimaryEmailAddress      string
 		AdditionalEmailAddresses []string
@@ -99,20 +100,38 @@ func (s PeopleService) Update(
 	ctx context.Context,
 	req UpdatePeopleRequest,
 ) (*coredata.People, error) {
-	params := coredata.UpdatePeopleParams{
-		ExpectedVersion:          req.ExpectedVersion,
-		Kind:                     req.Kind,
-		FullName:                 req.FullName,
-		PrimaryEmailAddress:      req.PrimaryEmailAddress,
-		AdditionalEmailAddresses: req.AdditionalEmailAddresses,
-	}
-
-	people := &coredata.People{ID: req.ID}
+	people := &coredata.People{}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return people.Update(ctx, conn, s.svc.scope, params)
+			if err := people.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
+				return fmt.Errorf("cannot load people: %w", err)
+			}
+
+			if req.UserID != nil {
+				people.UserID = req.UserID
+			}
+
+			if req.Kind != nil {
+				people.Kind = *req.Kind
+			}
+
+			if req.FullName != nil {
+				people.FullName = *req.FullName
+			}
+
+			if req.PrimaryEmailAddress != nil {
+				people.PrimaryEmailAddress = *req.PrimaryEmailAddress
+			}
+
+			if req.AdditionalEmailAddresses != nil {
+				people.AdditionalEmailAddresses = *req.AdditionalEmailAddresses
+			}
+
+			people.UpdatedAt = time.Now()
+
+			return people.Update(ctx, conn, s.svc.scope)
 		})
 	if err != nil {
 		return nil, err

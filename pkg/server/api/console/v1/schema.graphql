@@ -107,32 +107,6 @@ enum MesureImportance
     )
 }
 
-enum ServiceCriticality
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ServiceCriticality") {
-  LOW
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityLow"
-    )
-  MEDIUM
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityMedium"
-    )
-  HIGH
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityHigh"
-    )
-}
-
-enum RiskTier
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskTier") {
-  CRITICAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierCritical")
-  SIGNIFICANT
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierSignificant")
-  GENERAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierGeneral")
-}
-
 enum PolicyStatus
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
   DRAFT
@@ -274,6 +248,32 @@ enum ConnectorOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.ConnectorOrderFieldName"
     )
+}
+
+enum DataSensitivity
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.DataSensitivity") {
+  NONE
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityNone")
+  LOW
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityLow")
+  MEDIUM
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityMedium")
+  HIGH
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityHigh")
+  CRITICAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityCritical")
+}
+
+enum BusinessImpact
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.BusinessImpact") {
+  LOW
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactLow")
+  MEDIUM
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactMedium")
+  HIGH
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactHigh")
+  CRITICAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactCritical")
 }
 
 # Order Input Types
@@ -488,13 +488,19 @@ type Vendor implements Node {
     orderBy: VendorComplianceReportOrder
   ): VendorComplianceReportConnection! @goField(forceResolver: true)
 
+  riskAssessments(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: VendorRiskAssessmentOrder
+  ): VendorRiskAssessmentConnection! @goField(forceResolver: true)
+
   businessOwner: People @goField(forceResolver: true)
   securityOwner: People @goField(forceResolver: true)
 
   serviceStartAt: Datetime!
   serviceTerminationAt: Datetime
-  serviceCriticality: ServiceCriticality!
-  riskTier: RiskTier!
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
@@ -850,6 +856,16 @@ type ConnectorEdge {
   node: Connector!
 }
 
+type VendorRiskAssessmentConnection {
+  edges: [VendorRiskAssessmentEdge!]!
+  pageInfo: PageInfo!
+}
+
+type VendorRiskAssessmentEdge {
+  cursor: CursorKey!
+  node: VendorRiskAssessment!
+}
+
 # Root Types
 type Query {
   node(id: ID!): Node!
@@ -951,6 +967,8 @@ type Mutation {
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
   updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
+
+  createVendorRiskAssessment(input: CreateVendorRiskAssessmentInput!): CreateVendorRiskAssessmentPayload!
 }
 
 # Input Types
@@ -986,8 +1004,6 @@ input CreateVendorInput {
   termsOfServiceUrl: String
   serviceStartAt: Datetime!
   serviceTerminationAt: Datetime
-  serviceCriticality: ServiceCriticality!
-  riskTier: RiskTier!
   businessOwnerId: ID
   securityOwnerId: ID
 }
@@ -998,8 +1014,6 @@ input UpdateVendorInput {
   description: String
   serviceStartAt: Datetime
   serviceTerminationAt: Datetime
-  serviceCriticality: ServiceCriticality
-  riskTier: RiskTier
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
@@ -1433,4 +1447,49 @@ type InviteUserPayload {
 
 type RemoveUserPayload {
   success: Boolean!
+}
+
+input VendorRiskAssessmentOrder {
+  field: VendorRiskAssessmentOrderField!
+  direction: OrderDirection!
+}
+
+type VendorRiskAssessment implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  assessedAt: Datetime!
+  assessedBy: People! @goField(forceResolver: true)
+  expiresAt: Datetime!
+  dataSensitivity: DataSensitivity!
+  businessImpact: BusinessImpact!
+  notes: String
+  attachments: [String!]!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+enum VendorRiskAssessmentOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderFieldCreatedAt"
+    )
+  EXPIRES_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderFieldExpiresAt"
+    )
+}
+
+input CreateVendorRiskAssessmentInput {
+  vendorId: ID!
+  assessedBy: ID!
+  expiresAt: Datetime!
+  dataSensitivity: DataSensitivity!
+  businessImpact: BusinessImpact!
+  notes: String
+  attachments: [String!]
+}
+
+type CreateVendorRiskAssessmentPayload {
+  vendorRiskAssessmentEdge: VendorRiskAssessmentEdge!
 }

@@ -14,21 +14,28 @@
 
 package coredata
 
-const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MesureEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ConnectorEntityType
-	VendorRiskAssessmentEntityType
-	VendorEntityType
-	PeopleEntityType
-	VendorComplianceReportEntityType
-	PolicyEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
+type (
+	VendorRiskAssessmentOrderField string
 )
+
+const (
+	VendorRiskAssessmentOrderFieldCreatedAt VendorRiskAssessmentOrderField = "CREATED_AT"
+	VendorRiskAssessmentOrderFieldExpiresAt VendorRiskAssessmentOrderField = "EXPIRES_AT"
+)
+
+func (p VendorRiskAssessmentOrderField) Column() string {
+	return string(p)
+}
+
+func (p VendorRiskAssessmentOrderField) String() string {
+	return string(p)
+}
+
+func (p VendorRiskAssessmentOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *VendorRiskAssessmentOrderField) UnmarshalText(text []byte) error {
+	*p = VendorRiskAssessmentOrderField(text)
+	return nil
+}

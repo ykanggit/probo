@@ -52,8 +52,6 @@ func NewVendor(v *coredata.Vendor) *Vendor {
 		UpdatedAt:                  v.UpdatedAt,
 		ServiceStartAt:             v.ServiceStartAt,
 		ServiceTerminationAt:       v.ServiceTerminationAt,
-		ServiceCriticality:         v.ServiceCriticality,
-		RiskTier:                   v.RiskTier,
 		StatusPageURL:              v.StatusPageURL,
 		TermsOfServiceURL:          v.TermsOfServiceURL,
 		PrivacyPolicyURL:           v.PrivacyPolicyURL,

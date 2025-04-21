@@ -54,6 +54,7 @@ type ResolverRoot interface {
 	Task() TaskResolver
 	Vendor() VendorResolver
 	VendorComplianceReport() VendorComplianceReportResolver
+	VendorRiskAssessment() VendorRiskAssessmentResolver
 	Viewer() ViewerResolver
 }
 
@@ -158,6 +159,10 @@ type ComplexityRoot struct {
 
 	CreateVendorPayload struct {
 		VendorEdge func(childComplexity int) int
+	}
+
+	CreateVendorRiskAssessmentPayload struct {
+		VendorRiskAssessmentEdge func(childComplexity int) int
 	}
 
 	DeleteControlMesureMappingPayload struct {
@@ -311,6 +316,7 @@ type ComplexityRoot struct {
 		CreateRiskPolicyMapping      func(childComplexity int, input types.CreateRiskPolicyMappingInput) int
 		CreateTask                   func(childComplexity int, input types.CreateTaskInput) int
 		CreateVendor                 func(childComplexity int, input types.CreateVendorInput) int
+		CreateVendorRiskAssessment   func(childComplexity int, input types.CreateVendorRiskAssessmentInput) int
 		DeleteControlMesureMapping   func(childComplexity int, input types.DeleteControlMesureMappingInput) int
 		DeleteControlPolicyMapping   func(childComplexity int, input types.DeleteControlPolicyMappingInput) int
 		DeleteEvidence               func(childComplexity int, input types.DeleteEvidenceInput) int
@@ -557,10 +563,9 @@ type ComplexityRoot struct {
 		LegalName                  func(childComplexity int) int
 		Name                       func(childComplexity int) int
 		PrivacyPolicyURL           func(childComplexity int) int
-		RiskTier                   func(childComplexity int) int
+		RiskAssessments            func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorRiskAssessmentOrder) int
 		SecurityOwner              func(childComplexity int) int
 		SecurityPageURL            func(childComplexity int) int
-		ServiceCriticality         func(childComplexity int) int
 		ServiceLevelAgreementURL   func(childComplexity int) int
 		ServiceStartAt             func(childComplexity int) int
 		ServiceTerminationAt       func(childComplexity int) int
@@ -599,6 +604,30 @@ type ComplexityRoot struct {
 	}
 
 	VendorEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	VendorRiskAssessment struct {
+		AssessedAt      func(childComplexity int) int
+		AssessedBy      func(childComplexity int) int
+		Attachments     func(childComplexity int) int
+		BusinessImpact  func(childComplexity int) int
+		CreatedAt       func(childComplexity int) int
+		DataSensitivity func(childComplexity int) int
+		ExpiresAt       func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Notes           func(childComplexity int) int
+		UpdatedAt       func(childComplexity int) int
+		Vendor          func(childComplexity int) int
+	}
+
+	VendorRiskAssessmentConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	VendorRiskAssessmentEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
 	}
@@ -670,6 +699,7 @@ type MutationResolver interface {
 	CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error)
 	UpdatePolicy(ctx context.Context, input types.UpdatePolicyInput) (*types.UpdatePolicyPayload, error)
 	DeletePolicy(ctx context.Context, input types.DeletePolicyInput) (*types.DeletePolicyPayload, error)
+	CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error)
 }
 type OrganizationResolver interface {
 	LogoURL(ctx context.Context, obj *types.Organization) (*string, error)
@@ -702,6 +732,7 @@ type TaskResolver interface {
 }
 type VendorResolver interface {
 	ComplianceReports(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) (*types.VendorComplianceReportConnection, error)
+	RiskAssessments(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorRiskAssessmentOrder) (*types.VendorRiskAssessmentConnection, error)
 	BusinessOwner(ctx context.Context, obj *types.Vendor) (*types.People, error)
 	SecurityOwner(ctx context.Context, obj *types.Vendor) (*types.People, error)
 }
@@ -709,6 +740,11 @@ type VendorComplianceReportResolver interface {
 	Vendor(ctx context.Context, obj *types.VendorComplianceReport) (*types.Vendor, error)
 
 	FileURL(ctx context.Context, obj *types.VendorComplianceReport) (string, error)
+}
+type VendorRiskAssessmentResolver interface {
+	Vendor(ctx context.Context, obj *types.VendorRiskAssessment) (*types.Vendor, error)
+
+	AssessedBy(ctx context.Context, obj *types.VendorRiskAssessment) (*types.People, error)
 }
 type ViewerResolver interface {
 	Organizations(ctx context.Context, obj *types.Viewer, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder) (*types.OrganizationConnection, error)
@@ -994,6 +1030,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreateVendorPayload.VendorEdge(childComplexity), true
+
+	case "CreateVendorRiskAssessmentPayload.vendorRiskAssessmentEdge":
+		if e.complexity.CreateVendorRiskAssessmentPayload.VendorRiskAssessmentEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateVendorRiskAssessmentPayload.VendorRiskAssessmentEdge(childComplexity), true
 
 	case "DeleteControlMesureMappingPayload.success":
 		if e.complexity.DeleteControlMesureMappingPayload.Success == nil {
@@ -1593,6 +1636,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateVendor(childComplexity, args["input"].(types.CreateVendorInput)), true
+
+	case "Mutation.createVendorRiskAssessment":
+		if e.complexity.Mutation.CreateVendorRiskAssessment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createVendorRiskAssessment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateVendorRiskAssessment(childComplexity, args["input"].(types.CreateVendorRiskAssessmentInput)), true
 
 	case "Mutation.deleteControlMesureMapping":
 		if e.complexity.Mutation.DeleteControlMesureMapping == nil {
@@ -2822,12 +2877,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Vendor.PrivacyPolicyURL(childComplexity), true
 
-	case "Vendor.riskTier":
-		if e.complexity.Vendor.RiskTier == nil {
+	case "Vendor.riskAssessments":
+		if e.complexity.Vendor.RiskAssessments == nil {
 			break
 		}
 
-		return e.complexity.Vendor.RiskTier(childComplexity), true
+		args, err := ec.field_Vendor_riskAssessments_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Vendor.RiskAssessments(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.VendorRiskAssessmentOrder)), true
 
 	case "Vendor.securityOwner":
 		if e.complexity.Vendor.SecurityOwner == nil {
@@ -2842,13 +2902,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Vendor.SecurityPageURL(childComplexity), true
-
-	case "Vendor.serviceCriticality":
-		if e.complexity.Vendor.ServiceCriticality == nil {
-			break
-		}
-
-		return e.complexity.Vendor.ServiceCriticality(childComplexity), true
 
 	case "Vendor.serviceLevelAgreementUrl":
 		if e.complexity.Vendor.ServiceLevelAgreementURL == nil {
@@ -3025,6 +3078,111 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.VendorEdge.Node(childComplexity), true
 
+	case "VendorRiskAssessment.assessedAt":
+		if e.complexity.VendorRiskAssessment.AssessedAt == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.AssessedAt(childComplexity), true
+
+	case "VendorRiskAssessment.assessedBy":
+		if e.complexity.VendorRiskAssessment.AssessedBy == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.AssessedBy(childComplexity), true
+
+	case "VendorRiskAssessment.attachments":
+		if e.complexity.VendorRiskAssessment.Attachments == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.Attachments(childComplexity), true
+
+	case "VendorRiskAssessment.businessImpact":
+		if e.complexity.VendorRiskAssessment.BusinessImpact == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.BusinessImpact(childComplexity), true
+
+	case "VendorRiskAssessment.createdAt":
+		if e.complexity.VendorRiskAssessment.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.CreatedAt(childComplexity), true
+
+	case "VendorRiskAssessment.dataSensitivity":
+		if e.complexity.VendorRiskAssessment.DataSensitivity == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.DataSensitivity(childComplexity), true
+
+	case "VendorRiskAssessment.expiresAt":
+		if e.complexity.VendorRiskAssessment.ExpiresAt == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.ExpiresAt(childComplexity), true
+
+	case "VendorRiskAssessment.id":
+		if e.complexity.VendorRiskAssessment.ID == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.ID(childComplexity), true
+
+	case "VendorRiskAssessment.notes":
+		if e.complexity.VendorRiskAssessment.Notes == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.Notes(childComplexity), true
+
+	case "VendorRiskAssessment.updatedAt":
+		if e.complexity.VendorRiskAssessment.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.UpdatedAt(childComplexity), true
+
+	case "VendorRiskAssessment.vendor":
+		if e.complexity.VendorRiskAssessment.Vendor == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessment.Vendor(childComplexity), true
+
+	case "VendorRiskAssessmentConnection.edges":
+		if e.complexity.VendorRiskAssessmentConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessmentConnection.Edges(childComplexity), true
+
+	case "VendorRiskAssessmentConnection.pageInfo":
+		if e.complexity.VendorRiskAssessmentConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessmentConnection.PageInfo(childComplexity), true
+
+	case "VendorRiskAssessmentEdge.cursor":
+		if e.complexity.VendorRiskAssessmentEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessmentEdge.Cursor(childComplexity), true
+
+	case "VendorRiskAssessmentEdge.node":
+		if e.complexity.VendorRiskAssessmentEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.VendorRiskAssessmentEdge.Node(childComplexity), true
+
 	case "Viewer.id":
 		if e.complexity.Viewer.ID == nil {
 			break
@@ -3076,6 +3234,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateRiskPolicyMappingInput,
 		ec.unmarshalInputCreateTaskInput,
 		ec.unmarshalInputCreateVendorInput,
+		ec.unmarshalInputCreateVendorRiskAssessmentInput,
 		ec.unmarshalInputDeleteControlMesureMappingInput,
 		ec.unmarshalInputDeleteControlPolicyMappingInput,
 		ec.unmarshalInputDeleteEvidenceInput,
@@ -3116,6 +3275,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUserOrder,
 		ec.unmarshalInputVendorComplianceReportOrder,
 		ec.unmarshalInputVendorOrder,
+		ec.unmarshalInputVendorRiskAssessmentOrder,
 	)
 	first := true
 
@@ -3322,32 +3482,6 @@ enum MesureImportance
     )
 }
 
-enum ServiceCriticality
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ServiceCriticality") {
-  LOW
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityLow"
-    )
-  MEDIUM
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityMedium"
-    )
-  HIGH
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.ServiceCriticalityHigh"
-    )
-}
-
-enum RiskTier
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.RiskTier") {
-  CRITICAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierCritical")
-  SIGNIFICANT
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierSignificant")
-  GENERAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskTierGeneral")
-}
-
 enum PolicyStatus
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
   DRAFT
@@ -3489,6 +3623,32 @@ enum ConnectorOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.ConnectorOrderFieldName"
     )
+}
+
+enum DataSensitivity
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.DataSensitivity") {
+  NONE
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityNone")
+  LOW
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityLow")
+  MEDIUM
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityMedium")
+  HIGH
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityHigh")
+  CRITICAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityCritical")
+}
+
+enum BusinessImpact
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.BusinessImpact") {
+  LOW
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactLow")
+  MEDIUM
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactMedium")
+  HIGH
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactHigh")
+  CRITICAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactCritical")
 }
 
 # Order Input Types
@@ -3703,13 +3863,19 @@ type Vendor implements Node {
     orderBy: VendorComplianceReportOrder
   ): VendorComplianceReportConnection! @goField(forceResolver: true)
 
+  riskAssessments(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: VendorRiskAssessmentOrder
+  ): VendorRiskAssessmentConnection! @goField(forceResolver: true)
+
   businessOwner: People @goField(forceResolver: true)
   securityOwner: People @goField(forceResolver: true)
 
   serviceStartAt: Datetime!
   serviceTerminationAt: Datetime
-  serviceCriticality: ServiceCriticality!
-  riskTier: RiskTier!
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
@@ -4065,6 +4231,16 @@ type ConnectorEdge {
   node: Connector!
 }
 
+type VendorRiskAssessmentConnection {
+  edges: [VendorRiskAssessmentEdge!]!
+  pageInfo: PageInfo!
+}
+
+type VendorRiskAssessmentEdge {
+  cursor: CursorKey!
+  node: VendorRiskAssessment!
+}
+
 # Root Types
 type Query {
   node(id: ID!): Node!
@@ -4166,6 +4342,8 @@ type Mutation {
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
   updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
+
+  createVendorRiskAssessment(input: CreateVendorRiskAssessmentInput!): CreateVendorRiskAssessmentPayload!
 }
 
 # Input Types
@@ -4201,8 +4379,6 @@ input CreateVendorInput {
   termsOfServiceUrl: String
   serviceStartAt: Datetime!
   serviceTerminationAt: Datetime
-  serviceCriticality: ServiceCriticality!
-  riskTier: RiskTier!
   businessOwnerId: ID
   securityOwnerId: ID
 }
@@ -4213,8 +4389,6 @@ input UpdateVendorInput {
   description: String
   serviceStartAt: Datetime
   serviceTerminationAt: Datetime
-  serviceCriticality: ServiceCriticality
-  riskTier: RiskTier
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
@@ -4648,6 +4822,51 @@ type InviteUserPayload {
 
 type RemoveUserPayload {
   success: Boolean!
+}
+
+input VendorRiskAssessmentOrder {
+  field: VendorRiskAssessmentOrderField!
+  direction: OrderDirection!
+}
+
+type VendorRiskAssessment implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  assessedAt: Datetime!
+  assessedBy: People! @goField(forceResolver: true)
+  expiresAt: Datetime!
+  dataSensitivity: DataSensitivity!
+  businessImpact: BusinessImpact!
+  notes: String
+  attachments: [String!]!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+enum VendorRiskAssessmentOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderFieldCreatedAt"
+    )
+  EXPIRES_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderFieldExpiresAt"
+    )
+}
+
+input CreateVendorRiskAssessmentInput {
+  vendorId: ID!
+  assessedBy: ID!
+  expiresAt: Datetime!
+  dataSensitivity: DataSensitivity!
+  businessImpact: BusinessImpact!
+  notes: String
+  attachments: [String!]
+}
+
+type CreateVendorRiskAssessmentPayload {
+  vendorRiskAssessmentEdge: VendorRiskAssessmentEdge!
 }
 `, BuiltIn: false},
 }
@@ -5546,6 +5765,29 @@ func (ec *executionContext) field_Mutation_createTask_argsInput(
 	}
 
 	var zeroVal types.CreateTaskInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createVendorRiskAssessment_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createVendorRiskAssessment_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createVendorRiskAssessment_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateVendorRiskAssessmentInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateVendorRiskAssessmentInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorRiskAssessmentInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateVendorRiskAssessmentInput
 	return zeroVal, nil
 }
 
@@ -7615,6 +7857,101 @@ func (ec *executionContext) field_Vendor_complianceReports_argsOrderBy(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Vendor_riskAssessments_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Vendor_riskAssessments_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Vendor_riskAssessments_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Vendor_riskAssessments_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Vendor_riskAssessments_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Vendor_riskAssessments_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_Vendor_riskAssessments_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Vendor_riskAssessments_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Vendor_riskAssessments_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Vendor_riskAssessments_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Vendor_riskAssessments_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.VendorRiskAssessmentOrder, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOVendorRiskAssessmentOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessmentOrder(ctx, tmp)
+	}
+
+	var zeroVal *types.VendorRiskAssessmentOrder
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Viewer_organizations_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -9559,6 +9896,56 @@ func (ec *executionContext) fieldContext_CreateVendorPayload_vendorEdge(_ contex
 				return ec.fieldContext_VendorEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type VendorEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateVendorRiskAssessmentPayload_vendorRiskAssessmentEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateVendorRiskAssessmentPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateVendorRiskAssessmentPayload_vendorRiskAssessmentEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VendorRiskAssessmentEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorRiskAssessmentEdge)
+	fc.Result = res
+	return ec.marshalNVendorRiskAssessmentEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessmentEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateVendorRiskAssessmentPayload_vendorRiskAssessmentEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateVendorRiskAssessmentPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_VendorRiskAssessmentEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_VendorRiskAssessmentEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorRiskAssessmentEdge", field.Name)
 		},
 	}
 	return fc, nil
@@ -14858,6 +15245,65 @@ func (ec *executionContext) fieldContext_Mutation_deletePolicy(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createVendorRiskAssessment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createVendorRiskAssessment(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateVendorRiskAssessment(rctx, fc.Args["input"].(types.CreateVendorRiskAssessmentInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateVendorRiskAssessmentPayload)
+	fc.Result = res
+	return ec.marshalNCreateVendorRiskAssessmentPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorRiskAssessmentPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createVendorRiskAssessment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "vendorRiskAssessmentEdge":
+				return ec.fieldContext_CreateVendorRiskAssessmentPayload_vendorRiskAssessmentEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateVendorRiskAssessmentPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createVendorRiskAssessment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Organization_id(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Organization_id(ctx, field)
 	if err != nil {
@@ -19779,6 +20225,8 @@ func (ec *executionContext) fieldContext_UpdateVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "riskAssessments":
+				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
 			case "businessOwner":
 				return ec.fieldContext_Vendor_businessOwner(ctx, field)
 			case "securityOwner":
@@ -19787,10 +20235,6 @@ func (ec *executionContext) fieldContext_UpdateVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
 			case "serviceTerminationAt":
 				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
-			case "serviceCriticality":
-				return ec.fieldContext_Vendor_serviceCriticality(ctx, field)
-			case "riskTier":
-				return ec.fieldContext_Vendor_riskTier(ctx, field)
 			case "statusPageUrl":
 				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
 			case "termsOfServiceUrl":
@@ -20488,6 +20932,67 @@ func (ec *executionContext) fieldContext_Vendor_complianceReports(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Vendor_riskAssessments(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_riskAssessments(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Vendor().RiskAssessments(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.VendorRiskAssessmentOrder))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorRiskAssessmentConnection)
+	fc.Result = res
+	return ec.marshalNVendorRiskAssessmentConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessmentConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_riskAssessments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_VendorRiskAssessmentConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_VendorRiskAssessmentConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorRiskAssessmentConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Vendor_riskAssessments_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Vendor_businessOwner(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Vendor_businessOwner(ctx, field)
 	if err != nil {
@@ -20682,94 +21187,6 @@ func (ec *executionContext) fieldContext_Vendor_serviceTerminationAt(_ context.C
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Datetime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Vendor_serviceCriticality(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Vendor_serviceCriticality(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ServiceCriticality, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(coredata.ServiceCriticality)
-	fc.Result = res
-	return ec.marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Vendor_serviceCriticality(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vendor",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ServiceCriticality does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Vendor_riskTier(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Vendor_riskTier(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RiskTier, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(coredata.RiskTier)
-	fc.Result = res
-	return ec.marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Vendor_riskTier(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vendor",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type RiskTier does not have child fields")
 		},
 	}
 	return fc, nil
@@ -21408,6 +21825,8 @@ func (ec *executionContext) fieldContext_VendorComplianceReport_vendor(_ context
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "riskAssessments":
+				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
 			case "businessOwner":
 				return ec.fieldContext_Vendor_businessOwner(ctx, field)
 			case "securityOwner":
@@ -21416,10 +21835,6 @@ func (ec *executionContext) fieldContext_VendorComplianceReport_vendor(_ context
 				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
 			case "serviceTerminationAt":
 				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
-			case "serviceCriticality":
-				return ec.fieldContext_Vendor_serviceCriticality(ctx, field)
-			case "riskTier":
-				return ec.fieldContext_Vendor_riskTier(ctx, field)
 			case "statusPageUrl":
 				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
 			case "termsOfServiceUrl":
@@ -22165,6 +22580,8 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "riskAssessments":
+				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
 			case "businessOwner":
 				return ec.fieldContext_Vendor_businessOwner(ctx, field)
 			case "securityOwner":
@@ -22173,10 +22590,6 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
 			case "serviceTerminationAt":
 				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
-			case "serviceCriticality":
-				return ec.fieldContext_Vendor_serviceCriticality(ctx, field)
-			case "riskTier":
-				return ec.fieldContext_Vendor_riskTier(ctx, field)
 			case "statusPageUrl":
 				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
 			case "termsOfServiceUrl":
@@ -22205,6 +22618,765 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_id(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_vendor(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_vendor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.VendorRiskAssessment().Vendor(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Vendor)
+	fc.Result = res
+	return ec.marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_vendor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Vendor_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Vendor_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Vendor_description(ctx, field)
+			case "complianceReports":
+				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "riskAssessments":
+				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
+			case "businessOwner":
+				return ec.fieldContext_Vendor_businessOwner(ctx, field)
+			case "securityOwner":
+				return ec.fieldContext_Vendor_securityOwner(ctx, field)
+			case "serviceStartAt":
+				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
+			case "serviceTerminationAt":
+				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
+			case "statusPageUrl":
+				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
+			case "termsOfServiceUrl":
+				return ec.fieldContext_Vendor_termsOfServiceUrl(ctx, field)
+			case "privacyPolicyUrl":
+				return ec.fieldContext_Vendor_privacyPolicyUrl(ctx, field)
+			case "serviceLevelAgreementUrl":
+				return ec.fieldContext_Vendor_serviceLevelAgreementUrl(ctx, field)
+			case "dataProcessingAgreementUrl":
+				return ec.fieldContext_Vendor_dataProcessingAgreementUrl(ctx, field)
+			case "certifications":
+				return ec.fieldContext_Vendor_certifications(ctx, field)
+			case "securityPageUrl":
+				return ec.fieldContext_Vendor_securityPageUrl(ctx, field)
+			case "trustPageUrl":
+				return ec.fieldContext_Vendor_trustPageUrl(ctx, field)
+			case "headquarterAddress":
+				return ec.fieldContext_Vendor_headquarterAddress(ctx, field)
+			case "legalName":
+				return ec.fieldContext_Vendor_legalName(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Vendor_websiteUrl(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Vendor_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Vendor_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_assessedAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_assessedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssessedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_assessedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_assessedBy(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_assessedBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.VendorRiskAssessment().AssessedBy(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_assessedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_expiresAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_expiresAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExpiresAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_expiresAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_dataSensitivity(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_dataSensitivity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DataSensitivity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.DataSensitivity)
+	fc.Result = res
+	return ec.marshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_dataSensitivity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DataSensitivity does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_businessImpact(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_businessImpact(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BusinessImpact, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.BusinessImpact)
+	fc.Result = res
+	return ec.marshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_businessImpact(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type BusinessImpact does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_notes(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_notes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Notes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_notes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_attachments(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_attachments(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Attachments, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_attachments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessment_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessment_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessment_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessmentConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessmentConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessmentConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.VendorRiskAssessmentEdge)
+	fc.Result = res
+	return ec.marshalNVendorRiskAssessmentEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessmentEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessmentConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessmentConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_VendorRiskAssessmentEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_VendorRiskAssessmentEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorRiskAssessmentEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessmentConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessmentConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessmentConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessmentConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessmentConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessmentEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessmentEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessmentEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessmentEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessmentEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorRiskAssessmentEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessmentEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorRiskAssessmentEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorRiskAssessment)
+	fc.Result = res
+	return ec.marshalNVendorRiskAssessment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorRiskAssessmentEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorRiskAssessmentEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_VendorRiskAssessment_id(ctx, field)
+			case "vendor":
+				return ec.fieldContext_VendorRiskAssessment_vendor(ctx, field)
+			case "assessedAt":
+				return ec.fieldContext_VendorRiskAssessment_assessedAt(ctx, field)
+			case "assessedBy":
+				return ec.fieldContext_VendorRiskAssessment_assessedBy(ctx, field)
+			case "expiresAt":
+				return ec.fieldContext_VendorRiskAssessment_expiresAt(ctx, field)
+			case "dataSensitivity":
+				return ec.fieldContext_VendorRiskAssessment_dataSensitivity(ctx, field)
+			case "businessImpact":
+				return ec.fieldContext_VendorRiskAssessment_businessImpact(ctx, field)
+			case "notes":
+				return ec.fieldContext_VendorRiskAssessment_notes(ctx, field)
+			case "attachments":
+				return ec.fieldContext_VendorRiskAssessment_attachments(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_VendorRiskAssessment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_VendorRiskAssessment_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorRiskAssessment", field.Name)
 		},
 	}
 	return fc, nil
@@ -25041,7 +26213,7 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "description", "headquarterAddress", "legalName", "websiteUrl", "privacyPolicyUrl", "category", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "certifications", "securityPageUrl", "trustPageUrl", "statusPageUrl", "termsOfServiceUrl", "serviceStartAt", "serviceTerminationAt", "serviceCriticality", "riskTier", "businessOwnerId", "securityOwnerId"}
+	fieldsInOrder := [...]string{"organizationId", "name", "description", "headquarterAddress", "legalName", "websiteUrl", "privacyPolicyUrl", "category", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "certifications", "securityPageUrl", "trustPageUrl", "statusPageUrl", "termsOfServiceUrl", "serviceStartAt", "serviceTerminationAt", "businessOwnerId", "securityOwnerId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25167,20 +26339,6 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.ServiceTerminationAt = data
-		case "serviceCriticality":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceCriticality"))
-			data, err := ec.unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ServiceCriticality = data
-		case "riskTier":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("riskTier"))
-			data, err := ec.unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.RiskTier = data
 		case "businessOwnerId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("businessOwnerId"))
 			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
@@ -25195,6 +26353,75 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.SecurityOwnerID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateVendorRiskAssessmentInput(ctx context.Context, obj any) (types.CreateVendorRiskAssessmentInput, error) {
+	var it types.CreateVendorRiskAssessmentInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"vendorId", "assessedBy", "expiresAt", "dataSensitivity", "businessImpact", "notes", "attachments"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "vendorId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VendorID = data
+		case "assessedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assessedBy"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AssessedBy = data
+		case "expiresAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expiresAt"))
+			data, err := ec.unmarshalNDatetime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExpiresAt = data
+		case "dataSensitivity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dataSensitivity"))
+			data, err := ec.unmarshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DataSensitivity = data
+		case "businessImpact":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("businessImpact"))
+			data, err := ec.unmarshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BusinessImpact = data
+		case "notes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notes"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Notes = data
+		case "attachments":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("attachments"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Attachments = data
 		}
 	}
 
@@ -26531,7 +27758,7 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartAt", "serviceTerminationAt", "serviceCriticality", "riskTier", "statusPageUrl", "termsOfServiceUrl", "privacyPolicyUrl", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "websiteUrl", "legalName", "headquarterAddress", "category", "certifications", "securityPageUrl", "trustPageUrl", "businessOwnerId", "securityOwnerId"}
+	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartAt", "serviceTerminationAt", "statusPageUrl", "termsOfServiceUrl", "privacyPolicyUrl", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "websiteUrl", "legalName", "headquarterAddress", "category", "certifications", "securityPageUrl", "trustPageUrl", "businessOwnerId", "securityOwnerId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -26573,20 +27800,6 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.ServiceTerminationAt = data
-		case "serviceCriticality":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceCriticality"))
-			data, err := ec.unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ServiceCriticality = data
-		case "riskTier":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("riskTier"))
-			data, err := ec.unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.RiskTier = data
 		case "statusPageUrl":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusPageUrl"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -26848,6 +28061,40 @@ func (ec *executionContext) unmarshalInputVendorOrder(ctx context.Context, obj a
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputVendorRiskAssessmentOrder(ctx context.Context, obj any) (types.VendorRiskAssessmentOrder, error) {
+	var it types.VendorRiskAssessmentOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"field", "direction"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNVendorRiskAssessmentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorRiskAssessmentOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -26856,6 +28103,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case types.VendorRiskAssessment:
+		return ec._VendorRiskAssessment(ctx, sel, &obj)
+	case *types.VendorRiskAssessment:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._VendorRiskAssessment(ctx, sel, obj)
 	case types.VendorComplianceReport:
 		return ec._VendorComplianceReport(ctx, sel, &obj)
 	case *types.VendorComplianceReport:
@@ -27886,6 +29140,45 @@ func (ec *executionContext) _CreateVendorPayload(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("CreateVendorPayload")
 		case "vendorEdge":
 			out.Values[i] = ec._CreateVendorPayload_vendorEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var createVendorRiskAssessmentPayloadImplementors = []string{"CreateVendorRiskAssessmentPayload"}
+
+func (ec *executionContext) _CreateVendorRiskAssessmentPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateVendorRiskAssessmentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createVendorRiskAssessmentPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateVendorRiskAssessmentPayload")
+		case "vendorRiskAssessmentEdge":
+			out.Values[i] = ec._CreateVendorRiskAssessmentPayload_vendorRiskAssessmentEdge(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -29553,6 +30846,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deletePolicy":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deletePolicy(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createVendorRiskAssessment":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createVendorRiskAssessment(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -31837,6 +33137,42 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "riskAssessments":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Vendor_riskAssessments(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "businessOwner":
 			field := field
 
@@ -31910,16 +33246,6 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "serviceTerminationAt":
 			out.Values[i] = ec._Vendor_serviceTerminationAt(ctx, field, obj)
-		case "serviceCriticality":
-			out.Values[i] = ec._Vendor_serviceCriticality(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "riskTier":
-			out.Values[i] = ec._Vendor_riskTier(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "statusPageUrl":
 			out.Values[i] = ec._Vendor_statusPageUrl(ctx, field, obj)
 		case "termsOfServiceUrl":
@@ -32266,6 +33592,242 @@ func (ec *executionContext) _VendorEdge(ctx context.Context, sel ast.SelectionSe
 			}
 		case "node":
 			out.Values[i] = ec._VendorEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var vendorRiskAssessmentImplementors = []string{"VendorRiskAssessment", "Node"}
+
+func (ec *executionContext) _VendorRiskAssessment(ctx context.Context, sel ast.SelectionSet, obj *types.VendorRiskAssessment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, vendorRiskAssessmentImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VendorRiskAssessment")
+		case "id":
+			out.Values[i] = ec._VendorRiskAssessment_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "vendor":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._VendorRiskAssessment_vendor(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "assessedAt":
+			out.Values[i] = ec._VendorRiskAssessment_assessedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "assessedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._VendorRiskAssessment_assessedBy(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "expiresAt":
+			out.Values[i] = ec._VendorRiskAssessment_expiresAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "dataSensitivity":
+			out.Values[i] = ec._VendorRiskAssessment_dataSensitivity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "businessImpact":
+			out.Values[i] = ec._VendorRiskAssessment_businessImpact(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "notes":
+			out.Values[i] = ec._VendorRiskAssessment_notes(ctx, field, obj)
+		case "attachments":
+			out.Values[i] = ec._VendorRiskAssessment_attachments(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._VendorRiskAssessment_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._VendorRiskAssessment_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var vendorRiskAssessmentConnectionImplementors = []string{"VendorRiskAssessmentConnection"}
+
+func (ec *executionContext) _VendorRiskAssessmentConnection(ctx context.Context, sel ast.SelectionSet, obj *types.VendorRiskAssessmentConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, vendorRiskAssessmentConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VendorRiskAssessmentConnection")
+		case "edges":
+			out.Values[i] = ec._VendorRiskAssessmentConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._VendorRiskAssessmentConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var vendorRiskAssessmentEdgeImplementors = []string{"VendorRiskAssessmentEdge"}
+
+func (ec *executionContext) _VendorRiskAssessmentEdge(ctx context.Context, sel ast.SelectionSet, obj *types.VendorRiskAssessmentEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, vendorRiskAssessmentEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VendorRiskAssessmentEdge")
+		case "cursor":
+			out.Values[i] = ec._VendorRiskAssessmentEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._VendorRiskAssessmentEdge_node(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -32741,6 +34303,37 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact(ctx context.Context, v any) (coredata.BusinessImpact, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact(ctx context.Context, sel ast.SelectionSet, v coredata.BusinessImpact) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact = map[string]coredata.BusinessImpact{
+		"LOW":      coredata.BusinessImpactLow,
+		"MEDIUM":   coredata.BusinessImpactMedium,
+		"HIGH":     coredata.BusinessImpactHigh,
+		"CRITICAL": coredata.BusinessImpactCritical,
+	}
+	marshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact = map[coredata.BusinessImpact]string{
+		coredata.BusinessImpactLow:      "LOW",
+		coredata.BusinessImpactMedium:   "MEDIUM",
+		coredata.BusinessImpactHigh:     "HIGH",
+		coredata.BusinessImpactCritical: "CRITICAL",
+	}
+)
+
 func (ec *executionContext) unmarshalNConfirmEmailInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐConfirmEmailInput(ctx context.Context, v any) (types.ConfirmEmailInput, error) {
 	res, err := ec.unmarshalInputConfirmEmailInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -33215,6 +34808,25 @@ func (ec *executionContext) marshalNCreateVendorPayload2ᚖgithubᚗcomᚋgetpro
 	return ec._CreateVendorPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateVendorRiskAssessmentInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorRiskAssessmentInput(ctx context.Context, v any) (types.CreateVendorRiskAssessmentInput, error) {
+	res, err := ec.unmarshalInputCreateVendorRiskAssessmentInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateVendorRiskAssessmentPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorRiskAssessmentPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateVendorRiskAssessmentPayload) graphql.Marshaler {
+	return ec._CreateVendorRiskAssessmentPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateVendorRiskAssessmentPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorRiskAssessmentPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateVendorRiskAssessmentPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateVendorRiskAssessmentPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx context.Context, v any) (page.CursorKey, error) {
 	res, err := types.UnmarshalCursorKeyScalar(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -33229,6 +34841,39 @@ func (ec *executionContext) marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋ
 	}
 	return res
 }
+
+func (ec *executionContext) unmarshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity(ctx context.Context, v any) (coredata.DataSensitivity, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity(ctx context.Context, sel ast.SelectionSet, v coredata.DataSensitivity) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity = map[string]coredata.DataSensitivity{
+		"NONE":     coredata.DataSensitivityNone,
+		"LOW":      coredata.DataSensitivityLow,
+		"MEDIUM":   coredata.DataSensitivityMedium,
+		"HIGH":     coredata.DataSensitivityHigh,
+		"CRITICAL": coredata.DataSensitivityCritical,
+	}
+	marshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity = map[coredata.DataSensitivity]string{
+		coredata.DataSensitivityNone:     "NONE",
+		coredata.DataSensitivityLow:      "LOW",
+		coredata.DataSensitivityMedium:   "MEDIUM",
+		coredata.DataSensitivityHigh:     "HIGH",
+		coredata.DataSensitivityCritical: "CRITICAL",
+	}
+)
 
 func (ec *executionContext) unmarshalNDatetime2timeᚐTime(ctx context.Context, v any) (time.Time, error) {
 	res, err := graphql.UnmarshalTime(v)
@@ -34547,35 +36192,6 @@ var (
 	}
 )
 
-func (ec *executionContext) unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx context.Context, v any) (coredata.RiskTier, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier[tmp]
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx context.Context, sel ast.SelectionSet, v coredata.RiskTier) graphql.Marshaler {
-	res := graphql.MarshalString(marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier[v])
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
-var (
-	unmarshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier = map[string]coredata.RiskTier{
-		"CRITICAL":    coredata.RiskTierCritical,
-		"SIGNIFICANT": coredata.RiskTierSignificant,
-		"GENERAL":     coredata.RiskTierGeneral,
-	}
-	marshalNRiskTier2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier = map[coredata.RiskTier]string{
-		coredata.RiskTierCritical:    "CRITICAL",
-		coredata.RiskTierSignificant: "SIGNIFICANT",
-		coredata.RiskTierGeneral:     "GENERAL",
-	}
-)
-
 func (ec *executionContext) unmarshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx context.Context, v any) (coredata.RiskTreatment, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := unmarshalNRiskTreatment2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment[tmp]
@@ -34604,35 +36220,6 @@ var (
 		coredata.RiskTreatmentAccepted:    "ACCEPTED",
 		coredata.RiskTreatmentAvoided:     "AVOIDED",
 		coredata.RiskTreatmentTransferred: "TRANSFERRED",
-	}
-)
-
-func (ec *executionContext) unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx context.Context, v any) (coredata.ServiceCriticality, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality[tmp]
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx context.Context, sel ast.SelectionSet, v coredata.ServiceCriticality) graphql.Marshaler {
-	res := graphql.MarshalString(marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality[v])
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
-var (
-	unmarshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality = map[string]coredata.ServiceCriticality{
-		"LOW":    coredata.ServiceCriticalityLow,
-		"MEDIUM": coredata.ServiceCriticalityMedium,
-		"HIGH":   coredata.ServiceCriticalityHigh,
-	}
-	marshalNServiceCriticality2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality = map[coredata.ServiceCriticality]string{
-		coredata.ServiceCriticalityLow:    "LOW",
-		coredata.ServiceCriticalityMedium: "MEDIUM",
-		coredata.ServiceCriticalityHigh:   "HIGH",
 	}
 )
 
@@ -35313,6 +36900,111 @@ func (ec *executionContext) marshalNVendorOrderField2githubᚗcomᚋgetproboᚋp
 	return res
 }
 
+func (ec *executionContext) marshalNVendorRiskAssessment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessment(ctx context.Context, sel ast.SelectionSet, v *types.VendorRiskAssessment) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._VendorRiskAssessment(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNVendorRiskAssessmentConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessmentConnection(ctx context.Context, sel ast.SelectionSet, v types.VendorRiskAssessmentConnection) graphql.Marshaler {
+	return ec._VendorRiskAssessmentConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNVendorRiskAssessmentConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessmentConnection(ctx context.Context, sel ast.SelectionSet, v *types.VendorRiskAssessmentConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._VendorRiskAssessmentConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNVendorRiskAssessmentEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessmentEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.VendorRiskAssessmentEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNVendorRiskAssessmentEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessmentEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNVendorRiskAssessmentEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessmentEdge(ctx context.Context, sel ast.SelectionSet, v *types.VendorRiskAssessmentEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._VendorRiskAssessmentEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNVendorRiskAssessmentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorRiskAssessmentOrderField(ctx context.Context, v any) (coredata.VendorRiskAssessmentOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNVendorRiskAssessmentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorRiskAssessmentOrderField[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNVendorRiskAssessmentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorRiskAssessmentOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.VendorRiskAssessmentOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNVendorRiskAssessmentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorRiskAssessmentOrderField[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNVendorRiskAssessmentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorRiskAssessmentOrderField = map[string]coredata.VendorRiskAssessmentOrderField{
+		"CREATED_AT": coredata.VendorRiskAssessmentOrderFieldCreatedAt,
+		"EXPIRES_AT": coredata.VendorRiskAssessmentOrderFieldExpiresAt,
+	}
+	marshalNVendorRiskAssessmentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorRiskAssessmentOrderField = map[coredata.VendorRiskAssessmentOrderField]string{
+		coredata.VendorRiskAssessmentOrderFieldCreatedAt: "CREATED_AT",
+		coredata.VendorRiskAssessmentOrderFieldExpiresAt: "EXPIRES_AT",
+	}
+)
+
 func (ec *executionContext) marshalNViewer2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐViewer(ctx context.Context, sel ast.SelectionSet, v types.Viewer) graphql.Marshaler {
 	return ec._Viewer(ctx, sel, &v)
 }
@@ -35883,36 +37575,6 @@ func (ec *executionContext) unmarshalORiskOrder2ᚖgithubᚗcomᚋgetproboᚋpro
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx context.Context, v any) (*coredata.RiskTier, error) {
-	if v == nil {
-		return nil, nil
-	}
-	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier[tmp]
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier(ctx context.Context, sel ast.SelectionSet, v *coredata.RiskTier) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalString(marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier[*v])
-	return res
-}
-
-var (
-	unmarshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier = map[string]coredata.RiskTier{
-		"CRITICAL":    coredata.RiskTierCritical,
-		"SIGNIFICANT": coredata.RiskTierSignificant,
-		"GENERAL":     coredata.RiskTierGeneral,
-	}
-	marshalORiskTier2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTier = map[coredata.RiskTier]string{
-		coredata.RiskTierCritical:    "CRITICAL",
-		coredata.RiskTierSignificant: "SIGNIFICANT",
-		coredata.RiskTierGeneral:     "GENERAL",
-	}
-)
-
 func (ec *executionContext) unmarshalORiskTreatment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskTreatment(ctx context.Context, v any) (*coredata.RiskTreatment, error) {
 	if v == nil {
 		return nil, nil
@@ -35942,36 +37604,6 @@ var (
 		coredata.RiskTreatmentAccepted:    "ACCEPTED",
 		coredata.RiskTreatmentAvoided:     "AVOIDED",
 		coredata.RiskTreatmentTransferred: "TRANSFERRED",
-	}
-)
-
-func (ec *executionContext) unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx context.Context, v any) (*coredata.ServiceCriticality, error) {
-	if v == nil {
-		return nil, nil
-	}
-	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality[tmp]
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality(ctx context.Context, sel ast.SelectionSet, v *coredata.ServiceCriticality) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalString(marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality[*v])
-	return res
-}
-
-var (
-	unmarshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality = map[string]coredata.ServiceCriticality{
-		"LOW":    coredata.ServiceCriticalityLow,
-		"MEDIUM": coredata.ServiceCriticalityMedium,
-		"HIGH":   coredata.ServiceCriticalityHigh,
-	}
-	marshalOServiceCriticality2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐServiceCriticality = map[coredata.ServiceCriticality]string{
-		coredata.ServiceCriticalityLow:    "LOW",
-		coredata.ServiceCriticalityMedium: "MEDIUM",
-		coredata.ServiceCriticalityHigh:   "HIGH",
 	}
 )
 
@@ -36100,6 +37732,14 @@ func (ec *executionContext) unmarshalOVendorOrder2ᚖgithubᚗcomᚋgetproboᚋp
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputVendorOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOVendorRiskAssessmentOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessmentOrder(ctx context.Context, v any) (*types.VendorRiskAssessmentOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputVendorRiskAssessmentOrder(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

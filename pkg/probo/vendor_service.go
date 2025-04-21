@@ -48,8 +48,6 @@ type (
 		StatusPageURL              *string
 		ServiceStartAt             time.Time
 		ServiceTerminationAt       *time.Time
-		ServiceCriticality         coredata.ServiceCriticality
-		RiskTier                   coredata.RiskTier
 		BusinessOwnerID            *gid.GID
 		SecurityOwnerID            *gid.GID
 	}
@@ -72,10 +70,17 @@ type (
 		StatusPageURL              *string
 		ServiceStartAt             *time.Time
 		ServiceTerminationAt       *time.Time
-		ServiceCriticality         *coredata.ServiceCriticality
-		RiskTier                   *coredata.RiskTier
 		BusinessOwnerID            *gid.GID
 		SecurityOwnerID            *gid.GID
+	}
+
+	CreateVendorRiskAssessmentRequest struct {
+		VendorID        gid.GID
+		AssessedByID    gid.GID
+		ExpiresAt       time.Time
+		DataSensitivity coredata.DataSensitivity
+		BusinessImpact  coredata.BusinessImpact
+		Notes           *string
 	}
 )
 
@@ -133,14 +138,6 @@ func (s VendorService) Update(
 
 			if req.ServiceTerminationAt != nil {
 				vendor.ServiceTerminationAt = req.ServiceTerminationAt
-			}
-
-			if req.ServiceCriticality != nil {
-				vendor.ServiceCriticality = *req.ServiceCriticality
-			}
-
-			if req.RiskTier != nil {
-				vendor.RiskTier = *req.RiskTier
 			}
 
 			if req.StatusPageURL != nil {
@@ -296,8 +293,6 @@ func (s VendorService) Create(
 		TrustPageURL:               req.TrustPageURL,
 		StatusPageURL:              req.StatusPageURL,
 		TermsOfServiceURL:          req.TermsOfServiceURL,
-		ServiceCriticality:         req.ServiceCriticality,
-		RiskTier:                   req.RiskTier,
 	}
 
 	if req.Category != nil {
@@ -326,4 +321,66 @@ func (s VendorService) Create(
 	}
 
 	return vendor, nil
+}
+
+func (s VendorService) ListRiskAssessments(
+	ctx context.Context,
+	vendorID gid.GID,
+	cursor *page.Cursor[coredata.VendorRiskAssessmentOrderField],
+) (*page.Page[*coredata.VendorRiskAssessment, coredata.VendorRiskAssessmentOrderField], error) {
+	var vendorRiskAssessments coredata.VendorRiskAssessments
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return vendorRiskAssessments.LoadByVendorID(ctx, conn, s.svc.scope, vendorID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(vendorRiskAssessments, cursor), nil
+}
+
+func (s VendorService) CreateRiskAssessment(
+	ctx context.Context,
+	req CreateVendorRiskAssessmentRequest,
+) (*coredata.VendorRiskAssessment, error) {
+	vendorRiskAssessmentID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.VendorRiskAssessmentEntityType)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create vendor risk assessment global id: %w", err)
+	}
+
+	now := time.Now()
+
+	vendorRiskAssessment := &coredata.VendorRiskAssessment{
+		ID:              vendorRiskAssessmentID,
+		VendorID:        req.VendorID,
+		AssessedBy:      req.AssessedByID,
+		ExpiresAt:       req.ExpiresAt,
+		DataSensitivity: req.DataSensitivity,
+		BusinessImpact:  req.BusinessImpact,
+		Notes:           req.Notes,
+		CreatedAt:       now,
+		UpdatedAt:       now,
+	}
+
+	err = s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := vendorRiskAssessment.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert vendor risk assessment: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return vendorRiskAssessment, nil
 }

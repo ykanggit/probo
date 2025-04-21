@@ -31,23 +31,15 @@ type (
 		ID                       gid.GID    `db:"id"`
 		OrganizationID           gid.GID    `db:"organization_id"`
 		Kind                     PeopleKind `db:"kind"`
+		UserID                   *gid.GID   `db:"user_id"`
 		FullName                 string     `db:"full_name"`
 		PrimaryEmailAddress      string     `db:"primary_email_address"`
 		AdditionalEmailAddresses []string   `db:"additional_email_addresses"`
 		CreatedAt                time.Time  `db:"created_at"`
 		UpdatedAt                time.Time  `db:"updated_at"`
-		Version                  int        `db:"version"`
 	}
 
 	Peoples []*People
-
-	UpdatePeopleParams struct {
-		ExpectedVersion          int
-		FullName                 *string
-		PrimaryEmailAddress      *string
-		AdditionalEmailAddresses *[]string
-		Kind                     *PeopleKind
-	}
 )
 
 func (p People) CursorKey(orderBy PeopleOrderField) page.CursorKey {
@@ -72,12 +64,12 @@ SELECT
     id,
     organization_id,
     kind,
+    user_id,
     full_name,
     primary_email_address,
     additional_email_addresses,
     created_at,
-    updated_at,
-    version
+    updated_at
 FROM
     peoples
 WHERE
@@ -117,25 +109,25 @@ INSERT INTO
         tenant_id,
         id,
         organization_id,
+        user_id,
         kind,
         full_name,
         primary_email_address,
         additional_email_addresses,
         created_at,
-        updated_at,
-        version
+        updated_at
     )
 VALUES (
     @tenant_id,
     @people_id,
     @organization_id,
+    @user_id,
     @kind,
     @full_name,
     @primary_email_address,
     @additional_email_addresses,
     @created_at,
-    @updated_at,
-    @version
+    @updated_at
 )
 `
 
@@ -143,13 +135,13 @@ VALUES (
 		"tenant_id":                  scope.GetTenantID(),
 		"people_id":                  p.ID,
 		"organization_id":            p.OrganizationID,
+		"user_id":                    p.UserID,
 		"kind":                       p.Kind,
 		"full_name":                  p.FullName,
 		"primary_email_address":      p.PrimaryEmailAddress,
 		"additional_email_addresses": p.AdditionalEmailAddresses,
 		"created_at":                 p.CreatedAt,
 		"updated_at":                 p.UpdatedAt,
-		"version":                    p.Version,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -180,18 +172,17 @@ func (p *Peoples) LoadByOrganizationID(
 	organizationID gid.GID,
 	cursor *page.Cursor[PeopleOrderField],
 ) error {
-	// Base query
 	q := `
 SELECT
     id,
     organization_id,
     kind,
+    user_id,
     full_name,
     primary_email_address,
     additional_email_addresses,
     created_at,
-    updated_at,
-    version
+    updated_at
 FROM
     peoples
 WHERE
@@ -225,64 +216,35 @@ func (p *People) Update(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	params UpdatePeopleParams,
 ) error {
 	q := `
 UPDATE peoples SET
-    full_name = COALESCE(@full_name, full_name),
-    primary_email_address = COALESCE(@primary_email_address, primary_email_address),
-    additional_email_addresses = COALESCE(@additional_email_addresses, additional_email_addresses),
-    kind = COALESCE(@kind, kind),
-    updated_at = @updated_at,
-    version = version + 1
+	user_id = @user_id,
+	full_name = @full_name,
+	primary_email_address = @primary_email_address,
+	additional_email_addresses = @additional_email_addresses,
+	kind = @kind,
+	updated_at = @updated_at
 WHERE %s
     AND id = @people_id
-    AND version = @expected_version
-RETURNING 
-   	id,
-	organization_id,
-	kind,
-	full_name,
-	primary_email_address,
-	additional_email_addresses,
-	created_at,
-	updated_at,
-	version
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
-		"people_id":        p.ID,
-		"expected_version": params.ExpectedVersion,
-		"updated_at":       time.Now(),
+		"people_id":                  p.ID,
+		"user_id":                    p.UserID,
+		"full_name":                  p.FullName,
+		"primary_email_address":      p.PrimaryEmailAddress,
+		"additional_email_addresses": p.AdditionalEmailAddresses,
+		"kind":                       p.Kind,
+		"updated_at":                 p.UpdatedAt,
 	}
-
-	if params.FullName != nil {
-		args["full_name"] = *params.FullName
-	}
-	if params.PrimaryEmailAddress != nil {
-		args["primary_email_address"] = *params.PrimaryEmailAddress
-	}
-	if params.AdditionalEmailAddresses != nil {
-		args["additional_email_addresses"] = *params.AdditionalEmailAddresses
-	}
-	if params.Kind != nil {
-		args["kind"] = *params.Kind
-	}
-
 	maps.Copy(args, scope.SQLArguments())
 
-	rows, err := conn.Query(ctx, q, args)
+	_, err := conn.Exec(ctx, q, args)
 	if err != nil {
-		return fmt.Errorf("cannot query people: %w", err)
+		return fmt.Errorf("cannot update people: %w", err)
 	}
-
-	people, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[People])
-	if err != nil {
-		return fmt.Errorf("cannot collect people: %w", err)
-	}
-
-	*p = people
 
 	return nil
 }
