@@ -42,13 +42,6 @@ import type { SettingsViewRemoveUserMutation as SettingsViewRemoveUserMutationTy
 import { PageTemplate } from "@/components/PageTemplate";
 import { SettingsViewSkeleton } from "./SettingsPage";
 
-// Define the connector type until the generated type is available
-interface Connector {
-  id: string;
-  name: string;
-  type: string;
-  createdAt: string;
-}
 
 interface AvailableConnector {
   id: string;
@@ -127,7 +120,7 @@ function SettingsViewContent({
   const data = usePreloadedQuery(settingsViewQuery, queryRef);
   const organization = data.organization;
   const users = organization.users?.edges.map((edge) => edge.node) || [];
-  const connectors = (organization as any).connectors?.edges.map((edge: any) => edge.node) || [];
+  const connectors = organization.connectors?.edges.map((edge) => edge.node) || [];
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -149,9 +142,9 @@ function SettingsViewContent({
   ];
 
   // Filter out connectors that are already connected
-  const connectedConnectorIds = connectors.map((connector: Connector) => connector.name);
+  const connectedConnectorIds = connectors.map((connector) => connector.name);
   const notConnectedConnectors = availableConnectors.filter(
-    connector => !connectedConnectorIds.includes(connector.id)
+    (connector) => !connectedConnectorIds.includes(connector.id)
   );
 
   const [updateOrganization] =
@@ -499,7 +492,7 @@ function SettingsViewContent({
                 <div>
                   <h3 className="mb-4 text-sm font-medium">Connected services</h3>
                   <div className="space-y-4">
-                    {connectors.map((connector: Connector) => (
+                    {connectors.map((connector) => (
                       <div
                         key={connector.id}
                         className="flex items-center justify-between rounded-lg border p-3 shadow-xs"
