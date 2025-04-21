@@ -1258,12 +1258,6 @@ input RemoveUserInput {
   userId: ID!
 }
 
-input InitiateConnectorInput {
-  organizationId: ID!
-  connectorId: String!
-  continueUrl: String!
-}
-
 # Payload Types
 type CreateOrganizationPayload {
   organizationEdge: OrganizationEdge!
@@ -1439,8 +1433,4 @@ type InviteUserPayload {
 
 type RemoveUserPayload {
   success: Boolean!
-}
-
-type InitiateConnectorPayload {
-  redirectUrl: String!
 }

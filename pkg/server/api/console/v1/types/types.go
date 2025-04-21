@@ -433,16 +433,6 @@ type ImportMesurePayload struct {
 	MesureEdges []*MesureEdge `json:"mesureEdges"`
 }
 
-type InitiateConnectorInput struct {
-	OrganizationID gid.GID `json:"organizationId"`
-	ConnectorID    string  `json:"connectorId"`
-	ContinueURL    string  `json:"continueUrl"`
-}
-
-type InitiateConnectorPayload struct {
-	RedirectURL string `json:"redirectUrl"`
-}
-
 type InviteUserInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 	Email          string  `json:"email"`

@@ -267,10 +267,6 @@ type ComplexityRoot struct {
 		MesureEdges func(childComplexity int) int
 	}
 
-	InitiateConnectorPayload struct {
-		RedirectURL func(childComplexity int) int
-	}
-
 	InviteUserPayload struct {
 		Success func(childComplexity int) int
 	}
@@ -1290,13 +1286,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ImportMesurePayload.MesureEdges(childComplexity), true
-
-	case "InitiateConnectorPayload.redirectUrl":
-		if e.complexity.InitiateConnectorPayload.RedirectURL == nil {
-			break
-		}
-
-		return e.complexity.InitiateConnectorPayload.RedirectURL(childComplexity), true
 
 	case "InviteUserPayload.success":
 		if e.complexity.InviteUserPayload.Success == nil {
@@ -3105,7 +3094,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputFulfillEvidenceInput,
 		ec.unmarshalInputImportFrameworkInput,
 		ec.unmarshalInputImportMesureInput,
-		ec.unmarshalInputInitiateConnectorInput,
 		ec.unmarshalInputInviteUserInput,
 		ec.unmarshalInputMesureOrder,
 		ec.unmarshalInputOrganizationOrder,
@@ -4485,12 +4473,6 @@ input RemoveUserInput {
   userId: ID!
 }
 
-input InitiateConnectorInput {
-  organizationId: ID!
-  connectorId: String!
-  continueUrl: String!
-}
-
 # Payload Types
 type CreateOrganizationPayload {
   organizationEdge: OrganizationEdge!
@@ -4666,10 +4648,6 @@ type InviteUserPayload {
 
 type RemoveUserPayload {
   success: Boolean!
-}
-
-type InitiateConnectorPayload {
-  redirectUrl: String!
 }
 `, BuiltIn: false},
 }
@@ -11484,50 +11462,6 @@ func (ec *executionContext) fieldContext_ImportMesurePayload_mesureEdges(_ conte
 				return ec.fieldContext_MesureEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MesureEdge", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _InitiateConnectorPayload_redirectUrl(ctx context.Context, field graphql.CollectedField, obj *types.InitiateConnectorPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_InitiateConnectorPayload_redirectUrl(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RedirectURL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_InitiateConnectorPayload_redirectUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "InitiateConnectorPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -25830,47 +25764,6 @@ func (ec *executionContext) unmarshalInputImportMesureInput(ctx context.Context,
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputInitiateConnectorInput(ctx context.Context, obj any) (types.InitiateConnectorInput, error) {
-	var it types.InitiateConnectorInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"organizationId", "connectorId", "continueUrl"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "organizationId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OrganizationID = data
-		case "connectorId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connectorId"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ConnectorID = data
-		case "continueUrl":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("continueUrl"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContinueURL = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputInviteUserInput(ctx context.Context, obj any) (types.InviteUserInput, error) {
 	var it types.InviteUserInput
 	asMap := map[string]any{}
@@ -29002,45 +28895,6 @@ func (ec *executionContext) _ImportMesurePayload(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("ImportMesurePayload")
 		case "mesureEdges":
 			out.Values[i] = ec._ImportMesurePayload_mesureEdges(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var initiateConnectorPayloadImplementors = []string{"InitiateConnectorPayload"}
-
-func (ec *executionContext) _InitiateConnectorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.InitiateConnectorPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, initiateConnectorPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("InitiateConnectorPayload")
-		case "redirectUrl":
-			out.Values[i] = ec._InitiateConnectorPayload_redirectUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
