@@ -4,7 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## Security
+## [0.12.0] - 2025-04-20
+
+### Added
+
+- New vendors in the built-in lists
+
+### Changed
+
+- Update risk library with new risks
+
+
+### Security
 
 - Upgrade Golang dependencies
 - Upgrade Node dependencies
