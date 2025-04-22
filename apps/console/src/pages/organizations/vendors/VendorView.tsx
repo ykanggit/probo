@@ -412,7 +412,7 @@ function CertificationsView({
   onRemove: (tag: string) => void;
 }) {
   // Common security standards
-  const securityStandards = ["SOC 2", "ISO 27001", "HITRUST", "NIST"];
+  const securityStandards = ["SOC 2", "ISO 27001", "HITRUST", "NIST", "SOC 2 Type 2", "SOC 2 Type 1"];
   
   // Regulatory and legal certifications
   const regulatoryLegal = ["HIPAA", "FERPA", "FISMA", "PIPEDA", "GDPR", "CCPA"];
@@ -1341,59 +1341,171 @@ function VendorViewContent({
                 <div className="divide-y">
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
                     <p className="text-sm font-medium text-[#6B716A]">Status Page URL</p>
-                    <Input
-                      value={formData.statusPageUrl}
-                      onChange={(e) => handleFieldChange("statusPageUrl", e.target.value)}
-                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
-                    />
+                    <div className="flex items-center space-x-2 w-full">
+                      <Input
+                        value={formData.statusPageUrl}
+                        onChange={(e) => handleFieldChange("statusPageUrl", e.target.value)}
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
+                      />
+                      {formData.statusPageUrl && (
+                        <a
+                          href={formData.statusPageUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
                     <p className="text-sm font-medium text-[#6B716A]">Terms of Service URL</p>
-                    <Input
-                      value={formData.termsOfServiceUrl}
-                      onChange={(e) => handleFieldChange("termsOfServiceUrl", e.target.value)}
-                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
-                    />
+                    <div className="flex items-center space-x-2 w-full">
+                      <Input
+                        value={formData.termsOfServiceUrl}
+                        onChange={(e) => handleFieldChange("termsOfServiceUrl", e.target.value)}
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
+                      />
+                      {formData.termsOfServiceUrl && (
+                        <a
+                          href={formData.termsOfServiceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
                     <p className="text-sm font-medium text-[#6B716A]">Privacy Policy URL</p>
-                    <Input
-                      value={formData.privacyPolicyUrl}
-                      onChange={(e) => handleFieldChange("privacyPolicyUrl", e.target.value)}
-                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
-                    />
+                    <div className="flex items-center space-x-2 w-full">
+                      <Input
+                        value={formData.privacyPolicyUrl}
+                        onChange={(e) => handleFieldChange("privacyPolicyUrl", e.target.value)}
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
+                      />
+                      {formData.privacyPolicyUrl && (
+                        <a
+                          href={formData.privacyPolicyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
                     <p className="text-sm font-medium text-[#6B716A]">Service Level Agreement URL</p>
-                    <Input
-                      value={formData.serviceLevelAgreementUrl}
-                      onChange={(e) => handleFieldChange("serviceLevelAgreementUrl", e.target.value)}
-                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
-                    />
+                    <div className="flex items-center space-x-2 w-full">
+                      <Input
+                        value={formData.serviceLevelAgreementUrl}
+                        onChange={(e) => handleFieldChange("serviceLevelAgreementUrl", e.target.value)}
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
+                      />
+                      {formData.serviceLevelAgreementUrl && (
+                        <a
+                          href={formData.serviceLevelAgreementUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
                     <p className="text-sm font-medium text-[#6B716A]">Data Processing Agreement URL</p>
-                    <Input
-                      value={formData.dataProcessingAgreementUrl}
-                      onChange={(e) => handleFieldChange("dataProcessingAgreementUrl", e.target.value)}
-                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
-                    />
+                    <div className="flex items-center space-x-2 w-full">
+                      <Input
+                        value={formData.dataProcessingAgreementUrl}
+                        onChange={(e) => handleFieldChange("dataProcessingAgreementUrl", e.target.value)}
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
+                      />
+                      {formData.dataProcessingAgreementUrl && (
+                        <a
+                          href={formData.dataProcessingAgreementUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
                     <p className="text-sm font-medium text-[#6B716A]">Security Page URL</p>
-                    <Input
-                      value={formData.securityPageUrl}
-                      onChange={(e) => handleFieldChange("securityPageUrl", e.target.value)}
-                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
-                    />
+                    <div className="flex items-center space-x-2 w-full">
+                      <Input
+                        value={formData.securityPageUrl}
+                        onChange={(e) => handleFieldChange("securityPageUrl", e.target.value)}
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
+                      />
+                      {formData.securityPageUrl && (
+                        <a
+                          href={formData.securityPageUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
                     <p className="text-sm font-medium text-[#6B716A]">Trust Page URL</p>
-                    <Input
-                      value={formData.trustPageUrl}
-                      onChange={(e) => handleFieldChange("trustPageUrl", e.target.value)}
-                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
-                    />
+                    <div className="flex items-center space-x-2 w-full">
+                      <Input
+                        value={formData.trustPageUrl}
+                        onChange={(e) => handleFieldChange("trustPageUrl", e.target.value)}
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
+                      />
+                      {formData.trustPageUrl && (
+                        <a
+                          href={formData.trustPageUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
