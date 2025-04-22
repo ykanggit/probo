@@ -402,57 +402,6 @@ function ComplianceReportsTable({
   );
 }
 
-function TagList({
-  tags,
-  onAdd,
-  onRemove,
-}: {
-  tags: readonly string[];
-  onAdd: (tag: string) => void;
-  onRemove: (tag: string) => void;
-}) {
-  const [newTag, setNewTag] = useState("");
-
-  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && newTag.trim()) {
-      e.preventDefault();
-      onAdd(newTag.trim());
-      setNewTag("");
-    }
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        {tags.map((tag) => (
-          <div
-            key={tag}
-            className="flex items-center gap-1 rounded-full bg-[rgba(5,77,5,0.03)] px-3 py-1 text-sm font-medium"
-          >
-            <span className="text-[#141E12]">{tag}</span>
-            <button
-              onClick={() => onRemove(tag)}
-              className="text-primary hover:text-primary/80"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </div>
-        ))}
-      </div>
-      <div className="bg-[rgba(5,77,5,0.03)] rounded-lg p-1">
-        <Input
-          type="text"
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
-          onKeyDown={handleAddTag}
-          placeholder="Type and press Enter to add a certification"
-          className="border-0 bg-transparent p-1 shadow-none focus-visible:ring-0"
-        />
-      </div>
-    </div>
-  );
-}
-
 function CertificationsView({
   certifications,
   onAdd,
@@ -466,7 +415,7 @@ function CertificationsView({
   const securityStandards = ["SOC 2", "ISO 27001", "HITRUST", "NIST"];
   
   // Regulatory and legal certifications
-  const regulatoryLegal = ["HIPAA", "FERPA", "FISMA", "PIPEDA"];
+  const regulatoryLegal = ["HIPAA", "FERPA", "FISMA", "PIPEDA", "GDPR", "CCPA"];
   
   // Industry-specific certifications
   const industrySpecific = ["FinTech", "MPAA", "GSMA"];
@@ -474,17 +423,34 @@ function CertificationsView({
   // International & government certifications
   const internationalGov = ["FedRAMP", "ENS High", "IRAP", "CJIS"];
   
-  // Check if certification is in vendor's list
-  const isCertificationActive = (cert: string) => {
-    return certifications.includes(cert);
+  // State for new certification input
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newCertification, setNewCertification] = useState("");
+
+  // Handle adding a new custom certification
+  const handleAddCertification = () => {
+    if (newCertification.trim()) {
+      onAdd(newCertification.trim());
+      setNewCertification("");
+      setShowAddModal(false);
+    }
   };
+
+  // Get certifications by category
+  const securityCerts = certifications.filter(cert => securityStandards.includes(cert));
+  const regulatoryCerts = certifications.filter(cert => regulatoryLegal.includes(cert));
+  const industryCerts = certifications.filter(cert => industrySpecific.includes(cert));
+  const internationalCerts = certifications.filter(cert => internationalGov.includes(cert));
+  const customCerts = certifications.filter(cert => 
+    ![...securityStandards, ...regulatoryLegal, ...industrySpecific, ...internationalGov].includes(cert)
+  );
 
   return (
     <div className="rounded-xl border border-[#ECEFEC] bg-white overflow-hidden">
       <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(2,42,2,0.08)]">
         <h3 className="text-base font-medium text-[#141E12]">Certifications</h3>
         <Button
-          onClick={() => {}} // Will open modal to add custom certifications
+          onClick={() => setShowAddModal(true)}
           className="rounded-full bg-[rgba(0,39,0,0.05)] text-[#141E12] hover:bg-[rgba(0,39,0,0.08)] h-8 px-3"
           size="sm"
         >
@@ -498,139 +464,164 @@ function CertificationsView({
       
       <div className="p-5 space-y-6">
         {/* Security Standards */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-[#141E12]">Security Standards</h4>
-          <div className="flex flex-wrap gap-2">
-            {securityStandards.map(cert => (
-              <button
-                key={cert}
-                onClick={() => isCertificationActive(cert) ? onRemove(cert) : onAdd(cert)}
-                className={`flex items-center py-1.5 px-2 rounded text-sm font-medium ${
-                  isCertificationActive(cert) 
-                    ? "bg-[rgba(5,77,5,0.03)] text-[#6B716A]" 
-                    : "bg-[rgba(0,39,0,0.05)] text-[#141E12]"
-                }`}
-              >
-                {cert}
-                {isCertificationActive(cert) && (
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
-                    <path d="M12 4L4 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M4 4L12 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
-              </button>
-            ))}
+        {securityCerts.length > 0 && (
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-[#141E12]">Security Standards</h4>
+            <div className="flex flex-wrap gap-2">
+              {securityCerts.map(cert => (
+                <div
+                  key={cert}
+                  className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
+                >
+                  <span>{cert}</span>
+                  <button
+                    onClick={() => onRemove(cert)}
+                    className="text-[#6B716A] hover:text-[#141E12]"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Regulatory & Legal */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-[#141E12]">Regulatory & Legal</h4>
-          <div className="flex flex-wrap gap-2">
-            {regulatoryLegal.map(cert => (
-              <button
-                key={cert}
-                onClick={() => isCertificationActive(cert) ? onRemove(cert) : onAdd(cert)}
-                className={`flex items-center py-1.5 px-2 rounded text-sm font-medium ${
-                  isCertificationActive(cert) 
-                    ? "bg-[rgba(5,77,5,0.03)] text-[#6B716A]" 
-                    : "bg-[rgba(0,39,0,0.05)] text-[#141E12]"
-                }`}
-              >
-                {cert}
-                {isCertificationActive(cert) && (
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
-                    <path d="M12 4L4 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M4 4L12 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
-              </button>
-            ))}
+        {regulatoryCerts.length > 0 && (
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-[#141E12]">Regulatory & Legal</h4>
+            <div className="flex flex-wrap gap-2">
+              {regulatoryCerts.map(cert => (
+                <div
+                  key={cert}
+                  className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
+                >
+                  <span>{cert}</span>
+                  <button
+                    onClick={() => onRemove(cert)}
+                    className="text-[#6B716A] hover:text-[#141E12]"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Industry-Specific */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-[#141E12]">Industry-Specific</h4>
-          <div className="flex flex-wrap gap-2">
-            {industrySpecific.map(cert => (
-              <button
-                key={cert}
-                onClick={() => isCertificationActive(cert) ? onRemove(cert) : onAdd(cert)}
-                className={`flex items-center py-1.5 px-2 rounded text-sm font-medium ${
-                  isCertificationActive(cert) 
-                    ? "bg-[rgba(5,77,5,0.03)] text-[#6B716A]" 
-                    : "bg-[rgba(0,39,0,0.05)] text-[#141E12]"
-                }`}
-              >
-                {cert}
-                {isCertificationActive(cert) && (
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
-                    <path d="M12 4L4 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M4 4L12 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
-              </button>
-            ))}
+        {industryCerts.length > 0 && (
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-[#141E12]">Industry-Specific</h4>
+            <div className="flex flex-wrap gap-2">
+              {industryCerts.map(cert => (
+                <div
+                  key={cert}
+                  className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
+                >
+                  <span>{cert}</span>
+                  <button
+                    onClick={() => onRemove(cert)}
+                    className="text-[#6B716A] hover:text-[#141E12]"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         
         {/* International & Government */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-[#141E12]">International & Government</h4>
-          <div className="flex flex-wrap gap-2">
-            {internationalGov.map(cert => (
-              <button
-                key={cert}
-                onClick={() => isCertificationActive(cert) ? onRemove(cert) : onAdd(cert)}
-                className={`flex items-center py-1.5 px-2 rounded text-sm font-medium ${
-                  isCertificationActive(cert) 
-                    ? "bg-[rgba(5,77,5,0.03)] text-[#6B716A]" 
-                    : "bg-[rgba(0,39,0,0.05)] text-[#141E12]"
-                }`}
-              >
-                {cert}
-                {isCertificationActive(cert) && (
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
-                    <path d="M12 4L4 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M4 4L12 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
-              </button>
-            ))}
+        {internationalCerts.length > 0 && (
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-[#141E12]">International & Government</h4>
+            <div className="flex flex-wrap gap-2">
+              {internationalCerts.map(cert => (
+                <div
+                  key={cert}
+                  className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
+                >
+                  <span>{cert}</span>
+                  <button
+                    onClick={() => onRemove(cert)}
+                    className="text-[#6B716A] hover:text-[#141E12]"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Custom certifications */}
-        {certifications.length > 0 && (
+        {customCerts.length > 0 && (
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-[#141E12]">Custom Certifications</h4>
             <div className="flex flex-wrap gap-2">
-              {certifications
-                .filter(cert => 
-                  ![...securityStandards, ...regulatoryLegal, ...industrySpecific, ...internationalGov].includes(cert)
-                )
-                .map(cert => (
-                  <div
-                    key={cert}
-                    className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
+              {customCerts.map(cert => (
+                <div
+                  key={cert}
+                  className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
+                >
+                  <span>{cert}</span>
+                  <button
+                    onClick={() => onRemove(cert)}
+                    className="text-[#6B716A] hover:text-[#141E12]"
                   >
-                    <span>{cert}</span>
-                    <button
-                      onClick={() => onRemove(cert)}
-                      className="text-[#6B716A] hover:text-[#141E12]"
-                    >
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                ))}
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         )}
       </div>
+
+      {/* Add Certification Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-medium mb-4">Add Custom Certification</h3>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="certification-name">Certification Name</Label>
+                <Input 
+                  id="certification-name"
+                  value={newCertification} 
+                  onChange={(e) => setNewCertification(e.target.value)}
+                  placeholder="Enter certification name"
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowAddModal(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAddCertification}>
+                  Add
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -934,6 +925,42 @@ function VendorViewContent({
     }));
     setEditedFields((prev) => new Set(prev).add(field));
   };
+
+  // Auto-save handler specifically for certifications
+  const handleCertificationChange = useCallback((newCertifications: string[]) => {
+    // Update local state
+    setFormData(prev => ({
+      ...prev,
+      certifications: newCertifications,
+    }));
+    
+    // Auto-save the changes immediately
+    const formattedData = {
+      id: data.node.id!,
+      certifications: newCertifications,
+    };
+
+    updateVendor({
+      variables: {
+        input: formattedData,
+      },
+      onCompleted: () => {
+        toast({
+          title: "Success",
+          description: "Certifications updated",
+          variant: "default",
+        });
+        loadQuery({ vendorId: data.node.id!, organizationId: organizationId! });
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to update certifications",
+          variant: "destructive",
+        });
+      },
+    });
+  }, [updateVendor, data.node.id, loadQuery, toast, organizationId]);
 
   const handleCancel = () => {
     setFormData({
@@ -1378,14 +1405,13 @@ function VendorViewContent({
           <CertificationsView
             certifications={[...formData.certifications]}
             onAdd={(cert) => 
-              handleFieldChange("certifications", [
+              handleCertificationChange([
                 ...formData.certifications.filter(c => c !== cert),
                 cert,
               ])
             }
             onRemove={(cert) =>
-              handleFieldChange(
-                "certifications",
+              handleCertificationChange(
                 formData.certifications.filter((c) => c !== cert)
               )
             }
