@@ -1163,12 +1163,6 @@ function VendorViewContent({
     });
   };
 
-  const getVendorId = () => {
-    const id = data.node.id;
-    if (!id) return "";
-    return `vendor_${id.split(':')[1] || id}`;
-  };
-
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -1177,7 +1171,7 @@ function VendorViewContent({
             <div className="flex flex-wrap gap-x-12 gap-y-4 items-start mb-6">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-secondary">Vendor ID</p>
-                <p className="text-sm text-tertiary">{getVendorId()}</p>
+                <p className="text-sm text-tertiary">{data.node.id}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-secondary">Joined</p>
