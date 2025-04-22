@@ -69,6 +69,27 @@ func (s PeopleService) Get(
 	return people, nil
 }
 
+func (s PeopleService) GetByUserID(
+	ctx context.Context,
+	organizationID gid.GID,
+	userID gid.GID,
+) (*coredata.People, error) {
+	people := &coredata.People{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return people.LoadByUserID(ctx, conn, s.svc.scope, organizationID, userID)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return people, nil
+}
+
 func (s PeopleService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,

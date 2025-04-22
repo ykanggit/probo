@@ -94,6 +94,13 @@ const vendorViewQuery = graphql`
     organization: node(id: $organizationId) {
       ...PeopleSelector_organization
     }
+    viewer {
+      user {
+        people(organizationId: $organizationId) {
+          id
+        }
+      }
+    }
   }
 `;
 
@@ -675,6 +682,13 @@ function RiskAssessmentsTable({
     });
   };
 
+  // Check if assessment is expired
+  const isExpired = (expiresAt: string) => {
+    console.log(new Date(expiresAt) < new Date());
+
+    return new Date(expiresAt) < new Date();
+  };
+
   // Get severity label based on data sensitivity and business impact
   const getSeverityLabel = (dataSensitivity: string, businessImpact: string) => {
     // Simple logic to determine severity - can be adjusted based on requirements
@@ -731,35 +745,67 @@ function RiskAssessmentsTable({
           <tbody>
             {assessments.map((assessment) => {
               const severity = getSeverityLabel(assessment.dataSensitivity, assessment.businessImpact);
+              const expired = isExpired(assessment.expiresAt);
               return (
-                <tr key={assessment.id} className="border-b border-[rgba(2,42,2,0.08)]">
+                <tr 
+                  key={assessment.id} 
+                  className={cn(
+                    "border-b border-[rgba(2,42,2,0.08)]",
+                    expired && "bg-[#F7F7F7] text-[#A0A5A0]"
+                  )}
+                >
                   <td className="px-4 py-3">
-                    <span className="text-sm font-normal text-[#141E12]">
+                    <span className={cn(
+                      "text-sm font-normal",
+                      expired ? "text-[#A0A5A0]" : "text-[#141E12]"
+                    )}>
                       {formatDate(assessment.assessedAt)}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm font-normal text-[#141E12]">
-                      {formatDate(assessment.expiresAt)}
-                    </span>
+                    <div className="flex items-center">
+                      <span className={cn(
+                        "text-sm font-normal",
+                        expired ? "text-[#A0A5A0]" : "text-[#141E12]"
+                      )}>
+                        {formatDate(assessment.expiresAt)}
+                      </span>
+                      {expired && (
+                        <span className="ml-2 text-xs py-0.5 px-1.5 bg-[#F0F0F0] text-[#818780] rounded">
+                          Expired
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm font-normal text-[#141E12]">
+                    <span className={cn(
+                      "text-sm font-normal",
+                      expired ? "text-[#A0A5A0]" : "text-[#141E12]"
+                    )}>
                       {assessment.dataSensitivity.charAt(0) + assessment.dataSensitivity.slice(1).toLowerCase()}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm font-normal text-[#141E12]">
+                    <span className={cn(
+                      "text-sm font-normal",
+                      expired ? "text-[#A0A5A0]" : "text-[#141E12]"
+                    )}>
                       {assessment.businessImpact.charAt(0) + assessment.businessImpact.slice(1).toLowerCase()}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-sm font-normal px-2 py-1 rounded-full ${severity.color}`}>
+                    <span className={cn(
+                      "text-sm font-normal px-2 py-1 rounded-full",
+                      expired ? "bg-[#F0F0F0] text-[#818780]" : severity.color
+                    )}>
                       {severity.label}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm font-normal text-[#141E12]">
+                    <span className={cn(
+                      "text-sm font-normal",
+                      expired ? "text-[#A0A5A0]" : "text-[#141E12]"
+                    )}>
                       {assessment.assessedBy?.fullName || 'N/A'}
                     </span>
                   </td>
@@ -770,9 +816,9 @@ function RiskAssessmentsTable({
                         onClick={() => setShowDropdown(showDropdown === assessment.id ? null : assessment.id)}
                       >
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z" fill="#141E12"/>
-                          <path d="M3 9.5C3.82843 9.5 4.5 8.82843 4.5 8C4.5 7.17157 3.82843 6.5 3 6.5C2.17157 6.5 1.5 7.17157 1.5 8C1.5 8.82843 2.17157 9.5 3 9.5Z" fill="#141E12"/>
-                          <path d="M13 9.5C13.8284 9.5 14.5 8.82843 14.5 8C14.5 7.17157 13.8284 6.5 13 6.5C12.1716 6.5 11.5 7.17157 11.5 8C11.5 8.82843 12.1716 9.5 13 9.5Z" fill="#141E12"/>
+                          <path d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z" fill={expired ? "#A0A5A0" : "#141E12"}/>
+                          <path d="M3 9.5C3.82843 9.5 4.5 8.82843 4.5 8C4.5 7.17157 3.82843 6.5 3 6.5C2.17157 6.5 1.5 7.17157 1.5 8C1.5 8.82843 2.17157 9.5 3 9.5Z" fill={expired ? "#A0A5A0" : "#141E12"}/>
+                          <path d="M13 9.5C13.8284 9.5 14.5 8.82843 14.5 8C14.5 7.17157 13.8284 6.5 13 6.5C12.1716 6.5 11.5 7.17157 11.5 8C11.5 8.82843 12.1716 9.5 13 9.5Z" fill={expired ? "#A0A5A0" : "#141E12"}/>
                         </svg>
                       </button>
                       {showDropdown === assessment.id && (
@@ -1270,26 +1316,8 @@ function VendorViewContent({
     businessImpact: BusinessImpact;
     notes: string;
   }) => {
-    // Close the modal
-    setShowRiskAssessmentModal(false);
-    
-    // Current date for assessedAt, and 1 year later for expiresAt
-    const today = new Date();
-    const nextYear = new Date(today);
+    const nextYear = new Date();
     nextYear.setFullYear(nextYear.getFullYear() + 1);
-    
-    // Check if there's a business owner assigned
-    const businessOwnerId = data.node.businessOwner?.id;
-    if (!businessOwnerId) {
-      // This check is now redundant as it's handled in the modal
-      // but keeping it as a safeguard
-      toast({
-        title: "Error",
-        description: "Please assign a Business Owner to the vendor before creating a risk assessment",
-        variant: "destructive",
-      });
-      return;
-    }
     
     createRiskAssessment({
       variables: {
@@ -1301,12 +1329,11 @@ function VendorViewContent({
         ],
         input: {
           vendorId: data.node.id!,
-          assessedBy: businessOwnerId,
+          assessedBy: data.viewer.user.people?.id!,
           expiresAt: nextYear.toISOString(),
           dataSensitivity: formValues.dataSensitivity,
           businessImpact: formValues.businessImpact,
           notes: formValues.notes || "Risk assessment",
-          attachments: []
         },
       },
       onCompleted: () => {
@@ -1315,6 +1342,7 @@ function VendorViewContent({
           description: "Risk assessment created successfully",
           variant: "default",
         });
+        setShowRiskAssessmentModal(false);
         loadQuery({
           vendorId: data.node.id!,
           organizationId: organizationId!,
@@ -1328,7 +1356,7 @@ function VendorViewContent({
         });
       },
     });
-  }, [createRiskAssessment, data.node.id, data.node.businessOwner?.id, loadQuery, toast, organizationId]);
+  }, [createRiskAssessment, data.node.id, data.viewer.user.people?.id, loadQuery, toast, organizationId]);
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return "N/A";

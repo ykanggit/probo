@@ -455,6 +455,8 @@ type User implements Node {
   email: String!
   createdAt: Datetime!
   updatedAt: Datetime!
+
+  people(organizationId: ID!): People @goField(forceResolver: true)
 }
 
 type Connector implements Node {
@@ -1463,7 +1465,6 @@ type VendorRiskAssessment implements Node {
   dataSensitivity: DataSensitivity!
   businessImpact: BusinessImpact!
   notes: String
-  attachments: [String!]!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -1487,7 +1488,6 @@ input CreateVendorRiskAssessmentInput {
   dataSensitivity: DataSensitivity!
   businessImpact: BusinessImpact!
   notes: String
-  attachments: [String!]
 }
 
 type CreateVendorRiskAssessmentPayload {

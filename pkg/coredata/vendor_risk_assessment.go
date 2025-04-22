@@ -33,9 +33,8 @@ type (
 		VendorID        gid.GID         `db:"vendor_id"`
 		AssessedAt      time.Time       `db:"assessed_at"`
 		AssessedBy      gid.GID         `db:"assessed_by"`
-		AccessedAt      time.Time       `db:"accessed_at"`
-		ApprovedBy      gid.GID         `db:"approved_by"`
-		ApprovedAt      time.Time       `db:"approved_at"`
+		ApprovedBy      *gid.GID        `db:"approved_by"`
+		ApprovedAt      *time.Time      `db:"approved_at"`
 		ExpiresAt       time.Time       `db:"expires_at"`
 		DataSensitivity DataSensitivity `db:"data_sensitivity"`
 		BusinessImpact  BusinessImpact  `db:"business_impact"`
@@ -96,7 +95,6 @@ INSERT INTO
         vendor_id,
         assessed_at,
         assessed_by,
-        accessed_at,
         approved_by,
         approved_at,
         expires_at,
@@ -112,11 +110,12 @@ VALUES (
     @vendor_id,
     @assessed_at,
     @assessed_by,
+    @approved_by,
+    @approved_at,
     @expires_at,
     @data_sensitivity,
     @business_impact,
     @notes,
-    @attachments,
     @created_at,
     @updated_at
 )
@@ -128,7 +127,6 @@ VALUES (
 		"vendor_id":        r.VendorID,
 		"assessed_at":      r.AssessedAt,
 		"assessed_by":      r.AssessedBy,
-		"accessed_at":      r.AccessedAt,
 		"approved_by":      r.ApprovedBy,
 		"approved_at":      r.ApprovedAt,
 		"expires_at":       r.ExpiresAt,
@@ -155,7 +153,6 @@ SELECT
     vendor_id,
     assessed_at,
     assessed_by,
-    accessed_at,
     approved_by,
     approved_at,
     expires_at,
@@ -206,7 +203,6 @@ SELECT
     vendor_id,
     assessed_at,
     assessed_by,
-    accessed_at,
     approved_by,
     approved_at,
     expires_at,
@@ -260,7 +256,6 @@ SELECT
     vendor_id,
     assessed_at,
     assessed_by,
-    accessed_at,
     approved_by,
     approved_at,
     expires_at,

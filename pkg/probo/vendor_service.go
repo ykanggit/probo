@@ -359,6 +359,7 @@ func (s VendorService) CreateRiskAssessment(
 		ID:              vendorRiskAssessmentID,
 		VendorID:        req.VendorID,
 		AssessedBy:      req.AssessedByID,
+		AssessedAt:      now,
 		ExpiresAt:       req.ExpiresAt,
 		DataSensitivity: req.DataSensitivity,
 		BusinessImpact:  req.BusinessImpact,
@@ -369,12 +370,36 @@ func (s VendorService) CreateRiskAssessment(
 
 	err = s.svc.pg.WithTx(
 		ctx,
-		func(conn pg.Conn) error {
-			if err := vendorRiskAssessment.Insert(ctx, conn, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot insert vendor risk assessment: %w", err)
+		func(tx pg.Conn) error {
+			vendor := coredata.Vendor{ID: req.VendorID}
+			if err := vendor.ExpireNonExpiredRiskAssessments(ctx, tx, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot expire vendor risk assessments: %w", err)
 			}
 
+			if err := vendorRiskAssessment.Insert(ctx, tx, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert vendor risk assessment: %w", err)
+			}
 			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return vendorRiskAssessment, nil
+}
+
+func (s VendorService) GetRiskAssessment(
+	ctx context.Context,
+	vendorRiskAssessmentID gid.GID,
+) (*coredata.VendorRiskAssessment, error) {
+	vendorRiskAssessment := &coredata.VendorRiskAssessment{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return vendorRiskAssessment.LoadByID(ctx, conn, s.svc.scope, vendorRiskAssessmentID)
 		},
 	)
 

@@ -350,3 +350,37 @@ WHERE %s
 	_, err := conn.Exec(ctx, q, args)
 	return err
 }
+
+func (v Vendor) ExpireNonExpiredRiskAssessments(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+) error {
+	now := time.Now()
+
+	q := `
+	UPDATE vendor_risk_assessments
+	SET 
+		expires_at = @now,
+		updated_at = @now
+	WHERE
+		%s
+		AND vendor_id = @vendor_id
+		AND expires_at > @now
+	`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{
+		"vendor_id": v.ID,
+		"now":       now,
+	}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot expire existing risk assessments: %w", err)
+	}
+
+	return nil
+}

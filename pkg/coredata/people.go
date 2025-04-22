@@ -98,6 +98,53 @@ LIMIT 1;
 	return nil
 }
 
+func (p *People) LoadByUserID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+	userID gid.GID,
+) error {
+	q := `
+SELECT
+    id,
+    organization_id,
+    kind,
+    user_id,
+    full_name,
+    primary_email_address,
+    additional_email_addresses,
+    created_at,
+    updated_at
+FROM
+    peoples
+WHERE
+    %s
+    AND organization_id = @organization_id
+    AND user_id = @user_id
+LIMIT 1;
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"organization_id": organizationID, "user_id": userID}
+	maps.Copy(args, scope.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query people: %w", err)
+	}
+
+	people, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[People])
+	if err != nil {
+		return fmt.Errorf("cannot collect people: %w", err)
+	}
+
+	*p = people
+
+	return nil
+}
+
 func (p People) Insert(
 	ctx context.Context,
 	conn pg.Conn,

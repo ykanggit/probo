@@ -1049,16 +1049,19 @@ func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeleteP
 // CreateVendorRiskAssessment is the resolver for the createVendorRiskAssessment field.
 func (r *mutationResolver) CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.VendorID.TenantID())
-	user := UserFromContext(ctx)
 
-	expiresAt := time.Now().Add(time.Hour * 24 * 365)
+	fmt.Println("input.AssessedBy", input.AssessedBy)
+	fmt.Println("input.ExpiresAt", input.ExpiresAt)
+	fmt.Println("input.DataSensitivity", input.DataSensitivity)
+	fmt.Println("input.BusinessImpact", input.BusinessImpact)
+	fmt.Println("input.Notes", input.Notes)
 
 	vendorRiskAssessment, err := svc.Vendors.CreateRiskAssessment(
 		ctx,
 		probo.CreateVendorRiskAssessmentRequest{
 			VendorID:        input.VendorID,
-			AssessedByID:    user.ID,
-			ExpiresAt:       expiresAt,
+			AssessedByID:    input.AssessedBy,
+			ExpiresAt:       input.ExpiresAt,
 			DataSensitivity: input.DataSensitivity,
 			BusinessImpact:  input.BusinessImpact,
 			Notes:           input.Notes,
@@ -1558,6 +1561,18 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 	return types.NewEvidenceConnection(page), nil
 }
 
+// People is the resolver for the people field.
+func (r *userResolver) People(ctx context.Context, obj *types.User, organizationID gid.GID) (*types.People, error) {
+	svc := GetTenantService(ctx, r.proboSvc, organizationID.TenantID())
+
+	people, err := svc.Peoples.GetByUserID(ctx, organizationID, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get people: %w", err))
+	}
+
+	return types.NewPeople(people), nil
+}
+
 // ComplianceReports is the resolver for the complianceReports field.
 func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) (*types.VendorComplianceReportConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -1676,12 +1691,31 @@ func (r *vendorComplianceReportResolver) FileURL(ctx context.Context, obj *types
 
 // Vendor is the resolver for the vendor field.
 func (r *vendorRiskAssessmentResolver) Vendor(ctx context.Context, obj *types.VendorRiskAssessment) (*types.Vendor, error) {
-	panic(fmt.Errorf("not implemented: Vendor - vendor"))
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	vendor, err := svc.Vendors.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get vendor: %w", err))
+	}
+
+	return types.NewVendor(vendor), nil
 }
 
 // AssessedBy is the resolver for the assessedBy field.
 func (r *vendorRiskAssessmentResolver) AssessedBy(ctx context.Context, obj *types.VendorRiskAssessment) (*types.People, error) {
-	panic(fmt.Errorf("not implemented: AssessedBy - assessedBy"))
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	vendorRiskAssessment, err := svc.Vendors.GetRiskAssessment(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get vendor risk assessment: %w", err))
+	}
+
+	people, err := svc.Peoples.Get(ctx, vendorRiskAssessment.AssessedBy)
+	if err != nil {
+		panic(fmt.Errorf("failed to get assessed by: %w", err))
+	}
+
+	return types.NewPeople(people), nil
 }
 
 // Organizations is the resolver for the organizations field.
@@ -1739,6 +1773,9 @@ func (r *Resolver) Risk() schema.RiskResolver { return &riskResolver{r} }
 // Task returns schema.TaskResolver implementation.
 func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 
+// User returns schema.UserResolver implementation.
+func (r *Resolver) User() schema.UserResolver { return &userResolver{r} }
+
 // Vendor returns schema.VendorResolver implementation.
 func (r *Resolver) Vendor() schema.VendorResolver { return &vendorResolver{r} }
 
@@ -1765,6 +1802,7 @@ type policyResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type riskResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }
 type vendorResolver struct{ *Resolver }
 type vendorComplianceReportResolver struct{ *Resolver }
 type vendorRiskAssessmentResolver struct{ *Resolver }

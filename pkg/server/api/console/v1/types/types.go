@@ -252,7 +252,6 @@ type CreateVendorRiskAssessmentInput struct {
 	DataSensitivity coredata.DataSensitivity `json:"dataSensitivity"`
 	BusinessImpact  coredata.BusinessImpact  `json:"businessImpact"`
 	Notes           *string                  `json:"notes,omitempty"`
-	Attachments     []string                 `json:"attachments,omitempty"`
 }
 
 type CreateVendorRiskAssessmentPayload struct {
@@ -799,6 +798,7 @@ type User struct {
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+	People    *People   `json:"people,omitempty"`
 }
 
 func (User) IsNode()             {}
@@ -886,7 +886,6 @@ type VendorRiskAssessment struct {
 	DataSensitivity coredata.DataSensitivity `json:"dataSensitivity"`
 	BusinessImpact  coredata.BusinessImpact  `json:"businessImpact"`
 	Notes           *string                  `json:"notes,omitempty"`
-	Attachments     []string                 `json:"attachments"`
 	CreatedAt       time.Time                `json:"createdAt"`
 	UpdatedAt       time.Time                `json:"updatedAt"`
 }

@@ -52,6 +52,7 @@ type ResolverRoot interface {
 	Query() QueryResolver
 	Risk() RiskResolver
 	Task() TaskResolver
+	User() UserResolver
 	Vendor() VendorResolver
 	VendorComplianceReport() VendorComplianceReportResolver
 	VendorRiskAssessment() VendorRiskAssessmentResolver
@@ -538,6 +539,7 @@ type ComplexityRoot struct {
 		Email     func(childComplexity int) int
 		FullName  func(childComplexity int) int
 		ID        func(childComplexity int) int
+		People    func(childComplexity int, organizationID gid.GID) int
 		UpdatedAt func(childComplexity int) int
 	}
 
@@ -611,7 +613,6 @@ type ComplexityRoot struct {
 	VendorRiskAssessment struct {
 		AssessedAt      func(childComplexity int) int
 		AssessedBy      func(childComplexity int) int
-		Attachments     func(childComplexity int) int
 		BusinessImpact  func(childComplexity int) int
 		CreatedAt       func(childComplexity int) int
 		DataSensitivity func(childComplexity int) int
@@ -729,6 +730,9 @@ type RiskResolver interface {
 type TaskResolver interface {
 	AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error)
 	Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error)
+}
+type UserResolver interface {
+	People(ctx context.Context, obj *types.User, organizationID gid.GID) (*types.People, error)
 }
 type VendorResolver interface {
 	ComplianceReports(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) (*types.VendorComplianceReportConnection, error)
@@ -2760,6 +2764,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ID(childComplexity), true
 
+	case "User.people":
+		if e.complexity.User.People == nil {
+			break
+		}
+
+		args, err := ec.field_User_people_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.People(childComplexity, args["organizationId"].(gid.GID)), true
+
 	case "User.updatedAt":
 		if e.complexity.User.UpdatedAt == nil {
 			break
@@ -3091,13 +3107,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.VendorRiskAssessment.AssessedBy(childComplexity), true
-
-	case "VendorRiskAssessment.attachments":
-		if e.complexity.VendorRiskAssessment.Attachments == nil {
-			break
-		}
-
-		return e.complexity.VendorRiskAssessment.Attachments(childComplexity), true
 
 	case "VendorRiskAssessment.businessImpact":
 		if e.complexity.VendorRiskAssessment.BusinessImpact == nil {
@@ -3830,6 +3839,8 @@ type User implements Node {
   email: String!
   createdAt: Datetime!
   updatedAt: Datetime!
+
+  people(organizationId: ID!): People @goField(forceResolver: true)
 }
 
 type Connector implements Node {
@@ -4838,7 +4849,6 @@ type VendorRiskAssessment implements Node {
   dataSensitivity: DataSensitivity!
   businessImpact: BusinessImpact!
   notes: String
-  attachments: [String!]!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -4862,7 +4872,6 @@ input CreateVendorRiskAssessmentInput {
   dataSensitivity: DataSensitivity!
   businessImpact: BusinessImpact!
   notes: String
-  attachments: [String!]
 }
 
 type CreateVendorRiskAssessmentPayload {
@@ -7759,6 +7768,29 @@ func (ec *executionContext) field_Task_evidences_argsOrderBy(
 	}
 
 	var zeroVal *types.EvidenceOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_User_people_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_User_people_argsOrganizationID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["organizationId"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_User_people_argsOrganizationID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (gid.GID, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+	if tmp, ok := rawArgs["organizationId"]; ok {
+		return ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, tmp)
+	}
+
+	var zeroVal gid.GID
 	return zeroVal, nil
 }
 
@@ -20538,6 +20570,74 @@ func (ec *executionContext) fieldContext_User_updatedAt(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _User_people(ctx context.Context, field graphql.CollectedField, obj *types.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_people(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().People(rctx, obj, fc.Args["organizationId"].(gid.GID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalOPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_people(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_people_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UserConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.UserConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UserConnection_edges(ctx, field)
 	if err != nil {
@@ -20735,6 +20835,8 @@ func (ec *executionContext) fieldContext_UserEdge_node(_ context.Context, field 
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "people":
+				return ec.fieldContext_User_people(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -23034,50 +23136,6 @@ func (ec *executionContext) fieldContext_VendorRiskAssessment_notes(_ context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _VendorRiskAssessment_attachments(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_VendorRiskAssessment_attachments(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Attachments, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_VendorRiskAssessment_attachments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "VendorRiskAssessment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _VendorRiskAssessment_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorRiskAssessment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_VendorRiskAssessment_createdAt(ctx, field)
 	if err != nil {
@@ -23369,8 +23427,6 @@ func (ec *executionContext) fieldContext_VendorRiskAssessmentEdge_node(_ context
 				return ec.fieldContext_VendorRiskAssessment_businessImpact(ctx, field)
 			case "notes":
 				return ec.fieldContext_VendorRiskAssessment_notes(ctx, field)
-			case "attachments":
-				return ec.fieldContext_VendorRiskAssessment_attachments(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_VendorRiskAssessment_createdAt(ctx, field)
 			case "updatedAt":
@@ -23475,6 +23531,8 @@ func (ec *executionContext) fieldContext_Viewer_user(_ context.Context, field gr
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "people":
+				return ec.fieldContext_User_people(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -26366,7 +26424,7 @@ func (ec *executionContext) unmarshalInputCreateVendorRiskAssessmentInput(ctx co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"vendorId", "assessedBy", "expiresAt", "dataSensitivity", "businessImpact", "notes", "attachments"}
+	fieldsInOrder := [...]string{"vendorId", "assessedBy", "expiresAt", "dataSensitivity", "businessImpact", "notes"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -26415,13 +26473,6 @@ func (ec *executionContext) unmarshalInputCreateVendorRiskAssessmentInput(ctx co
 				return it, err
 			}
 			it.Notes = data
-		case "attachments":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("attachments"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Attachments = data
 		}
 	}
 
@@ -32945,28 +32996,61 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._User_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "fullName":
 			out.Values[i] = ec._User_fullName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "email":
 			out.Values[i] = ec._User_email(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "createdAt":
 			out.Values[i] = ec._User_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._User_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "people":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_people(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -33728,11 +33812,6 @@ func (ec *executionContext) _VendorRiskAssessment(ctx context.Context, sel ast.S
 			}
 		case "notes":
 			out.Values[i] = ec._VendorRiskAssessment_notes(ctx, field, obj)
-		case "attachments":
-			out.Values[i] = ec._VendorRiskAssessment_attachments(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "createdAt":
 			out.Values[i] = ec._VendorRiskAssessment_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
