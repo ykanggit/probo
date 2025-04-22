@@ -311,7 +311,6 @@ function ListVendorContent({
   return (
     <PageTemplate
       title="Vendors"
-      description="Vendors are third-party services that your company uses. Add them to keep track of their risk and compliance status."
       actions={
         <Button
           className="flex items-center gap-2"

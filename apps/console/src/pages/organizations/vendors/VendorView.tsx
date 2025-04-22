@@ -453,6 +453,188 @@ function TagList({
   );
 }
 
+function CertificationsView({
+  certifications,
+  onAdd,
+  onRemove,
+}: {
+  certifications: readonly string[];
+  onAdd: (tag: string) => void;
+  onRemove: (tag: string) => void;
+}) {
+  // Common security standards
+  const securityStandards = ["SOC 2", "ISO 27001", "HITRUST", "NIST"];
+  
+  // Regulatory and legal certifications
+  const regulatoryLegal = ["HIPAA", "FERPA", "FISMA", "PIPEDA"];
+  
+  // Industry-specific certifications
+  const industrySpecific = ["FinTech", "MPAA", "GSMA"];
+  
+  // International & government certifications
+  const internationalGov = ["FedRAMP", "ENS High", "IRAP", "CJIS"];
+  
+  // Check if certification is in vendor's list
+  const isCertificationActive = (cert: string) => {
+    return certifications.includes(cert);
+  };
+
+  return (
+    <div className="rounded-xl border border-[#ECEFEC] bg-white overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(2,42,2,0.08)]">
+        <h3 className="text-base font-medium text-[#141E12]">Certifications</h3>
+        <Button
+          onClick={() => {}} // Will open modal to add custom certifications
+          className="rounded-full bg-[rgba(0,39,0,0.05)] text-[#141E12] hover:bg-[rgba(0,39,0,0.08)] h-8 px-3"
+          size="sm"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-1.5">
+            <path d="M8 3.5V12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M3.5 8H12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Add certification
+        </Button>
+      </div>
+      
+      <div className="p-5 space-y-6">
+        {/* Security Standards */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-[#141E12]">Security Standards</h4>
+          <div className="flex flex-wrap gap-2">
+            {securityStandards.map(cert => (
+              <button
+                key={cert}
+                onClick={() => isCertificationActive(cert) ? onRemove(cert) : onAdd(cert)}
+                className={`flex items-center py-1.5 px-2 rounded text-sm font-medium ${
+                  isCertificationActive(cert) 
+                    ? "bg-[rgba(5,77,5,0.03)] text-[#6B716A]" 
+                    : "bg-[rgba(0,39,0,0.05)] text-[#141E12]"
+                }`}
+              >
+                {cert}
+                {isCertificationActive(cert) && (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
+                    <path d="M12 4L4 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M4 4L12 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Regulatory & Legal */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-[#141E12]">Regulatory & Legal</h4>
+          <div className="flex flex-wrap gap-2">
+            {regulatoryLegal.map(cert => (
+              <button
+                key={cert}
+                onClick={() => isCertificationActive(cert) ? onRemove(cert) : onAdd(cert)}
+                className={`flex items-center py-1.5 px-2 rounded text-sm font-medium ${
+                  isCertificationActive(cert) 
+                    ? "bg-[rgba(5,77,5,0.03)] text-[#6B716A]" 
+                    : "bg-[rgba(0,39,0,0.05)] text-[#141E12]"
+                }`}
+              >
+                {cert}
+                {isCertificationActive(cert) && (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
+                    <path d="M12 4L4 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M4 4L12 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Industry-Specific */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-[#141E12]">Industry-Specific</h4>
+          <div className="flex flex-wrap gap-2">
+            {industrySpecific.map(cert => (
+              <button
+                key={cert}
+                onClick={() => isCertificationActive(cert) ? onRemove(cert) : onAdd(cert)}
+                className={`flex items-center py-1.5 px-2 rounded text-sm font-medium ${
+                  isCertificationActive(cert) 
+                    ? "bg-[rgba(5,77,5,0.03)] text-[#6B716A]" 
+                    : "bg-[rgba(0,39,0,0.05)] text-[#141E12]"
+                }`}
+              >
+                {cert}
+                {isCertificationActive(cert) && (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
+                    <path d="M12 4L4 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M4 4L12 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* International & Government */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-[#141E12]">International & Government</h4>
+          <div className="flex flex-wrap gap-2">
+            {internationalGov.map(cert => (
+              <button
+                key={cert}
+                onClick={() => isCertificationActive(cert) ? onRemove(cert) : onAdd(cert)}
+                className={`flex items-center py-1.5 px-2 rounded text-sm font-medium ${
+                  isCertificationActive(cert) 
+                    ? "bg-[rgba(5,77,5,0.03)] text-[#6B716A]" 
+                    : "bg-[rgba(0,39,0,0.05)] text-[#141E12]"
+                }`}
+              >
+                {cert}
+                {isCertificationActive(cert) && (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
+                    <path d="M12 4L4 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M4 4L12 12" stroke="#6B716A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Custom certifications */}
+        {certifications.length > 0 && (
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-[#141E12]">Custom Certifications</h4>
+            <div className="flex flex-wrap gap-2">
+              {certifications
+                .filter(cert => 
+                  ![...securityStandards, ...regulatoryLegal, ...industrySpecific, ...internationalGov].includes(cert)
+                )
+                .map(cert => (
+                  <div
+                    key={cert}
+                    className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
+                  >
+                    <span>{cert}</span>
+                    <button
+                      onClick={() => onRemove(cert)}
+                      className="text-[#6B716A] hover:text-[#141E12]"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 interface RiskAssessment {
   id: string;
   assessedAt: string;
@@ -1193,33 +1375,21 @@ function VendorViewContent({
         );
       case 'certifications':
         return (
-          <div className="rounded-xl border border-border bg-white p-0 overflow-hidden">
-            <div className="px-5 py-4 border-b border-[rgba(2,42,2,0.08)]">
-              <h3 className="text-base font-medium">Certifications</h3>
-            </div>
-            <div className="p-5 space-y-4">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-[#6B716A]">
-                  List of certifications held by the vendor
-                </p>
-                <TagList
-                  tags={[...formData.certifications]}
-                  onAdd={(tag) =>
-                    handleFieldChange("certifications", [
-                      ...formData.certifications,
-                      tag,
-                    ])
-                  }
-                  onRemove={(tag) =>
-                    handleFieldChange(
-                      "certifications",
-                      formData.certifications.filter((t) => t !== tag)
-                    )
-                  }
-                />
-              </div>
-            </div>
-          </div>
+          <CertificationsView
+            certifications={[...formData.certifications]}
+            onAdd={(cert) => 
+              handleFieldChange("certifications", [
+                ...formData.certifications.filter(c => c !== cert),
+                cert,
+              ])
+            }
+            onRemove={(cert) =>
+              handleFieldChange(
+                "certifications",
+                formData.certifications.filter((c) => c !== cert)
+              )
+            }
+          />
         );
       case 'complianceReports':
         return (
@@ -1238,7 +1408,7 @@ function VendorViewContent({
           <div className="space-y-4">
             <RiskAssessmentsTable
               assessments={
-                data.node.riskAssessments?.edges.map((edge) => edge.node) ?? []
+                (data.node.riskAssessments?.edges.map(edge => edge.node) || []) as RiskAssessment[]
               }
               onCreateAssessment={handleCreateRiskAssessment}
             />
