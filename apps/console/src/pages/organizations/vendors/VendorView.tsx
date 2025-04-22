@@ -20,6 +20,7 @@ import type { VendorViewDeleteComplianceReportMutation as DeleteComplianceReport
 import type { VendorViewUploadComplianceReportMutation as UploadComplianceReportMutationType } from "./__generated__/VendorViewUploadComplianceReportMutation.graphql";
 import type { VendorViewUpdateVendorMutation } from "./__generated__/VendorViewUpdateVendorMutation.graphql";
 import type { VendorViewCreateRiskAssessmentMutation } from "./__generated__/VendorViewCreateRiskAssessmentMutation.graphql";
+import type { BusinessImpact, DataSensitivity } from "./__generated__/VendorViewCreateRiskAssessmentMutation.graphql";
 import { useParams } from "react-router";
 import { cn } from "@/lib/utils";
 import { PageTemplate } from "@/components/PageTemplate";
@@ -818,6 +819,160 @@ function RiskAssessmentsTable({
   );
 }
 
+function RiskAssessmentModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  businessOwnerId,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: {
+    dataSensitivity: DataSensitivity;
+    businessImpact: BusinessImpact;
+    notes: string;
+  }) => void;
+  businessOwnerId: string | null;
+}) {
+  const [dataSensitivity, setDataSensitivity] = useState<DataSensitivity>("LOW");
+  const [businessImpact, setBusinessImpact] = useState<BusinessImpact>("LOW");
+  const [notes, setNotes] = useState("");
+  const [showError, setShowError] = useState(false);
+  
+  if (!isOpen) return null;
+  
+  const handleSubmit = () => {
+    if (!businessOwnerId) {
+      setShowError(true);
+      return;
+    }
+    
+    onSubmit({
+      dataSensitivity,
+      businessImpact,
+      notes,
+    });
+  };
+
+  // Data sensitivity descriptions from vendor_risk_assessment.go
+  const dataSensitivityOptions = [
+    { value: "NONE", label: "None", description: "No sensitive data" },
+    { value: "LOW", label: "Low", description: "Public or non-sensitive data" },
+    { value: "MEDIUM", label: "Medium", description: "Internal/restricted data" },
+    { value: "HIGH", label: "High", description: "Confidential data" },
+    { value: "CRITICAL", label: "Critical", description: "Regulated/PII/financial data" },
+  ];
+
+  // Business impact descriptions from vendor_risk_assessment.go
+  const businessImpactOptions = [
+    { value: "LOW", label: "Low", description: "Minimal impact on business" },
+    { value: "MEDIUM", label: "Medium", description: "Moderate impact on business" },
+    { value: "HIGH", label: "High", description: "Significant business impact" },
+    { value: "CRITICAL", label: "Critical", description: "Critical to business operations" },
+  ];
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <h3 className="text-lg font-medium mb-4">Create Risk Assessment</h3>
+        
+        {showError && !businessOwnerId && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-800">
+            <p className="text-sm font-medium">Business Owner Required</p>
+            <p className="text-xs mt-1">Please assign a Business Owner to this vendor before creating a risk assessment.</p>
+          </div>
+        )}
+        
+        <div className="space-y-6">
+          <div>
+            <Label htmlFor="data-sensitivity" className="mb-2 block">Data Sensitivity</Label>
+            <select
+              id="data-sensitivity"
+              value={dataSensitivity}
+              onChange={(e) => setDataSensitivity(e.target.value as DataSensitivity)}
+              className="w-full rounded-md border border-[#ECEFEC] px-3 py-2 focus:border-[#054D05] focus:ring-[#054D05]"
+            >
+              {dataSensitivityOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <div className="mt-2 p-3 bg-[rgba(5,77,5,0.03)] rounded-md">
+              <p className="text-sm text-[#141E12] font-medium mb-1">
+                {dataSensitivityOptions.find(o => o.value === dataSensitivity)?.label}: 
+              </p>
+              <p className="text-sm text-[#6B716A]">
+                {dataSensitivityOptions.find(o => o.value === dataSensitivity)?.description}
+              </p>
+              <p className="mt-2 text-xs text-[#6B716A]">
+                Select the level of sensitivity for the data this vendor processes or stores.
+              </p>
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="business-impact" className="mb-2 block">Business Impact</Label>
+            <select
+              id="business-impact"
+              value={businessImpact}
+              onChange={(e) => setBusinessImpact(e.target.value as BusinessImpact)}
+              className="w-full rounded-md border border-[#ECEFEC] px-3 py-2 focus:border-[#054D05] focus:ring-[#054D05]"
+            >
+              {businessImpactOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <div className="mt-2 p-3 bg-[rgba(5,77,5,0.03)] rounded-md">
+              <p className="text-sm text-[#141E12] font-medium mb-1">
+                {businessImpactOptions.find(o => o.value === businessImpact)?.label}: 
+              </p>
+              <p className="text-sm text-[#6B716A]">
+                {businessImpactOptions.find(o => o.value === businessImpact)?.description}
+              </p>
+              <p className="mt-2 text-xs text-[#6B716A]">
+                Select the impact on your business if this vendor experiences an outage or data breach.
+              </p>
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="notes" className="mb-2 block">Notes</Label>
+            <textarea
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full rounded-md border border-[#ECEFEC] px-3 py-2 min-h-[80px]"
+              placeholder="Add any additional notes about this risk assessment"
+            />
+            <p className="mt-2 text-xs text-[#6B716A]">
+              Add any context or details about this risk assessment that might be helpful for future reference.
+            </p>
+          </div>
+          
+          <div className="flex justify-end gap-2 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={onClose}
+              className="border-[#ECEFEC] text-[#141E12]"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmit}
+              className="bg-[#054D05] text-white hover:bg-[#054D05]/90"
+            >
+              Create Assessment
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function VendorViewContent({
   queryRef,
 }: {
@@ -827,6 +982,7 @@ function VendorViewContent({
   const data = usePreloadedQuery(vendorViewQuery, queryRef);
   const [activeTab, setActiveTab] = useState<'overview' | 'certifications' | 'complianceReports' | 'riskAssessments'>('overview');
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
+  const [showRiskAssessmentModal, setShowRiskAssessmentModal] = useState(false);
   const [formData, setFormData] = useState({
     name: data.node.name || "",
     description: data.node.description || "",
@@ -845,8 +1001,6 @@ function VendorViewContent({
     websiteUrl: data.node.websiteUrl || "",
     businessOwnerId: data.node.businessOwner?.id || null,
     securityOwnerId: data.node.securityOwner?.id || null,
-    riskTier: "GENERAL" as "GENERAL" | "SIGNIFICANT" | "CRITICAL",
-    serviceCriticality: "LOW" as "LOW" | "MEDIUM" | "HIGH",
   });
   const [updateVendor] =
     useMutation<VendorViewUpdateVendorMutation>(updateVendorMutation);
@@ -981,8 +1135,6 @@ function VendorViewContent({
       websiteUrl: data.node.websiteUrl || "",
       businessOwnerId: data.node.businessOwner?.id || null,
       securityOwnerId: data.node.securityOwner?.id || null,
-      riskTier: "GENERAL" as "GENERAL" | "SIGNIFICANT" | "CRITICAL",
-      serviceCriticality: "LOW" as "LOW" | "MEDIUM" | "HIGH",
     });
     setEditedFields(new Set());
   };
@@ -1110,10 +1262,34 @@ function VendorViewContent({
   );
 
   const handleCreateRiskAssessment = useCallback(() => {
+    setShowRiskAssessmentModal(true);
+  }, []);
+  
+  const handleRiskAssessmentSubmit = useCallback((formValues: {
+    dataSensitivity: DataSensitivity;
+    businessImpact: BusinessImpact;
+    notes: string;
+  }) => {
+    // Close the modal
+    setShowRiskAssessmentModal(false);
+    
     // Current date for assessedAt, and 1 year later for expiresAt
     const today = new Date();
     const nextYear = new Date(today);
     nextYear.setFullYear(nextYear.getFullYear() + 1);
+    
+    // Check if there's a business owner assigned
+    const businessOwnerId = data.node.businessOwner?.id;
+    if (!businessOwnerId) {
+      // This check is now redundant as it's handled in the modal
+      // but keeping it as a safeguard
+      toast({
+        title: "Error",
+        description: "Please assign a Business Owner to the vendor before creating a risk assessment",
+        variant: "destructive",
+      });
+      return;
+    }
     
     createRiskAssessment({
       variables: {
@@ -1125,11 +1301,11 @@ function VendorViewContent({
         ],
         input: {
           vendorId: data.node.id!,
-          assessedBy: data.node.businessOwner?.id || "",
+          assessedBy: businessOwnerId,
           expiresAt: nextYear.toISOString(),
-          dataSensitivity: "LOW",
-          businessImpact: "LOW",
-          notes: "Initial risk assessment",
+          dataSensitivity: formValues.dataSensitivity,
+          businessImpact: formValues.businessImpact,
+          notes: formValues.notes || "Risk assessment",
           attachments: []
         },
       },
@@ -1615,6 +1791,14 @@ function VendorViewContent({
             </Button>
           </div>
         )}
+        
+        {/* Risk Assessment Modal */}
+        <RiskAssessmentModal
+          isOpen={showRiskAssessmentModal}
+          onClose={() => setShowRiskAssessmentModal(false)}
+          onSubmit={handleRiskAssessmentSubmit}
+          businessOwnerId={formData.businessOwnerId}
+        />
     </PageTemplate>
   );
 }
