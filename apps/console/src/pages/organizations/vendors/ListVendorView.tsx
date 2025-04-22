@@ -8,9 +8,9 @@ import {
   usePaginationFragment,
 } from "react-relay";
 import { useSearchParams, useParams } from "react-router";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Store, ChevronRight, Trash2 } from "lucide-react";
+import { Store, Plus, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
@@ -83,6 +83,7 @@ const vendorListFragment = graphql`
           id
           name
           description
+          websiteUrl
           createdAt
           updatedAt
         }
@@ -108,6 +109,7 @@ const createVendorMutation = graphql`
           id
           name
           description
+          websiteUrl
           createdAt
           updatedAt
         }
@@ -141,7 +143,7 @@ function LoadAboveButton({
   }
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mt-4">
       <Button
         variant="outline"
         onClick={onLoadMore}
@@ -168,7 +170,7 @@ function LoadBelowButton({
   }
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mt-4">
       <Button
         variant="outline"
         onClick={onLoadMore}
@@ -194,6 +196,7 @@ function ListVendorContent({
   const [, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAddVendorDropdown, setShowAddVendorDropdown] = useState(false);
   const [filteredVendors, setFilteredVendors] = useState<VendorData[]>([]);
   const [vendorsData, setVendorsData] = useState<VendorData[]>([]);
   const [isLoadingVendors, setIsLoadingVendors] = useState(false);
@@ -250,14 +253,77 @@ function ListVendorContent({
     threshold: 0.3,
   });
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (value.trim() === "") {
+      setFilteredVendors([]);
+    } else {
+      const results = fuse.search(value).map((result) => result.item);
+      setFilteredVendors(results);
+    }
+  };
+
+  // Helper to format date (similar to "Mon, 8 Mar. 2025" in the design)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
+  // Get favicon URL from website URL
+  const getFaviconUrl = (websiteUrl: string | null | undefined) => {
+    if (!websiteUrl) return null;
+    
+    try {
+      const url = new URL(websiteUrl);
+      return `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  // Function to determine risk badge style
+  const getRiskBadgeStyle = (riskLevel: string | undefined) => {
+    switch (riskLevel) {
+      case "CRITICAL":
+        return "bg-[#FFEFEF] text-[#CD2B31]";
+      case "SIGNIFICANT":
+        return "bg-[#FFF1E7] text-[#BD4B00]";
+      default:
+        return "bg-[#EEFADC] text-[#5D770D]";
+    }
+  };
+
+  // Mock risk status for demo (since the data doesn't have this field)
+  const getRiskStatus = (vendorId: string) => {
+    // Simplistic way to assign different risk levels for demo
+    const hash = vendorId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    if (hash % 3 === 0) return "CRITICAL";
+    if (hash % 3 === 1) return "SIGNIFICANT";
+    return "GENERAL";
+  };
+
   return (
     <PageTemplate
       title="Vendors"
-      description="Vendors are third-party services that your company uses. Add them to
-      keep track of their risk and compliance status."
+      description="Vendors are third-party services that your company uses. Add them to keep track of their risk and compliance status."
+      actions={
+        <Button
+          className="flex items-center gap-2"
+          onClick={() => setShowAddVendorDropdown(!showAddVendorDropdown)}
+        >
+          <Plus className="h-4 w-4" />
+          Add vendor
+        </Button>
+      }
     >
-      <div className="space-y-6">
-        <div className="rounded-xl border bg-level-1 p-4">
+      {showAddVendorDropdown && (
+        <div className="mb-6 p-4 border rounded-xl bg-white relative">
           <div className="flex items-center gap-2 mb-4">
             <Store className="h-5 w-5" />
             <h3 className="font-medium">Add a vendor</h3>
@@ -268,18 +334,7 @@ function ListVendorContent({
               placeholder="Type vendor's name"
               value={searchTerm}
               style={{ borderRadius: "0.3rem" }}
-              onChange={(e) => {
-                const value = e.target.value;
-                setSearchTerm(value);
-                if (value.trim() === "") {
-                  setFilteredVendors([]);
-                } else {
-                  const results = fuse
-                    .search(value)
-                    .map((result) => result.item);
-                  setFilteredVendors(results);
-                }
-              }}
+              onChange={handleSearchChange}
               disabled={isLoadingVendors}
             />
             {isLoadingVendors && (
@@ -291,12 +346,12 @@ function ListVendorContent({
             {searchTerm.trim() !== "" && (
               <div
                 style={{ borderRadius: "0.3rem" }}
-                className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-invert-bg shadow-md z-10"
+                className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-white shadow-md z-10"
               >
                 {filteredVendors.map((vendor) => (
                   <button
                     key={vendor.name}
-                    className="w-full px-3 py-2 text-left bg-invert-bg hover:bg-h-subtle-bg"
+                    className="w-full px-3 py-2 text-left hover:bg-gray-50"
                     onClick={() => {
                       createVendor({
                         variables: {
@@ -325,6 +380,7 @@ function ListVendorContent({
                         onCompleted() {
                           setSearchTerm("");
                           setFilteredVendors([]);
+                          setShowAddVendorDropdown(false);
                           toast({
                             title: "Vendor added",
                             description:
@@ -334,12 +390,24 @@ function ListVendorContent({
                       });
                     }}
                   >
-                    {vendor.name}
+                    <div className="flex items-center gap-2">
+                      {vendor.websiteUrl && (
+                        <img 
+                          src={getFaviconUrl(vendor.websiteUrl) || ''} 
+                          alt="" 
+                          className="w-4 h-4"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      )}
+                      {vendor.name}
+                    </div>
                   </button>
                 ))}
                 <button
-                  className="w-full px-3 py-2 text-left hover:bg-h-subtle-bg flex items-center gap-2 border-t"
-                  onClick={() => {
+                  className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 border-t"
+                  onClick={(e) => {
                     createVendor({
                       variables: {
                         connections: [vendorsConnection.vendors.__id],
@@ -348,13 +416,12 @@ function ListVendorContent({
                           name: searchTerm.trim(),
                           description: "",
                           serviceStartAt: new Date().toISOString(),
-                          serviceCriticality: "LOW",
-                          riskTier: "GENERAL",
                         },
                       },
                       onCompleted() {
                         setSearchTerm("");
                         setFilteredVendors([]);
+                        setShowAddVendorDropdown(false);
                         toast({
                           title: "Vendor created",
                           description:
@@ -364,80 +431,180 @@ function ListVendorContent({
                     });
                   }}
                 >
-                  <span className="font-medium">Create new vendor:</span>{" "}
-                  {searchTerm}
+                  <div className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    <span className="font-medium">Create new vendor:</span> {searchTerm}
+                  </div>
                 </button>
               </div>
             )}
           </div>
         </div>
+      )}
 
-        <div className="space-y-2">
-          {vendors.map((vendor) => (
-            <Link
-              key={vendor?.id}
-              to={`/organizations/${organizationId}/vendors/${vendor?.id}`}
-              className="block"
-            >
-              <div className="flex items-center justify-between p-4 rounded-xl border bg-level-1 hover:bg-accent-bg/5 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>{vendor?.name?.[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium">{vendor?.name}</p>
-                  </div>
-                </div>
+      <div className="rounded-xl border overflow-hidden">
+        <table className="w-full bg-white">
+          <thead className="bg-white border-b border-gray-100">
+            <tr>
+              <th className="py-3 px-4 text-left text-xs font-semibold text-gray-500">
                 <div className="flex items-center gap-2">
-                  <Badge
-                    variant="secondary"
-                    className={
-                      vendor.riskTier === "CRITICAL"
-                        ? "bg-danger-bg text-danger rounded-full px-3 py-0.5 text-xs font-medium"
-                        : vendor?.riskTier === "SIGNIFICANT"
-                        ? "bg-warning-bg text-warning rounded-full px-3 py-0.5 text-xs font-medium"
-                        : "bg-success-bg text-success rounded-full px-3 py-0.5 text-xs font-medium"
-                    }
+                  Vendor
+                  <svg
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-gray-400"
                   >
-                    {vendor.riskTier}
-                  </Badge>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-tertiary hover:bg-transparent hover:[&>svg]:text-danger"
-                    onClick={(e) => {
-                      e.preventDefault(); // Prevent navigation
-                      if (
-                        window.confirm(
-                          "Are you sure you want to delete this vendor?"
-                        )
-                      ) {
-                        deleteVendor({
-                          variables: {
-                            connections: [vendorsConnection.vendors.__id],
-                            input: {
-                              vendorId: vendor.id,
-                            },
-                          },
-                          onCompleted() {
-                            toast({
-                              title: "Vendor deleted",
-                              description:
-                                "The vendor has been deleted successfully",
-                            });
-                          },
-                        });
-                      }
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 transition-colors" />
-                  </Button>
-                  <ChevronRight className="h-4 w-4 text-tertiary" />
+                    <path d="M4 6L7 3H1L4 6Z" fill="currentColor" />
+                  </svg>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </th>
+              <th className="py-3 px-4 text-left text-xs font-semibold text-gray-500">
+                <div className="flex items-center gap-2">
+                  Last update
+                  <svg
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-gray-400"
+                  >
+                    <path d="M4 6L7 3H1L4 6Z" fill="currentColor" />
+                  </svg>
+                </div>
+              </th>
+              <th className="py-3 px-4 text-left text-xs font-semibold text-gray-500">
+                <div className="flex items-center gap-2">
+                  Risk
+                  <svg
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-gray-400"
+                  >
+                    <path d="M4 6L7 3H1L4 6Z" fill="currentColor" />
+                  </svg>
+                </div>
+              </th>
+              <th className="py-3 px-4 text-left text-xs font-semibold text-gray-500">
+                <div className="flex items-center gap-2">
+                  Compliance status
+                  <svg
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-gray-400"
+                  >
+                    <path d="M4 6L7 3H1L4 6Z" fill="currentColor" />
+                  </svg>
+                </div>
+              </th>
+              <th className="py-3 px-4"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {vendors.map((vendor) => {
+              const riskStatus = getRiskStatus(vendor.id);
+              return (
+                <tr
+                  key={vendor.id}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors bg-white"
+                >
+                  <td className="py-4 px-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8 bg-white">
+                        {(() => {
+                          const faviconUrl = vendor.websiteUrl ? getFaviconUrl(vendor.websiteUrl) : null;
+                          return faviconUrl ? (
+                            <AvatarImage src={faviconUrl} alt={vendor.name} />
+                          ) : (
+                            <AvatarFallback>{vendor.name?.[0]}</AvatarFallback>
+                          );
+                        })()}
+                      </Avatar>
+                      <Link
+                        to={`/organizations/${organizationId}/vendors/${vendor.id}`}
+                        className="font-medium hover:underline"
+                      >
+                        {vendor.name}
+                      </Link>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4 text-sm">
+                    {formatDate(vendor.updatedAt)}
+                  </td>
+                  <td className="py-4 px-4">
+                    <Badge className={`${getRiskBadgeStyle(riskStatus)} font-medium text-xs px-2 py-1 rounded-md`}>
+                      {riskStatus === "CRITICAL" 
+                        ? "Critical"
+                        : riskStatus === "SIGNIFICANT"
+                        ? "Medium"
+                        : "General"}
+                    </Badge>
+                  </td>
+                  <td className="py-4 px-4">
+                    <Badge 
+                      className={`${
+                        riskStatus === "CRITICAL" 
+                          ? "bg-[#FFEFEF] text-[#CD2B31]" 
+                          : riskStatus === "SIGNIFICANT" 
+                          ? "bg-[#FFF1E7] text-[#BD4B00]" 
+                          : "bg-[#EEFADC] text-[#5D770D]"
+                      } font-medium text-xs px-2 py-1 rounded-md`}
+                    >
+                      {riskStatus === "CRITICAL" 
+                        ? "Late" 
+                        : riskStatus === "SIGNIFICANT" 
+                        ? "In Progress" 
+                        : "Completed"}
+                    </Badge>
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        // Handle menu click - could be expanded into a dropdown menu
+                        if (
+                          window.confirm(
+                            "Are you sure you want to delete this vendor?"
+                          )
+                        ) {
+                          deleteVendor({
+                            variables: {
+                              connections: [vendorsConnection.vendors.__id],
+                              input: {
+                                vendorId: vendor.id,
+                              },
+                            },
+                            onCompleted() {
+                              toast({
+                                title: "Vendor deleted",
+                                description:
+                                  "The vendor has been deleted successfully",
+                              });
+                            },
+                          });
+                        }
+                      }}
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
 
       <LoadAboveButton

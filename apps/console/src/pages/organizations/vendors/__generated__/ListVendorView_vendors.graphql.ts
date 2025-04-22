@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1ea33fd638cd871d891e3cd41e1f3372>>
+ * @generated SignedSource<<e3d4dae05baff068e5f61916fb436e10>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -21,6 +21,7 @@ export type ListVendorView_vendors$data = {
         readonly id: string;
         readonly name: string;
         readonly updatedAt: string;
+        readonly websiteUrl: string | null | undefined;
       };
     }>;
     readonly pageInfo: {
@@ -157,6 +158,13 @@ return {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
+                  "name": "websiteUrl",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
                   "name": "createdAt",
                   "storageKey": null
                 },
@@ -248,6 +256,6 @@ return {
 };
 })();
 
-(node as any).hash = "477e430705f0f3cbadb8dfac89e24629";
+(node as any).hash = "3908e5fd1af7e0cb367a480fc9fc437e";
 
 export default node;

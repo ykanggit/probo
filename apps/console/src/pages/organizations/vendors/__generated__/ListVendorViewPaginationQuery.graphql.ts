@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a59c7eee4b53c2b74df89a2fa693d9cd>>
+ * @generated SignedSource<<2d5b613cbbbd051c4c1f1561f55bf644>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -214,6 +214,13 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
+                            "name": "websiteUrl",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
                             "name": "createdAt",
                             "storageKey": null
                           },
@@ -313,16 +320,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b4165eeba6363c964b11f14f678d5338",
+    "cacheID": "b1055c67d0940ecd9189ec80410a8add",
     "id": null,
     "metadata": {},
     "name": "ListVendorViewPaginationQuery",
     "operationKind": "query",
-    "text": "query ListVendorViewPaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ListVendorView_vendors_pbnwq\n    id\n  }\n}\n\nfragment ListVendorView_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query ListVendorViewPaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ListVendorView_vendors_pbnwq\n    id\n  }\n}\n\nfragment ListVendorView_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        description\n        websiteUrl\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "477e430705f0f3cbadb8dfac89e24629";
+(node as any).hash = "3908e5fd1af7e0cb367a480fc9fc437e";
 
 export default node;

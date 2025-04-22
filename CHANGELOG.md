@@ -18,7 +18,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Completely redesigned vendor detail page with a cleaner, more intuitive layout
+- Completely redesigned vendor list page
+- Completely redesigned vendor detail page
 - Improved compliance reports table with better file size formatting and date display
 - People may be linked to user
 

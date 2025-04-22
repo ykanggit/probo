@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ccdef4cce3d167b401f6d89dea1dde33>>
+ * @generated SignedSource<<55ac3df9e65daff882c0d44f7b4904c2>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -43,6 +43,7 @@ export type ListVendorViewCreateVendorMutation$data = {
         readonly id: string;
         readonly name: string;
         readonly updatedAt: string;
+        readonly websiteUrl: string | null | undefined;
       };
     };
   };
@@ -105,6 +106,13 @@ v3 = {
           "args": null,
           "kind": "ScalarField",
           "name": "description",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "websiteUrl",
           "storageKey": null
         },
         {
@@ -193,16 +201,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "03c1d61a3a252ca74bd8da1821f1e0b9",
+    "cacheID": "4ff1631133af0ca4a0d3109dbd1bda4f",
     "id": null,
     "metadata": {},
     "name": "ListVendorViewCreateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation ListVendorViewCreateVendorMutation(\n  $input: CreateVendorInput!\n) {\n  createVendor(input: $input) {\n    vendorEdge {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation ListVendorViewCreateVendorMutation(\n  $input: CreateVendorInput!\n) {\n  createVendor(input: $input) {\n    vendorEdge {\n      node {\n        id\n        name\n        description\n        websiteUrl\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "05ca888317537533f7345000f0948c0c";
+(node as any).hash = "94be3494153c93d4bf4d1a6324b95f17";
 
 export default node;
