@@ -19,6 +19,7 @@ import type { VendorViewQuery as VendorViewQueryType } from "./__generated__/Ven
 import type { VendorViewDeleteComplianceReportMutation as DeleteComplianceReportMutationType } from "./__generated__/VendorViewDeleteComplianceReportMutation.graphql";
 import type { VendorViewUploadComplianceReportMutation as UploadComplianceReportMutationType } from "./__generated__/VendorViewUploadComplianceReportMutation.graphql";
 import type { VendorViewUpdateVendorMutation } from "./__generated__/VendorViewUpdateVendorMutation.graphql";
+import type { VendorViewCreateRiskAssessmentMutation } from "./__generated__/VendorViewCreateRiskAssessmentMutation.graphql";
 import { useParams } from "react-router";
 import { cn } from "@/lib/utils";
 import { PageTemplate } from "@/components/PageTemplate";
@@ -34,8 +35,6 @@ const vendorViewQuery = graphql`
         description
         serviceStartAt
         serviceTerminationAt
-        serviceCriticality
-        riskTier
         statusPageUrl
         termsOfServiceUrl
         privacyPolicyUrl
@@ -71,6 +70,24 @@ const vendorViewQuery = graphql`
             }
           }
         }
+        riskAssessments(first: 100)
+          @connection(key: "VendorView_riskAssessments") {
+          edges {
+            node {
+              id
+          assessedAt
+          expiresAt
+          dataSensitivity
+          businessImpact
+          notes
+          assessedBy {
+            id
+            fullName
+          }
+          createdAt
+            }
+          }
+        }
       }
     }
     organization: node(id: $organizationId) {
@@ -88,8 +105,6 @@ const updateVendorMutation = graphql`
         description
         serviceStartAt
         serviceTerminationAt
-        serviceCriticality
-        riskTier
         statusPageUrl
         termsOfServiceUrl
         privacyPolicyUrl
@@ -140,6 +155,31 @@ const uploadComplianceReportMutation = graphql`
           validUntil
           fileUrl
           fileSize
+          createdAt
+        }
+      }
+    }
+  }
+`;
+
+const createRiskAssessmentMutation = graphql`
+  mutation VendorViewCreateRiskAssessmentMutation(
+    $input: CreateVendorRiskAssessmentInput!
+    $connections: [ID!]!
+  ) {
+    createVendorRiskAssessment(input: $input) {
+      vendorRiskAssessmentEdge @appendEdge(connections: $connections) {
+        node {
+          id
+          assessedAt
+          expiresAt
+          dataSensitivity
+          businessImpact
+          notes
+          assessedBy {
+            id
+            fullName
+          }
           createdAt
         }
       }
@@ -214,86 +254,130 @@ function ComplianceReportsTable({
   onUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showDropdown, setShowDropdown] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Truncate filename to a reasonable length if needed
-  const truncateFilename = (filename: string, maxLength = 40) => {
-    if (filename.length <= maxLength) return filename;
-    const extension = filename.split(".").pop();
-    const name = filename.substring(0, maxLength - extension!.length - 3);
-    return `${name}...${extension}`;
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Format file size to human-readable format
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  };
+
+  // Format date to match Figma design
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
   };
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <h2 className="text-lg font-medium">Compliance Reports</h2>
-        <p className="text-sm text-secondary">
-          Upload and manage compliance reports for this vendor
-        </p>
-      </div>
-      <div className="rounded-md border">
-        <div className="overflow-hidden">
-          <table className="w-full table-fixed">
-            <thead>
-              <tr className="border-b">
-                <th className="w-2/5 px-4 py-2 text-left text-sm font-medium">
-                  Report Name
-                </th>
-                <th className="w-1/5 px-4 py-2 text-left text-sm font-medium">
-                  Report Date
-                </th>
-                <th className="w-1/5 px-4 py-2 text-left text-sm font-medium">
-                  Valid Until
-                </th>
-                <th className="w-1/5 px-4 py-2 text-left text-sm font-medium">
-                  File Size
-                </th>
-                <th className="w-1/5 px-4 py-2 text-left text-sm font-medium">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {reports.map((report) => (
-                <tr key={report.id} className="border-b">
-                  <td className="px-4 py-2">
+      <div className="rounded-xl border border-[#ECEFEC] bg-white overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-[rgba(2,42,2,0.08)]">
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#818780]">Report name</span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#818780]">Report date</span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#818780]">Valid until</span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-right w-16"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {reports.map((report) => (
+              <tr key={report.id} className="border-b border-[rgba(2,42,2,0.08)]">
+                <td className="px-4 py-3">
+                  <div className="flex flex-col justify-center">
                     <a
                       href={report.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block text-primary hover:underline"
-                      title={report.reportName}
+                      className="text-sm font-normal text-[#141E12] hover:underline"
                     >
-                      <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                        {truncateFilename(report.reportName)}
-                      </div>
+                      {report.reportName}
                     </a>
-                  </td>
-                  <td className="px-4 py-2 text-sm">
-                    {new Date(report.reportDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-2 text-sm">
-                    {report.validUntil
-                      ? new Date(report.validUntil).toLocaleDateString()
-                      : "N/A"}
-                  </td>
-                  <td className="px-4 py-2 text-sm">
-                    {(report.fileSize / 1024 / 1024).toFixed(2)} MB
-                  </td>
-                  <td className="px-4 py-2">
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => onDelete(report.id)}
+                    <span className="text-xs text-[#818780]">
+                      {formatFileSize(report.fileSize)}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-sm font-normal text-[#141E12]">
+                    {formatDate(report.reportDate)}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-sm font-normal text-[#141E12]">
+                    {report.validUntil ? formatDate(report.validUntil) : 'N/A'}
+                  </span>
+                </td>
+                <td className="text-right pr-6 py-3">
+                  <div className="relative" ref={showDropdown === report.id ? dropdownRef : null}>
+                    <button
+                      className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-[rgba(2,42,2,0.03)]"
+                      onClick={() => setShowDropdown(showDropdown === report.id ? null : report.id)}
                     >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z" fill="#141E12"/>
+                        <path d="M3 9.5C3.82843 9.5 4.5 8.82843 4.5 8C4.5 7.17157 3.82843 6.5 3 6.5C2.17157 6.5 1.5 7.17157 1.5 8C1.5 8.82843 2.17157 9.5 3 9.5Z" fill="#141E12"/>
+                        <path d="M13 9.5C13.8284 9.5 14.5 8.82843 14.5 8C14.5 7.17157 13.8284 6.5 13 6.5C12.1716 6.5 11.5 7.17157 11.5 8C11.5 8.82843 12.1716 9.5 13 9.5Z" fill="#141E12"/>
+                      </svg>
+                    </button>
+                    {showDropdown === report.id && (
+                      <div className="absolute right-0 mt-1 bg-white rounded-md shadow-lg border border-[#ECEFEC] z-10" style={{ bottom: '100%', marginBottom: '5px' }}>
+                        <button
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                          onClick={() => {
+                            onDelete(report.id);
+                            setShowDropdown(null);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {reports.length === 0 && (
+              <tr>
+                <td colSpan={4} className="text-center py-6 text-sm text-[#818780]">
+                  No compliance reports uploaded yet
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
       <div className="mt-4">
         <input
@@ -305,11 +389,12 @@ function ComplianceReportsTable({
         />
         <Button
           onClick={() => fileInputRef.current?.click()}
-          className="bg-primary text-invert hover:bg-primary/90"
+          className="rounded-full px-4 py-2 bg-[#054D05] text-white hover:bg-[#054D05]/90"
+          size="sm"
         >
           Upload New Report
         </Button>
-        <p className="mt-2 text-sm text-secondary">
+        <p className="mt-2 text-sm text-[#6B716A]">
           Only PDF files up to 10MB are allowed
         </p>
       </div>
@@ -342,9 +427,9 @@ function TagList({
         {tags.map((tag) => (
           <div
             key={tag}
-            className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm"
+            className="flex items-center gap-1 rounded-full bg-[rgba(5,77,5,0.03)] px-3 py-1 text-sm font-medium"
           >
-            <span>{tag}</span>
+            <span className="text-[#141E12]">{tag}</span>
             <button
               onClick={() => onRemove(tag)}
               className="text-primary hover:text-primary/80"
@@ -354,14 +439,208 @@ function TagList({
           </div>
         ))}
       </div>
-      <Input
-        type="text"
-        value={newTag}
-        onChange={(e) => setNewTag(e.target.value)}
-        onKeyDown={handleAddTag}
-        placeholder="Type and press Enter to add a certification"
-        className="mt-2"
-      />
+      <div className="bg-[rgba(5,77,5,0.03)] rounded-lg p-1">
+        <Input
+          type="text"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+          onKeyDown={handleAddTag}
+          placeholder="Type and press Enter to add a certification"
+          className="border-0 bg-transparent p-1 shadow-none focus-visible:ring-0"
+        />
+      </div>
+    </div>
+  );
+}
+
+interface RiskAssessment {
+  id: string;
+  assessedAt: string;
+  expiresAt: string;
+  dataSensitivity: string;
+  businessImpact: string;
+  notes: string | null;
+  assessedBy: {
+    id: string;
+    fullName: string;
+  } | null;
+  createdAt: string;
+}
+
+function RiskAssessmentsTable({
+  assessments,
+  onCreateAssessment,
+}: {
+  assessments: RiskAssessment[];
+  onCreateAssessment: () => void;
+}) {
+  const [showDropdown, setShowDropdown] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Format date to match Figma design
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  // Get severity label based on data sensitivity and business impact
+  const getSeverityLabel = (dataSensitivity: string, businessImpact: string) => {
+    // Simple logic to determine severity - can be adjusted based on requirements
+    if (dataSensitivity === 'CRITICAL' || businessImpact === 'CRITICAL') {
+      return { label: 'Critical', color: 'bg-red-100 text-red-800' };
+    } else if (dataSensitivity === 'HIGH' || businessImpact === 'HIGH') {
+      return { label: 'High', color: 'bg-orange-100 text-orange-800' };
+    } else if (dataSensitivity === 'MEDIUM' || businessImpact === 'MEDIUM') {
+      return { label: 'Medium', color: 'bg-yellow-100 text-yellow-800' };
+    } else {
+      return { label: 'Low', color: 'bg-green-100 text-green-800' };
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-[#ECEFEC] bg-white overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-[rgba(2,42,2,0.08)]">
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#818780]">Assessed Date</span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#818780]">Expires</span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#818780]">Data Sensitivity</span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#818780]">Business Impact</span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#818780]">Severity</span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#818780]">Assessed By</span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-right w-16"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {assessments.map((assessment) => {
+              const severity = getSeverityLabel(assessment.dataSensitivity, assessment.businessImpact);
+              return (
+                <tr key={assessment.id} className="border-b border-[rgba(2,42,2,0.08)]">
+                  <td className="px-4 py-3">
+                    <span className="text-sm font-normal text-[#141E12]">
+                      {formatDate(assessment.assessedAt)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-sm font-normal text-[#141E12]">
+                      {formatDate(assessment.expiresAt)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-sm font-normal text-[#141E12]">
+                      {assessment.dataSensitivity.charAt(0) + assessment.dataSensitivity.slice(1).toLowerCase()}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-sm font-normal text-[#141E12]">
+                      {assessment.businessImpact.charAt(0) + assessment.businessImpact.slice(1).toLowerCase()}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`text-sm font-normal px-2 py-1 rounded-full ${severity.color}`}>
+                      {severity.label}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-sm font-normal text-[#141E12]">
+                      {assessment.assessedBy?.fullName || 'N/A'}
+                    </span>
+                  </td>
+                  <td className="text-right pr-6 py-3">
+                    <div className="relative" ref={showDropdown === assessment.id ? dropdownRef : null}>
+                      <button
+                        className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-[rgba(2,42,2,0.03)]"
+                        onClick={() => setShowDropdown(showDropdown === assessment.id ? null : assessment.id)}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z" fill="#141E12"/>
+                          <path d="M3 9.5C3.82843 9.5 4.5 8.82843 4.5 8C4.5 7.17157 3.82843 6.5 3 6.5C2.17157 6.5 1.5 7.17157 1.5 8C1.5 8.82843 2.17157 9.5 3 9.5Z" fill="#141E12"/>
+                          <path d="M13 9.5C13.8284 9.5 14.5 8.82843 14.5 8C14.5 7.17157 13.8284 6.5 13 6.5C12.1716 6.5 11.5 7.17157 11.5 8C11.5 8.82843 12.1716 9.5 13 9.5Z" fill="#141E12"/>
+                        </svg>
+                      </button>
+                      {showDropdown === assessment.id && (
+                        <div className="absolute right-0 mt-1 bg-white rounded-md shadow-lg border border-[#ECEFEC] z-10" style={{ bottom: '100%', marginBottom: '5px' }}>
+                          <button
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-[rgba(2,42,2,0.03)]"
+                            onClick={() => {
+                              // View or edit functionality can be added here
+                              setShowDropdown(null);
+                            }}
+                          >
+                            View details
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+            {assessments.length === 0 && (
+              <tr>
+                <td colSpan={7} className="text-center py-6 text-sm text-[#818780]">
+                  No risk assessments created yet
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      <div className="mt-4">
+        <Button
+          onClick={onCreateAssessment}
+          className="rounded-full px-4 py-2 bg-[#054D05] text-white hover:bg-[#054D05]/90"
+          size="sm"
+        >
+          Create Risk Assessment
+        </Button>
+        <p className="mt-2 text-sm text-[#6B716A]">
+          Create a new risk assessment for this vendor
+        </p>
+      </div>
     </div>
   );
 }
@@ -373,14 +652,13 @@ function VendorViewContent({
 }) {
   const { organizationId } = useParams();
   const data = usePreloadedQuery(vendorViewQuery, queryRef);
+  const [activeTab, setActiveTab] = useState<'overview' | 'certifications' | 'complianceReports' | 'riskAssessments'>('overview');
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     name: data.node.name || "",
     description: data.node.description || "",
     serviceStartAt: formatDateForInput(data.node.serviceStartAt),
     serviceTerminationAt: formatDateForInput(data.node.serviceTerminationAt),
-    serviceCriticality: data.node.serviceCriticality,
-    riskTier: data.node.riskTier,
     statusPageUrl: data.node.statusPageUrl || "",
     termsOfServiceUrl: data.node.termsOfServiceUrl || "",
     privacyPolicyUrl: data.node.privacyPolicyUrl || "",
@@ -394,6 +672,8 @@ function VendorViewContent({
     websiteUrl: data.node.websiteUrl || "",
     businessOwnerId: data.node.businessOwner?.id || null,
     securityOwnerId: data.node.securityOwner?.id || null,
+    riskTier: "GENERAL" as "GENERAL" | "SIGNIFICANT" | "CRITICAL",
+    serviceCriticality: "LOW" as "LOW" | "MEDIUM" | "HIGH",
   });
   const [updateVendor] =
     useMutation<VendorViewUpdateVendorMutation>(updateVendorMutation);
@@ -404,6 +684,10 @@ function VendorViewContent({
   const [uploadVendorComplianceReport] =
     useMutation<UploadComplianceReportMutationType>(
       uploadComplianceReportMutation
+    );
+  const [createRiskAssessment] =
+    useMutation<VendorViewCreateRiskAssessmentMutation>(
+      createRiskAssessmentMutation
     );
   const [, loadQuery] = useQueryLoader<VendorViewQueryType>(vendorViewQuery);
   const { toast } = useToast();
@@ -475,8 +759,6 @@ function VendorViewContent({
       description: data.node.description || "",
       serviceStartAt: formatDateForInput(data.node.serviceStartAt),
       serviceTerminationAt: formatDateForInput(data.node.serviceTerminationAt),
-      serviceCriticality: data.node.serviceCriticality,
-      riskTier: data.node.riskTier,
       statusPageUrl: data.node.statusPageUrl || "",
       termsOfServiceUrl: data.node.termsOfServiceUrl || "",
       privacyPolicyUrl: data.node.privacyPolicyUrl || "",
@@ -490,6 +772,8 @@ function VendorViewContent({
       websiteUrl: data.node.websiteUrl || "",
       businessOwnerId: data.node.businessOwner?.id || null,
       securityOwnerId: data.node.securityOwner?.id || null,
+      riskTier: "GENERAL" as "GENERAL" | "SIGNIFICANT" | "CRITICAL",
+      serviceCriticality: "LOW" as "LOW" | "MEDIUM" | "HIGH",
     });
     setEditedFields(new Set());
   };
@@ -616,321 +900,308 @@ function VendorViewContent({
     ]
   );
 
-  return (
-    <PageTemplate title={formData.name}>
-      <div className="max-w-2xl space-y-6">
-        <Card className="p-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-lg font-medium">Basic Information</h2>
-              <p className="text-sm text-secondary">
-                General information about the vendor
-              </p>
-            </div>
+  const handleCreateRiskAssessment = useCallback(() => {
+    // Current date for assessedAt, and 1 year later for expiresAt
+    const today = new Date();
+    const nextYear = new Date(today);
+    nextYear.setFullYear(nextYear.getFullYear() + 1);
+    
+    createRiskAssessment({
+      variables: {
+        connections: [
+          ConnectionHandler.getConnectionID(
+            data.node.id!,
+            "VendorView_riskAssessments"
+          ),
+        ],
+        input: {
+          vendorId: data.node.id!,
+          assessedBy: data.node.businessOwner?.id || "",
+          expiresAt: nextYear.toISOString(),
+          dataSensitivity: "LOW",
+          businessImpact: "LOW",
+          notes: "Initial risk assessment",
+          attachments: []
+        },
+      },
+      onCompleted: () => {
+        toast({
+          title: "Success",
+          description: "Risk assessment created successfully",
+          variant: "default",
+        });
+        loadQuery({
+          vendorId: data.node.id!,
+          organizationId: organizationId!,
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to create risk assessment",
+          variant: "destructive",
+        });
+      },
+    });
+  }, [createRiskAssessment, data.node.id, data.node.businessOwner?.id, loadQuery, toast, organizationId]);
 
-            <div className="space-y-4">
-              <EditableField
-                label="Name"
-                value={formData.name}
-                onChange={(value) => handleFieldChange("name", value)}
-              />
+  const formatDate = (dateStr: string | null | undefined) => {
+    if (!dateStr) return "N/A";
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
-              <EditableField
-                label="Description"
-                value={formData.description}
-                onChange={(value) => handleFieldChange("description", value)}
-              />
+  const getVendorId = () => {
+    const id = data.node.id;
+    if (!id) return "";
+    return `vendor_${id.split(':')[1] || id}`;
+  };
 
-              <EditableField
-                label="Legal Name"
-                value={formData.legalName}
-                onChange={(value) => handleFieldChange("legalName", value)}
-              />
-
-              <EditableField
-                label="Headquarter Address"
-                value={formData.headquarterAddress}
-                onChange={(value) =>
-                  handleFieldChange("headquarterAddress", value)
-                }
-              />
-
-              <EditableField
-                label="Website URL"
-                value={formData.websiteUrl}
-                onChange={(value) => handleFieldChange("websiteUrl", value)}
-              />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-lg font-medium">Ownership Information</h2>
-              <p className="text-sm text-secondary">
-                Individuals responsible for this vendor
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-tertiary" />
-                  <Label className="text-sm">Business Owner</Label>
-                </div>
-                <PeopleSelector
-                  organizationRef={data.organization}
-                  selectedPersonId={formData.businessOwnerId}
-                  onSelect={(value) =>
-                    handleFieldChange("businessOwnerId", value)
-                  }
-                  placeholder="Select business owner (optional)"
-                />
-                <p className="text-sm text-secondary">
-                  The person responsible for business decisions related to this
-                  vendor
-                </p>
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <div className="space-y-6">
+            <div className="flex flex-wrap gap-x-12 gap-y-4 items-start mb-6">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-secondary">Vendor ID</p>
+                <p className="text-sm text-tertiary">{getVendorId()}</p>
               </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-tertiary" />
-                  <Label className="text-sm">Security Owner</Label>
-                </div>
-                <PeopleSelector
-                  organizationRef={data.organization}
-                  selectedPersonId={formData.securityOwnerId}
-                  onSelect={(value) =>
-                    handleFieldChange("securityOwnerId", value)
-                  }
-                  placeholder="Select security owner (optional)"
-                />
-                <p className="text-sm text-secondary">
-                  The person responsible for security oversight of this vendor
-                </p>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-secondary">Joined</p>
+                <p className="text-sm text-tertiary">{formatDate(data.node.createdAt)}</p>
               </div>
             </div>
-          </div>
-        </Card>
 
-        <Card className="p-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-lg font-medium">
-                Risk & Service Information
-              </h2>
-              <p className="text-sm text-secondary">
-                Information about service criticality and risk
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <EditableField
-                label="Service Start At"
-                value={formData.serviceStartAt}
-                type="datetime-local"
-                onChange={(value) => handleFieldChange("serviceStartAt", value)}
-              />
-
-              <EditableField
-                label="Service Termination At"
-                value={formData.serviceTerminationAt}
-                type="datetime-local"
-                onChange={(value) =>
-                  handleFieldChange("serviceTerminationAt", value)
-                }
-              />
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <HelpCircle className="h-4 w-4 text-tertiary" />
-                  <Label className="text-sm">Service Criticality</Label>
+            <div className="grid grid-cols-1 gap-6">
+              {/* Vendor details card */}
+              <div className="rounded-xl border border-border bg-white p-0 overflow-hidden">
+                <div className="px-5 py-4 border-b border-[rgba(2,42,2,0.08)]">
+                  <h3 className="text-base font-medium">Vendor details</h3>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() =>
-                      handleFieldChange("serviceCriticality", "LOW")
-                    }
-                    className={cn(
-                      "rounded-full px-4 py-1 text-sm transition-colors",
-                      formData.serviceCriticality === "LOW"
-                        ? "bg-success-bg text-success ring ring-success-b"
-                        : "bg-invert-bg"
-                    )}
-                  >
-                    Low
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleFieldChange("serviceCriticality", "MEDIUM")
-                    }
-                    className={cn(
-                      "rounded-full px-4 py-1 text-sm transition-colors",
-                      formData.serviceCriticality === "MEDIUM"
-                        ? "bg-warning-bg text-warning ring ring-warning-b"
-                        : "bg-invert-bg"
-                    )}
-                  >
-                    Medium
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleFieldChange("serviceCriticality", "HIGH")
-                    }
-                    className={cn(
-                      "rounded-full px-4 py-1 text-sm transition-colors",
-                      formData.serviceCriticality === "HIGH"
-                        ? "bg-danger-bg text-danger ring ring-danger-b"
-                        : "bg-invert-bg"
-                    )}
-                  >
-                    High
-                  </button>
+                <div className="p-5 space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-[#6B716A]">Name</p>
+                    <div className="rounded-lg bg-[rgba(5,77,5,0.03)] px-2 py-1.5">
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => handleFieldChange("name", e.target.value)}
+                        className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 p-0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-[#6B716A]">Description</p>
+                    <div className="rounded-lg bg-[rgba(5,77,5,0.03)] px-2 py-1.5">
+                      <textarea
+                        value={formData.description}
+                        onChange={(e) => {
+                          handleFieldChange("description", e.target.value);
+                          e.target.style.height = '0';
+                          e.target.style.height = (e.target.scrollHeight) + 'px';
+                        }}
+                        className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 resize-none outline-none focus:ring-0 focus-visible:ring-0 p-0"
+                        style={{ 
+                          overflow: 'hidden',
+                          height: 'auto',
+                          minHeight: '1.5em',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-[#6B716A]">Legal name</p>
+                    <div className="rounded-lg bg-[rgba(5,77,5,0.03)] px-2 py-1.5">
+                      <input
+                        type="text"
+                        value={formData.legalName}
+                        onChange={(e) => handleFieldChange("legalName", e.target.value)}
+                        className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 p-0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-[#6B716A]">Headquarter Address</p>
+                    <div className="rounded-lg bg-[rgba(5,77,5,0.03)] px-2 py-1.5">
+                      <input
+                        type="text"
+                        value={formData.headquarterAddress}
+                        onChange={(e) => handleFieldChange("headquarterAddress", e.target.value)}
+                        className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 p-0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-[#6B716A]">Website URL</p>
+                    <div className="rounded-lg bg-[rgba(5,77,5,0.03)] px-2 py-1.5">
+                      <input
+                        type="text"
+                        value={formData.websiteUrl}
+                        onChange={(e) => handleFieldChange("websiteUrl", e.target.value)}
+                        className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 p-0"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm text-secondary">
-                  {formData.serviceCriticality === "HIGH" &&
-                    "Critical service - downtime severely impacts end-users"}
-                  {formData.serviceCriticality === "MEDIUM" &&
-                    "Important service - downtime moderately affects end-users"}
-                  {formData.serviceCriticality === "LOW" &&
-                    "Non-critical service - minimal end-user impact if down"}
-                </p>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <HelpCircle className="h-4 w-4 text-tertiary" />
-                  <Label className="text-sm">Risk Tier</Label>
+              {/* Ownership details card */}
+              <div className="rounded-xl border border-border bg-white p-0 overflow-hidden">
+                <div className="px-5 py-4 border-b border-[rgba(2,42,2,0.08)]">
+                  <h3 className="text-base font-medium">Ownership details</h3>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleFieldChange("riskTier", "CRITICAL")}
-                    className={cn(
-                      "rounded-full px-4 py-1 text-sm transition-colors",
-                      formData.riskTier === "CRITICAL"
-                        ? "bg-danger-bg text-danger ring ring-danger-b"
-                        : "bg-invert-bg"
-                    )}
-                  >
-                    Critical
-                  </button>
-                  <button
-                    onClick={() => handleFieldChange("riskTier", "SIGNIFICANT")}
-                    className={cn(
-                      "rounded-full px-4 py-1 text-sm transition-colors",
-                      formData.riskTier === "SIGNIFICANT"
-                        ? "bg-warning-bg text-warning ring ring-warning-b"
-                        : "bg-invert-bg"
-                    )}
-                  >
-                    Significant
-                  </button>
-                  <button
-                    onClick={() => handleFieldChange("riskTier", "GENERAL")}
-                    className={cn(
-                      "rounded-full px-4 py-1 text-sm transition-colors",
-                      formData.riskTier === "GENERAL"
-                        ? "bg-info-bg text-info ring ring-info-b"
-                        : "bg-invert-bg"
-                    )}
-                  >
-                    General
-                  </button>
+                <div className="p-5 space-y-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-[#6B716A]">Business Owner</p>
+                      <HelpCircle className="h-4 w-4 text-tertiary" />
+                    </div>
+                    <div className="bg-[rgba(5,77,5,0.03)] rounded-lg p-1">
+                      <PeopleSelector
+                        organizationRef={data.organization}
+                        selectedPersonId={formData.businessOwnerId}
+                        onSelect={(value) => handleFieldChange("businessOwnerId", value)}
+                        placeholder="Select"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-[#6B716A]">Security Owner</p>
+                      <HelpCircle className="h-4 w-4 text-tertiary" />
+                    </div>
+                    <div className="bg-[rgba(5,77,5,0.03)] rounded-lg p-1">
+                      <PeopleSelector
+                        organizationRef={data.organization}
+                        selectedPersonId={formData.securityOwnerId}
+                        onSelect={(value) => handleFieldChange("securityOwnerId", value)}
+                        placeholder="Select"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm text-secondary">
-                  {formData.riskTier === "CRITICAL" &&
-                    "Handles sensitive data, critical for platform operation"}
-                  {formData.riskTier === "SIGNIFICANT" &&
-                    "No user data access, but important for platform management"}
-                  {formData.riskTier === "GENERAL" &&
-                    "General vendor with minimal risk"}
-                </p>
+              </div>
+
+              {/* Risk & Service Information card */}
+              <div className="rounded-xl border border-border bg-white p-0 overflow-hidden">
+                <div className="px-5 py-4 border-b border-[rgba(2,42,2,0.08)]">
+                  <h3 className="text-base font-medium">Risk & Service Information</h3>
+                </div>
+                <div className="p-5 space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-[#6B716A]">Start date</p>
+                    <div className="inline-block bg-[rgba(5,77,5,0.03)] rounded-lg px-3 py-2">
+                      <Input
+                        type="datetime-local"
+                        value={formData.serviceStartAt}
+                        onChange={(e) => handleFieldChange("serviceStartAt", e.target.value)}
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 w-auto"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-[#6B716A]">End date</p>
+                    <div className="inline-block bg-[rgba(5,77,5,0.03)] rounded-lg px-3 py-2">
+                      <Input
+                        type="datetime-local"
+                        value={formData.serviceTerminationAt}
+                        onChange={(e) => handleFieldChange("serviceTerminationAt", e.target.value)}
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 w-auto"
+                        placeholder="Select"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Links card */}
+              <div className="rounded-xl border border-border bg-white p-0 overflow-hidden">
+                <div className="px-5 py-4 border-b border-[rgba(2,42,2,0.08)]">
+                  <h3 className="text-base font-medium">Links</h3>
+                </div>
+                <div className="divide-y">
+                  <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
+                    <p className="text-sm font-medium text-[#6B716A]">Status Page URL</p>
+                    <Input
+                      value={formData.statusPageUrl}
+                      onChange={(e) => handleFieldChange("statusPageUrl", e.target.value)}
+                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
+                    <p className="text-sm font-medium text-[#6B716A]">Terms of Service URL</p>
+                    <Input
+                      value={formData.termsOfServiceUrl}
+                      onChange={(e) => handleFieldChange("termsOfServiceUrl", e.target.value)}
+                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
+                    <p className="text-sm font-medium text-[#6B716A]">Privacy Policy URL</p>
+                    <Input
+                      value={formData.privacyPolicyUrl}
+                      onChange={(e) => handleFieldChange("privacyPolicyUrl", e.target.value)}
+                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
+                    <p className="text-sm font-medium text-[#6B716A]">Service Level Agreement URL</p>
+                    <Input
+                      value={formData.serviceLevelAgreementUrl}
+                      onChange={(e) => handleFieldChange("serviceLevelAgreementUrl", e.target.value)}
+                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
+                    <p className="text-sm font-medium text-[#6B716A]">Data Processing Agreement URL</p>
+                    <Input
+                      value={formData.dataProcessingAgreementUrl}
+                      onChange={(e) => handleFieldChange("dataProcessingAgreementUrl", e.target.value)}
+                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
+                    <p className="text-sm font-medium text-[#6B716A]">Security Page URL</p>
+                    <Input
+                      value={formData.securityPageUrl}
+                      onChange={(e) => handleFieldChange("securityPageUrl", e.target.value)}
+                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
+                    <p className="text-sm font-medium text-[#6B716A]">Trust Page URL</p>
+                    <Input
+                      value={formData.trustPageUrl}
+                      onChange={(e) => handleFieldChange("trustPageUrl", e.target.value)}
+                      className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-lg font-medium">Documentation & Links</h2>
-              <p className="text-sm text-secondary">
-                Important URLs related to the vendor
-              </p>
+        );
+      case 'certifications':
+        return (
+          <div className="rounded-xl border border-border bg-white p-0 overflow-hidden">
+            <div className="px-5 py-4 border-b border-[rgba(2,42,2,0.08)]">
+              <h3 className="text-base font-medium">Certifications</h3>
             </div>
-
-            <div className="space-y-4">
-              <EditableField
-                label="Status Page URL"
-                value={formData.statusPageUrl}
-                onChange={(value) => handleFieldChange("statusPageUrl", value)}
-              />
-
-              <EditableField
-                label="Terms of Service URL"
-                value={formData.termsOfServiceUrl}
-                onChange={(value) =>
-                  handleFieldChange("termsOfServiceUrl", value)
-                }
-              />
-
-              <EditableField
-                label="Privacy Policy URL"
-                value={formData.privacyPolicyUrl}
-                onChange={(value) =>
-                  handleFieldChange("privacyPolicyUrl", value)
-                }
-              />
-
-              <EditableField
-                label="Service Level Agreement URL"
-                value={formData.serviceLevelAgreementUrl}
-                onChange={(value) =>
-                  handleFieldChange("serviceLevelAgreementUrl", value)
-                }
-              />
-
-              <EditableField
-                label="Data Processing Agreement URL"
-                value={formData.dataProcessingAgreementUrl}
-                onChange={(value) =>
-                  handleFieldChange("dataProcessingAgreementUrl", value)
-                }
-              />
-
-              <EditableField
-                label="Security Page URL"
-                value={formData.securityPageUrl}
-                onChange={(value) =>
-                  handleFieldChange("securityPageUrl", value)
-                }
-              />
-
-              <EditableField
-                label="Trust Page URL"
-                value={formData.trustPageUrl}
-                onChange={(value) => handleFieldChange("trustPageUrl", value)}
-              />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-lg font-medium">Certifications</h2>
-              <p className="text-sm text-secondary">
-                List of certifications held by the vendor
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <HelpCircle className="h-4 w-4 text-tertiary" />
-                  <Label className="text-sm">Certifications</Label>
-                </div>
+            <div className="p-5 space-y-4">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-[#6B716A]">
+                  List of certifications held by the vendor
+                </p>
                 <TagList
                   tags={[...formData.certifications]}
                   onAdd={(tag) =>
@@ -949,31 +1220,99 @@ function VendorViewContent({
               </div>
             </div>
           </div>
-        </Card>
+        );
+      case 'complianceReports':
+        return (
+          <div className="space-y-4">
+            <ComplianceReportsTable
+              reports={
+                data.node.complianceReports?.edges.map((edge) => edge.node) ?? []
+              }
+              onDelete={handleDeleteReport}
+              onUpload={handleUploadReport}
+            />
+          </div>
+        );
+      case 'riskAssessments':
+        return (
+          <div className="space-y-4">
+            <RiskAssessmentsTable
+              assessments={
+                data.node.riskAssessments?.edges.map((edge) => edge.node) ?? []
+              }
+              onCreateAssessment={handleCreateRiskAssessment}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
-        <Card className="p-6">
-          <ComplianceReportsTable
-            reports={
-              data.node.complianceReports?.edges.map((edge) => edge.node) ?? []
-            }
-            onDelete={handleDeleteReport}
-            onUpload={handleUploadReport}
-          />
-        </Card>
-
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            className="bg-primary text-invert hover:bg-primary/90"
-            disabled={!hasChanges}
-          >
-            Save Changes
-          </Button>
+  return (
+    <PageTemplate title={formData.name}>
+        <div className="border-b mb-6">
+          <div className="flex">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={cn("px-4 py-3 text-sm font-medium border-b-2 -mb-px", 
+                activeTab === 'overview' 
+                  ? "border-primary text-primary" 
+                  : "border-transparent text-secondary hover:text-primary hover:border-secondary"
+              )}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('certifications')}
+              className={cn("px-4 py-3 text-sm font-medium border-b-2 -mb-px", 
+                activeTab === 'certifications' 
+                  ? "border-primary text-primary" 
+                  : "border-transparent text-secondary hover:text-primary hover:border-secondary"
+              )}
+            >
+              Certifications
+            </button>
+            <button
+              onClick={() => setActiveTab('complianceReports')}
+              className={cn("px-4 py-3 text-sm font-medium border-b-2 -mb-px", 
+                activeTab === 'complianceReports' 
+                  ? "border-primary text-primary" 
+                  : "border-transparent text-secondary hover:text-primary hover:border-secondary"
+              )}
+            >
+              Compliance reports
+            </button>
+            <button
+              onClick={() => setActiveTab('riskAssessments')}
+              className={cn("px-4 py-3 text-sm font-medium border-b-2 -mb-px", 
+                activeTab === 'riskAssessments' 
+                  ? "border-primary text-primary" 
+                  : "border-transparent text-secondary hover:text-primary hover:border-secondary"
+              )}
+            >
+              Risk assessments
+            </button>
+          </div>
         </div>
-      </div>
+
+        {/* Tab content */}
+        {renderTabContent()}
+
+        {/* Save/cancel buttons */}
+        {hasChanges && (
+          <div className="mt-6 flex justify-end gap-2">
+            <Button variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              className="bg-primary text-invert hover:bg-primary/90"
+            >
+              Save Changes
+            </Button>
+          </div>
+        )}
     </PageTemplate>
   );
 }

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b85fbf05b6b7f76bd8ceb87383bfd4b3>>
+ * @generated SignedSource<<1ea33fd638cd871d891e3cd41e1f3372>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
-export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
 import { FragmentRefs } from "relay-runtime";
 export type ListVendorView_vendors$data = {
   readonly id: string;
@@ -21,7 +20,6 @@ export type ListVendorView_vendors$data = {
         readonly description: string | null | undefined;
         readonly id: string;
         readonly name: string;
-        readonly riskTier: RiskTier;
         readonly updatedAt: string;
       };
     }>;
@@ -173,13 +171,6 @@ return {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
-                  "name": "riskTier",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
                   "name": "__typename",
                   "storageKey": null
                 }
@@ -257,6 +248,6 @@ return {
 };
 })();
 
-(node as any).hash = "6e3badec3308017fd318d4bd1dc41b44";
+(node as any).hash = "477e430705f0f3cbadb8dfac89e24629";
 
 export default node;

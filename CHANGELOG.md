@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- New "Risk assessments" tab for vendors that allows you to:
+  - View all risk assessments for a vendor in one place
+  - Create new risk assessments with data sensitivity and business impact ratings
+  - Track assessment expiration dates
+- Automatic people record creation when accepting invitations
+- New vendors in the built-in lists
+- Introduced a connector framework enabling integration with external
+  services:
+  - Add OAuth2 connector implementation
+
+### Changed
+
+- Completely redesigned vendor detail page with a cleaner, more intuitive layout
+- Improved compliance reports table with better file size formatting and date display
+- People may be linked to user
+
 ## [0.12.0] - 2025-04-20
 
 ### Added

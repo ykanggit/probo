@@ -80,7 +80,7 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 	r.Post("/auth/register", SignUpHandler(usrmgrSvc, authCfg))
 	r.Post("/auth/login", SignInHandler(usrmgrSvc, authCfg))
 	r.Delete("/auth/logout", SignOutHandler(usrmgrSvc, authCfg))
-	r.Post("/auth/invitation", InvitationConfirmationHandler(usrmgrSvc, authCfg))
+	r.Post("/auth/invitation", InvitationConfirmationHandler(usrmgrSvc, proboSvc, authCfg))
 	r.Post("/auth/forget-password", ForgetPasswordHandler(usrmgrSvc, authCfg))
 	r.Post("/auth/reset-password", ResetPasswordHandler(usrmgrSvc, authCfg))
 

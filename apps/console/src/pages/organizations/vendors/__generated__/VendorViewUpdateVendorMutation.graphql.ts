@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e8b13d28eed7587f5fbefcc073c53dc4>>
+ * @generated SignedSource<<574565aac89550e684dc54b21327b565>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,8 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
-export type ServiceCriticality = "HIGH" | "LOW" | "MEDIUM";
 export type UpdateVendorInput = {
   businessOwnerId?: string | null | undefined;
   category?: string | null | undefined;
@@ -22,10 +20,8 @@ export type UpdateVendorInput = {
   legalName?: string | null | undefined;
   name?: string | null | undefined;
   privacyPolicyUrl?: string | null | undefined;
-  riskTier?: RiskTier | null | undefined;
   securityOwnerId?: string | null | undefined;
   securityPageUrl?: string | null | undefined;
-  serviceCriticality?: ServiceCriticality | null | undefined;
   serviceLevelAgreementUrl?: string | null | undefined;
   serviceStartAt?: string | null | undefined;
   serviceTerminationAt?: string | null | undefined;
@@ -52,13 +48,11 @@ export type VendorViewUpdateVendorMutation$data = {
       readonly legalName: string | null | undefined;
       readonly name: string;
       readonly privacyPolicyUrl: string | null | undefined;
-      readonly riskTier: RiskTier;
       readonly securityOwner: {
         readonly fullName: string;
         readonly id: string;
       } | null | undefined;
       readonly securityPageUrl: string | null | undefined;
-      readonly serviceCriticality: ServiceCriticality;
       readonly serviceLevelAgreementUrl: string | null | undefined;
       readonly serviceStartAt: string;
       readonly serviceTerminationAt: string | null | undefined;
@@ -150,20 +144,6 @@ v3 = [
             "args": null,
             "kind": "ScalarField",
             "name": "serviceTerminationAt",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "serviceCriticality",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "riskTier",
             "storageKey": null
           },
           {
@@ -295,16 +275,16 @@ return {
     "selections": (v3/*: any*/)
   },
   "params": {
-    "cacheID": "d582aaaddaa73ef8e0fdef172364c64e",
+    "cacheID": "9e2c4c33246b4aa469cdd737be1e690a",
     "id": null,
     "metadata": {},
     "name": "VendorViewUpdateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      serviceCriticality\n      riskTier\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "627ef1694ebc04845b019bb65dd72c97";
+(node as any).hash = "58c28ca0307e1b27f2ebb72c3c2e7535";
 
 export default node;

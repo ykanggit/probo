@@ -1585,7 +1585,27 @@ func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendo
 
 // RiskAssessments is the resolver for the riskAssessments field.
 func (r *vendorResolver) RiskAssessments(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorRiskAssessmentOrder) (*types.VendorRiskAssessmentConnection, error) {
-	panic(fmt.Errorf("not implemented: RiskAssessments - riskAssessments"))
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.VendorRiskAssessmentOrderField]{
+		Field:     coredata.VendorRiskAssessmentOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.VendorRiskAssessmentOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Vendors.ListRiskAssessments(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("failed to list vendor risk assessments: %w", err))
+	}
+
+	return types.NewVendorRiskAssessmentConnection(page), nil
 }
 
 // BusinessOwner is the resolver for the businessOwner field.

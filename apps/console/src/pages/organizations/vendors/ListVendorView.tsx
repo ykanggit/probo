@@ -85,7 +85,6 @@ const vendorListFragment = graphql`
           description
           createdAt
           updatedAt
-          riskTier
         }
       }
       pageInfo {
@@ -111,7 +110,6 @@ const createVendorMutation = graphql`
           description
           createdAt
           updatedAt
-          riskTier
         }
       }
     }
@@ -322,8 +320,6 @@ function ListVendorContent({
                             statusPageUrl: vendor.statusPageUrl,
                             termsOfServiceUrl: vendor.termsOfServiceUrl,
                             serviceStartAt: new Date().toISOString(),
-                            serviceCriticality: "LOW",
-                            riskTier: "GENERAL",
                           },
                         },
                         onCompleted() {

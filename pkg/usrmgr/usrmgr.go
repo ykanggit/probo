@@ -710,31 +710,32 @@ func (s Service) InviteUser(
 	)
 }
 
-func (s Service) ConfirmInvitation(ctx context.Context, tokenString string, password string) error {
+func (s Service) ConfirmInvitation(ctx context.Context, tokenString string, password string) (*coredata.User, error) {
 	token, err := statelesstoken.ValidateToken[InvitationData](
 		s.tokenSecret,
 		TokenTypeOrganizationInvitation,
 		tokenString,
 	)
 	if err != nil {
-		return fmt.Errorf("cannot validate organization invitation token: %w", err)
+		return nil, fmt.Errorf("cannot validate organization invitation token: %w", err)
 	}
 
 	if len(password) < 8 {
-		return &ErrInvalidPassword{len(password)}
+		return nil, &ErrInvalidPassword{len(password)}
 	}
 
 	now := time.Now()
 
 	hashedPassword, err := s.hp.HashPassword([]byte(password))
 	if err != nil {
-		return fmt.Errorf("cannot hash password: %w", err)
+		return nil, fmt.Errorf("cannot hash password: %w", err)
 	}
 
-	return s.pg.WithTx(
+	user := &coredata.User{}
+
+	err = s.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
-			user := &coredata.User{}
 
 			if err := user.LoadByEmail(ctx, tx, token.Data.Email); err != nil {
 				var errUserNotFound *coredata.ErrUserNotFound
@@ -766,9 +767,31 @@ func (s Service) ConfirmInvitation(ctx context.Context, tokenString string, pass
 				return fmt.Errorf("cannot insert user organization: %w", err)
 			}
 
+			people := coredata.People{
+				OrganizationID:      token.Data.OrganizationID,
+				UserID:              &user.ID,
+				FullName:            token.Data.FullName,
+				PrimaryEmailAddress: token.Data.Email,
+				Kind:                coredata.PeopleKindEmployee,
+				CreatedAt:           now,
+				UpdatedAt:           now,
+			}
+
+			scope := coredata.NewScope(token.Data.OrganizationID.TenantID())
+
+			if err := people.Insert(ctx, tx, scope); err != nil {
+				return fmt.Errorf("cannot insert people: %w", err)
+			}
+
 			return nil
 		},
 	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s Service) RemoveUser(ctx context.Context, organizationID gid.GID, userID gid.GID) error {

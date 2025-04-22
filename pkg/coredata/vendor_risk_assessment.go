@@ -90,7 +90,7 @@ func (r VendorRiskAssessment) Insert(
 ) error {
 	q := `
 INSERT INTO
-    risk_assessments (
+    vendor_risk_assessments (
         tenant_id,
         id,
         vendor_id,
@@ -165,7 +165,7 @@ SELECT
     created_at,
     updated_at
 FROM
-    risk_assessments
+    vendor_risk_assessments
 WHERE
     %s
     AND id = @id
@@ -216,7 +216,7 @@ SELECT
     created_at,
     updated_at
 FROM
-    risk_assessments
+    vendor_risk_assessments
 WHERE
     %s
     AND vendor_id = @vendor_id
@@ -270,7 +270,7 @@ SELECT
     created_at,
     updated_at
 FROM
-    risk_assessments
+    vendor_risk_assessments
 WHERE
     %s
     AND vendor_id = @vendor_id

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<178462391e73ba2adb212005c3813f33>>
+ * @generated SignedSource<<ccdef4cce3d167b401f6d89dea1dde33>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,8 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type RiskTier = "CRITICAL" | "GENERAL" | "SIGNIFICANT";
-export type ServiceCriticality = "HIGH" | "LOW" | "MEDIUM";
 export type CreateVendorInput = {
   businessOwnerId?: string | null | undefined;
   category?: string | null | undefined;
@@ -22,10 +20,8 @@ export type CreateVendorInput = {
   name: string;
   organizationId: string;
   privacyPolicyUrl?: string | null | undefined;
-  riskTier: RiskTier;
   securityOwnerId?: string | null | undefined;
   securityPageUrl?: string | null | undefined;
-  serviceCriticality: ServiceCriticality;
   serviceLevelAgreementUrl?: string | null | undefined;
   serviceStartAt: string;
   serviceTerminationAt?: string | null | undefined;
@@ -46,7 +42,6 @@ export type ListVendorViewCreateVendorMutation$data = {
         readonly description: string | null | undefined;
         readonly id: string;
         readonly name: string;
-        readonly riskTier: RiskTier;
         readonly updatedAt: string;
       };
     };
@@ -125,13 +120,6 @@ v3 = {
           "kind": "ScalarField",
           "name": "updatedAt",
           "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "riskTier",
-          "storageKey": null
         }
       ],
       "storageKey": null
@@ -205,16 +193,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "6b3c93935ce5b90fead6aadd70992667",
+    "cacheID": "03c1d61a3a252ca74bd8da1821f1e0b9",
     "id": null,
     "metadata": {},
     "name": "ListVendorViewCreateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation ListVendorViewCreateVendorMutation(\n  $input: CreateVendorInput!\n) {\n  createVendor(input: $input) {\n    vendorEdge {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n        riskTier\n      }\n    }\n  }\n}\n"
+    "text": "mutation ListVendorViewCreateVendorMutation(\n  $input: CreateVendorInput!\n) {\n  createVendor(input: $input) {\n    vendorEdge {\n      node {\n        id\n        name\n        description\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d75423060ceec238c1cc6b38f79be4e1";
+(node as any).hash = "05ca888317537533f7345000f0948c0c";
 
 export default node;
