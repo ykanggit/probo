@@ -176,7 +176,7 @@ const createRiskAssessmentMutation = graphql`
     $connections: [ID!]!
   ) {
     createVendorRiskAssessment(input: $input) {
-      vendorRiskAssessmentEdge @appendEdge(connections: $connections) {
+      vendorRiskAssessmentEdge @prependEdge(connections: $connections) {
         node {
           id
           assessedAt
@@ -194,40 +194,6 @@ const createRiskAssessmentMutation = graphql`
     }
   }
 `;
-
-function EditableField({
-  label,
-  value,
-  onChange,
-  type = "text",
-  helpText,
-  disabled = false,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  type?: string;
-  helpText?: string;
-  disabled?: boolean;
-}) {
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <HelpCircle className="h-4 w-4 text-tertiary" />
-        <Label className="text-sm">{label}</Label>
-      </div>
-      <div className="space-y-2">
-        <Input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-        />
-        {helpText && <p className="text-sm text-secondary">{helpText}</p>}
-      </div>
-    </div>
-  );
-}
 
 // Format date for input field (YYYY-MM-DDTHH:mm)
 function formatDateForInput(date: string | null | undefined): string {
@@ -689,20 +655,6 @@ function RiskAssessmentsTable({
     return new Date(expiresAt) < new Date();
   };
 
-  // Get severity label based on data sensitivity and business impact
-  const getSeverityLabel = (dataSensitivity: string, businessImpact: string) => {
-    // Simple logic to determine severity - can be adjusted based on requirements
-    if (dataSensitivity === 'CRITICAL' || businessImpact === 'CRITICAL') {
-      return { label: 'Critical', color: 'bg-red-100 text-red-800' };
-    } else if (dataSensitivity === 'HIGH' || businessImpact === 'HIGH') {
-      return { label: 'High', color: 'bg-orange-100 text-orange-800' };
-    } else if (dataSensitivity === 'MEDIUM' || businessImpact === 'MEDIUM') {
-      return { label: 'Medium', color: 'bg-yellow-100 text-yellow-800' };
-    } else {
-      return { label: 'Low', color: 'bg-green-100 text-green-800' };
-    }
-  };
-
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-[#ECEFEC] bg-white overflow-hidden">
@@ -731,11 +683,6 @@ function RiskAssessmentsTable({
               </th>
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#818780]">Severity</span>
-                </div>
-              </th>
-              <th className="px-4 py-3 text-left">
-                <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-[#818780]">Assessed By</span>
                 </div>
               </th>
@@ -744,7 +691,6 @@ function RiskAssessmentsTable({
           </thead>
           <tbody>
             {assessments.map((assessment) => {
-              const severity = getSeverityLabel(assessment.dataSensitivity, assessment.businessImpact);
               const expired = isExpired(assessment.expiresAt);
               return (
                 <tr 
@@ -791,14 +737,6 @@ function RiskAssessmentsTable({
                       expired ? "text-[#A0A5A0]" : "text-[#141E12]"
                     )}>
                       {assessment.businessImpact.charAt(0) + assessment.businessImpact.slice(1).toLowerCase()}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={cn(
-                      "text-sm font-normal px-2 py-1 rounded-full",
-                      expired ? "bg-[#F0F0F0] text-[#818780]" : severity.color
-                    )}>
-                      {severity.label}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -1342,6 +1280,8 @@ function VendorViewContent({
         loadQuery({
           vendorId: data.node.id!,
           organizationId: organizationId!,
+        }, {
+          fetchPolicy: "network-only",
         });
       },
       onError: (error) => {

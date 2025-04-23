@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<08de2d8758474132b472d63f413b59a5>>
+ * @generated SignedSource<<863e9f8552e5bb472cc4b02a6dbad1bf>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -204,7 +204,7 @@ return {
             "alias": null,
             "args": null,
             "filters": null,
-            "handle": "appendEdge",
+            "handle": "prependEdge",
             "key": "",
             "kind": "LinkedHandle",
             "name": "vendorRiskAssessmentEdge",
@@ -232,6 +232,6 @@ return {
 };
 })();
 
-(node as any).hash = "7def769f97c5a728a7331756a6e3c5b2";
+(node as any).hash = "d28e057eba5f7287f3d0f5e38d444ca5";
 
 export default node;
