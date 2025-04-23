@@ -501,21 +501,6 @@ function ListVendorContent({
               </th>
               <th className="py-3 px-4 text-left text-xs font-semibold text-gray-500">
                 <div className="flex items-center gap-2">
-                  Last update
-                  <svg
-                    width="8"
-                    height="8"
-                    viewBox="0 0 8 8"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="text-gray-400"
-                  >
-                    <path d="M4 6L7 3H1L4 6Z" fill="currentColor" />
-                  </svg>
-                </div>
-              </th>
-              <th className="py-3 px-4 text-left text-xs font-semibold text-gray-500">
-                <div className="flex items-center gap-2">
                   Data Risk
                   <svg
                     width="8"
@@ -574,9 +559,6 @@ function ListVendorContent({
                         {vendor.name}
                       </Link>
                     </div>
-                  </td>
-                  <td className="py-4 px-4 text-sm">
-                    {formatDate(vendor.updatedAt)}
                   </td>
                   <td className="py-4 px-4">
                     {riskStatus.status === "NEEDED" ? (
