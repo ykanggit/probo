@@ -16,47 +16,97 @@ package coredata
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 )
 
-func (ds DataSensitivity) MarshalText() ([]byte, error) {
-	return []byte(ds.String()), nil
+type DataSensitivity string
+
+const (
+	DataSensitivityNone     DataSensitivity = "NONE"
+	DataSensitivityLow      DataSensitivity = "LOW"
+	DataSensitivityMedium   DataSensitivity = "MEDIUM"
+	DataSensitivityHigh     DataSensitivity = "HIGH"
+	DataSensitivityCritical DataSensitivity = "CRITICAL"
+)
+
+func (i DataSensitivity) String() string {
+	return string(i)
 }
 
-func (ds *DataSensitivity) UnmarshalText(data []byte) error {
-	val := string(data)
-
-	switch val {
-	case DataSensitivityNone.String():
-		*ds = DataSensitivityNone
-	case DataSensitivityLow.String():
-		*ds = DataSensitivityLow
-	case DataSensitivityMedium.String():
-		*ds = DataSensitivityMedium
-	case DataSensitivityHigh.String():
-		*ds = DataSensitivityHigh
-	case DataSensitivityCritical.String():
-		*ds = DataSensitivityCritical
+func (i *DataSensitivity) Scan(value interface{}) error {
+	switch v := value.(type) {
+	case string:
+		switch v {
+		case "NONE":
+			*i = DataSensitivityNone
+		case "LOW":
+			*i = DataSensitivityLow
+		case "MEDIUM":
+			*i = DataSensitivityMedium
+		case "HIGH":
+			*i = DataSensitivityHigh
+		case "CRITICAL":
+			*i = DataSensitivityCritical
+		default:
+			return fmt.Errorf("invalid DataSensitivity value: %q", v)
+		}
 	default:
-		return fmt.Errorf("invalid DataSensitivity value: %q", val)
+		return fmt.Errorf("unsupported type for DataSensitivity: %T", value)
 	}
-
 	return nil
 }
 
-func (ds DataSensitivity) String() string {
-	return string(ds)
+func (i DataSensitivity) Value() (driver.Value, error) {
+	return i.String(), nil
 }
 
-func (ds *DataSensitivity) Scan(value any) error {
-	val, ok := value.(string)
-	if !ok {
-		return fmt.Errorf("invalid scan source for DataSensitivity, expected string got %T", value)
+func (i DataSensitivity) MarshalJSON() ([]byte, error) {
+	return json.Marshal(i.String())
+}
+
+func (i *DataSensitivity) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
 	}
 
-	return ds.UnmarshalText([]byte(val))
+	switch s {
+	case "NONE":
+		*i = DataSensitivityNone
+	case "LOW":
+		*i = DataSensitivityLow
+	case "MEDIUM":
+		*i = DataSensitivityMedium
+	case "HIGH":
+		*i = DataSensitivityHigh
+	case "CRITICAL":
+		*i = DataSensitivityCritical
+	default:
+		return fmt.Errorf("invalid DataSensitivity value: %q", s)
+	}
+	return nil
 }
 
-func (ds DataSensitivity) Value() (driver.Value, error) {
-	return ds.String(), nil
+func (i *DataSensitivity) UnmarshalText(text []byte) error {
+	var s string
+	if err := json.Unmarshal(text, &s); err != nil {
+		return err
+	}
+
+	switch s {
+	case "NONE":
+		*i = DataSensitivityNone
+	case "LOW":
+		*i = DataSensitivityLow
+	case "MEDIUM":
+		*i = DataSensitivityMedium
+	case "HIGH":
+		*i = DataSensitivityHigh
+	case "CRITICAL":
+		*i = DataSensitivityCritical
+	default:
+		return fmt.Errorf("invalid DataSensitivity value: %q", s)
+	}
+	return nil
 }

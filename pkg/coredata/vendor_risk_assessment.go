@@ -43,31 +43,7 @@ type (
 		UpdatedAt       time.Time       `db:"updated_at"`
 	}
 
-	// DataSensitivity represents the level of data sensitivity handled by a vendor
-	DataSensitivity string
-
-	// BusinessImpact represents the impact level the vendor has on business operations
-	BusinessImpact string
-
-	// RiskAssessments is a collection of RiskAssessment objects
 	VendorRiskAssessments []*VendorRiskAssessment
-)
-
-// Constants for DataSensitivity
-const (
-	DataSensitivityNone     DataSensitivity = "NONE"     // No sensitive data
-	DataSensitivityLow      DataSensitivity = "LOW"      // Public or non-sensitive data
-	DataSensitivityMedium   DataSensitivity = "MEDIUM"   // Internal/restricted data
-	DataSensitivityHigh     DataSensitivity = "HIGH"     // Confidential data
-	DataSensitivityCritical DataSensitivity = "CRITICAL" // Regulated/PII/financial data
-)
-
-// Constants for BusinessImpact
-const (
-	BusinessImpactLow      BusinessImpact = "LOW"      // Minimal impact on business
-	BusinessImpactMedium   BusinessImpact = "MEDIUM"   // Moderate impact on business
-	BusinessImpactHigh     BusinessImpact = "HIGH"     // Significant business impact
-	BusinessImpactCritical BusinessImpact = "CRITICAL" // Critical to business operations
 )
 
 func (v VendorRiskAssessment) CursorKey(orderBy VendorRiskAssessmentOrderField) page.CursorKey {
