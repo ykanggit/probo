@@ -95,7 +95,7 @@ $func$ LANGUAGE plpgsql IMMUTABLE;
 
 -- Function to generate a GID
 CREATE OR REPLACE FUNCTION generate_gid(tenant_id bytea, entity_type int)
-RETURNS bytea AS $func$
+RETURNS text AS $func$
 DECLARE
     id bytea;
     timestamp_ms_bytes bytea;
@@ -125,7 +125,8 @@ BEGIN
     random_bytes := gen_random_bytes(6);
     id := id || random_bytes;
     
-    RETURN id;
+    -- Return as URL-safe base64
+    RETURN rtrim(translate(encode(id, 'base64'), '+/', '-_'), '=');
 END;
 $func$ LANGUAGE plpgsql VOLATILE;
 
@@ -247,8 +248,6 @@ BEGIN
     RETURN decode(padded_text, 'base64');
 END;
 $$ LANGUAGE plpgsql;
-
-
 
 CREATE TYPE data_sensitivity AS ENUM ('NONE', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL');
 CREATE TYPE business_impact AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL');
