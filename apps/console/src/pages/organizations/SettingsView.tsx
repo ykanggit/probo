@@ -541,7 +541,8 @@ function SettingsViewContent({
                         <div className="flex items-center gap-2">
                           <a
                             href={(() => {
-                              const url = new URL(`${process.env.API_SERVER_HOST}/api/console/v1/connectors/initiate`);
+                              const baseUrl = process.env.API_SERVER_HOST || window.location.origin;
+                              const url = new URL('/api/console/v1/connectors/initiate', baseUrl);
                               url.searchParams.append('organization_id', organization.id);
                               url.searchParams.append('connector_id', connector.id);
                               url.searchParams.append('continue', window.location.href);
