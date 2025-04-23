@@ -265,7 +265,7 @@ CREATE TABLE risk_assessments (
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-ALTER TABLE peoples ADD COLUMN user_id TEXT NOT NULL REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE peoples ADD COLUMN user_id TEXT REFERENCES users(id) ON DELETE SET NULL;
 
 UPDATE peoples p
 SET user_id = u.id 
