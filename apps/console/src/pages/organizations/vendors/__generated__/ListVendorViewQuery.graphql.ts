@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4d1328e7df631fabe3c8b7dccdf5ffb0>>
+ * @generated SignedSource<<500e7888f7d464b89781689be541b2c5>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -233,6 +233,82 @@ return {
                             "name": "updatedAt",
                             "storageKey": null
                           },
+                          {
+                            "alias": null,
+                            "args": [
+                              {
+                                "kind": "Literal",
+                                "name": "first",
+                                "value": 1
+                              },
+                              {
+                                "kind": "Literal",
+                                "name": "orderBy",
+                                "value": {
+                                  "direction": "DESC",
+                                  "field": "ASSESSED_AT"
+                                }
+                              }
+                            ],
+                            "concreteType": "VendorRiskAssessmentConnection",
+                            "kind": "LinkedField",
+                            "name": "riskAssessments",
+                            "plural": false,
+                            "selections": [
+                              {
+                                "alias": null,
+                                "args": null,
+                                "concreteType": "VendorRiskAssessmentEdge",
+                                "kind": "LinkedField",
+                                "name": "edges",
+                                "plural": true,
+                                "selections": [
+                                  {
+                                    "alias": null,
+                                    "args": null,
+                                    "concreteType": "VendorRiskAssessment",
+                                    "kind": "LinkedField",
+                                    "name": "node",
+                                    "plural": false,
+                                    "selections": [
+                                      (v6/*: any*/),
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "assessedAt",
+                                        "storageKey": null
+                                      },
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "expiresAt",
+                                        "storageKey": null
+                                      },
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "dataSensitivity",
+                                        "storageKey": null
+                                      },
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "businessImpact",
+                                        "storageKey": null
+                                      }
+                                    ],
+                                    "storageKey": null
+                                  }
+                                ],
+                                "storageKey": null
+                              }
+                            ],
+                            "storageKey": "riskAssessments(first:1,orderBy:{\"direction\":\"DESC\",\"field\":\"ASSESSED_AT\"})"
+                          },
                           (v11/*: any*/)
                         ],
                         "storageKey": null
@@ -322,12 +398,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "f4269cea33bcb3665cfc49bc350cf426",
+    "cacheID": "7a3b85e5ebe050f67283192623ccd695",
     "id": null,
     "metadata": {},
     "name": "ListVendorViewQuery",
     "operationKind": "query",
-    "text": "query ListVendorViewQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...ListVendorView_vendors_pbnwq\n  }\n}\n\nfragment ListVendorView_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        description\n        websiteUrl\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query ListVendorViewQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...ListVendorView_vendors_pbnwq\n  }\n}\n\nfragment ListVendorView_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        description\n        websiteUrl\n        createdAt\n        updatedAt\n        riskAssessments(first: 1, orderBy: {direction: DESC, field: ASSESSED_AT}) {\n          edges {\n            node {\n              id\n              assessedAt\n              expiresAt\n              dataSensitivity\n              businessImpact\n            }\n          }\n        }\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();

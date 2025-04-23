@@ -4863,6 +4863,10 @@ enum VendorRiskAssessmentOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderFieldExpiresAt"
     )
+  ASSESSED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderFieldAssessedAt"
+    )
 }
 
 input CreateVendorRiskAssessmentInput {
@@ -37075,12 +37079,14 @@ func (ec *executionContext) marshalNVendorRiskAssessmentOrderField2githubᚗcom�
 
 var (
 	unmarshalNVendorRiskAssessmentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorRiskAssessmentOrderField = map[string]coredata.VendorRiskAssessmentOrderField{
-		"CREATED_AT": coredata.VendorRiskAssessmentOrderFieldCreatedAt,
-		"EXPIRES_AT": coredata.VendorRiskAssessmentOrderFieldExpiresAt,
+		"CREATED_AT":  coredata.VendorRiskAssessmentOrderFieldCreatedAt,
+		"EXPIRES_AT":  coredata.VendorRiskAssessmentOrderFieldExpiresAt,
+		"ASSESSED_AT": coredata.VendorRiskAssessmentOrderFieldAssessedAt,
 	}
 	marshalNVendorRiskAssessmentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorRiskAssessmentOrderField = map[coredata.VendorRiskAssessmentOrderField]string{
-		coredata.VendorRiskAssessmentOrderFieldCreatedAt: "CREATED_AT",
-		coredata.VendorRiskAssessmentOrderFieldExpiresAt: "EXPIRES_AT",
+		coredata.VendorRiskAssessmentOrderFieldCreatedAt:  "CREATED_AT",
+		coredata.VendorRiskAssessmentOrderFieldExpiresAt:  "EXPIRES_AT",
+		coredata.VendorRiskAssessmentOrderFieldAssessedAt: "ASSESSED_AT",
 	}
 )
 

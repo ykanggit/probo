@@ -23,6 +23,12 @@ import { ListVendorViewPaginationQuery } from "./__generated__/ListVendorViewPag
 import { ListVendorView_vendors$key } from "./__generated__/ListVendorView_vendors.graphql";
 import { ListVendorViewQuery } from "./__generated__/ListVendorViewQuery.graphql";
 import { ListVendorViewDeleteVendorMutation } from "./__generated__/ListVendorViewDeleteVendorMutation.graphql";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface VendorData {
   name: string;
@@ -86,6 +92,17 @@ const vendorListFragment = graphql`
           websiteUrl
           createdAt
           updatedAt
+          riskAssessments(first: 1, orderBy: { direction: DESC, field: ASSESSED_AT }) {
+            edges {
+              node {
+                id
+                assessedAt
+                expiresAt
+                dataSensitivity
+                businessImpact
+              }
+            }
+          }
         }
       }
       pageInfo {
@@ -292,20 +309,42 @@ function ListVendorContent({
     switch (riskLevel) {
       case "CRITICAL":
         return "bg-[#FFEFEF] text-[#CD2B31]";
-      case "SIGNIFICANT":
+      case "HIGH":
         return "bg-[#FFF1E7] text-[#BD4B00]";
-      default:
+      case "MEDIUM":
+        return "bg-[#FFF8E7] text-[#B54708]";
+      case "LOW":
         return "bg-[#EEFADC] text-[#5D770D]";
+      case "NONE":
+        return "bg-[#E6F4FF] text-[#0B4F71]";
+      default:
+        return "bg-gray-100 text-gray-600";
     }
   };
 
-  // Mock risk status for demo (since the data doesn't have this field)
-  const getRiskStatus = (vendorId: string) => {
-    // Simplistic way to assign different risk levels for demo
-    const hash = vendorId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    if (hash % 3 === 0) return "CRITICAL";
-    if (hash % 3 === 1) return "SIGNIFICANT";
-    return "GENERAL";
+  // Get risk assessment status
+  const getRiskAssessmentStatus = (vendor: any) => {
+    const latestAssessment = vendor.riskAssessments?.edges[0]?.node;
+    
+    if (!latestAssessment) {
+      return {
+        status: "NEEDED",
+        dataSensitivity: null,
+        businessImpact: null,
+        isExpired: false
+      };
+    }
+
+    const now = new Date();
+    const expiresAt = new Date(latestAssessment.expiresAt);
+    const isExpired = expiresAt < now;
+
+    return {
+      status: isExpired ? "EXPIRED" : "VALID",
+      dataSensitivity: latestAssessment.dataSensitivity,
+      businessImpact: latestAssessment.businessImpact,
+      isExpired
+    };
   };
 
   return (
@@ -477,7 +516,7 @@ function ListVendorContent({
               </th>
               <th className="py-3 px-4 text-left text-xs font-semibold text-gray-500">
                 <div className="flex items-center gap-2">
-                  Risk
+                  Data Risk
                   <svg
                     width="8"
                     height="8"
@@ -492,7 +531,7 @@ function ListVendorContent({
               </th>
               <th className="py-3 px-4 text-left text-xs font-semibold text-gray-500">
                 <div className="flex items-center gap-2">
-                  Compliance status
+                  Business Risk
                   <svg
                     width="8"
                     height="8"
@@ -510,7 +549,7 @@ function ListVendorContent({
           </thead>
           <tbody>
             {vendors.map((vendor) => {
-              const riskStatus = getRiskStatus(vendor.id);
+              const riskStatus = getRiskAssessmentStatus(vendor);
               return (
                 <tr
                   key={vendor.id}
@@ -540,64 +579,78 @@ function ListVendorContent({
                     {formatDate(vendor.updatedAt)}
                   </td>
                   <td className="py-4 px-4">
-                    <Badge className={`${getRiskBadgeStyle(riskStatus)} font-medium text-xs px-2 py-1 rounded-md`}>
-                      {riskStatus === "CRITICAL" 
-                        ? "Critical"
-                        : riskStatus === "SIGNIFICANT"
-                        ? "Medium"
-                        : "General"}
-                    </Badge>
+                    {riskStatus.status === "NEEDED" ? (
+                      <Badge className="bg-gray-100 text-gray-600 font-medium text-xs px-2 py-1 rounded-md">
+                        Assessment needed
+                      </Badge>
+                    ) : riskStatus.status === "EXPIRED" ? (
+                      <Badge className="bg-[#FFEFEF] text-[#CD2B31] font-medium text-xs px-2 py-1 rounded-md">
+                        Assessment expired
+                      </Badge>
+                    ) : (
+                      <Badge className={`${getRiskBadgeStyle(riskStatus.dataSensitivity)} font-medium text-xs px-2 py-1 rounded-md`}>
+                        {riskStatus.dataSensitivity || "NONE"}
+                      </Badge>
+                    )}
                   </td>
                   <td className="py-4 px-4">
-                    <Badge 
-                      className={`${
-                        riskStatus === "CRITICAL" 
-                          ? "bg-[#FFEFEF] text-[#CD2B31]" 
-                          : riskStatus === "SIGNIFICANT" 
-                          ? "bg-[#FFF1E7] text-[#BD4B00]" 
-                          : "bg-[#EEFADC] text-[#5D770D]"
-                      } font-medium text-xs px-2 py-1 rounded-md`}
-                    >
-                      {riskStatus === "CRITICAL" 
-                        ? "Late" 
-                        : riskStatus === "SIGNIFICANT" 
-                        ? "In Progress" 
-                        : "Completed"}
-                    </Badge>
+                    {riskStatus.status === "NEEDED" ? (
+                      <Badge className="bg-gray-100 text-gray-600 font-medium text-xs px-2 py-1 rounded-md">
+                        Assessment needed
+                      </Badge>
+                    ) : riskStatus.status === "EXPIRED" ? (
+                      <Badge className="bg-[#FFEFEF] text-[#CD2B31] font-medium text-xs px-2 py-1 rounded-md">
+                        Assessment expired
+                      </Badge>
+                    ) : (
+                      <Badge className={`${getRiskBadgeStyle(riskStatus.businessImpact)} font-medium text-xs px-2 py-1 rounded-md`}>
+                        {riskStatus.businessImpact || "LOW"}
+                      </Badge>
+                    )}
                   </td>
                   <td className="py-4 px-4 text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-full"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        // Handle menu click - could be expanded into a dropdown menu
-                        if (
-                          window.confirm(
-                            "Are you sure you want to delete this vendor?"
-                          )
-                        ) {
-                          deleteVendor({
-                            variables: {
-                              connections: [vendorsConnection.vendors.__id],
-                              input: {
-                                vendorId: vendor.id,
-                              },
-                            },
-                            onCompleted() {
-                              toast({
-                                title: "Vendor deleted",
-                                description:
-                                  "The vendor has been deleted successfully",
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (
+                              window.confirm(
+                                "Are you sure you want to delete this vendor?"
+                              )
+                            ) {
+                              deleteVendor({
+                                variables: {
+                                  connections: [vendorsConnection.vendors.__id],
+                                  input: {
+                                    vendorId: vendor.id,
+                                  },
+                                },
+                                onCompleted() {
+                                  toast({
+                                    title: "Vendor deleted",
+                                    description:
+                                      "The vendor has been deleted successfully",
+                                  });
+                                },
                               });
-                            },
-                          });
-                        }
-                      }}
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
+                            }
+                          }}
+                        >
+                          Delete vendor
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </td>
                 </tr>
               );

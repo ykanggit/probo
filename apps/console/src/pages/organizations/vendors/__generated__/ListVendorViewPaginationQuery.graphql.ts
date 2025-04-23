@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2d5b613cbbbd051c4c1f1561f55bf644>>
+ * @generated SignedSource<<53f7cbf9132d69012d6e13909a807576>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -231,6 +231,82 @@ return {
                             "name": "updatedAt",
                             "storageKey": null
                           },
+                          {
+                            "alias": null,
+                            "args": [
+                              {
+                                "kind": "Literal",
+                                "name": "first",
+                                "value": 1
+                              },
+                              {
+                                "kind": "Literal",
+                                "name": "orderBy",
+                                "value": {
+                                  "direction": "DESC",
+                                  "field": "ASSESSED_AT"
+                                }
+                              }
+                            ],
+                            "concreteType": "VendorRiskAssessmentConnection",
+                            "kind": "LinkedField",
+                            "name": "riskAssessments",
+                            "plural": false,
+                            "selections": [
+                              {
+                                "alias": null,
+                                "args": null,
+                                "concreteType": "VendorRiskAssessmentEdge",
+                                "kind": "LinkedField",
+                                "name": "edges",
+                                "plural": true,
+                                "selections": [
+                                  {
+                                    "alias": null,
+                                    "args": null,
+                                    "concreteType": "VendorRiskAssessment",
+                                    "kind": "LinkedField",
+                                    "name": "node",
+                                    "plural": false,
+                                    "selections": [
+                                      (v11/*: any*/),
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "assessedAt",
+                                        "storageKey": null
+                                      },
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "expiresAt",
+                                        "storageKey": null
+                                      },
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "dataSensitivity",
+                                        "storageKey": null
+                                      },
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "businessImpact",
+                                        "storageKey": null
+                                      }
+                                    ],
+                                    "storageKey": null
+                                  }
+                                ],
+                                "storageKey": null
+                              }
+                            ],
+                            "storageKey": "riskAssessments(first:1,orderBy:{\"direction\":\"DESC\",\"field\":\"ASSESSED_AT\"})"
+                          },
                           (v10/*: any*/)
                         ],
                         "storageKey": null
@@ -320,16 +396,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b1055c67d0940ecd9189ec80410a8add",
+    "cacheID": "bbb819bae323711ced24c6d5ab842906",
     "id": null,
     "metadata": {},
     "name": "ListVendorViewPaginationQuery",
     "operationKind": "query",
-    "text": "query ListVendorViewPaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ListVendorView_vendors_pbnwq\n    id\n  }\n}\n\nfragment ListVendorView_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        description\n        websiteUrl\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
+    "text": "query ListVendorViewPaginationQuery(\n  $after: CursorKey\n  $before: CursorKey\n  $first: Int\n  $last: Int\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ListVendorView_vendors_pbnwq\n    id\n  }\n}\n\nfragment ListVendorView_vendors_pbnwq on Organization {\n  vendors(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        description\n        websiteUrl\n        createdAt\n        updatedAt\n        riskAssessments(first: 1, orderBy: {direction: DESC, field: ASSESSED_AT}) {\n          edges {\n            node {\n              id\n              assessedAt\n              expiresAt\n              dataSensitivity\n              businessImpact\n            }\n          }\n        }\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3908e5fd1af7e0cb367a480fc9fc437e";
+(node as any).hash = "eb39ac51abe77196431f4f20ac0010a9";
 
 export default node;

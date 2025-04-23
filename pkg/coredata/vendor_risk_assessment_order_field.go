@@ -19,8 +19,9 @@ type (
 )
 
 const (
-	VendorRiskAssessmentOrderFieldCreatedAt VendorRiskAssessmentOrderField = "CREATED_AT"
-	VendorRiskAssessmentOrderFieldExpiresAt VendorRiskAssessmentOrderField = "EXPIRES_AT"
+	VendorRiskAssessmentOrderFieldCreatedAt  VendorRiskAssessmentOrderField = "CREATED_AT"
+	VendorRiskAssessmentOrderFieldExpiresAt  VendorRiskAssessmentOrderField = "EXPIRES_AT"
+	VendorRiskAssessmentOrderFieldAssessedAt VendorRiskAssessmentOrderField = "ASSESSED_AT"
 )
 
 func (p VendorRiskAssessmentOrderField) Column() string {

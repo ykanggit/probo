@@ -52,6 +52,8 @@ func (v VendorRiskAssessment) CursorKey(orderBy VendorRiskAssessmentOrderField) 
 		return page.NewCursorKey(v.ID, v.CreatedAt)
 	case VendorRiskAssessmentOrderFieldExpiresAt:
 		return page.NewCursorKey(v.ID, v.ExpiresAt)
+	case VendorRiskAssessmentOrderFieldAssessedAt:
+		return page.NewCursorKey(v.ID, v.AssessedAt)
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))

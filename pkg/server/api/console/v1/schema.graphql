@@ -1479,6 +1479,10 @@ enum VendorRiskAssessmentOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderFieldExpiresAt"
     )
+  ASSESSED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderFieldAssessedAt"
+    )
 }
 
 input CreateVendorRiskAssessmentInput {

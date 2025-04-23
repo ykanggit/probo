@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e3d4dae05baff068e5f61916fb436e10>>
+ * @generated SignedSource<<c99ab9d208e0554aff738243c0115a04>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,8 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
+export type BusinessImpact = "CRITICAL" | "HIGH" | "LOW" | "MEDIUM";
+export type DataSensitivity = "CRITICAL" | "HIGH" | "LOW" | "MEDIUM" | "NONE";
 import { FragmentRefs } from "relay-runtime";
 export type ListVendorView_vendors$data = {
   readonly id: string;
@@ -20,6 +22,17 @@ export type ListVendorView_vendors$data = {
         readonly description: string | null | undefined;
         readonly id: string;
         readonly name: string;
+        readonly riskAssessments: {
+          readonly edges: ReadonlyArray<{
+            readonly node: {
+              readonly assessedAt: string;
+              readonly businessImpact: BusinessImpact;
+              readonly dataSensitivity: DataSensitivity;
+              readonly expiresAt: string;
+              readonly id: string;
+            };
+          }>;
+        };
         readonly updatedAt: string;
         readonly websiteUrl: string | null | undefined;
       };
@@ -177,6 +190,82 @@ return {
                 },
                 {
                   "alias": null,
+                  "args": [
+                    {
+                      "kind": "Literal",
+                      "name": "first",
+                      "value": 1
+                    },
+                    {
+                      "kind": "Literal",
+                      "name": "orderBy",
+                      "value": {
+                        "direction": "DESC",
+                        "field": "ASSESSED_AT"
+                      }
+                    }
+                  ],
+                  "concreteType": "VendorRiskAssessmentConnection",
+                  "kind": "LinkedField",
+                  "name": "riskAssessments",
+                  "plural": false,
+                  "selections": [
+                    {
+                      "alias": null,
+                      "args": null,
+                      "concreteType": "VendorRiskAssessmentEdge",
+                      "kind": "LinkedField",
+                      "name": "edges",
+                      "plural": true,
+                      "selections": [
+                        {
+                          "alias": null,
+                          "args": null,
+                          "concreteType": "VendorRiskAssessment",
+                          "kind": "LinkedField",
+                          "name": "node",
+                          "plural": false,
+                          "selections": [
+                            (v1/*: any*/),
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "assessedAt",
+                              "storageKey": null
+                            },
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "expiresAt",
+                              "storageKey": null
+                            },
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "dataSensitivity",
+                              "storageKey": null
+                            },
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "businessImpact",
+                              "storageKey": null
+                            }
+                          ],
+                          "storageKey": null
+                        }
+                      ],
+                      "storageKey": null
+                    }
+                  ],
+                  "storageKey": "riskAssessments(first:1,orderBy:{\"direction\":\"DESC\",\"field\":\"ASSESSED_AT\"})"
+                },
+                {
+                  "alias": null,
                   "args": null,
                   "kind": "ScalarField",
                   "name": "__typename",
@@ -256,6 +345,6 @@ return {
 };
 })();
 
-(node as any).hash = "3908e5fd1af7e0cb367a480fc9fc437e";
+(node as any).hash = "eb39ac51abe77196431f4f20ac0010a9";
 
 export default node;
