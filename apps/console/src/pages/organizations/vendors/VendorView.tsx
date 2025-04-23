@@ -883,16 +883,19 @@ function RiskAssessmentModal({
   const [dataSensitivity, setDataSensitivity] = useState<DataSensitivity>("LOW");
   const [businessImpact, setBusinessImpact] = useState<BusinessImpact>("LOW");
   const [notes, setNotes] = useState("");
-  const [showError, setShowError] = useState(false);
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setDataSensitivity("LOW");
+      setBusinessImpact("LOW");
+      setNotes("");
+    }
+  }, [isOpen]);
   
   if (!isOpen) return null;
   
   const handleSubmit = () => {
-    if (!businessOwnerId) {
-      setShowError(true);
-      return;
-    }
-    
     onSubmit({
       dataSensitivity,
       businessImpact,
@@ -921,13 +924,6 @@ function RiskAssessmentModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <h3 className="text-lg font-medium mb-4">Create Risk Assessment</h3>
-        
-        {showError && !businessOwnerId && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-800">
-            <p className="text-sm font-medium">Business Owner Required</p>
-            <p className="text-xs mt-1">Please assign a Business Owner to this vendor before creating a risk assessment.</p>
-          </div>
-        )}
         
         <div className="space-y-6">
           <div>
