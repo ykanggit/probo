@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.13.0] - 2025-04-23
+
 ### Added
 
 - New "Risk assessments" tab for vendors that allows you to:
