@@ -282,8 +282,7 @@ INSERT INTO peoples (
     user_id,
     additional_email_addresses,
     created_at,
-    updated_at,
-    version
+    updated_at
 )
 SELECT 
     o.tenant_id,
@@ -295,8 +294,7 @@ SELECT
     u.id,
     ARRAY[]::TEXT[],
     NOW(),
-    NOW(),
-    1
+    NOW()
 FROM users u
 JOIN users_organizations uo ON u.id = uo.user_id
 JOIN organizations o ON uo.organization_id = o.id
