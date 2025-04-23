@@ -368,6 +368,10 @@ func (s VendorService) CreateRiskAssessment(
 		UpdatedAt:       now,
 	}
 
+	if !req.ExpiresAt.After(now) {
+		return nil, fmt.Errorf("expiresAt %v must be in the future", req.ExpiresAt)
+	}
+
 	err = s.svc.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {

@@ -21,6 +21,7 @@ import type { VendorViewUploadComplianceReportMutation as UploadComplianceReport
 import type { VendorViewUpdateVendorMutation } from "./__generated__/VendorViewUpdateVendorMutation.graphql";
 import type { VendorViewCreateRiskAssessmentMutation } from "./__generated__/VendorViewCreateRiskAssessmentMutation.graphql";
 import type { BusinessImpact, DataSensitivity } from "./__generated__/VendorViewCreateRiskAssessmentMutation.graphql";
+import type {  VendorViewQuery$data } from "./__generated__/VendorViewQuery.graphql";
 import { useParams } from "react-router";
 import { cn } from "@/lib/utils";
 import { PageTemplate } from "@/components/PageTemplate";
@@ -618,7 +619,7 @@ function RiskAssessmentsTable({
   assessments,
   onCreateAssessment,
 }: {
-  assessments: RiskAssessment[];
+  assessments: NonNullable<NonNullable<VendorViewQuery$data["node"]>["riskAssessments"]>["edges"];
   onCreateAssessment: () => void;
 }) {
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
@@ -648,12 +649,7 @@ function RiskAssessmentsTable({
     });
   };
 
-  // Check if assessment is expired
-  const isExpired = (expiresAt: string) => {
-    console.log(new Date(expiresAt) < new Date());
-
-    return new Date(expiresAt) < new Date();
-  };
+  const isExpired = (expiresAt: string) => new Date(expiresAt) < new Date();
 
   return (
     <div className="space-y-4">
@@ -690,11 +686,12 @@ function RiskAssessmentsTable({
             </tr>
           </thead>
           <tbody>
-            {assessments.map((assessment) => {
-              const expired = isExpired(assessment.expiresAt);
+            {assessments?.map((edge) => {
+              const assessment = edge?.node;
+              const expired = isExpired(assessment?.expiresAt || "");
               return (
                 <tr 
-                  key={assessment.id} 
+                  key={assessment?.id} 
                   className={cn(
                     "border-b border-[rgba(2,42,2,0.08)]",
                     expired && "bg-[#F7F7F7] text-[#A0A5A0]"
@@ -705,7 +702,7 @@ function RiskAssessmentsTable({
                       "text-sm font-normal",
                       expired ? "text-[#A0A5A0]" : "text-[#141E12]"
                     )}>
-                      {formatDate(assessment.assessedAt)}
+                      {formatDate(assessment?.assessedAt || "")}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -714,7 +711,7 @@ function RiskAssessmentsTable({
                         "text-sm font-normal",
                         expired ? "text-[#A0A5A0]" : "text-[#141E12]"
                       )}>
-                        {formatDate(assessment.expiresAt)}
+                        {formatDate(assessment?.expiresAt || "")}
                       </span>
                       {expired && (
                         <span className="ml-2 text-xs py-0.5 px-1.5 bg-[#F0F0F0] text-[#818780] rounded">
@@ -728,7 +725,7 @@ function RiskAssessmentsTable({
                       "text-sm font-normal",
                       expired ? "text-[#A0A5A0]" : "text-[#141E12]"
                     )}>
-                      {assessment.dataSensitivity.charAt(0) + assessment.dataSensitivity.slice(1).toLowerCase()}
+                      {assessment?.dataSensitivity.charAt(0) + assessment?.dataSensitivity.slice(1).toLowerCase()}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -736,7 +733,7 @@ function RiskAssessmentsTable({
                       "text-sm font-normal",
                       expired ? "text-[#A0A5A0]" : "text-[#141E12]"
                     )}>
-                      {assessment.businessImpact.charAt(0) + assessment.businessImpact.slice(1).toLowerCase()}
+                      {assessment?.businessImpact.charAt(0) + assessment?.businessImpact.slice(1).toLowerCase()}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -744,14 +741,14 @@ function RiskAssessmentsTable({
                       "text-sm font-normal",
                       expired ? "text-[#A0A5A0]" : "text-[#141E12]"
                     )}>
-                      {assessment.assessedBy?.fullName || 'N/A'}
+                      {assessment?.assessedBy?.fullName || 'N/A'}
                     </span>
                   </td>
                   <td className="text-right pr-6 py-3">
-                    <div className="relative" ref={showDropdown === assessment.id ? dropdownRef : null}>
+                    <div className="relative" ref={showDropdown === assessment?.id ? dropdownRef : null}>
                       <button
                         className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-[rgba(2,42,2,0.03)]"
-                        onClick={() => setShowDropdown(showDropdown === assessment.id ? null : assessment.id)}
+                        onClick={() => setShowDropdown(showDropdown === assessment?.id ? null : assessment?.id)}
                       >
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z" fill={expired ? "#A0A5A0" : "#141E12"}/>
@@ -759,7 +756,7 @@ function RiskAssessmentsTable({
                           <path d="M13 9.5C13.8284 9.5 14.5 8.82843 14.5 8C14.5 7.17157 13.8284 6.5 13 6.5C12.1716 6.5 11.5 7.17157 11.5 8C11.5 8.82843 12.1716 9.5 13 9.5Z" fill={expired ? "#A0A5A0" : "#141E12"}/>
                         </svg>
                       </button>
-                      {showDropdown === assessment.id && (
+                      {showDropdown === assessment?.id && (
                         <div className="absolute right-0 mt-1 bg-white rounded-md shadow-lg border border-[#ECEFEC] z-10" style={{ bottom: '100%', marginBottom: '5px' }}>
                           <button
                             className="w-full text-left px-4 py-2 text-sm hover:bg-[rgba(2,42,2,0.03)]"
@@ -777,7 +774,7 @@ function RiskAssessmentsTable({
                 </tr>
               );
             })}
-            {assessments.length === 0 && (
+            {assessments?.length === 0 && (
               <tr>
                 <td colSpan={7} className="text-center py-6 text-sm text-[#818780]">
                   No risk assessments created yet
@@ -1679,9 +1676,7 @@ function VendorViewContent({
         return (
           <div className="space-y-4">
             <RiskAssessmentsTable
-              assessments={
-                (data.node.riskAssessments?.edges.map(edge => edge.node) || []) as RiskAssessment[]
-              }
+              assessments={data.node.riskAssessments?.edges || []}
               onCreateAssessment={handleCreateRiskAssessment}
             />
           </div>
