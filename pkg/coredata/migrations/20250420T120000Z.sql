@@ -223,20 +223,24 @@ RETURNS bytea AS $$
 DECLARE
     padded_text text;
     mod_length integer;
+    normalized_text text;
 BEGIN
+    -- Replace URL-safe characters with standard base64 characters
+    normalized_text := translate(input_text, '-_', '+/');
+    
     -- Calculate how many padding characters we need to add
-    mod_length := length(input_text) % 4;
+    mod_length := length(normalized_text) % 4;
     
     -- Add the required padding
     IF mod_length = 0 THEN
-        padded_text := input_text;
+        padded_text := normalized_text;
     ELSIF mod_length = 1 THEN
         -- Invalid base64 - length mod 4 can't be 1
         RAISE EXCEPTION 'Invalid base64 length';
     ELSIF mod_length = 2 THEN
-        padded_text := input_text || '==';
+        padded_text := normalized_text || '==';
     ELSIF mod_length = 3 THEN
-        padded_text := input_text || '=';
+        padded_text := normalized_text || '=';
     END IF;
     
     -- Decode the padded base64
