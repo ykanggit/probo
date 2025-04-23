@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { PageTemplate } from "@/components/PageTemplate";
 import { VendorViewSkeleton } from "./VendorPage";
 import PeopleSelector from "@/components/PeopleSelector";
+import { formatDistanceToNow, format, isPast } from "date-fns";
 
 const vendorViewQuery = graphql`
   query VendorViewQuery($vendorId: ID!, $organizationId: ID!) {
@@ -601,20 +602,6 @@ function CertificationsView({
   );
 }
 
-interface RiskAssessment {
-  id: string;
-  assessedAt: string;
-  expiresAt: string;
-  dataSensitivity: string;
-  businessImpact: string;
-  notes: string | null;
-  assessedBy: {
-    id: string;
-    fullName: string;
-  } | null;
-  createdAt: string;
-}
-
 function RiskAssessmentsTable({
   assessments,
   onCreateAssessment,
@@ -638,18 +625,19 @@ function RiskAssessmentsTable({
     };
   }, []);
 
-  // Format date to match Figma design
-  const formatDate = (dateString: string) => {
+  // Format date to relative time using date-fns
+  const formatRelativeDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
+    return formatDistanceToNow(date, { addSuffix: true });
   };
 
-  const isExpired = (expiresAt: string) => new Date(expiresAt) < new Date();
+  // Format date for tooltip
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return format(date, "EEE, d MMM yyyy");
+  };
+
+  const isExpired = (expiresAt: string) => isPast(new Date(expiresAt));
 
   return (
     <div className="space-y-4">
@@ -659,7 +647,7 @@ function RiskAssessmentsTable({
             <tr className="border-b border-[rgba(2,42,2,0.08)]">
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#818780]">Assessed Date</span>
+                  <span className="text-xs font-semibold text-[#818780]">Assessed By</span>
                 </div>
               </th>
               <th className="px-4 py-3 text-left">
@@ -675,11 +663,6 @@ function RiskAssessmentsTable({
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-[#818780]">Business Impact</span>
-                </div>
-              </th>
-              <th className="px-4 py-3 text-left">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#818780]">Assessed By</span>
                 </div>
               </th>
               <th className="px-4 py-3 text-right w-16"></th>
@@ -702,16 +685,27 @@ function RiskAssessmentsTable({
                       "text-sm font-normal",
                       expired ? "text-[#A0A5A0]" : "text-[#141E12]"
                     )}>
-                      {formatDate(assessment?.assessedAt || "")}
+                      {assessment?.assessedBy?.fullName || 'N/A'} (<span 
+                      className={cn(
+                        "text-sm font-normal",
+                        expired ? "text-[#A0A5A0]" : "text-[#141E12]"
+                      )}
+                      title={formatDate(assessment?.assessedAt || "")}
+                    >
+                      {formatRelativeDate(assessment?.assessedAt || "")}
+                    </span>)
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center">
-                      <span className={cn(
-                        "text-sm font-normal",
-                        expired ? "text-[#A0A5A0]" : "text-[#141E12]"
-                      )}>
-                        {formatDate(assessment?.expiresAt || "")}
+                      <span 
+                        className={cn(
+                          "text-sm font-normal",
+                          expired ? "text-[#A0A5A0]" : "text-[#141E12]"
+                        )}
+                        title={formatDate(assessment?.expiresAt || "")}
+                      >
+                        {formatRelativeDate(assessment?.expiresAt || "")}
                       </span>
                       {expired && (
                         <span className="ml-2 text-xs py-0.5 px-1.5 bg-[#F0F0F0] text-[#818780] rounded">
@@ -734,14 +728,6 @@ function RiskAssessmentsTable({
                       expired ? "text-[#A0A5A0]" : "text-[#141E12]"
                     )}>
                       {assessment?.businessImpact.charAt(0) + assessment?.businessImpact.slice(1).toLowerCase()}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={cn(
-                      "text-sm font-normal",
-                      expired ? "text-[#A0A5A0]" : "text-[#141E12]"
-                    )}>
-                      {assessment?.assessedBy?.fullName || 'N/A'}
                     </span>
                   </td>
                   <td className="text-right pr-6 py-3">
