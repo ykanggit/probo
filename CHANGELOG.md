@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.13.1] - 2025-04-24
+
+### Fixed
+
+- Fix psql `generated_gid` returns padded base64
+- Fix `user_id` not set when create new organization
+- Fix `additional_email_addresses` not set when invite in organization
+
 ## [0.13.0] - 2025-04-23
 
 ### Added
