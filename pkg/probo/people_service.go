@@ -179,6 +179,7 @@ func (s PeopleService) Create(
 		FullName:                 req.FullName,
 		PrimaryEmailAddress:      req.PrimaryEmailAddress,
 		AdditionalEmailAddresses: req.AdditionalEmailAddresses,
+		UserID:                   req.UserID,
 		CreatedAt:                now,
 		UpdatedAt:                now,
 	}

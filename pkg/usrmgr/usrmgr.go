@@ -768,13 +768,14 @@ func (s Service) ConfirmInvitation(ctx context.Context, tokenString string, pass
 			}
 
 			people := coredata.People{
-				OrganizationID:      token.Data.OrganizationID,
-				UserID:              &user.ID,
-				FullName:            token.Data.FullName,
-				PrimaryEmailAddress: token.Data.Email,
-				Kind:                coredata.PeopleKindEmployee,
-				CreatedAt:           now,
-				UpdatedAt:           now,
+				OrganizationID:           token.Data.OrganizationID,
+				UserID:                   &user.ID,
+				FullName:                 token.Data.FullName,
+				PrimaryEmailAddress:      token.Data.Email,
+				Kind:                     coredata.PeopleKindEmployee,
+				AdditionalEmailAddresses: []string{},
+				CreatedAt:                now,
+				UpdatedAt:                now,
 			}
 
 			scope := coredata.NewScope(token.Data.OrganizationID.TenantID())
