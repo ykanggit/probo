@@ -77,7 +77,7 @@ function CreatePolicyForm({
       : "empty"
   );
 
-  const [commitMutation] =
+  const [createPolicy] =
     useMutation<NewPolicyViewMutation>(CreatePolicyMutation);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -109,13 +109,13 @@ function CreatePolicyForm({
       ownerId,
     };
 
-    commitMutation({
+    createPolicy({
       variables: {
         input,
         connections: [
           ConnectionHandler.getConnectionID(
             organizationId!,
-            "PolicyListPage_policies"
+            "PolicyListView_policies"
           ),
         ],
       },

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<605e2b8b9bc6fdd85a121a1f1904cc00>>
+ * @generated SignedSource<<391e3817107bb96f50aad61d20cad0a8>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -160,7 +160,7 @@ v5 = [
   {
     "kind": "Literal",
     "name": "first",
-    "value": 25
+    "value": 100
   }
 ];
 return {
@@ -228,7 +228,7 @@ return {
                 "name": "policies",
                 "plural": false,
                 "selections": (v4/*: any*/),
-                "storageKey": "policies(first:25)"
+                "storageKey": "policies(first:100)"
               },
               {
                 "alias": null,
@@ -250,7 +250,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "361b81169a803b656d673b7b8d1c5583",
+    "cacheID": "6434c8135f68ac64eb2f06983ddc3595",
     "id": null,
     "metadata": {
       "connection": [
@@ -267,11 +267,11 @@ return {
     },
     "name": "PolicyListViewQuery",
     "operationKind": "query",
-    "text": "query PolicyListViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      policies(first: 25) {\n        edges {\n          node {\n            id\n            name\n            content\n            createdAt\n            updatedAt\n            status\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query PolicyListViewQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            name\n            content\n            createdAt\n            updatedAt\n            status\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c0ed3d1334a535f752062c6479ed3a7e";
+(node as any).hash = "5567339ad9b2be90b94edc8b1a16fe1e";
 
 export default node;
