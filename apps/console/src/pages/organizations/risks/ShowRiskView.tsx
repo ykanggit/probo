@@ -82,6 +82,7 @@ const showRiskViewQuery = graphql`
         inherentImpact
         residualLikelihood
         residualImpact
+        note
         createdAt
         updatedAt
         mesures(first: 100) @connection(key: "Risk__mesures") {
@@ -1009,6 +1010,19 @@ function ShowRiskViewContent({
             </div>
           </CardContent>
         </Card>
+
+        {risk.note && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle>Note</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-sm max-w-none">
+                {risk.note}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Tabs defaultValue="mesures" className="w-full">
           <TabsList>

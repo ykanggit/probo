@@ -58,5 +58,6 @@ func NewRisk(r *coredata.Risk) *Risk {
 		Category:           r.Category,
 		CreatedAt:          r.CreatedAt,
 		UpdatedAt:          r.UpdatedAt,
+		Note:               r.Note,
 	}
 }

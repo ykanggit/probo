@@ -41,6 +41,7 @@ type (
 		InherentImpact     int
 		ResidualLikelihood *int
 		ResidualImpact     *int
+		Note               *string
 	}
 
 	UpdateRiskRequest struct {
@@ -54,6 +55,7 @@ type (
 		InherentImpact     *int
 		ResidualLikelihood *int
 		ResidualImpact     *int
+		Note               *string
 	}
 )
 
@@ -184,6 +186,10 @@ func (s RiskService) Create(
 		UpdatedAt:          now,
 	}
 
+	if req.Note != nil {
+		risk.Note = *req.Note
+	}
+
 	if req.ResidualLikelihood != nil {
 		risk.ResidualLikelihood = *req.ResidualLikelihood
 	}
@@ -273,6 +279,10 @@ func (s RiskService) Update(
 
 			if req.Category != nil {
 				risk.Category = *req.Category
+			}
+
+			if req.Note != nil {
+				risk.Note = *req.Note
 			}
 
 			risk.UpdatedAt = time.Now()

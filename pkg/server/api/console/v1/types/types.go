@@ -183,6 +183,7 @@ type CreateRiskInput struct {
 	InherentImpact     int                    `json:"inherentImpact"`
 	ResidualLikelihood *int                   `json:"residualLikelihood,omitempty"`
 	ResidualImpact     *int                   `json:"residualImpact,omitempty"`
+	Note               *string                `json:"note,omitempty"`
 }
 
 type CreateRiskMesureMappingInput struct {
@@ -608,6 +609,7 @@ type Risk struct {
 	ResidualLikelihood int                    `json:"residualLikelihood"`
 	ResidualImpact     int                    `json:"residualImpact"`
 	ResidualSeverity   int                    `json:"residualSeverity"`
+	Note               string                 `json:"note"`
 	Owner              *People                `json:"owner,omitempty"`
 	Mesures            *MesureConnection      `json:"mesures"`
 	Policies           *PolicyConnection      `json:"policies"`
@@ -736,6 +738,7 @@ type UpdateRiskInput struct {
 	InherentImpact     *int                    `json:"inherentImpact,omitempty"`
 	ResidualLikelihood *int                    `json:"residualLikelihood,omitempty"`
 	ResidualImpact     *int                    `json:"residualImpact,omitempty"`
+	Note               *string                 `json:"note,omitempty"`
 }
 
 type UpdateRiskPayload struct {

@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.13.1] - 2025-04-24
+### Added
+
+- Risk can have note
+
+## [0.13.2] - 2025-04-24
 
 ### Fixed
 

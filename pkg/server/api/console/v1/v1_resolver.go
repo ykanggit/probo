@@ -749,6 +749,7 @@ func (r *mutationResolver) CreateRisk(ctx context.Context, input types.CreateRis
 			InherentImpact:     input.InherentImpact,
 			ResidualLikelihood: input.ResidualLikelihood,
 			ResidualImpact:     input.ResidualImpact,
+			Note:               input.Note,
 		},
 	)
 	if err != nil {
@@ -777,6 +778,7 @@ func (r *mutationResolver) UpdateRisk(ctx context.Context, input types.UpdateRis
 			InherentImpact:     input.InherentImpact,
 			ResidualLikelihood: input.ResidualLikelihood,
 			ResidualImpact:     input.ResidualImpact,
+			Note:               input.Note,
 		},
 	)
 	if err != nil {

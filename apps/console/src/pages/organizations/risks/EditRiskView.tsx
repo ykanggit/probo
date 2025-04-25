@@ -52,6 +52,7 @@ const editRiskViewQuery = graphql`
         residualLikelihood
         residualImpact
         treatment
+        note
         owner {
           id
           fullName
@@ -78,6 +79,7 @@ const updateRiskMutation = graphql`
         residualLikelihood
         residualImpact
         treatment
+        note
         updatedAt
         owner {
           id
@@ -107,6 +109,7 @@ function EditRiskViewContent({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+  const [note, setNote] = useState("");
   const [inherentLikelihood, setInherentLikelihood] = useState<number>(3);
   const [inherentImpact, setInherentImpact] = useState<number>(3);
   const [residualLikelihood, setResidualLikelihood] = useState<number>(3);
@@ -124,6 +127,7 @@ function EditRiskViewContent({
       setName(risk.name || "");
       setDescription(risk.description || "");
       setCategory(risk.category || "");
+      setNote(risk.note || "");
       // Set values directly as integers
       setInherentLikelihood(risk.inherentLikelihood || 3);
       setInherentImpact(risk.inherentImpact || 3);
@@ -158,6 +162,7 @@ function EditRiskViewContent({
       residualLikelihood,
       residualImpact,
       treatment,
+      note,
       ownerId: ownerId || undefined,
     };
 
@@ -238,6 +243,17 @@ function EditRiskViewContent({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={5}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="note">Note</Label>
+              <Textarea
+                id="note"
+                placeholder="Add any additional note about this risk"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={3}
               />
             </div>
 

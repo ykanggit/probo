@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5a97a0d2387d66d74de35ec9b5bc86cf>>
+ * @generated SignedSource<<8241dc0eb1cf23f48be022628e0ab2b3>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,6 +17,7 @@ export type UpdateRiskInput = {
   inherentImpact?: number | null | undefined;
   inherentLikelihood?: number | null | undefined;
   name?: string | null | undefined;
+  note?: string | null | undefined;
   ownerId?: string | null | undefined;
   residualImpact?: number | null | undefined;
   residualLikelihood?: number | null | undefined;
@@ -34,6 +35,7 @@ export type EditRiskViewUpdateRiskMutation$data = {
       readonly inherentImpact: number;
       readonly inherentLikelihood: number;
       readonly name: string;
+      readonly note: string;
       readonly owner: {
         readonly fullName: string;
         readonly id: string;
@@ -149,6 +151,13 @@ v2 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
+            "name": "note",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
           },
@@ -196,16 +205,16 @@ return {
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "a640c5be0a7614478f2d229154d9206a",
+    "cacheID": "9ae05593d756dd95091353fe5706f8e3",
     "id": null,
     "metadata": {},
     "name": "EditRiskViewUpdateRiskMutation",
     "operationKind": "mutation",
-    "text": "mutation EditRiskViewUpdateRiskMutation(\n  $input: UpdateRiskInput!\n) {\n  updateRisk(input: $input) {\n    risk {\n      id\n      name\n      description\n      category\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      treatment\n      updatedAt\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
+    "text": "mutation EditRiskViewUpdateRiskMutation(\n  $input: UpdateRiskInput!\n) {\n  updateRisk(input: $input) {\n    risk {\n      id\n      name\n      description\n      category\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      treatment\n      note\n      updatedAt\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "7f4cfbd3d1e3fa396b7ffbcac1e12b0a";
+(node as any).hash = "dd20595391e04ea370129e1bf055a5ad";
 
 export default node;

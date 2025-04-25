@@ -95,6 +95,7 @@ function NewRiskForm({
   const [residualImpact, setResidualImpact] = useState<number>(3);
   const [treatment, setTreatment] = useState<string>("MITIGATED");
   const [ownerId, setOwnerId] = useState<string | null>(null);
+  const [note, setNote] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -216,6 +217,7 @@ function NewRiskForm({
       residualImpact,
       treatment,
       ownerId: ownerId || undefined,
+      note,
     };
 
     createRisk({
@@ -421,6 +423,20 @@ function NewRiskForm({
               </Select>
               <p className="text-sm text-tertiary">
                 Choose how you plan to address this risk
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="note">Notes</Label>
+              <Textarea
+                id="note"
+                placeholder="Add any additional notes about this risk"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={3}
+              />
+              <p className="text-sm text-tertiary">
+                Optional notes to provide more context about the risk
               </p>
             </div>
 

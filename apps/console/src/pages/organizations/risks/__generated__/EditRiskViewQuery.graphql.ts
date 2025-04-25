@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<028d64b4c532fdc04b77de62bd70311b>>
+ * @generated SignedSource<<0637df266d41a7d8d4a54f4ecaf2b6ed>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -26,6 +26,7 @@ export type EditRiskViewQuery$data = {
     readonly inherentImpact?: number;
     readonly inherentLikelihood?: number;
     readonly name?: string;
+    readonly note?: string;
     readonly owner?: {
       readonly fullName: string;
       readonly id: string;
@@ -125,10 +126,17 @@ v12 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "fullName",
+  "name": "note",
   "storageKey": null
 },
 v13 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "fullName",
+  "storageKey": null
+},
+v14 = {
   "alias": null,
   "args": null,
   "concreteType": "People",
@@ -137,25 +145,25 @@ v13 = {
   "plural": false,
   "selections": [
     (v3/*: any*/),
-    (v12/*: any*/)
+    (v13/*: any*/)
   ],
   "storageKey": null
 },
-v14 = [
+v15 = [
   {
     "kind": "Variable",
     "name": "id",
     "variableName": "organizationId"
   }
 ],
-v15 = {
+v16 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v16 = [
+v17 = [
   {
     "kind": "Literal",
     "name": "first",
@@ -200,7 +208,8 @@ return {
               (v9/*: any*/),
               (v10/*: any*/),
               (v11/*: any*/),
-              (v13/*: any*/)
+              (v12/*: any*/),
+              (v14/*: any*/)
             ],
             "type": "Risk",
             "abstractKey": null
@@ -210,7 +219,7 @@ return {
       },
       {
         "alias": "organization",
-        "args": (v14/*: any*/),
+        "args": (v15/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
@@ -245,7 +254,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v15/*: any*/),
+          (v16/*: any*/),
           (v3/*: any*/),
           {
             "kind": "InlineFragment",
@@ -258,7 +267,8 @@ return {
               (v9/*: any*/),
               (v10/*: any*/),
               (v11/*: any*/),
-              (v13/*: any*/)
+              (v12/*: any*/),
+              (v14/*: any*/)
             ],
             "type": "Risk",
             "abstractKey": null
@@ -268,20 +278,20 @@ return {
       },
       {
         "alias": "organization",
-        "args": (v14/*: any*/),
+        "args": (v15/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v15/*: any*/),
+          (v16/*: any*/),
           (v3/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v16/*: any*/),
+                "args": (v17/*: any*/),
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
                 "name": "peoples",
@@ -304,7 +314,7 @@ return {
                         "plural": false,
                         "selections": [
                           (v3/*: any*/),
-                          (v12/*: any*/),
+                          (v13/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -312,7 +322,7 @@ return {
                             "name": "primaryEmailAddress",
                             "storageKey": null
                           },
-                          (v15/*: any*/)
+                          (v16/*: any*/)
                         ],
                         "storageKey": null
                       },
@@ -356,7 +366,7 @@ return {
               },
               {
                 "alias": null,
-                "args": (v16/*: any*/),
+                "args": (v17/*: any*/),
                 "filters": [
                   "orderBy"
                 ],
@@ -375,16 +385,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "cdae5e406ef1b70c372791cc998e82ac",
+    "cacheID": "d12002d4d1efd523c4f048d068e78644",
     "id": null,
     "metadata": {},
     "name": "EditRiskViewQuery",
     "operationKind": "query",
-    "text": "query EditRiskViewQuery(\n  $riskId: ID!\n  $organizationId: ID!\n) {\n  risk: node(id: $riskId) {\n    __typename\n    ... on Risk {\n      id\n      name\n      description\n      category\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      treatment\n      owner {\n        id\n        fullName\n      }\n    }\n    id\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query EditRiskViewQuery(\n  $riskId: ID!\n  $organizationId: ID!\n) {\n  risk: node(id: $riskId) {\n    __typename\n    ... on Risk {\n      id\n      name\n      description\n      category\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      treatment\n      note\n      owner {\n        id\n        fullName\n      }\n    }\n    id\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3ea38c607c8a1d3f18eaa964476f1529";
+(node as any).hash = "44e4278c5a81cde3ab21584cb4f6de83";
 
 export default node;

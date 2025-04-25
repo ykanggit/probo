@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<166b32236b296d1d0a4956cabacb1715>>
+ * @generated SignedSource<<e318c9e0fe4355eb4923acb54da59ebb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -46,6 +46,7 @@ export type ShowRiskViewQuery$data = {
       }>;
     };
     readonly name?: string;
+    readonly note?: string;
     readonly owner?: {
       readonly fullName: string;
       readonly id: string;
@@ -165,31 +166,38 @@ v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "createdAt",
+  "name": "note",
   "storageKey": null
 },
 v12 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "updatedAt",
+  "name": "createdAt",
   "storageKey": null
 },
 v13 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "__typename",
+  "name": "updatedAt",
   "storageKey": null
 },
 v14 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "cursor",
+  "name": "__typename",
   "storageKey": null
 },
 v15 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "cursor",
+  "storageKey": null
+},
+v16 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -214,7 +222,7 @@ v15 = {
   ],
   "storageKey": null
 },
-v16 = [
+v17 = [
   {
     "alias": null,
     "args": null,
@@ -241,7 +249,7 @@ v16 = [
             "name": "category",
             "storageKey": null
           },
-          (v11/*: any*/),
+          (v12/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -249,17 +257,17 @@ v16 = [
             "name": "state",
             "storageKey": null
           },
-          (v13/*: any*/)
+          (v14/*: any*/)
         ],
         "storageKey": null
       },
-      (v14/*: any*/)
+      (v15/*: any*/)
     ],
     "storageKey": null
   },
-  (v15/*: any*/)
+  (v16/*: any*/)
 ],
-v17 = [
+v18 = [
   {
     "alias": null,
     "args": null,
@@ -285,18 +293,18 @@ v17 = [
             "name": "status",
             "storageKey": null
           },
-          (v11/*: any*/),
-          (v13/*: any*/)
+          (v12/*: any*/),
+          (v14/*: any*/)
         ],
         "storageKey": null
       },
-      (v14/*: any*/)
+      (v15/*: any*/)
     ],
     "storageKey": null
   },
-  (v15/*: any*/)
+  (v16/*: any*/)
 ],
-v18 = [
+v19 = [
   {
     "alias": null,
     "args": null,
@@ -323,18 +331,18 @@ v18 = [
           },
           (v3/*: any*/),
           (v4/*: any*/),
-          (v11/*: any*/),
-          (v13/*: any*/)
+          (v12/*: any*/),
+          (v14/*: any*/)
         ],
         "storageKey": null
       },
-      (v14/*: any*/)
+      (v15/*: any*/)
     ],
     "storageKey": null
   },
-  (v15/*: any*/)
+  (v16/*: any*/)
 ],
-v19 = [
+v20 = [
   {
     "kind": "Literal",
     "name": "first",
@@ -370,6 +378,7 @@ return {
               (v10/*: any*/),
               (v11/*: any*/),
               (v12/*: any*/),
+              (v13/*: any*/),
               {
                 "alias": "mesures",
                 "args": null,
@@ -377,7 +386,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__Risk__mesures_connection",
                 "plural": false,
-                "selections": (v16/*: any*/),
+                "selections": (v17/*: any*/),
                 "storageKey": null
               },
               {
@@ -387,7 +396,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__Risk__policies_connection",
                 "plural": false,
-                "selections": (v17/*: any*/),
+                "selections": (v18/*: any*/),
                 "storageKey": null
               },
               {
@@ -397,7 +406,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__Risk__controls_connection",
                 "plural": false,
-                "selections": (v18/*: any*/),
+                "selections": (v19/*: any*/),
                 "storageKey": null
               }
             ],
@@ -425,7 +434,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v13/*: any*/),
+          (v14/*: any*/),
           (v2/*: any*/),
           {
             "kind": "InlineFragment",
@@ -440,19 +449,20 @@ return {
               (v10/*: any*/),
               (v11/*: any*/),
               (v12/*: any*/),
+              (v13/*: any*/),
               {
                 "alias": null,
-                "args": (v19/*: any*/),
+                "args": (v20/*: any*/),
                 "concreteType": "MesureConnection",
                 "kind": "LinkedField",
                 "name": "mesures",
                 "plural": false,
-                "selections": (v16/*: any*/),
+                "selections": (v17/*: any*/),
                 "storageKey": "mesures(first:100)"
               },
               {
                 "alias": null,
-                "args": (v19/*: any*/),
+                "args": (v20/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "Risk__mesures",
@@ -461,17 +471,17 @@ return {
               },
               {
                 "alias": null,
-                "args": (v19/*: any*/),
+                "args": (v20/*: any*/),
                 "concreteType": "PolicyConnection",
                 "kind": "LinkedField",
                 "name": "policies",
                 "plural": false,
-                "selections": (v17/*: any*/),
+                "selections": (v18/*: any*/),
                 "storageKey": "policies(first:100)"
               },
               {
                 "alias": null,
-                "args": (v19/*: any*/),
+                "args": (v20/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "Risk__policies",
@@ -480,17 +490,17 @@ return {
               },
               {
                 "alias": null,
-                "args": (v19/*: any*/),
+                "args": (v20/*: any*/),
                 "concreteType": "ControlConnection",
                 "kind": "LinkedField",
                 "name": "controls",
                 "plural": false,
-                "selections": (v18/*: any*/),
+                "selections": (v19/*: any*/),
                 "storageKey": "controls(first:100)"
               },
               {
                 "alias": null,
-                "args": (v19/*: any*/),
+                "args": (v20/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "Risk__controls",
@@ -507,7 +517,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b315b57d1b366f87758e300825909da0",
+    "cacheID": "05f0fe48c916ecda883f606eed0c9244",
     "id": null,
     "metadata": {
       "connection": [
@@ -542,11 +552,11 @@ return {
     },
     "name": "ShowRiskViewQuery",
     "operationKind": "query",
-    "text": "query ShowRiskViewQuery(\n  $riskId: ID!\n) {\n  node(id: $riskId) {\n    __typename\n    id\n    ... on Risk {\n      name\n      description\n      treatment\n      owner {\n        id\n        fullName\n      }\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      createdAt\n      updatedAt\n      mesures(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            createdAt\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            name\n            status\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      controls(first: 100) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            description\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ShowRiskViewQuery(\n  $riskId: ID!\n) {\n  node(id: $riskId) {\n    __typename\n    id\n    ... on Risk {\n      name\n      description\n      treatment\n      owner {\n        id\n        fullName\n      }\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      note\n      createdAt\n      updatedAt\n      mesures(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            createdAt\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            name\n            status\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      controls(first: 100) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            description\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "bbb709790492c573d25ee19412956501";
+(node as any).hash = "25e67618b61999a955716e937a53a470";
 
 export default node;

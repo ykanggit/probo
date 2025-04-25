@@ -448,6 +448,7 @@ type ComplexityRoot struct {
 		InherentSeverity   func(childComplexity int) int
 		Mesures            func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MesureOrderBy) int
 		Name               func(childComplexity int) int
+		Note               func(childComplexity int) int
 		Owner              func(childComplexity int) int
 		Policies           func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) int
 		ResidualImpact     func(childComplexity int) int
@@ -2474,6 +2475,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Risk.Name(childComplexity), true
 
+	case "Risk.note":
+		if e.complexity.Risk.Note == nil {
+			break
+		}
+
+		return e.complexity.Risk.Note(childComplexity), true
+
 	case "Risk.owner":
 		if e.complexity.Risk.Owner == nil {
 			break
@@ -4062,6 +4070,7 @@ type Risk implements Node {
   residualLikelihood: Int!
   residualImpact: Int!
   residualSeverity: Int!
+  note: String!
 
   owner: People @goField(forceResolver: true)
 
@@ -4543,6 +4552,7 @@ input CreateRiskInput {
   inherentImpact: Int!
   residualLikelihood: Int
   residualImpact: Int
+  note: String
 }
 
 input UpdateRiskInput {
@@ -4556,6 +4566,7 @@ input UpdateRiskInput {
   inherentImpact: Int
   residualLikelihood: Int
   residualImpact: Int
+  note: String
 }
 
 input DeleteRiskInput {
@@ -18405,6 +18416,50 @@ func (ec *executionContext) fieldContext_Risk_residualSeverity(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Risk_note(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Risk_note(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Note, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Risk_note(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Risk",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Risk_owner(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Risk_owner(ctx, field)
 	if err != nil {
@@ -18942,6 +18997,8 @@ func (ec *executionContext) fieldContext_RiskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Risk_residualImpact(ctx, field)
 			case "residualSeverity":
 				return ec.fieldContext_Risk_residualSeverity(ctx, field)
+			case "note":
+				return ec.fieldContext_Risk_note(ctx, field)
 			case "owner":
 				return ec.fieldContext_Risk_owner(ctx, field)
 			case "mesures":
@@ -20131,6 +20188,8 @@ func (ec *executionContext) fieldContext_UpdateRiskPayload_risk(_ context.Contex
 				return ec.fieldContext_Risk_residualImpact(ctx, field)
 			case "residualSeverity":
 				return ec.fieldContext_Risk_residualSeverity(ctx, field)
+			case "note":
+				return ec.fieldContext_Risk_note(ctx, field)
 			case "owner":
 				return ec.fieldContext_Risk_owner(ctx, field)
 			case "mesures":
@@ -26062,7 +26121,7 @@ func (ec *executionContext) unmarshalInputCreateRiskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "description", "category", "ownerId", "treatment", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact"}
+	fieldsInOrder := [...]string{"organizationId", "name", "description", "category", "ownerId", "treatment", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact", "note"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -26139,6 +26198,13 @@ func (ec *executionContext) unmarshalInputCreateRiskInput(ctx context.Context, o
 				return it, err
 			}
 			it.ResidualImpact = data
+		case "note":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("note"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Note = data
 		}
 	}
 
@@ -27668,7 +27734,7 @@ func (ec *executionContext) unmarshalInputUpdateRiskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "category", "ownerId", "treatment", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact"}
+	fieldsInOrder := [...]string{"id", "name", "description", "category", "ownerId", "treatment", "inherentLikelihood", "inherentImpact", "residualLikelihood", "residualImpact", "note"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -27745,6 +27811,13 @@ func (ec *executionContext) unmarshalInputUpdateRiskInput(ctx context.Context, o
 				return it, err
 			}
 			it.ResidualImpact = data
+		case "note":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("note"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Note = data
 		}
 	}
 
@@ -32064,6 +32137,11 @@ func (ec *executionContext) _Risk(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "residualSeverity":
 			out.Values[i] = ec._Risk_residualSeverity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "note":
+			out.Values[i] = ec._Risk_note(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
