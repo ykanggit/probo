@@ -28,7 +28,7 @@ export default function OrganizationLayout() {
             "p-8 h-screen overflow-auto",
             controlMatch || frameworkMatch
               ? "w-full"
-              : "mx-auto w-lg md:w-xl lg:w-3xl xl:w-4xl 2xl:w-5xl"
+              : "mx-auto w-2xl md:w-3xl lg:w-5xl xl:w-6xl 2xl:w-7xl"
           )}
         >
           <header className="flex shrink-0 items-center gap-2 mb-7">
