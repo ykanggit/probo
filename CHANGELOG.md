@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Risk can have note
+- Cache static assets
 
 ## [0.13.2] - 2025-04-24
 

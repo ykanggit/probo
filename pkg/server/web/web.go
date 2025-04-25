@@ -17,12 +17,15 @@ package web
 import (
 	"io/fs"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/getprobo/probo/apps/console"
 )
 
 type Server struct {
-	spaFS http.FileSystem
+	spaFS        http.FileSystem
+	indexContent []byte
 }
 
 func NewServer() (*Server, error) {
@@ -31,49 +34,61 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
+	indexFile, err := subFS.Open("index.html")
+	if err != nil {
+		return nil, err
+	}
+	defer indexFile.Close()
+
+	stat, err := indexFile.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	indexContent := make([]byte, stat.Size())
+	_, err = indexFile.Read(indexContent)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Server{
-		spaFS: http.FS(subFS),
+		spaFS:        http.FS(subFS),
+		indexContent: indexContent,
 	}, nil
 }
 
 func (s *Server) ServeSPA(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
-	if path == "/" {
-		path = "/index.html"
-	}
-
 	f, err := s.spaFS.Open(path)
 	if err == nil {
 		defer f.Close()
+
+		if isStaticFile(path) {
+			w.Header().Set("Cache-Control", "public, max-age=31536000")
+			w.Header().Set("Expires", time.Now().Add(365*24*time.Hour).Format(time.RFC1123))
+		}
 
 		http.FileServer(s.spaFS).ServeHTTP(w, r)
 		return
 	}
 
-	indexFile, err := s.spaFS.Open("/index.html")
-	if err != nil {
-		http.Error(w, "Not Found", http.StatusNotFound)
-		return
-	}
-	defer indexFile.Close()
-
-	stat, err := indexFile.Stat()
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	content := make([]byte, stat.Size())
-	_, err = indexFile.Read(content)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	w.Write(content)
+	w.Write(s.indexContent)
+}
+
+func isStaticFile(path string) bool {
+	extensions := []string{".js", ".css", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".woff", ".woff2", ".ttf", ".eot"}
+	for _, ext := range extensions {
+		if strings.HasSuffix(path, ext) {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
