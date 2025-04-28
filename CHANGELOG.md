@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.15.1] - 2025-04-27
+
+### Fixed
+
+- Fix SQL syntax error
+
 ## [0.15.0] - 2025-04-27
 
 ### Added
