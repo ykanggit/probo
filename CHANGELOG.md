@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Removed
+
+- Remove `importance` field from measure as it's not used anymore
+
 ## [0.14.0] - 2025-04-24
 
 ### Added
