@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+
+### Added
+
+- Add delete measure in the UI and GraphQL API
+
 ### Removed
 
 - Remove `importance` field from measure as it's not used anymore

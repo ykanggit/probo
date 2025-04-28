@@ -292,6 +292,14 @@ type DeleteFrameworkPayload struct {
 	DeletedFrameworkID gid.GID `json:"deletedFrameworkId"`
 }
 
+type DeleteMesureInput struct {
+	MesureID gid.GID `json:"mesureId"`
+}
+
+type DeleteMesurePayload struct {
+	DeletedMesureID gid.GID `json:"deletedMesureId"`
+}
+
 type DeleteOrganizationInput struct {
 	OrganizationID gid.GID `json:"organizationId"`
 }

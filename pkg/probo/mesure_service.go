@@ -371,3 +371,18 @@ func (s MesureService) Create(
 
 	return mesure, nil
 }
+
+func (s MesureService) Delete(
+	ctx context.Context,
+	mesureID gid.GID,
+) error {
+	return s.svc.pg.WithTx(ctx, func(conn pg.Conn) error {
+		mesure := &coredata.Mesure{ID: mesureID}
+
+		if err := mesure.Delete(ctx, conn, s.svc.scope); err != nil {
+			return fmt.Errorf("cannot delete mesure: %w", err)
+		}
+
+		return nil
+	})
+}

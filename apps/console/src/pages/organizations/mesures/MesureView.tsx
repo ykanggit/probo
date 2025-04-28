@@ -15,6 +15,7 @@ import {
   useMutation,
   fetchQuery,
   useRelayEnvironment,
+  ConnectionHandler,
 } from "react-relay";
 import {
   AlertTriangle,
@@ -106,6 +107,7 @@ import { MesureViewCreateControlMappingMutation } from "./__generated__/MesureVi
 import { MesureViewDeleteControlMappingMutation } from "./__generated__/MesureViewDeleteControlMappingMutation.graphql";
 import { MesureViewRisksQuery$data } from "./__generated__/MesureViewRisksQuery.graphql";
 import { MesureViewRisksQuery } from "./__generated__/MesureViewRisksQuery.graphql";
+import { MesureViewDeleteMesureMutation } from "./__generated__/MesureViewDeleteMesureMutation.graphql";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -326,6 +328,17 @@ const updateMesureStateMutation = graphql`
   }
 `;
 
+const deleteMesureMutation = graphql`
+  mutation MesureViewDeleteMesureMutation(
+    $input: DeleteMesureInput!
+    $connections: [ID!]!
+  ) {
+    deleteMesure(input: $input) {
+      deletedMesureId @deleteEdge(connections: $connections)
+    }
+  }
+`;
+
 const organizationQuery = graphql`
   query MesureViewOrganizationQuery($organizationId: ID!) {
     organization: node(id: $organizationId) {
@@ -477,10 +490,16 @@ function MesureViewContent({
     mesureViewQuery,
     queryRef
   );
-  const { toast } = useToast();
-  const { organizationId, mesureId } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { organizationId, mesureId } = useParams<{
+    organizationId: string;
+    mesureId: string;
+  }>();
   const environment = useRelayEnvironment();
+
+  const [commitDeleteMesure, isDeletingMesure] = useMutation<MesureViewDeleteMesureMutation>(deleteMesureMutation);
+  const [isDeleteMesureOpen, setIsDeleteMesureOpen] = useState(false);
 
   // Add state for main content tabs
   const [mainContentTab, setMainContentTab] = useState<string>("tasks");
@@ -1815,32 +1834,70 @@ function MesureViewContent({
     return "Very High";
   };
 
+  const handleDeleteMesure = () => {
+    setIsDeleteMesureOpen(true);
+  };
+
+  const confirmDeleteMesure = () => {
+    const connectionId = ConnectionHandler.getConnectionID(
+      organizationId!,
+      "MesureListView_mesures"
+    );
+
+    commitDeleteMesure({
+      variables: {
+        connections: [connectionId],
+        input: {
+          mesureId: mesureId!,
+        },
+      },
+      onCompleted: () => {
+        toast({
+          title: "Mesure deleted",
+          description: "Mesure has been deleted successfully.",
+        });
+        navigate(`/organizations/${organizationId}/mesures`);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error deleting mesure",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
   return (
     <PageTemplate
-      title={data.mesure.name ?? ""}
+      title={data.mesure?.name || "Mesure"}
+      description={data.mesure?.description}
       actions={
-        <div className="flex items-center gap-2">
-          <Button onClick={handleEditMesure}>Edit Mesure</Button>
-          <Select
-            defaultValue={data.mesure.state}
-            onValueChange={handleMesureStateChange}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleEditMesure}
           >
-            <SelectTrigger className="w-[160px] h-10 text-sm">
-              <div
-                className={`${getStateColor(
-                  data.mesure.state
-                )} px-2 py-0.5 rounded-sm text-sm w-full text-center`}
-              >
-                {formatState(data.mesure.state)}
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="NOT_STARTED">Not Started</SelectItem>
-              <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-              <SelectItem value="IMPLEMENTED">Implemented</SelectItem>
-              <SelectItem value="NOT_APPLICABLE">Not Applicable</SelectItem>
-            </SelectContent>
-          </Select>
+            Edit
+          </Button>
+          <select
+            value={data.mesure?.state || ""}
+            onChange={(e) => handleMesureStateChange(e.target.value)}
+            className="rounded-full cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-active-b disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-low-b hover:bg-h-tertiary-bg active:bg-p-tertiary-bg focus:bg-tertiary-bg shadow-xs px-2"
+          >
+            <option value="">Select state</option>
+            <option value="NOT_STARTED">Not Started</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="NOT_APPLICABLE">Not Applicable</option>
+            <option value="IMPLEMENTED">Implemented</option>
+          </select>
+          <Button
+            variant="destructive"
+            onClick={() => handleDeleteMesure()}
+            disabled={isDeletingMesure}
+          >
+            {isDeletingMesure ? "Deleting..." : "Delete"}
+          </Button>
         </div>
       }
     >
@@ -3595,6 +3652,33 @@ function MesureViewContent({
                 Submit Link
               </Button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Mesure Confirmation Dialog */}
+      <Dialog open={isDeleteMesureOpen} onOpenChange={setIsDeleteMesureOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Mesure</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this mesure? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteMesureOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteMesure}
+              disabled={isDeletingMesure}
+            >
+              {isDeletingMesure ? "Deleting..." : "Delete"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

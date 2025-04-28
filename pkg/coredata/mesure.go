@@ -433,3 +433,22 @@ WHERE %s
 	_, err := conn.Exec(ctx, q, args)
 	return err
 }
+
+func (m *Mesure) Delete(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+) error {
+	q := `
+DELETE FROM mesures
+WHERE %s
+    AND id = @mesure_id
+`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"mesure_id": m.ID}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}

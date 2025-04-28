@@ -182,6 +182,10 @@ type ComplexityRoot struct {
 		DeletedFrameworkID func(childComplexity int) int
 	}
 
+	DeleteMesurePayload struct {
+		DeletedMesureID func(childComplexity int) int
+	}
+
 	DeleteOrganizationPayload struct {
 		DeletedOrganizationID func(childComplexity int) int
 	}
@@ -321,6 +325,7 @@ type ComplexityRoot struct {
 		DeleteControlPolicyMapping   func(childComplexity int, input types.DeleteControlPolicyMappingInput) int
 		DeleteEvidence               func(childComplexity int, input types.DeleteEvidenceInput) int
 		DeleteFramework              func(childComplexity int, input types.DeleteFrameworkInput) int
+		DeleteMesure                 func(childComplexity int, input types.DeleteMesureInput) int
 		DeleteOrganization           func(childComplexity int, input types.DeleteOrganizationInput) int
 		DeletePeople                 func(childComplexity int, input types.DeletePeopleInput) int
 		DeletePolicy                 func(childComplexity int, input types.DeletePolicyInput) int
@@ -675,6 +680,7 @@ type MutationResolver interface {
 	CreateMesure(ctx context.Context, input types.CreateMesureInput) (*types.CreateMesurePayload, error)
 	UpdateMesure(ctx context.Context, input types.UpdateMesureInput) (*types.UpdateMesurePayload, error)
 	ImportMesure(ctx context.Context, input types.ImportMesureInput) (*types.ImportMesurePayload, error)
+	DeleteMesure(ctx context.Context, input types.DeleteMesureInput) (*types.DeleteMesurePayload, error)
 	CreateControlMesureMapping(ctx context.Context, input types.CreateControlMesureMappingInput) (*types.CreateControlMesureMappingPayload, error)
 	CreateControlPolicyMapping(ctx context.Context, input types.CreateControlPolicyMappingInput) (*types.CreateControlPolicyMappingPayload, error)
 	DeleteControlMesureMapping(ctx context.Context, input types.DeleteControlMesureMappingInput) (*types.DeleteControlMesureMappingPayload, error)
@@ -1069,6 +1075,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeleteFrameworkPayload.DeletedFrameworkID(childComplexity), true
+
+	case "DeleteMesurePayload.deletedMesureId":
+		if e.complexity.DeleteMesurePayload.DeletedMesureID == nil {
+			break
+		}
+
+		return e.complexity.DeleteMesurePayload.DeletedMesureID(childComplexity), true
 
 	case "DeleteOrganizationPayload.deletedOrganizationId":
 		if e.complexity.DeleteOrganizationPayload.DeletedOrganizationID == nil {
@@ -1693,6 +1706,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteFramework(childComplexity, args["input"].(types.DeleteFrameworkInput)), true
+
+	case "Mutation.deleteMesure":
+		if e.complexity.Mutation.DeleteMesure == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMesure_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMesure(childComplexity, args["input"].(types.DeleteMesureInput)), true
 
 	case "Mutation.deleteOrganization":
 		if e.complexity.Mutation.DeleteOrganization == nil {
@@ -3248,6 +3273,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeleteControlPolicyMappingInput,
 		ec.unmarshalInputDeleteEvidenceInput,
 		ec.unmarshalInputDeleteFrameworkInput,
+		ec.unmarshalInputDeleteMesureInput,
 		ec.unmarshalInputDeleteOrganizationInput,
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeletePolicyInput,
@@ -4279,6 +4305,7 @@ type Mutation {
   createMesure(input: CreateMesureInput!): CreateMesurePayload!
   updateMesure(input: UpdateMesureInput!): UpdateMesurePayload!
   importMesure(input: ImportMesureInput!): ImportMesurePayload!
+  deleteMesure(input: DeleteMesureInput!): DeleteMesurePayload!
 
   # Control mutations
   createControlMesureMapping(
@@ -4865,7 +4892,14 @@ input CreateVendorRiskAssessmentInput {
 type CreateVendorRiskAssessmentPayload {
   vendorRiskAssessmentEdge: VendorRiskAssessmentEdge!
 }
-`, BuiltIn: false},
+
+input DeleteMesureInput {
+  mesureId: ID!
+}
+
+type DeleteMesurePayload {
+  deletedMesureId: ID!
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -5900,6 +5934,29 @@ func (ec *executionContext) field_Mutation_deleteFramework_argsInput(
 	}
 
 	var zeroVal types.DeleteFrameworkInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteMesure_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteMesure_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteMesure_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteMesureInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteMesureInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteMesureInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteMesureInput
 	return zeroVal, nil
 }
 
@@ -10147,6 +10204,50 @@ func (ec *executionContext) fieldContext_DeleteFrameworkPayload_deletedFramework
 	return fc, nil
 }
 
+func (ec *executionContext) _DeleteMesurePayload_deletedMesureId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteMesurePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteMesurePayload_deletedMesureId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedMesureID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteMesurePayload_deletedMesureId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteMesurePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DeleteOrganizationPayload_deletedOrganizationId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteOrganizationPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
 	if err != nil {
@@ -13738,6 +13839,65 @@ func (ec *executionContext) fieldContext_Mutation_importMesure(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_importMesure_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteMesure(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteMesure(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteMesure(rctx, fc.Args["input"].(types.DeleteMesureInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteMesurePayload)
+	fc.Result = res
+	return ec.marshalNDeleteMesurePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteMesurePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteMesure(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedMesureId":
+				return ec.fieldContext_DeleteMesurePayload_deletedMesureId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteMesurePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteMesure_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -26589,6 +26749,33 @@ func (ec *executionContext) unmarshalInputDeleteFrameworkInput(ctx context.Conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteMesureInput(ctx context.Context, obj any) (types.DeleteMesureInput, error) {
+	var it types.DeleteMesureInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"mesureId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "mesureId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mesureId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MesureID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDeleteOrganizationInput(ctx context.Context, obj any) (types.DeleteOrganizationInput, error) {
 	var it types.DeleteOrganizationInput
 	asMap := map[string]any{}
@@ -29400,6 +29587,45 @@ func (ec *executionContext) _DeleteFrameworkPayload(ctx context.Context, sel ast
 	return out
 }
 
+var deleteMesurePayloadImplementors = []string{"DeleteMesurePayload"}
+
+func (ec *executionContext) _DeleteMesurePayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteMesurePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteMesurePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteMesurePayload")
+		case "deletedMesureId":
+			out.Values[i] = ec._DeleteMesurePayload_deletedMesureId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deleteOrganizationPayloadImplementors = []string{"DeleteOrganizationPayload"}
 
 func (ec *executionContext) _DeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteOrganizationPayload) graphql.Marshaler {
@@ -30705,6 +30931,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "importMesure":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_importMesure(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteMesure":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteMesure(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -35031,6 +35264,25 @@ func (ec *executionContext) marshalNDeleteFrameworkPayload2ᚖgithubᚗcomᚋget
 		return graphql.Null
 	}
 	return ec._DeleteFrameworkPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeleteMesureInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteMesureInput(ctx context.Context, v any) (types.DeleteMesureInput, error) {
+	res, err := ec.unmarshalInputDeleteMesureInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteMesurePayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteMesurePayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteMesurePayload) graphql.Marshaler {
+	return ec._DeleteMesurePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteMesurePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteMesurePayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteMesurePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteMesurePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeleteOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationInput(ctx context.Context, v any) (types.DeleteOrganizationInput, error) {

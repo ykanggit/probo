@@ -593,6 +593,20 @@ func (r *mutationResolver) ImportMesure(ctx context.Context, input types.ImportM
 	}, nil
 }
 
+// DeleteMesure is the resolver for the deleteMesure field.
+func (r *mutationResolver) DeleteMesure(ctx context.Context, input types.DeleteMesureInput) (*types.DeleteMesurePayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.MesureID.TenantID())
+
+	err := svc.Mesures.Delete(ctx, input.MesureID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete mesure: %w", err))
+	}
+
+	return &types.DeleteMesurePayload{
+		DeletedMesureID: input.MesureID,
+	}, nil
+}
+
 // CreateControlMesureMapping is the resolver for the createControlMesureMapping field.
 func (r *mutationResolver) CreateControlMesureMapping(ctx context.Context, input types.CreateControlMesureMappingInput) (*types.CreateControlMesureMappingPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.MesureID.TenantID())

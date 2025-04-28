@@ -895,6 +895,7 @@ type Mutation {
   createMesure(input: CreateMesureInput!): CreateMesurePayload!
   updateMesure(input: UpdateMesureInput!): UpdateMesurePayload!
   importMesure(input: ImportMesureInput!): ImportMesurePayload!
+  deleteMesure(input: DeleteMesureInput!): DeleteMesurePayload!
 
   # Control mutations
   createControlMesureMapping(
@@ -1480,4 +1481,12 @@ input CreateVendorRiskAssessmentInput {
 
 type CreateVendorRiskAssessmentPayload {
   vendorRiskAssessmentEdge: VendorRiskAssessmentEdge!
+}
+
+input DeleteMesureInput {
+  mesureId: ID!
+}
+
+type DeleteMesurePayload {
+  deletedMesureId: ID!
 }
