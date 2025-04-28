@@ -91,22 +91,6 @@ enum PeopleKind
     )
 }
 
-enum MesureImportance
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.MesureImportance") {
-  MANDATORY
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MesureImportanceMandatory"
-    )
-  PREFERRED
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MesureImportancePreferred"
-    )
-  ADVANCED
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MesureImportanceAdvanced"
-    )
-}
-
 enum PolicyStatus
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
   DRAFT
@@ -581,7 +565,6 @@ type Mesure implements Node {
   name: String!
   description: String!
   state: MesureState!
-  importance: MesureImportance!
 
   tasks(
     first: Int
@@ -1083,7 +1066,6 @@ input CreateMesureInput {
   name: String!
   description: String!
   category: String!
-  importance: MesureImportance!
 }
 
 input UpdateMesureInput {
@@ -1092,7 +1074,6 @@ input UpdateMesureInput {
   description: String
   category: String
   state: MesureState
-  importance: MesureImportance
 }
 
 input ImportMesureInput {

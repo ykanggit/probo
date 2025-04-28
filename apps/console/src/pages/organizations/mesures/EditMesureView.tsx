@@ -26,7 +26,6 @@ const editMesureQuery = graphql`
         name
         description
         category
-        importance
       }
     }
   }
@@ -59,8 +58,7 @@ function EditMesureViewContent({
   const [formData, setFormData] = useState({
     name: mesure.name ?? "",
     description: mesure.description ?? "",
-    category: mesure.category ?? "",
-    importance: mesure.importance,
+    category: mesure.category ?? ""
   });
 
   const [commit, isInFlight] =
@@ -91,8 +89,7 @@ function EditMesureViewContent({
           id: mesureId!,
           name: formData.name,
           description: formData.description,
-          category: formData.category,
-          importance: formData.importance,
+          category: formData.category
         },
       },
       onCompleted(data, errors) {
@@ -151,52 +148,6 @@ function EditMesureViewContent({
             onChange={(value) => handleFieldChange("category", value)}
             required
           />
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label className="text-sm">Importance</Label>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleFieldChange("importance", "MANDATORY")}
-                  className={cn(
-                    "rounded-full cursor-pointer px-4 py-1 text-sm transition-colors",
-                    formData.importance === "MANDATORY"
-                      ? "bg-danger-bg text-danger ring ring-danger-b"
-                      : "bg-invert-bg hover:bg-h-invert-bg"
-                  )}
-                >
-                  Mandatory
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleFieldChange("importance", "PREFERRED")}
-                  className={cn(
-                    "rounded-full cursor-pointer px-4 py-1 text-sm transition-colors",
-                    formData.importance === "PREFERRED"
-                      ? "bg-warning-bg text-warning ring ring-warning-b"
-                      : "bg-invert-bg hover:bg-h-invert-bg"
-                  )}
-                >
-                  Preferred
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleFieldChange("importance", "ADVANCED")}
-                  className={cn(
-                    "rounded-full cursor-pointer px-4 py-1 text-sm transition-colors",
-                    formData.importance === "ADVANCED"
-                      ? "bg-info-bg text-info ring ring-info-b"
-                      : "bg-invert-bg hover:bg-h-invert-bg"
-                  )}
-                >
-                  Advanced
-                </button>
-              </div>
-            </div>
-          </div>
 
           <div className="flex justify-end gap-3">
             <Button

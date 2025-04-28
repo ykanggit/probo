@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<03360061cfc99eaa1ec9921a815f9fa0>>
+ * @generated SignedSource<<94f5c5a041ae3730b8f4a71ad63530a8>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type MesureImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type MesureState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type ControlLinkedMesuresQuery$variables = {
   controlId: string;
@@ -23,7 +22,6 @@ export type ControlLinkedMesuresQuery$data = {
           readonly category: string;
           readonly description: string;
           readonly id: string;
-          readonly importance: MesureImportance;
           readonly name: string;
           readonly state: MesureState;
         };
@@ -102,13 +100,6 @@ v4 = [
             "args": null,
             "kind": "ScalarField",
             "name": "category",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "importance",
             "storageKey": null
           },
           {
@@ -253,7 +244,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "19d9240a60b26d765a93e00be9e1e83f",
+    "cacheID": "b29cb1662103fc42abf16fa6b3458a68",
     "id": null,
     "metadata": {
       "connection": [
@@ -270,11 +261,11 @@ return {
     },
     "name": "ControlLinkedMesuresQuery",
     "operationKind": "query",
-    "text": "query ControlLinkedMesuresQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      mesures(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            importance\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlLinkedMesuresQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      mesures(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "acb01a862fb268c4b4b557edc3090a0e";
+(node as any).hash = "e42a48d7b21eaa5c42331377b6a9bc9c";
 
 export default node;

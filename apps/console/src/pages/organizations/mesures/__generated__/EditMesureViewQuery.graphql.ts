@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7a5c27ece406a4250a38977e9ed9173f>>
+ * @generated SignedSource<<958d4f8ddfa37ee60ce8db10cfde0f6c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type MesureImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type EditMesureViewQuery$variables = {
   mesureId: string;
 };
@@ -18,7 +17,6 @@ export type EditMesureViewQuery$data = {
     readonly category?: string;
     readonly description?: string;
     readonly id?: string;
-    readonly importance?: MesureImportance;
     readonly name?: string;
   };
 };
@@ -69,13 +67,6 @@ v5 = {
   "kind": "ScalarField",
   "name": "category",
   "storageKey": null
-},
-v6 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "importance",
-  "storageKey": null
 };
 return {
   "fragment": {
@@ -98,8 +89,7 @@ return {
               (v2/*: any*/),
               (v3/*: any*/),
               (v4/*: any*/),
-              (v5/*: any*/),
-              (v6/*: any*/)
+              (v5/*: any*/)
             ],
             "type": "Mesure",
             "abstractKey": null
@@ -138,8 +128,7 @@ return {
             "selections": [
               (v3/*: any*/),
               (v4/*: any*/),
-              (v5/*: any*/),
-              (v6/*: any*/)
+              (v5/*: any*/)
             ],
             "type": "Mesure",
             "abstractKey": null
@@ -150,16 +139,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d38df91a88f32d80da84fc47b7ca17ca",
+    "cacheID": "3dbf7d90b0ae49ce617abdf063f6b908",
     "id": null,
     "metadata": {},
     "name": "EditMesureViewQuery",
     "operationKind": "query",
-    "text": "query EditMesureViewQuery(\n  $mesureId: ID!\n) {\n  node(id: $mesureId) {\n    __typename\n    ... on Mesure {\n      id\n      name\n      description\n      category\n      importance\n    }\n    id\n  }\n}\n"
+    "text": "query EditMesureViewQuery(\n  $mesureId: ID!\n) {\n  node(id: $mesureId) {\n    __typename\n    ... on Mesure {\n      id\n      name\n      description\n      category\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "abca56f710248363bacef919222a8420";
+(node as any).hash = "97156ec05431ae5b11aa2b5441e8f411";
 
 export default node;

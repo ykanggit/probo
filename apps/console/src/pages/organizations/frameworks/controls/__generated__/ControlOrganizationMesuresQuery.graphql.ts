@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<345a2b05f66a0bb630eea3c12f549e52>>
+ * @generated SignedSource<<862b2210a9d569a05063cebc805bdd01>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type MesureImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type MesureState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type ControlOrganizationMesuresQuery$variables = {
   organizationId: string;
@@ -23,7 +22,6 @@ export type ControlOrganizationMesuresQuery$data = {
           readonly category: string;
           readonly description: string;
           readonly id: string;
-          readonly importance: MesureImportance;
           readonly name: string;
           readonly state: MesureState;
         };
@@ -102,13 +100,6 @@ v4 = [
             "args": null,
             "kind": "ScalarField",
             "name": "category",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "importance",
             "storageKey": null
           },
           {
@@ -253,7 +244,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "59ceb60db60754876774a3856686b35c",
+    "cacheID": "bb1066800bfa28aaa64a2fd1f12c5924",
     "id": null,
     "metadata": {
       "connection": [
@@ -270,11 +261,11 @@ return {
     },
     "name": "ControlOrganizationMesuresQuery",
     "operationKind": "query",
-    "text": "query ControlOrganizationMesuresQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      mesures(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            importance\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOrganizationMesuresQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      mesures(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "cc43b07a1a1f5831f5d09fbd13d8805d";
+(node as any).hash = "5f1d6b11af3d92bec1c4d37ceb12b7c3";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<911e86f76b51015804e409479ee4068c>>
+ * @generated SignedSource<<ecce6472ee50f706d3e4ba91cba0798e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,7 +11,6 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type EvidenceState = "FULFILLED" | "REQUESTED";
 export type EvidenceType = "FILE" | "LINK";
-export type MesureImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type MesureState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type TaskState = "DONE" | "TODO";
 export type MesureViewQuery$variables = {
@@ -22,7 +21,6 @@ export type MesureViewQuery$data = {
     readonly category?: string;
     readonly description?: string;
     readonly id: string;
-    readonly importance?: MesureImportance;
     readonly name?: string;
     readonly state?: MesureState;
     readonly tasks?: {
@@ -112,24 +110,17 @@ v6 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "importance",
+  "name": "category",
   "storageKey": null
 },
 v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "category",
-  "storageKey": null
-},
-v8 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
   "name": "timeEstimate",
   "storageKey": null
 },
-v9 = {
+v8 = {
   "alias": null,
   "args": null,
   "concreteType": "People",
@@ -155,21 +146,21 @@ v9 = {
   ],
   "storageKey": null
 },
-v10 = {
+v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v11 = {
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "cursor",
   "storageKey": null
 },
-v12 = {
+v11 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -194,7 +185,7 @@ v12 = {
   ],
   "storageKey": null
 },
-v13 = {
+v12 = {
   "kind": "ClientExtension",
   "selections": [
     {
@@ -206,7 +197,7 @@ v13 = {
     }
   ]
 },
-v14 = [
+v13 = [
   {
     "alias": null,
     "args": null,
@@ -268,25 +259,25 @@ v14 = [
             "storageKey": null
           },
           (v4/*: any*/),
-          (v10/*: any*/)
+          (v9/*: any*/)
         ],
         "storageKey": null
       },
-      (v11/*: any*/)
+      (v10/*: any*/)
     ],
     "storageKey": null
   },
-  (v12/*: any*/),
-  (v13/*: any*/)
+  (v11/*: any*/),
+  (v12/*: any*/)
 ],
-v15 = [
+v14 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 100
   }
 ],
-v16 = [
+v15 = [
   {
     "kind": "Literal",
     "name": "first",
@@ -316,7 +307,6 @@ return {
               (v4/*: any*/),
               (v5/*: any*/),
               (v6/*: any*/),
-              (v7/*: any*/),
               {
                 "alias": "tasks",
                 "args": null,
@@ -345,8 +335,8 @@ return {
                           (v3/*: any*/),
                           (v4/*: any*/),
                           (v5/*: any*/),
+                          (v7/*: any*/),
                           (v8/*: any*/),
-                          (v9/*: any*/),
                           {
                             "alias": "evidences",
                             "args": null,
@@ -354,19 +344,19 @@ return {
                             "kind": "LinkedField",
                             "name": "__MesureView_evidences_connection",
                             "plural": false,
-                            "selections": (v14/*: any*/),
+                            "selections": (v13/*: any*/),
                             "storageKey": null
                           },
-                          (v10/*: any*/)
+                          (v9/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v11/*: any*/)
+                      (v10/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v12/*: any*/),
-                  (v13/*: any*/)
+                  (v11/*: any*/),
+                  (v12/*: any*/)
                 ],
                 "storageKey": null
               }
@@ -395,7 +385,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v10/*: any*/),
+          (v9/*: any*/),
           (v2/*: any*/),
           {
             "kind": "InlineFragment",
@@ -404,10 +394,9 @@ return {
               (v4/*: any*/),
               (v5/*: any*/),
               (v6/*: any*/),
-              (v7/*: any*/),
               {
                 "alias": null,
-                "args": (v15/*: any*/),
+                "args": (v14/*: any*/),
                 "concreteType": "TaskConnection",
                 "kind": "LinkedField",
                 "name": "tasks",
@@ -433,43 +422,43 @@ return {
                           (v3/*: any*/),
                           (v4/*: any*/),
                           (v5/*: any*/),
+                          (v7/*: any*/),
                           (v8/*: any*/),
-                          (v9/*: any*/),
                           {
                             "alias": null,
-                            "args": (v16/*: any*/),
+                            "args": (v15/*: any*/),
                             "concreteType": "EvidenceConnection",
                             "kind": "LinkedField",
                             "name": "evidences",
                             "plural": false,
-                            "selections": (v14/*: any*/),
+                            "selections": (v13/*: any*/),
                             "storageKey": "evidences(first:50)"
                           },
                           {
                             "alias": null,
-                            "args": (v16/*: any*/),
+                            "args": (v15/*: any*/),
                             "filters": null,
                             "handle": "connection",
                             "key": "MesureView_evidences",
                             "kind": "LinkedHandle",
                             "name": "evidences"
                           },
-                          (v10/*: any*/)
+                          (v9/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v11/*: any*/)
+                      (v10/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v12/*: any*/),
-                  (v13/*: any*/)
+                  (v11/*: any*/),
+                  (v12/*: any*/)
                 ],
                 "storageKey": "tasks(first:100)"
               },
               {
                 "alias": null,
-                "args": (v15/*: any*/),
+                "args": (v14/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "MesureView_tasks",
@@ -486,7 +475,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "e4c3abf8e8559e732088a9123863a375",
+    "cacheID": "b4cafbe98bf9830ee31732f39dd6d088",
     "id": null,
     "metadata": {
       "connection": [
@@ -509,11 +498,11 @@ return {
     },
     "name": "MesureViewQuery",
     "operationKind": "query",
-    "text": "query MesureViewQuery(\n  $mesureId: ID!\n) {\n  mesure: node(id: $mesureId) {\n    __typename\n    id\n    ... on Mesure {\n      name\n      description\n      state\n      importance\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  type\n                  url\n                  createdAt\n                  description\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query MesureViewQuery(\n  $mesureId: ID!\n) {\n  mesure: node(id: $mesureId) {\n    __typename\n    id\n    ... on Mesure {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  type\n                  url\n                  createdAt\n                  description\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "38c0abd51a589411fc60391269af0227";
+(node as any).hash = "023013720b7bc4cf9062268bffd0571b";
 
 export default node;

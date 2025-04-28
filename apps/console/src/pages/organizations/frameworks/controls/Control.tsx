@@ -65,7 +65,6 @@ const linkedMesuresQuery = graphql`
               name
               description
               category
-              importance
               state
             }
           }
@@ -88,7 +87,6 @@ const organizationMesuresQuery = graphql`
               name
               description
               category
-              importance
               state
             }
           }
@@ -721,24 +719,6 @@ export function Control({
     setIsPolicyMappingDialogOpen(true);
   }, [loadPoliciesData]);
 
-  // UI helper functions
-  const formatImportance = (importance: string | undefined): string => {
-    if (!importance) return "Unknown";
-
-    switch (importance) {
-      case "LOW":
-        return "Low";
-      case "MEDIUM":
-        return "Medium";
-      case "HIGH":
-        return "High";
-      case "CRITICAL":
-        return "Critical";
-      default:
-        return importance;
-    }
-  };
-
   const formatState = (state: string | undefined): string => {
     if (!state) return "Unknown";
 
@@ -753,23 +733,6 @@ export function Control({
         return "Not Applicable";
       default:
         return state;
-    }
-  };
-
-  const getImportanceColor = (importance: string | undefined): string => {
-    if (!importance) return "bg-secondary-bg text-secondary";
-
-    switch (importance) {
-      case "LOW":
-        return "bg-success-bg text-success";
-      case "MEDIUM":
-        return "bg-info-bg text-info";
-      case "HIGH":
-        return "bg-warning-bg text-warning";
-      case "CRITICAL":
-        return "bg-danger-bg text-danger";
-      default:
-        return "bg-secondary-bg text-secondary";
     }
   };
 
@@ -871,9 +834,6 @@ export function Control({
                         <thead className="sticky top-0 bg-white">
                           <tr className="border-b text-left text-sm text-secondary bg-invert-bg">
                             <th className="py-3 px-4 font-medium">Name</th>
-                            <th className="py-3 px-4 font-medium">
-                              Importance
-                            </th>
                             <th className="py-3 px-4 font-medium">State</th>
                             <th className="py-3 px-4 font-medium text-right">
                               Actions
@@ -897,15 +857,6 @@ export function Control({
                                       {mesure.description}
                                     </div>
                                   )}
-                                </td>
-                                <td className="py-3 px-4">
-                                  <div
-                                    className={`px-2 py-0.5 rounded-full text-xs ${getImportanceColor(
-                                      mesure.importance
-                                    )} inline-block`}
-                                  >
-                                    {formatImportance(mesure.importance)}
-                                  </div>
                                 </td>
                                 <td className="py-3 px-4">
                                   <div
@@ -1000,7 +951,6 @@ export function Control({
                   <thead>
                     <tr className="border-b text-left text-sm text-secondary bg-invert-bg">
                       <th className="py-3 px-4 font-medium">Name</th>
-                      <th className="py-3 px-4 font-medium">Importance</th>
                       <th className="py-3 px-4 font-medium">State</th>
                       <th className="py-3 px-4 font-medium text-right">
                         Actions
@@ -1020,15 +970,6 @@ export function Control({
                               {mesure.description}
                             </div>
                           )}
-                        </td>
-                        <td className="py-3 px-4">
-                          <div
-                            className={`px-2 py-0.5 rounded-full text-xs ${getImportanceColor(
-                              mesure.importance
-                            )} inline-block`}
-                          >
-                            {formatImportance(mesure.importance)}
-                          </div>
                         </td>
                         <td className="py-3 px-4">
                           <div

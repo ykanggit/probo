@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9dac57f235ab6d16f6b3f78002c83dcc>>
+ * @generated SignedSource<<8e8e8ce00d1ef971d4cb203c17d3abd6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,13 +9,11 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type MesureImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type MesureState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type UpdateMesureInput = {
   category?: string | null | undefined;
   description?: string | null | undefined;
   id: string;
-  importance?: MesureImportance | null | undefined;
   name?: string | null | undefined;
   state?: MesureState | null | undefined;
 };

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<251663bea47f61a5857366afa4cc0d28>>
+ * @generated SignedSource<<35c287e8ba9940b8d697c48c563f41c8>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type MesureImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type MesureState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type ImportMesureInput = {
   file: any;
@@ -27,7 +26,6 @@ export type MesureListViewImportMesureMutation$data = {
         readonly createdAt: string;
         readonly description: string;
         readonly id: string;
-        readonly importance: MesureImportance;
         readonly name: string;
         readonly state: MesureState;
         readonly updatedAt: string;
@@ -107,13 +105,6 @@ v3 = {
           "args": null,
           "kind": "ScalarField",
           "name": "state",
-          "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "importance",
           "storageKey": null
         },
         {
@@ -202,16 +193,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "179ac701005009dc5f30388570061264",
+    "cacheID": "8cf2772dcac48b487c892d2b68a3bb51",
     "id": null,
     "metadata": {},
     "name": "MesureListViewImportMesureMutation",
     "operationKind": "mutation",
-    "text": "mutation MesureListViewImportMesureMutation(\n  $input: ImportMesureInput!\n) {\n  importMesure(input: $input) {\n    mesureEdges {\n      node {\n        id\n        name\n        description\n        category\n        state\n        importance\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
+    "text": "mutation MesureListViewImportMesureMutation(\n  $input: ImportMesureInput!\n) {\n  importMesure(input: $input) {\n    mesureEdges {\n      node {\n        id\n        name\n        description\n        category\n        state\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c1c9deeaa806b9553b7eb25d8832818c";
+(node as any).hash = "38c30a8751334cce8ba85a64574d9dd6";
 
 export default node;

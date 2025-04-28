@@ -51,7 +51,6 @@ const mesureListViewQuery = graphql`
               description
               category
               state
-              importance
               createdAt
               updatedAt
             }
@@ -75,7 +74,6 @@ const importMesureMutation = graphql`
           description
           category
           state
-          importance
           createdAt
           updatedAt
         }
@@ -90,7 +88,6 @@ interface Mesure {
   description?: string;
   state?: string;
   category?: string;
-  importance?: string;
   status?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -523,9 +520,6 @@ function MesureListContent({
                           <thead>
                             <tr className="bg-subtle-bg/30 text-sm font-medium text-tertiary">
                               <th className="w-24 px-4 py-2 text-left">
-                                Importance
-                              </th>
-                              <th className="w-24 px-4 py-2 text-left">
                                 Status
                               </th>
                               <th className="px-4 py-2 text-left">Mesure</th>
@@ -537,11 +531,6 @@ function MesureListContent({
                                 key={mesure.id || Math.random().toString()}
                                 className="hover:bg-h-subtle-bg cursor-pointer"
                               >
-                                <td className="w-24 px-4 py-3 align-middle">
-                                  <Badge variant="outline" className="text-xs">
-                                    {mesure.importance}
-                                  </Badge>
-                                </td>
                                 <td className="w-24 px-4 py-3 align-middle">
                                   <div className="flex items-center justify-center">
                                     {mesure.status
@@ -593,12 +582,6 @@ function MesureListContent({
                                             <h4 className="font-bold text-md">
                                               {mesure.name}
                                             </h4>
-                                            <Badge
-                                              variant="outline"
-                                              className="text-xs"
-                                            >
-                                              {mesure.importance}
-                                            </Badge>
                                           </div>
 
                                           {mesure.description && (

@@ -36,8 +36,7 @@ export default function NewMesureView() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    category: "",
-    importance: "MADATORY" as "MANDATORY" | "PREFERRED" | "ADVANCED",
+    category: ""
   });
 
   const [commit, isInFlight] =
@@ -73,8 +72,7 @@ export default function NewMesureView() {
           organizationId: organizationId!,
           name: formData.name,
           description: formData.description,
-          category: formData.category,
-          importance: formData.importance,
+          category: formData.category
         },
         connections: [connectionId],
       },
@@ -136,52 +134,6 @@ export default function NewMesureView() {
             onChange={(value) => handleFieldChange("category", value)}
             required
           />
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label className="text-sm">Importance</Label>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleFieldChange("importance", "MANDATORY")}
-                  className={cn(
-                    "rounded-full cursor-pointer px-4 py-1 text-sm transition-colors",
-                    formData.importance === "MANDATORY"
-                      ? "bg-red-100 text-red-900 ring-2 ring-red-600 ring-offset-2"
-                      : "bg-secondary-bg text-primary hover:bg-h-secondary-bg"
-                  )}
-                >
-                  Mandatory
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleFieldChange("importance", "PREFERRED")}
-                  className={cn(
-                    "rounded-full cursor-pointer px-4 py-1 text-sm transition-colors",
-                    formData.importance === "PREFERRED"
-                      ? "bg-yellow-100 text-yellow-900 ring-2 ring-yellow-600 ring-offset-2"
-                      : "bg-secondary-bg text-primary hover:bg-h-secondary-bg"
-                  )}
-                >
-                  Preferred
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleFieldChange("importance", "ADVANCED")}
-                  className={cn(
-                    "rounded-full cursor-pointer px-4 py-1 text-sm transition-colors",
-                    formData.importance === "ADVANCED"
-                      ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                      : "bg-secondary-bg text-primary hover:bg-h-secondary-bg"
-                  )}
-                >
-                  Advanced
-                </button>
-              </div>
-            </div>
-          </div>
 
           <div className="flex justify-end gap-3">
             <Button

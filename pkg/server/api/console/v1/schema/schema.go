@@ -283,7 +283,6 @@ type ComplexityRoot struct {
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
-		Importance  func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Risks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) int
 		State       func(childComplexity int) int
@@ -1381,13 +1380,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mesure.ID(childComplexity), true
-
-	case "Mesure.importance":
-		if e.complexity.Mesure.Importance == nil {
-			break
-		}
-
-		return e.complexity.Mesure.Importance(childComplexity), true
 
 	case "Mesure.name":
 		if e.complexity.Mesure.Name == nil {
@@ -3483,22 +3475,6 @@ enum PeopleKind
     )
 }
 
-enum MesureImportance
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.MesureImportance") {
-  MANDATORY
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MesureImportanceMandatory"
-    )
-  PREFERRED
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MesureImportancePreferred"
-    )
-  ADVANCED
-    @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.MesureImportanceAdvanced"
-    )
-}
-
 enum PolicyStatus
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
   DRAFT
@@ -3973,7 +3949,6 @@ type Mesure implements Node {
   name: String!
   description: String!
   state: MesureState!
-  importance: MesureImportance!
 
   tasks(
     first: Int
@@ -4475,7 +4450,6 @@ input CreateMesureInput {
   name: String!
   description: String!
   category: String!
-  importance: MesureImportance!
 }
 
 input UpdateMesureInput {
@@ -4484,7 +4458,6 @@ input UpdateMesureInput {
   description: String
   category: String
   state: MesureState
-  importance: MesureImportance
 }
 
 input ImportMesureInput {
@@ -12165,50 +12138,6 @@ func (ec *executionContext) fieldContext_Mesure_state(_ context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Mesure_importance(ctx context.Context, field graphql.CollectedField, obj *types.Mesure) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mesure_importance(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Importance, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(coredata.MesureImportance)
-	fc.Result = res
-	return ec.marshalNMesureImportance2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mesure_importance(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mesure",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type MesureImportance does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mesure_tasks(ctx context.Context, field graphql.CollectedField, obj *types.Mesure) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mesure_tasks(ctx, field)
 	if err != nil {
@@ -12677,8 +12606,6 @@ func (ec *executionContext) fieldContext_MesureEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Mesure_description(ctx, field)
 			case "state":
 				return ec.fieldContext_Mesure_state(ctx, field)
-			case "importance":
-				return ec.fieldContext_Mesure_importance(ctx, field)
 			case "tasks":
 				return ec.fieldContext_Mesure_tasks(ctx, field)
 			case "risks":
@@ -19912,8 +19839,6 @@ func (ec *executionContext) fieldContext_UpdateMesurePayload_mesure(_ context.Co
 				return ec.fieldContext_Mesure_description(ctx, field)
 			case "state":
 				return ec.fieldContext_Mesure_state(ctx, field)
-			case "importance":
-				return ec.fieldContext_Mesure_importance(ctx, field)
 			case "tasks":
 				return ec.fieldContext_Mesure_tasks(ctx, field)
 			case "risks":
@@ -25922,7 +25847,7 @@ func (ec *executionContext) unmarshalInputCreateMesureInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "description", "category", "importance"}
+	fieldsInOrder := [...]string{"organizationId", "name", "description", "category"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25957,13 +25882,6 @@ func (ec *executionContext) unmarshalInputCreateMesureInput(ctx context.Context,
 				return it, err
 			}
 			it.Category = data
-		case "importance":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("importance"))
-			data, err := ec.unmarshalNMesureImportance2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Importance = data
 		}
 	}
 
@@ -27514,7 +27432,7 @@ func (ec *executionContext) unmarshalInputUpdateMesureInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "category", "state", "importance"}
+	fieldsInOrder := [...]string{"id", "name", "description", "category", "state"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -27556,13 +27474,6 @@ func (ec *executionContext) unmarshalInputUpdateMesureInput(ctx context.Context,
 				return it, err
 			}
 			it.State = data
-		case "importance":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("importance"))
-			data, err := ec.unmarshalOMesureImportance2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Importance = data
 		}
 	}
 
@@ -30414,11 +30325,6 @@ func (ec *executionContext) _Mesure(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "state":
 			out.Values[i] = ec._Mesure_state(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "importance":
-			out.Values[i] = ec._Mesure_importance(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -35733,35 +35639,6 @@ func (ec *executionContext) marshalNMesureEdge2ᚖgithubᚗcomᚋgetproboᚋprob
 	return ec._MesureEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNMesureImportance2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance(ctx context.Context, v any) (coredata.MesureImportance, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalNMesureImportance2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance[tmp]
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNMesureImportance2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance(ctx context.Context, sel ast.SelectionSet, v coredata.MesureImportance) graphql.Marshaler {
-	res := graphql.MarshalString(marshalNMesureImportance2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance[v])
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
-var (
-	unmarshalNMesureImportance2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance = map[string]coredata.MesureImportance{
-		"MANDATORY": coredata.MesureImportanceMandatory,
-		"PREFERRED": coredata.MesureImportancePreferred,
-		"ADVANCED":  coredata.MesureImportanceAdvanced,
-	}
-	marshalNMesureImportance2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance = map[coredata.MesureImportance]string{
-		coredata.MesureImportanceMandatory: "MANDATORY",
-		coredata.MesureImportancePreferred: "PREFERRED",
-		coredata.MesureImportanceAdvanced:  "ADVANCED",
-	}
-)
-
 func (ec *executionContext) unmarshalNMesureOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureOrderField(ctx context.Context, v any) (coredata.MesureOrderField, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := unmarshalNMesureOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureOrderField[tmp]
@@ -37570,36 +37447,6 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	res := graphql.MarshalInt(*v)
 	return res
 }
-
-func (ec *executionContext) unmarshalOMesureImportance2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance(ctx context.Context, v any) (*coredata.MesureImportance, error) {
-	if v == nil {
-		return nil, nil
-	}
-	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalOMesureImportance2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance[tmp]
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOMesureImportance2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance(ctx context.Context, sel ast.SelectionSet, v *coredata.MesureImportance) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalString(marshalOMesureImportance2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance[*v])
-	return res
-}
-
-var (
-	unmarshalOMesureImportance2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance = map[string]coredata.MesureImportance{
-		"MANDATORY": coredata.MesureImportanceMandatory,
-		"PREFERRED": coredata.MesureImportancePreferred,
-		"ADVANCED":  coredata.MesureImportanceAdvanced,
-	}
-	marshalOMesureImportance2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐMesureImportance = map[coredata.MesureImportance]string{
-		coredata.MesureImportanceMandatory: "MANDATORY",
-		coredata.MesureImportancePreferred: "PREFERRED",
-		coredata.MesureImportanceAdvanced:  "ADVANCED",
-	}
-)
 
 func (ec *executionContext) unmarshalOMesureOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMesureOrderBy(ctx context.Context, v any) (*types.MesureOrderBy, error) {
 	if v == nil {

@@ -539,7 +539,6 @@ func (r *mutationResolver) CreateMesure(ctx context.Context, input types.CreateM
 		Name:           input.Name,
 		Description:    input.Description,
 		Category:       input.Category,
-		Importance:     input.Importance,
 	})
 	if err != nil {
 		panic(fmt.Errorf("cannot create mesure: %w", err))
@@ -559,7 +558,6 @@ func (r *mutationResolver) UpdateMesure(ctx context.Context, input types.UpdateM
 		Name:        input.Name,
 		Description: input.Description,
 		Category:    input.Category,
-		Importance:  input.Importance,
 		State:       input.State,
 	})
 	if err != nil {

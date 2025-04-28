@@ -152,7 +152,6 @@ const mesureViewQuery = graphql`
         name
         description
         state
-        importance
         category
         tasks(first: 100) @connection(key: "MesureView_tasks") {
           __id
@@ -573,19 +572,6 @@ function MesureViewContent({
     }
   }, [environment, mesureId]);
 
-  const formatImportance = (importance: string | undefined): string => {
-    if (!importance) return "";
-
-    const upperImportance = importance.toUpperCase();
-
-    if (upperImportance === "MANDATORY") return "Mandatory";
-    if (upperImportance === "PREFERRED") return "Preferred";
-    if (upperImportance === "ADVANCED") return "Advanced";
-
-    const formatted = importance.toLowerCase();
-    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-  };
-
   const formatState = (state: string | undefined): string => {
     if (!state) return "";
 
@@ -609,18 +595,6 @@ function MesureViewContent({
     if (upperState === "IN_PROGRESS") return "bg-blue-100 text-blue-800";
     if (upperState === "NOT_APPLICABLE") return "bg-purple-100 text-purple-800";
     if (upperState === "IMPLEMENTED") return "bg-green-100 text-green-800";
-
-    return "bg-secondary-bg text-primary";
-  };
-
-  const getImportanceColor = (importance: string | undefined): string => {
-    if (!importance) return "bg-secondary-bg text-primary";
-
-    const upperImportance = importance.toUpperCase();
-
-    if (upperImportance === "MANDATORY") return "bg-red-100 text-red-800";
-    if (upperImportance === "PREFERRED") return "bg-orange-100 text-orange-800";
-    if (upperImportance === "ADVANCED") return "bg-blue-100 text-blue-800";
 
     return "bg-secondary-bg text-primary";
   };
@@ -1867,13 +1841,6 @@ function MesureViewContent({
               <SelectItem value="NOT_APPLICABLE">Not Applicable</SelectItem>
             </SelectContent>
           </Select>
-          <div
-            className={`${getImportanceColor(
-              data.mesure.importance
-            )} px-3 py-1 rounded-full text-sm`}
-          >
-            {formatImportance(data.mesure.importance)}
-          </div>
         </div>
       }
     >

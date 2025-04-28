@@ -36,7 +36,6 @@ type (
 		Name           string
 		Description    string
 		Category       string
-		Importance     coredata.MesureImportance
 	}
 
 	UpdateMesureRequest struct {
@@ -45,16 +44,13 @@ type (
 		Description *string
 		Category    *string
 		State       *coredata.MesureState
-		Importance  *coredata.MesureImportance
 	}
 
 	ImportMesureRequest struct {
 		Mesures []struct {
-			Name        string                    `json:"name"`
-			Description string                    `json:"description"`
-			Category    string                    `json:"category"`
-			Importance  coredata.MesureImportance `json:"importance"`
-			ReferenceID string                    `json:"reference-id"`
+			Name        string `json:"name"`
+			Category    string `json:"category"`
+			ReferenceID string `json:"reference-id"`
 			Standards   []struct {
 				Framework string `json:"framework"`
 				Control   string `json:"control"`
@@ -157,11 +153,10 @@ func (s MesureService) Import(
 					ID:             mesureID,
 					OrganizationID: organizationID,
 					Name:           req.Mesures[i].Name,
-					Description:    req.Mesures[i].Description,
+					Description:    "",
 					Category:       req.Mesures[i].Category,
 					State:          coredata.MesureStateNotStarted,
 					ReferenceID:    req.Mesures[i].ReferenceID,
-					Importance:     req.Mesures[i].Importance,
 					CreatedAt:      now,
 					UpdatedAt:      now,
 				}
@@ -289,10 +284,6 @@ func (s MesureService) Update(
 				mesure.State = *req.State
 			}
 
-			if req.Importance != nil {
-				mesure.Importance = *req.Importance
-			}
-
 			mesure.UpdatedAt = time.Now()
 
 			if err := mesure.Update(ctx, conn, s.svc.scope); err != nil {
@@ -359,7 +350,6 @@ func (s MesureService) Create(
 		Category:       req.Category,
 		ReferenceID:    "custom-mesure-" + referenceID.String(),
 		State:          coredata.MesureStateNotStarted,
-		Importance:     req.Importance,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}

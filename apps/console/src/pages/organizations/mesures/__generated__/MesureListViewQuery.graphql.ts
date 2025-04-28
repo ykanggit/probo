@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<90d959a85cf60161201cb5736ac6abcf>>
+ * @generated SignedSource<<23a821bbb6c3645f99e769acaf1ccbee>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type MesureImportance = "ADVANCED" | "MANDATORY" | "PREFERRED";
 export type MesureState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
 export type MesureListViewQuery$variables = {
   first?: number | null | undefined;
@@ -25,7 +24,6 @@ export type MesureListViewQuery$data = {
           readonly createdAt: string;
           readonly description: string;
           readonly id: string;
-          readonly importance: MesureImportance;
           readonly name: string;
           readonly state: MesureState;
           readonly updatedAt: string;
@@ -115,13 +113,6 @@ v5 = [
             "args": null,
             "kind": "ScalarField",
             "name": "state",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "importance",
             "storageKey": null
           },
           {
@@ -279,7 +270,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9f6e9e1487bd34be972a52077bc91ee8",
+    "cacheID": "f71922f62a78f77f2cfc2de55b48f3d6",
     "id": null,
     "metadata": {
       "connection": [
@@ -296,11 +287,11 @@ return {
     },
     "name": "MesureListViewQuery",
     "operationKind": "query",
-    "text": "query MesureListViewQuery(\n  $organizationId: ID!\n  $first: Int\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      mesures(first: $first) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            state\n            importance\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query MesureListViewQuery(\n  $organizationId: ID!\n  $first: Int\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      mesures(first: $first) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            state\n            createdAt\n            updatedAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "47928382749f3bac585927423bcdd09e";
+(node as any).hash = "d5f2d0ddef43b63261b9a9dfbbf08070";
 
 export default node;

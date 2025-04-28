@@ -128,11 +128,10 @@ type CreateFrameworkPayload struct {
 }
 
 type CreateMesureInput struct {
-	OrganizationID gid.GID                   `json:"organizationId"`
-	Name           string                    `json:"name"`
-	Description    string                    `json:"description"`
-	Category       string                    `json:"category"`
-	Importance     coredata.MesureImportance `json:"importance"`
+	OrganizationID gid.GID `json:"organizationId"`
+	Name           string  `json:"name"`
+	Description    string  `json:"description"`
+	Category       string  `json:"category"`
 }
 
 type CreateMesurePayload struct {
@@ -456,17 +455,16 @@ type InviteUserPayload struct {
 }
 
 type Mesure struct {
-	ID          gid.GID                   `json:"id"`
-	Category    string                    `json:"category"`
-	Name        string                    `json:"name"`
-	Description string                    `json:"description"`
-	State       coredata.MesureState      `json:"state"`
-	Importance  coredata.MesureImportance `json:"importance"`
-	Tasks       *TaskConnection           `json:"tasks"`
-	Risks       *RiskConnection           `json:"risks"`
-	Controls    *ControlConnection        `json:"controls"`
-	CreatedAt   time.Time                 `json:"createdAt"`
-	UpdatedAt   time.Time                 `json:"updatedAt"`
+	ID          gid.GID              `json:"id"`
+	Category    string               `json:"category"`
+	Name        string               `json:"name"`
+	Description string               `json:"description"`
+	State       coredata.MesureState `json:"state"`
+	Tasks       *TaskConnection      `json:"tasks"`
+	Risks       *RiskConnection      `json:"risks"`
+	Controls    *ControlConnection   `json:"controls"`
+	CreatedAt   time.Time            `json:"createdAt"`
+	UpdatedAt   time.Time            `json:"updatedAt"`
 }
 
 func (Mesure) IsNode()             {}
@@ -680,12 +678,11 @@ type UpdateFrameworkPayload struct {
 }
 
 type UpdateMesureInput struct {
-	ID          gid.GID                    `json:"id"`
-	Name        *string                    `json:"name,omitempty"`
-	Description *string                    `json:"description,omitempty"`
-	Category    *string                    `json:"category,omitempty"`
-	State       *coredata.MesureState      `json:"state,omitempty"`
-	Importance  *coredata.MesureImportance `json:"importance,omitempty"`
+	ID          gid.GID               `json:"id"`
+	Name        *string               `json:"name,omitempty"`
+	Description *string               `json:"description,omitempty"`
+	Category    *string               `json:"category,omitempty"`
+	State       *coredata.MesureState `json:"state,omitempty"`
 }
 
 type UpdateMesurePayload struct {

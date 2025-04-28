@@ -29,17 +29,16 @@ import (
 
 type (
 	Mesure struct {
-		ID             gid.GID          `db:"id"`
-		TenantID       gid.TenantID     `db:"tenant_id"`
-		OrganizationID gid.GID          `db:"organization_id"`
-		Category       string           `db:"category"`
-		Name           string           `db:"name"`
-		Description    string           `db:"description"`
-		Importance     MesureImportance `db:"importance"`
-		State          MesureState      `db:"state"`
-		ReferenceID    string           `db:"reference_id"`
-		CreatedAt      time.Time        `db:"created_at"`
-		UpdatedAt      time.Time        `db:"updated_at"`
+		ID             gid.GID      `db:"id"`
+		TenantID       gid.TenantID `db:"tenant_id"`
+		OrganizationID gid.GID      `db:"organization_id"`
+		Category       string       `db:"category"`
+		Name           string       `db:"name"`
+		Description    string       `db:"description"`
+		State          MesureState  `db:"state"`
+		ReferenceID    string       `db:"reference_id"`
+		CreatedAt      time.Time    `db:"created_at"`
+		UpdatedAt      time.Time    `db:"updated_at"`
 	}
 
 	Mesures []*Mesure
@@ -71,7 +70,6 @@ WITH msrs AS (
 		m.name,
 		m.description,
 		m.state,
-		m.importance,
 		m.reference_id,
 		m.created_at,
 		m.updated_at
@@ -90,7 +88,6 @@ SELECT
 	name,
 	description,
 	state,
-	importance,
 	reference_id,
 	created_at,
 	updated_at
@@ -137,7 +134,6 @@ WITH mtgtns AS (
 		m.name,
 		m.description,
 		m.state,
-		m.importance,
 		m.reference_id,
 		m.created_at,
 		m.updated_at
@@ -156,7 +152,6 @@ SELECT
 	name,
 	description,
 	state,
-	importance,
 	reference_id,
 	created_at,
 	updated_at
@@ -202,7 +197,6 @@ SELECT
     name,
     description,
     state,
-	importance,
     reference_id,
     created_at,
     updated_at
@@ -249,7 +243,6 @@ SELECT
     name,
     description,
     state,
-	importance,
     reference_id,
     created_at,
     updated_at
@@ -294,7 +287,6 @@ INSERT INTO
         organization_id,
 		category,
         name,
-		importance,
 		state,
         description,
         reference_id,
@@ -307,7 +299,6 @@ VALUES (
     @organization_id,
 	@category,
     @name,
-	@importance,
 	@state,
     @description,
     @reference_id,
@@ -339,7 +330,6 @@ RETURNING
 		"organization_id": m.OrganizationID,
 		"category":        m.Category,
 		"name":            m.Name,
-		"importance":      m.Importance,
 		"state":           m.State,
 		"description":     m.Description,
 		"reference_id":    m.ReferenceID,
@@ -375,7 +365,6 @@ INSERT INTO
         organization_id,
 		category,
         name,
-		importance,
 		state,
         description,
         reference_id,
@@ -388,7 +377,6 @@ VALUES (
     @organization_id,
 	@category,
     @name,
-	@importance,
 	@state,
     @description,
     @reference_id,
@@ -408,7 +396,6 @@ VALUES (
 		"created_at":      m.CreatedAt,
 		"updated_at":      m.UpdatedAt,
 		"state":           m.State,
-		"importance":      m.Importance,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -426,7 +413,6 @@ SET
   description = @description,
   category = @category,
   state = @state,
-  importance = @importance,
   updated_at = @updated_at
 WHERE %s
     AND id = @mesure_id
@@ -439,7 +425,6 @@ WHERE %s
 		"description": m.Description,
 		"category":    m.Category,
 		"state":       m.State,
-		"importance":  m.Importance,
 		"updated_at":  m.UpdatedAt,
 	}
 
