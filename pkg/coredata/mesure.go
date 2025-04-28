@@ -316,7 +316,6 @@ RETURNING
     organization_id,
 	category,
     name,
-	importance,
 	state,
     description,
 	reference_id,
