@@ -75,6 +75,7 @@ func (r *Risks) LoadByMesureID(
 WITH rsks AS (
 	SELECT
 		r.id,
+		r.tenant_id,
 		r.organization_id,
 		r.name,
 		r.description,

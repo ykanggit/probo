@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Fix delete evidence from task list does not work
+- Fix cannot load attached measure risks
 
 ## [0.14.0] - 2025-04-24
 
