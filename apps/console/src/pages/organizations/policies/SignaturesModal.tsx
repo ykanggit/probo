@@ -100,21 +100,6 @@ interface SignaturesModalProps {
   } | null;
 }
 
-// Define the signature type based on the GraphQL response
-// interface Signature {
-//   id: string;
-//   state: string;
-//   signedAt?: string | null;
-//   requestedAt: string;
-//   signedBy: {
-//     fullName: string;
-//     id: string;
-//   } | null;
-//   requestedBy: {
-//     fullName: string;
-//   } | null;
-// }
-
 export function SignaturesModal({ 
   isOpen, 
   onClose, 
@@ -126,10 +111,7 @@ export function SignaturesModal({
     policyRef
   );
   
-  // Safely access and extract version nodes
   const versionNodes = (data?.policyVersions?.edges?.map(edge => edge.node) || []);
-    
-  // Filter to just published versions and sort by version number
   const publishedVersions = versionNodes
     .filter(v => v.status === "PUBLISHED")
     .sort((a, b) => b.version - a.version);
@@ -147,7 +129,6 @@ export function SignaturesModal({
   
   const [commitRequestSignature] = useMutation<SignaturesModalRequestSignatureMutation>(requestSignatureMutation);
   
-  // Load organization data when the modal opens and we have a valid version selected
   useEffect(() => {
     if (isOpen && organizationId && selectedVersionData?.status === "PUBLISHED") {
       loadQuery({ organizationId });
@@ -160,7 +141,6 @@ export function SignaturesModal({
     return format(date, "h:mm a • MMM d, yyyy");
   };
 
-  // Safely type signatures as our defined Signature interface
   const signatures = selectedVersionData?.signatures?.edges?.map(edge => edge.node) || [];
   
   const handleRequestSignature = (personId: string) => {

@@ -592,9 +592,9 @@ export function Control({
     return policies.filter((policy) => {
       return (
         !policySearchQuery ||
-        policy.name?.toLowerCase().includes(policySearchQuery.toLowerCase()) ||
-        (policy.content &&
-          policy.content
+        policy.title?.toLowerCase().includes(policySearchQuery.toLowerCase()) ||
+        (policy.description &&
+          policy.description
             .toLowerCase()
             .includes(policySearchQuery.toLowerCase()))
       );
@@ -1092,18 +1092,18 @@ export function Control({
                               >
                                 <td className="py-3 px-4">
                                   <div className="font-medium">
-                                    {policy.name}
+                                    {policy.title}
                                   </div>
-                                  {policy.content && (
+                                  {policy.description && (
                                     <div className="text-xs text-secondary line-clamp-1 mt-0.5">
-                                      {policy.content}
+                                      {policy.description}
                                     </div>
                                   )}
                                 </td>
                                 <td className="py-3 px-4">
-                                  {policy.reviewDate
+                                  {policy.updatedAt
                                     ? new Date(
-                                        policy.reviewDate
+                                        policy.updatedAt
                                       ).toLocaleDateString()
                                     : "Not set"}
                                 </td>
@@ -1202,16 +1202,16 @@ export function Control({
                         className="border-b hover:bg-invert-bg"
                       >
                         <td className="py-3 px-4">
-                          <div className="font-medium">{policy.name}</div>
-                          {policy.content && (
+                          <div className="font-medium">{policy.title}</div>
+                          {policy.description && (
                             <div className="text-xs text-secondary line-clamp-1 mt-0.5">
-                              {policy.content}
+                              {policy.description}
                             </div>
                           )}
                         </td>
                         <td className="py-3 px-4">
-                          {policy.reviewDate
-                            ? new Date(policy.reviewDate).toLocaleDateString()
+                          {policy.updatedAt
+                            ? new Date(policy.updatedAt).toLocaleDateString()
                             : "Not set"}
                         </td>
                         <td className="py-3 px-4 text-right whitespace-nowrap">
