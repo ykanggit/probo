@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Policy history
+- Policy signature
+
 ### Fixed
 
 - Fix cannot delete measure with linked risk
