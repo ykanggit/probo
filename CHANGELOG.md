@@ -13,6 +13,10 @@ All notable changes to this project will be documented in this file.
 
 - Remove `importance` field from measure as it's not used anymore
 
+### Fixed
+
+- Fix delete evidence from task list does not work
+
 ## [0.14.0] - 2025-04-24
 
 ### Added

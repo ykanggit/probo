@@ -2752,13 +2752,11 @@ function MesureViewContent({
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        if (selectedTask) {
-                                          handleDeleteEvidence(
-                                            evidence.id,
-                                            evidence.filename,
-                                            selectedTask.id
-                                          );
-                                        }
+                                        handleDeleteEvidence(
+                                          evidence.id,
+                                          evidence.filename,
+                                          task.id
+                                        );
                                       }}
                                       className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
                                       title="Delete"
