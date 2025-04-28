@@ -59,8 +59,6 @@ export function VersionHistoryModal({
   const latestVersion = versions.length > 0 ? versions[0].version : 0;
   const [selectedVersion, setSelectedVersion] = useState<number>(latestVersion);
   
-  const currentVersionData = versions.find(v => v.version === selectedVersion);
-  
   // Format time helper for version history
   const formatDateTime = (dateString?: string | null) => {
     if (!dateString) return "N/A";
