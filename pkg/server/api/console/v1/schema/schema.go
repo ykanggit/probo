@@ -49,6 +49,8 @@ type ResolverRoot interface {
 	Mutation() MutationResolver
 	Organization() OrganizationResolver
 	Policy() PolicyResolver
+	PolicyVersion() PolicyVersionResolver
+	PolicyVersionSignature() PolicyVersionSignatureResolver
 	Query() QueryResolver
 	Risk() RiskResolver
 	Task() TaskResolver
@@ -118,6 +120,10 @@ type ComplexityRoot struct {
 		Success func(childComplexity int) int
 	}
 
+	CreateDraftPolicyVersionPayload struct {
+		PolicyVersionEdge func(childComplexity int) int
+	}
+
 	CreateEvidencePayload struct {
 		EvidenceEdge func(childComplexity int) int
 	}
@@ -139,7 +145,8 @@ type ComplexityRoot struct {
 	}
 
 	CreatePolicyPayload struct {
-		PolicyEdge func(childComplexity int) int
+		PolicyEdge        func(childComplexity int) int
+		PolicyVersionEdge func(childComplexity int) int
 	}
 
 	CreateRiskMesureMappingPayload struct {
@@ -309,6 +316,7 @@ type ComplexityRoot struct {
 		ConfirmEmail                 func(childComplexity int, input types.ConfirmEmailInput) int
 		CreateControlMesureMapping   func(childComplexity int, input types.CreateControlMesureMappingInput) int
 		CreateControlPolicyMapping   func(childComplexity int, input types.CreateControlPolicyMappingInput) int
+		CreateDraftPolicyVersion     func(childComplexity int, input types.CreateDraftPolicyVersionInput) int
 		CreateEvidence               func(childComplexity int, input types.CreateEvidenceInput) int
 		CreateFramework              func(childComplexity int, input types.CreateFrameworkInput) int
 		CreateMesure                 func(childComplexity int, input types.CreateMesureInput) int
@@ -339,14 +347,16 @@ type ComplexityRoot struct {
 		ImportFramework              func(childComplexity int, input types.ImportFrameworkInput) int
 		ImportMesure                 func(childComplexity int, input types.ImportMesureInput) int
 		InviteUser                   func(childComplexity int, input types.InviteUserInput) int
+		PublishPolicyVersion         func(childComplexity int, input types.PublishPolicyVersionInput) int
 		RemoveUser                   func(childComplexity int, input types.RemoveUserInput) int
 		RequestEvidence              func(childComplexity int, input types.RequestEvidenceInput) int
+		RequestSignature             func(childComplexity int, input types.RequestSignatureInput) int
 		UnassignTask                 func(childComplexity int, input types.UnassignTaskInput) int
 		UpdateFramework              func(childComplexity int, input types.UpdateFrameworkInput) int
 		UpdateMesure                 func(childComplexity int, input types.UpdateMesureInput) int
 		UpdateOrganization           func(childComplexity int, input types.UpdateOrganizationInput) int
 		UpdatePeople                 func(childComplexity int, input types.UpdatePeopleInput) int
-		UpdatePolicy                 func(childComplexity int, input types.UpdatePolicyInput) int
+		UpdatePolicyVersion          func(childComplexity int, input types.UpdatePolicyVersionInput) int
 		UpdateRisk                   func(childComplexity int, input types.UpdateRiskInput) int
 		UpdateTask                   func(childComplexity int, input types.UpdateTaskInput) int
 		UpdateVendor                 func(childComplexity int, input types.UpdateVendorInput) int
@@ -407,15 +417,15 @@ type ComplexityRoot struct {
 	}
 
 	Policy struct {
-		Content    func(childComplexity int) int
-		Controls   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) int
-		CreatedAt  func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Name       func(childComplexity int) int
-		Owner      func(childComplexity int) int
-		ReviewDate func(childComplexity int) int
-		Status     func(childComplexity int) int
-		UpdatedAt  func(childComplexity int) int
+		Controls                func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) int
+		CreatedAt               func(childComplexity int) int
+		CurrentPublishedVersion func(childComplexity int) int
+		Description             func(childComplexity int) int
+		ID                      func(childComplexity int) int
+		Owner                   func(childComplexity int) int
+		Title                   func(childComplexity int) int
+		UpdatedAt               func(childComplexity int) int
+		Versions                func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyVersionOrderBy, filter *types.PolicyVersionFilter) int
 	}
 
 	PolicyConnection struct {
@@ -426,6 +436,57 @@ type ComplexityRoot struct {
 	PolicyEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
+	}
+
+	PolicyVersion struct {
+		Changelog   func(childComplexity int) int
+		Content     func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Policy      func(childComplexity int) int
+		PublishedAt func(childComplexity int) int
+		PublishedBy func(childComplexity int) int
+		Signatures  func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyVersionSignatureOrder) int
+		Status      func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
+		Version     func(childComplexity int) int
+	}
+
+	PolicyVersionConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	PolicyVersionEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	PolicyVersionSignature struct {
+		CreatedAt     func(childComplexity int) int
+		ID            func(childComplexity int) int
+		PolicyVersion func(childComplexity int) int
+		RequestedAt   func(childComplexity int) int
+		RequestedBy   func(childComplexity int) int
+		SignedAt      func(childComplexity int) int
+		SignedBy      func(childComplexity int) int
+		State         func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+	}
+
+	PolicyVersionSignatureConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	PolicyVersionSignatureEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	PublishPolicyVersionPayload struct {
+		Policy        func(childComplexity int) int
+		PolicyVersion func(childComplexity int) int
 	}
 
 	Query struct {
@@ -439,6 +500,10 @@ type ComplexityRoot struct {
 
 	RequestEvidencePayload struct {
 		EvidenceEdge func(childComplexity int) int
+	}
+
+	RequestSignaturePayload struct {
+		PolicyVersionSignatureEdge func(childComplexity int) int
 	}
 
 	Risk struct {
@@ -521,6 +586,10 @@ type ComplexityRoot struct {
 
 	UpdatePolicyPayload struct {
 		Policy func(childComplexity int) int
+	}
+
+	UpdatePolicyVersionPayload struct {
+		PolicyVersion func(childComplexity int) int
 	}
 
 	UpdateRiskPayload struct {
@@ -704,8 +773,11 @@ type MutationResolver interface {
 	UploadVendorComplianceReport(ctx context.Context, input types.UploadVendorComplianceReportInput) (*types.UploadVendorComplianceReportPayload, error)
 	DeleteVendorComplianceReport(ctx context.Context, input types.DeleteVendorComplianceReportInput) (*types.DeleteVendorComplianceReportPayload, error)
 	CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error)
-	UpdatePolicy(ctx context.Context, input types.UpdatePolicyInput) (*types.UpdatePolicyPayload, error)
 	DeletePolicy(ctx context.Context, input types.DeletePolicyInput) (*types.DeletePolicyPayload, error)
+	PublishPolicyVersion(ctx context.Context, input types.PublishPolicyVersionInput) (*types.PublishPolicyVersionPayload, error)
+	CreateDraftPolicyVersion(ctx context.Context, input types.CreateDraftPolicyVersionInput) (*types.CreateDraftPolicyVersionPayload, error)
+	UpdatePolicyVersion(ctx context.Context, input types.UpdatePolicyVersionInput) (*types.UpdatePolicyVersionPayload, error)
+	RequestSignature(ctx context.Context, input types.RequestSignatureInput) (*types.RequestSignaturePayload, error)
 	CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error)
 }
 type OrganizationResolver interface {
@@ -721,7 +793,21 @@ type OrganizationResolver interface {
 }
 type PolicyResolver interface {
 	Owner(ctx context.Context, obj *types.Policy) (*types.People, error)
+	Versions(ctx context.Context, obj *types.Policy, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyVersionOrderBy, filter *types.PolicyVersionFilter) (*types.PolicyVersionConnection, error)
 	Controls(ctx context.Context, obj *types.Policy, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
+}
+type PolicyVersionResolver interface {
+	Policy(ctx context.Context, obj *types.PolicyVersion) (*types.Policy, error)
+
+	Signatures(ctx context.Context, obj *types.PolicyVersion, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyVersionSignatureOrder) (*types.PolicyVersionSignatureConnection, error)
+	PublishedBy(ctx context.Context, obj *types.PolicyVersion) (*types.People, error)
+}
+type PolicyVersionSignatureResolver interface {
+	PolicyVersion(ctx context.Context, obj *types.PolicyVersionSignature) (*types.PolicyVersion, error)
+
+	SignedBy(ctx context.Context, obj *types.PolicyVersionSignature) (*types.People, error)
+
+	RequestedBy(ctx context.Context, obj *types.PolicyVersionSignature) (*types.People, error)
 }
 type QueryResolver interface {
 	Node(ctx context.Context, id gid.GID) (types.Node, error)
@@ -964,6 +1050,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CreateControlPolicyMappingPayload.Success(childComplexity), true
 
+	case "CreateDraftPolicyVersionPayload.policyVersionEdge":
+		if e.complexity.CreateDraftPolicyVersionPayload.PolicyVersionEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateDraftPolicyVersionPayload.PolicyVersionEdge(childComplexity), true
+
 	case "CreateEvidencePayload.evidenceEdge":
 		if e.complexity.CreateEvidencePayload.EvidenceEdge == nil {
 			break
@@ -1005,6 +1098,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreatePolicyPayload.PolicyEdge(childComplexity), true
+
+	case "CreatePolicyPayload.policyVersionEdge":
+		if e.complexity.CreatePolicyPayload.PolicyVersionEdge == nil {
+			break
+		}
+
+		return e.complexity.CreatePolicyPayload.PolicyVersionEdge(childComplexity), true
 
 	case "CreateRiskMesureMappingPayload.success":
 		if e.complexity.CreateRiskMesureMappingPayload.Success == nil {
@@ -1515,6 +1615,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateControlPolicyMapping(childComplexity, args["input"].(types.CreateControlPolicyMappingInput)), true
 
+	case "Mutation.createDraftPolicyVersion":
+		if e.complexity.Mutation.CreateDraftPolicyVersion == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createDraftPolicyVersion_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateDraftPolicyVersion(childComplexity, args["input"].(types.CreateDraftPolicyVersionInput)), true
+
 	case "Mutation.createEvidence":
 		if e.complexity.Mutation.CreateEvidence == nil {
 			break
@@ -1875,6 +1987,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.InviteUser(childComplexity, args["input"].(types.InviteUserInput)), true
 
+	case "Mutation.publishPolicyVersion":
+		if e.complexity.Mutation.PublishPolicyVersion == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_publishPolicyVersion_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PublishPolicyVersion(childComplexity, args["input"].(types.PublishPolicyVersionInput)), true
+
 	case "Mutation.removeUser":
 		if e.complexity.Mutation.RemoveUser == nil {
 			break
@@ -1898,6 +2022,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.RequestEvidence(childComplexity, args["input"].(types.RequestEvidenceInput)), true
+
+	case "Mutation.requestSignature":
+		if e.complexity.Mutation.RequestSignature == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_requestSignature_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RequestSignature(childComplexity, args["input"].(types.RequestSignatureInput)), true
 
 	case "Mutation.unassignTask":
 		if e.complexity.Mutation.UnassignTask == nil {
@@ -1959,17 +2095,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdatePeople(childComplexity, args["input"].(types.UpdatePeopleInput)), true
 
-	case "Mutation.updatePolicy":
-		if e.complexity.Mutation.UpdatePolicy == nil {
+	case "Mutation.updatePolicyVersion":
+		if e.complexity.Mutation.UpdatePolicyVersion == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updatePolicy_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updatePolicyVersion_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdatePolicy(childComplexity, args["input"].(types.UpdatePolicyInput)), true
+		return e.complexity.Mutation.UpdatePolicyVersion(childComplexity, args["input"].(types.UpdatePolicyVersionInput)), true
 
 	case "Mutation.updateRisk":
 		if e.complexity.Mutation.UpdateRisk == nil {
@@ -2283,13 +2419,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PeopleEdge.Node(childComplexity), true
 
-	case "Policy.content":
-		if e.complexity.Policy.Content == nil {
-			break
-		}
-
-		return e.complexity.Policy.Content(childComplexity), true
-
 	case "Policy.controls":
 		if e.complexity.Policy.Controls == nil {
 			break
@@ -2309,19 +2438,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Policy.CreatedAt(childComplexity), true
 
+	case "Policy.currentPublishedVersion":
+		if e.complexity.Policy.CurrentPublishedVersion == nil {
+			break
+		}
+
+		return e.complexity.Policy.CurrentPublishedVersion(childComplexity), true
+
+	case "Policy.description":
+		if e.complexity.Policy.Description == nil {
+			break
+		}
+
+		return e.complexity.Policy.Description(childComplexity), true
+
 	case "Policy.id":
 		if e.complexity.Policy.ID == nil {
 			break
 		}
 
 		return e.complexity.Policy.ID(childComplexity), true
-
-	case "Policy.name":
-		if e.complexity.Policy.Name == nil {
-			break
-		}
-
-		return e.complexity.Policy.Name(childComplexity), true
 
 	case "Policy.owner":
 		if e.complexity.Policy.Owner == nil {
@@ -2330,19 +2466,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Policy.Owner(childComplexity), true
 
-	case "Policy.reviewDate":
-		if e.complexity.Policy.ReviewDate == nil {
+	case "Policy.title":
+		if e.complexity.Policy.Title == nil {
 			break
 		}
 
-		return e.complexity.Policy.ReviewDate(childComplexity), true
-
-	case "Policy.status":
-		if e.complexity.Policy.Status == nil {
-			break
-		}
-
-		return e.complexity.Policy.Status(childComplexity), true
+		return e.complexity.Policy.Title(childComplexity), true
 
 	case "Policy.updatedAt":
 		if e.complexity.Policy.UpdatedAt == nil {
@@ -2350,6 +2479,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Policy.UpdatedAt(childComplexity), true
+
+	case "Policy.versions":
+		if e.complexity.Policy.Versions == nil {
+			break
+		}
+
+		args, err := ec.field_Policy_versions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Policy.Versions(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.PolicyVersionOrderBy), args["filter"].(*types.PolicyVersionFilter)), true
 
 	case "PolicyConnection.edges":
 		if e.complexity.PolicyConnection.Edges == nil {
@@ -2378,6 +2519,221 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PolicyEdge.Node(childComplexity), true
+
+	case "PolicyVersion.changelog":
+		if e.complexity.PolicyVersion.Changelog == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersion.Changelog(childComplexity), true
+
+	case "PolicyVersion.content":
+		if e.complexity.PolicyVersion.Content == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersion.Content(childComplexity), true
+
+	case "PolicyVersion.createdAt":
+		if e.complexity.PolicyVersion.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersion.CreatedAt(childComplexity), true
+
+	case "PolicyVersion.id":
+		if e.complexity.PolicyVersion.ID == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersion.ID(childComplexity), true
+
+	case "PolicyVersion.policy":
+		if e.complexity.PolicyVersion.Policy == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersion.Policy(childComplexity), true
+
+	case "PolicyVersion.publishedAt":
+		if e.complexity.PolicyVersion.PublishedAt == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersion.PublishedAt(childComplexity), true
+
+	case "PolicyVersion.publishedBy":
+		if e.complexity.PolicyVersion.PublishedBy == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersion.PublishedBy(childComplexity), true
+
+	case "PolicyVersion.signatures":
+		if e.complexity.PolicyVersion.Signatures == nil {
+			break
+		}
+
+		args, err := ec.field_PolicyVersion_signatures_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.PolicyVersion.Signatures(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.PolicyVersionSignatureOrder)), true
+
+	case "PolicyVersion.status":
+		if e.complexity.PolicyVersion.Status == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersion.Status(childComplexity), true
+
+	case "PolicyVersion.updatedAt":
+		if e.complexity.PolicyVersion.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersion.UpdatedAt(childComplexity), true
+
+	case "PolicyVersion.version":
+		if e.complexity.PolicyVersion.Version == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersion.Version(childComplexity), true
+
+	case "PolicyVersionConnection.edges":
+		if e.complexity.PolicyVersionConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionConnection.Edges(childComplexity), true
+
+	case "PolicyVersionConnection.pageInfo":
+		if e.complexity.PolicyVersionConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionConnection.PageInfo(childComplexity), true
+
+	case "PolicyVersionEdge.cursor":
+		if e.complexity.PolicyVersionEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionEdge.Cursor(childComplexity), true
+
+	case "PolicyVersionEdge.node":
+		if e.complexity.PolicyVersionEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionEdge.Node(childComplexity), true
+
+	case "PolicyVersionSignature.createdAt":
+		if e.complexity.PolicyVersionSignature.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignature.CreatedAt(childComplexity), true
+
+	case "PolicyVersionSignature.id":
+		if e.complexity.PolicyVersionSignature.ID == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignature.ID(childComplexity), true
+
+	case "PolicyVersionSignature.policyVersion":
+		if e.complexity.PolicyVersionSignature.PolicyVersion == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignature.PolicyVersion(childComplexity), true
+
+	case "PolicyVersionSignature.requestedAt":
+		if e.complexity.PolicyVersionSignature.RequestedAt == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignature.RequestedAt(childComplexity), true
+
+	case "PolicyVersionSignature.requestedBy":
+		if e.complexity.PolicyVersionSignature.RequestedBy == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignature.RequestedBy(childComplexity), true
+
+	case "PolicyVersionSignature.signedAt":
+		if e.complexity.PolicyVersionSignature.SignedAt == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignature.SignedAt(childComplexity), true
+
+	case "PolicyVersionSignature.signedBy":
+		if e.complexity.PolicyVersionSignature.SignedBy == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignature.SignedBy(childComplexity), true
+
+	case "PolicyVersionSignature.state":
+		if e.complexity.PolicyVersionSignature.State == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignature.State(childComplexity), true
+
+	case "PolicyVersionSignature.updatedAt":
+		if e.complexity.PolicyVersionSignature.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignature.UpdatedAt(childComplexity), true
+
+	case "PolicyVersionSignatureConnection.edges":
+		if e.complexity.PolicyVersionSignatureConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignatureConnection.Edges(childComplexity), true
+
+	case "PolicyVersionSignatureConnection.pageInfo":
+		if e.complexity.PolicyVersionSignatureConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignatureConnection.PageInfo(childComplexity), true
+
+	case "PolicyVersionSignatureEdge.cursor":
+		if e.complexity.PolicyVersionSignatureEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignatureEdge.Cursor(childComplexity), true
+
+	case "PolicyVersionSignatureEdge.node":
+		if e.complexity.PolicyVersionSignatureEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.PolicyVersionSignatureEdge.Node(childComplexity), true
+
+	case "PublishPolicyVersionPayload.policy":
+		if e.complexity.PublishPolicyVersionPayload.Policy == nil {
+			break
+		}
+
+		return e.complexity.PublishPolicyVersionPayload.Policy(childComplexity), true
+
+	case "PublishPolicyVersionPayload.policyVersion":
+		if e.complexity.PublishPolicyVersionPayload.PolicyVersion == nil {
+			break
+		}
+
+		return e.complexity.PublishPolicyVersionPayload.PolicyVersion(childComplexity), true
 
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
@@ -2411,6 +2767,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.RequestEvidencePayload.EvidenceEdge(childComplexity), true
+
+	case "RequestSignaturePayload.policyVersionSignatureEdge":
+		if e.complexity.RequestSignaturePayload.PolicyVersionSignatureEdge == nil {
+			break
+		}
+
+		return e.complexity.RequestSignaturePayload.PolicyVersionSignatureEdge(childComplexity), true
 
 	case "Risk.category":
 		if e.complexity.Risk.Category == nil {
@@ -2732,6 +3095,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdatePolicyPayload.Policy(childComplexity), true
+
+	case "UpdatePolicyVersionPayload.policyVersion":
+		if e.complexity.UpdatePolicyVersionPayload.PolicyVersion == nil {
+			break
+		}
+
+		return e.complexity.UpdatePolicyVersionPayload.PolicyVersion(childComplexity), true
 
 	case "UpdateRiskPayload.risk":
 		if e.complexity.UpdateRiskPayload.Risk == nil {
@@ -3257,6 +3627,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputControlOrder,
 		ec.unmarshalInputCreateControlMesureMappingInput,
 		ec.unmarshalInputCreateControlPolicyMappingInput,
+		ec.unmarshalInputCreateDraftPolicyVersionInput,
 		ec.unmarshalInputCreateEvidenceInput,
 		ec.unmarshalInputCreateFrameworkInput,
 		ec.unmarshalInputCreateMesureInput,
@@ -3293,8 +3664,13 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputOrganizationOrder,
 		ec.unmarshalInputPeopleOrder,
 		ec.unmarshalInputPolicyOrder,
+		ec.unmarshalInputPolicyVersionFilter,
+		ec.unmarshalInputPolicyVersionOrder,
+		ec.unmarshalInputPolicyVersionSignatureOrder,
+		ec.unmarshalInputPublishPolicyVersionInput,
 		ec.unmarshalInputRemoveUserInput,
 		ec.unmarshalInputRequestEvidenceInput,
+		ec.unmarshalInputRequestSignatureInput,
 		ec.unmarshalInputRiskOrder,
 		ec.unmarshalInputTaskOrder,
 		ec.unmarshalInputUnassignTaskInput,
@@ -3303,6 +3679,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateOrganizationInput,
 		ec.unmarshalInputUpdatePeopleInput,
 		ec.unmarshalInputUpdatePolicyInput,
+		ec.unmarshalInputUpdatePolicyVersionInput,
 		ec.unmarshalInputUpdateRiskInput,
 		ec.unmarshalInputUpdateTaskInput,
 		ec.unmarshalInputUpdateVendorInput,
@@ -3505,8 +3882,8 @@ enum PolicyStatus
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
   DRAFT
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft")
-  ACTIVE
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusActive")
+  PUBLISHED
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusPublished")
 }
 
 enum EvidenceType
@@ -3594,7 +3971,14 @@ enum TaskOrderField
 
 enum PolicyOrderField
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyOrderField") {
-  NAME
+  TITLE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyOrderFieldTitle"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyOrderFieldCreatedAt"
+    )
 }
 
 enum RiskOrderField
@@ -3668,6 +4052,18 @@ enum BusinessImpact
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactHigh")
   CRITICAL
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactCritical")
+}
+
+enum PolicyVersionOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderField") {
+  VERSION
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderFieldVersion"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderFieldCreatedAt"
+    )
 }
 
 # Order Input Types
@@ -3767,6 +4163,18 @@ input OrganizationOrder {
 input ConnectorOrder {
   field: ConnectorOrderField!
   direction: OrderDirection!
+}
+
+input PolicyVersionOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.PolicyVersionOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: PolicyVersionOrderField!
+}
+
+input PolicyVersionFilter {
+  status: PolicyStatus
 }
 
 # Core Types
@@ -4041,11 +4449,19 @@ type Evidence implements Node {
 
 type Policy implements Node {
   id: ID!
-  name: String!
-  status: PolicyStatus!
-  content: String!
-  reviewDate: Datetime
+  title: String!
+  description: String!
+  currentPublishedVersion: Int
   owner: People! @goField(forceResolver: true)
+
+  versions(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: PolicyVersionOrder
+    filter: PolicyVersionFilter
+  ): PolicyVersionConnection! @goField(forceResolver: true)
 
   controls(
     first: Int
@@ -4262,6 +4678,16 @@ type VendorRiskAssessmentEdge {
   node: VendorRiskAssessment!
 }
 
+type PolicyVersionConnection {
+  edges: [PolicyVersionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PolicyVersionEdge {
+  cursor: CursorKey!
+  node: PolicyVersion!
+}
+
 # Root Types
 type Query {
   node(id: ID!): Node!
@@ -4362,8 +4788,11 @@ type Mutation {
 
   # Policy mutations
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
-  updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
+  publishPolicyVersion(input: PublishPolicyVersionInput!): PublishPolicyVersionPayload!
+  createDraftPolicyVersion(input: CreateDraftPolicyVersionInput!): CreateDraftPolicyVersionPayload!
+  updatePolicyVersion(input: UpdatePolicyVersionInput!): UpdatePolicyVersionPayload!
+  requestSignature(input: RequestSignatureInput!): RequestSignaturePayload!
 
   createVendorRiskAssessment(input: CreateVendorRiskAssessmentInput!): CreateVendorRiskAssessmentPayload!
 }
@@ -4634,20 +5063,17 @@ input DeleteVendorComplianceReportInput {
 
 input CreatePolicyInput {
   organizationId: ID!
-  name: String!
+  title: String!
   content: String!
-  status: PolicyStatus!
-  reviewDate: Datetime
   ownerId: ID!
 }
 
 input UpdatePolicyInput {
   id: ID!
-  name: String
+  title: String
   content: String
-  status: PolicyStatus
-  reviewDate: Datetime
   ownerId: ID
+  createdBy: ID
 }
 
 input DeletePolicyInput {
@@ -4824,6 +5250,7 @@ type DeleteVendorComplianceReportPayload {
 
 type CreatePolicyPayload {
   policyEdge: PolicyEdge!
+  policyVersionEdge: PolicyVersionEdge!
 }
 
 type UpdatePolicyPayload {
@@ -4899,7 +5326,116 @@ input DeleteMesureInput {
 
 type DeleteMesurePayload {
   deletedMesureId: ID!
-}`, BuiltIn: false},
+}
+
+type PolicyVersion implements Node {
+  id: ID!
+  policy: Policy! @goField(forceResolver: true)
+  status: PolicyStatus!
+  version: Int!
+  content: String!
+  changelog: String!
+
+  signatures(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: PolicyVersionSignatureOrder
+  ): PolicyVersionSignatureConnection! @goField(forceResolver: true)
+
+  publishedBy: People @goField(forceResolver: true)
+  publishedAt: Datetime
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type PolicyVersionSignatureConnection {
+  edges: [PolicyVersionSignatureEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PolicyVersionSignatureEdge {
+  cursor: CursorKey!
+  node: PolicyVersionSignature!
+}
+
+input PolicyVersionSignatureOrder {
+  field: PolicyVersionSignatureOrderField!
+  direction: OrderDirection!
+}
+
+enum PolicyVersionSignatureState
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureState") {
+  REQUESTED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureStateRequested"
+    )
+  SIGNED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureStateSigned"
+    )
+}
+
+enum PolicyVersionSignatureOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderFieldCreatedAt"
+    )
+  SIGNED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderFieldSignedAt"
+    )
+}
+
+type PolicyVersionSignature implements Node {
+  id: ID!
+  policyVersion: PolicyVersion! @goField(forceResolver: true)
+  state: PolicyVersionSignatureState!
+  signedBy: People! @goField(forceResolver: true)
+  signedAt: Datetime
+  requestedAt: Datetime!
+  requestedBy: People! @goField(forceResolver: true)
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+input RequestSignatureInput {
+  policyVersionId: ID!
+  signatoryId: ID!
+}
+
+type RequestSignaturePayload {
+  policyVersionSignatureEdge: PolicyVersionSignatureEdge!
+}
+
+input PublishPolicyVersionInput {
+  policyId: ID!
+}
+
+type PublishPolicyVersionPayload {
+  policyVersion: PolicyVersion!
+  policy: Policy!
+}
+
+type CreateDraftPolicyVersionPayload {
+  policyVersionEdge: PolicyVersionEdge!
+}
+
+input CreateDraftPolicyVersionInput {
+  policyID: ID!
+}
+
+input UpdatePolicyVersionInput {
+  policyVersionId: ID!
+  content: String!
+}
+
+type UpdatePolicyVersionPayload {
+  policyVersion: PolicyVersion!
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -5566,6 +6102,29 @@ func (ec *executionContext) field_Mutation_createControlPolicyMapping_argsInput(
 	}
 
 	var zeroVal types.CreateControlPolicyMappingInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createDraftPolicyVersion_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createDraftPolicyVersion_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createDraftPolicyVersion_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateDraftPolicyVersionInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateDraftPolicyVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDraftPolicyVersionInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateDraftPolicyVersionInput
 	return zeroVal, nil
 }
 
@@ -6259,6 +6818,29 @@ func (ec *executionContext) field_Mutation_inviteUser_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_publishPolicyVersion_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_publishPolicyVersion_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_publishPolicyVersion_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.PublishPolicyVersionInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNPublishPolicyVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPublishPolicyVersionInput(ctx, tmp)
+	}
+
+	var zeroVal types.PublishPolicyVersionInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_removeUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -6302,6 +6884,29 @@ func (ec *executionContext) field_Mutation_requestEvidence_argsInput(
 	}
 
 	var zeroVal types.RequestEvidenceInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_requestSignature_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_requestSignature_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_requestSignature_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.RequestSignatureInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNRequestSignatureInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRequestSignatureInput(ctx, tmp)
+	}
+
+	var zeroVal types.RequestSignatureInput
 	return zeroVal, nil
 }
 
@@ -6420,26 +7025,26 @@ func (ec *executionContext) field_Mutation_updatePeople_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updatePolicy_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Mutation_updatePolicyVersion_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Mutation_updatePolicy_argsInput(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_updatePolicyVersion_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["input"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_Mutation_updatePolicy_argsInput(
+func (ec *executionContext) field_Mutation_updatePolicyVersion_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (types.UpdatePolicyInput, error) {
+) (types.UpdatePolicyVersionInput, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNUpdatePolicyInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyInput(ctx, tmp)
+		return ec.unmarshalNUpdatePolicyVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyVersionInput(ctx, tmp)
 	}
 
-	var zeroVal types.UpdatePolicyInput
+	var zeroVal types.UpdatePolicyVersionInput
 	return zeroVal, nil
 }
 
@@ -7295,6 +7900,101 @@ func (ec *executionContext) field_Organization_vendors_argsOrderBy(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_PolicyVersion_signatures_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_PolicyVersion_signatures_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_PolicyVersion_signatures_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_PolicyVersion_signatures_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_PolicyVersion_signatures_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_PolicyVersion_signatures_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_PolicyVersion_signatures_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_PolicyVersion_signatures_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_PolicyVersion_signatures_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_PolicyVersion_signatures_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_PolicyVersion_signatures_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.PolicyVersionSignatureOrder, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOPolicyVersionSignatureOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignatureOrder(ctx, tmp)
+	}
+
+	var zeroVal *types.PolicyVersionSignatureOrder
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Policy_controls_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -7387,6 +8087,119 @@ func (ec *executionContext) field_Policy_controls_argsOrderBy(
 	}
 
 	var zeroVal *types.ControlOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Policy_versions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Policy_versions_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Policy_versions_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Policy_versions_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Policy_versions_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Policy_versions_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	arg5, err := ec.field_Policy_versions_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
+	return args, nil
+}
+func (ec *executionContext) field_Policy_versions_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Policy_versions_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Policy_versions_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Policy_versions_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Policy_versions_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.PolicyVersionOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOPolicyVersionOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.PolicyVersionOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Policy_versions_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.PolicyVersionFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPolicyVersionFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.PolicyVersionFilter
 	return zeroVal, nil
 }
 
@@ -9440,6 +10253,56 @@ func (ec *executionContext) fieldContext_CreateControlPolicyMappingPayload_succe
 	return fc, nil
 }
 
+func (ec *executionContext) _CreateDraftPolicyVersionPayload_policyVersionEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateDraftPolicyVersionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateDraftPolicyVersionPayload_policyVersionEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PolicyVersionEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyVersionEdge)
+	fc.Result = res
+	return ec.marshalNPolicyVersionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateDraftPolicyVersionPayload_policyVersionEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateDraftPolicyVersionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_PolicyVersionEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_PolicyVersionEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersionEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CreateEvidencePayload_evidenceEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateEvidencePayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CreateEvidencePayload_evidenceEdge(ctx, field)
 	if err != nil {
@@ -9735,6 +10598,56 @@ func (ec *executionContext) fieldContext_CreatePolicyPayload_policyEdge(_ contex
 				return ec.fieldContext_PolicyEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PolicyEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreatePolicyPayload_policyVersionEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreatePolicyPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreatePolicyPayload_policyVersionEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PolicyVersionEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyVersionEdge)
+	fc.Result = res
+	return ec.marshalNPolicyVersionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreatePolicyPayload_policyVersionEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreatePolicyPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_PolicyVersionEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_PolicyVersionEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersionEdge", field.Name)
 		},
 	}
 	return fc, nil
@@ -15243,6 +16156,8 @@ func (ec *executionContext) fieldContext_Mutation_createPolicy(ctx context.Conte
 			switch field.Name {
 			case "policyEdge":
 				return ec.fieldContext_CreatePolicyPayload_policyEdge(ctx, field)
+			case "policyVersionEdge":
+				return ec.fieldContext_CreatePolicyPayload_policyVersionEdge(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreatePolicyPayload", field.Name)
 		},
@@ -15255,65 +16170,6 @@ func (ec *executionContext) fieldContext_Mutation_createPolicy(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createPolicy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updatePolicy(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updatePolicy(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdatePolicy(rctx, fc.Args["input"].(types.UpdatePolicyInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.UpdatePolicyPayload)
-	fc.Result = res
-	return ec.marshalNUpdatePolicyPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updatePolicy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "policy":
-				return ec.fieldContext_UpdatePolicyPayload_policy(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type UpdatePolicyPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updatePolicy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -15373,6 +16229,244 @@ func (ec *executionContext) fieldContext_Mutation_deletePolicy(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deletePolicy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_publishPolicyVersion(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_publishPolicyVersion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PublishPolicyVersion(rctx, fc.Args["input"].(types.PublishPolicyVersionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PublishPolicyVersionPayload)
+	fc.Result = res
+	return ec.marshalNPublishPolicyVersionPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPublishPolicyVersionPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_publishPolicyVersion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "policyVersion":
+				return ec.fieldContext_PublishPolicyVersionPayload_policyVersion(ctx, field)
+			case "policy":
+				return ec.fieldContext_PublishPolicyVersionPayload_policy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PublishPolicyVersionPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_publishPolicyVersion_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createDraftPolicyVersion(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createDraftPolicyVersion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateDraftPolicyVersion(rctx, fc.Args["input"].(types.CreateDraftPolicyVersionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateDraftPolicyVersionPayload)
+	fc.Result = res
+	return ec.marshalNCreateDraftPolicyVersionPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDraftPolicyVersionPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createDraftPolicyVersion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "policyVersionEdge":
+				return ec.fieldContext_CreateDraftPolicyVersionPayload_policyVersionEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateDraftPolicyVersionPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createDraftPolicyVersion_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updatePolicyVersion(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePolicyVersion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePolicyVersion(rctx, fc.Args["input"].(types.UpdatePolicyVersionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UpdatePolicyVersionPayload)
+	fc.Result = res
+	return ec.marshalNUpdatePolicyVersionPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyVersionPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePolicyVersion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "policyVersion":
+				return ec.fieldContext_UpdatePolicyVersionPayload_policyVersion(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdatePolicyVersionPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePolicyVersion_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_requestSignature(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_requestSignature(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RequestSignature(rctx, fc.Args["input"].(types.RequestSignatureInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.RequestSignaturePayload)
+	fc.Result = res
+	return ec.marshalNRequestSignaturePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRequestSignaturePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_requestSignature(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "policyVersionSignatureEdge":
+				return ec.fieldContext_RequestSignaturePayload_policyVersionSignatureEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type RequestSignaturePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_requestSignature_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -17093,8 +18187,8 @@ func (ec *executionContext) fieldContext_Policy_id(_ context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _Policy_name(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Policy_name(ctx, field)
+func (ec *executionContext) _Policy_title(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_title(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -17107,7 +18201,7 @@ func (ec *executionContext) _Policy_name(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
+		return obj.Title, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17124,7 +18218,7 @@ func (ec *executionContext) _Policy_name(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Policy_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Policy_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Policy",
 		Field:      field,
@@ -17137,8 +18231,8 @@ func (ec *executionContext) fieldContext_Policy_name(_ context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Policy_status(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Policy_status(ctx, field)
+func (ec *executionContext) _Policy_description(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_description(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -17151,51 +18245,7 @@ func (ec *executionContext) _Policy_status(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(coredata.PolicyStatus)
-	fc.Result = res
-	return ec.marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Policy_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Policy",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type PolicyStatus does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Policy_content(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Policy_content(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Content, nil
+		return obj.Description, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17212,7 +18262,7 @@ func (ec *executionContext) _Policy_content(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Policy_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Policy_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Policy",
 		Field:      field,
@@ -17225,8 +18275,8 @@ func (ec *executionContext) fieldContext_Policy_content(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Policy_reviewDate(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Policy_reviewDate(ctx, field)
+func (ec *executionContext) _Policy_currentPublishedVersion(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_currentPublishedVersion(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -17239,7 +18289,7 @@ func (ec *executionContext) _Policy_reviewDate(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ReviewDate, nil
+		return obj.CurrentPublishedVersion, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17248,19 +18298,19 @@ func (ec *executionContext) _Policy_reviewDate(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Policy_reviewDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Policy_currentPublishedVersion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Policy",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Datetime does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -17322,6 +18372,67 @@ func (ec *executionContext) fieldContext_Policy_owner(_ context.Context, field g
 			}
 			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Policy_versions(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_versions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Policy().Versions(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.PolicyVersionOrderBy), fc.Args["filter"].(*types.PolicyVersionFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyVersionConnection)
+	fc.Result = res
+	return ec.marshalNPolicyVersionConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Policy_versions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Policy",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_PolicyVersionConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_PolicyVersionConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersionConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Policy_versions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -17664,16 +18775,1556 @@ func (ec *executionContext) fieldContext_PolicyEdge_node(_ context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Policy_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Policy_name(ctx, field)
-			case "status":
-				return ec.fieldContext_Policy_status(ctx, field)
-			case "content":
-				return ec.fieldContext_Policy_content(ctx, field)
-			case "reviewDate":
-				return ec.fieldContext_Policy_reviewDate(ctx, field)
+			case "title":
+				return ec.fieldContext_Policy_title(ctx, field)
+			case "description":
+				return ec.fieldContext_Policy_description(ctx, field)
+			case "currentPublishedVersion":
+				return ec.fieldContext_Policy_currentPublishedVersion(ctx, field)
 			case "owner":
 				return ec.fieldContext_Policy_owner(ctx, field)
+			case "versions":
+				return ec.fieldContext_Policy_versions(ctx, field)
+			case "controls":
+				return ec.fieldContext_Policy_controls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Policy_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Policy_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Policy", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_id(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_policy(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_policy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.PolicyVersion().Policy(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Policy)
+	fc.Result = res
+	return ec.marshalNPolicy2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicy(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_policy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Policy_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Policy_title(ctx, field)
+			case "description":
+				return ec.fieldContext_Policy_description(ctx, field)
+			case "currentPublishedVersion":
+				return ec.fieldContext_Policy_currentPublishedVersion(ctx, field)
+			case "owner":
+				return ec.fieldContext_Policy_owner(ctx, field)
+			case "versions":
+				return ec.fieldContext_Policy_versions(ctx, field)
+			case "controls":
+				return ec.fieldContext_Policy_controls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Policy_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Policy_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Policy", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_status(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.PolicyStatus)
+	fc.Result = res
+	return ec.marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PolicyStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_version(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_version(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Version, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_content(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_content(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_changelog(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_changelog(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Changelog, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_changelog(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_signatures(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_signatures(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.PolicyVersion().Signatures(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.PolicyVersionSignatureOrder))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyVersionSignatureConnection)
+	fc.Result = res
+	return ec.marshalNPolicyVersionSignatureConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignatureConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_signatures(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_PolicyVersionSignatureConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_PolicyVersionSignatureConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersionSignatureConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_PolicyVersion_signatures_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_publishedBy(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_publishedBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.PolicyVersion().PublishedBy(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalOPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_publishedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_publishedAt(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_publishedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PublishedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_publishedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersion_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersion_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersion_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.PolicyVersionEdge)
+	fc.Result = res
+	return ec.marshalNPolicyVersionEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_PolicyVersionEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_PolicyVersionEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersionEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyVersion)
+	fc.Result = res
+	return ec.marshalNPolicyVersion2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersion(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PolicyVersion_id(ctx, field)
+			case "policy":
+				return ec.fieldContext_PolicyVersion_policy(ctx, field)
+			case "status":
+				return ec.fieldContext_PolicyVersion_status(ctx, field)
+			case "version":
+				return ec.fieldContext_PolicyVersion_version(ctx, field)
+			case "content":
+				return ec.fieldContext_PolicyVersion_content(ctx, field)
+			case "changelog":
+				return ec.fieldContext_PolicyVersion_changelog(ctx, field)
+			case "signatures":
+				return ec.fieldContext_PolicyVersion_signatures(ctx, field)
+			case "publishedBy":
+				return ec.fieldContext_PolicyVersion_publishedBy(ctx, field)
+			case "publishedAt":
+				return ec.fieldContext_PolicyVersion_publishedAt(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PolicyVersion_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PolicyVersion_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersion", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignature_id(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignature) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignature_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignature_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignature",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignature_policyVersion(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignature) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignature_policyVersion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.PolicyVersionSignature().PolicyVersion(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyVersion)
+	fc.Result = res
+	return ec.marshalNPolicyVersion2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersion(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignature_policyVersion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignature",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PolicyVersion_id(ctx, field)
+			case "policy":
+				return ec.fieldContext_PolicyVersion_policy(ctx, field)
+			case "status":
+				return ec.fieldContext_PolicyVersion_status(ctx, field)
+			case "version":
+				return ec.fieldContext_PolicyVersion_version(ctx, field)
+			case "content":
+				return ec.fieldContext_PolicyVersion_content(ctx, field)
+			case "changelog":
+				return ec.fieldContext_PolicyVersion_changelog(ctx, field)
+			case "signatures":
+				return ec.fieldContext_PolicyVersion_signatures(ctx, field)
+			case "publishedBy":
+				return ec.fieldContext_PolicyVersion_publishedBy(ctx, field)
+			case "publishedAt":
+				return ec.fieldContext_PolicyVersion_publishedAt(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PolicyVersion_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PolicyVersion_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersion", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignature_state(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignature) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignature_state(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.State, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.PolicyVersionSignatureState)
+	fc.Result = res
+	return ec.marshalNPolicyVersionSignatureState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureState(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignature_state(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignature",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PolicyVersionSignatureState does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignature_signedBy(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignature) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignature_signedBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.PolicyVersionSignature().SignedBy(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignature_signedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignature",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignature_signedAt(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignature) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignature_signedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SignedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignature_signedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignature",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignature_requestedAt(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignature) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignature_requestedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RequestedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignature_requestedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignature",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignature_requestedBy(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignature) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignature_requestedBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.PolicyVersionSignature().RequestedBy(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignature_requestedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignature",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignature_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignature) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignature_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignature_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignature",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignature_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignature) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignature_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignature_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignature",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignatureConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignatureConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignatureConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.PolicyVersionSignatureEdge)
+	fc.Result = res
+	return ec.marshalNPolicyVersionSignatureEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignatureEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignatureConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignatureConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_PolicyVersionSignatureEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_PolicyVersionSignatureEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersionSignatureEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignatureConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignatureConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignatureConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignatureConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignatureConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignatureEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignatureEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignatureEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignatureEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignatureEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PolicyVersionSignatureEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.PolicyVersionSignatureEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PolicyVersionSignatureEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyVersionSignature)
+	fc.Result = res
+	return ec.marshalNPolicyVersionSignature2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignature(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PolicyVersionSignatureEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PolicyVersionSignatureEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PolicyVersionSignature_id(ctx, field)
+			case "policyVersion":
+				return ec.fieldContext_PolicyVersionSignature_policyVersion(ctx, field)
+			case "state":
+				return ec.fieldContext_PolicyVersionSignature_state(ctx, field)
+			case "signedBy":
+				return ec.fieldContext_PolicyVersionSignature_signedBy(ctx, field)
+			case "signedAt":
+				return ec.fieldContext_PolicyVersionSignature_signedAt(ctx, field)
+			case "requestedAt":
+				return ec.fieldContext_PolicyVersionSignature_requestedAt(ctx, field)
+			case "requestedBy":
+				return ec.fieldContext_PolicyVersionSignature_requestedBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PolicyVersionSignature_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PolicyVersionSignature_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersionSignature", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PublishPolicyVersionPayload_policyVersion(ctx context.Context, field graphql.CollectedField, obj *types.PublishPolicyVersionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PublishPolicyVersionPayload_policyVersion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PolicyVersion, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyVersion)
+	fc.Result = res
+	return ec.marshalNPolicyVersion2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersion(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PublishPolicyVersionPayload_policyVersion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PublishPolicyVersionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PolicyVersion_id(ctx, field)
+			case "policy":
+				return ec.fieldContext_PolicyVersion_policy(ctx, field)
+			case "status":
+				return ec.fieldContext_PolicyVersion_status(ctx, field)
+			case "version":
+				return ec.fieldContext_PolicyVersion_version(ctx, field)
+			case "content":
+				return ec.fieldContext_PolicyVersion_content(ctx, field)
+			case "changelog":
+				return ec.fieldContext_PolicyVersion_changelog(ctx, field)
+			case "signatures":
+				return ec.fieldContext_PolicyVersion_signatures(ctx, field)
+			case "publishedBy":
+				return ec.fieldContext_PolicyVersion_publishedBy(ctx, field)
+			case "publishedAt":
+				return ec.fieldContext_PolicyVersion_publishedAt(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PolicyVersion_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PolicyVersion_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersion", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PublishPolicyVersionPayload_policy(ctx context.Context, field graphql.CollectedField, obj *types.PublishPolicyVersionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PublishPolicyVersionPayload_policy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Policy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Policy)
+	fc.Result = res
+	return ec.marshalNPolicy2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicy(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PublishPolicyVersionPayload_policy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PublishPolicyVersionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Policy_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Policy_title(ctx, field)
+			case "description":
+				return ec.fieldContext_Policy_description(ctx, field)
+			case "currentPublishedVersion":
+				return ec.fieldContext_Policy_currentPublishedVersion(ctx, field)
+			case "owner":
+				return ec.fieldContext_Policy_owner(ctx, field)
+			case "versions":
+				return ec.fieldContext_Policy_versions(ctx, field)
 			case "controls":
 				return ec.fieldContext_Policy_controls(ctx, field)
 			case "createdAt":
@@ -18014,6 +20665,56 @@ func (ec *executionContext) fieldContext_RequestEvidencePayload_evidenceEdge(_ c
 				return ec.fieldContext_EvidenceEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EvidenceEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RequestSignaturePayload_policyVersionSignatureEdge(ctx context.Context, field graphql.CollectedField, obj *types.RequestSignaturePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RequestSignaturePayload_policyVersionSignatureEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PolicyVersionSignatureEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyVersionSignatureEdge)
+	fc.Result = res
+	return ec.marshalNPolicyVersionSignatureEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignatureEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_RequestSignaturePayload_policyVersionSignatureEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RequestSignaturePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_PolicyVersionSignatureEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_PolicyVersionSignatureEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersionSignatureEdge", field.Name)
 		},
 	}
 	return fc, nil
@@ -20189,16 +22890,16 @@ func (ec *executionContext) fieldContext_UpdatePolicyPayload_policy(_ context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Policy_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Policy_name(ctx, field)
-			case "status":
-				return ec.fieldContext_Policy_status(ctx, field)
-			case "content":
-				return ec.fieldContext_Policy_content(ctx, field)
-			case "reviewDate":
-				return ec.fieldContext_Policy_reviewDate(ctx, field)
+			case "title":
+				return ec.fieldContext_Policy_title(ctx, field)
+			case "description":
+				return ec.fieldContext_Policy_description(ctx, field)
+			case "currentPublishedVersion":
+				return ec.fieldContext_Policy_currentPublishedVersion(ctx, field)
 			case "owner":
 				return ec.fieldContext_Policy_owner(ctx, field)
+			case "versions":
+				return ec.fieldContext_Policy_versions(ctx, field)
 			case "controls":
 				return ec.fieldContext_Policy_controls(ctx, field)
 			case "createdAt":
@@ -20207,6 +22908,74 @@ func (ec *executionContext) fieldContext_UpdatePolicyPayload_policy(_ context.Co
 				return ec.fieldContext_Policy_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Policy", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdatePolicyVersionPayload_policyVersion(ctx context.Context, field graphql.CollectedField, obj *types.UpdatePolicyVersionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdatePolicyVersionPayload_policyVersion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PolicyVersion, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyVersion)
+	fc.Result = res
+	return ec.marshalNPolicyVersion2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersion(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdatePolicyVersionPayload_policyVersion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdatePolicyVersionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PolicyVersion_id(ctx, field)
+			case "policy":
+				return ec.fieldContext_PolicyVersion_policy(ctx, field)
+			case "status":
+				return ec.fieldContext_PolicyVersion_status(ctx, field)
+			case "version":
+				return ec.fieldContext_PolicyVersion_version(ctx, field)
+			case "content":
+				return ec.fieldContext_PolicyVersion_content(ctx, field)
+			case "changelog":
+				return ec.fieldContext_PolicyVersion_changelog(ctx, field)
+			case "signatures":
+				return ec.fieldContext_PolicyVersion_signatures(ctx, field)
+			case "publishedBy":
+				return ec.fieldContext_PolicyVersion_publishedBy(ctx, field)
+			case "publishedAt":
+				return ec.fieldContext_PolicyVersion_publishedAt(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PolicyVersion_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PolicyVersion_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyVersion", field.Name)
 		},
 	}
 	return fc, nil
@@ -25897,6 +28666,33 @@ func (ec *executionContext) unmarshalInputCreateControlPolicyMappingInput(ctx co
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateDraftPolicyVersionInput(ctx context.Context, obj any) (types.CreateDraftPolicyVersionInput, error) {
+	var it types.CreateDraftPolicyVersionInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"policyID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "policyID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("policyID"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PolicyID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateEvidenceInput(ctx context.Context, obj any) (types.CreateEvidenceInput, error) {
 	var it types.CreateEvidenceInput
 	asMap := map[string]any{}
@@ -26137,7 +28933,7 @@ func (ec *executionContext) unmarshalInputCreatePolicyInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "content", "status", "reviewDate", "ownerId"}
+	fieldsInOrder := [...]string{"organizationId", "title", "content", "ownerId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -26151,13 +28947,13 @@ func (ec *executionContext) unmarshalInputCreatePolicyInput(ctx context.Context,
 				return it, err
 			}
 			it.OrganizationID = data
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Name = data
+			it.Title = data
 		case "content":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -26165,20 +28961,6 @@ func (ec *executionContext) unmarshalInputCreatePolicyInput(ctx context.Context,
 				return it, err
 			}
 			it.Content = data
-		case "status":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Status = data
-		case "reviewDate":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reviewDate"))
-			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ReviewDate = data
 		case "ownerId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerId"))
 			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
@@ -27394,6 +30176,128 @@ func (ec *executionContext) unmarshalInputPolicyOrder(ctx context.Context, obj a
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputPolicyVersionFilter(ctx context.Context, obj any) (types.PolicyVersionFilter, error) {
+	var it types.PolicyVersionFilter
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPolicyVersionOrder(ctx context.Context, obj any) (types.PolicyVersionOrderBy, error) {
+	var it types.PolicyVersionOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNPolicyVersionOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPolicyVersionSignatureOrder(ctx context.Context, obj any) (types.PolicyVersionSignatureOrder, error) {
+	var it types.PolicyVersionSignatureOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"field", "direction"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNPolicyVersionSignatureOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPublishPolicyVersionInput(ctx context.Context, obj any) (types.PublishPolicyVersionInput, error) {
+	var it types.PublishPolicyVersionInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"policyId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "policyId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("policyId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PolicyID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRemoveUserInput(ctx context.Context, obj any) (types.RemoveUserInput, error) {
 	var it types.RemoveUserInput
 	asMap := map[string]any{}
@@ -27470,6 +30374,40 @@ func (ec *executionContext) unmarshalInputRequestEvidenceInput(ctx context.Conte
 				return it, err
 			}
 			it.Description = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputRequestSignatureInput(ctx context.Context, obj any) (types.RequestSignatureInput, error) {
+	var it types.RequestSignatureInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"policyVersionId", "signatoryId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "policyVersionId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("policyVersionId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PolicyVersionID = data
+		case "signatoryId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("signatoryId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SignatoryID = data
 		}
 	}
 
@@ -27770,7 +30708,7 @@ func (ec *executionContext) unmarshalInputUpdatePolicyInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "content", "status", "reviewDate", "ownerId"}
+	fieldsInOrder := [...]string{"id", "title", "content", "ownerId", "createdBy"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -27784,13 +30722,13 @@ func (ec *executionContext) unmarshalInputUpdatePolicyInput(ctx context.Context,
 				return it, err
 			}
 			it.ID = data
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Name = data
+			it.Title = data
 		case "content":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -27798,20 +30736,6 @@ func (ec *executionContext) unmarshalInputUpdatePolicyInput(ctx context.Context,
 				return it, err
 			}
 			it.Content = data
-		case "status":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Status = data
-		case "reviewDate":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reviewDate"))
-			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ReviewDate = data
 		case "ownerId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerId"))
 			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
@@ -27819,6 +30743,47 @@ func (ec *executionContext) unmarshalInputUpdatePolicyInput(ctx context.Context,
 				return it, err
 			}
 			it.OwnerID = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdatePolicyVersionInput(ctx context.Context, obj any) (types.UpdatePolicyVersionInput, error) {
+	var it types.UpdatePolicyVersionInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"policyVersionId", "content"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "policyVersionId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("policyVersionId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PolicyVersionID = data
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
 		}
 	}
 
@@ -28371,6 +31336,20 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Risk(ctx, sel, obj)
+	case types.PolicyVersionSignature:
+		return ec._PolicyVersionSignature(ctx, sel, &obj)
+	case *types.PolicyVersionSignature:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._PolicyVersionSignature(ctx, sel, obj)
+	case types.PolicyVersion:
+		return ec._PolicyVersion(ctx, sel, &obj)
+	case *types.PolicyVersion:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._PolicyVersion(ctx, sel, obj)
 	case types.Policy:
 		return ec._Policy(ctx, sel, &obj)
 	case *types.Policy:
@@ -28963,6 +31942,45 @@ func (ec *executionContext) _CreateControlPolicyMappingPayload(ctx context.Conte
 	return out
 }
 
+var createDraftPolicyVersionPayloadImplementors = []string{"CreateDraftPolicyVersionPayload"}
+
+func (ec *executionContext) _CreateDraftPolicyVersionPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateDraftPolicyVersionPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createDraftPolicyVersionPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateDraftPolicyVersionPayload")
+		case "policyVersionEdge":
+			out.Values[i] = ec._CreateDraftPolicyVersionPayload_policyVersionEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createEvidencePayloadImplementors = []string{"CreateEvidencePayload"}
 
 func (ec *executionContext) _CreateEvidencePayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateEvidencePayload) graphql.Marshaler {
@@ -29171,6 +32189,11 @@ func (ec *executionContext) _CreatePolicyPayload(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("CreatePolicyPayload")
 		case "policyEdge":
 			out.Values[i] = ec._CreatePolicyPayload_policyEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "policyVersionEdge":
+			out.Values[i] = ec._CreatePolicyPayload_policyVersionEdge(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -31103,16 +34126,37 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updatePolicy":
+		case "deletePolicy":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updatePolicy(ctx, field)
+				return ec._Mutation_deletePolicy(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "deletePolicy":
+		case "publishPolicyVersion":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deletePolicy(ctx, field)
+				return ec._Mutation_publishPolicyVersion(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createDraftPolicyVersion":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createDraftPolicyVersion(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatePolicyVersion":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePolicyVersion(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "requestSignature":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_requestSignature(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -31831,23 +34875,18 @@ func (ec *executionContext) _Policy(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "name":
-			out.Values[i] = ec._Policy_name(ctx, field, obj)
+		case "title":
+			out.Values[i] = ec._Policy_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "status":
-			out.Values[i] = ec._Policy_status(ctx, field, obj)
+		case "description":
+			out.Values[i] = ec._Policy_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "content":
-			out.Values[i] = ec._Policy_content(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "reviewDate":
-			out.Values[i] = ec._Policy_reviewDate(ctx, field, obj)
+		case "currentPublishedVersion":
+			out.Values[i] = ec._Policy_currentPublishedVersion(ctx, field, obj)
 		case "owner":
 			field := field
 
@@ -31858,6 +34897,42 @@ func (ec *executionContext) _Policy(ctx context.Context, sel ast.SelectionSet, o
 					}
 				}()
 				res = ec._Policy_owner(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "versions":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Policy_versions(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -32041,6 +35116,571 @@ func (ec *executionContext) _PolicyEdge(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var policyVersionImplementors = []string{"PolicyVersion", "Node"}
+
+func (ec *executionContext) _PolicyVersion(ctx context.Context, sel ast.SelectionSet, obj *types.PolicyVersion) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, policyVersionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PolicyVersion")
+		case "id":
+			out.Values[i] = ec._PolicyVersion_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "policy":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._PolicyVersion_policy(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "status":
+			out.Values[i] = ec._PolicyVersion_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "version":
+			out.Values[i] = ec._PolicyVersion_version(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "content":
+			out.Values[i] = ec._PolicyVersion_content(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "changelog":
+			out.Values[i] = ec._PolicyVersion_changelog(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "signatures":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._PolicyVersion_signatures(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "publishedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._PolicyVersion_publishedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "publishedAt":
+			out.Values[i] = ec._PolicyVersion_publishedAt(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._PolicyVersion_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._PolicyVersion_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var policyVersionConnectionImplementors = []string{"PolicyVersionConnection"}
+
+func (ec *executionContext) _PolicyVersionConnection(ctx context.Context, sel ast.SelectionSet, obj *types.PolicyVersionConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, policyVersionConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PolicyVersionConnection")
+		case "edges":
+			out.Values[i] = ec._PolicyVersionConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._PolicyVersionConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var policyVersionEdgeImplementors = []string{"PolicyVersionEdge"}
+
+func (ec *executionContext) _PolicyVersionEdge(ctx context.Context, sel ast.SelectionSet, obj *types.PolicyVersionEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, policyVersionEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PolicyVersionEdge")
+		case "cursor":
+			out.Values[i] = ec._PolicyVersionEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._PolicyVersionEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var policyVersionSignatureImplementors = []string{"PolicyVersionSignature", "Node"}
+
+func (ec *executionContext) _PolicyVersionSignature(ctx context.Context, sel ast.SelectionSet, obj *types.PolicyVersionSignature) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, policyVersionSignatureImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PolicyVersionSignature")
+		case "id":
+			out.Values[i] = ec._PolicyVersionSignature_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "policyVersion":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._PolicyVersionSignature_policyVersion(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "state":
+			out.Values[i] = ec._PolicyVersionSignature_state(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "signedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._PolicyVersionSignature_signedBy(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "signedAt":
+			out.Values[i] = ec._PolicyVersionSignature_signedAt(ctx, field, obj)
+		case "requestedAt":
+			out.Values[i] = ec._PolicyVersionSignature_requestedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "requestedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._PolicyVersionSignature_requestedBy(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "createdAt":
+			out.Values[i] = ec._PolicyVersionSignature_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._PolicyVersionSignature_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var policyVersionSignatureConnectionImplementors = []string{"PolicyVersionSignatureConnection"}
+
+func (ec *executionContext) _PolicyVersionSignatureConnection(ctx context.Context, sel ast.SelectionSet, obj *types.PolicyVersionSignatureConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, policyVersionSignatureConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PolicyVersionSignatureConnection")
+		case "edges":
+			out.Values[i] = ec._PolicyVersionSignatureConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._PolicyVersionSignatureConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var policyVersionSignatureEdgeImplementors = []string{"PolicyVersionSignatureEdge"}
+
+func (ec *executionContext) _PolicyVersionSignatureEdge(ctx context.Context, sel ast.SelectionSet, obj *types.PolicyVersionSignatureEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, policyVersionSignatureEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PolicyVersionSignatureEdge")
+		case "cursor":
+			out.Values[i] = ec._PolicyVersionSignatureEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._PolicyVersionSignatureEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var publishPolicyVersionPayloadImplementors = []string{"PublishPolicyVersionPayload"}
+
+func (ec *executionContext) _PublishPolicyVersionPayload(ctx context.Context, sel ast.SelectionSet, obj *types.PublishPolicyVersionPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, publishPolicyVersionPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PublishPolicyVersionPayload")
+		case "policyVersion":
+			out.Values[i] = ec._PublishPolicyVersionPayload_policyVersion(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "policy":
+			out.Values[i] = ec._PublishPolicyVersionPayload_policy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -32187,6 +35827,45 @@ func (ec *executionContext) _RequestEvidencePayload(ctx context.Context, sel ast
 			out.Values[i] = graphql.MarshalString("RequestEvidencePayload")
 		case "evidenceEdge":
 			out.Values[i] = ec._RequestEvidencePayload_evidenceEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var requestSignaturePayloadImplementors = []string{"RequestSignaturePayload"}
+
+func (ec *executionContext) _RequestSignaturePayload(ctx context.Context, sel ast.SelectionSet, obj *types.RequestSignaturePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, requestSignaturePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RequestSignaturePayload")
+		case "policyVersionSignatureEdge":
+			out.Values[i] = ec._RequestSignaturePayload_policyVersionSignatureEdge(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -33021,6 +36700,45 @@ func (ec *executionContext) _UpdatePolicyPayload(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("UpdatePolicyPayload")
 		case "policy":
 			out.Values[i] = ec._UpdatePolicyPayload_policy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updatePolicyVersionPayloadImplementors = []string{"UpdatePolicyVersionPayload"}
+
+func (ec *executionContext) _UpdatePolicyVersionPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdatePolicyVersionPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updatePolicyVersionPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdatePolicyVersionPayload")
+		case "policyVersion":
+			out.Values[i] = ec._UpdatePolicyVersionPayload_policyVersion(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -34899,6 +38617,25 @@ func (ec *executionContext) marshalNCreateControlPolicyMappingPayload2ᚖgithub�
 	return ec._CreateControlPolicyMappingPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateDraftPolicyVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDraftPolicyVersionInput(ctx context.Context, v any) (types.CreateDraftPolicyVersionInput, error) {
+	res, err := ec.unmarshalInputCreateDraftPolicyVersionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateDraftPolicyVersionPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDraftPolicyVersionPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateDraftPolicyVersionPayload) graphql.Marshaler {
+	return ec._CreateDraftPolicyVersionPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateDraftPolicyVersionPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDraftPolicyVersionPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateDraftPolicyVersionPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateDraftPolicyVersionPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateEvidenceInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateEvidenceInput(ctx context.Context, v any) (types.CreateEvidenceInput, error) {
 	res, err := ec.unmarshalInputCreateEvidenceInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -36220,6 +39957,10 @@ var (
 	}
 )
 
+func (ec *executionContext) marshalNPolicy2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicy(ctx context.Context, sel ast.SelectionSet, v types.Policy) graphql.Marshaler {
+	return ec._Policy(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNPolicy2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicy(ctx context.Context, sel ast.SelectionSet, v *types.Policy) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -36300,12 +40041,12 @@ func (ec *executionContext) marshalNPolicyEdge2ᚖgithubᚗcomᚋgetproboᚋprob
 
 func (ec *executionContext) unmarshalNPolicyOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyOrderField(ctx context.Context, v any) (coredata.PolicyOrderField, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := coredata.PolicyOrderField(tmp)
+	res := unmarshalNPolicyOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyOrderField[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNPolicyOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.PolicyOrderField) graphql.Marshaler {
-	res := graphql.MarshalString(string(v))
+	res := graphql.MarshalString(marshalNPolicyOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyOrderField[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -36313,6 +40054,17 @@ func (ec *executionContext) marshalNPolicyOrderField2githubᚗcomᚋgetproboᚋp
 	}
 	return res
 }
+
+var (
+	unmarshalNPolicyOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyOrderField = map[string]coredata.PolicyOrderField{
+		"TITLE":      coredata.PolicyOrderFieldTitle,
+		"CREATED_AT": coredata.PolicyOrderFieldCreatedAt,
+	}
+	marshalNPolicyOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyOrderField = map[coredata.PolicyOrderField]string{
+		coredata.PolicyOrderFieldTitle:     "TITLE",
+		coredata.PolicyOrderFieldCreatedAt: "CREATED_AT",
+	}
+)
 
 func (ec *executionContext) unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus(ctx context.Context, v any) (coredata.PolicyStatus, error) {
 	tmp, err := graphql.UnmarshalString(v)
@@ -36332,14 +40084,274 @@ func (ec *executionContext) marshalNPolicyStatus2githubᚗcomᚋgetproboᚋprobo
 
 var (
 	unmarshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus = map[string]coredata.PolicyStatus{
-		"DRAFT":  coredata.PolicyStatusDraft,
-		"ACTIVE": coredata.PolicyStatusActive,
+		"DRAFT":     coredata.PolicyStatusDraft,
+		"PUBLISHED": coredata.PolicyStatusPublished,
 	}
 	marshalNPolicyStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus = map[coredata.PolicyStatus]string{
-		coredata.PolicyStatusDraft:  "DRAFT",
-		coredata.PolicyStatusActive: "ACTIVE",
+		coredata.PolicyStatusDraft:     "DRAFT",
+		coredata.PolicyStatusPublished: "PUBLISHED",
 	}
 )
+
+func (ec *executionContext) marshalNPolicyVersion2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersion(ctx context.Context, sel ast.SelectionSet, v types.PolicyVersion) graphql.Marshaler {
+	return ec._PolicyVersion(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPolicyVersion2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersion(ctx context.Context, sel ast.SelectionSet, v *types.PolicyVersion) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PolicyVersion(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPolicyVersionConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionConnection(ctx context.Context, sel ast.SelectionSet, v types.PolicyVersionConnection) graphql.Marshaler {
+	return ec._PolicyVersionConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPolicyVersionConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionConnection(ctx context.Context, sel ast.SelectionSet, v *types.PolicyVersionConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PolicyVersionConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPolicyVersionEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.PolicyVersionEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPolicyVersionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPolicyVersionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionEdge(ctx context.Context, sel ast.SelectionSet, v *types.PolicyVersionEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PolicyVersionEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPolicyVersionOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionOrderField(ctx context.Context, v any) (coredata.PolicyVersionOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNPolicyVersionOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionOrderField[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPolicyVersionOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.PolicyVersionOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNPolicyVersionOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionOrderField[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNPolicyVersionOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionOrderField = map[string]coredata.PolicyVersionOrderField{
+		"VERSION":    coredata.PolicyVersionOrderFieldVersion,
+		"CREATED_AT": coredata.PolicyVersionOrderFieldCreatedAt,
+	}
+	marshalNPolicyVersionOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionOrderField = map[coredata.PolicyVersionOrderField]string{
+		coredata.PolicyVersionOrderFieldVersion:   "VERSION",
+		coredata.PolicyVersionOrderFieldCreatedAt: "CREATED_AT",
+	}
+)
+
+func (ec *executionContext) marshalNPolicyVersionSignature2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignature(ctx context.Context, sel ast.SelectionSet, v *types.PolicyVersionSignature) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PolicyVersionSignature(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPolicyVersionSignatureConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignatureConnection(ctx context.Context, sel ast.SelectionSet, v types.PolicyVersionSignatureConnection) graphql.Marshaler {
+	return ec._PolicyVersionSignatureConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPolicyVersionSignatureConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignatureConnection(ctx context.Context, sel ast.SelectionSet, v *types.PolicyVersionSignatureConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PolicyVersionSignatureConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPolicyVersionSignatureEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignatureEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.PolicyVersionSignatureEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPolicyVersionSignatureEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignatureEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPolicyVersionSignatureEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignatureEdge(ctx context.Context, sel ast.SelectionSet, v *types.PolicyVersionSignatureEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PolicyVersionSignatureEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPolicyVersionSignatureOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureOrderField(ctx context.Context, v any) (coredata.PolicyVersionSignatureOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNPolicyVersionSignatureOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureOrderField[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPolicyVersionSignatureOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.PolicyVersionSignatureOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNPolicyVersionSignatureOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureOrderField[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNPolicyVersionSignatureOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureOrderField = map[string]coredata.PolicyVersionSignatureOrderField{
+		"CREATED_AT": coredata.PolicyVersionSignatureOrderFieldCreatedAt,
+		"SIGNED_AT":  coredata.PolicyVersionSignatureOrderFieldSignedAt,
+	}
+	marshalNPolicyVersionSignatureOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureOrderField = map[coredata.PolicyVersionSignatureOrderField]string{
+		coredata.PolicyVersionSignatureOrderFieldCreatedAt: "CREATED_AT",
+		coredata.PolicyVersionSignatureOrderFieldSignedAt:  "SIGNED_AT",
+	}
+)
+
+func (ec *executionContext) unmarshalNPolicyVersionSignatureState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureState(ctx context.Context, v any) (coredata.PolicyVersionSignatureState, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNPolicyVersionSignatureState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureState[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPolicyVersionSignatureState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureState(ctx context.Context, sel ast.SelectionSet, v coredata.PolicyVersionSignatureState) graphql.Marshaler {
+	res := graphql.MarshalString(marshalNPolicyVersionSignatureState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureState[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNPolicyVersionSignatureState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureState = map[string]coredata.PolicyVersionSignatureState{
+		"REQUESTED": coredata.PolicyVersionSignatureStateRequested,
+		"SIGNED":    coredata.PolicyVersionSignatureStateSigned,
+	}
+	marshalNPolicyVersionSignatureState2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyVersionSignatureState = map[coredata.PolicyVersionSignatureState]string{
+		coredata.PolicyVersionSignatureStateRequested: "REQUESTED",
+		coredata.PolicyVersionSignatureStateSigned:    "SIGNED",
+	}
+)
+
+func (ec *executionContext) unmarshalNPublishPolicyVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPublishPolicyVersionInput(ctx context.Context, v any) (types.PublishPolicyVersionInput, error) {
+	res, err := ec.unmarshalInputPublishPolicyVersionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPublishPolicyVersionPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPublishPolicyVersionPayload(ctx context.Context, sel ast.SelectionSet, v types.PublishPolicyVersionPayload) graphql.Marshaler {
+	return ec._PublishPolicyVersionPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPublishPolicyVersionPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPublishPolicyVersionPayload(ctx context.Context, sel ast.SelectionSet, v *types.PublishPolicyVersionPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PublishPolicyVersionPayload(ctx, sel, v)
+}
 
 func (ec *executionContext) unmarshalNRemoveUserInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveUserInput(ctx context.Context, v any) (types.RemoveUserInput, error) {
 	res, err := ec.unmarshalInputRemoveUserInput(ctx, v)
@@ -36377,6 +40389,25 @@ func (ec *executionContext) marshalNRequestEvidencePayload2ᚖgithubᚗcomᚋget
 		return graphql.Null
 	}
 	return ec._RequestEvidencePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNRequestSignatureInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRequestSignatureInput(ctx context.Context, v any) (types.RequestSignatureInput, error) {
+	res, err := ec.unmarshalInputRequestSignatureInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRequestSignaturePayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRequestSignaturePayload(ctx context.Context, sel ast.SelectionSet, v types.RequestSignaturePayload) graphql.Marshaler {
+	return ec._RequestSignaturePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNRequestSignaturePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRequestSignaturePayload(ctx context.Context, sel ast.SelectionSet, v *types.RequestSignaturePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._RequestSignaturePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNRisk2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRisk(ctx context.Context, sel ast.SelectionSet, v *types.Risk) graphql.Marshaler {
@@ -36774,23 +40805,23 @@ func (ec *executionContext) marshalNUpdatePeoplePayload2ᚖgithubᚗcomᚋgetpro
 	return ec._UpdatePeoplePayload(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdatePolicyInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyInput(ctx context.Context, v any) (types.UpdatePolicyInput, error) {
-	res, err := ec.unmarshalInputUpdatePolicyInput(ctx, v)
+func (ec *executionContext) unmarshalNUpdatePolicyVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyVersionInput(ctx context.Context, v any) (types.UpdatePolicyVersionInput, error) {
+	res, err := ec.unmarshalInputUpdatePolicyVersionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUpdatePolicyPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyPayload(ctx context.Context, sel ast.SelectionSet, v types.UpdatePolicyPayload) graphql.Marshaler {
-	return ec._UpdatePolicyPayload(ctx, sel, &v)
+func (ec *executionContext) marshalNUpdatePolicyVersionPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyVersionPayload(ctx context.Context, sel ast.SelectionSet, v types.UpdatePolicyVersionPayload) graphql.Marshaler {
+	return ec._UpdatePolicyVersionPayload(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUpdatePolicyPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyPayload(ctx context.Context, sel ast.SelectionSet, v *types.UpdatePolicyPayload) graphql.Marshaler {
+func (ec *executionContext) marshalNUpdatePolicyVersionPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdatePolicyVersionPayload(ctx context.Context, sel ast.SelectionSet, v *types.UpdatePolicyVersionPayload) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._UpdatePolicyPayload(ctx, sel, v)
+	return ec._UpdatePolicyVersionPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateRiskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateRiskInput(ctx context.Context, v any) (types.UpdateRiskInput, error) {
@@ -37820,14 +41851,38 @@ func (ec *executionContext) marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋpr
 
 var (
 	unmarshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus = map[string]coredata.PolicyStatus{
-		"DRAFT":  coredata.PolicyStatusDraft,
-		"ACTIVE": coredata.PolicyStatusActive,
+		"DRAFT":     coredata.PolicyStatusDraft,
+		"PUBLISHED": coredata.PolicyStatusPublished,
 	}
 	marshalOPolicyStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPolicyStatus = map[coredata.PolicyStatus]string{
-		coredata.PolicyStatusDraft:  "DRAFT",
-		coredata.PolicyStatusActive: "ACTIVE",
+		coredata.PolicyStatusDraft:     "DRAFT",
+		coredata.PolicyStatusPublished: "PUBLISHED",
 	}
 )
+
+func (ec *executionContext) unmarshalOPolicyVersionFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionFilter(ctx context.Context, v any) (*types.PolicyVersionFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPolicyVersionFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOPolicyVersionOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionOrderBy(ctx context.Context, v any) (*types.PolicyVersionOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPolicyVersionOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOPolicyVersionSignatureOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyVersionSignatureOrder(ctx context.Context, v any) (*types.PolicyVersionSignatureOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPolicyVersionSignatureOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
 
 func (ec *executionContext) unmarshalORiskOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRiskOrderBy(ctx context.Context, v any) (*types.RiskOrderBy, error) {
 	if v == nil {

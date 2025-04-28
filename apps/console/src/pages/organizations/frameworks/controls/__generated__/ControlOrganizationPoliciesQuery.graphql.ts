@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<cfe85b9fdabaf24f9a7f575eca8a6417>>
+ * @generated SignedSource<<1f9de20276a5c0b1291c5e25dc11990b>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type PolicyStatus = "ACTIVE" | "DRAFT";
 export type ControlOrganizationPoliciesQuery$variables = {
   organizationId: string;
 };
@@ -19,11 +18,16 @@ export type ControlOrganizationPoliciesQuery$data = {
     readonly policies?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
-          readonly content: string;
+          readonly createdAt: string;
+          readonly currentPublishedVersion: number | null | undefined;
+          readonly description: string;
           readonly id: string;
-          readonly name: string;
-          readonly reviewDate: string | null | undefined;
-          readonly status: PolicyStatus;
+          readonly owner: {
+            readonly fullName: string;
+            readonly id: string;
+          };
+          readonly title: string;
+          readonly updatedAt: string;
         };
       }>;
     };
@@ -85,28 +89,54 @@ v4 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "name",
+            "name": "title",
             "storageKey": null
           },
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "content",
+            "name": "description",
             "storageKey": null
           },
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "status",
+            "name": "currentPublishedVersion",
             "storageKey": null
           },
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "reviewDate",
+            "name": "createdAt",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "updatedAt",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "People",
+            "kind": "LinkedField",
+            "name": "owner",
+            "plural": false,
+            "selections": [
+              (v2/*: any*/),
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "fullName",
+                "storageKey": null
+              }
+            ],
             "storageKey": null
           },
           (v3/*: any*/)
@@ -244,7 +274,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "3a3c91f3e18e8a4b66011aa583e262e4",
+    "cacheID": "94e32c7758c8df264b99a44150de687d",
     "id": null,
     "metadata": {
       "connection": [
@@ -261,11 +291,11 @@ return {
     },
     "name": "ControlOrganizationPoliciesQuery",
     "operationKind": "query",
-    "text": "query ControlOrganizationPoliciesQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            name\n            content\n            status\n            reviewDate\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlOrganizationPoliciesQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            title\n            description\n            currentPublishedVersion\n            createdAt\n            updatedAt\n            owner {\n              id\n              fullName\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "f4699d729e6df6192efd201047689204";
+(node as any).hash = "47aaf55ffb65d3220df2b0fe2688bc12";
 
 export default node;

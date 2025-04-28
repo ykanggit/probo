@@ -1008,41 +1008,29 @@ func (r *mutationResolver) DeleteVendorComplianceReport(ctx context.Context, inp
 func (r *mutationResolver) CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
-	policy, err := svc.Policies.Create(ctx, probo.CreatePolicyRequest{
-		OrganizationID: input.OrganizationID,
-		Name:           input.Name,
-		Content:        input.Content,
-		Status:         input.Status,
-		ReviewDate:     input.ReviewDate,
-		OwnerID:        input.OwnerID,
-	})
+	user := UserFromContext(ctx)
+	people, err := svc.Peoples.GetByUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	policy, policyVersion, err := svc.Policies.Create(
+		ctx,
+		probo.CreatePolicyRequest{
+			OrganizationID: input.OrganizationID,
+			Title:          input.Title,
+			OwnerID:        input.OwnerID,
+			Content:        input.Content,
+			CreatedBy:      people.ID,
+		},
+	)
 	if err != nil {
 		panic(fmt.Errorf("cannot create policy: %w", err))
 	}
 
 	return &types.CreatePolicyPayload{
-		PolicyEdge: types.NewPolicyEdge(policy, coredata.PolicyOrderFieldCreatedAt),
-	}, nil
-}
-
-// UpdatePolicy is the resolver for the updatePolicy field.
-func (r *mutationResolver) UpdatePolicy(ctx context.Context, input types.UpdatePolicyInput) (*types.UpdatePolicyPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
-
-	policy, err := svc.Policies.Update(ctx, probo.UpdatePolicyRequest{
-		ID:         input.ID,
-		Name:       input.Name,
-		Content:    input.Content,
-		Status:     input.Status,
-		ReviewDate: input.ReviewDate,
-		OwnerID:    input.OwnerID,
-	})
-	if err != nil {
-		panic(fmt.Errorf("cannot update policy: %w", err))
-	}
-
-	return &types.UpdatePolicyPayload{
-		Policy: types.NewPolicy(policy),
+		PolicyEdge:        types.NewPolicyEdge(policy, coredata.PolicyOrderFieldTitle),
+		PolicyVersionEdge: types.NewPolicyVersionEdge(policyVersion, coredata.PolicyVersionOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -1060,15 +1048,95 @@ func (r *mutationResolver) DeletePolicy(ctx context.Context, input types.DeleteP
 	}, nil
 }
 
+// PublishPolicyVersion is the resolver for the publishPolicyVersion field.
+func (r *mutationResolver) PublishPolicyVersion(ctx context.Context, input types.PublishPolicyVersionInput) (*types.PublishPolicyVersionPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.PolicyID.TenantID())
+	user := UserFromContext(ctx)
+
+	people, err := svc.Peoples.GetByUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	policy, policyVersion, err := svc.Policies.PublishVersion(ctx, input.PolicyID, people.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot publish policy version: %w", err))
+	}
+
+	return &types.PublishPolicyVersionPayload{
+		PolicyVersion: types.NewPolicyVersion(policyVersion),
+		Policy:        types.NewPolicy(policy),
+	}, nil
+}
+
+// CreateDraftPolicyVersion is the resolver for the createDraftPolicyVersion field.
+func (r *mutationResolver) CreateDraftPolicyVersion(ctx context.Context, input types.CreateDraftPolicyVersionInput) (*types.CreateDraftPolicyVersionPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.PolicyID.TenantID())
+
+	user := UserFromContext(ctx)
+	people, err := svc.Peoples.GetByUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	policyVersion, err := svc.Policies.CreateDraft(ctx, input.PolicyID, people.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot create draft policy version: %w", err))
+	}
+
+	return &types.CreateDraftPolicyVersionPayload{
+		PolicyVersionEdge: types.NewPolicyVersionEdge(policyVersion, coredata.PolicyVersionOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdatePolicyVersion is the resolver for the updatePolicyVersion field.
+func (r *mutationResolver) UpdatePolicyVersion(ctx context.Context, input types.UpdatePolicyVersionInput) (*types.UpdatePolicyVersionPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.PolicyVersionID.TenantID())
+
+	policyVersion, err := svc.Policies.UpdateVersion(ctx, probo.UpdatePolicyVersionRequest{
+		ID:      input.PolicyVersionID,
+		Content: input.Content,
+	})
+	if err != nil {
+		panic(fmt.Errorf("cannot update policy version: %w", err))
+	}
+
+	return &types.UpdatePolicyVersionPayload{
+		PolicyVersion: types.NewPolicyVersion(policyVersion),
+	}, nil
+}
+
+// RequestSignature is the resolver for the requestSignature field.
+func (r *mutationResolver) RequestSignature(ctx context.Context, input types.RequestSignatureInput) (*types.RequestSignaturePayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.PolicyVersionID.TenantID())
+
+	user := UserFromContext(ctx)
+
+	people, err := svc.Peoples.GetByUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	policyVersionSignature, err := svc.Policies.RequestSignature(
+		ctx,
+		probo.RequestSignatureRequest{
+			PolicyVersionID: input.PolicyVersionID,
+			RequestedBy:     people.ID,
+			Signatory:       input.SignatoryID,
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("cannot request signature: %w", err))
+	}
+
+	return &types.RequestSignaturePayload{
+		PolicyVersionSignatureEdge: types.NewPolicyVersionSignatureEdge(policyVersionSignature, coredata.PolicyVersionSignatureOrderFieldCreatedAt),
+	}, nil
+}
+
 // CreateVendorRiskAssessment is the resolver for the createVendorRiskAssessment field.
 func (r *mutationResolver) CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.VendorID.TenantID())
-
-	fmt.Println("input.AssessedBy", input.AssessedBy)
-	fmt.Println("input.ExpiresAt", input.ExpiresAt)
-	fmt.Println("input.DataSensitivity", input.DataSensitivity)
-	fmt.Println("input.BusinessImpact", input.BusinessImpact)
-	fmt.Println("input.Notes", input.Notes)
 
 	vendorRiskAssessment, err := svc.Vendors.CreateRiskAssessment(
 		ctx,
@@ -1225,7 +1293,7 @@ func (r *organizationResolver) Policies(ctx context.Context, obj *types.Organiza
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.PolicyOrderField]{
-		Field:     coredata.PolicyOrderFieldName,
+		Field:     coredata.PolicyOrderFieldTitle,
 		Direction: page.OrderDirectionDesc,
 	}
 	if orderBy != nil {
@@ -1313,6 +1381,31 @@ func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.P
 	return types.NewPeople(owner), nil
 }
 
+// Versions is the resolver for the versions field.
+func (r *policyResolver) Versions(ctx context.Context, obj *types.Policy, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyVersionOrderBy, filter *types.PolicyVersionFilter) (*types.PolicyVersionConnection, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.PolicyVersionOrderField]{
+		Field:     coredata.PolicyVersionOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.PolicyVersionOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Policies.ListVersions(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list policy versions: %w", err))
+	}
+
+	return types.NewPolicyVersionConnection(page), nil
+}
+
 // Controls is the resolver for the controls field.
 func (r *policyResolver) Controls(ctx context.Context, obj *types.Policy, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -1336,6 +1429,120 @@ func (r *policyResolver) Controls(ctx context.Context, obj *types.Policy, first 
 	}
 
 	return types.NewControlConnection(page), nil
+}
+
+// Policy is the resolver for the policy field.
+func (r *policyVersionResolver) Policy(ctx context.Context, obj *types.PolicyVersion) (*types.Policy, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	policyVersion, err := svc.Policies.GetVersion(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get policy version: %w", err))
+	}
+
+	policy, err := svc.Policies.Get(ctx, policyVersion.PolicyID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get policy: %w", err))
+	}
+
+	return types.NewPolicy(policy), nil
+}
+
+// Signatures is the resolver for the signatures field.
+func (r *policyVersionResolver) Signatures(ctx context.Context, obj *types.PolicyVersion, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyVersionSignatureOrder) (*types.PolicyVersionSignatureConnection, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.PolicyVersionSignatureOrderField]{
+		Field:     coredata.PolicyVersionSignatureOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.PolicyVersionSignatureOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Policies.ListSignatures(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list policy version signatures: %w", err))
+	}
+
+	return types.NewPolicyVersionSignatureConnection(page), nil
+}
+
+// PublishedBy is the resolver for the publishedBy field.
+func (r *policyVersionResolver) PublishedBy(ctx context.Context, obj *types.PolicyVersion) (*types.People, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	policyVersion, err := svc.Policies.GetVersion(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get policy version: %w", err))
+	}
+
+	if policyVersion.PublishedBy == nil {
+		return nil, nil
+	}
+
+	people, err := svc.Peoples.Get(ctx, *policyVersion.PublishedBy)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	return types.NewPeople(people), nil
+}
+
+// PolicyVersion is the resolver for the policyVersion field.
+func (r *policyVersionSignatureResolver) PolicyVersion(ctx context.Context, obj *types.PolicyVersionSignature) (*types.PolicyVersion, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	policyVersionSignature, err := svc.Policies.GetVersionSignature(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get policy version signature: %w", err))
+	}
+
+	policyVersion, err := svc.Policies.GetVersion(ctx, policyVersionSignature.PolicyVersionID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get policy version: %w", err))
+	}
+
+	return types.NewPolicyVersion(policyVersion), nil
+}
+
+// SignedBy is the resolver for the signedBy field.
+func (r *policyVersionSignatureResolver) SignedBy(ctx context.Context, obj *types.PolicyVersionSignature) (*types.People, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	policyVersionSignature, err := svc.Policies.GetVersionSignature(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get policy version signature: %w", err))
+	}
+
+	people, err := svc.Peoples.Get(ctx, policyVersionSignature.SignedBy)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	return types.NewPeople(people), nil
+}
+
+// RequestedBy is the resolver for the requestedBy field.
+func (r *policyVersionSignatureResolver) RequestedBy(ctx context.Context, obj *types.PolicyVersionSignature) (*types.People, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	policyVersionSignature, err := svc.Policies.GetVersionSignature(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get policy version signature: %w", err))
+	}
+
+	people, err := svc.Peoples.Get(ctx, policyVersionSignature.RequestedBy)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	return types.NewPeople(people), nil
 }
 
 // Node is the resolver for the node field.
@@ -1417,6 +1624,18 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 			panic(fmt.Errorf("cannot get vendor compliance report: %w", err))
 		}
 		return types.NewVendorComplianceReport(vendorComplianceReport), nil
+	case coredata.PolicyVersionEntityType:
+		policyVersion, err := svc.Policies.GetVersion(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get policy version: %w", err))
+		}
+		return types.NewPolicyVersion(policyVersion), nil
+	case coredata.PolicyVersionSignatureEntityType:
+		policyVersionSignature, err := svc.Policies.GetVersionSignature(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get policy version signature: %w", err))
+		}
+		return types.NewPolicyVersionSignature(policyVersionSignature), nil
 	default:
 	}
 
@@ -1579,7 +1798,7 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 func (r *userResolver) People(ctx context.Context, obj *types.User, organizationID gid.GID) (*types.People, error) {
 	svc := GetTenantService(ctx, r.proboSvc, organizationID.TenantID())
 
-	people, err := svc.Peoples.GetByUserID(ctx, organizationID, obj.ID)
+	people, err := svc.Peoples.GetByUserID(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("failed to get people: %w", err))
 	}
@@ -1778,6 +1997,14 @@ func (r *Resolver) Organization() schema.OrganizationResolver { return &organiza
 // Policy returns schema.PolicyResolver implementation.
 func (r *Resolver) Policy() schema.PolicyResolver { return &policyResolver{r} }
 
+// PolicyVersion returns schema.PolicyVersionResolver implementation.
+func (r *Resolver) PolicyVersion() schema.PolicyVersionResolver { return &policyVersionResolver{r} }
+
+// PolicyVersionSignature returns schema.PolicyVersionSignatureResolver implementation.
+func (r *Resolver) PolicyVersionSignature() schema.PolicyVersionSignatureResolver {
+	return &policyVersionSignatureResolver{r}
+}
+
 // Query returns schema.QueryResolver implementation.
 func (r *Resolver) Query() schema.QueryResolver { return &queryResolver{r} }
 
@@ -1813,6 +2040,8 @@ type mesureResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type policyResolver struct{ *Resolver }
+type policyVersionResolver struct{ *Resolver }
+type policyVersionSignatureResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type riskResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }

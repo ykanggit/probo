@@ -102,7 +102,6 @@ func (p *People) LoadByUserID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	organizationID gid.GID,
 	userID gid.GID,
 ) error {
 	q := `
@@ -120,14 +119,13 @@ FROM
     peoples
 WHERE
     %s
-    AND organization_id = @organization_id
     AND user_id = @user_id
 LIMIT 1;
 `
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"organization_id": organizationID, "user_id": userID}
+	args := pgx.StrictNamedArgs{"user_id": userID}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)

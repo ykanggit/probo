@@ -44,12 +44,10 @@ func NewPolicyEdge(policy *coredata.Policy, orderBy coredata.PolicyOrderField) *
 
 func NewPolicy(policy *coredata.Policy) *Policy {
 	return &Policy{
-		ID:         policy.ID,
-		Name:       policy.Name,
-		Content:    policy.Content,
-		CreatedAt:  policy.CreatedAt,
-		UpdatedAt:  policy.UpdatedAt,
-		Status:     policy.Status,
-		ReviewDate: policy.ReviewDate,
+		ID:                      policy.ID,
+		Title:                   policy.Title,
+		CurrentPublishedVersion: policy.CurrentPublishedVersion,
+		CreatedAt:               policy.CreatedAt,
+		UpdatedAt:               policy.UpdatedAt,
 	}
 }

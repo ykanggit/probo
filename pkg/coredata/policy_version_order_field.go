@@ -14,23 +14,28 @@
 
 package coredata
 
-const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MesureEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ConnectorEntityType
-	VendorRiskAssessmentEntityType
-	VendorEntityType
-	PeopleEntityType
-	VendorComplianceReportEntityType
-	PolicyEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
-	PolicyVersionEntityType
-	PolicyVersionSignatureEntityType
+type (
+	PolicyVersionOrderField string
 )
+
+const (
+	PolicyVersionOrderFieldCreatedAt PolicyVersionOrderField = "CREATED_AT"
+	PolicyVersionOrderFieldVersion   PolicyVersionOrderField = "VERSION"
+)
+
+func (p PolicyVersionOrderField) Column() string {
+	return string(p)
+}
+
+func (p PolicyVersionOrderField) String() string {
+	return string(p)
+}
+
+func (p PolicyVersionOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *PolicyVersionOrderField) UnmarshalText(text []byte) error {
+	*p = PolicyVersionOrderField(text)
+	return nil
+}

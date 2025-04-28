@@ -20,7 +20,7 @@ type (
 
 const (
 	PolicyOrderFieldCreatedAt PolicyOrderField = "CREATED_AT"
-	PolicyOrderFieldName      PolicyOrderField = "NAME"
+	PolicyOrderFieldTitle     PolicyOrderField = "TITLE"
 )
 
 func (p PolicyOrderField) Column() string {

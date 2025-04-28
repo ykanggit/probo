@@ -95,8 +95,8 @@ enum PolicyStatus
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyStatus") {
   DRAFT
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft")
-  ACTIVE
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusActive")
+  PUBLISHED
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusPublished")
 }
 
 enum EvidenceType
@@ -184,7 +184,14 @@ enum TaskOrderField
 
 enum PolicyOrderField
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyOrderField") {
-  NAME
+  TITLE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyOrderFieldTitle"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyOrderFieldCreatedAt"
+    )
 }
 
 enum RiskOrderField
@@ -258,6 +265,18 @@ enum BusinessImpact
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactHigh")
   CRITICAL
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactCritical")
+}
+
+enum PolicyVersionOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderField") {
+  VERSION
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderFieldVersion"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderFieldCreatedAt"
+    )
 }
 
 # Order Input Types
@@ -357,6 +376,18 @@ input OrganizationOrder {
 input ConnectorOrder {
   field: ConnectorOrderField!
   direction: OrderDirection!
+}
+
+input PolicyVersionOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.PolicyVersionOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: PolicyVersionOrderField!
+}
+
+input PolicyVersionFilter {
+  status: PolicyStatus
 }
 
 # Core Types
@@ -631,11 +662,19 @@ type Evidence implements Node {
 
 type Policy implements Node {
   id: ID!
-  name: String!
-  status: PolicyStatus!
-  content: String!
-  reviewDate: Datetime
+  title: String!
+  description: String!
+  currentPublishedVersion: Int
   owner: People! @goField(forceResolver: true)
+
+  versions(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: PolicyVersionOrder
+    filter: PolicyVersionFilter
+  ): PolicyVersionConnection! @goField(forceResolver: true)
 
   controls(
     first: Int
@@ -852,6 +891,16 @@ type VendorRiskAssessmentEdge {
   node: VendorRiskAssessment!
 }
 
+type PolicyVersionConnection {
+  edges: [PolicyVersionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PolicyVersionEdge {
+  cursor: CursorKey!
+  node: PolicyVersion!
+}
+
 # Root Types
 type Query {
   node(id: ID!): Node!
@@ -952,8 +1001,11 @@ type Mutation {
 
   # Policy mutations
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
-  updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
+  publishPolicyVersion(input: PublishPolicyVersionInput!): PublishPolicyVersionPayload!
+  createDraftPolicyVersion(input: CreateDraftPolicyVersionInput!): CreateDraftPolicyVersionPayload!
+  updatePolicyVersion(input: UpdatePolicyVersionInput!): UpdatePolicyVersionPayload!
+  requestSignature(input: RequestSignatureInput!): RequestSignaturePayload!
 
   createVendorRiskAssessment(input: CreateVendorRiskAssessmentInput!): CreateVendorRiskAssessmentPayload!
 }
@@ -1224,20 +1276,17 @@ input DeleteVendorComplianceReportInput {
 
 input CreatePolicyInput {
   organizationId: ID!
-  name: String!
+  title: String!
   content: String!
-  status: PolicyStatus!
-  reviewDate: Datetime
   ownerId: ID!
 }
 
 input UpdatePolicyInput {
   id: ID!
-  name: String
+  title: String
   content: String
-  status: PolicyStatus
-  reviewDate: Datetime
   ownerId: ID
+  createdBy: ID
 }
 
 input DeletePolicyInput {
@@ -1414,6 +1463,7 @@ type DeleteVendorComplianceReportPayload {
 
 type CreatePolicyPayload {
   policyEdge: PolicyEdge!
+  policyVersionEdge: PolicyVersionEdge!
 }
 
 type UpdatePolicyPayload {
@@ -1489,4 +1539,112 @@ input DeleteMesureInput {
 
 type DeleteMesurePayload {
   deletedMesureId: ID!
+}
+
+type PolicyVersion implements Node {
+  id: ID!
+  policy: Policy! @goField(forceResolver: true)
+  status: PolicyStatus!
+  version: Int!
+  content: String!
+  changelog: String!
+
+  signatures(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: PolicyVersionSignatureOrder
+  ): PolicyVersionSignatureConnection! @goField(forceResolver: true)
+
+  publishedBy: People @goField(forceResolver: true)
+  publishedAt: Datetime
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type PolicyVersionSignatureConnection {
+  edges: [PolicyVersionSignatureEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PolicyVersionSignatureEdge {
+  cursor: CursorKey!
+  node: PolicyVersionSignature!
+}
+
+input PolicyVersionSignatureOrder {
+  field: PolicyVersionSignatureOrderField!
+  direction: OrderDirection!
+}
+
+enum PolicyVersionSignatureState
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureState") {
+  REQUESTED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureStateRequested"
+    )
+  SIGNED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureStateSigned"
+    )
+}
+
+enum PolicyVersionSignatureOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderFieldCreatedAt"
+    )
+  SIGNED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderFieldSignedAt"
+    )
+}
+
+type PolicyVersionSignature implements Node {
+  id: ID!
+  policyVersion: PolicyVersion! @goField(forceResolver: true)
+  state: PolicyVersionSignatureState!
+  signedBy: People! @goField(forceResolver: true)
+  signedAt: Datetime
+  requestedAt: Datetime!
+  requestedBy: People! @goField(forceResolver: true)
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+input RequestSignatureInput {
+  policyVersionId: ID!
+  signatoryId: ID!
+}
+
+type RequestSignaturePayload {
+  policyVersionSignatureEdge: PolicyVersionSignatureEdge!
+}
+
+input PublishPolicyVersionInput {
+  policyId: ID!
+}
+
+type PublishPolicyVersionPayload {
+  policyVersion: PolicyVersion!
+  policy: Policy!
+}
+
+type CreateDraftPolicyVersionPayload {
+  policyVersionEdge: PolicyVersionEdge!
+}
+
+input CreateDraftPolicyVersionInput {
+  policyID: ID!
+}
+
+input UpdatePolicyVersionInput {
+  policyVersionId: ID!
+  content: String!
+}
+
+type UpdatePolicyVersionPayload {
+  policyVersion: PolicyVersion!
 }

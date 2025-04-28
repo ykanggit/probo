@@ -106,10 +106,15 @@ const linkedPoliciesQuery = graphql`
           edges {
             node {
               id
-              name
-              content
-              status
-              reviewDate
+              title
+              description
+              currentPublishedVersion
+              createdAt
+              updatedAt
+              owner {
+                id
+                fullName
+              }
             }
           }
         }
@@ -128,10 +133,15 @@ const organizationPoliciesQuery = graphql`
           edges {
             node {
               id
-              name
-              content
-              status
-              reviewDate
+              title
+              description
+              currentPublishedVersion
+              createdAt
+              updatedAt
+              owner {
+                id
+                fullName
+              }
             }
           }
         }
@@ -582,7 +592,7 @@ export function Control({
     return policies.filter((policy) => {
       return (
         !policySearchQuery ||
-        policy.name.toLowerCase().includes(policySearchQuery.toLowerCase()) ||
+        policy.name?.toLowerCase().includes(policySearchQuery.toLowerCase()) ||
         (policy.content &&
           policy.content
             .toLowerCase()
@@ -1066,10 +1076,7 @@ export function Control({
                         <thead className="sticky top-0 bg-white">
                           <tr className="border-b text-left text-sm text-secondary bg-invert-bg">
                             <th className="py-3 px-4 font-medium">Name</th>
-                            <th className="py-3 px-4 font-medium">Status</th>
-                            <th className="py-3 px-4 font-medium">
-                              Review Date
-                            </th>
+                            <th className="py-3 px-4 font-medium">Review Date</th>
                             <th className="py-3 px-4 font-medium text-right">
                               Actions
                             </th>
@@ -1092,17 +1099,6 @@ export function Control({
                                       {policy.content}
                                     </div>
                                   )}
-                                </td>
-                                <td className="py-3 px-4">
-                                  <div
-                                    className={`px-2 py-0.5 rounded-full text-xs ${
-                                      policy.status === "ACTIVE"
-                                        ? "bg-success-bg text-success"
-                                        : "bg-secondary-bg text-secondary"
-                                    } inline-block`}
-                                  >
-                                    {policy.status}
-                                  </div>
                                 </td>
                                 <td className="py-3 px-4">
                                   {policy.reviewDate
@@ -1137,7 +1133,7 @@ export function Control({
                                         handleLinkPolicy(policy.id)
                                       }
                                       disabled={isLinkingPolicy}
-                                      className="text-xs h-7 text-info border-info-b hover:bg-h-info-bg"
+                                      className="text-xs h-7  text-info border-info-b hover:bg-h-info-bg"
                                     >
                                       {isLinkingPolicy ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -1193,7 +1189,6 @@ export function Control({
                   <thead>
                     <tr className="border-b text-left text-sm text-secondary bg-invert-bg">
                       <th className="py-3 px-4 font-medium">Name</th>
-                      <th className="py-3 px-4 font-medium">Status</th>
                       <th className="py-3 px-4 font-medium">Review Date</th>
                       <th className="py-3 px-4 font-medium text-right">
                         Actions
@@ -1213,17 +1208,6 @@ export function Control({
                               {policy.content}
                             </div>
                           )}
-                        </td>
-                        <td className="py-3 px-4">
-                          <div
-                            className={`px-2 py-0.5 rounded-full text-xs ${
-                              policy.status === "ACTIVE"
-                                ? "bg-success-bg text-success"
-                                : "bg-secondary-bg text-secondary"
-                            } inline-block`}
-                          >
-                            {policy.status}
-                          </div>
                         </td>
                         <td className="py-3 px-4">
                           {policy.reviewDate

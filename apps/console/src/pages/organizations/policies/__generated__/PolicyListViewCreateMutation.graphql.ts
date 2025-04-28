@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2026b385ee5eb895da6ca9c919762913>>
+ * @generated SignedSource<<885dc2a54ba3b8d4663e197cfe61d704>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,39 +9,36 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type PolicyStatus = "ACTIVE" | "DRAFT";
 export type CreatePolicyInput = {
   content: string;
-  name: string;
   organizationId: string;
   ownerId: string;
-  reviewDate?: string | null | undefined;
-  status: PolicyStatus;
+  title: string;
 };
-export type NewPolicyViewMutation$variables = {
+export type PolicyListViewCreateMutation$variables = {
   connections: ReadonlyArray<string>;
   input: CreatePolicyInput;
 };
-export type NewPolicyViewMutation$data = {
+export type PolicyListViewCreateMutation$data = {
   readonly createPolicy: {
     readonly policyEdge: {
       readonly node: {
-        readonly content: string;
+        readonly createdAt: string;
+        readonly description: string;
         readonly id: string;
-        readonly name: string;
         readonly owner: {
           readonly fullName: string;
           readonly id: string;
         };
-        readonly reviewDate: string | null | undefined;
-        readonly status: PolicyStatus;
+        readonly title: string;
+        readonly updatedAt: string;
       };
     };
   };
 };
-export type NewPolicyViewMutation = {
-  response: NewPolicyViewMutation$data;
-  variables: NewPolicyViewMutation$variables;
+export type PolicyListViewCreateMutation = {
+  response: PolicyListViewCreateMutation$data;
+  variables: PolicyListViewCreateMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -90,28 +87,28 @@ v4 = {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "name",
+          "name": "title",
           "storageKey": null
         },
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "content",
+          "name": "description",
           "storageKey": null
         },
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "status",
+          "name": "createdAt",
           "storageKey": null
         },
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "reviewDate",
+          "name": "updatedAt",
           "storageKey": null
         },
         {
@@ -147,7 +144,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "NewPolicyViewMutation",
+    "name": "PolicyListViewCreateMutation",
     "selections": [
       {
         "alias": null,
@@ -172,7 +169,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "NewPolicyViewMutation",
+    "name": "PolicyListViewCreateMutation",
     "selections": [
       {
         "alias": null,
@@ -205,16 +202,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "aa29cde3106d1c8d35c6ae8e74f310b7",
+    "cacheID": "f7aae6d7a0d276e71caec643e43b5ee5",
     "id": null,
     "metadata": {},
-    "name": "NewPolicyViewMutation",
+    "name": "PolicyListViewCreateMutation",
     "operationKind": "mutation",
-    "text": "mutation NewPolicyViewMutation(\n  $input: CreatePolicyInput!\n) {\n  createPolicy(input: $input) {\n    policyEdge {\n      node {\n        id\n        name\n        content\n        status\n        reviewDate\n        owner {\n          id\n          fullName\n        }\n      }\n    }\n  }\n}\n"
+    "text": "mutation PolicyListViewCreateMutation(\n  $input: CreatePolicyInput!\n) {\n  createPolicy(input: $input) {\n    policyEdge {\n      node {\n        id\n        title\n        description\n        createdAt\n        updatedAt\n        owner {\n          id\n          fullName\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "f6dcabf6c51e3858c9750e00fcc0cc15";
+(node as any).hash = "d55ac010a7ad352d830d3a38f2f8d5a8";
 
 export default node;

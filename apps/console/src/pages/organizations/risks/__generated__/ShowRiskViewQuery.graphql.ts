@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e318c9e0fe4355eb4923acb54da59ebb>>
+ * @generated SignedSource<<5d1745636bcff5f05d946bcd613463e5>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,7 +10,6 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type MesureState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
-export type PolicyStatus = "ACTIVE" | "DRAFT";
 export type RiskTreatment = "ACCEPTED" | "AVOIDED" | "MITIGATED" | "TRANSFERRED";
 export type ShowRiskViewQuery$variables = {
   riskId: string;
@@ -56,8 +55,7 @@ export type ShowRiskViewQuery$data = {
         readonly node: {
           readonly createdAt: string;
           readonly id: string;
-          readonly name: string;
-          readonly status: PolicyStatus;
+          readonly title: string;
         };
       }>;
     };
@@ -285,12 +283,11 @@ v18 = [
         "plural": false,
         "selections": [
           (v2/*: any*/),
-          (v3/*: any*/),
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "status",
+            "name": "title",
             "storageKey": null
           },
           (v12/*: any*/),
@@ -517,7 +514,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "05f0fe48c916ecda883f606eed0c9244",
+    "cacheID": "a88eba4c398c292d41deaddd1d77bb3b",
     "id": null,
     "metadata": {
       "connection": [
@@ -552,11 +549,11 @@ return {
     },
     "name": "ShowRiskViewQuery",
     "operationKind": "query",
-    "text": "query ShowRiskViewQuery(\n  $riskId: ID!\n) {\n  node(id: $riskId) {\n    __typename\n    id\n    ... on Risk {\n      name\n      description\n      treatment\n      owner {\n        id\n        fullName\n      }\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      note\n      createdAt\n      updatedAt\n      mesures(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            createdAt\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            name\n            status\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      controls(first: 100) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            description\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ShowRiskViewQuery(\n  $riskId: ID!\n) {\n  node(id: $riskId) {\n    __typename\n    id\n    ... on Risk {\n      name\n      description\n      treatment\n      owner {\n        id\n        fullName\n      }\n      inherentLikelihood\n      inherentImpact\n      residualLikelihood\n      residualImpact\n      note\n      createdAt\n      updatedAt\n      mesures(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            category\n            createdAt\n            state\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            title\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      controls(first: 100) {\n        edges {\n          node {\n            id\n            referenceId\n            name\n            description\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "25e67618b61999a955716e937a53a470";
+(node as any).hash = "96158658ecb7c406fc969e086917c03e";
 
 export default node;

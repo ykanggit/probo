@@ -104,6 +104,14 @@ type CreateControlPolicyMappingPayload struct {
 	Success bool `json:"success"`
 }
 
+type CreateDraftPolicyVersionInput struct {
+	PolicyID gid.GID `json:"policyID"`
+}
+
+type CreateDraftPolicyVersionPayload struct {
+	PolicyVersionEdge *PolicyVersionEdge `json:"policyVersionEdge"`
+}
+
 type CreateEvidenceInput struct {
 	TaskID      gid.GID               `json:"taskId"`
 	Name        string                `json:"name"`
@@ -159,16 +167,15 @@ type CreatePeoplePayload struct {
 }
 
 type CreatePolicyInput struct {
-	OrganizationID gid.GID               `json:"organizationId"`
-	Name           string                `json:"name"`
-	Content        string                `json:"content"`
-	Status         coredata.PolicyStatus `json:"status"`
-	ReviewDate     *time.Time            `json:"reviewDate,omitempty"`
-	OwnerID        gid.GID               `json:"ownerId"`
+	OrganizationID gid.GID `json:"organizationId"`
+	Title          string  `json:"title"`
+	Content        string  `json:"content"`
+	OwnerID        gid.GID `json:"ownerId"`
 }
 
 type CreatePolicyPayload struct {
-	PolicyEdge *PolicyEdge `json:"policyEdge"`
+	PolicyEdge        *PolicyEdge        `json:"policyEdge"`
+	PolicyVersionEdge *PolicyVersionEdge `json:"policyVersionEdge"`
 }
 
 type CreateRiskInput struct {
@@ -556,15 +563,15 @@ type PeopleEdge struct {
 }
 
 type Policy struct {
-	ID         gid.GID               `json:"id"`
-	Name       string                `json:"name"`
-	Status     coredata.PolicyStatus `json:"status"`
-	Content    string                `json:"content"`
-	ReviewDate *time.Time            `json:"reviewDate,omitempty"`
-	Owner      *People               `json:"owner"`
-	Controls   *ControlConnection    `json:"controls"`
-	CreatedAt  time.Time             `json:"createdAt"`
-	UpdatedAt  time.Time             `json:"updatedAt"`
+	ID                      gid.GID                  `json:"id"`
+	Title                   string                   `json:"title"`
+	Description             string                   `json:"description"`
+	CurrentPublishedVersion *int                     `json:"currentPublishedVersion,omitempty"`
+	Owner                   *People                  `json:"owner"`
+	Versions                *PolicyVersionConnection `json:"versions"`
+	Controls                *ControlConnection       `json:"controls"`
+	CreatedAt               time.Time                `json:"createdAt"`
+	UpdatedAt               time.Time                `json:"updatedAt"`
 }
 
 func (Policy) IsNode()             {}
@@ -578,6 +585,76 @@ type PolicyConnection struct {
 type PolicyEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Policy        `json:"node"`
+}
+
+type PolicyVersion struct {
+	ID          gid.GID                           `json:"id"`
+	Policy      *Policy                           `json:"policy"`
+	Status      coredata.PolicyStatus             `json:"status"`
+	Version     int                               `json:"version"`
+	Content     string                            `json:"content"`
+	Changelog   string                            `json:"changelog"`
+	Signatures  *PolicyVersionSignatureConnection `json:"signatures"`
+	PublishedBy *People                           `json:"publishedBy,omitempty"`
+	PublishedAt *time.Time                        `json:"publishedAt,omitempty"`
+	CreatedAt   time.Time                         `json:"createdAt"`
+	UpdatedAt   time.Time                         `json:"updatedAt"`
+}
+
+func (PolicyVersion) IsNode()             {}
+func (this PolicyVersion) GetID() gid.GID { return this.ID }
+
+type PolicyVersionConnection struct {
+	Edges    []*PolicyVersionEdge `json:"edges"`
+	PageInfo *PageInfo            `json:"pageInfo"`
+}
+
+type PolicyVersionEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *PolicyVersion `json:"node"`
+}
+
+type PolicyVersionFilter struct {
+	Status *coredata.PolicyStatus `json:"status,omitempty"`
+}
+
+type PolicyVersionSignature struct {
+	ID            gid.GID                              `json:"id"`
+	PolicyVersion *PolicyVersion                       `json:"policyVersion"`
+	State         coredata.PolicyVersionSignatureState `json:"state"`
+	SignedBy      *People                              `json:"signedBy"`
+	SignedAt      *time.Time                           `json:"signedAt,omitempty"`
+	RequestedAt   time.Time                            `json:"requestedAt"`
+	RequestedBy   *People                              `json:"requestedBy"`
+	CreatedAt     time.Time                            `json:"createdAt"`
+	UpdatedAt     time.Time                            `json:"updatedAt"`
+}
+
+func (PolicyVersionSignature) IsNode()             {}
+func (this PolicyVersionSignature) GetID() gid.GID { return this.ID }
+
+type PolicyVersionSignatureConnection struct {
+	Edges    []*PolicyVersionSignatureEdge `json:"edges"`
+	PageInfo *PageInfo                     `json:"pageInfo"`
+}
+
+type PolicyVersionSignatureEdge struct {
+	Cursor page.CursorKey          `json:"cursor"`
+	Node   *PolicyVersionSignature `json:"node"`
+}
+
+type PolicyVersionSignatureOrder struct {
+	Field     coredata.PolicyVersionSignatureOrderField `json:"field"`
+	Direction page.OrderDirection                       `json:"direction"`
+}
+
+type PublishPolicyVersionInput struct {
+	PolicyID gid.GID `json:"policyId"`
+}
+
+type PublishPolicyVersionPayload struct {
+	PolicyVersion *PolicyVersion `json:"policyVersion"`
+	Policy        *Policy        `json:"policy"`
 }
 
 type Query struct {
@@ -601,6 +678,15 @@ type RequestEvidenceInput struct {
 
 type RequestEvidencePayload struct {
 	EvidenceEdge *EvidenceEdge `json:"evidenceEdge"`
+}
+
+type RequestSignatureInput struct {
+	PolicyVersionID gid.GID `json:"policyVersionId"`
+	SignatoryID     gid.GID `json:"signatoryId"`
+}
+
+type RequestSignaturePayload struct {
+	PolicyVersionSignatureEdge *PolicyVersionSignatureEdge `json:"policyVersionSignatureEdge"`
 }
 
 type Risk struct {
@@ -720,16 +806,24 @@ type UpdatePeoplePayload struct {
 }
 
 type UpdatePolicyInput struct {
-	ID         gid.GID                `json:"id"`
-	Name       *string                `json:"name,omitempty"`
-	Content    *string                `json:"content,omitempty"`
-	Status     *coredata.PolicyStatus `json:"status,omitempty"`
-	ReviewDate *time.Time             `json:"reviewDate,omitempty"`
-	OwnerID    *gid.GID               `json:"ownerId,omitempty"`
+	ID        gid.GID  `json:"id"`
+	Title     *string  `json:"title,omitempty"`
+	Content   *string  `json:"content,omitempty"`
+	OwnerID   *gid.GID `json:"ownerId,omitempty"`
+	CreatedBy *gid.GID `json:"createdBy,omitempty"`
 }
 
 type UpdatePolicyPayload struct {
 	Policy *Policy `json:"policy"`
+}
+
+type UpdatePolicyVersionInput struct {
+	PolicyVersionID gid.GID `json:"policyVersionId"`
+	Content         string  `json:"content"`
+}
+
+type UpdatePolicyVersionPayload struct {
+	PolicyVersion *PolicyVersion `json:"policyVersion"`
 }
 
 type UpdateRiskInput struct {

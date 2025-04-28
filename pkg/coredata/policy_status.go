@@ -25,7 +25,7 @@ type (
 
 const (
 	PolicyStatusDraft PolicyStatus = iota
-	PolicyStatusActive
+	PolicyStatusPublished
 )
 
 func (ps PolicyStatus) MarshalText() ([]byte, error) {
@@ -38,8 +38,8 @@ func (ps *PolicyStatus) UnmarshalText(data []byte) error {
 	switch val {
 	case PolicyStatusDraft.String():
 		*ps = PolicyStatusDraft
-	case PolicyStatusActive.String():
-		*ps = PolicyStatusActive
+	case PolicyStatusPublished.String():
+		*ps = PolicyStatusPublished
 	default:
 		return fmt.Errorf("invalid PolicyStatus value: %q", val)
 	}
@@ -53,8 +53,8 @@ func (ps PolicyStatus) String() string {
 	switch ps {
 	case PolicyStatusDraft:
 		val = "DRAFT"
-	case PolicyStatusActive:
-		val = "ACTIVE"
+	case PolicyStatusPublished:
+		val = "PUBLISHED"
 	}
 
 	return val

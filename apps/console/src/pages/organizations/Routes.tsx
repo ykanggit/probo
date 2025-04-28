@@ -19,9 +19,8 @@ import { NewPeoplePage } from "./people/NewPeoplePage";
 import { PeopleListPage } from "./people/PeopleListPage";
 import { PeoplePage } from "./people/PeoplePage";
 import { EditPolicyPage } from "./policies/EditPolicyPage";
-import { NewPolicyPage } from "./policies/NewPolicyPage";
 import { PolicyListPage } from "./policies/PolicyListPage";
-import { PolicyPage } from "./policies/PolicyPage";
+import { ShowPolicyPage } from "./policies/ShowPolicyPage";
 import { EditRiskPage } from "./risks/EditRiskPage";
 import { NewRiskPage } from "./risks/NewRiskPage";
 import { ListRiskPage } from "./risks/ListRiskPage";
@@ -54,9 +53,8 @@ export function OrganizationsRoutes() {
         <Route path="mesures/:mesureId/edit" element={<EditMesurePage />} />
         <Route path="vendors/:vendorId" element={<VendorPage />} />
         <Route path="policies" element={<PolicyListPage />} />
-        <Route path="policies/new" element={<NewPolicyPage />} />
-        <Route path="policies/:policyId" element={<PolicyPage />} />
-        <Route path="policies/:policyId/edit" element={<EditPolicyPage />} />
+        <Route path="policies/:policyId" element={<ShowPolicyPage />} />
+        <Route path="policies/:policyId/versions/:versionId/edit" element={<EditPolicyPage />} />
         <Route path="risks" element={<ListRiskPage />} />
         <Route path="risks/new" element={<NewRiskPage />} />
         <Route path="risks/:riskId" element={<ShowRiskView />} />

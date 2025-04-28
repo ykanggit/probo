@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<171200736f3a443faae3f8b7c2085f4f>>
+ * @generated SignedSource<<d8d76cb73e37916ddc34017550ff3702>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,30 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type PolicyStatus = "ACTIVE" | "DRAFT";
-export type UpdatePolicyInput = {
-  content?: string | null | undefined;
-  id: string;
-  name?: string | null | undefined;
-  ownerId?: string | null | undefined;
-  reviewDate?: string | null | undefined;
-  status?: PolicyStatus | null | undefined;
+export type UpdatePolicyVersionInput = {
+  content: string;
+  policyVersionId: string;
 };
 export type EditPolicyViewMutation$variables = {
-  input: UpdatePolicyInput;
+  input: UpdatePolicyVersionInput;
 };
 export type EditPolicyViewMutation$data = {
-  readonly updatePolicy: {
-    readonly policy: {
+  readonly updatePolicyVersion: {
+    readonly policyVersion: {
       readonly content: string;
       readonly id: string;
-      readonly name: string;
-      readonly owner: {
-        readonly fullName: string;
-        readonly id: string;
-      };
-      readonly reviewDate: string | null | undefined;
-      readonly status: PolicyStatus;
     };
   };
 };
@@ -49,14 +37,7 @@ var v0 = [
     "name": "input"
   }
 ],
-v1 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
-},
-v2 = [
+v1 = [
   {
     "alias": null,
     "args": [
@@ -66,25 +47,24 @@ v2 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "UpdatePolicyPayload",
+    "concreteType": "UpdatePolicyVersionPayload",
     "kind": "LinkedField",
-    "name": "updatePolicy",
+    "name": "updatePolicyVersion",
     "plural": false,
     "selections": [
       {
         "alias": null,
         "args": null,
-        "concreteType": "Policy",
+        "concreteType": "PolicyVersion",
         "kind": "LinkedField",
-        "name": "policy",
+        "name": "policyVersion",
         "plural": false,
         "selections": [
-          (v1/*: any*/),
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "name",
+            "name": "id",
             "storageKey": null
           },
           {
@@ -92,39 +72,6 @@ v2 = [
             "args": null,
             "kind": "ScalarField",
             "name": "content",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "status",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "reviewDate",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "People",
-            "kind": "LinkedField",
-            "name": "owner",
-            "plural": false,
-            "selections": [
-              (v1/*: any*/),
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
-                "name": "fullName",
-                "storageKey": null
-              }
-            ],
             "storageKey": null
           }
         ],
@@ -140,7 +87,7 @@ return {
     "kind": "Fragment",
     "metadata": null,
     "name": "EditPolicyViewMutation",
-    "selections": (v2/*: any*/),
+    "selections": (v1/*: any*/),
     "type": "Mutation",
     "abstractKey": null
   },
@@ -149,19 +96,19 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
     "name": "EditPolicyViewMutation",
-    "selections": (v2/*: any*/)
+    "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "643990a3ab54cb51144f434b023531e7",
+    "cacheID": "02b56043d606c6237dd502a7695fea50",
     "id": null,
     "metadata": {},
     "name": "EditPolicyViewMutation",
     "operationKind": "mutation",
-    "text": "mutation EditPolicyViewMutation(\n  $input: UpdatePolicyInput!\n) {\n  updatePolicy(input: $input) {\n    policy {\n      id\n      name\n      content\n      status\n      reviewDate\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
+    "text": "mutation EditPolicyViewMutation(\n  $input: UpdatePolicyVersionInput!\n) {\n  updatePolicyVersion(input: $input) {\n    policyVersion {\n      id\n      content\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "41d4945568bc1f43eeedc727a968654d";
+(node as any).hash = "556fbcc4fadc0011c1a2154dcffeb389";
 
 export default node;

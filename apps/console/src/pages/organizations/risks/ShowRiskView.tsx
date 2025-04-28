@@ -101,8 +101,7 @@ const showRiskViewQuery = graphql`
           edges {
             node {
               id
-              name
-              status
+              title
               createdAt
             }
           }
@@ -155,8 +154,7 @@ const organizationPoliciesQuery = graphql`
           edges {
             node {
               id
-              name
-              status
+              title
             }
           }
         }
@@ -530,7 +528,7 @@ function ShowRiskViewContent({
     return policies.filter((policy) => {
       return (
         !policySearchQuery ||
-        policy.name.toLowerCase().includes(policySearchQuery.toLowerCase())
+        policy.title.toLowerCase().includes(policySearchQuery.toLowerCase())
       );
     });
   }, [getPolicies, policySearchQuery]);
@@ -731,7 +729,7 @@ function ShowRiskViewContent({
 
           toast({
             title: "Success",
-            description: `Linked policy "${policy.name}" to this risk.`,
+            description: `Linked policy "${policy.title}" to this risk.`,
           });
         },
         onError: (error) => {
@@ -803,7 +801,7 @@ function ShowRiskViewContent({
 
           toast({
             title: "Success",
-            description: `Unlinked policy "${policy.name}" from this risk.`,
+            description: `Unlinked policy "${policy.title}" from this risk.`,
           });
         },
         onError: (error) => {
@@ -1090,15 +1088,26 @@ function ShowRiskViewContent({
           <TabsContent value="policies" className="space-y-4">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Risk Policies</h2>
-              <Button
-                onClick={() => {
-                  setIsPolicyDialogOpen(true);
-                  loadPoliciesData();
-                }}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Link Policy
-              </Button>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  asChild
+                >
+                  <Link to={`/organizations/${organizationId}/policies/new?riskId=${risk.id}`}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Version
+                  </Link>
+                </Button>
+                <Button
+                  onClick={() => {
+                    setIsPolicyDialogOpen(true);
+                    loadPoliciesData();
+                  }}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Link Policy
+                </Button>
+              </div>
             </div>
             {policies.length > 0 ? (
               <div className="rounded-md border">
@@ -1117,7 +1126,7 @@ function ShowRiskViewContent({
                             to={`/organizations/${organizationId}/policies/${policy.id}`}
                             className="font-medium text-blue-600 hover:underline"
                           >
-                            {policy.name}
+                            {policy.title}
                           </Link>
                         </TableCell>
                         <TableCell>
@@ -1350,7 +1359,7 @@ function ShowRiskViewContent({
                         >
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-medium">{policy.name}</h3>
+                              <h3 className="font-medium">{policy.title}</h3>
                             </div>
                             {isLinked ? (
                               <Button

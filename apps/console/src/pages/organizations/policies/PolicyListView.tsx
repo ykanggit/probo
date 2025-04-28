@@ -15,6 +15,7 @@ import {
   MoreHorizontal,
   Trash2,
   Eye,
+  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,24 +25,59 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import type { PolicyListViewQuery as PolicyListViewQueryType } from "./__generated__/PolicyListViewQuery.graphql";
+import { format } from "date-fns";
+import type { PolicyListViewQuery, PolicyListViewQuery$data } from "./__generated__/PolicyListViewQuery.graphql";
 import type { PolicyListViewDeleteMutation } from "./__generated__/PolicyListViewDeleteMutation.graphql";
+import type { PolicyListViewCreateMutation } from "./__generated__/PolicyListViewCreateMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
 import { PolicyListViewSkeleton } from "./PolicyListPage";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Avatar } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import PeopleSelector from "@/components/PeopleSelector";
+import type { PeopleSelector_organization$key } from "@/components/__generated__/PeopleSelector_organization.graphql";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
-const PolicyListViewQuery = graphql`
+const policyListViewQuery = graphql`
   query PolicyListViewQuery($organizationId: ID!) {
+    viewer {
+      user {
+        id
+      }
+    }
+
     organization: node(id: $organizationId) {
       ... on Organization {
-        policies(first: 100) @connection(key: "PolicyListView_policies") {
+        ...PeopleSelector_organization
+        policies(first: 50, orderBy: {field: TITLE, direction: ASC}) @connection(key: "PolicyListView_policies") {
           edges {
             node {
               id
-              name
-              content
+              title
+              description
+              currentPublishedVersion
               createdAt
               updatedAt
-              status
+              owner {
+                id
+                fullName
+              }
+              versions(first: 1) {
+                edges {
+                  node {
+                    id
+                    status
+                    updatedAt
+                  }
+                }
+              }
             }
           }
         }
@@ -61,29 +97,47 @@ const DeletePolicyMutation = graphql`
   }
 `;
 
+const createPolicyMutation = graphql`
+  mutation PolicyListViewCreateMutation(
+    $input: CreatePolicyInput!
+    $connections: [ID!]!
+  ) {
+    createPolicy(input: $input) {
+      policyEdge @prependEdge(connections: $connections) {
+        node {
+          id
+          title
+          description
+          createdAt
+          updatedAt
+          owner {
+            id
+            fullName
+          }
+        }
+      }
+    }
+  }
+`;
+
 function PolicyTableRow({
   policy,
   organizationId,
 }: {
-  policy: {
-    id: string;
-    name: string;
-    content?: string;
-    status?: string;
-    updatedAt: string;
-  };
+  policy: NonNullable<PolicyListViewQuery$data["organization"]["policies"]>["edges"][0]["node"];
   organizationId: string;
 }) {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [commitDeleteMutation] = useMutation<PolicyListViewDeleteMutation>(DeletePolicyMutation);
+  const [deletePolicy, isDeleting] = useMutation<PolicyListViewDeleteMutation>(DeletePolicyMutation);
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const latestVersion = policy.versions?.edges[0]?.node;
+  const status = latestVersion?.status || "DRAFT";
+
+  const handleDeletePolicy = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (window.confirm("Are you sure you want to delete this policy? This action cannot be undone.")) {
-      setIsDeleting(true);
-      commitDeleteMutation({
+      deletePolicy({
         variables: {
           input: {
             policyId: policy.id,
@@ -96,7 +150,6 @@ function PolicyTableRow({
           ],
         },
         onCompleted: (_, errors) => {
-          setIsDeleting(false);
           if (errors) {
             console.error("Error deleting policy:", errors);
             toast({
@@ -112,7 +165,6 @@ function PolicyTableRow({
           });
         },
         onError: (error) => {
-          setIsDeleting(false);
           console.error("Error deleting policy:", error);
           toast({
             title: "Error",
@@ -131,27 +183,33 @@ function PolicyTableRow({
 
   return (
     <tr 
-      className="border-t border-[#ECEFEC] hover:bg-[rgba(5,77,5,0.01)] cursor-pointer"
+      className="border-t border-solid-b hover:bg-subtle-bg cursor-pointer"
       onClick={() => {
         navigate(`/organizations/${organizationId}/policies/${policy.id}`);
       }}
     >
       <td className="py-4 px-6">
         <div className="flex flex-col">
-          <span className="font-medium text-[#141E12]">{policy.name}</span>
-          <span className="text-sm text-[#818780]">
-            Description
+          <span className="font-medium text-primary">{policy.title}</span>
+          <span className="text-sm text-tertiary">
+            {policy.description || "No description provided"}
           </span>
         </div>
       </td>
       <td className="py-4 px-6">
-        <span className="text-sm text-[#141E12]">Mon, 8 Mar. 2025</span>
+        <span className="text-sm text-primary">
+          {format(new Date(policy.updatedAt), "MMM d, yyyy")}
+        </span>
       </td>
       <td className="py-4 px-6">
         <Badge
-          className="bg-[rgba(5,77,5,0.03)] text-[#6B716A] font-medium border-0 py-0 px-[6px] h-5 text-xs rounded-md"
+          className={`font-medium border-0 py-0 px-[6px] h-5 text-xs rounded-md ${
+            status === "PUBLISHED" 
+              ? "bg-success-bg text-success" 
+              : "bg-secondary-bg text-tertiary"
+          }`}
         >
-          Draft
+          {status === "PUBLISHED" ? "Published" : "Draft"}
         </Badge>
       </td>
       <td className="py-4 px-6 text-right">
@@ -172,8 +230,8 @@ function PolicyTableRow({
               View
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={handleDelete}
-              className="text-red-600 focus:text-red-600 focus:bg-red-50"
+              onClick={handleDeletePolicy}
+              className="text-danger focus:text-danger focus:bg-danger-bg"
               disabled={isDeleting}
             >
               <Trash2 className="mr-2 h-4 w-4" />
@@ -186,60 +244,264 @@ function PolicyTableRow({
   );
 }
 
+function CreatePolicyModal({
+  open,
+  onOpenChange,
+  organizationId,
+  organizationRef,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  organizationId: string;
+  organizationRef: PeopleSelector_organization$key;
+}) {
+  const { toast } = useToast();
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [ownerId, setOwnerId] = useState<string | null>(null);
+
+  const [createPolicy, isCreating] = useMutation<PolicyListViewCreateMutation>(createPolicyMutation);
+
+  // Reset form fields
+  const resetForm = () => {
+    setTitle("");
+    setContent("");
+    setOwnerId(null);
+  };
+
+  const handleCreatePolicy = () => {
+    if (!title.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a policy title.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!ownerId) {
+      toast({
+        title: "Error",
+        description: "Please select an owner for the policy.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const input = {
+      organizationId,
+      title,
+      content,
+      ownerId,
+    };
+
+    createPolicy({
+      variables: {
+        input,
+        connections: [
+          ConnectionHandler.getConnectionID(
+            organizationId,
+            "PolicyListView_policies",
+            {orderBy: {field: "TITLE", direction: "ASC"}}
+          ),
+        ],
+      },
+      onCompleted: (response, errors) => {
+        if (errors) {
+          console.error("Error creating policy:", errors);
+          toast({
+            title: "Error",
+            description: "Failed to create policy. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        toast({
+          title: "Success",
+          description: "Policy created successfully!",
+        });
+
+        resetForm();
+        onOpenChange(false);
+      },
+      onError: (error) => {
+        console.error("Error creating policy:", error);
+        toast({
+          title: "Error",
+          description: "Failed to create policy. Please try again.",
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!open) {
+      resetForm();
+    }
+  }, [open]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[1080px] h-[700px] max-h-[700px] p-0 gap-0 flex flex-col">
+        <DialogTitle className="sr-only">Create new policy</DialogTitle>
+        <DialogDescription className="sr-only">Form to create a new policy with title, content, and owner information.</DialogDescription>
+        <div className="flex justify-between items-center py-2 px-4 border-b border-solid-b h-[40px]">
+          <div className="flex items-center gap-1 text-sm">
+            <span className="text-tertiary">Policies</span>
+            <ChevronDown className="h-3 w-3 text-quaternary rotate-[270deg]" />
+            <span className="font-medium">New policy</span>
+          </div>
+        </div>
+
+        <div className="flex flex-1 overflow-hidden">
+          <div className="flex-1 p-6 overflow-y-auto">
+            <div className="mb-6">
+              <h1 
+                className={`text-4xl leading-tight font-bold outline-none focus:outline-none ${!title ? 'text-gray-400' : 'text-black'}`}
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={(e) => setTitle(e.currentTarget.textContent || "")}
+                style={{ WebkitTapHighlightColor: 'transparent' }}
+                onClick={(e) => {
+                  if (!title) {
+                    e.currentTarget.textContent = '';
+                  }
+                }}
+                onFocus={(e) => {
+                  if (!title) {
+                    e.currentTarget.textContent = '';
+                  }
+                }}
+              >
+                {title || "Enter policy title..."}
+              </h1>
+            </div>
+            <Textarea
+              placeholder="This Privacy Policy outlines how NovaSoft collects, uses, and protects personal information provided by users of its services. By accessing or using our platform, you agree to the collection and use of information in accordance with this policy..."
+              className="min-h-[300px] border-none resize-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
+          </div>
+          <div className="w-[420px] bg-[rgba(5,77,5,0.03)] p-6 flex flex-col gap-4">
+            <h3 className="font-medium text-base">Properties</h3>
+            
+            <div className="flex flex-col gap-4">
+              <div className="flex justify-between items-center py-2 border-t border-[rgba(2,42,2,0.08)]">
+                <span className="text-sm font-medium text-tertiary">Status</span>
+                <div className="bg-[rgba(0,39,0,0.05)] py-1.5 px-2 rounded-lg">
+                  <span className="text-sm font-medium">Draft</span>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center py-2 border-t border-[rgba(2,42,2,0.08)]">
+                <span className="text-sm font-medium text-tertiary">Owner</span>
+                <div className="relative">
+                  <PeopleSelector
+                    organizationRef={organizationRef}
+                    selectedPersonId={ownerId}
+                    onSelect={setOwnerId}
+                    placeholder="Select owner"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center py-2 border-t border-[rgba(2,42,2,0.08)]">
+                <span className="text-sm font-medium text-tertiary">Review date</span>
+                <Button size="icon" variant="outline" className="h-8 w-8 rounded-full bg-[rgba(0,39,0,0.05)] border-none">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter className="flex justify-end items-center gap-3 px-4 py-2 border-t border-solid-b h-[60px]">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="h-9"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleCreatePolicy}
+            disabled={isCreating}
+            className="h-9"
+          >
+            {isCreating ? "Creating..." : "Create policy"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function PolicyListViewContent({
   queryRef,
 }: {
-  queryRef: PreloadedQuery<PolicyListViewQueryType>;
+  queryRef: PreloadedQuery<PolicyListViewQuery>;
 }) {
-  const data = usePreloadedQuery<PolicyListViewQueryType>(
-    PolicyListViewQuery,
+  const data = usePreloadedQuery<PolicyListViewQuery>(
+    policyListViewQuery,
     queryRef
   );
   const { organizationId } = useParams();
   const policies =
-    data.organization.policies?.edges.map((edge) => edge?.node) ?? [];
+    data.organization?.policies?.edges.map((edge) => edge?.node) ?? [];
+  
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setCreateModalOpen(true);
+  };
+
+  const handleCloseModal = (open: boolean) => {
+    setCreateModalOpen(open);
+  };
 
   return (
     <PageTemplate
       title="Policies"
       actions={
-        <Button asChild>
-          <Link to={`/organizations/${organizationId}/policies/new`}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create policy
-          </Link>
+        <Button onClick={handleOpenModal}>
+          <Plus className="mr-2 h-4 w-4" />
+          New policy
         </Button>
       }
     >
       {/* Policy table */}
-      <div className="rounded-lg border border-[#ECEFEC] overflow-hidden bg-white">
+      <div className="rounded-lg border border-solid-b overflow-hidden bg-level-1">
         <table className="w-full">
           <thead>
-            <tr className="bg-white text-left">
-              <th className="py-3 px-6 text-xs font-medium text-[#818780] border-b border-[rgba(2,42,2,0.08)]">
+            <tr className="bg-level-1 text-left">
+              <th className="py-3 px-6 text-xs font-medium text-tertiary border-b border-low-b">
                 <div className="flex items-center gap-1">
-                  Vendor
-                  <ChevronDown className="h-3 w-3 text-[#C3C8C2]" />
+                  Policy
+                  <ChevronDown className="h-3 w-3 text-quaternary" />
                 </div>
               </th>
-              <th className="py-3 px-6 text-xs font-medium text-[#818780] border-b border-[rgba(2,42,2,0.08)]">
+              <th className="py-3 px-6 text-xs font-medium text-tertiary border-b border-low-b">
                 <div className="flex items-center gap-1">
                   Last update
-                  <ChevronDown className="h-3 w-3 text-[#C3C8C2]" />
+                  <ChevronDown className="h-3 w-3 text-quaternary" />
                 </div>
               </th>
-              <th className="py-3 px-6 text-xs font-medium text-[#818780] border-b border-[rgba(2,42,2,0.08)]">
+              <th className="py-3 px-6 text-xs font-medium text-tertiary border-b border-low-b">
                 <div className="flex items-center gap-1">
                   Status
-                  <ChevronDown className="h-3 w-3 text-[#C3C8C2]" />
+                  <ChevronDown className="h-3 w-3 text-quaternary" />
                 </div>
               </th>
-              <th className="py-3 px-6 text-right text-xs font-medium text-[#818780] border-b border-[rgba(2,42,2,0.08)]"></th>
+              <th className="py-3 px-6 text-right text-xs font-medium text-tertiary border-b border-low-b"></th>
             </tr>
           </thead>
-          <tbody className="bg-white">
+          <tbody className="bg-level-1">
             {policies.length > 0 ? (
-              policies.map((policy) => (
+              policies.map((policy: any) => (
                 <PolicyTableRow
                   key={policy.id}
                   policy={policy}
@@ -251,14 +513,12 @@ function PolicyListViewContent({
                 <td colSpan={4} className="py-12 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <h3 className="text-lg font-medium">No policies found</h3>
-                    <p className="text-[#818780]">
+                    <p className="text-tertiary">
                       Create your first policy to get started
                     </p>
-                    <Button asChild>
-                      <Link to={`/organizations/${organizationId}/policies/new`}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create policy
-                      </Link>
+                    <Button onClick={handleOpenModal}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create policy
                     </Button>
                   </div>
                 </td>
@@ -267,13 +527,20 @@ function PolicyListViewContent({
           </tbody>
         </table>
       </div>
+
+      <CreatePolicyModal
+        open={createModalOpen}
+        onOpenChange={handleCloseModal}
+        organizationId={organizationId!}
+        organizationRef={data.organization}
+      />
     </PageTemplate>
   );
 }
 
 export default function PolicyListView() {
   const [queryRef, loadQuery] =
-    useQueryLoader<PolicyListViewQueryType>(PolicyListViewQuery);
+    useQueryLoader<PolicyListViewQuery>(policyListViewQuery);
 
   const { organizationId } = useParams();
 

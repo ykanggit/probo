@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5f81eaad8c66c579401d9c73180f8f91>>
+ * @generated SignedSource<<ca410ce7df7231383e55d134d37916bd>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,7 +15,7 @@ export type OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery$variables = {
 export type OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery$data = {
   readonly policy: {
     readonly id: string;
-    readonly name?: string;
+    readonly title?: string;
   };
 };
 export type OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery = {
@@ -52,7 +52,7 @@ v3 = {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
-      "name": "name",
+      "name": "title",
       "storageKey": null
     }
   ],
@@ -112,16 +112,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "13d6ac9cf6f904f8a03f141b6b6e2564",
+    "cacheID": "bc0b04bbe75c94660de230461532773a",
     "id": null,
     "metadata": {},
     "name": "OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery",
     "operationKind": "query",
-    "text": "query OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery(\n  $policyId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      name\n    }\n  }\n}\n"
+    "text": "query OrganizationBreadcrumbBreadcrumbPolicyOverviewQuery(\n  $policyId: ID!\n) {\n  policy: node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      title\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "6ed45dd2d1fa369329edde6b77eec92d";
+(node as any).hash = "ced380d1e6eb1c31ecc5f2dc9096133b";
 
 export default node;

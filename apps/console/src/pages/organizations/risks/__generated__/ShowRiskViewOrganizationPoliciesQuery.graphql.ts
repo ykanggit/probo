@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<86be887d4ec59050fd69900fd80863a2>>
+ * @generated SignedSource<<0335bb26d78f02170c02c7c2279a6bfd>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type PolicyStatus = "ACTIVE" | "DRAFT";
 export type ShowRiskViewOrganizationPoliciesQuery$variables = {
   organizationId: string;
 };
@@ -20,8 +19,7 @@ export type ShowRiskViewOrganizationPoliciesQuery$data = {
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly id: string;
-          readonly name: string;
-          readonly status: PolicyStatus;
+          readonly title: string;
         };
       }>;
     };
@@ -83,14 +81,7 @@ v4 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "name",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "status",
+            "name": "title",
             "storageKey": null
           },
           (v3/*: any*/)
@@ -228,7 +219,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a229f1f805e79f8de378305e021d7fea",
+    "cacheID": "a92a6b2390e95e67b42fd18cc1030a9a",
     "id": null,
     "metadata": {
       "connection": [
@@ -245,11 +236,11 @@ return {
     },
     "name": "ShowRiskViewOrganizationPoliciesQuery",
     "operationKind": "query",
-    "text": "query ShowRiskViewOrganizationPoliciesQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            name\n            status\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ShowRiskViewOrganizationPoliciesQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ... on Organization {\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            title\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "26cbf19cd716aee7413931357b9c5354";
+(node as any).hash = "b47adf6c3a247367a6b23dd161df2702";
 
 export default node;

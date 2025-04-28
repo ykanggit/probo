@@ -18,21 +18,21 @@ type PolicyService struct {
 type (
 	CreatePolicyRequest struct {
 		OrganizationID gid.GID
-		Name           string
-		Status         coredata.PolicyStatus
+		Title          string
 		Content        string
-		ReviewDate     *time.Time
 		OwnerID        gid.GID
+		CreatedBy      gid.GID
 	}
 
-	UpdatePolicyRequest struct {
-		ID              gid.GID
-		ExpectedVersion int
-		Name            *string
-		Content         *string
-		Status          *coredata.PolicyStatus
-		ReviewDate      *time.Time
-		OwnerID         *gid.GID
+	UpdatePolicyVersionRequest struct {
+		ID      gid.GID
+		Content string
+	}
+
+	RequestSignatureRequest struct {
+		PolicyVersionID gid.GID
+		RequestedBy     gid.GID
+		Signatory       gid.GID
 	}
 )
 
@@ -56,38 +56,203 @@ func (s *PolicyService) Get(
 	return policy, nil
 }
 
+func (s *PolicyService) PublishVersion(
+	ctx context.Context,
+	policyID gid.GID,
+	publishedBy gid.GID,
+) (*coredata.Policy, *coredata.PolicyVersion, error) {
+	policy := &coredata.Policy{}
+	policyVersion := &coredata.PolicyVersion{}
+	now := time.Now()
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			if err := policy.LoadByID(ctx, tx, s.svc.scope, policyID); err != nil {
+				return fmt.Errorf("cannot load policy %q: %w", policyID, err)
+			}
+
+			if err := policyVersion.LoadLatestVersion(ctx, tx, s.svc.scope, policyID); err != nil {
+				return fmt.Errorf("cannot load current draft: %w", err)
+			}
+
+			if policyVersion.Status != coredata.PolicyStatusDraft {
+				return fmt.Errorf("cannot publish version")
+			}
+
+			policy.CurrentPublishedVersion = &policyVersion.VersionNumber
+			policy.UpdatedAt = now
+
+			policyVersion.Status = coredata.PolicyStatusPublished
+			policyVersion.PublishedAt = &now
+			policyVersion.PublishedBy = &publishedBy
+			policyVersion.UpdatedAt = now
+
+			if err := policy.Update(ctx, tx, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot update policy: %w", err)
+			}
+
+			if err := policyVersion.Update(ctx, tx, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot update policy version: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return policy, policyVersion, nil
+}
+
 func (s *PolicyService) Create(
 	ctx context.Context,
 	req CreatePolicyRequest,
-) (*coredata.Policy, error) {
+) (*coredata.Policy, *coredata.PolicyVersion, error) {
 	now := time.Now()
 	policyID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.PolicyEntityType)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create policy global id: %w", err)
+		return nil, nil, fmt.Errorf("cannot create policy global id: %w", err)
 	}
 
-	organization := &coredata.Organization{}
+	policyVersionID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.PolicyVersionEntityType)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot create policy version global id: %w", err)
+	}
+
 	policy := &coredata.Policy{
 		ID:             policyID,
 		OrganizationID: req.OrganizationID,
 		OwnerID:        req.OwnerID,
-		Name:           req.Name,
-		Content:        req.Content,
-		Status:         req.Status,
-		ReviewDate:     req.ReviewDate,
+		Title:          req.Title,
 		CreatedAt:      now,
 		UpdatedAt:      now,
+	}
+
+	policyVersion := &coredata.PolicyVersion{
+		ID:            policyVersionID,
+		PolicyID:      policyID,
+		VersionNumber: 1,
+		Content:       req.Content,
+		CreatedBy:     req.CreatedBy,
+		CreatedAt:     now,
+		UpdatedAt:     now,
+	}
+	err = s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := policy.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert policy: %w", err)
+			}
+
+			if err := policyVersion.Update(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot create policy version: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return policy, policyVersion, nil
+}
+
+func (s *PolicyService) UpdateVersion(
+	ctx context.Context,
+	req UpdatePolicyVersionRequest,
+) (*coredata.PolicyVersion, error) {
+	policyVersion := &coredata.PolicyVersion{}
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := policyVersion.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
+				return fmt.Errorf("cannot load policy version %q: %w", req.ID, err)
+			}
+
+			if policyVersion.Status != coredata.PolicyStatusDraft {
+				return fmt.Errorf("cannot update published version")
+			}
+
+			policyVersion.Content = req.Content
+			policyVersion.UpdatedAt = time.Now()
+
+			if err := policyVersion.Update(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot update policy version: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return policyVersion, nil
+}
+
+func (s *PolicyService) GetVersionSignature(
+	ctx context.Context,
+	signatureID gid.GID,
+) (*coredata.PolicyVersionSignature, error) {
+	policyVersionSignature := &coredata.PolicyVersionSignature{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return policyVersionSignature.LoadByID(ctx, conn, s.svc.scope, signatureID)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return policyVersionSignature, nil
+}
+
+func (s *PolicyService) RequestSignature(
+	ctx context.Context,
+	req RequestSignatureRequest,
+) (*coredata.PolicyVersionSignature, error) {
+	policyVersionSignatureID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.PolicyVersionSignatureEntityType)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create policy version signature global id: %w", err)
+	}
+
+	policyVersion, err := s.GetVersion(ctx, req.PolicyVersionID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get policy version: %w", err)
+	}
+
+	if policyVersion.Status != coredata.PolicyStatusPublished {
+		return nil, fmt.Errorf("cannot request signature for unpublished version")
+	}
+
+	now := time.Now()
+	policyVersionSignature := &coredata.PolicyVersionSignature{
+		ID:              policyVersionSignatureID,
+		PolicyVersionID: req.PolicyVersionID,
+		State:           coredata.PolicyVersionSignatureStateRequested,
+		RequestedBy:     req.RequestedBy,
+		RequestedAt:     now,
+		SignedBy:        req.Signatory,
+		SignedAt:        nil,
+		CreatedAt:       now,
+		UpdatedAt:       now,
 	}
 
 	err = s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.OrganizationID); err != nil {
-				return fmt.Errorf("cannot load organization %q: %w", req.OrganizationID, err)
-			}
-
-			if err := policy.Insert(ctx, conn, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot insert policy: %w", err)
+			if err := policyVersionSignature.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert policy version signature: %w", err)
 			}
 
 			return nil
@@ -98,54 +263,77 @@ func (s *PolicyService) Create(
 		return nil, err
 	}
 
-	return policy, nil
+	return policyVersionSignature, nil
 }
 
-func (s *PolicyService) Update(
+func (s *PolicyService) ListSignatures(
 	ctx context.Context,
-	req UpdatePolicyRequest,
-) (*coredata.Policy, error) {
-	policy := &coredata.Policy{}
+	policyVersionID gid.GID,
+	cursor *page.Cursor[coredata.PolicyVersionSignatureOrderField],
+) (*page.Page[*coredata.PolicyVersionSignature, coredata.PolicyVersionSignatureOrderField], error) {
+	var policyVersionSignatures coredata.PolicyVersionSignatures
 
-	err := s.svc.pg.WithTx(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			if err := policy.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
-				return fmt.Errorf("cannot load policy %q: %w", req.ID, err)
+			return policyVersionSignatures.LoadByPolicyVersionID(ctx, conn, s.svc.scope, policyVersionID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(policyVersionSignatures, cursor), nil
+}
+
+func (s *PolicyService) CreateDraft(
+	ctx context.Context,
+	policyID gid.GID,
+	createdBy gid.GID,
+) (*coredata.PolicyVersion, error) {
+	draftVersionID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.PolicyVersionEntityType)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create policy version global id: %w", err)
+	}
+
+	latestVersion := &coredata.PolicyVersion{}
+	draftVersion := &coredata.PolicyVersion{}
+	now := time.Now()
+
+	err = s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := latestVersion.LoadLatestVersion(ctx, conn, s.svc.scope, policyID); err != nil {
+				return fmt.Errorf("cannot load latest version: %w", err)
 			}
 
-			if req.Name != nil {
-				policy.Name = *req.Name
+			if latestVersion.Status != coredata.PolicyStatusPublished {
+				return fmt.Errorf("cannot create draft from unpublished version")
 			}
 
-			if req.Content != nil {
-				policy.Content = *req.Content
-			}
+			draftVersion.ID = draftVersionID
+			draftVersion.PolicyID = policyID
+			draftVersion.VersionNumber = latestVersion.VersionNumber + 1
+			draftVersion.Content = latestVersion.Content
+			draftVersion.Status = coredata.PolicyStatusDraft
+			draftVersion.CreatedBy = createdBy
+			draftVersion.CreatedAt = now
+			draftVersion.UpdatedAt = now
 
-			if req.Status != nil {
-				policy.Status = *req.Status
-			}
-
-			if req.ReviewDate != nil {
-				policy.ReviewDate = req.ReviewDate
-			}
-
-			if req.OwnerID != nil {
-				policy.OwnerID = *req.OwnerID
-			}
-
-			if err := policy.Update(ctx, conn, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot update policy: %w", err)
+			if err := draftVersion.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot create draft: %w", err)
 			}
 
 			return nil
 		},
 	)
+
 	if err != nil {
 		return nil, err
 	}
 
-	return policy, nil
+	return draftVersion, nil
 }
 
 func (s *PolicyService) Delete(
@@ -160,6 +348,47 @@ func (s *PolicyService) Delete(
 			return policy.Delete(ctx, conn, s.svc.scope)
 		},
 	)
+}
+
+func (s *PolicyService) ListVersions(
+	ctx context.Context,
+	policyID gid.GID,
+	cursor *page.Cursor[coredata.PolicyVersionOrderField],
+) (*page.Page[*coredata.PolicyVersion, coredata.PolicyVersionOrderField], error) {
+	var policyVersions coredata.PolicyVersions
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return policyVersions.LoadByPolicyID(ctx, conn, s.svc.scope, policyID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(policyVersions, cursor), nil
+}
+
+func (s *PolicyService) GetVersion(
+	ctx context.Context,
+	policyVersionID gid.GID,
+) (*coredata.PolicyVersion, error) {
+	policyVersion := &coredata.PolicyVersion{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return policyVersion.LoadByID(ctx, conn, s.svc.scope, policyVersionID)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return policyVersion, nil
 }
 
 func (s *PolicyService) ListByOrganizationID(

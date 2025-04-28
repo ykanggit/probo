@@ -5,9 +5,9 @@ import { useLocation } from "react-router";
 import { ErrorBoundaryWithLocation } from "../ErrorBoundary";
 import { lazy } from "@probo/react-lazy";
 
-const PolicyView = lazy(() => import("./PolicyView"));
+const ShowPolicyView = lazy(() => import("./ShowPolicyView"));
 
-export function PolicyViewSkeleton() {
+export function ShowPolicyViewSkeleton() {
   return (
     <PageTemplateSkeleton
       withDescription
@@ -108,13 +108,13 @@ export function PolicyViewSkeleton() {
   );
 }
 
-export function PolicyPage() {
+export function ShowPolicyPage() {
   const location = useLocation();
 
   return (
-    <Suspense key={location.pathname} fallback={<PolicyViewSkeleton />}>
+    <Suspense key={location.pathname} fallback={<ShowPolicyViewSkeleton />}>
       <ErrorBoundaryWithLocation>
-        <PolicyView />
+        <ShowPolicyView />
       </ErrorBoundaryWithLocation>
     </Suspense>
   );

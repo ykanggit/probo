@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9bddb18bf52f14881a85995793bdc1ca>>
+ * @generated SignedSource<<85bdd7f83672d1a88247d958f4b7dfaf>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,6 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type PolicyStatus = "ACTIVE" | "DRAFT";
 export type ControlLinkedPoliciesQuery$variables = {
   controlId: string;
 };
@@ -19,11 +18,16 @@ export type ControlLinkedPoliciesQuery$data = {
     readonly policies?: {
       readonly edges: ReadonlyArray<{
         readonly node: {
-          readonly content: string;
+          readonly createdAt: string;
+          readonly currentPublishedVersion: number | null | undefined;
+          readonly description: string;
           readonly id: string;
-          readonly name: string;
-          readonly reviewDate: string | null | undefined;
-          readonly status: PolicyStatus;
+          readonly owner: {
+            readonly fullName: string;
+            readonly id: string;
+          };
+          readonly title: string;
+          readonly updatedAt: string;
         };
       }>;
     };
@@ -85,28 +89,54 @@ v4 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "name",
+            "name": "title",
             "storageKey": null
           },
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "content",
+            "name": "description",
             "storageKey": null
           },
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "status",
+            "name": "currentPublishedVersion",
             "storageKey": null
           },
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "reviewDate",
+            "name": "createdAt",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "updatedAt",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "People",
+            "kind": "LinkedField",
+            "name": "owner",
+            "plural": false,
+            "selections": [
+              (v2/*: any*/),
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "fullName",
+                "storageKey": null
+              }
+            ],
             "storageKey": null
           },
           (v3/*: any*/)
@@ -244,7 +274,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "67f9bf1d5f255f5406e932abde540e08",
+    "cacheID": "24c5ce380772f28348df8cf089a58a8e",
     "id": null,
     "metadata": {
       "connection": [
@@ -261,11 +291,11 @@ return {
     },
     "name": "ControlLinkedPoliciesQuery",
     "operationKind": "query",
-    "text": "query ControlLinkedPoliciesQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            name\n            content\n            status\n            reviewDate\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ControlLinkedPoliciesQuery(\n  $controlId: ID!\n) {\n  control: node(id: $controlId) {\n    __typename\n    id\n    ... on Control {\n      policies(first: 100) {\n        edges {\n          node {\n            id\n            title\n            description\n            currentPublishedVersion\n            createdAt\n            updatedAt\n            owner {\n              id\n              fullName\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3904c2344754177177fa7c16129dc894";
+(node as any).hash = "d4d16cac2a05ea1d38fde55d04f21c01";
 
 export default node;

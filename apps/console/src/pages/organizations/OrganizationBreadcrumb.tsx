@@ -290,7 +290,7 @@ function BreadcrumbPolicyOverview() {
           policy: node(id: $policyId) {
             id
             ... on Policy {
-              name
+              title
             }
           }
         }
@@ -306,7 +306,7 @@ function BreadcrumbPolicyOverview() {
         <BreadcrumbNavLink
           to={`/organizations/${organizationId}/policies/${policyId}`}
         >
-          {data.policy?.name}
+          {data.policy?.title}
         </BreadcrumbNavLink>
       </BreadcrumbItem>
       <Outlet />

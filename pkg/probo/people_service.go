@@ -71,7 +71,6 @@ func (s PeopleService) Get(
 
 func (s PeopleService) GetByUserID(
 	ctx context.Context,
-	organizationID gid.GID,
 	userID gid.GID,
 ) (*coredata.People, error) {
 	people := &coredata.People{}
@@ -79,7 +78,7 @@ func (s PeopleService) GetByUserID(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return people.LoadByUserID(ctx, conn, s.svc.scope, organizationID, userID)
+			return people.LoadByUserID(ctx, conn, s.svc.scope, userID)
 		},
 	)
 
