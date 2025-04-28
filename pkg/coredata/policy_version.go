@@ -189,7 +189,7 @@ INSERT INTO policy_versions (
 		"content":        p.Content,
 		"changelog":      p.Changelog,
 		"created_by":     p.CreatedBy,
-		"status":         PolicyStatusDraft,
+		"status":         p.Status,
 		"created_at":     now,
 		"updated_at":     now,
 	}

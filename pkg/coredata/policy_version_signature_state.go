@@ -41,7 +41,7 @@ func (pvs *PolicyVersionSignatureState) UnmarshalText(data []byte) error {
 	case PolicyVersionSignatureStateSigned.String():
 		*pvs = PolicyVersionSignatureStateSigned
 	default:
-		return fmt.Errorf("invalid MesureState value: %q", val)
+		return fmt.Errorf("invalid PolicyVersionSignatureState value: %q", val)
 	}
 
 	return nil
@@ -55,6 +55,8 @@ func (pvs PolicyVersionSignatureState) String() string {
 		val = "REQUESTED"
 	case PolicyVersionSignatureStateSigned:
 		val = "SIGNED"
+	default:
+		panic(fmt.Errorf("invalid PolicyVersionSignatureState value: %q", string(pvs)))
 	}
 
 	return val
@@ -63,7 +65,7 @@ func (pvs PolicyVersionSignatureState) String() string {
 func (pvs *PolicyVersionSignatureState) Scan(value any) error {
 	val, ok := value.(string)
 	if !ok {
-		return fmt.Errorf("invalid scan source for MesureState, expected string got %T", value)
+		return fmt.Errorf("invalid scan source for PolicyVersionSignatureState, expected string got %T", value)
 	}
 
 	return pvs.UnmarshalText([]byte(val))

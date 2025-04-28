@@ -33,7 +33,7 @@ SELECT
     p.tenant_id,
     p.id,
     1,
-    '',
+    p.content,
     'Initial version',
     p.owner_id,
     'DRAFT',
@@ -56,5 +56,5 @@ SET current_published_version = 1
 WHERE EXISTS (
     SELECT 1 FROM policy_versions pv 
     WHERE pv.policy_id = p.id 
-    AND pv.status = 'published'
+    AND pv.status = 'PUBLISHED'
 );

@@ -136,6 +136,7 @@ func (s *PolicyService) Create(
 		PolicyID:      policyID,
 		VersionNumber: 1,
 		Content:       req.Content,
+		Status:        coredata.PolicyStatusDraft,
 		CreatedBy:     req.CreatedBy,
 		CreatedAt:     now,
 		UpdatedAt:     now,
@@ -147,7 +148,7 @@ func (s *PolicyService) Create(
 				return fmt.Errorf("cannot insert policy: %w", err)
 			}
 
-			if err := policyVersion.Update(ctx, conn, s.svc.scope); err != nil {
+			if err := policyVersion.Insert(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot create policy version: %w", err)
 			}
 

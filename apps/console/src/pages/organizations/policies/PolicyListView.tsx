@@ -38,11 +38,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Avatar } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 import PeopleSelector from "@/components/PeopleSelector";
 import type { PeopleSelector_organization$key } from "@/components/__generated__/PeopleSelector_organization.graphql";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 const policyListViewQuery = graphql`
@@ -363,7 +360,7 @@ function CreatePolicyModal({
                 className={`text-4xl leading-tight font-bold outline-none focus:outline-none ${!title ? 'text-gray-400' : 'text-black'}`}
                 contentEditable
                 suppressContentEditableWarning
-                onBlur={(e) => setTitle(e.currentTarget.textContent || "")}
+                onInput={(e) => setTitle(e.currentTarget.textContent || "")}
                 style={{ WebkitTapHighlightColor: 'transparent' }}
                 onClick={(e) => {
                   if (!title) {
