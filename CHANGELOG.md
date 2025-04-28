@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix cannot delete measure with linked risk
+
 ## [0.15.1] - 2025-04-27
 
 ### Fixed
