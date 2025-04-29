@@ -4,10 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.16.0] = 2025-04-29
+
 ### Added
 
 - Policy history
 - Policy signature
+- New vendors in the built-in lists
 
 ### Fixed
 
