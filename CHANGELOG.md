@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.17.0] = 2025-04-29
+
+### Added
+
+- Add policy unlogged sign
+
 ## [0.16.0] = 2025-04-29
 
 ### Added
