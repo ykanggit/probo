@@ -1090,15 +1090,6 @@ function ShowRiskViewContent({
               <h2 className="text-xl font-semibold">Risk Policies</h2>
               <div className="flex space-x-2">
                 <Button
-                  variant="outline"
-                  asChild
-                >
-                  <Link to={`/organizations/${organizationId}/policies/new?riskId=${risk.id}`}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Version
-                  </Link>
-                </Button>
-                <Button
                   onClick={() => {
                     setIsPolicyDialogOpen(true);
                     loadPoliciesData();
