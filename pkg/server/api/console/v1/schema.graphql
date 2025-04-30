@@ -12,6 +12,7 @@ directive @goModel(
 
 directive @goEnum(value: String) on ENUM_VALUE
 
+
 # Scalars
 scalar CursorKey
 scalar Void
@@ -1006,6 +1007,7 @@ type Mutation {
   createDraftPolicyVersion(input: CreateDraftPolicyVersionInput!): CreateDraftPolicyVersionPayload!
   updatePolicyVersion(input: UpdatePolicyVersionInput!): UpdatePolicyVersionPayload!
   requestSignature(input: RequestSignatureInput!): RequestSignaturePayload!
+  sendSigningNotifications(input: SendSigningNotificationsInput!): SendSigningNotificationsPayload!
 
   createVendorRiskAssessment(input: CreateVendorRiskAssessmentInput!): CreateVendorRiskAssessmentPayload!
 }
@@ -1647,4 +1649,12 @@ input UpdatePolicyVersionInput {
 
 type UpdatePolicyVersionPayload {
   policyVersion: PolicyVersion!
+}
+
+input SendSigningNotificationsInput {
+  organizationId: ID!
+}
+
+type SendSigningNotificationsPayload {
+  success: Boolean!
 }

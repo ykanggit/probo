@@ -723,6 +723,14 @@ type RiskEdge struct {
 	Node   *Risk          `json:"node"`
 }
 
+type SendSigningNotificationsInput struct {
+	OrganizationID gid.GID `json:"organizationId"`
+}
+
+type SendSigningNotificationsPayload struct {
+	Success bool `json:"success"`
+}
+
 type Session struct {
 	ID        gid.GID   `json:"id"`
 	ExpiresAt time.Time `json:"expiresAt"`

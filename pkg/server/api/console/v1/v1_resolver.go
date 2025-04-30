@@ -1134,6 +1134,20 @@ func (r *mutationResolver) RequestSignature(ctx context.Context, input types.Req
 	}, nil
 }
 
+// SendSigningNotifications is the resolver for the sendSigningNotifications field.
+func (r *mutationResolver) SendSigningNotifications(ctx context.Context, input types.SendSigningNotificationsInput) (*types.SendSigningNotificationsPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+
+	err := svc.Policies.SendSigningNotifications(ctx, input.OrganizationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot send signing notifications: %w", err))
+	}
+
+	return &types.SendSigningNotificationsPayload{
+		Success: true,
+	}, nil
+}
+
 // CreateVendorRiskAssessment is the resolver for the createVendorRiskAssessment field.
 func (r *mutationResolver) CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.VendorID.TenantID())
