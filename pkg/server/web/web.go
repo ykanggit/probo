@@ -17,8 +17,6 @@ package web
 import (
 	"io/fs"
 	"net/http"
-	"strings"
-	"time"
 
 	"github.com/getprobo/probo/apps/console"
 )
@@ -63,12 +61,6 @@ func (s *Server) ServeSPA(w http.ResponseWriter, r *http.Request) {
 	f, err := s.spaFS.Open(path)
 	if err == nil {
 		defer f.Close()
-
-		if isStaticFile(path) {
-			w.Header().Set("Cache-Control", "public, max-age=31536000")
-			w.Header().Set("Expires", time.Now().Add(365*24*time.Hour).Format(time.RFC1123))
-		}
-
 		http.FileServer(s.spaFS).ServeHTTP(w, r)
 		return
 	}
@@ -79,16 +71,6 @@ func (s *Server) ServeSPA(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write(s.indexContent)
-}
-
-func isStaticFile(path string) bool {
-	extensions := []string{".js", ".css", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".woff", ".woff2", ".ttf", ".eot"}
-	for _, ext := range extensions {
-		if strings.HasSuffix(path, ext) {
-			return true
-		}
-	}
-	return false
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
