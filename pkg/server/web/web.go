@@ -15,9 +15,11 @@
 package web
 
 import (
+	"compress/gzip"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"strings"
@@ -132,6 +134,23 @@ func (s *Server) ServeSPA(w http.ResponseWriter, r *http.Request) {
 	w.Write(s.indexContent)
 }
 
+type gzipResponseWriter struct {
+	io.Writer
+	http.ResponseWriter
+}
+
+func (w gzipResponseWriter) Write(b []byte) (int, error) {
+	return w.Writer.Write(b)
+}
+
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+		w.Header().Set("Content-Encoding", "gzip")
+		gz := gzip.NewWriter(w)
+		defer gz.Close()
+		s.ServeSPA(gzipResponseWriter{Writer: gz, ResponseWriter: w}, r)
+		return
+	}
+
 	s.ServeSPA(w, r)
 }
