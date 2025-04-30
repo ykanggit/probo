@@ -5,12 +5,13 @@ import { buildEndpoint } from "../utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import ReactMarkdown from "react-markdown";
 
 type Document = {
-  id: string;
+  policy_version_id: string;
   title: string;
   content: string;
-  signed: boolean;
+  signed?: boolean;
 };
 
 type SigningResponse = {
@@ -38,7 +39,7 @@ export default function SigningRequestsPage() {
 
     async function fetchDocuments() {
       try {
-        const response = await fetch(buildEndpoint("/api/signing-requests"), {
+        const response = await fetch(buildEndpoint("/api/console/v1/policies/signing-requests"), {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -50,8 +51,18 @@ export default function SigningRequestsPage() {
           throw new Error("Failed to fetch signing documents");
         }
 
-        const data: SigningResponse = await response.json();
-        setSigningData(data);
+        const documents: Document[] = await response.json();
+        // Transform the API response to match our internal structure
+        const enhancedDocuments = documents.map(doc => ({
+          ...doc,
+          signed: false
+        }));
+        
+        setSigningData({
+          documents: enhancedDocuments,
+          requesterName: "Requester", // Default values as they're not in the API response
+          requesterOrganization: "Organization"
+        });
       } catch (err) {
         setError(err instanceof Error ? err.message : "An unknown error occurred");
       } finally {
@@ -69,7 +80,7 @@ export default function SigningRequestsPage() {
     const docToSign = signingData.documents[currentDocIndex];
     
     try {
-      const response = await fetch(buildEndpoint(`/api/signing-requests/${docToSign.id}/sign`), {
+      const response = await fetch(buildEndpoint(`/api/console/v1/policies/signing-requests/${docToSign.policy_version_id}/sign`), {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -203,7 +214,9 @@ export default function SigningRequestsPage() {
         
         <CardContent>
           <div className="border rounded-md p-4 min-h-[400px] bg-muted/20">
-            <div dangerouslySetInnerHTML={{ __html: currentDoc.content }} />
+            <div className="prose prose-olive max-w-none">
+              <ReactMarkdown>{currentDoc.content}</ReactMarkdown>
+            </div>
           </div>
         </CardContent>
         

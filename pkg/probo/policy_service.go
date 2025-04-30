@@ -10,6 +10,7 @@ import (
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/statelesstoken"
+	"github.com/jackc/pgx/v5"
 	"go.gearno.de/kit/pg"
 )
 
@@ -172,6 +173,51 @@ func (s *PolicyService) Create(
 	}
 
 	return policy, policyVersion, nil
+}
+
+func (s *PolicyService) ListSigningRequests(
+	ctx context.Context,
+	organizationID gid.GID,
+	peopleID gid.GID,
+) ([]map[string]any, error) {
+	q := `
+SELECT 
+  p.title, 
+  pv.content,
+  pv.id AS policy_version_id
+FROM
+	policies p 
+	INNER JOIN policy_versions pv ON pv.policy_id = p.id 
+	INNER JOIN policy_version_signatures pvs ON pvs.policy_version_id = pv.id 
+WHERE 
+    p.tenant_id = $1
+	AND pvs.signed_by = $2
+	AND pvs.signed_at IS NULL
+`
+
+	var results []map[string]any
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			rows, err := conn.Query(ctx, q, s.svc.scope.GetTenantID(), peopleID)
+			if err != nil {
+				return fmt.Errorf("cannot query policies: %w", err)
+			}
+
+			results, err = pgx.CollectRows(rows, pgx.RowToMap)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 func (s *PolicyService) SendSigningNotifications(
