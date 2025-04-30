@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.18.0] - 2025-04-30
+
+### Added
+
+- Static files are served using GZip
+- Static fiels are served with ETag and Cache header fields
+
+### Fixed
+
+- Entrypoint JS/CSS has no chunk hash
+
 ## [0.17.0] = 2025-04-29
 
 ### Added
