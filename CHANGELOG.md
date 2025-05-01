@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.20.0] - 2025-05-01
+
 ### Added
 
 - Add end-user confirmation before sending policy sign notification
