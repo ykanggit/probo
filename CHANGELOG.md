@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.19.2] - 2025-05-01
+
+### Fixed
+
+- Fix 5xx when invite user in an organization
+
 ## [0.19.1] - 2025-05-01
 
 ### Fixed
