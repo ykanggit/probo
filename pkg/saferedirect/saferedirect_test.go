@@ -86,6 +86,20 @@ func TestSafeRedirect_Validate(t *testing.T) {
 			expectedURL:     "",
 			expectedIsValid: false,
 		},
+		{
+			name:            "double slash attack",
+			allowedHost:     "example.com",
+			redirectURL:     "//evil.com/phishing",
+			expectedURL:     "",
+			expectedIsValid: false,
+		},
+		{
+			name:            "slash-backslash attack",
+			allowedHost:     "example.com",
+			redirectURL:     "/\\evil.com/phishing",
+			expectedURL:     "",
+			expectedIsValid: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -134,6 +148,20 @@ func TestSafeRedirect_GetSafeRedirectURL(t *testing.T) {
 			fallbackURL: "/home",
 			expectedURL: "/home",
 		},
+		{
+			name:        "double slash attack",
+			allowedHost: "example.com",
+			redirectURL: "//evil.com/phishing",
+			fallbackURL: "/home",
+			expectedURL: "/home",
+		},
+		{
+			name:        "slash-backslash attack",
+			allowedHost: "example.com",
+			redirectURL: "/\\evil.com/phishing",
+			fallbackURL: "/home",
+			expectedURL: "/home",
+		},
 	}
 
 	for _, tt := range tests {
@@ -179,6 +207,22 @@ func TestSafeRedirect_Redirect(t *testing.T) {
 			name:           "empty redirect URL",
 			allowedHost:    "example.com",
 			redirectURL:    "",
+			fallbackURL:    "/home",
+			expectedStatus: http.StatusFound,
+			expectedURL:    "/home",
+		},
+		{
+			name:           "double slash attack",
+			allowedHost:    "example.com",
+			redirectURL:    "//evil.com/phishing",
+			fallbackURL:    "/home",
+			expectedStatus: http.StatusFound,
+			expectedURL:    "/home",
+		},
+		{
+			name:           "slash-backslash attack",
+			allowedHost:    "example.com",
+			redirectURL:    "/\\evil.com/phishing",
 			fallbackURL:    "/home",
 			expectedStatus: http.StatusFound,
 			expectedURL:    "/home",
@@ -257,6 +301,24 @@ func TestSafeRedirect_RedirectFromQuery(t *testing.T) {
 			expectedStatus: http.StatusFound,
 			expectedURL:    "/profile",
 		},
+		{
+			name:           "double slash attack in query",
+			allowedHost:    "example.com",
+			queryParam:     "continue",
+			queryValue:     "//evil.com/phishing",
+			fallbackURL:    "/home",
+			expectedStatus: http.StatusFound,
+			expectedURL:    "/home",
+		},
+		{
+			name:           "slash-backslash attack in query",
+			allowedHost:    "example.com",
+			queryParam:     "continue",
+			queryValue:     "/\\evil.com/phishing",
+			fallbackURL:    "/home",
+			expectedStatus: http.StatusFound,
+			expectedURL:    "/home",
+		},
 	}
 
 	for _, tt := range tests {
@@ -265,10 +327,8 @@ func TestSafeRedirect_RedirectFromQuery(t *testing.T) {
 				AllowedHost: tt.allowedHost,
 			}
 
-			// Create a test HTTP recorder to capture the response
 			w := httptest.NewRecorder()
 
-			// Create request with query parameter
 			url := "http://test.com"
 			if tt.queryValue != "" {
 				url = "http://test.com?" + tt.queryParam + "=" + tt.queryValue
@@ -277,12 +337,10 @@ func TestSafeRedirect_RedirectFromQuery(t *testing.T) {
 
 			sr.RedirectFromQuery(w, r, tt.queryParam, tt.fallbackURL, tt.expectedStatus)
 
-			// Check that we got the expected status code
 			if w.Code != tt.expectedStatus {
 				t.Errorf("RedirectFromQuery() status = %v, want %v", w.Code, tt.expectedStatus)
 			}
 
-			// Check that the Location header contains the expected URL
 			location := w.Header().Get("Location")
 			if location != tt.expectedURL {
 				t.Errorf("RedirectFromQuery() location = %v, want %v", location, tt.expectedURL)

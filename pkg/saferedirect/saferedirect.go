@@ -32,6 +32,9 @@ func (sr *SafeRedirect) Validate(redirectURL string) (string, bool) {
 	}
 
 	if strings.HasPrefix(redirectURL, "/") {
+		if len(redirectURL) > 1 && (redirectURL[1] == '/' || redirectURL[1] == '\\') {
+			return "", false
+		}
 		return redirectURL, true
 	}
 
