@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.19.1] - 2025-05-01
+
 ### Fixed
 
 - Evidence URL not set
