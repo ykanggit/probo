@@ -1,5 +1,145 @@
 # Vendors
 
+## Table of Contents by Category
+
+### Analytics
+
+- [Plausible Analytics](#plausible-analytics)
+- [PostHog](#posthog)
+- [Segment](#segment)
+
+### Cloud monitoring
+
+- [Better Stack](#better-stack)
+- [Datadog](#datadog)
+
+### Cloud provider
+
+- [Amazon Web Services (AWS)](#amazon-web-services-aws)
+- [Cloudflare](#cloudflare)
+- [Google](#google)
+- [Heroku](#heroku)
+- [Latitude.sh](#latitudesh)
+- [Microsoft Azure](#microsoft-azure)
+- [OVHcloud US](#ovhcloud-us)
+- [OVHcloud global](#ovhcloud-global)
+- [Porter](#porter)
+- [Vercel](#vercel)
+
+### Collaboration
+
+- [Cal.com](#calcom)
+- [Calendly](#calendly)
+- [Claap](#claap)
+- [Google Workspace](#google-workspace)
+- [Microsoft 365](#microsoft-365)
+- [Otter.ai](#otterai)
+- [Signal](#signal)
+- [Slack](#slack)
+- [Zoom](#zoom)
+- [monday.com](#mondaycom)
+
+### Communication & Collaboration
+
+- [Sendgrid](#sendgrid)
+- [Twilio](#twilio)
+
+### Data storage and processing
+
+- [Airtable](#airtable)
+- [ClickHouse](#clickhouse)
+- [PlanetScale](#planetscale)
+- [Supabase](#supabase)
+
+### Document management
+
+- [Notion](#notion)
+
+### Employee management
+
+- [Checkr](#checkr)
+- [Gusto](#gusto)
+- [Rippling](#rippling)
+
+### Engineering
+
+- [Algolia](#algolia)
+- [Anthropic](#anthropic)
+- [Atlassian](#atlassian)
+- [Cursor](#cursor)
+- [Docker](#docker)
+- [Langfuse](#langfuse)
+- [Linear](#linear)
+- [Mintlify](#mintlify)
+- [OpenAI](#openai)
+- [Sentry](#sentry)
+- [Together AI](#together-ai)
+- [jsDelivr](#jsdelivr)
+- [npm](#npm)
+
+### Finance
+
+- [Brex](#brex)
+- [Carta](#carta)
+- [Mercury](#mercury)
+- [Pulley](#pulley)
+- [Puzzle](#puzzle)
+- [Qonto](#qonto)
+- [Ramp](#ramp)
+- [Spendesk](#spendesk)
+- [Stripe](#stripe)
+- [Vouch](#vouch)
+
+### IT
+
+- [Namecheap](#namecheap)
+- [Plesk](#plesk)
+
+### Identity provider
+
+- [Auth0](#auth0)
+- [Clerk](#clerk)
+
+### Marketing
+
+- [Brevo](#brevo)
+- [Hubspot](#hubspot)
+- [Mailchimp](#mailchimp)
+- [Resend](#resend)
+
+### Password management
+
+- [1Password](#1password)
+- [Bitwarden](#bitwarden)
+
+### Product and design
+
+- [Figma](#figma)
+- [Framer](#framer)
+- [Pitch](#pitch)
+- [Webflow](#webflow)
+
+### Recruiting
+
+- [Lever](#lever)
+
+### Sales
+
+- [Apollo.io](#apolloio)
+- [Pipedrive](#pipedrive)
+- [folk](#folk)
+
+### Security
+
+- [Probo](#probo)
+- [Tailscale](#tailscale)
+
+### Version control
+
+- [Github](#github)
+
+---
+
 ## Slack
 
 Slack is a team communication platform that allows users to send messages, files, and images to each other.
@@ -19,7 +159,7 @@ Slack is a team communication platform that allows users to send messages, files
 | Security Page | [Link](https://slack.com/intl/en-gb/trust/security) |
 | Status Page | [Link](https://slack-status.com/) |
 
-**Category:** Communication
+**Category:** Collaboration
 
 ### Certifications
 
@@ -50,7 +190,7 @@ Zoom is a video communication platform that allows users to send messages, files
 | Security Page | [Link](https://zoom.us/trust/security) |
 | Status Page | [Link](https://status.zoom.us/) |
 
-**Category:** Communication
+**Category:** Collaboration
 
 ### Certifications
 
@@ -95,7 +235,7 @@ Github is a code hosting platform for version control and collaboration.
 | Status Page | [Link](https://www.githubstatus.com/) |
 | Subprocessors List | [Link](https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors) |
 
-**Category:** Code Hosting
+**Category:** Version control
 
 ### Certifications
 
@@ -127,7 +267,7 @@ Online payment processing platform that enables businesses to accept and manage 
 | Status Page | [Link](https://status.stripe.com/) |
 | Data Processing Agreement | [Link](https://stripe.com/legal/dpa) |
 
-**Category:** Payment Processing
+**Category:** Finance
 
 ### Certifications
 
@@ -163,7 +303,7 @@ Cloudflare is a cloud computing company that provides a range of services, inclu
 | Security Page | [Link](https://www.cloudflare.com/en-gb/security) |
 | Status Page | [Link](https://www.cloudflarestatus.com/) |
 
-**Category:** Web Hosting
+**Category:** Cloud provider
 
 ### Certifications
 
@@ -210,7 +350,7 @@ Sentry is a cloud-based platform for monitoring and analyzing application perfor
 | Security Page | [Link](https://sentry.io/security) |
 | Status Page | [Link](https://status.sentry.io/) |
 
-**Category:** Monitoring
+**Category:** Engineering
 
 ### Certifications
 
@@ -238,7 +378,7 @@ Datadog is a cloud-based platform for monitoring and analyzing application perfo
 | Trust Page | [Link](https://datadog.com/trust) |
 | Status Page | [Link](https://status.datadoghq.com/) |
 
-**Category:** Monitoring
+**Category:** Cloud monitoring
 
 ### Certifications
 
@@ -275,7 +415,7 @@ Vercel is a cloud-based platform for monitoring and analyzing application perfor
 | Status Page | [Link](https://status.vercel.com/) |
 | Data Processing Agreement | [Link](https://vercel.com/legal/dpa) |
 
-**Category:** Web Hosting
+**Category:** Cloud provider
 
 ### Certifications
 
@@ -310,7 +450,7 @@ Cloud-based email delivery platform that provides transactional and marketing em
 | Status Page | [Link](https://status.sendgrid.com/) |
 | Data Processing Agreement | [Link](https://sendgrid.com/dpa) |
 
-**Category:** Email Marketing
+**Category:** Communication & Collaboration
 
 ### Certifications
 
@@ -345,7 +485,7 @@ Cloud-based design and prototyping platform that enables collaborative interface
 | Status Page | [Link](https://status.figma.com/) |
 | Service Software Agreement | [Link](https://www.figma.com/ssa/) |
 
-**Category:** Design
+**Category:** Product and design
 
 ### Certifications
 
@@ -384,7 +524,7 @@ Cloud-based workspace and collaboration platform that offers document management
 | Business Associate Agreement | [Link](https://www.notion.so/notion/Business-Associate-Agreement-909d9f4ccca041b1a23d0fe6e56fa111) |
 | Subprocessors List | [Link](https://www.notion.so/notion/Notion-s-List-of-Subprocessors-268fa5bcfa0f46b6bc29436b21676734) |
 
-**Category:** Project Management
+**Category:** Document management
 
 ### Certifications
 
@@ -419,7 +559,7 @@ Mintlify is a cloud-based documentation platform that enables teams to create, m
 | Status Page | [Link](https://status.mintlify.com/) |
 | Subprocessors List | [Link](https://security.mintlify.com) |
 
-**Category:** Documentation
+**Category:** Engineering
 
 ### Certifications
 
@@ -448,7 +588,7 @@ Open-source Firebase alternative providing a backend-as-a-service platform with 
 | Status Page | [Link](https://status.supabase.com/) |
 | Data Processing Agreement | [Link](https://supabase.com/legal/dpa) |
 
-**Category:** Database
+**Category:** Data storage and processing
 
 ### Certifications
 
@@ -480,7 +620,7 @@ Segment is a cloud-based customer data platform that enables businesses to colle
 | Data Processing Agreement | [Link](https://www.twilio.com/en-us/legal/data-protection-addendum) |
 | Subprocessors List | [Link](https://www.twilio.com/en-us/legal/sub-processors) |
 
-**Category:** Customer Data Platform
+**Category:** Analytics
 
 ### Certifications
 
@@ -514,7 +654,7 @@ Auth0 is a cloud-based identity and access management platform that enables busi
 | Status Page | [Link](https://status.auth0.com/) |
 | Data Processing Agreement | [Link](https://www.okta.com/trustandcompliance/#data-processing-addendum) |
 
-**Category:** Identity and Access Management
+**Category:** Identity provider
 
 ### Certifications
 
@@ -554,7 +694,7 @@ Heroku is a cloud-based platform for building, deploying, and scaling applicatio
 | Data Processing Agreement | [Link](https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/Agreements/data-processing-addendum.pdf) |
 | Subprocessors List | [Link](https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/misc/salesforce-infrastructure-and-subprocessors.pdf) |
 
-**Category:** Cloud Platform
+**Category:** Cloud provider
 
 ### Certifications
 
@@ -590,7 +730,7 @@ Linear is a cloud-based project management platform that enables teams to manage
 | Data Processing Agreement | [Link](https://linear.app/dpa) |
 | Subprocessors List | [Link](https://linear.app/dpa) |
 
-**Category:** Project Management
+**Category:** Engineering
 
 ### Certifications
 
@@ -620,7 +760,7 @@ Hubspot is a cloud-based marketing and sales platform that enables businesses to
 | Data Processing Agreement | [Link](https://legal.hubspot.com/dpa) |
 | Subprocessors List | [Link](https://legal.hubspot.com/sub-processors-page) |
 
-**Category:** Marketing and Sales
+**Category:** Marketing
 
 ### Certifications
 
@@ -649,7 +789,7 @@ Langfuse is a cloud-based language model platform that enables businesses to bui
 | Status Page | [Link](https://status.langfuse.com/) |
 | Data Processing Agreement | [Link](https://static.langfuse.com/legal/2025-02-17-Public-Langfuse%20DPA.docx.pdf) |
 
-**Category:** Language Model
+**Category:** Engineering
 
 ### Certifications
 
@@ -681,7 +821,7 @@ Google Workspace is a cloud-based productivity suite that enables businesses to 
 | Data Processing Agreement | [Link](https://workspace.google.com/terms/09242021/dpa_terms/) |
 | Subprocessors List | [Link](https://workspace.google.com/terms/subprocessors/) |
 
-**Category:** Productivity
+**Category:** Collaboration
 
 ### Certifications
 
@@ -721,7 +861,7 @@ Algolia is a search-as-a-service platform that enables businesses to deliver fas
 | Data Processing Agreement | [Link](https://www.algolia.com/policies/data-processing) |
 | Subprocessors List | [Link](https://www.algolia.com/policies/infrastructure-and-sub-processors) |
 
-**Category:** Search-as-a-Service
+**Category:** Engineering
 
 ### Certifications
 
@@ -757,7 +897,7 @@ Open-source product analytics platform that enables teams to understand user beh
 | Data Processing Agreement | [Link](https://posthog.com/dpa) |
 | Subprocessors List | [Link](https://posthog.com/dpa) |
 
-**Category:** Product Analytics
+**Category:** Analytics
 
 ### Certifications
 
@@ -789,7 +929,7 @@ Airtable is a no-code platform that combines the simplicity of a spreadsheet wit
 | Data Processing Agreement | [Link](https://www.airtable.com/company/dpa) |
 | Subprocessors List | [Link](https://www.airtable.com/company/subprocessors) |
 
-**Category:** No-Code/Low-Code Platform
+**Category:** Data storage and processing
 
 ### Certifications
 
@@ -826,7 +966,7 @@ OpenAI is an AI research and deployment company dedicated to ensuring that artif
 | Business Associate Agreement | [Link](https://openai.com/policies/business-terms/) |
 | Subprocessors List | [Link](https://openai.com/policies/sub-processor-list/) |
 
-**Category:** Artificial Intelligence Research and Deployment
+**Category:** Engineering
 
 ### Certifications
 
@@ -860,7 +1000,7 @@ Anthropic is an AI safety and research company developing reliable, interpretabl
 | Data Processing Agreement | [Link](https://assets-global.website-files.com/6548404a216c2e42eb79648b/65680354f8f4425cc8a8110c_Toothless-Anthropic_DPA_Sep-22-2023.pdf) |
 | Subprocessors List | [Link](https://trust.anthropic.com/subprocessors) |
 
-**Category:** Artificial Intelligence / AI Safety
+**Category:** Engineering
 
 ### Certifications
 
@@ -889,7 +1029,7 @@ Gusto is a cloud-based platform that provides payroll, benefits, and human resou
 | Status Page | [Link](https://status.gusto.com/) |
 | Business Associate Agreement | [Link](https://support.gusto.com/article/152166121100000/The-Health-Insurance-Portability-and-Accountability-Act-of-1996-HIPAA) |
 
-**Category:** HR / Payroll
+**Category:** Employee management
 
 ### Certifications
 
@@ -922,7 +1062,7 @@ Amazon Web Services (AWS) is the world's most comprehensive and broadly adopted 
 | Business Associate Agreement | [Link](https://aws.amazon.com/compliance/hipaa-compliance/) |
 | Subprocessors List | [Link](https://aws.amazon.com/compliance/sub-processors/) |
 
-**Category:** Cloud Infrastructure
+**Category:** Cloud provider
 
 ### Certifications
 
@@ -1017,7 +1157,7 @@ Online scheduling platform that automates appointment booking and meeting manage
 | Data Processing Agreement | [Link](https://calendly.com/legal/data-processing-addendum) |
 | Subprocessors List | [Link](https://help.calendly.com/hc/en-us/articles/360047345493-Calendly-sub-processors-GDPR-CCPA) |
 
-**Category:** Scheduling/Appointment Management
+**Category:** Collaboration
 
 ### Certifications
 
@@ -1051,7 +1191,7 @@ jsDelivr is a free, open-source Content Delivery Network (CDN) for open-source f
 | Data Processing Agreement | [Link](https://www.jsdelivr.com/documents/data-processing-agreement.pdf) |
 | Subprocessors List | [Link](https://www.jsdelivr.com/terms/sub-processors) |
 
-**Category:** Content Delivery Network (CDN)
+**Category:** Engineering
 
 ### Certifications
 
@@ -1078,7 +1218,7 @@ npm is the world's largest software registry, providing a platform for JavaScrip
 | Security Page | [Link](https://docs.npmjs.com/policies/security/) |
 | Status Page | [Link](https://status.npmjs.org/) |
 
-**Category:** Package Management / Code Hosting
+**Category:** Engineering
 
 ### Certifications
 
@@ -1107,7 +1247,7 @@ Clerk provides a comprehensive suite of embeddable UIs, flexible APIs, and admin
 | Data Processing Agreement | [Link](https://clerk.com/legal/dpa) |
 | Subprocessors List | [Link](https://clerk.com/legal/subprocessors) |
 
-**Category:** Authentication and User Management
+**Category:** Identity provider
 
 ### Certifications
 
@@ -1138,7 +1278,7 @@ Open-source, privacy-focused web analytics platform that provides simple and lig
 | Data Processing Agreement | [Link](https://plausible.io/dpa) |
 | Subprocessors List | [Link](https://plausible.io/privacy) |
 
-**Category:** Platform and user analytics
+**Category:** Analytics
 
 ### Certifications
 
@@ -1167,7 +1307,7 @@ Latitude.sh provides global bare metal cloud infrastructure, enabling developers
 | Status Page | [Link](https://status.latitude.sh/) |
 | Data Processing Agreement | [Link](https://www.latitude.sh/legal/dpa) |
 
-**Category:** Bare Metal Cloud Infrastructure
+**Category:** Cloud provider
 
 ### Certifications
 
@@ -1193,7 +1333,7 @@ Together AI provides a full-stack cloud platform for developers to train, fine-t
 | Trust Page | [Link](https://trust.together.ai) |
 | Status Page | [Link](https://status.together.ai/) |
 
-**Category:** AI Infrastructure / Model Hosting
+**Category:** Engineering
 
 ### Certifications
 
@@ -1223,7 +1363,7 @@ Fintech company that provides banking services to early stage start-up companies
 | Trust Page | [Link](https://trust.mercury.com/) |
 | Status Page | [Link](https://status.mercury.com/) |
 
-**Category:** Banking Services
+**Category:** Finance
 
 ### Certifications
 
@@ -1251,7 +1391,7 @@ Signal is a secure messaging app that provides end-to-end encryption for text, v
 | Security Page | [Link](https://signal.org/security) |
 | Status Page | [Link](https://status.signal.org/) |
 
-**Category:** Messaging
+**Category:** Collaboration
 
 ---
 
@@ -1277,7 +1417,7 @@ monday.com is a work management platform that helps teams plan, track, and manag
 | Business Associate Agreement | [Link](https://monday.com/l/privacy/hipaa-baa) |
 | Subprocessors List | [Link](https://monday.com/l/privacy/sub-processors-subsidiaries-support) |
 
-**Category:** Work Management
+**Category:** Collaboration
 
 ### Certifications
 
@@ -1317,7 +1457,7 @@ Carta is a financial technology company that provides a platform for managing em
 | Data Processing Agreement | [Link](https://carta.com/legal/carta-europe/data-processor-agreement/) |
 | Subprocessors List | [Link](https://carta.com/legal/carta-europe/data-processor-agreement/) |
 
-**Category:** Employee Equity Compensation
+**Category:** Finance
 
 ### Certifications
 
@@ -1350,7 +1490,7 @@ Apollo.io is an AI-powered sales intelligence and engagement platform that helps
 | Data Processing Agreement | [Link](https://www.apollo.io/dpa) |
 | Subprocessors List | [Link](https://trust.apollo.io/) |
 
-**Category:** Sales Intelligence & Engagement
+**Category:** Sales
 
 ### Certifications
 
@@ -1386,7 +1526,7 @@ Atlassian provides collaboration and productivity software for teams, including 
 | Business Associate Agreement | [Link](https://www.atlassian.com/legal/business-associate-agreement) |
 | Subprocessors List | [Link](https://www.atlassian.com/legal/sub-processors) |
 
-**Category:** Collaboration and Productivity Software
+**Category:** Engineering
 
 ### Certifications
 
@@ -1440,7 +1580,7 @@ Webflow is a no-code visual development platform that allows users to design, bu
 | Data Processing Agreement | [Link](https://webflow.com/legal/dpa) |
 | Subprocessors List | [Link](https://uploads-ssl.webflow.com/5d80c03f1edd7bd68fcdb623/657c411c020d1ee5f047f6ab_20231207%20-%20List%20of%20approved%20Sub-processors.pdf) |
 
-**Category:** Website Builder / No-Code Platform
+**Category:** Product and design
 
 ### Certifications
 
@@ -1472,7 +1612,7 @@ Webflow is a no-code visual development platform that allows users to design, bu
 | Data Processing Agreement | [Link](https://1passwordstatic.com/files/legal-center/1Password_Online_DPA_v202504.pdf) |
 | Subprocessors List | [Link](https://1passwordstatic.com/files/legal-center/notice-of-updates-to-the-1password-subprocessor-list.pdf) |
 
-**Category:** Password Management
+**Category:** Password management
 
 ### Certifications
 
@@ -1508,7 +1648,7 @@ Checkr provides AI-powered background check and screening services to help busin
 | Data Processing Agreement | [Link](https://checkr.com/legal/dpa) |
 | Subprocessors List | [Link](https://checkr.com/sub-processor-list) |
 
-**Category:** Employment Screening
+**Category:** Employee management
 
 ### Certifications
 
@@ -1542,7 +1682,7 @@ Rippling is an all-in-one workforce management platform that unifies HR, IT, pay
 | Data Processing Agreement | [Link](https://app.rippling.com/legal/dpa) |
 | Subprocessors List | [Link](https://app.rippling.com/legal/subprocessors) |
 
-**Category:** Workforce Management
+**Category:** Employee management
 
 ### Certifications
 
@@ -1571,7 +1711,7 @@ Vouch is a digital-first insurance platform providing tailored coverage solution
 | Terms of Service | [Link](https://www.vouch.us/legal/terms-of-use) |
 | Data Processing Agreement | [Link](https://help.vouchfor.com/docs/support/security/data-processing-addendum/) |
 
-**Category:** Business Insurance
+**Category:** Finance
 
 ### Certifications
 
@@ -1600,7 +1740,7 @@ Twilio is a cloud communications platform that provides APIs for developers to a
 | Data Processing Agreement | [Link](https://www.twilio.com/en-us/legal/data-protection-addendum) |
 | Subprocessors List | [Link](https://www.twilio.com/en-us/legal/sub-processors) |
 
-**Category:** Cloud Communications Platform
+**Category:** Communication & Collaboration
 
 ### Certifications
 
@@ -1635,7 +1775,7 @@ Qonto is a European business finance solution offering online banking, invoicing
 | Security Page | [Link](https://qonto.com/en/security) |
 | Trust Page | [Link](https://qonto.com/en/trust) |
 
-**Category:** Business Banking / Financial Services
+**Category:** Finance
 
 ### Certifications
 
@@ -1667,7 +1807,7 @@ AI-powered integrated development environment enhancing developer productivity w
 | Status Page | [Link](https://status.cursor.com/) |
 | Subprocessors List | [Link](https://trust.cursor.com/subprocessors) |
 
-**Category:** AI Code Editor
+**Category:** Engineering
 
 ### Certifications
 
@@ -1694,7 +1834,7 @@ Pulley is an equity management platform that helps startups manage cap tables, i
 | Security Page | [Link](https://pulley.com/security) |
 | Subprocessors List | [Link](https://large-walk-bd5.notion.site/6449d3ecd2854af0a313b6e8679b5795?v=d61abc36355842bb939d49544f18dc95) |
 
-**Category:** Equity Management / Cap Table Software
+**Category:** Finance
 
 ### Certifications
 
@@ -1726,7 +1866,7 @@ Microsoft Azure is a comprehensive cloud computing platform offering a wide rang
 | Business Associate Agreement | [Link](https://learn.microsoft.com/en-us/compliance/regulatory/offering-hipaa-hitech) |
 | Subprocessors List | [Link](https://www.microsoft.com/en-us/download/details.aspx?id=50426) |
 
-**Category:** Cloud Computing Platform
+**Category:** Cloud provider
 
 ### Certifications
 
@@ -1855,7 +1995,7 @@ Microsoft 365 is a cloud-based productivity suite offering applications like Wor
 | Business Associate Agreement | [Link](https://learn.microsoft.com/en-us/compliance/regulatory/offering-hipaa-hitech) |
 | Subprocessors List | [Link](https://www.microsoft.com/en-us/download/details.aspx?id=50426) |
 
-**Category:** Productivity & Collaboration Software
+**Category:** Collaboration
 
 ### Certifications
 
@@ -1981,7 +2121,7 @@ Google is a multinational technology company specializing in internet-related se
 | Trust Page | [Link](https://business.safety.google/) |
 | Status Page | [Link](https://ads.google.com/status/publisher/) |
 
-**Category:** Technology & Internet Services
+**Category:** Cloud provider
 
 ### Certifications
 
@@ -2015,7 +2155,7 @@ Namecheap is an ICANN-accredited domain registrar and web hosting company offeri
 | Status Page | [Link](https://www.namecheap.com/status-updates/) |
 | Data Processing Agreement | [Link](https://www.namecheap.com/legal/universal/data-processing-addendum/) |
 
-**Category:** Domain Registration and Web Hosting
+**Category:** IT
 
 ### Certifications
 
@@ -2042,7 +2182,7 @@ Porter is a platform-as-a-service (PaaS) that enables developers to deploy and m
 | Security Page | [Link](https://docs.porter.run/security-and-compliance/soc2-hipaa) |
 | Status Page | [Link](https://status.porter.run/) |
 
-**Category:** Platform as a Service (PaaS)
+**Category:** Cloud provider
 
 ### Certifications
 
@@ -2072,7 +2212,7 @@ Bitwarden is a secure, open-source password manager that enables individuals and
 | Status Page | [Link](https://status.bitwarden.com/) |
 | Subprocessors List | [Link](https://bitwarden.com/help/subprocessors/) |
 
-**Category:** Password Management
+**Category:** Password management
 
 ### Certifications
 
@@ -2107,7 +2247,7 @@ Framer is a no-code website builder that enables designers and teams to create a
 | Data Processing Agreement | [Link](https://www.framer.com/legal/data-processing-addendum/) |
 | Subprocessors List | [Link](https://www.framer.com/legal/sub-processors/) |
 
-**Category:** Website Builder / No-Code Platform
+**Category:** Product and design
 
 ### Certifications
 
@@ -2141,7 +2281,7 @@ Cal.com is an open-source scheduling platform that lets individuals and organiza
 | Business Associate Agreement | [Link](https://app.cal.com/apps/baa-for-hipaa) |
 | Subprocessors List | [Link](https://security.cal.com/?itemUid=e3fae2ca-94a9-416b-b577-5c90e382df57) |
 
-**Category:** Scheduling / Productivity
+**Category:** Collaboration
 
 ### Certifications
 
@@ -2174,7 +2314,7 @@ All-in-one marketing automation platform that lets organizations create, send, a
 | Data Processing Agreement | [Link](https://mailchimp.com/legal/data-processing-addendum/) |
 | Subprocessors List | [Link](https://mailchimp.com/legal/subprocessors/) |
 
-**Category:** Marketing Automation
+**Category:** Marketing
 
 ### Certifications
 
@@ -2209,7 +2349,7 @@ AI-powered meeting assistant that captures, transcribes, and summarizes conversa
 | Data Processing Agreement | [Link](https://otter.ai/terms-of-service#data-processing-agreement) |
 | Subprocessors List | [Link](https://otter.ai/subprocessors) |
 
-**Category:** AI Transcription & Meeting Intelligence
+**Category:** Collaboration
 
 ### Certifications
 
@@ -2234,460 +2374,6 @@ Developer‑focused email delivery platform offering a modern API and tooling to
 | Resource | Link |
 |----------|------|
 | Website | [Link](https://resend.com) |
-| Privacy Policy | [Link](https://resend.com/legal/privacy-policy) |
-| Terms of Service | [Link](https://resend.com/legal/terms-of-service) |
-| Security Page | [Link](https://resend.com/security) |
-| Trust Page | [Link](https://resend.com/security) |
-| Status Page | [Link](https://resend-status.com/) |
-| Data Processing Agreement | [Link](https://resend.com/legal/dpa) |
-| Subprocessors List | [Link](https://resend.com/legal/subprocessors) |
-
-**Category:** Email Delivery Platform
-
-### Certifications
-
-- SOC 2 Type 2
-- GDPR
-- CCPA
-- Data Privacy Framework (DPF)
-
----
-
-## Pylon
-
-Pylon provides a modern unified customer-support platform for B2B companies, combining ticketing, chat, knowledge base, AI assistance, customer portal and workflows in one tool.
-
-**Legal Name:** Pylon Labs, Inc.
-
-**Headquarters:** 188 King Street, Unit 502, San Francisco, CA 94107, USA
-
-### Links
-
-| Resource | Link |
-|----------|------|
-| Website | [Link](https://usepylon.com) |
-| Privacy Policy | [Link](https://usepylon.com/privacy) |
-| Terms of Service | [Link](https://usepylon.com/terms) |
-| Security Page | [Link](https://usepylon.com/security) |
-| Trust Page | [Link](https://trust.usepylon.com) |
-| Status Page | [Link](https://status.usepylon.com) |
-| Data Processing Agreement | [Link](https://usepylon.com/data-processing-agreement) |
-| Subprocessors List | [Link](https://usepylon.com/subprocessors) |
-
-**Category:** Customer Support Platform
-
-### Certifications
-
-- SOC 2 Type 2
-- ISO/IEC 27001
-- GDPR
-- HIPAA
-
----
-
-## Loops
-
-Email platform for SaaS companies that lets teams create, send and track product, marketing, and transactional emails from a single interface
-
-**Legal Name:** Astrodon Inc.
-
-### Links
-
-| Resource | Link |
-|----------|------|
-| Website | [Link](https://loops.so) |
-| Privacy Policy | [Link](https://loops.so/privacy) |
-| Terms of Service | [Link](https://loops.so/terms) |
-| Status Page | [Link](https://loops.statuspage.io) |
-| Data Processing Agreement | [Link](https://loops.so/dpa) |
-| Subprocessors List | [Link](https://loops.so/subprocessors) |
-
-**Category:** Email Marketing Platform
-
-### Certifications
-
-- GDPR
-- CCPA
-
----
-
-## Perplexity
-
-Generative AI answer engine that delivers real-time, source-cited answers to user questions.
-
-**Legal Name:** Perplexity AI, Inc.
-
-**Headquarters:** 115 Sansome St, San Francisco, CA 94104-3601, United States
-
-### Links
-
-| Resource | Link |
-|----------|------|
-| Website | [Link](https://www.perplexity.ai) |
-| Privacy Policy | [Link](https://www.perplexity.ai/hub/legal/privacy-policy) |
-| Terms of Service | [Link](https://www.perplexity.ai/hub/legal/terms-of-service) |
-| Security Page | [Link](https://www.perplexity.ai/hub/security) |
-| Trust Page | [Link](https://trust.perplexity.ai) |
-| Status Page | [Link](https://status.perplexity.ai/) |
-| Data Processing Agreement | [Link](https://www.perplexity.ai/hub/legal/enterprise-terms-of-service) |
-| Subprocessors List | [Link](https://trust.perplexity.ai/) |
-
-**Category:** AI Answer Engine
-
-### Certifications
-
-- SOC 2 Type 2
-- GDPR
-- CCPA
-- PCI DSS
-- CAIQ Lite
-
----
-
-## Google Cloud Platform
-
-Comprehensive public cloud computing platform offering infrastructure, data analytics, AI, security, and developer tools
-
-**Legal Name:** Google LLC
-
-**Headquarters:** 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA
-
-### Links
-
-| Resource | Link |
-|----------|------|
-| Website | [Link](https://cloud.google.com) |
-| Privacy Policy | [Link](https://cloud.google.com/terms/cloud-privacy-notice) |
-| Terms of Service | [Link](https://cloud.google.com/terms) |
-| Service Level Agreement | [Link](https://cloud.google.com/terms/sla) |
-| Security Page | [Link](https://cloud.google.com/security) |
-| Trust Page | [Link](https://cloud.google.com/trust-center) |
-| Status Page | [Link](https://status.cloud.google.com/) |
-| Data Processing Agreement | [Link](https://cloud.google.com/terms/data-processing-terms) |
-| Business Associate Agreement | [Link](https://cloud.google.com/terms/hipaa-baa) |
-| Subprocessors List | [Link](https://cloud.google.com/terms/subprocessors) |
-
-**Category:** Cloud Computing Platform
-
-### Certifications
-
-- Cloud Computing Compliance Controls Catalog (C5)
-- CSA
-- GSMA SAS-SM
-- Higher Education Cloud Vendor Assessment Tool (HECVAT)
-- ISO 9001:2015
-- ISO 22301:2019 & BS EN ISO 22301:2019
-- ISO 50001:2018
-- ISO/IEC 27001
-- ISO/IEC 27017
-- ISO/IEC 27018
-- ISO/IEC 27701
-- ISO/IEC 42001
-- PCI 3DS Core Security Standard
-- PCI DSS
-- PCI PIN Security
-- SOC 1
-- SOC 2
-- SOC 3
-- SWIFT on Google Cloud
-- Uptime Institute's Tier Standards
-- VPAT (WCAG, U.S. Section 508, EN 301 549)
-- FedRAMP
-- FIPS 140-2 Validated
-- HITRUST CSF
-- Independent Security Evaluators (ISE) Audit
-- Minimum Acceptable Risk Standards for Exchanges (MARS-E)
-- StateRAMP
-- TruSight
-- U.S. Cybersecurity Maturity Model Certification (CMMC)
-- U.S. Defense Information Systems Agency Provisional Authorization
-- Spain Esquema Nacional de Seguridad (ENS)
-- EU Cloud Code of Conduct
-- HDS
-- ISAE 3000 Type 2 Report (FINMA)
-- ISO 14001
-- Microfin
-- NCSC - Cyber Essentials Plus (UK)
-- Police Assured Secure Facilities (PASF)
-- Qatar National Information Assurance (NIA)
-- SWIPO Data Portability Code of Conduct
-- TISAX
-- Australia Hosting Certification Framework (HCF)
-- Cloud Security Assurance Program (CSAP) Low Level for Group C
-- Information System Security Management and Assessment Program (ISMAP)
-- IRAP (Information Security Registered Assessors Program)
-- JIIMA
-- K-ISMS (Korea)
-- MTCS (Singapore) Tier 3
-- OSPAR
-- SNI 27001
-- ETDA (Thailand)
-- GxP
-- California Consumer Privacy Act (CCPA)
-- COPPA (U.S.)
-- Export Administration Regulations (EAR)
-- FERPA (U.S.)
-- FINRA (US)
-- Google Cloud Data Processing Addendum Mapping - U.S. State Privacy Laws
-- HIPAA
-- IRS 1075
-- International Traffic in Arms Regulations (ITAR)
-- GLBA
-- OSFI (Canada)
-- FG16/5 - FCA
-- NERC CIP
-- PHIPA (Canada)
-- PIPEDA (Canada)
-- US Federal Banking Agencies
-- U.S. Defense Federal Acquisition Regulation Supplement (DFARS)
-- ACPR (France)
-- BaFin Cloud Outsourcing Guidance
-- Banco de España
-- Banco de Portugal
-- Bank of Italy
-- BRSA (Turkey)
-- BSI Critical Infrastructure (KRITIS)
-- BWG (Austria)
-- Central Bank of Ireland (Ireland)
-- CSSF (Luxembourg)
-- De Nederlandsche Bank (the Netherlands)
-- EU DORA
-- European Union’s Digital Markets Act
-- EU Solvency II
-- EU Standard Contractual Clauses
-- FINMA (Switzerland)
-- FSA (Denmark)
-- GDPR
-- Google Cloud & the EU Network and Information Systems Directive (NIS2)
-- Israel’s Privacy Protection Authority
-- KNF (Poland)
-- MaRisk AT 9 Outsourcing
-- PRA (UK)
-- revFADP (Switzerland)
-- South Africa POPI
-- SFSA (Sweden)
-- Telecoms Security Act (UK)
-- VAG (Austria)
-- SYSC 8 Outsourcing - FCA Handbook
-- UK CHECK
-- PDPL (Argentina)
-- BCRA (Argentina)
-- Central Bank of Brazil (Brazil)
-- CNBV (Mexico)
-- CNSF (Mexico)
-- CMF (Chile)
-- Superintendencia de Banca (Peru)
-- Financial Superintendence of Colombia
-- Lei Geral de Proteção de Dados (LGPD)
-- ASFI (Bolivia)
-- Act on the Protection of Personal Information (Japan)
-- APRA Prudential Standard CPS 234
-- APPs (Australia)
-- APRA (Australia)
-- Bank Negara (Malaysia)
-- Bank of Thailand (BOT)
-- BSP (Philippines)
-- DSA (Bangladesh)
-- FSC Insurance Outsourcing Directions
-- FSC Banking Outsourcing Regulations
-- GR 95/2018 guidelines
-- IA (Hong Kong)
-- HKMA (Hong Kong)
-- MAMPU (Malaysia)
-- PDPO (Hong Kong)
-- Indonesia Government Regulation No. 71 (GR 71)
-- IRDAI (India)
-- FSC (Korea)
-- Korean Financial Supervisory Service (FSS)
-- MAS TRM Guidelines
-- OIC (Thailand)
-- OJK Circular 21 of 2017 (SEOJK 21)
-- OJK Regulation No. 38 of 2016 (POJK 38)
-- PDP Law (Indonesia)
-- PDPA (Malaysia)
-- PDPA (Philippines)
-- PDPA (Taiwan)
-- PDPA (Thailand)
-- PDPD (Vietnam)
-- PIPA (Korea)
-- RBI (India)
-- Reserve Bank of New Zealand (New Zealand)
-- Securities and Exchange Board of India (SEBI)
-- PDPA (Singapore)
-- State Bank of Vietnam
-- The Privacy Act (New Zealand)
-
----
-
-## Fly.io
-
-Developer-focused public cloud platform offering hardware-virtualized containers (Fly Machines) with KVM isolation, automatic scaling to zero, and integrated tools for deploying and managing applications globally
-
-**Legal Name:** Fly.io, Inc.
-
-**Headquarters:** 2045 W Grand Ave, Chicago, IL 60612, United States
-
-### Links
-
-| Resource | Link |
-|----------|------|
-| Website | [Link](https://fly.io) |
-| Privacy Policy | [Link](https://fly.io/legal/privacy-policy) |
-| Terms of Service | [Link](https://fly.io/legal/terms-of-service) |
-| Service Level Agreement | [Link](https://fly.io/legal/sla-uptime/) |
-| Security Page | [Link](https://fly.io/security) |
-| Trust Page | [Link](https://fly.io/compliance) |
-| Status Page | [Link](https://status.fly.io/) |
-| Data Processing Agreement | [Link](https://fly.io/documents) |
-| Business Associate Agreement | [Link](https://fly.io/documents) |
-| Subprocessors List | [Link](https://fly.io/legal/sub-processors/) |
-
-**Category:** Application Hosting
-
-### Certifications
-
-- SOC 2 Type 2
-- EU-U.S. DPF
-- UK DPF
-- Swiss-U.S. DPF
-- HIPAA
-- GDPR
-- CCPA
-
----
-
-## Upstash
-
-Serverless data platform providing HTTP-based Redis, Vector, and QStash services with global low-latency, automatic scaling, and durable storage
-
-**Legal Name:** Upstash, Inc.
-
-**Headquarters:** 6202 Via De Adrianna, San Jose, CA 95120, United States
-
-### Links
-
-| Resource | Link |
-|----------|------|
-| Website | [Link](https://upstash.com) |
-| Privacy Policy | [Link](https://upstash.com/trust/privacy.pdf) |
-| Terms of Service | [Link](https://upstash.com/trust/terms.pdf) |
-| Service Level Agreement | [Link](https://upstash.com/docs/common/help/sla) |
-| Security Page | [Link](https://upstash.com/static/trust/security-measures.pdf) |
-| Trust Page | [Link](https://trust.upstash.com) |
-| Status Page | [Link](https://status.upstash.com) |
-| Data Processing Agreement | [Link](https://upstash.com/static/trust/dpa.pdf) |
-| Subprocessors List | [Link](https://trust.upstash.com/subprocessors) |
-
-**Category:** Serverless Database Platform
-
-### Certifications
-
-- SOC 2 Type 2
-- GDPR
-- CCPA
-
----
-
-## bunny.net
-
-Cloud-based content-delivery, edge-storage and optimization platform that accelerates and secures web content worldwide.
-
-**Legal Name:** BunnyWay d.o.o.
-
-**Headquarters:** Dunajska cesta 165, 1000 Ljubljana, Slovenia
-
-### Links
-
-| Resource | Link |
-|----------|------|
-| Website | [Link](https://bunny.net) |
-| Privacy Policy | [Link](https://bunny.net/privacy/) |
-| Terms of Service | [Link](https://bunny.net/tos/) |
-| Service Level Agreement | [Link](https://bunny.net/sla/) |
-| Security Page | [Link](https://bunny.net/shield/) |
-| Status Page | [Link](https://status.bunny.net/) |
-| Subprocessors List | [Link](https://bunny.net/gdpr/sub-processors/) |
-
-**Category:** Content Delivery Network (CDN) / Edge Cloud
-
-### Certifications
-
-- ISO 27001
-- GDPR
-
----
-
-## ClickUp
-
-All-in-one productivity platform for project management, document collaboration, and goal tracking.
-
-**Legal Name:** Mango Technologies, Inc.
-
-**Headquarters:** 350 Tenth Ave, 5th Floor, San Diego, CA 92101, United States
-
-### Links
-
-| Resource | Link |
-|----------|------|
-| Website | [Link](https://clickup.com) |
-| Privacy Policy | [Link](https://clickup.com/terms/privacy) |
-| Terms of Service | [Link](https://clickup.com/terms) |
-| Security Page | [Link](https://clickup.com/security) |
-| Trust Page | [Link](https://security.clickup.com) |
-| Status Page | [Link](https://status.clickup.com) |
-| Data Processing Agreement | [Link](https://clickup.com/terms/dpa) |
-| Subprocessors List | [Link](https://clickup.com/terms/dpa/subprocessors) |
-
-**Category:** Project Management
-
-### Certifications
-
-- SOC 2 Type 2
-- ISO/IEC 27001
-- ISO 27017
-- ISO 27018
-- PCI DSS
-- GDPR
-- CCPA
-- CPRA
-- LGPD
-- VCDPA
-
----
-
-## Danami
-
-Developer of security, firewall and anti-spam extensions for the Plesk hosting control panel.
-
-**Legal Name:** Danami International Inc.
-
-**Headquarters:** 5314 56 St, Camrose, Alberta T4V 2E5, Canada
-
-### Links
-
-| Resource | Link |
-|----------|------|
-| Website | [Link](https://www.danami.com) |
-| Privacy Policy | [Link](https://www.danami.com/legal/privacy-policy) |
-| Terms of Service | [Link](https://www.danami.com/legal/terms-of-service) |
-
-**Category:** Web-hosting security / Plesk extensions
-
----
-
-## New Relic
-
-New Relic provides a full-stack observability platform that lets engineering teams monitor, analyze, and improve application, infrastructure, and digital-experience performance in real time.
-
-**Legal Name:** New Relic, Inc.
-
-**Headquarters:** 188 Spear St., Suite 1000, San Francisco, CA 94105, USA
-
-### Links
-
-| Resource | Link |
-|----------|------|
-| Website | [Link](https://newrelic.com) |
 | Privacy Policy | [Link](https://newrelic.com/termsandconditions/privacy) |
 | Terms of Service | [Link](https://newrelic.com/termsandconditions/terms) |
 | Service Level Agreement | [Link](https://docs.newrelic.com/docs/licenses/license-information/referenced-policies/service-level-availability-commitment/) |
@@ -2698,17 +2384,11 @@ New Relic provides a full-stack observability platform that lets engineering tea
 | Business Associate Agreement | [Link](https://newrelic.com/termsandconditions/hipaabaafaq) |
 | Subprocessors List | [Link](https://newrelic.com/sub-processors) |
 
-**Category:** Observability / Application Performance Monitoring
+**Category:** Marketing
 
 ### Certifications
 
 - SOC 2 Type 2
-- ISO/IEC 27001:2022
-- FedRAMP Moderate
-- PCI DSS Level 1
-- TISAX Level 2
-- HITRUST CSF
-- HIPAA
 - GDPR
 - CCPA
 - Data Privacy Framework (DPF)
@@ -2736,7 +2416,7 @@ OVHcloud is a French cloud computing company offering public and private cloud p
 | Data Processing Agreement | [Link](https://storage.gra.cloud.ovh.net/v1/AUTH_325716a587c64897acbef9a4a4726e38/contracts/4683679-OVH_Data_Protection_Agreement-IE-5.1.pdf) |
 | Subprocessors List | [Link](https://www.ovh.ie/support/termsofservice/OVH%20IE%20Sub%20processors.pdf) |
 
-**Category:** Cloud Infrastructure Provider
+**Category:** Cloud provider
 
 ### Certifications
 
@@ -2781,7 +2461,7 @@ Global cloud-infrastructure provider delivering bare-metal servers, public and p
 | Data Processing Agreement | [Link](https://us.ovhcloud.com/legal/data-processing-agreement/) |
 | Subprocessors List | [Link](https://storage.gra.cloud.ovh.net/v1/AUTH_325716a587c64897acbef9a4a4726e38/contracts/30c4ab8-OVH_Sub_processors-IE-2.0.pdf) |
 
-**Category:** Cloud Infrastructure Provider
+**Category:** Cloud provider
 
 ### Certifications
 
@@ -2822,7 +2502,7 @@ Pipedrive is a sales-focused CRM platform designed to help small businesses mana
 | Data Processing Agreement | [Link](https://www.pipedrive.com/en/privacy/dpa) |
 | Subprocessors List | [Link](https://www.pipedrive.com/en/subprocessors) |
 
-**Category:** CRM Software
+**Category:** Sales
 
 ### Certifications
 
@@ -2853,7 +2533,7 @@ Web-hosting control-panel software for building, securing and running websites a
 | Security Page | [Link](https://docs.plesk.com/en-US/obsidian/administrator-guide/plesk-administration/securing-plesk.59464/) |
 | Subprocessors List | [Link](https://www.plesk.com/wp-content/uploads/legal/gdpr3.pdf) |
 
-**Category:** Web Hosting Control Panel
+**Category:** IT
 
 ### Certifications
 
@@ -2882,7 +2562,7 @@ Cloud-based CRM and multichannel marketing platform that lets businesses run ema
 | Data Processing Agreement | [Link](https://www.brevo.com/legal/termsofuse/#dpa) |
 | Subprocessors List | [Link](https://www.brevo.com/legal/termsofuse/#sub-processors) |
 
-**Category:** Email Marketing & CRM
+**Category:** Marketing
 
 ### Certifications
 
@@ -2911,7 +2591,7 @@ Developer-first observability platform that unifies log management, uptime monit
 | Data Processing Agreement | [Link](https://betterstack.com/dpa) |
 | Subprocessors List | [Link](https://betterstack.com/dpa/schedules) |
 
-**Category:** Observability / Monitoring
+**Category:** Cloud monitoring
 
 ### Certifications
 
@@ -2943,7 +2623,7 @@ PlanetScale provides a serverless, MySQL-compatible database-as-a-service built 
 | Data Processing Agreement | [Link](https://planetscale.com/legal/data-processing-addendum) |
 | Subprocessors List | [Link](https://planetscale.com/legal/subprocessors) |
 
-**Category:** Database-as-a-Service
+**Category:** Data storage and processing
 
 ### Certifications
 
@@ -2978,7 +2658,7 @@ Developer platform for building, sharing, and running containerized applications
 | Data Processing Agreement | [Link](https://www.docker.com/app/uploads/2022/03/2022-Docker-EU-UK-SCC-Data-Processing-Agreement.pdf) |
 | Subprocessors List | [Link](https://www.docker.com/trust/privacy/sub-processors/) |
 
-**Category:** Container Platform
+**Category:** Engineering
 
 ### Certifications
 
@@ -3017,7 +2697,7 @@ AI-powered global spend platform offering corporate cards, expense management, b
 | Data Processing Agreement | [Link](https://www.brex.com/legal/dpa) |
 | Subprocessors List | [Link](https://trust-portal.brex.com) |
 
-**Category:** Spend Management & Corporate Card
+**Category:** Finance
 
 ### Certifications
 
@@ -3049,7 +2729,7 @@ Corporate spend-management platform offering corporate cards, expense automation
 | Data Processing Agreement | [Link](https://ramp.com/legal/dpa) |
 | Subprocessors List | [Link](https://trust.ramp.com/) |
 
-**Category:** Spend Management
+**Category:** Finance
 
 ### Certifications
 
@@ -3085,7 +2765,7 @@ Open-source column-oriented database and managed cloud service for ultra-fast, r
 | Data Processing Agreement | [Link](https://clickhouse.com/legal/agreements/data-processing-addendum) |
 | Subprocessors List | [Link](https://clickhouse.com/legal/agreements/subprocessors) |
 
-**Category:** Real-time Analytics Database
+**Category:** Data storage and processing
 
 ### Certifications
 
@@ -3124,7 +2804,7 @@ Tailscale provides a zero-config mesh VPN and zero-trust networking platform tha
 | Data Processing Agreement | [Link](https://tailscale.com/dpa) |
 | Subprocessors List | [Link](https://tailscale.com/dpa-subprocessors) |
 
-**Category:** Zero-Trust Networking / Mesh VPN
+**Category:** Security
 
 ### Certifications
 
@@ -3153,7 +2833,7 @@ Puzzle provides modern, real-time accounting software that gives startups automa
 | Trust Page | [Link](https://trust.puzzle.io) |
 | Status Page | [Link](https://status.puzzle.io/) |
 
-**Category:** Accounting Software
+**Category:** Finance
 
 ### Certifications
 
@@ -3180,7 +2860,7 @@ Probo is an open-source compliance platform that helps startups achieve SOC 2 an
 | Terms of Service | [Link](https://www.getprobo.com/terms) |
 | Subprocessors List | [Link](https://www.getprobo.com/subprocessors) |
 
-**Category:** Compliance & risk management software
+**Category:** Security
 
 ---
 
@@ -3203,7 +2883,7 @@ Lightweight, collaborative CRM that automates contact and relationship managemen
 | Status Page | [Link](https://status.folk.app/) |
 | Subprocessors List | [Link](https://www.folk.app/privacy-policy#3-list-of-sub-processors) |
 
-**Category:** CRM
+**Category:** Sales
 
 ### Certifications
 
@@ -3227,7 +2907,7 @@ AI-powered meeting recorder and video workspace that automates post-meeting task
 | Status Page | [Link](https://claap.instatus.com/) |
 | Subprocessors List | [Link](https://www.claap.io/legal/privacy-policy#sub-processors) |
 
-**Category:** Sales Enablement / AI Meeting Automation
+**Category:** Collaboration
 
 ### Certifications
 
@@ -3258,7 +2938,7 @@ Cloud-based presentation platform that lets teams collaboratively create, design
 | Data Processing Agreement | [Link](https://pitch.com/dpa) |
 | Subprocessors List | [Link](https://pitch.com/dpa#annex-7-2) |
 
-**Category:** Presentation Software
+**Category:** Product and design
 
 ### Certifications
 
@@ -3287,7 +2967,7 @@ Spendesk is a comprehensive spend management platform offering solutions like vi
 | Data Processing Agreement | [Link](https://www.spendesk.com/legals/terms/customers/#Annex-three) |
 | Subprocessors List | [Link](https://www.spendesk.com/legals/subprocessors/) |
 
-**Category:** Spend Management
+**Category:** Finance
 
 ### Certifications
 
@@ -3318,7 +2998,7 @@ Cloud-based talent-acquisition suite that combines applicant-tracking and candid
 | Data Processing Agreement | [Link](https://www.lever.co/agreements/dpa/) |
 | Subprocessors List | [Link](https://www.lever.co/subprocessors-archive-june-2023/) |
 
-**Category:** Applicant Tracking / Talent Acquisition
+**Category:** Recruiting
 
 ### Certifications
 

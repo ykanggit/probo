@@ -17,9 +17,45 @@ const formatAsList = (array) => {
 };
 
 file.write('# Vendors\n\n');
+file.write('## Table of Contents by Category\n\n');
+
+const categoriesMap = new Map();
 
 for (const vendor of vendors) {
-  // Vendor name and description
+  const category = (vendor.category || vendor.categories || 'Uncategorized');
+  
+  if (!categoriesMap.has(category)) {
+    categoriesMap.set(category, []);
+  }
+  
+  categoriesMap.get(category).push(vendor.name);
+}
+
+const sortedCategories = [...categoriesMap.keys()].sort();
+
+for (const category of sortedCategories) {
+  file.write(`### ${category}\n\n`);
+  
+  const vendorsInCategory = categoriesMap.get(category).sort();
+  for (const vendorName of vendorsInCategory) {
+    // Create proper anchor by:
+    // 1. Converting to lowercase
+    // 2. Replacing spaces with hyphens
+    // 3. Removing parentheses, dots, and other special characters
+    const anchor = vendorName.toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[\(\)\.]/g, '')
+      .replace(/[^a-z0-9\-]/g, '');
+    
+    file.write(`- [${vendorName}](#${anchor})\n`);
+  }
+  
+  file.write('\n');
+}
+
+file.write('---\n\n');
+
+for (const vendor of vendors) {
   file.write(`## ${vendor.name}\n\n`);
   if (vendor.description) {
     file.write(`${vendor.description}\n\n`);
