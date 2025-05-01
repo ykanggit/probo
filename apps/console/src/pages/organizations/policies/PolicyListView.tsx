@@ -497,12 +497,12 @@ function PolicyListViewContent({
     <PageTemplate
       title="Policies"
       actions={
-        <div>
+        <div className="flex items-center gap-2">
           <Button onClick={handleOpenModal}>
             <Plus className="mr-2 h-4 w-4" />
             New policy
-        </Button>
-        <Button onClick={handleSendSigningNotifications}>
+          </Button>
+          <Button onClick={handleSendSigningNotifications}>
             Send signing notifications
           </Button>
         </div>

@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix not aligned button on policy list view
+
 ## [0.19.2] - 2025-05-01
 
 ### Fixed
