@@ -36,8 +36,6 @@ const vendorViewQuery = graphql`
         id
         name
         description
-        serviceStartAt
-        serviceTerminationAt
         statusPageUrl
         termsOfServiceUrl
         privacyPolicyUrl
@@ -113,8 +111,6 @@ const updateVendorMutation = graphql`
         id
         name
         description
-        serviceStartAt
-        serviceTerminationAt
         statusPageUrl
         termsOfServiceUrl
         privacyPolicyUrl
@@ -949,8 +945,6 @@ function VendorViewContent({
   const [formData, setFormData] = useState({
     name: data.node.name || "",
     description: data.node.description || "",
-    serviceStartAt: formatDateForInput(data.node.serviceStartAt),
-    serviceTerminationAt: formatDateForInput(data.node.serviceTerminationAt),
     statusPageUrl: data.node.statusPageUrl || "",
     termsOfServiceUrl: data.node.termsOfServiceUrl || "",
     privacyPolicyUrl: data.node.privacyPolicyUrl || "",
@@ -987,10 +981,6 @@ function VendorViewContent({
   const handleSave = useCallback(() => {
     const formattedData = {
       ...formData,
-      serviceStartAt: formatDateForAPI(formData.serviceStartAt),
-      serviceTerminationAt: formData.serviceTerminationAt
-        ? formatDateForAPI(formData.serviceTerminationAt)
-        : null,
       businessOwnerId: formData.businessOwnerId || undefined,
       securityOwnerId: formData.securityOwnerId || undefined,
     };
@@ -1083,8 +1073,6 @@ function VendorViewContent({
     setFormData({
       name: data.node.name || "",
       description: data.node.description || "",
-      serviceStartAt: formatDateForInput(data.node.serviceStartAt),
-      serviceTerminationAt: formatDateForInput(data.node.serviceTerminationAt),
       statusPageUrl: data.node.statusPageUrl || "",
       termsOfServiceUrl: data.node.termsOfServiceUrl || "",
       privacyPolicyUrl: data.node.privacyPolicyUrl || "",
@@ -1410,39 +1398,6 @@ function VendorViewContent({
                         organizationRef={data.organization}
                         selectedPersonId={formData.securityOwnerId}
                         onSelect={(value) => handleFieldChange("securityOwnerId", value)}
-                        placeholder="Select"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Risk & Service Information card */}
-              <div className="rounded-xl border border-border bg-white p-0 overflow-hidden">
-                <div className="px-5 py-4 border-b border-[rgba(2,42,2,0.08)]">
-                  <h3 className="text-base font-medium">Risk & Service Information</h3>
-                </div>
-                <div className="p-5 space-y-4">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-[#6B716A]">Start date</p>
-                    <div className="inline-block bg-[rgba(5,77,5,0.03)] rounded-lg px-3 py-2">
-                      <Input
-                        type="datetime-local"
-                        value={formData.serviceStartAt}
-                        onChange={(e) => handleFieldChange("serviceStartAt", e.target.value)}
-                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 w-auto"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-[#6B716A]">End date</p>
-                    <div className="inline-block bg-[rgba(5,77,5,0.03)] rounded-lg px-3 py-2">
-                      <Input
-                        type="datetime-local"
-                        value={formData.serviceTerminationAt}
-                        onChange={(e) => handleFieldChange("serviceTerminationAt", e.target.value)}
-                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 w-auto"
                         placeholder="Select"
                       />
                     </div>

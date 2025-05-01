@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<55ac3df9e65daff882c0d44f7b4904c2>>
+ * @generated SignedSource<<c911b01b560dfe4143e7ffd06650ff58>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -23,8 +23,6 @@ export type CreateVendorInput = {
   securityOwnerId?: string | null | undefined;
   securityPageUrl?: string | null | undefined;
   serviceLevelAgreementUrl?: string | null | undefined;
-  serviceStartAt: string;
-  serviceTerminationAt?: string | null | undefined;
   statusPageUrl?: string | null | undefined;
   termsOfServiceUrl?: string | null | undefined;
   trustPageUrl?: string | null | undefined;

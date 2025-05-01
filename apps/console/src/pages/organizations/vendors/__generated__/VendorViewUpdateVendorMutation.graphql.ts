@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<574565aac89550e684dc54b21327b565>>
+ * @generated SignedSource<<9089536ddf16d713cfc68bd20f8f8caf>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -23,8 +23,6 @@ export type UpdateVendorInput = {
   securityOwnerId?: string | null | undefined;
   securityPageUrl?: string | null | undefined;
   serviceLevelAgreementUrl?: string | null | undefined;
-  serviceStartAt?: string | null | undefined;
-  serviceTerminationAt?: string | null | undefined;
   statusPageUrl?: string | null | undefined;
   termsOfServiceUrl?: string | null | undefined;
   trustPageUrl?: string | null | undefined;
@@ -54,8 +52,6 @@ export type VendorViewUpdateVendorMutation$data = {
       } | null | undefined;
       readonly securityPageUrl: string | null | undefined;
       readonly serviceLevelAgreementUrl: string | null | undefined;
-      readonly serviceStartAt: string;
-      readonly serviceTerminationAt: string | null | undefined;
       readonly statusPageUrl: string | null | undefined;
       readonly termsOfServiceUrl: string | null | undefined;
       readonly trustPageUrl: string | null | undefined;
@@ -130,20 +126,6 @@ v3 = [
             "args": null,
             "kind": "ScalarField",
             "name": "description",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "serviceStartAt",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "serviceTerminationAt",
             "storageKey": null
           },
           {
@@ -275,16 +257,16 @@ return {
     "selections": (v3/*: any*/)
   },
   "params": {
-    "cacheID": "9e2c4c33246b4aa469cdd737be1e690a",
+    "cacheID": "c539b8cd35be693bea445fa86c473bfd",
     "id": null,
     "metadata": {},
     "name": "VendorViewUpdateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      serviceStartAt\n      serviceTerminationAt\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "58c28ca0307e1b27f2ebb72c3c2e7535";
+(node as any).hash = "478f755b8d9a6b7f7deec1b3a1c71d07";
 
 export default node;

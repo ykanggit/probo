@@ -648,8 +648,6 @@ type ComplexityRoot struct {
 		SecurityOwner              func(childComplexity int) int
 		SecurityPageURL            func(childComplexity int) int
 		ServiceLevelAgreementURL   func(childComplexity int) int
-		ServiceStartAt             func(childComplexity int) int
-		ServiceTerminationAt       func(childComplexity int) int
 		StatusPageURL              func(childComplexity int) int
 		TermsOfServiceURL          func(childComplexity int) int
 		TrustPageURL               func(childComplexity int) int
@@ -3346,20 +3344,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Vendor.ServiceLevelAgreementURL(childComplexity), true
 
-	case "Vendor.serviceStartAt":
-		if e.complexity.Vendor.ServiceStartAt == nil {
-			break
-		}
-
-		return e.complexity.Vendor.ServiceStartAt(childComplexity), true
-
-	case "Vendor.serviceTerminationAt":
-		if e.complexity.Vendor.ServiceTerminationAt == nil {
-			break
-		}
-
-		return e.complexity.Vendor.ServiceTerminationAt(childComplexity), true
-
 	case "Vendor.statusPageUrl":
 		if e.complexity.Vendor.StatusPageURL == nil {
 			break
@@ -4330,8 +4314,6 @@ type Vendor implements Node {
   businessOwner: People @goField(forceResolver: true)
   securityOwner: People @goField(forceResolver: true)
 
-  serviceStartAt: Datetime!
-  serviceTerminationAt: Datetime
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
@@ -4856,8 +4838,6 @@ input CreateVendorInput {
   trustPageUrl: String
   statusPageUrl: String
   termsOfServiceUrl: String
-  serviceStartAt: Datetime!
-  serviceTerminationAt: Datetime
   businessOwnerId: ID
   securityOwnerId: ID
 }
@@ -4866,8 +4846,6 @@ input UpdateVendorInput {
   id: ID!
   name: String
   description: String
-  serviceStartAt: Datetime
-  serviceTerminationAt: Datetime
   statusPageUrl: String
   termsOfServiceUrl: String
   privacyPolicyUrl: String
@@ -23341,10 +23319,6 @@ func (ec *executionContext) fieldContext_UpdateVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_businessOwner(ctx, field)
 			case "securityOwner":
 				return ec.fieldContext_Vendor_securityOwner(ctx, field)
-			case "serviceStartAt":
-				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
-			case "serviceTerminationAt":
-				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
 			case "statusPageUrl":
 				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
 			case "termsOfServiceUrl":
@@ -24287,91 +24261,6 @@ func (ec *executionContext) fieldContext_Vendor_securityOwner(_ context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Vendor_serviceStartAt(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Vendor_serviceStartAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ServiceStartAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(time.Time)
-	fc.Result = res
-	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Vendor_serviceStartAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vendor",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Datetime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Vendor_serviceTerminationAt(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ServiceTerminationAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Vendor_serviceTerminationAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vendor",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Datetime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Vendor_statusPageUrl(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Vendor_statusPageUrl(ctx, field)
 	if err != nil {
@@ -25011,10 +24900,6 @@ func (ec *executionContext) fieldContext_VendorComplianceReport_vendor(_ context
 				return ec.fieldContext_Vendor_businessOwner(ctx, field)
 			case "securityOwner":
 				return ec.fieldContext_Vendor_securityOwner(ctx, field)
-			case "serviceStartAt":
-				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
-			case "serviceTerminationAt":
-				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
 			case "statusPageUrl":
 				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
 			case "termsOfServiceUrl":
@@ -25766,10 +25651,6 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_businessOwner(ctx, field)
 			case "securityOwner":
 				return ec.fieldContext_Vendor_securityOwner(ctx, field)
-			case "serviceStartAt":
-				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
-			case "serviceTerminationAt":
-				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
 			case "statusPageUrl":
 				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
 			case "termsOfServiceUrl":
@@ -25900,10 +25781,6 @@ func (ec *executionContext) fieldContext_VendorRiskAssessment_vendor(_ context.C
 				return ec.fieldContext_Vendor_businessOwner(ctx, field)
 			case "securityOwner":
 				return ec.fieldContext_Vendor_securityOwner(ctx, field)
-			case "serviceStartAt":
-				return ec.fieldContext_Vendor_serviceStartAt(ctx, field)
-			case "serviceTerminationAt":
-				return ec.fieldContext_Vendor_serviceTerminationAt(ctx, field)
 			case "statusPageUrl":
 				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
 			case "termsOfServiceUrl":
@@ -29362,7 +29239,7 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "description", "headquarterAddress", "legalName", "websiteUrl", "privacyPolicyUrl", "category", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "certifications", "securityPageUrl", "trustPageUrl", "statusPageUrl", "termsOfServiceUrl", "serviceStartAt", "serviceTerminationAt", "businessOwnerId", "securityOwnerId"}
+	fieldsInOrder := [...]string{"organizationId", "name", "description", "headquarterAddress", "legalName", "websiteUrl", "privacyPolicyUrl", "category", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "certifications", "securityPageUrl", "trustPageUrl", "statusPageUrl", "termsOfServiceUrl", "businessOwnerId", "securityOwnerId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -29474,20 +29351,6 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.TermsOfServiceURL = data
-		case "serviceStartAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceStartAt"))
-			data, err := ec.unmarshalNDatetime2timeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ServiceStartAt = data
-		case "serviceTerminationAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceTerminationAt"))
-			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ServiceTerminationAt = data
 		case "businessOwnerId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("businessOwnerId"))
 			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
@@ -31137,7 +31000,7 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "serviceStartAt", "serviceTerminationAt", "statusPageUrl", "termsOfServiceUrl", "privacyPolicyUrl", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "websiteUrl", "legalName", "headquarterAddress", "category", "certifications", "securityPageUrl", "trustPageUrl", "businessOwnerId", "securityOwnerId"}
+	fieldsInOrder := [...]string{"id", "name", "description", "statusPageUrl", "termsOfServiceUrl", "privacyPolicyUrl", "serviceLevelAgreementUrl", "dataProcessingAgreementUrl", "websiteUrl", "legalName", "headquarterAddress", "category", "certifications", "securityPageUrl", "trustPageUrl", "businessOwnerId", "securityOwnerId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -31165,20 +31028,6 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 				return it, err
 			}
 			it.Description = data
-		case "serviceStartAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceStartAt"))
-			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ServiceStartAt = data
-		case "serviceTerminationAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceTerminationAt"))
-			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ServiceTerminationAt = data
 		case "statusPageUrl":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusPageUrl"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -37496,13 +37345,6 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "serviceStartAt":
-			out.Values[i] = ec._Vendor_serviceStartAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "serviceTerminationAt":
-			out.Values[i] = ec._Vendor_serviceTerminationAt(ctx, field, obj)
 		case "statusPageUrl":
 			out.Values[i] = ec._Vendor_statusPageUrl(ctx, field, obj)
 		case "termsOfServiceUrl":

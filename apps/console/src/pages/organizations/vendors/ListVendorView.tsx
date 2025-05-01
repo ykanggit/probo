@@ -414,7 +414,6 @@ function ListVendorContent({
                             trustPageUrl: vendor.trustPageUrl,
                             statusPageUrl: vendor.statusPageUrl,
                             termsOfServiceUrl: vendor.termsOfServiceUrl,
-                            serviceStartAt: new Date().toISOString(),
                           },
                         },
                         onCompleted() {
@@ -455,7 +454,6 @@ function ListVendorContent({
                           organizationId: data.organization.id,
                           name: searchTerm.trim(),
                           description: "",
-                          serviceStartAt: new Date().toISOString(),
                         },
                       },
                       onCompleted() {

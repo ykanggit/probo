@@ -13,6 +13,10 @@ All notable changes to this project will be documented in this file.
 
 - Fix not aligned button on policy list view
 
+### Removed
+
+- Remove start and end service date of vendor
+
 ## [0.19.2] - 2025-05-01
 
 ### Fixed

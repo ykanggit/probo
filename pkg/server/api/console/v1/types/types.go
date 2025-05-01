@@ -227,25 +227,23 @@ type CreateTaskPayload struct {
 }
 
 type CreateVendorInput struct {
-	OrganizationID             gid.GID    `json:"organizationId"`
-	Name                       string     `json:"name"`
-	Description                *string    `json:"description,omitempty"`
-	HeadquarterAddress         *string    `json:"headquarterAddress,omitempty"`
-	LegalName                  *string    `json:"legalName,omitempty"`
-	WebsiteURL                 *string    `json:"websiteUrl,omitempty"`
-	PrivacyPolicyURL           *string    `json:"privacyPolicyUrl,omitempty"`
-	Category                   *string    `json:"category,omitempty"`
-	ServiceLevelAgreementURL   *string    `json:"serviceLevelAgreementUrl,omitempty"`
-	DataProcessingAgreementURL *string    `json:"dataProcessingAgreementUrl,omitempty"`
-	Certifications             []string   `json:"certifications,omitempty"`
-	SecurityPageURL            *string    `json:"securityPageUrl,omitempty"`
-	TrustPageURL               *string    `json:"trustPageUrl,omitempty"`
-	StatusPageURL              *string    `json:"statusPageUrl,omitempty"`
-	TermsOfServiceURL          *string    `json:"termsOfServiceUrl,omitempty"`
-	ServiceStartAt             time.Time  `json:"serviceStartAt"`
-	ServiceTerminationAt       *time.Time `json:"serviceTerminationAt,omitempty"`
-	BusinessOwnerID            *gid.GID   `json:"businessOwnerId,omitempty"`
-	SecurityOwnerID            *gid.GID   `json:"securityOwnerId,omitempty"`
+	OrganizationID             gid.GID  `json:"organizationId"`
+	Name                       string   `json:"name"`
+	Description                *string  `json:"description,omitempty"`
+	HeadquarterAddress         *string  `json:"headquarterAddress,omitempty"`
+	LegalName                  *string  `json:"legalName,omitempty"`
+	WebsiteURL                 *string  `json:"websiteUrl,omitempty"`
+	PrivacyPolicyURL           *string  `json:"privacyPolicyUrl,omitempty"`
+	Category                   *string  `json:"category,omitempty"`
+	ServiceLevelAgreementURL   *string  `json:"serviceLevelAgreementUrl,omitempty"`
+	DataProcessingAgreementURL *string  `json:"dataProcessingAgreementUrl,omitempty"`
+	Certifications             []string `json:"certifications,omitempty"`
+	SecurityPageURL            *string  `json:"securityPageUrl,omitempty"`
+	TrustPageURL               *string  `json:"trustPageUrl,omitempty"`
+	StatusPageURL              *string  `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL          *string  `json:"termsOfServiceUrl,omitempty"`
+	BusinessOwnerID            *gid.GID `json:"businessOwnerId,omitempty"`
+	SecurityOwnerID            *gid.GID `json:"securityOwnerId,omitempty"`
 }
 
 type CreateVendorPayload struct {
@@ -865,25 +863,23 @@ type UpdateTaskPayload struct {
 }
 
 type UpdateVendorInput struct {
-	ID                         gid.GID    `json:"id"`
-	Name                       *string    `json:"name,omitempty"`
-	Description                *string    `json:"description,omitempty"`
-	ServiceStartAt             *time.Time `json:"serviceStartAt,omitempty"`
-	ServiceTerminationAt       *time.Time `json:"serviceTerminationAt,omitempty"`
-	StatusPageURL              *string    `json:"statusPageUrl,omitempty"`
-	TermsOfServiceURL          *string    `json:"termsOfServiceUrl,omitempty"`
-	PrivacyPolicyURL           *string    `json:"privacyPolicyUrl,omitempty"`
-	ServiceLevelAgreementURL   *string    `json:"serviceLevelAgreementUrl,omitempty"`
-	DataProcessingAgreementURL *string    `json:"dataProcessingAgreementUrl,omitempty"`
-	WebsiteURL                 *string    `json:"websiteUrl,omitempty"`
-	LegalName                  *string    `json:"legalName,omitempty"`
-	HeadquarterAddress         *string    `json:"headquarterAddress,omitempty"`
-	Category                   *string    `json:"category,omitempty"`
-	Certifications             []string   `json:"certifications,omitempty"`
-	SecurityPageURL            *string    `json:"securityPageUrl,omitempty"`
-	TrustPageURL               *string    `json:"trustPageUrl,omitempty"`
-	BusinessOwnerID            *gid.GID   `json:"businessOwnerId,omitempty"`
-	SecurityOwnerID            *gid.GID   `json:"securityOwnerId,omitempty"`
+	ID                         gid.GID  `json:"id"`
+	Name                       *string  `json:"name,omitempty"`
+	Description                *string  `json:"description,omitempty"`
+	StatusPageURL              *string  `json:"statusPageUrl,omitempty"`
+	TermsOfServiceURL          *string  `json:"termsOfServiceUrl,omitempty"`
+	PrivacyPolicyURL           *string  `json:"privacyPolicyUrl,omitempty"`
+	ServiceLevelAgreementURL   *string  `json:"serviceLevelAgreementUrl,omitempty"`
+	DataProcessingAgreementURL *string  `json:"dataProcessingAgreementUrl,omitempty"`
+	WebsiteURL                 *string  `json:"websiteUrl,omitempty"`
+	LegalName                  *string  `json:"legalName,omitempty"`
+	HeadquarterAddress         *string  `json:"headquarterAddress,omitempty"`
+	Category                   *string  `json:"category,omitempty"`
+	Certifications             []string `json:"certifications,omitempty"`
+	SecurityPageURL            *string  `json:"securityPageUrl,omitempty"`
+	TrustPageURL               *string  `json:"trustPageUrl,omitempty"`
+	BusinessOwnerID            *gid.GID `json:"businessOwnerId,omitempty"`
+	SecurityOwnerID            *gid.GID `json:"securityOwnerId,omitempty"`
 }
 
 type UpdateVendorPayload struct {
@@ -932,8 +928,6 @@ type Vendor struct {
 	RiskAssessments            *VendorRiskAssessmentConnection   `json:"riskAssessments"`
 	BusinessOwner              *People                           `json:"businessOwner,omitempty"`
 	SecurityOwner              *People                           `json:"securityOwner,omitempty"`
-	ServiceStartAt             time.Time                         `json:"serviceStartAt"`
-	ServiceTerminationAt       *time.Time                        `json:"serviceTerminationAt,omitempty"`
 	StatusPageURL              *string                           `json:"statusPageUrl,omitempty"`
 	TermsOfServiceURL          *string                           `json:"termsOfServiceUrl,omitempty"`
 	PrivacyPolicyURL           *string                           `json:"privacyPolicyUrl,omitempty"`

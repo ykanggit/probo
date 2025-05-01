@@ -46,8 +46,6 @@ type (
 		TrustPageURL               *string
 		TermsOfServiceURL          *string
 		StatusPageURL              *string
-		ServiceStartAt             time.Time
-		ServiceTerminationAt       *time.Time
 		BusinessOwnerID            *gid.GID
 		SecurityOwnerID            *gid.GID
 	}
@@ -68,8 +66,6 @@ type (
 		SecurityPageURL            *string
 		TrustPageURL               *string
 		StatusPageURL              *string
-		ServiceStartAt             *time.Time
-		ServiceTerminationAt       *time.Time
 		BusinessOwnerID            *gid.GID
 		SecurityOwnerID            *gid.GID
 	}
@@ -130,14 +126,6 @@ func (s VendorService) Update(
 
 			if req.Description != nil {
 				vendor.Description = req.Description
-			}
-
-			if req.ServiceStartAt != nil {
-				vendor.ServiceStartAt = *req.ServiceStartAt
-			}
-
-			if req.ServiceTerminationAt != nil {
-				vendor.ServiceTerminationAt = req.ServiceTerminationAt
 			}
 
 			if req.StatusPageURL != nil {
@@ -277,8 +265,6 @@ func (s VendorService) Create(
 		CreatedAt:                  now,
 		UpdatedAt:                  now,
 		Description:                req.Description,
-		ServiceStartAt:             req.ServiceStartAt,
-		ServiceTerminationAt:       req.ServiceTerminationAt,
 		HeadquarterAddress:         req.HeadquarterAddress,
 		LegalName:                  req.LegalName,
 		WebsiteURL:                 req.WebsiteURL,
