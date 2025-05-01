@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Security
+
+- Update javascript dependencies
+- Fix open redirect when the redirect url use `//`
+
 ## [0.18.1] - 2025-04-30
 
 ### Fixed
