@@ -165,10 +165,7 @@ func (s RiskService) Create(
 	req CreateRiskRequest,
 ) (*coredata.Risk, error) {
 	now := time.Now()
-	riskID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.RiskEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create global id: %w", err)
-	}
+	riskID := gid.New(s.svc.scope.GetTenantID(), coredata.RiskEntityType)
 
 	risk := &coredata.Risk{
 		ID:                 riskID,
@@ -198,7 +195,7 @@ func (s RiskService) Create(
 		risk.ResidualImpact = *req.ResidualImpact
 	}
 
-	err = s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
 			return risk.Insert(ctx, conn, s.svc.scope)

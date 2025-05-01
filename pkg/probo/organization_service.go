@@ -50,10 +50,7 @@ func (s OrganizationService) Create(
 	req CreateOrganizationRequest,
 ) (*coredata.Organization, error) {
 	now := time.Now()
-	organizationID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.OrganizationEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create organization global id: %w", err)
-	}
+	organizationID := gid.New(s.svc.scope.GetTenantID(), coredata.OrganizationEntityType)
 
 	organization := &coredata.Organization{
 		ID:        organizationID,
@@ -63,7 +60,7 @@ func (s OrganizationService) Create(
 		UpdatedAt: now,
 	}
 
-	err = s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(tx pg.Conn) error {
 			if err := organization.Insert(ctx, tx); err != nil {

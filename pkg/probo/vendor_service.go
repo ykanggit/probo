@@ -267,10 +267,7 @@ func (s VendorService) Create(
 	req CreateVendorRequest,
 ) (*coredata.Vendor, error) {
 	now := time.Now()
-	vendorID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.VendorEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create vendor global id: %w", err)
-	}
+	vendorID := gid.New(s.svc.scope.GetTenantID(), coredata.VendorEntityType)
 
 	organization := &coredata.Organization{}
 	vendor := &coredata.Vendor{
@@ -301,7 +298,7 @@ func (s VendorService) Create(
 		vendor.Category = "Other"
 	}
 
-	err = s.svc.pg.WithTx(
+	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.OrganizationID); err != nil {
@@ -348,10 +345,7 @@ func (s VendorService) CreateRiskAssessment(
 	ctx context.Context,
 	req CreateVendorRiskAssessmentRequest,
 ) (*coredata.VendorRiskAssessment, error) {
-	vendorRiskAssessmentID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.VendorRiskAssessmentEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create vendor risk assessment global id: %w", err)
-	}
+	vendorRiskAssessmentID := gid.New(s.svc.scope.GetTenantID(), coredata.VendorRiskAssessmentEntityType)
 
 	now := time.Now()
 
@@ -372,7 +366,7 @@ func (s VendorService) CreateRiskAssessment(
 		return nil, fmt.Errorf("expiresAt %v must be in the future", req.ExpiresAt)
 	}
 
-	err = s.svc.pg.WithTx(
+	err := s.svc.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
 			vendor := coredata.Vendor{ID: req.VendorID}

@@ -85,11 +85,7 @@ func (s EvidenceService) Request(
 	ctx context.Context,
 	req RequestEvidenceRequest,
 ) (*coredata.Evidence, error) {
-	evidenceID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.EvidenceEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create evidence global id: %w", err)
-	}
-
+	evidenceID := gid.New(s.svc.scope.GetTenantID(), coredata.EvidenceEntityType)
 	now := time.Now()
 
 	evidence := &coredata.Evidence{
@@ -103,7 +99,7 @@ func (s EvidenceService) Request(
 		UpdatedAt:   now,
 	}
 
-	err = s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
 			return evidence.Insert(ctx, conn, s.svc.scope)
@@ -192,10 +188,7 @@ func (s EvidenceService) Create(
 	req CreateEvidenceRequest,
 ) (*coredata.Evidence, error) {
 	now := time.Now()
-	evidenceID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.EvidenceEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create evidence global id: %w", err)
-	}
+	evidenceID := gid.New(s.svc.scope.GetTenantID(), coredata.EvidenceEntityType)
 
 	referenceID, err := uuid.NewV4()
 	if err != nil {

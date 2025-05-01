@@ -98,10 +98,7 @@ func (s VendorComplianceReportService) Upload(
 
 	now := time.Now()
 
-	vendorComplianceReportID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.VendorComplianceReportEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot generate vendor compliance report ID: %w", err)
-	}
+	vendorComplianceReportID := gid.New(s.svc.scope.GetTenantID(), coredata.VendorComplianceReportEntityType)
 
 	vendorComplianceReport := &coredata.VendorComplianceReport{
 		ID:         vendorComplianceReportID,

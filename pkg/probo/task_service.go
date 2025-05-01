@@ -53,10 +53,7 @@ func (s TaskService) Create(
 	req CreateTaskRequest,
 ) (*coredata.Task, error) {
 	now := time.Now()
-	taskID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.TaskEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot generate id: %w", err)
-	}
+	taskID := gid.New(s.svc.scope.GetTenantID(), coredata.TaskEntityType)
 
 	referenceID, err := uuid.NewV4()
 	if err != nil {

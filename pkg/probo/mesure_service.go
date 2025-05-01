@@ -144,10 +144,7 @@ func (s MeasureService) Import(
 			for i := range req.Measures {
 				now := time.Now()
 
-				measureID, err := gid.NewGID(organizationID.TenantID(), coredata.MeasureEntityType)
-				if err != nil {
-					return fmt.Errorf("cannot create global id: %w", err)
-				}
+				measureID := gid.New(organizationID.TenantID(), coredata.MeasureEntityType)
 
 				measure := &coredata.Measure{
 					ID:             measureID,
@@ -168,10 +165,7 @@ func (s MeasureService) Import(
 				}
 
 				for j := range req.Measures[i].Tasks {
-					taskID, err := gid.NewGID(organizationID.TenantID(), coredata.TaskEntityType)
-					if err != nil {
-						return fmt.Errorf("cannot create global id: %w", err)
-					}
+					taskID := gid.New(organizationID.TenantID(), coredata.TaskEntityType)
 
 					task := &coredata.Task{
 						ID:          taskID,
@@ -189,10 +183,7 @@ func (s MeasureService) Import(
 					}
 
 					for k := range req.Measures[i].Tasks[j].RequestedEvidences {
-						evidenceID, err := gid.NewGID(organizationID.TenantID(), coredata.EvidenceEntityType)
-						if err != nil {
-							return fmt.Errorf("cannot create global id: %w", err)
-						}
+						evidenceID := gid.New(organizationID.TenantID(), coredata.EvidenceEntityType)
 
 						evidence := &coredata.Evidence{
 							State:       coredata.EvidenceStateRequested,
@@ -332,10 +323,7 @@ func (s MeasureService) Create(
 	req CreateMeasureRequest,
 ) (*coredata.Measure, error) {
 	now := time.Now()
-	measureID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.MeasureEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create measure global id: %w", err)
-	}
+	measureID := gid.New(s.svc.scope.GetTenantID(), coredata.MeasureEntityType)
 
 	referenceID, err := uuid.NewV4()
 	if err != nil {

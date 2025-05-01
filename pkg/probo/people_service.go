@@ -165,10 +165,7 @@ func (s PeopleService) Create(
 	req CreatePeopleRequest,
 ) (*coredata.People, error) {
 	now := time.Now()
-	peopleID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.PeopleEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create people global id: %w", err)
-	}
+	peopleID := gid.New(s.svc.scope.GetTenantID(), coredata.PeopleEntityType)
 
 	organization := &coredata.Organization{}
 	people := &coredata.People{
@@ -183,7 +180,7 @@ func (s PeopleService) Create(
 		UpdatedAt:                now,
 	}
 
-	err = s.svc.pg.WithTx(
+	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.OrganizationID); err != nil {

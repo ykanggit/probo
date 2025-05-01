@@ -61,10 +61,7 @@ func (s FrameworkService) Create(
 	req CreateFrameworkRequest,
 ) (*coredata.Framework, error) {
 	now := time.Now()
-	frameworkID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.FrameworkEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create global id: %w", err)
-	}
+	frameworkID := gid.New(s.svc.scope.GetTenantID(), coredata.FrameworkEntityType)
 
 	framework := &coredata.Framework{
 		ID:             frameworkID,
@@ -76,7 +73,7 @@ func (s FrameworkService) Create(
 		UpdatedAt:      now,
 	}
 
-	err = s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
 			return framework.Insert(ctx, conn, s.svc.scope)
@@ -187,10 +184,7 @@ func (s FrameworkService) Import(
 	organizationID gid.GID,
 	req ImportFrameworkRequest,
 ) (*coredata.Framework, error) {
-	frameworkID, err := gid.NewGID(organizationID.TenantID(), coredata.FrameworkEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create global id: %w", err)
-	}
+	frameworkID := gid.New(organizationID.TenantID(), coredata.FrameworkEntityType)
 
 	now := time.Now()
 	framework := &coredata.Framework{
@@ -204,10 +198,7 @@ func (s FrameworkService) Import(
 
 	importedControls := coredata.Controls{}
 	for _, control := range req.Framework.Controls {
-		controlID, err := gid.NewGID(organizationID.TenantID(), coredata.ControlEntityType)
-		if err != nil {
-			return nil, fmt.Errorf("cannot create global id: %w", err)
-		}
+		controlID := gid.New(organizationID.TenantID(), coredata.ControlEntityType)
 
 		now := time.Now()
 		control := &coredata.Control{
@@ -224,12 +215,10 @@ func (s FrameworkService) Import(
 		importedControls = append(importedControls, control)
 	}
 
-	err = s.svc.pg.WithTx(
+	err := s.svc.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
-
-			err := framework.Insert(ctx, tx, s.svc.scope)
-			if err != nil {
+			if err := framework.Insert(ctx, tx, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert framework: %w", err)
 			}
 

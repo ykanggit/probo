@@ -124,15 +124,8 @@ func (s *PolicyService) Create(
 	req CreatePolicyRequest,
 ) (*coredata.Policy, *coredata.PolicyVersion, error) {
 	now := time.Now()
-	policyID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.PolicyEntityType)
-	if err != nil {
-		return nil, nil, fmt.Errorf("cannot create policy global id: %w", err)
-	}
-
-	policyVersionID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.PolicyVersionEntityType)
-	if err != nil {
-		return nil, nil, fmt.Errorf("cannot create policy version global id: %w", err)
-	}
+	policyID := gid.New(s.svc.scope.GetTenantID(), coredata.PolicyEntityType)
+	policyVersionID := gid.New(s.svc.scope.GetTenantID(), coredata.PolicyVersionEntityType)
 
 	policy := &coredata.Policy{
 		ID:             policyID,
@@ -153,7 +146,7 @@ func (s *PolicyService) Create(
 		CreatedAt:     now,
 		UpdatedAt:     now,
 	}
-	err = s.svc.pg.WithTx(
+	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := policy.Insert(ctx, conn, s.svc.scope); err != nil {
@@ -235,10 +228,7 @@ func (s *PolicyService) SendSigningNotifications(
 			for _, people := range peoples {
 				now := time.Now()
 
-				emailID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.EmailEntityType)
-				if err != nil {
-					return fmt.Errorf("cannot create email global id: %w", err)
-				}
+				emailID := gid.New(s.svc.scope.GetTenantID(), coredata.EmailEntityType)
 
 				token, err := statelesstoken.NewToken(
 					s.svc.tokenSecret,
@@ -398,10 +388,7 @@ func (s *PolicyService) RequestSignature(
 	ctx context.Context,
 	req RequestSignatureRequest,
 ) (*coredata.PolicyVersionSignature, error) {
-	policyVersionSignatureID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.PolicyVersionSignatureEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create policy version signature global id: %w", err)
-	}
+	policyVersionSignatureID := gid.New(s.svc.scope.GetTenantID(), coredata.PolicyVersionSignatureEntityType)
 
 	policyVersion, err := s.GetVersion(ctx, req.PolicyVersionID)
 	if err != nil {
@@ -469,16 +456,13 @@ func (s *PolicyService) CreateDraft(
 	policyID gid.GID,
 	createdBy gid.GID,
 ) (*coredata.PolicyVersion, error) {
-	draftVersionID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.PolicyVersionEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create policy version global id: %w", err)
-	}
+	draftVersionID := gid.New(s.svc.scope.GetTenantID(), coredata.PolicyVersionEntityType)
 
 	latestVersion := &coredata.PolicyVersion{}
 	draftVersion := &coredata.PolicyVersion{}
 	now := time.Now()
 
-	err = s.svc.pg.WithTx(
+	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := latestVersion.LoadLatestVersion(ctx, conn, s.svc.scope, policyID); err != nil {

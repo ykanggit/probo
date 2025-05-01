@@ -87,11 +87,7 @@ func (s *ConnectorService) CreateOrUpdate(
 		return nil, fmt.Errorf("connection configuration is required")
 	}
 
-	connectorID, err := gid.NewGID(s.svc.scope.GetTenantID(), coredata.ConnectorEntityType)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create connector global id: %w", err)
-	}
-
+	connectorID := gid.New(s.svc.scope.GetTenantID(), coredata.ConnectorEntityType)
 	now := time.Now()
 
 	connector := &coredata.Connector{
@@ -104,7 +100,7 @@ func (s *ConnectorService) CreateOrUpdate(
 		UpdatedAt:      now,
 	}
 
-	err = s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := connector.Upsert(ctx, conn, s.svc.scope, s.svc.encryptionKey); err != nil {
