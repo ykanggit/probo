@@ -3,6 +3,33 @@
  */
 
 /**
+ * Category types for vendors
+ */
+export type VendorCategory =
+  | 'Cloud monitoring'
+  | 'Cloud provider'
+  | 'Collaboration'
+  | 'Customer support'
+  | 'Analytics'
+  | 'Data storage and processing'
+  | 'Document management'
+  | 'Employee management'
+  | 'Engineering'
+  | 'Finance'
+  | 'Identity provider'
+  | 'IT'
+  | 'Marketing'
+  | 'Office operations'
+  | 'Other'
+  | 'Password management'
+  | 'Product and design'
+  | 'Professional services'
+  | 'Recruiting'
+  | 'Sales'
+  | 'Security'
+  | 'Version control';
+
+/**
  * Represents a software vendor or service provider with associated metadata
  */
 export interface Vendor {
@@ -43,7 +70,7 @@ export interface Vendor {
   description?: string;
   
   /** Primary category for the vendor */
-  category?: string;
+  category?: VendorCategory;
   
   /** Security or compliance certifications held by the vendor */
   certifications?: string[];
