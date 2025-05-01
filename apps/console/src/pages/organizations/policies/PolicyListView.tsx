@@ -472,8 +472,10 @@ function PolicyListViewContent({
     data.organization?.policies?.edges.map((edge) => edge?.node) ?? [];
   
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [confirmSigningModalOpen, setConfirmSigningModalOpen] = useState(false);
 
-  const [sendSigningNotifications, _] = useMutation<PolicyListViewSendSigningNotificationsMutation>(sendSigningNotificationsMutation);
+  const [sendSigningNotifications, isSendingNotifications] = useMutation<PolicyListViewSendSigningNotificationsMutation>(sendSigningNotificationsMutation);
+  const { toast } = useToast();
 
   const handleOpenModal = () => {
     setCreateModalOpen(true);
@@ -490,6 +492,31 @@ function PolicyListViewContent({
           organizationId: organizationId!,
         },
       },
+      onCompleted: (response, errors) => {
+        if (errors) {
+          console.error("Error sending signing notifications:", errors);
+          toast({
+            title: "Error",
+            description: "Failed to send signing notifications. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        toast({
+          title: "Success",
+          description: "Signing notifications sent successfully!",
+        });
+        setConfirmSigningModalOpen(false);
+      },
+      onError: (error) => {
+        console.error("Error sending signing notifications:", error);
+        toast({
+          title: "Error",
+          description: "Failed to send signing notifications. Please try again.",
+          variant: "destructive",
+        });
+      },
     });
   };
 
@@ -502,7 +529,7 @@ function PolicyListViewContent({
             <Plus className="mr-2 h-4 w-4" />
             New policy
           </Button>
-          <Button onClick={handleSendSigningNotifications}>
+          <Button onClick={() => setConfirmSigningModalOpen(true)}>
             Send signing notifications
           </Button>
         </div>
@@ -569,6 +596,30 @@ function PolicyListViewContent({
         organizationId={organizationId!}
         organizationRef={data.organization}
       />
+      
+      {/* Confirmation Modal for Sending Signing Notifications */}
+      <Dialog open={confirmSigningModalOpen} onOpenChange={setConfirmSigningModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogTitle>Send Signing Notifications</DialogTitle>
+          <DialogDescription>
+            This will send signing notifications to all users who have pending policies to sign. Are you sure you want to continue?
+          </DialogDescription>
+          <DialogFooter className="gap-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setConfirmSigningModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendSigningNotifications}
+              disabled={isSendingNotifications}
+            >
+              {isSendingNotifications ? "Sending..." : "Send Notifications"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageTemplate>
   );
 }

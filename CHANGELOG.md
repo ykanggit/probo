@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add end-user confirmation before sending policy sign notification
+
 ### Fixed
 
 - Fix not aligned button on policy list view
