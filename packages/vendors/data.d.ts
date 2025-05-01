@@ -6,11 +6,11 @@
  * Category types for vendors
  */
 export type VendorCategory =
+  | 'Analytics'
   | 'Cloud monitoring'
   | 'Cloud provider'
   | 'Collaboration'
   | 'Customer support'
-  | 'Analytics'
   | 'Data storage and processing'
   | 'Document management'
   | 'Employee management'
