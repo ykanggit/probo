@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Evidence URL not set
+
 ## [0.19.0] - 2025-04-30
 
 ### Changed
