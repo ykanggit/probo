@@ -139,7 +139,7 @@
     },
     {
       "name": "Sentry",
-      "headquarterAddress": "1 Market St, San Francisco, CA 94105",
+      "headquarterAddress": "45 Fremont St, San Francisco, CA 94105",
       "legalName": "Sentry, Inc.",
       "websiteUrl": "https://sentry.io",
       "privacyPolicyUrl": "https://sentry.io/privacy",
@@ -152,7 +152,7 @@
     },
     {
       "name": "Datadog",
-      "headquarterAddress": "1 Market St, San Francisco, CA 94105",
+      "headquarterAddress": "New York Times Bldg, 620 8th Ave, New York, NY 10018",
       "legalName": "Datadog, Inc.",
       "websiteUrl": "https://datadog.com",
       "privacyPolicyUrl": "https://datadog.com/privacy",
@@ -177,7 +177,7 @@
     },
     {
       "name": "Vercel",
-      "headquarterAddress": "1 Market St, San Francisco, CA 94105",
+      "headquarterAddress": "650 California St, San Francisco, CA 94108, US",
       "legalName": "Vercel, Inc.",
       "websiteUrl": "https://vercel.com",
       "privacyPolicyUrl": "https://vercel.com/legal/privacy-policy",
