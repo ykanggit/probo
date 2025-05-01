@@ -1,6 +1,6 @@
-# Vendors Data
+# Vendors
 
-The [vendors.json](vendors.json) file contains data about various vendors and their security certifications. This data is licensed under the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) license.
+The [vendors.json](vendors.json) file and derived files contains data about various vendors and their security certifications. This data is licensed under the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) license.
 
 ## License Requirements
 

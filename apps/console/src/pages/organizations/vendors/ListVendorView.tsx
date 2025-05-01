@@ -29,24 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface VendorData {
-  name: string;
-  headquarterAddress: string;
-  legalName: string;
-  websiteUrl: string;
-  privacyPolicyUrl: string;
-  serviceLevelAgreementUrl?: string;
-  category: string;
-  dataProcessingAgreementUrl?: string;
-  description: string;
-  categories: string[];
-  certifications: string[];
-  securityPageUrl?: string;
-  trustPageUrl?: string;
-  statusPageUrl?: string;
-  termsOfServiceUrl?: string;
-}
+import { Vendor, Vendors } from "@probo/vendors";
 
 const ITEMS_PER_PAGE = 25;
 
@@ -214,8 +197,8 @@ function ListVendorContent({
   const [, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddVendorDropdown, setShowAddVendorDropdown] = useState(false);
-  const [filteredVendors, setFilteredVendors] = useState<VendorData[]>([]);
-  const [vendorsData, setVendorsData] = useState<VendorData[]>([]);
+  const [filteredVendors, setFilteredVendors] = useState<Vendors>([]);
+  const [vendorsData, setVendorsData] = useState<Vendors>([]);
   const [isLoadingVendors, setIsLoadingVendors] = useState(false);
   const [createVendor] =
     useMutation<ListVendorViewCreateVendorMutation>(createVendorMutation);
@@ -227,12 +210,8 @@ function ListVendorContent({
     const loadVendorsData = async () => {
       try {
         setIsLoadingVendors(true);
-        const response = await fetch("/data/vendors/vendors.json");
-        if (!response.ok) {
-          throw new Error("Failed to load vendors data");
-        }
-        const data = await response.json();
-        setVendorsData(data);
+        const { default: vendors } = await import("@probo/vendors");
+        setVendorsData(vendors);
       } catch (error) {
         console.error("Error loading vendors data:", error);
         toast({
@@ -265,7 +244,7 @@ function ListVendorContent({
     vendorsConnection.vendors.edges.map((edge) => edge.node) ?? [];
   const pageInfo = vendorsConnection.vendors.pageInfo;
 
-  const fuse = new Fuse<VendorData>(vendorsData, {
+  const fuse = new Fuse<Vendor>(vendorsData, {
     keys: ["name"],
     threshold: 0.3,
   });

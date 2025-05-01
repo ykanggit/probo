@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@probo/react-lazy": "^0.1.0",
+    "@probo/vendors": "^0.0.1",
     "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-avatar": "^1.1.3",
     "@radix-ui/react-checkbox": "^1.0.4",
