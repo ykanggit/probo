@@ -339,7 +339,7 @@ Sentry is a cloud-based platform for monitoring and analyzing application perfor
 
 **Legal Name:** Sentry, Inc.
 
-**Headquarters:** 1 Market St, San Francisco, CA 94105
+**Headquarters:** 45 Fremont St, San Francisco, CA 94105
 
 ### Links
 
@@ -365,7 +365,7 @@ Datadog is a cloud-based platform for monitoring and analyzing application perfo
 
 **Legal Name:** Datadog, Inc.
 
-**Headquarters:** 1 Market St, San Francisco, CA 94105
+**Headquarters:** New York Times Bldg, 620 8th Ave, New York, NY 10018
 
 ### Links
 
@@ -401,7 +401,7 @@ Vercel is a cloud-based platform for monitoring and analyzing application perfor
 
 **Legal Name:** Vercel, Inc.
 
-**Headquarters:** 1 Market St, San Francisco, CA 94105
+**Headquarters:** 650 California St, San Francisco, CA 94108, US
 
 ### Links
 
