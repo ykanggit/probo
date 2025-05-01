@@ -941,6 +941,7 @@ func (r *mutationResolver) CreateEvidence(ctx context.Context, input types.Creat
 		if input.URL == nil || *input.URL == "" {
 			return nil, fmt.Errorf("URL is required for LINK type evidence")
 		}
+		req.URL = *input.URL
 	}
 
 	evidence, err := svc.Evidences.Create(ctx, req)
