@@ -331,7 +331,8 @@ function ListVendorContent({
         status: "NEEDED",
         dataSensitivity: null,
         businessImpact: null,
-        isExpired: false
+        isExpired: false,
+        assessedAt: null
       };
     }
 
@@ -343,7 +344,8 @@ function ListVendorContent({
       status: isExpired ? "EXPIRED" : "VALID",
       dataSensitivity: latestAssessment.dataSensitivity,
       businessImpact: latestAssessment.businessImpact,
-      isExpired
+      isExpired,
+      assessedAt: latestAssessment.assessedAt
     };
   };
 
@@ -529,6 +531,21 @@ function ListVendorContent({
                   </svg>
                 </div>
               </th>
+              <th className="py-3 px-4 text-left text-xs font-semibold text-gray-500">
+                <div className="flex items-center gap-2">
+                  Accessed At
+                  <svg
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-gray-400"
+                  >
+                    <path d="M4 6L7 3H1L4 6Z" fill="currentColor" />
+                  </svg>
+                </div>
+              </th>
               <th className="py-3 px-4"></th>
             </tr>
           </thead>
@@ -589,6 +606,9 @@ function ListVendorContent({
                         {riskStatus.businessImpact || "LOW"}
                       </Badge>
                     )}
+                  </td>
+                  <td className="py-4 px-4">
+                    {riskStatus.assessedAt ? formatDate(riskStatus.assessedAt) : "N/A"}
                   </td>
                   <td className="py-4 px-4 text-right">
                     <DropdownMenu>

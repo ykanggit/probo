@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Add end-user confirmation before sending policy sign notification
+- Add assessed at in the vendor list
 
 ### Fixed
 
