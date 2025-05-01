@@ -767,7 +767,9 @@ func (s Service) ConfirmInvitation(ctx context.Context, tokenString string, pass
 				return fmt.Errorf("cannot insert user organization: %w", err)
 			}
 
+			peopleID := gid.New(token.Data.OrganizationID.TenantID(), coredata.PeopleEntityType)
 			people := coredata.People{
+				ID:                       peopleID,
 				OrganizationID:           token.Data.OrganizationID,
 				UserID:                   &user.ID,
 				FullName:                 token.Data.FullName,
