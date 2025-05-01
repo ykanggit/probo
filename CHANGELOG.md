@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.19.0] - 2025-04-30
+
+### Changed
+- New vendors in the built-in lists
+
 ### Security
 
 - Update javascript dependencies
