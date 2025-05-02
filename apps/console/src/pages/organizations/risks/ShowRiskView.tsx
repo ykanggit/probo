@@ -892,45 +892,40 @@ function ShowRiskViewContent({
               <div>
                 <h3 className="text-sm font-medium mb-6">Risk Assessment</h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="flex flex-col space-y-8">
                   {/* Initial Assessment */}
                   <div>
                     <h4 className="text-sm font-medium mb-5 flex items-center">
                       <span className="w-3 h-3 rounded-full bg-orange-500 mr-2"></span>
                       Initial Assessment
                     </h4>
-                    <div className="grid grid-cols-3 gap-6">
-                      <div>
-                        <p className="text-sm text-slate-600 mb-2">
-                          Likelihood
-                        </p>
-                        <div
-                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
-                          style={
-                            getLikelihoodLabel(risk.inherentLikelihood!).style
-                          }
-                        >
-                          {getLikelihoodLabel(risk.inherentLikelihood!).label}
-                        </div>
+                    
+                    <div className="flex items-center">
+                      <div
+                        className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                        style={
+                          getLikelihoodLabel(risk.inherentLikelihood!).style
+                        }
+                      >
+                        {getLikelihoodLabel(risk.inherentLikelihood!).label}
                       </div>
-                      <div>
-                        <p className="text-sm text-slate-600 mb-2">Impact</p>
-                        <div
-                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
-                          style={getImpactLabel(risk.inherentImpact!).style}
-                        >
-                          {getImpactLabel(risk.inherentImpact!).label}
-                        </div>
+                      
+                      <span className="mx-4 text-xl">×</span>
+                      
+                      <div
+                        className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                        style={getImpactLabel(risk.inherentImpact!).style}
+                      >
+                        {getImpactLabel(risk.inherentImpact!).label}
                       </div>
-                      <div>
-                        <p className="text-sm text-slate-600 mb-2">Severity</p>
-                        <div
-                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
-                          style={severity.style}
-                        >
-                          {severity.level} (
-                          {risk.inherentLikelihood! * risk.inherentImpact!})
-                        </div>
+                      
+                      <span className="mx-4 text-xl">=</span>
+                      
+                      <div
+                        className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                        style={severity.style}
+                      >
+                        {severity.level} ({risk.inherentLikelihood! * risk.inherentImpact!})
                       </div>
                     </div>
                   </div>
@@ -941,38 +936,33 @@ function ShowRiskViewContent({
                       <span className="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
                       After Treatment
                     </h4>
-                    <div className="grid grid-cols-3 gap-6">
-                      <div>
-                        <p className="text-sm text-slate-600 mb-2">
-                          Likelihood
-                        </p>
-                        <div
-                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
-                          style={
-                            getLikelihoodLabel(risk.residualLikelihood!).style
-                          }
-                        >
-                          {getLikelihoodLabel(risk.residualLikelihood!).label}
-                        </div>
+                    
+                    <div className="flex items-center">
+                      <div
+                        className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                        style={
+                          getLikelihoodLabel(risk.residualLikelihood!).style
+                        }
+                      >
+                        {getLikelihoodLabel(risk.residualLikelihood!).label}
                       </div>
-                      <div>
-                        <p className="text-sm text-slate-600 mb-2">Impact</p>
-                        <div
-                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
-                          style={getImpactLabel(risk.residualImpact!).style}
-                        >
-                          {getImpactLabel(risk.residualImpact!).label}
-                        </div>
+                      
+                      <span className="mx-4 text-xl">×</span>
+                      
+                      <div
+                        className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                        style={getImpactLabel(risk.residualImpact!).style}
+                      >
+                        {getImpactLabel(risk.residualImpact!).label}
                       </div>
-                      <div>
-                        <p className="text-sm text-slate-600 mb-2">Severity</p>
-                        <div
-                          className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
-                          style={residualSeverity.style}
-                        >
-                          {residualSeverity.level} (
-                          {risk.residualLikelihood! * risk.residualImpact!})
-                        </div>
+                      
+                      <span className="mx-4 text-xl">=</span>
+                      
+                      <div
+                        className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
+                        style={residualSeverity.style}
+                      >
+                        {residualSeverity.level} ({risk.residualLikelihood! * risk.residualImpact!})
                       </div>
                     </div>
                   </div>
@@ -983,16 +973,7 @@ function ShowRiskViewContent({
                   risk.inherentImpact !== risk.residualImpact) && (
                   <div className="mt-6 text-center pt-4 border-t">
                     <p className="text-sm text-slate-600">
-                      Risk severity reduced from{" "}
-                      <span className="font-semibold">
-                        {severity.level} (
-                        {risk.inherentLikelihood! * risk.inherentImpact!})
-                      </span>{" "}
-                      to{" "}
-                      <span className="font-semibold">
-                        {residualSeverity.level} (
-                        {risk.residualLikelihood! * risk.residualImpact!})
-                      </span>
+                      Risk severity reduced from <span className="font-semibold">{severity.level} ({risk.inherentLikelihood! * risk.inherentImpact!})</span> to <span className="font-semibold">{residualSeverity.level} ({risk.residualLikelihood! * risk.residualImpact!})</span>
                       {risk.treatment === "MITIGATED" &&
                         risk.measures?.edges &&
                         risk.measures.edges.length > 0 &&
