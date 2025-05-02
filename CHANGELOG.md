@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Add markdown table support
+
 ## [0.20.1] - 2025-05-01
 
 ### Changed
