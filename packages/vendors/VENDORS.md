@@ -12,12 +12,15 @@
 
 - [Better Stack](#better-stack)
 - [Datadog](#datadog)
+- [New Relic](#new-relic)
 
 ### Cloud provider
 
 - [Amazon Web Services (AWS)](#amazon-web-services-aws)
 - [Cloudflare](#cloudflare)
+- [Fly.io](#flyio)
 - [Google](#google)
+- [Google Cloud Platform](#google-cloud-platform)
 - [Heroku](#heroku)
 - [Latitude.sh](#latitudesh)
 - [Microsoft Azure](#microsoft-azure)
@@ -25,6 +28,7 @@
 - [OVHcloud global](#ovhcloud-global)
 - [Porter](#porter)
 - [Vercel](#vercel)
+- [bunny.net](#bunnynet)
 
 ### Collaboration
 
@@ -44,12 +48,21 @@
 - [Sendgrid](#sendgrid)
 - [Twilio](#twilio)
 
+### Customer support
+
+- [Pylon](#pylon)
+
 ### Data storage and processing
 
 - [Airtable](#airtable)
 - [ClickHouse](#clickhouse)
 - [PlanetScale](#planetscale)
 - [Supabase](#supabase)
+- [Upstash](#upstash)
+
+### Developer tools
+
+- [Danami](#danami)
 
 ### Document management
 
@@ -104,7 +117,9 @@
 
 - [Brevo](#brevo)
 - [Hubspot](#hubspot)
+- [Loops](#loops)
 - [Mailchimp](#mailchimp)
+- [Perplexity](#perplexity)
 - [Resend](#resend)
 
 ### Password management
@@ -118,6 +133,10 @@
 - [Framer](#framer)
 - [Pitch](#pitch)
 - [Webflow](#webflow)
+
+### Project management
+
+- [ClickUp](#clickup)
 
 ### Recruiting
 
@@ -2363,7 +2382,7 @@ AI-powered meeting assistant that captures, transcribes, and summarizes conversa
 
 ## Resend
 
-Developer‑focused email delivery platform offering a modern API and tooling to build, test and send transactional and marketing emails at scale.
+Developer-focused email delivery platform offering a modern API and tooling to build, test and send transactional and marketing emails at scale.
 
 **Legal Name:** Plus Five Five, Inc.
 
@@ -3008,6 +3027,468 @@ Cloud-based talent-acquisition suite that combines applicant-tracking and candid
 - CAIQ
 - CCPA
 - EU-U.S. Privacy Shield
+
+---
+
+## Google Cloud Platform
+
+Comprehensive public cloud computing platform offering infrastructure, data analytics, AI, security, and developer tools
+
+**Legal Name:** Google LLC
+
+**Headquarters:** 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA
+
+### Links
+
+| Resource | Link |
+|----------|------|
+| Website | [Link](https://cloud.google.com) |
+| Privacy Policy | [Link](https://cloud.google.com/terms/cloud-privacy-notice) |
+| Terms of Service | [Link](https://cloud.google.com/terms) |
+| Service Level Agreement | [Link](https://cloud.google.com/terms/sla) |
+| Security Page | [Link](https://cloud.google.com/security) |
+| Trust Page | [Link](https://cloud.google.com/trust-center) |
+| Status Page | [Link](https://status.cloud.google.com/) |
+| Data Processing Agreement | [Link](https://cloud.google.com/terms/data-processing-terms) |
+| Business Associate Agreement | [Link](https://cloud.google.com/terms/hipaa-baa) |
+| Subprocessors List | [Link](https://cloud.google.com/terms/subprocessors) |
+
+**Category:** Cloud provider
+
+### Certifications
+
+- Cloud Computing Compliance Controls Catalog (C5)
+- CSA
+- GSMA SAS-SM
+- Higher Education Cloud Vendor Assessment Tool (HECVAT)
+- ISO 9001:2015
+- ISO 22301:2019 & BS EN ISO 22301:2019
+- ISO 50001:2018
+- ISO/IEC 27001
+- ISO/IEC 27017
+- ISO/IEC 27018
+- ISO/IEC 27701
+- ISO/IEC 42001
+- PCI 3DS Core Security Standard
+- PCI DSS
+- PCI PIN Security
+- SOC 1
+- SOC 2
+- SOC 3
+- SWIFT on Google Cloud
+- Uptime Institute's Tier Standards
+- VPAT (WCAG, U.S. Section 508, EN 301 549)
+- FedRAMP
+- FIPS 140-2 Validated
+- HITRUST CSF
+- Independent Security Evaluators (ISE) Audit
+- Minimum Acceptable Risk Standards for Exchanges (MARS-E)
+- StateRAMP
+- TruSight
+- U.S. Cybersecurity Maturity Model Certification (CMMC)
+- U.S. Defense Information Systems Agency Provisional Authorization
+- Spain Esquema Nacional de Seguridad (ENS)
+- EU Cloud Code of Conduct
+- HDS
+- ISAE 3000 Type 2 Report (FINMA)
+- ISO 14001
+- Microfin
+- NCSC - Cyber Essentials Plus (UK)
+- Police Assured Secure Facilities (PASF)
+- Qatar National Information Assurance (NIA)
+- SWIPO Data Portability Code of Conduct
+- TISAX
+- Australia Hosting Certification Framework (HCF)
+- Cloud Security Assurance Program (CSAP) Low Level for Group C
+- Information System Security Management and Assessment Program (ISMAP)
+- IRAP (Information Security Registered Assessors Program)
+- JIIMA
+- K-ISMS (Korea)
+- MTCS (Singapore) Tier 3
+- OSPAR
+- SNI 27001
+- ETDA (Thailand)
+- GxP
+- California Consumer Privacy Act (CCPA)
+- COPPA (U.S.)
+- Export Administration Regulations (EAR)
+- FERPA (U.S.)
+- FINRA (US)
+- Google Cloud Data Processing Addendum Mapping - U.S. State Privacy Laws
+- HIPAA
+- IRS 1075
+- International Traffic in Arms Regulations (ITAR)
+- GLBA
+- OSFI (Canada)
+- FG16/5 - FCA
+- NERC CIP
+- PHIPA (Canada)
+- PIPEDA (Canada)
+- US Federal Banking Agencies
+- U.S. Defense Federal Acquisition Regulation Supplement (DFARS)
+- ACPR (France)
+- BaFin Cloud Outsourcing Guidance
+- Banco de España
+- Banco de Portugal
+- Bank of Italy
+- BRSA (Turkey)
+- BSI Critical Infrastructure (KRITIS)
+- BWG (Austria)
+- Central Bank of Ireland (Ireland)
+- CSSF (Luxembourg)
+- De Nederlandsche Bank (the Netherlands)
+- EU DORA
+- European Union's Digital Markets Act
+- EU Solvency II
+- EU Standard Contractual Clauses
+- FINMA (Switzerland)
+- FSA (Denmark)
+- GDPR
+- Google Cloud & the EU Network and Information Systems Directive (NIS2)
+- Israel's Privacy Protection Authority
+- KNF (Poland)
+- MaRisk AT 9 Outsourcing
+- PRA (UK)
+- revFADP (Switzerland)
+- South Africa POPI
+- SFSA (Sweden)
+- Telecoms Security Act (UK)
+- VAG (Austria)
+- SYSC 8 Outsourcing - FCA Handbook
+- UK CHECK
+- PDPL (Argentina)
+- BCRA (Argentina)
+- Central Bank of Brazil (Brazil)
+- CNBV (Mexico)
+- CNSF (Mexico)
+- CMF (Chile)
+- Superintendencia de Banca (Peru)
+- Financial Superintendence of Colombia
+- Lei Geral de Proteção de Dados (LGPD)
+- ASFI (Bolivia)
+- Act on the Protection of Personal Information (Japan)
+- APRA Prudential Standard CPS 234
+- APPs (Australia)
+- APRA (Australia)
+- Bank Negara (Malaysia)
+- Bank of Thailand (BOT)
+- BSP (Philippines)
+- DSA (Bangladesh)
+- FSC Insurance Outsourcing Directions
+- FSC Banking Outsourcing Regulations
+- GR 95/2018 guidelines
+- IA (Hong Kong)
+- HKMA (Hong Kong)
+- MAMPU (Malaysia)
+- PDPO (Hong Kong)
+- Indonesia Government Regulation No. 71 (GR 71)
+- IRDAI (India)
+- FSC (Korea)
+- Korean Financial Supervisory Service (FSS)
+- MAS TRM Guidelines
+- OIC (Thailand)
+- OJK Circular 21 of 2017 (SEOJK 21)
+- OJK Regulation No. 38 of 2016 (POJK 38)
+- PDP Law (Indonesia)
+- PDPA (Malaysia)
+- PDPA (Philippines)
+- PDPA (Taiwan)
+- PDPA (Thailand)
+- PDPD (Vietnam)
+- PIPA (Korea)
+- RBI (India)
+- Reserve Bank of New Zealand (New Zealand)
+- Securities and Exchange Board of India (SEBI)
+- PDPA (Singapore)
+- State Bank of Vietnam
+- The Privacy Act (New Zealand)
+
+---
+
+## Fly.io
+
+Developer-focused public cloud platform offering hardware-virtualized containers (Fly Machines) with KVM isolation, automatic scaling to zero, and integrated tools for deploying and managing applications globally
+
+**Legal Name:** Fly.io, Inc.
+
+**Headquarters:** 2045 W Grand Ave, Chicago, IL 60612, United States
+
+### Links
+
+| Resource | Link |
+|----------|------|
+| Website | [Link](https://fly.io) |
+| Privacy Policy | [Link](https://fly.io/legal/privacy-policy) |
+| Terms of Service | [Link](https://fly.io/legal/terms-of-service) |
+| Service Level Agreement | [Link](https://fly.io/legal/sla-uptime/) |
+| Security Page | [Link](https://fly.io/security) |
+| Trust Page | [Link](https://fly.io/compliance) |
+| Status Page | [Link](https://status.fly.io/) |
+| Data Processing Agreement | [Link](https://fly.io/documents) |
+| Business Associate Agreement | [Link](https://fly.io/documents) |
+| Subprocessors List | [Link](https://fly.io/legal/sub-processors/) |
+
+**Category:** Cloud provider
+
+### Certifications
+
+- SOC 2 Type 2
+- EU-U.S. DPF
+- UK DPF
+- Swiss-U.S. DPF
+- HIPAA
+- GDPR
+- CCPA
+
+---
+
+## Upstash
+
+Serverless data platform providing HTTP-based Redis, Vector, and QStash services with global low-latency, automatic scaling, and durable storage
+
+**Legal Name:** Upstash, Inc.
+
+**Headquarters:** 6202 Via De Adrianna, San Jose, CA 95120, United States
+
+### Links
+
+| Resource | Link |
+|----------|------|
+| Website | [Link](https://upstash.com) |
+| Privacy Policy | [Link](https://upstash.com/trust/privacy.pdf) |
+| Terms of Service | [Link](https://upstash.com/trust/terms.pdf) |
+| Service Level Agreement | [Link](https://upstash.com/docs/common/help/sla) |
+| Security Page | [Link](https://upstash.com/static/trust/security-measures.pdf) |
+| Trust Page | [Link](https://trust.upstash.com) |
+| Status Page | [Link](https://status.upstash.com) |
+| Data Processing Agreement | [Link](https://upstash.com/static/trust/dpa.pdf) |
+| Subprocessors List | [Link](https://trust.upstash.com/subprocessors) |
+
+**Category:** Data storage and processing
+
+### Certifications
+
+- SOC 2 Type 2
+- GDPR
+- CCPA
+
+---
+
+## bunny.net
+
+Cloud-based content-delivery, edge-storage and optimization platform that accelerates and secures web content worldwide.
+
+**Legal Name:** BunnyWay d.o.o.
+
+**Headquarters:** Dunajska cesta 165, 1000 Ljubljana, Slovenia
+
+### Links
+
+| Resource | Link |
+|----------|------|
+| Website | [Link](https://bunny.net) |
+| Privacy Policy | [Link](https://bunny.net/privacy/) |
+| Terms of Service | [Link](https://bunny.net/tos/) |
+| Service Level Agreement | [Link](https://bunny.net/sla/) |
+| Security Page | [Link](https://bunny.net/shield/) |
+| Status Page | [Link](https://status.bunny.net/) |
+| Subprocessors List | [Link](https://bunny.net/gdpr/sub-processors/) |
+
+**Category:** Cloud provider
+
+### Certifications
+
+- ISO 27001
+- GDPR
+
+---
+
+## ClickUp
+
+All-in-one productivity platform for project management, document collaboration, and goal tracking.
+
+**Legal Name:** Mango Technologies, Inc.
+
+**Headquarters:** 350 Tenth Ave, 5th Floor, San Diego, CA 92101, United States
+
+### Links
+
+| Resource | Link |
+|----------|------|
+| Website | [Link](https://clickup.com) |
+| Privacy Policy | [Link](https://clickup.com/terms/privacy) |
+| Terms of Service | [Link](https://clickup.com/terms) |
+| Security Page | [Link](https://clickup.com/security) |
+| Trust Page | [Link](https://security.clickup.com) |
+| Status Page | [Link](https://status.clickup.com) |
+| Data Processing Agreement | [Link](https://clickup.com/terms/dpa) |
+| Subprocessors List | [Link](https://clickup.com/terms/dpa/subprocessors) |
+
+**Category:** Project management
+
+### Certifications
+
+- SOC 2 Type 2
+- ISO/IEC 27001
+- ISO 27017
+- ISO 27018
+- PCI DSS
+- GDPR
+- CCPA
+- CPRA
+- LGPD
+- VCDPA
+
+---
+
+## Danami
+
+Developer of security, firewall and anti-spam extensions for the Plesk hosting control panel.
+
+**Legal Name:** Danami International Inc.
+
+**Headquarters:** 5314 56 St, Camrose, Alberta T4V 2E5, Canada
+
+### Links
+
+| Resource | Link |
+|----------|------|
+| Website | [Link](https://www.danami.com) |
+| Privacy Policy | [Link](https://www.danami.com/legal/privacy-policy) |
+| Terms of Service | [Link](https://www.danami.com/legal/terms-of-service) |
+
+**Category:** Developer tools
+
+---
+
+## New Relic
+
+New Relic provides a full-stack observability platform that lets engineering teams monitor, analyze, and improve application, infrastructure, and digital-experience performance in real time.
+
+**Legal Name:** New Relic, Inc.
+
+**Headquarters:** 188 Spear St., Suite 1000, San Francisco, CA 94105, USA
+
+### Links
+
+| Resource | Link |
+|----------|------|
+| Website | [Link](https://newrelic.com) |
+| Privacy Policy | [Link](https://newrelic.com/termsandconditions/privacy) |
+| Terms of Service | [Link](https://newrelic.com/termsandconditions/terms) |
+| Service Level Agreement | [Link](https://docs.newrelic.com/docs/licenses/license-information/referenced-policies/service-level-availability-commitment/) |
+| Security Page | [Link](https://newrelic.com/security) |
+| Trust Page | [Link](https://newrelic.com/security) |
+| Status Page | [Link](https://status.newrelic.com/) |
+| Data Processing Agreement | [Link](https://newrelic.com/sites/default/files/2023-11/New_Relic_GDPR_DPA_SCCs_Oct_2023_presigned.pdf) |
+| Business Associate Agreement | [Link](https://newrelic.com/termsandconditions/hipaabaafaq) |
+| Subprocessors List | [Link](https://newrelic.com/sub-processors) |
+
+**Category:** Cloud monitoring
+
+### Certifications
+
+- SOC 2 Type 2
+- ISO/IEC 27001:2022
+- FedRAMP Moderate
+- PCI DSS Level 1
+- TISAX Level 2
+- HITRUST CSF
+- HIPAA
+- GDPR
+- CCPA
+- Data Privacy Framework (DPF)
+
+---
+
+## Pylon
+
+Pylon provides a modern unified customer-support platform for B2B companies, combining ticketing, chat, knowledge base, AI assistance, customer portal and workflows in one tool.
+
+**Legal Name:** Pylon Labs, Inc.
+
+**Headquarters:** 188 King Street, Unit 502, San Francisco, CA 94107, USA
+
+### Links
+
+| Resource | Link |
+|----------|------|
+| Website | [Link](https://usepylon.com) |
+| Privacy Policy | [Link](https://usepylon.com/privacy) |
+| Terms of Service | [Link](https://usepylon.com/terms) |
+| Security Page | [Link](https://usepylon.com/security) |
+| Trust Page | [Link](https://trust.usepylon.com) |
+| Status Page | [Link](https://status.usepylon.com) |
+| Data Processing Agreement | [Link](https://usepylon.com/data-processing-agreement) |
+| Subprocessors List | [Link](https://usepylon.com/subprocessors) |
+
+**Category:** Customer support
+
+### Certifications
+
+- SOC 2 Type 2
+- ISO/IEC 27001
+- GDPR
+- HIPAA
+
+---
+
+## Loops
+
+Email platform for SaaS companies that lets teams create, send and track product, marketing, and transactional emails from a single interface
+
+**Legal Name:** Astrodon Inc.
+
+### Links
+
+| Resource | Link |
+|----------|------|
+| Website | [Link](https://loops.so) |
+| Privacy Policy | [Link](https://loops.so/privacy) |
+| Terms of Service | [Link](https://loops.so/terms) |
+| Status Page | [Link](https://loops.statuspage.io) |
+| Data Processing Agreement | [Link](https://loops.so/dpa) |
+| Subprocessors List | [Link](https://loops.so/subprocessors) |
+
+**Category:** Marketing
+
+### Certifications
+
+- GDPR
+- CCPA
+
+---
+
+## Perplexity
+
+Generative AI answer engine that delivers real-time, source-cited answers to user questions.
+
+**Legal Name:** Perplexity AI, Inc.
+
+**Headquarters:** 115 Sansome St, San Francisco, CA 94104-3601, United States
+
+### Links
+
+| Resource | Link |
+|----------|------|
+| Website | [Link](https://www.perplexity.ai) |
+| Privacy Policy | [Link](https://www.perplexity.ai/hub/legal/privacy-policy) |
+| Terms of Service | [Link](https://www.perplexity.ai/hub/legal/terms-of-service) |
+| Security Page | [Link](https://www.perplexity.ai/hub/security) |
+| Trust Page | [Link](https://trust.perplexity.ai) |
+| Status Page | [Link](https://status.perplexity.ai/) |
+| Data Processing Agreement | [Link](https://www.perplexity.ai/hub/legal/enterprise-terms-of-service) |
+| Subprocessors List | [Link](https://trust.perplexity.ai/) |
+
+**Category:** Marketing
+
+### Certifications
+
+- SOC 2 Type 2
+- GDPR
+- CCPA
+- PCI DSS
+- CAIQ Lite
 
 ---
 
