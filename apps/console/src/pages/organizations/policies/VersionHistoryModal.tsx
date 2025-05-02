@@ -6,6 +6,7 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { graphql, useFragment } from "react-relay";
 import type { VersionHistoryModal_policyVersions$key } from "./__generated__/VersionHistoryModal_policyVersions.graphql";
+import remarkGfm from "remark-gfm";
 
 export const policyVersionsFragment = graphql`
   fragment VersionHistoryModal_policyVersions on Policy {
@@ -114,7 +115,7 @@ export function VersionHistoryModal({
             
             <div className="prose prose-olive max-w-none">
               {selectedVersion && (
-                <ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {versions.find(v => v.version === selectedVersion)?.content || "No content available"}
                 </ReactMarkdown>
               )}

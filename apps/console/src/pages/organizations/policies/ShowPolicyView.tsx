@@ -15,6 +15,7 @@ import type { ShowPolicyViewQuery } from "./__generated__/ShowPolicyViewQuery.gr
 import { ShowPolicyViewPublishMutation } from "./__generated__/ShowPolicyViewPublishMutation.graphql";
 import { ShowPolicyViewCreateDraftMutation } from "./__generated__/ShowPolicyViewCreateDraftMutation.graphql";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from 'remark-gfm'
 import { ShowPolicyViewSkeleton } from "./ShowPolicyPage";
 import { format } from "date-fns";
 import {
@@ -339,7 +340,7 @@ function ShowPolicyContent({
               )}
               
               <div className="prose prose-olive max-w-none">
-                <ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {latestVersionNode.content || "No content available"}
                 </ReactMarkdown>
               </div>

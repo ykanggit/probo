@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type Document = {
   policy_version_id: string;
@@ -215,7 +216,7 @@ export default function SigningRequestsPage() {
         <CardContent>
           <div className="border rounded-md p-4 min-h-[400px] bg-muted/20">
             <div className="prose prose-olive max-w-none">
-              <ReactMarkdown>{currentDoc.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{currentDoc.content}</ReactMarkdown>
             </div>
           </div>
         </CardContent>
