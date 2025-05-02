@@ -16,7 +16,6 @@ import {
   useTransition,
 } from "react";
 import type { ListRiskViewQuery } from "./__generated__/ListRiskViewQuery.graphql";
-import type { RiskTreatment } from "./__generated__/ListRiskView_risks.graphql";
 import { useParams, useSearchParams } from "react-router";
 import { PageTemplate } from "@/components/PageTemplate";
 import { RiskViewSkeleton } from "./ListRiskPage";
@@ -136,12 +135,23 @@ const deleteRiskMutation = graphql`
   }
 `;
 
-// Helper function to convert risk score to severity label
-const riskScoreToSeverity = (score: number): string => {
-  if (score >= 20) return "Catastrophic";
-  if (score >= 12) return "Critical";
-  if (score >= 5) return "Marginal";
-  return "Negligible";
+// Helper function to convert risk score to risk level
+const calculateRiskLevel = (score: number): string => {
+  if (score >= 15) return "High";
+  if (score >= 8) return "Medium"; 
+  return "Low";
+};
+
+// Helper function to get color for risk level that matches the matrix colors
+const getRiskLevelColor = (level: string): {backgroundColor: string, color: string} => {
+  switch(level) {
+    case "High":
+      return {backgroundColor: "#ef4444", color: "#ffffff"}; // red-500
+    case "Medium":
+      return {backgroundColor: "#fcd34d", color: "#000000"}; // yellow-300  
+    default:
+      return {backgroundColor: "#22c55e", color: "#ffffff"}; // green-500
+  }
 };
 
 // Helper function to format treatment value
@@ -224,30 +234,6 @@ const emptyRiskMatrixColors = {
   high: "bg-red-50 text-black",
 };
 
-type RiskNode = {
-  readonly id: string;
-  readonly name: string;
-  readonly inherentLikelihood: number;
-  readonly inherentImpact: number;
-  readonly residualLikelihood: number;
-  readonly residualImpact: number;
-  readonly treatment: RiskTreatment;
-  readonly description: string;
-  readonly category: string;
-  readonly createdAt: string;
-  readonly updatedAt: string;
-  readonly owner: {
-    readonly id: string;
-    readonly fullName: string;
-  } | null;
-  readonly measures: {
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly category: string;
-      };
-    }>;
-  };
-};
 
 // Risk Matrix Component
 function RiskMatrix({
@@ -312,39 +298,15 @@ function RiskMatrix({
     // This follows the 5x5 grid with rows representing impact (5 to 1) and columns representing likelihood (1 to 5)
     const colorMatrix = [
       // Impact 5 (Catastrophic) - first row
-      [
-        colorSet.medium,
-        colorSet.medium,
-        colorSet.high,
-        colorSet.high,
-        colorSet.high,
-      ],
+      [colorSet.low, colorSet.medium, colorSet.high, colorSet.high, colorSet.high],
       // Impact 4 (Significant) - second row
-      [
-        colorSet.low,
-        colorSet.medium,
-        colorSet.medium,
-        colorSet.high,
-        colorSet.high,
-      ],
+      [colorSet.low, colorSet.medium, colorSet.medium, colorSet.high, colorSet.high],
       // Impact 3 (Moderate) - third row
-      [
-        colorSet.low,
-        colorSet.low,
-        colorSet.medium,
-        colorSet.medium,
-        colorSet.high,
-      ],
+      [colorSet.low, colorSet.low, colorSet.medium, colorSet.medium, colorSet.high],
       // Impact 2 (Low) - fourth row
-      [
-        colorSet.low,
-        colorSet.low,
-        colorSet.low,
-        colorSet.medium,
-        colorSet.medium,
-      ],
+      [colorSet.low, colorSet.low, colorSet.low, colorSet.medium, colorSet.medium],
       // Impact 1 (Negligible) - fifth row
-      [colorSet.low, colorSet.low, colorSet.low, colorSet.low, colorSet.medium],
+      [colorSet.low, colorSet.low, colorSet.low, colorSet.low, colorSet.low],
     ];
 
     return colorMatrix[row][col];
@@ -409,32 +371,15 @@ function RiskMatrix({
             </div>
 
             <div className="text-sm pt-1 border-t border-gray-200 mt-1">
-              <span className="text-muted-foreground">Risk Score:</span>
+              <span className="text-muted-foreground">Risk Level:</span>
               <span className="font-bold ml-1">
-                {impactValue * likelihoodValue}
+                {calculateRiskLevel(impactValue * likelihoodValue)} ({impactValue * likelihoodValue})
               </span>
               <span
                 className="ml-2 px-2 py-0.5 text-xs rounded-full font-medium inline-block"
-                style={{
-                  backgroundColor:
-                    impactValue * likelihoodValue >= 20
-                      ? "#ef4444"
-                      : impactValue * likelihoodValue >= 12
-                      ? "#f59e0b"
-                      : impactValue * likelihoodValue >= 5
-                      ? "#10b981"
-                      : "#94a3b8",
-                  color:
-                    impactValue * likelihoodValue >= 12 ? "white" : "inherit",
-                }}
+                style={getRiskLevelColor(calculateRiskLevel(impactValue * likelihoodValue))}
               >
-                {impactValue * likelihoodValue >= 20
-                  ? "Catastrophic"
-                  : impactValue * likelihoodValue >= 12
-                  ? "Critical"
-                  : impactValue * likelihoodValue >= 5
-                  ? "Marginal"
-                  : "Negligible"}
+                {calculateRiskLevel(impactValue * likelihoodValue)}
               </span>
             </div>
           </div>
@@ -449,26 +394,14 @@ function RiskMatrix({
                     className="text-sm border-l-2 pl-2"
                     style={{
                       borderColor:
-                        (isResidual
-                          ? (risk.residualImpact || risk.inherentImpact) *
-                            (risk.residualLikelihood || risk.inherentLikelihood)
-                          : risk.inherentImpact * risk.inherentLikelihood) >= 20
-                          ? "#ef4444"
-                          : (isResidual
+                        getRiskLevelColor(
+                          calculateRiskLevel(
+                            isResidual
                               ? (risk.residualImpact || risk.inherentImpact) *
-                                (risk.residualLikelihood ||
-                                  risk.inherentLikelihood)
-                              : risk.inherentImpact *
-                                risk.inherentLikelihood) >= 12
-                          ? "#f59e0b"
-                          : (isResidual
-                              ? (risk.residualImpact || risk.inherentImpact) *
-                                (risk.residualLikelihood ||
-                                  risk.inherentLikelihood)
-                              : risk.inherentImpact *
-                                risk.inherentLikelihood) >= 5
-                          ? "#10b981"
-                          : "#94a3b8",
+                                (risk.residualLikelihood || risk.inherentLikelihood)
+                              : risk.inherentImpact * risk.inherentLikelihood
+                          )
+                        ).backgroundColor
                     }}
                   >
                     <Link
@@ -773,13 +706,13 @@ function ListRiskViewContent({
                       Name
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/6">
-                      Inherent
+                      Inherent Risk Score
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/6">
                       Treatment
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/6">
-                      Residual
+                      Residual Risk Score
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-tertiary w-1/6">
                       Owner
@@ -828,25 +761,9 @@ function ListRiskViewContent({
                           >
                             <span
                               className="px-2 py-0.5 text-xs rounded-full font-medium inline-block"
-                              style={{
-                                backgroundColor:
-                                  risk.inherentLikelihood * risk.inherentImpact >= 20
-                                    ? "#ef4444"
-                                    : risk.inherentLikelihood * risk.inherentImpact >= 12
-                                    ? "#f59e0b"
-                                    : risk.inherentLikelihood * risk.inherentImpact >= 5
-                                    ? "#10b981"
-                                    : "#94a3b8",
-                                color:
-                                  risk.inherentLikelihood * risk.inherentImpact >= 12
-                                    ? "white"
-                                    : "inherit",
-                              }}
+                              style={getRiskLevelColor(calculateRiskLevel(risk.inherentLikelihood * risk.inherentImpact))}
                             >
-                              {riskScoreToSeverity(
-                                risk.inherentLikelihood * risk.inherentImpact
-                              )}{" "}
-                              ({risk.inherentLikelihood * risk.inherentImpact})
+                              {calculateRiskLevel(risk.inherentLikelihood * risk.inherentImpact)} ({risk.inherentLikelihood * risk.inherentImpact})
                             </span>
                           </Link>
                         </td>
@@ -866,25 +783,9 @@ function ListRiskViewContent({
                             {risk.residualLikelihood && risk.residualImpact ? (
                               <span
                                 className="px-2 py-0.5 text-xs rounded-full font-medium inline-block"
-                                style={{
-                                  backgroundColor:
-                                    risk.residualLikelihood * risk.residualImpact >= 20
-                                      ? "#ef4444"
-                                      : risk.residualLikelihood * risk.residualImpact >= 12
-                                      ? "#f59e0b"
-                                      : risk.residualLikelihood * risk.residualImpact >= 5
-                                      ? "#10b981"
-                                      : "#94a3b8",
-                                  color:
-                                    risk.residualLikelihood * risk.residualImpact >= 12
-                                      ? "white"
-                                      : "inherit",
-                                }}
+                                style={getRiskLevelColor(calculateRiskLevel(risk.residualLikelihood * risk.residualImpact))}
                               >
-                                {riskScoreToSeverity(
-                                  risk.residualLikelihood * risk.residualImpact
-                                )}{" "}
-                                ({risk.residualLikelihood * risk.residualImpact})
+                                {calculateRiskLevel(risk.residualLikelihood * risk.residualImpact)} ({risk.residualLikelihood * risk.residualImpact})
                               </span>
                             ) : (
                               "Not set"

@@ -207,46 +207,37 @@ const deleteRiskPolicyMappingMutation = graphql`
   }
 `;
 
+// Replace the current getRiskSeverity function with the functions from ListRiskView.tsx
+// Helper function to convert risk score to risk level
+const calculateRiskLevel = (score: number): string => {
+  if (score >= 15) return "High";
+  if (score >= 8) return "Medium"; 
+  return "Low";
+};
+
+// Helper function to get color for risk level that matches the matrix colors
+const getRiskLevelColor = (level: string): {backgroundColor: string, color: string} => {
+  switch(level) {
+    case "High":
+      return {backgroundColor: "#ef4444", color: "#ffffff"}; // red-500
+    case "Medium":
+      return {backgroundColor: "#fcd34d", color: "#000000"}; // yellow-300  
+    default:
+      return {backgroundColor: "#22c55e", color: "#ffffff"}; // green-500
+  }
+};
+
 function getRiskSeverity(likelihood: number, impact: number) {
   const score = likelihood * impact;
-  if (score >= 20)
-    return {
-      level: "Catastrophic",
-      score: score,
-      style: {
-        backgroundColor: "#ef4444",
-        color: "white",
-      },
-    };
-  if (score >= 12)
-    return {
-      level: "Critical",
-      score: score,
-      style: {
-        backgroundColor: "#f59e0b",
-        color: "white",
-      },
-    };
-  if (score >= 5)
-    return {
-      level: "Marginal",
-      score: score,
-      style: {
-        backgroundColor: "#10b981",
-        color: "inherit",
-      },
-    };
+  const level = calculateRiskLevel(score);
   return {
-    level: "Negligible",
+    level: level,
     score: score,
-    style: {
-      backgroundColor: "#94a3b8",
-      color: "inherit",
-    },
+    style: getRiskLevelColor(level),
   };
 }
 
-// Add helper functions to convert numerical values to labels
+// Keep the getLikelihoodLabel and getImpactLabel functions as they are
 function getLikelihoodLabel(likelihood: number): {
   label: string;
   style: React.CSSProperties;
@@ -254,26 +245,26 @@ function getLikelihoodLabel(likelihood: number): {
   if (likelihood === 5)
     return {
       label: "Frequent (5)",
-      style: { backgroundColor: "#ef4444", color: "white" },
+      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
     };
   if (likelihood === 4)
     return {
       label: "Probable (4)",
-      style: { backgroundColor: "#f59e0b", color: "white" },
+      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
     };
   if (likelihood === 3)
     return {
       label: "Occasional (3)",
-      style: { backgroundColor: "#eab308", color: "black" },
+      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
     };
   if (likelihood === 2)
     return {
       label: "Remote (2)",
-      style: { backgroundColor: "#10b981", color: "black" },
+      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
     };
   return {
     label: "Improbable (1)",
-    style: { backgroundColor: "#94a3b8", color: "black" },
+    style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
   };
 }
 
@@ -284,26 +275,26 @@ function getImpactLabel(impact: number): {
   if (impact === 5)
     return {
       label: "Catastrophic (5)",
-      style: { backgroundColor: "#ef4444", color: "white" },
+      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
     };
   if (impact === 4)
     return {
       label: "Significant (4)",
-      style: { backgroundColor: "#f59e0b", color: "white" },
+      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
     };
   if (impact === 3)
     return {
       label: "Moderate (3)",
-      style: { backgroundColor: "#eab308", color: "black" },
+      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
     };
   if (impact === 2)
     return {
       label: "Low (2)",
-      style: { backgroundColor: "#10b981", color: "black" },
+      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
     };
   return {
     label: "Negligible (1)",
-    style: { backgroundColor: "#94a3b8", color: "black" },
+    style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
   };
 }
 
