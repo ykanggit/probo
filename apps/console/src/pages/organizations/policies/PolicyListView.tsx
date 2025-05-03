@@ -73,6 +73,14 @@ const policyListViewQuery = graphql`
                     id
                     status
                     updatedAt
+                    signatures(first: 100) {
+                      edges {
+                        node {
+                          id
+                          state
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -138,6 +146,13 @@ function PolicyTableRow({
 
   const latestVersion = policy.versions?.edges[0]?.node;
   const status = latestVersion?.status || "DRAFT";
+  
+  // Get signature counts
+  const signatureEdges = latestVersion?.signatures?.edges || [];
+  const totalSignatures = signatureEdges.length;
+  const signedCount = signatureEdges.filter(
+    edge => edge?.node?.state === "SIGNED"
+  ).length;
 
   const handleDeletePolicy = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -203,8 +218,20 @@ function PolicyTableRow({
       </td>
       <td className="py-4 px-6">
         <span className="text-sm text-primary">
+          {policy.owner?.fullName || "Unassigned"}
+        </span>
+      </td>
+      <td className="py-4 px-6">
+        <span className="text-sm text-primary">
           {format(new Date(policy.updatedAt), "MMM d, yyyy")}
         </span>
+      </td>
+      <td className="py-4 px-6">
+        {status === "PUBLISHED" ? (
+          <span className="text-sm text-primary">{signedCount} / {totalSignatures}</span>
+        ) : (
+          <span className="text-sm text-tertiary">-</span>
+        )}
       </td>
       <td className="py-4 px-6">
         <Badge
@@ -548,7 +575,19 @@ function PolicyListViewContent({
               </th>
               <th className="py-3 px-6 text-xs font-medium text-tertiary border-b border-low-b">
                 <div className="flex items-center gap-1">
+                  Owner
+                  <ChevronDown className="h-3 w-3 text-quaternary" />
+                </div>
+              </th>
+              <th className="py-3 px-6 text-xs font-medium text-tertiary border-b border-low-b">
+                <div className="flex items-center gap-1">
                   Last update
+                  <ChevronDown className="h-3 w-3 text-quaternary" />
+                </div>
+              </th>
+              <th className="py-3 px-6 text-xs font-medium text-tertiary border-b border-low-b">
+                <div className="flex items-center gap-1">
+                  Signatures
                   <ChevronDown className="h-3 w-3 text-quaternary" />
                 </div>
               </th>
@@ -572,7 +611,7 @@ function PolicyListViewContent({
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="py-12 text-center">
+                <td colSpan={5} className="py-12 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <h3 className="text-lg font-medium">No policies found</h3>
                     <p className="text-tertiary">

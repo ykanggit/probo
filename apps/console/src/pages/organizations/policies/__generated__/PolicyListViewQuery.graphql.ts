@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5b24e53258fceb03535363014f57a15e>>
+ * @generated SignedSource<<fbe65b0fb14443a15a43bd3d4100118f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,6 +11,7 @@
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type PolicyStatus = "DRAFT" | "PUBLISHED";
+export type PolicyVersionSignatureState = "REQUESTED" | "SIGNED";
 export type PolicyListViewQuery$variables = {
   organizationId: string;
 };
@@ -33,6 +34,14 @@ export type PolicyListViewQuery$data = {
             readonly edges: ReadonlyArray<{
               readonly node: {
                 readonly id: string;
+                readonly signatures: {
+                  readonly edges: ReadonlyArray<{
+                    readonly node: {
+                      readonly id: string;
+                      readonly state: PolicyVersionSignatureState;
+                    };
+                  }>;
+                };
                 readonly status: PolicyStatus;
                 readonly updatedAt: string;
               };
@@ -111,20 +120,25 @@ v6 = {
   "storageKey": null
 },
 v7 = {
+  "kind": "Literal",
+  "name": "first",
+  "value": 100
+},
+v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v8 = {
+v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "cursor",
   "storageKey": null
 },
-v9 = {
+v10 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -149,7 +163,7 @@ v9 = {
   ],
   "storageKey": null
 },
-v10 = [
+v11 = [
   {
     "alias": null,
     "args": null,
@@ -247,7 +261,50 @@ v10 = [
                         "name": "status",
                         "storageKey": null
                       },
-                      (v5/*: any*/)
+                      (v5/*: any*/),
+                      {
+                        "alias": null,
+                        "args": [
+                          (v7/*: any*/)
+                        ],
+                        "concreteType": "PolicyVersionSignatureConnection",
+                        "kind": "LinkedField",
+                        "name": "signatures",
+                        "plural": false,
+                        "selections": [
+                          {
+                            "alias": null,
+                            "args": null,
+                            "concreteType": "PolicyVersionSignatureEdge",
+                            "kind": "LinkedField",
+                            "name": "edges",
+                            "plural": true,
+                            "selections": [
+                              {
+                                "alias": null,
+                                "args": null,
+                                "concreteType": "PolicyVersionSignature",
+                                "kind": "LinkedField",
+                                "name": "node",
+                                "plural": false,
+                                "selections": [
+                                  (v1/*: any*/),
+                                  {
+                                    "alias": null,
+                                    "args": null,
+                                    "kind": "ScalarField",
+                                    "name": "state",
+                                    "storageKey": null
+                                  }
+                                ],
+                                "storageKey": null
+                              }
+                            ],
+                            "storageKey": null
+                          }
+                        ],
+                        "storageKey": "signatures(first:100)"
+                      }
                     ],
                     "storageKey": null
                   }
@@ -257,22 +314,18 @@ v10 = [
             ],
             "storageKey": "versions(first:1)"
           },
-          (v7/*: any*/)
+          (v8/*: any*/)
         ],
         "storageKey": null
       },
-      (v8/*: any*/)
+      (v9/*: any*/)
     ],
     "storageKey": null
   },
-  (v9/*: any*/)
+  (v10/*: any*/)
 ],
-v11 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 100
-  },
+v12 = [
+  (v7/*: any*/),
   {
     "kind": "Literal",
     "name": "orderBy",
@@ -282,10 +335,10 @@ v11 = [
     }
   }
 ],
-v12 = [
+v13 = [
   "orderBy"
 ],
-v13 = [
+v14 = [
   {
     "kind": "Literal",
     "name": "first",
@@ -337,7 +390,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__PolicyListView_policies_connection",
                 "plural": false,
-                "selections": (v10/*: any*/),
+                "selections": (v11/*: any*/),
                 "storageKey": "__PolicyListView_policies_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"TITLE\"})"
               }
             ],
@@ -378,14 +431,14 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v7/*: any*/),
+          (v8/*: any*/),
           (v1/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v11/*: any*/),
+                "args": (v12/*: any*/),
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
                 "name": "peoples",
@@ -416,22 +469,22 @@ return {
                             "name": "primaryEmailAddress",
                             "storageKey": null
                           },
-                          (v7/*: any*/)
+                          (v8/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v8/*: any*/)
+                      (v9/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v9/*: any*/)
+                  (v10/*: any*/)
                 ],
                 "storageKey": "peoples(first:100,orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
               },
               {
                 "alias": null,
-                "args": (v11/*: any*/),
-                "filters": (v12/*: any*/),
+                "args": (v12/*: any*/),
+                "filters": (v13/*: any*/),
                 "handle": "connection",
                 "key": "PeopleSelector_organization_peoples",
                 "kind": "LinkedHandle",
@@ -439,18 +492,18 @@ return {
               },
               {
                 "alias": null,
-                "args": (v13/*: any*/),
+                "args": (v14/*: any*/),
                 "concreteType": "PolicyConnection",
                 "kind": "LinkedField",
                 "name": "policies",
                 "plural": false,
-                "selections": (v10/*: any*/),
+                "selections": (v11/*: any*/),
                 "storageKey": "policies(first:50,orderBy:{\"direction\":\"ASC\",\"field\":\"TITLE\"})"
               },
               {
                 "alias": null,
-                "args": (v13/*: any*/),
-                "filters": (v12/*: any*/),
+                "args": (v14/*: any*/),
+                "filters": (v13/*: any*/),
                 "handle": "connection",
                 "key": "PolicyListView_policies",
                 "kind": "LinkedHandle",
@@ -466,7 +519,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ed650f54cc226d3adea27a78a777890c",
+    "cacheID": "1a9f6afc7b288a1051294afe154f14c4",
     "id": null,
     "metadata": {
       "connection": [
@@ -483,11 +536,11 @@ return {
     },
     "name": "PolicyListViewQuery",
     "operationKind": "query",
-    "text": "query PolicyListViewQuery(\n  $organizationId: ID!\n) {\n  viewer {\n    user {\n      id\n    }\n    id\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      ...PeopleSelector_organization\n      policies(first: 50, orderBy: {field: TITLE, direction: ASC}) {\n        edges {\n          node {\n            id\n            title\n            description\n            currentPublishedVersion\n            createdAt\n            updatedAt\n            owner {\n              id\n              fullName\n            }\n            versions(first: 1) {\n              edges {\n                node {\n                  id\n                  status\n                  updatedAt\n                }\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query PolicyListViewQuery(\n  $organizationId: ID!\n) {\n  viewer {\n    user {\n      id\n    }\n    id\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      ...PeopleSelector_organization\n      policies(first: 50, orderBy: {field: TITLE, direction: ASC}) {\n        edges {\n          node {\n            id\n            title\n            description\n            currentPublishedVersion\n            createdAt\n            updatedAt\n            owner {\n              id\n              fullName\n            }\n            versions(first: 1) {\n              edges {\n                node {\n                  id\n                  status\n                  updatedAt\n                  signatures(first: 100) {\n                    edges {\n                      node {\n                        id\n                        state\n                      }\n                    }\n                  }\n                }\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "b3b0798be0779c09013a4743d015e87f";
+(node as any).hash = "0aa2374fc681f6d130fbf03586707d5a";
 
 export default node;
