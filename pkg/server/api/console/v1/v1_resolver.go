@@ -112,6 +112,31 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 	return types.NewControlConnection(page), nil
 }
 
+// Evidences is the resolver for the evidences field.
+func (r *measureResolver) Evidences(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.EvidenceOrderField]{
+		Field:     coredata.EvidenceOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.EvidenceOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Evidences.ListForMeasureID(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list measure evidences: %w", err)
+	}
+
+	return types.NewEvidenceConnection(page), nil
+}
+
 // Tasks is the resolver for the tasks field.
 func (r *measureResolver) Tasks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -875,7 +900,7 @@ func (r *mutationResolver) RequestEvidence(ctx context.Context, input types.Requ
 	evidence, err := svc.Evidences.Request(
 		ctx,
 		probo.RequestEvidenceRequest{
-			TaskID:      input.TaskID,
+			TaskID:      &input.TaskID,
 			Name:        input.Name,
 			Type:        input.Type,
 			Description: input.Description,
@@ -917,39 +942,6 @@ func (r *mutationResolver) FulfillEvidence(ctx context.Context, input types.Fulf
 	}, nil
 }
 
-// CreateEvidence is the resolver for the createEvidence field.
-func (r *mutationResolver) CreateEvidence(ctx context.Context, input types.CreateEvidenceInput) (*types.CreateEvidencePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
-
-	req := probo.CreateEvidenceRequest{
-		TaskID:      input.TaskID,
-		Name:        input.Name,
-		Type:        input.Type,
-		Description: input.Description,
-	}
-
-	if input.Type == coredata.EvidenceTypeFile {
-		if input.File == nil {
-			return nil, fmt.Errorf("file is required for FILE type evidence")
-		}
-		req.File = input.File.File
-	} else if input.Type == coredata.EvidenceTypeLink {
-		if input.URL == nil || *input.URL == "" {
-			return nil, fmt.Errorf("URL is required for LINK type evidence")
-		}
-		req.URL = *input.URL
-	}
-
-	evidence, err := svc.Evidences.Create(ctx, req)
-	if err != nil {
-		panic(fmt.Errorf("failed to create evidence: %w", err))
-	}
-
-	return &types.CreateEvidencePayload{
-		EvidenceEdge: types.NewEvidenceEdge(evidence, coredata.EvidenceOrderFieldCreatedAt),
-	}, nil
-}
-
 // DeleteEvidence is the resolver for the deleteEvidence field.
 func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.EvidenceID.TenantID())
@@ -961,6 +953,56 @@ func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.Delet
 
 	return &types.DeleteEvidencePayload{
 		DeletedEvidenceID: input.EvidenceID,
+	}, nil
+}
+
+// UploadTaskEvidence is the resolver for the uploadTaskEvidence field.
+func (r *mutationResolver) UploadTaskEvidence(ctx context.Context, input types.UploadTaskEvidenceInput) (*types.UploadTaskEvidencePayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
+
+	evidence, err := svc.Evidences.UploadTaskEvidence(
+		ctx,
+		probo.UploadTaskEvidenceRequest{
+			TaskID: input.TaskID,
+			File: probo.File{
+				Content:     input.File.File,
+				Filename:    input.File.Filename,
+				Size:        input.File.Size,
+				ContentType: input.File.ContentType,
+			},
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("cannot upload task evidence: %w", err))
+	}
+
+	return &types.UploadTaskEvidencePayload{
+		EvidenceEdge: types.NewEvidenceEdge(evidence, coredata.EvidenceOrderFieldCreatedAt),
+	}, nil
+}
+
+// UploadMeasureEvidence is the resolver for the uploadMeasureEvidence field.
+func (r *mutationResolver) UploadMeasureEvidence(ctx context.Context, input types.UploadMeasureEvidenceInput) (*types.UploadMeasureEvidencePayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.MeasureID.TenantID())
+
+	evidence, err := svc.Evidences.UploadMeasureEvidence(
+		ctx,
+		probo.UploadMeasureEvidenceRequest{
+			MeasureID: input.MeasureID,
+			File: probo.File{
+				Content:     input.File.File,
+				Filename:    input.File.Filename,
+				Size:        input.File.Size,
+				ContentType: input.File.ContentType,
+			},
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("cannot upload measure evidence: %w", err))
+	}
+
+	return &types.UploadMeasureEvidencePayload{
+		EvidenceEdge: types.NewEvidenceEdge(evidence, coredata.EvidenceOrderFieldCreatedAt),
 	}, nil
 }
 

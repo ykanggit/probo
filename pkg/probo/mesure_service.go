@@ -188,7 +188,7 @@ func (s MeasureService) Import(
 						evidence := &coredata.Evidence{
 							State:       coredata.EvidenceStateRequested,
 							ID:          evidenceID,
-							TaskID:      task.ID,
+							TaskID:      &task.ID,
 							ReferenceID: req.Measures[i].Tasks[j].RequestedEvidences[k].ReferenceID,
 							Type:        req.Measures[i].Tasks[j].RequestedEvidences[k].Type,
 							Description: req.Measures[i].Tasks[j].RequestedEvidences[k].Name,

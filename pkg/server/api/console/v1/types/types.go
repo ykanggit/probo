@@ -473,6 +473,7 @@ type Measure struct {
 	Name        string                `json:"name"`
 	Description string                `json:"description"`
 	State       coredata.MeasureState `json:"state"`
+	Evidences   *EvidenceConnection   `json:"evidences"`
 	Tasks       *TaskConnection       `json:"tasks"`
 	Risks       *RiskConnection       `json:"risks"`
 	Controls    *ControlConnection    `json:"controls"`
@@ -884,6 +885,24 @@ type UpdateVendorInput struct {
 
 type UpdateVendorPayload struct {
 	Vendor *Vendor `json:"vendor"`
+}
+
+type UploadMeasureEvidenceInput struct {
+	MeasureID gid.GID        `json:"measureId"`
+	File      graphql.Upload `json:"file"`
+}
+
+type UploadMeasureEvidencePayload struct {
+	EvidenceEdge *EvidenceEdge `json:"evidenceEdge"`
+}
+
+type UploadTaskEvidenceInput struct {
+	TaskID gid.GID        `json:"taskId"`
+	File   graphql.Upload `json:"file"`
+}
+
+type UploadTaskEvidencePayload struct {
+	EvidenceEdge *EvidenceEdge `json:"evidenceEdge"`
 }
 
 type UploadVendorComplianceReportInput struct {

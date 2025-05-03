@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<63dbc912431a9ea23a2ce515ba95af86>>
+ * @generated SignedSource<<03d8e2eca1cc7ffaf797c66ef7fa11c1>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -20,6 +20,22 @@ export type MeasureViewQuery$data = {
   readonly measure: {
     readonly category?: string;
     readonly description?: string;
+    readonly evidences?: {
+      readonly __id: string;
+      readonly edges: ReadonlyArray<{
+        readonly node: {
+          readonly createdAt: string;
+          readonly description: string;
+          readonly filename: string;
+          readonly id: string;
+          readonly mimeType: string;
+          readonly size: number;
+          readonly state: EvidenceState;
+          readonly type: EvidenceType;
+          readonly url: string | null | undefined;
+        };
+      }>;
+    };
     readonly id: string;
     readonly name?: string;
     readonly state?: MeasureState;
@@ -117,50 +133,17 @@ v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "timeEstimate",
-  "storageKey": null
-},
-v8 = {
-  "alias": null,
-  "args": null,
-  "concreteType": "People",
-  "kind": "LinkedField",
-  "name": "assignedTo",
-  "plural": false,
-  "selections": [
-    (v2/*: any*/),
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "fullName",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "primaryEmailAddress",
-      "storageKey": null
-    }
-  ],
-  "storageKey": null
-},
-v9 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v10 = {
+v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "cursor",
   "storageKey": null
 },
-v11 = {
+v9 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -185,7 +168,7 @@ v11 = {
   ],
   "storageKey": null
 },
-v12 = {
+v10 = {
   "kind": "ClientExtension",
   "selections": [
     {
@@ -197,7 +180,7 @@ v12 = {
     }
   ]
 },
-v13 = [
+v11 = [
   {
     "alias": null,
     "args": null,
@@ -259,17 +242,50 @@ v13 = [
             "storageKey": null
           },
           (v4/*: any*/),
-          (v9/*: any*/)
+          (v7/*: any*/)
         ],
         "storageKey": null
       },
-      (v10/*: any*/)
+      (v8/*: any*/)
     ],
     "storageKey": null
   },
-  (v11/*: any*/),
-  (v12/*: any*/)
+  (v9/*: any*/),
+  (v10/*: any*/)
 ],
+v12 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "timeEstimate",
+  "storageKey": null
+},
+v13 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "People",
+  "kind": "LinkedField",
+  "name": "assignedTo",
+  "plural": false,
+  "selections": [
+    (v2/*: any*/),
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "fullName",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "primaryEmailAddress",
+      "storageKey": null
+    }
+  ],
+  "storageKey": null
+},
 v14 = [
   {
     "kind": "Literal",
@@ -308,6 +324,16 @@ return {
               (v5/*: any*/),
               (v6/*: any*/),
               {
+                "alias": "evidences",
+                "args": null,
+                "concreteType": "EvidenceConnection",
+                "kind": "LinkedField",
+                "name": "__MeasureView_evidences_connection",
+                "plural": false,
+                "selections": (v11/*: any*/),
+                "storageKey": null
+              },
+              {
                 "alias": "tasks",
                 "args": null,
                 "concreteType": "TaskConnection",
@@ -335,28 +361,28 @@ return {
                           (v3/*: any*/),
                           (v4/*: any*/),
                           (v5/*: any*/),
-                          (v7/*: any*/),
-                          (v8/*: any*/),
+                          (v12/*: any*/),
+                          (v13/*: any*/),
                           {
                             "alias": "evidences",
                             "args": null,
                             "concreteType": "EvidenceConnection",
                             "kind": "LinkedField",
-                            "name": "__MeasureView_evidences_connection",
+                            "name": "__MeasureView_task_evidences_connection",
                             "plural": false,
-                            "selections": (v13/*: any*/),
+                            "selections": (v11/*: any*/),
                             "storageKey": null
                           },
-                          (v9/*: any*/)
+                          (v7/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v10/*: any*/)
+                      (v8/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v11/*: any*/),
-                  (v12/*: any*/)
+                  (v9/*: any*/),
+                  (v10/*: any*/)
                 ],
                 "storageKey": null
               }
@@ -385,7 +411,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v9/*: any*/),
+          (v7/*: any*/),
           (v2/*: any*/),
           {
             "kind": "InlineFragment",
@@ -394,6 +420,25 @@ return {
               (v4/*: any*/),
               (v5/*: any*/),
               (v6/*: any*/),
+              {
+                "alias": null,
+                "args": (v14/*: any*/),
+                "concreteType": "EvidenceConnection",
+                "kind": "LinkedField",
+                "name": "evidences",
+                "plural": false,
+                "selections": (v11/*: any*/),
+                "storageKey": "evidences(first:100)"
+              },
+              {
+                "alias": null,
+                "args": (v14/*: any*/),
+                "filters": null,
+                "handle": "connection",
+                "key": "MeasureView_evidences",
+                "kind": "LinkedHandle",
+                "name": "evidences"
+              },
               {
                 "alias": null,
                 "args": (v14/*: any*/),
@@ -422,8 +467,8 @@ return {
                           (v3/*: any*/),
                           (v4/*: any*/),
                           (v5/*: any*/),
-                          (v7/*: any*/),
-                          (v8/*: any*/),
+                          (v12/*: any*/),
+                          (v13/*: any*/),
                           {
                             "alias": null,
                             "args": (v15/*: any*/),
@@ -431,7 +476,7 @@ return {
                             "kind": "LinkedField",
                             "name": "evidences",
                             "plural": false,
-                            "selections": (v13/*: any*/),
+                            "selections": (v11/*: any*/),
                             "storageKey": "evidences(first:50)"
                           },
                           {
@@ -439,20 +484,20 @@ return {
                             "args": (v15/*: any*/),
                             "filters": null,
                             "handle": "connection",
-                            "key": "MeasureView_evidences",
+                            "key": "MeasureView_task_evidences",
                             "kind": "LinkedHandle",
                             "name": "evidences"
                           },
-                          (v9/*: any*/)
+                          (v7/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v10/*: any*/)
+                      (v8/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v11/*: any*/),
-                  (v12/*: any*/)
+                  (v9/*: any*/),
+                  (v10/*: any*/)
                 ],
                 "storageKey": "tasks(first:100)"
               },
@@ -475,10 +520,19 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9c4b0f0032102448259ea5deb2b9d57a",
+    "cacheID": "d3e4d9723d12bce8158b83eb76d05a90",
     "id": null,
     "metadata": {
       "connection": [
+        {
+          "count": null,
+          "cursor": null,
+          "direction": "forward",
+          "path": [
+            "measure",
+            "evidences"
+          ]
+        },
         {
           "count": null,
           "cursor": null,
@@ -498,11 +552,11 @@ return {
     },
     "name": "MeasureViewQuery",
     "operationKind": "query",
-    "text": "query MeasureViewQuery(\n  $measureId: ID!\n) {\n  measure: node(id: $measureId) {\n    __typename\n    id\n    ... on Measure {\n      name\n      description\n      state\n      category\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  type\n                  url\n                  createdAt\n                  description\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query MeasureViewQuery(\n  $measureId: ID!\n) {\n  measure: node(id: $measureId) {\n    __typename\n    id\n    ... on Measure {\n      name\n      description\n      state\n      category\n      evidences(first: 100) {\n        edges {\n          node {\n            id\n            mimeType\n            filename\n            size\n            state\n            type\n            url\n            createdAt\n            description\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      tasks(first: 100) {\n        edges {\n          node {\n            id\n            name\n            description\n            state\n            timeEstimate\n            assignedTo {\n              id\n              fullName\n              primaryEmailAddress\n            }\n            evidences(first: 50) {\n              edges {\n                node {\n                  id\n                  mimeType\n                  filename\n                  size\n                  state\n                  type\n                  url\n                  createdAt\n                  description\n                  __typename\n                }\n                cursor\n              }\n              pageInfo {\n                endCursor\n                hasNextPage\n              }\n            }\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "0de1c02cbaf76feae0ecdbd93f530fa7";
+(node as any).hash = "288412cccb1f4c14b1852504e5536af1";
 
 export default node;

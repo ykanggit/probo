@@ -1434,15 +1434,9 @@ function MeasureViewContent({
   const confirmDeleteEvidence = () => {
     if (!evidenceToDelete) return;
 
-    let evidenceConnectionId;
-    
-    // If taskId is empty, it's a measure-level evidence
-    if (!evidenceToDelete.taskId) {
-      evidenceConnectionId = getMeasureEvidenceConnectionId();
-    } else {
-      // Otherwise it's a task-level evidence
-      evidenceConnectionId = getEvidenceConnectionId(evidenceToDelete.taskId);
-    }
+    const evidenceConnectionId = getEvidenceConnectionId(
+      evidenceToDelete.taskId
+    );
 
     deleteEvidence({
       variables: {
@@ -1454,10 +1448,6 @@ function MeasureViewContent({
       onCompleted: () => {
         setIsDeleteEvidenceOpen(false);
         setEvidenceToDelete(null);
-        toast({
-          title: "Evidence deleted",
-          description: "Evidence has been deleted successfully.",
-        });
       },
       onError: (error) => {
         toast({
@@ -2020,6 +2010,7 @@ function MeasureViewContent({
   return (
     <PageTemplate
       title={data.measure?.name || "Measure"}
+      description={data.measure?.description}
       actions={
         <div className="flex gap-2">
           <Button
@@ -2438,306 +2429,9 @@ function MeasureViewContent({
             <TabsContent value="link" className="space-y-4 pt-4">
               <div className="space-y-4">
                 <div className="grid w-full items-center gap-1.5">
-                  <Label htmlFor="evidence-url">URL</Label>
+                  <Label htmlFor="evidence-name">Name</Label>
                   <Input
-                    id="evidence-url"
-                    value={linkEvidenceUrl}
-                    onChange={(e) => setLinkEvidenceUrl(e.target.value)}
-                    placeholder="https://example.com"
-                    type="url"
-                  />
-                </div>
-
-                <div className="grid w-full items-center gap-1.5">
-                  <Label htmlFor="evidence-description">
-                    Description (optional)
-                  </Label>
-                  <Textarea
-                    id="evidence-description"
-                    value={linkEvidenceDescription}
-                    onChange={(e) => setLinkEvidenceDescription(e.target.value)}
-                    placeholder="Describe this evidence (optional)"
-                    className="min-h-[100px]"
-                  />
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setEvidenceDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            {activeTab === "link" && (
-              <Button onClick={handleLinkEvidenceSubmit}>Add Link</Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Hidden file input for direct uploads */}
-      <input
-        type="file"
-        ref={hiddenFileInputRef}
-        onChange={handleFileSelected}
-        style={{ display: "none" }}
-        accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
-      />
-
-      {/* Delete Task Confirmation Dialog */}
-      <Dialog open={isDeleteTaskOpen} onOpenChange={setIsDeleteTaskOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Task</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete the task &quot;
-              {taskToDelete?.name}&quot;? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteTaskOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDeleteTask}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add the Preview Modal */}
-      <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
-        <DialogContent className="sm:max-w-4xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span>{previewEvidence?.filename}</span>
-            </DialogTitle>
-            <DialogDescription>
-              Preview of the evidence file. You can view or download the file
-              from here.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col items-center justify-center min-h-[300px] bg-invert-bg rounded-md p-4">
-            {isLoadingFileUrl ? (
-              <div className="flex flex-col items-center gap-2">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                <p className="text-secondary">Loading preview...</p>
-              </div>
-            ) : previewEvidence?.fileUrl ? (
-              previewEvidence.mimeType.startsWith("image/") ? (
-                <img
-                  src={previewEvidence.fileUrl}
-                  alt={previewEvidence.filename}
-                  className="max-h-[70vh] object-contain"
-                />
-              ) : previewEvidence.mimeType.includes("pdf") ? (
-                <iframe
-                  src={previewEvidence.fileUrl}
-                  className="w-full h-[70vh]"
-                  title={previewEvidence.filename}
-                />
-              ) : (
-                <div className="flex flex-col items-center gap-4">
-                  <FileGeneric className="w-16 h-16 text-tertiary" />
-                  <p className="text-secondary">
-                    Preview not available for this file type
-                  </p>
-                  <Button
-                    onClick={() => {
-                      if (previewEvidence?.fileUrl) {
-                        window.open(previewEvidence.fileUrl, "_blank");
-                      }
-                    }}
-                  >
-                    Download File
-                  </Button>
-                </div>
-              )
-            ) : (
-              <div className="flex flex-col items-center gap-2">
-                <FileGeneric className="w-12 h-12 text-tertiary" />
-                <p className="text-secondary">Failed to load preview</p>
-              </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsPreviewModalOpen(false)}
-            >
-              Close
-            </Button>
-            {previewEvidence?.fileUrl && (
-              <Button
-                onClick={() => {
-                  if (previewEvidence?.fileUrl) {
-                    window.open(previewEvidence.fileUrl, "_blank");
-                  }
-                }}
-              >
-                Download
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add Delete Evidence Confirmation Dialog */}
-      <Dialog
-        open={isDeleteEvidenceOpen}
-        onOpenChange={setIsDeleteEvidenceOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Evidence</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete the evidence &quot;
-              {evidenceToDelete?.filename}&quot;? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteEvidenceOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDeleteEvidence}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Fulfill Evidence Dialog */}
-      <Dialog
-        open={fulfillEvidenceDialogOpen}
-        onOpenChange={setFulfillEvidenceDialogOpen}
-      >
-        <DialogContent className="sm:max-w-[525px]">
-          <DialogHeader>
-            <DialogTitle>Fulfill Evidence</DialogTitle>
-            <DialogDescription>
-              Provide the requested evidence: {evidenceToFulfill?.filename}
-            </DialogDescription>
-          </DialogHeader>
-
-          <Tabs
-            value={activeTab}
-            onValueChange={(value: string) =>
-              setActiveTab(value as "file" | "link")
-            }
-          >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="file">Document</TabsTrigger>
-              <TabsTrigger value="link">Link</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="file" className="space-y-4">
-              <div className="space-y-4 pt-4">
-                <p>Upload a document to fulfill this evidence request.</p>
-                <Button
-                  onClick={() => {
-                    if (hiddenFileInputRef.current) {
-                      // Set a temp onchange handler for the file input
-                      const originalOnChange =
-                        hiddenFileInputRef.current.onchange;
-                      hiddenFileInputRef.current.onchange = (e) => {
-                        hiddenFileInputRef.current!.onchange = originalOnChange;
-                        handleFulfillEvidenceWithFile({
-                          target: {
-                            files: (e.target as HTMLInputElement)?.files,
-                          },
-                        } as React.ChangeEvent<HTMLInputElement>);
-                      };
-                      hiddenFileInputRef.current.click();
-                      setFulfillEvidenceDialogOpen(false);
-                    }
-                  }}
-                  className="w-full"
-                >
-                  Select Document
-                </Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="link" className="space-y-4 pt-4">
-              <div className="space-y-4">
-                <div className="grid w-full items-center gap-1.5">
-                  <Label htmlFor="evidence-url">URL</Label>
-                  <Input
-                    id="evidence-url"
-                    value={linkEvidenceUrl}
-                    onChange={(e) => setLinkEvidenceUrl(e.target.value)}
-                    placeholder="https://example.com"
-                    type="url"
-                  />
-                </div>
-
-                <div className="grid w-full items-center gap-1.5">
-                  <Label htmlFor="evidence-description">
-                    Description (optional)
-                  </Label>
-                  <Textarea
-                    id="evidence-description"
-                    value={linkEvidenceDescription}
-                    onChange={(e) => setLinkEvidenceDescription(e.target.value)}
-                    placeholder="Describe this evidence (optional)"
-                    className="min-h-[100px]"
-                  />
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setFulfillEvidenceDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            {activeTab === "link" && (
-              <Button onClick={handleFulfillEvidenceWithLink}>
-                Submit Link
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Measure Confirmation Dialog */}
-      <Dialog open={isDeleteMeasureOpen} onOpenChange={setIsDeleteMeasureOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Measure</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this measure? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteMeasureOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDeleteMeasure}
-              disabled={isDeletingMeasure}
-            >
-              {isDeletingMeasure ? "Deleting..." : "Delete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                    id="evidence-name"
     </PageTemplate>
   );
 }

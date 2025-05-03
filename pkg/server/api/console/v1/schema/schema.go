@@ -293,6 +293,7 @@ type ComplexityRoot struct {
 		Controls    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) int
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
+		Evidences   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) int
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Risks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) int
@@ -317,7 +318,6 @@ type ComplexityRoot struct {
 		CreateControlMeasureMapping  func(childComplexity int, input types.CreateControlMeasureMappingInput) int
 		CreateControlPolicyMapping   func(childComplexity int, input types.CreateControlPolicyMappingInput) int
 		CreateDraftPolicyVersion     func(childComplexity int, input types.CreateDraftPolicyVersionInput) int
-		CreateEvidence               func(childComplexity int, input types.CreateEvidenceInput) int
 		CreateFramework              func(childComplexity int, input types.CreateFrameworkInput) int
 		CreateMeasure                func(childComplexity int, input types.CreateMeasureInput) int
 		CreateOrganization           func(childComplexity int, input types.CreateOrganizationInput) int
@@ -361,6 +361,8 @@ type ComplexityRoot struct {
 		UpdateRisk                   func(childComplexity int, input types.UpdateRiskInput) int
 		UpdateTask                   func(childComplexity int, input types.UpdateTaskInput) int
 		UpdateVendor                 func(childComplexity int, input types.UpdateVendorInput) int
+		UploadMeasureEvidence        func(childComplexity int, input types.UploadMeasureEvidenceInput) int
+		UploadTaskEvidence           func(childComplexity int, input types.UploadTaskEvidenceInput) int
 		UploadVendorComplianceReport func(childComplexity int, input types.UploadVendorComplianceReportInput) int
 	}
 
@@ -609,6 +611,14 @@ type ComplexityRoot struct {
 		Vendor func(childComplexity int) int
 	}
 
+	UploadMeasureEvidencePayload struct {
+		EvidenceEdge func(childComplexity int) int
+	}
+
+	UploadTaskEvidencePayload struct {
+		EvidenceEdge func(childComplexity int) int
+	}
+
 	UploadVendorComplianceReportPayload struct {
 		VendorComplianceReportEdge func(childComplexity int) int
 	}
@@ -728,6 +738,7 @@ type FrameworkResolver interface {
 	Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
 }
 type MeasureResolver interface {
+	Evidences(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error)
 	Tasks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
 	Risks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error)
 	Controls(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
@@ -771,8 +782,9 @@ type MutationResolver interface {
 	DeleteRiskPolicyMapping(ctx context.Context, input types.DeleteRiskPolicyMappingInput) (*types.DeleteRiskPolicyMappingPayload, error)
 	RequestEvidence(ctx context.Context, input types.RequestEvidenceInput) (*types.RequestEvidencePayload, error)
 	FulfillEvidence(ctx context.Context, input types.FulfillEvidenceInput) (*types.FulfillEvidencePayload, error)
-	CreateEvidence(ctx context.Context, input types.CreateEvidenceInput) (*types.CreateEvidencePayload, error)
 	DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error)
+	UploadTaskEvidence(ctx context.Context, input types.UploadTaskEvidenceInput) (*types.UploadTaskEvidencePayload, error)
+	UploadMeasureEvidence(ctx context.Context, input types.UploadMeasureEvidenceInput) (*types.UploadMeasureEvidencePayload, error)
 	UploadVendorComplianceReport(ctx context.Context, input types.UploadVendorComplianceReportInput) (*types.UploadVendorComplianceReportPayload, error)
 	DeleteVendorComplianceReport(ctx context.Context, input types.DeleteVendorComplianceReportInput) (*types.DeleteVendorComplianceReportPayload, error)
 	CreatePolicy(ctx context.Context, input types.CreatePolicyInput) (*types.CreatePolicyPayload, error)
@@ -1491,6 +1503,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Measure.Description(childComplexity), true
 
+	case "Measure.evidences":
+		if e.complexity.Measure.Evidences == nil {
+			break
+		}
+
+		args, err := ec.field_Measure_evidences_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Measure.Evidences(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.EvidenceOrderBy)), true
+
 	case "Measure.id":
 		if e.complexity.Measure.ID == nil {
 			break
@@ -1630,18 +1654,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateDraftPolicyVersion(childComplexity, args["input"].(types.CreateDraftPolicyVersionInput)), true
-
-	case "Mutation.createEvidence":
-		if e.complexity.Mutation.CreateEvidence == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createEvidence_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateEvidence(childComplexity, args["input"].(types.CreateEvidenceInput)), true
 
 	case "Mutation.createFramework":
 		if e.complexity.Mutation.CreateFramework == nil {
@@ -2158,6 +2170,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateVendor(childComplexity, args["input"].(types.UpdateVendorInput)), true
+
+	case "Mutation.uploadMeasureEvidence":
+		if e.complexity.Mutation.UploadMeasureEvidence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_uploadMeasureEvidence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UploadMeasureEvidence(childComplexity, args["input"].(types.UploadMeasureEvidenceInput)), true
+
+	case "Mutation.uploadTaskEvidence":
+		if e.complexity.Mutation.UploadTaskEvidence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_uploadTaskEvidence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UploadTaskEvidence(childComplexity, args["input"].(types.UploadTaskEvidenceInput)), true
 
 	case "Mutation.uploadVendorComplianceReport":
 		if e.complexity.Mutation.UploadVendorComplianceReport == nil {
@@ -3147,6 +3183,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateVendorPayload.Vendor(childComplexity), true
 
+	case "UploadMeasureEvidencePayload.evidenceEdge":
+		if e.complexity.UploadMeasureEvidencePayload.EvidenceEdge == nil {
+			break
+		}
+
+		return e.complexity.UploadMeasureEvidencePayload.EvidenceEdge(childComplexity), true
+
+	case "UploadTaskEvidencePayload.evidenceEdge":
+		if e.complexity.UploadTaskEvidencePayload.EvidenceEdge == nil {
+			break
+		}
+
+		return e.complexity.UploadTaskEvidencePayload.EvidenceEdge(childComplexity), true
+
 	case "UploadVendorComplianceReportPayload.vendorComplianceReportEdge":
 		if e.complexity.UploadVendorComplianceReportPayload.VendorComplianceReportEdge == nil {
 			break
@@ -3693,6 +3743,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateRiskInput,
 		ec.unmarshalInputUpdateTaskInput,
 		ec.unmarshalInputUpdateVendorInput,
+		ec.unmarshalInputUploadMeasureEvidenceInput,
+		ec.unmarshalInputUploadTaskEvidenceInput,
 		ec.unmarshalInputUploadVendorComplianceReportInput,
 		ec.unmarshalInputUserOrder,
 		ec.unmarshalInputVendorComplianceReportOrder,
@@ -4393,6 +4445,14 @@ type Measure implements Node {
   description: String!
   state: MeasureState!
 
+  evidences(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: EvidenceOrder
+  ): EvidenceConnection! @goField(forceResolver: true)
+
   tasks(
     first: Int
     after: CursorKey
@@ -4784,8 +4844,9 @@ type Mutation {
   # Evidence mutations
   requestEvidence(input: RequestEvidenceInput!): RequestEvidencePayload!
   fulfillEvidence(input: FulfillEvidenceInput!): FulfillEvidencePayload!
-  createEvidence(input: CreateEvidenceInput!): CreateEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
+  uploadTaskEvidence(input: UploadTaskEvidenceInput!): UploadTaskEvidencePayload!
+  uploadMeasureEvidence(input: UploadMeasureEvidenceInput!): UploadMeasureEvidencePayload!
 
   # Vendor Compliance Report mutations
   uploadVendorComplianceReport(
@@ -5448,7 +5509,26 @@ input SendSigningNotificationsInput {
 
 type SendSigningNotificationsPayload {
   success: Boolean!
-}`, BuiltIn: false},
+}
+
+type UploadTaskEvidencePayload {
+  evidenceEdge: EvidenceEdge!
+}
+
+type UploadMeasureEvidencePayload {
+  evidenceEdge: EvidenceEdge!
+}
+
+input UploadTaskEvidenceInput {
+  taskId: ID!
+  file: Upload!
+}
+
+input UploadMeasureEvidenceInput {
+  measureId: ID!
+  file: Upload!
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -5836,6 +5916,101 @@ func (ec *executionContext) field_Measure_controls_argsOrderBy(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Measure_evidences_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Measure_evidences_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Measure_evidences_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Measure_evidences_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Measure_evidences_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Measure_evidences_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_Measure_evidences_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Measure_evidences_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Measure_evidences_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Measure_evidences_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Measure_evidences_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.EvidenceOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOEvidenceOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.EvidenceOrderBy
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Measure_risks_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -6138,29 +6313,6 @@ func (ec *executionContext) field_Mutation_createDraftPolicyVersion_argsInput(
 	}
 
 	var zeroVal types.CreateDraftPolicyVersionInput
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_createEvidence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_createEvidence_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_createEvidence_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (types.CreateEvidenceInput, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNCreateEvidenceInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateEvidenceInput(ctx, tmp)
-	}
-
-	var zeroVal types.CreateEvidenceInput
 	return zeroVal, nil
 }
 
@@ -7150,6 +7302,52 @@ func (ec *executionContext) field_Mutation_updateVendor_argsInput(
 	}
 
 	var zeroVal types.UpdateVendorInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadMeasureEvidence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_uploadMeasureEvidence_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_uploadMeasureEvidence_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UploadMeasureEvidenceInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUploadMeasureEvidenceInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadMeasureEvidenceInput(ctx, tmp)
+	}
+
+	var zeroVal types.UploadMeasureEvidenceInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadTaskEvidence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_uploadTaskEvidence_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_uploadTaskEvidence_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UploadTaskEvidenceInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUploadTaskEvidenceInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadTaskEvidenceInput(ctx, tmp)
+	}
+
+	var zeroVal types.UploadTaskEvidenceInput
 	return zeroVal, nil
 }
 
@@ -13188,6 +13386,67 @@ func (ec *executionContext) fieldContext_Measure_state(_ context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Measure_evidences(ctx context.Context, field graphql.CollectedField, obj *types.Measure) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Measure_evidences(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Measure().Evidences(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.EvidenceOrderBy))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.EvidenceConnection)
+	fc.Result = res
+	return ec.marshalNEvidenceConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Measure_evidences(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Measure",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_EvidenceConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_EvidenceConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EvidenceConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Measure_evidences_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Measure_tasks(ctx context.Context, field graphql.CollectedField, obj *types.Measure) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Measure_tasks(ctx, field)
 	if err != nil {
@@ -13656,6 +13915,8 @@ func (ec *executionContext) fieldContext_MeasureEdge_node(_ context.Context, fie
 				return ec.fieldContext_Measure_description(ctx, field)
 			case "state":
 				return ec.fieldContext_Measure_state(ctx, field)
+			case "evidences":
+				return ec.fieldContext_Measure_evidences(ctx, field)
 			case "tasks":
 				return ec.fieldContext_Measure_tasks(ctx, field)
 			case "risks":
@@ -15915,65 +16176,6 @@ func (ec *executionContext) fieldContext_Mutation_fulfillEvidence(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createEvidence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createEvidence(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateEvidence(rctx, fc.Args["input"].(types.CreateEvidenceInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.CreateEvidencePayload)
-	fc.Result = res
-	return ec.marshalNCreateEvidencePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateEvidencePayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createEvidence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "evidenceEdge":
-				return ec.fieldContext_CreateEvidencePayload_evidenceEdge(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type CreateEvidencePayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createEvidence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_deleteEvidence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_deleteEvidence(ctx, field)
 	if err != nil {
@@ -16027,6 +16229,124 @@ func (ec *executionContext) fieldContext_Mutation_deleteEvidence(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteEvidence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_uploadTaskEvidence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_uploadTaskEvidence(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UploadTaskEvidence(rctx, fc.Args["input"].(types.UploadTaskEvidenceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UploadTaskEvidencePayload)
+	fc.Result = res
+	return ec.marshalNUploadTaskEvidencePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadTaskEvidencePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_uploadTaskEvidence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "evidenceEdge":
+				return ec.fieldContext_UploadTaskEvidencePayload_evidenceEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UploadTaskEvidencePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_uploadTaskEvidence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_uploadMeasureEvidence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_uploadMeasureEvidence(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UploadMeasureEvidence(rctx, fc.Args["input"].(types.UploadMeasureEvidenceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UploadMeasureEvidencePayload)
+	fc.Result = res
+	return ec.marshalNUploadMeasureEvidencePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadMeasureEvidencePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_uploadMeasureEvidence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "evidenceEdge":
+				return ec.fieldContext_UploadMeasureEvidencePayload_evidenceEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UploadMeasureEvidencePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_uploadMeasureEvidence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -22839,6 +23159,8 @@ func (ec *executionContext) fieldContext_UpdateMeasurePayload_measure(_ context.
 				return ec.fieldContext_Measure_description(ctx, field)
 			case "state":
 				return ec.fieldContext_Measure_state(ctx, field)
+			case "evidences":
+				return ec.fieldContext_Measure_evidences(ctx, field)
 			case "tasks":
 				return ec.fieldContext_Measure_tasks(ctx, field)
 			case "risks":
@@ -23347,6 +23669,106 @@ func (ec *executionContext) fieldContext_UpdateVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UploadMeasureEvidencePayload_evidenceEdge(ctx context.Context, field graphql.CollectedField, obj *types.UploadMeasureEvidencePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UploadMeasureEvidencePayload_evidenceEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EvidenceEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.EvidenceEdge)
+	fc.Result = res
+	return ec.marshalNEvidenceEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UploadMeasureEvidencePayload_evidenceEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UploadMeasureEvidencePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_EvidenceEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_EvidenceEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EvidenceEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UploadTaskEvidencePayload_evidenceEdge(ctx context.Context, field graphql.CollectedField, obj *types.UploadTaskEvidencePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UploadTaskEvidencePayload_evidenceEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EvidenceEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.EvidenceEdge)
+	fc.Result = res
+	return ec.marshalNEvidenceEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidenceEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UploadTaskEvidencePayload_evidenceEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UploadTaskEvidencePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_EvidenceEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_EvidenceEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EvidenceEdge", field.Name)
 		},
 	}
 	return fc, nil
@@ -31132,6 +31554,74 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUploadMeasureEvidenceInput(ctx context.Context, obj any) (types.UploadMeasureEvidenceInput, error) {
+	var it types.UploadMeasureEvidenceInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"measureId", "file"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "measureId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("measureId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MeasureID = data
+		case "file":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+			data, err := ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.File = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUploadTaskEvidenceInput(ctx context.Context, obj any) (types.UploadTaskEvidenceInput, error) {
+	var it types.UploadTaskEvidenceInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"taskId", "file"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "taskId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("taskId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TaskID = data
+		case "file":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+			data, err := ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.File = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUploadVendorComplianceReportInput(ctx context.Context, obj any) (types.UploadVendorComplianceReportInput, error) {
 	var it types.UploadVendorComplianceReportInput
 	asMap := map[string]any{}
@@ -33614,6 +34104,42 @@ func (ec *executionContext) _Measure(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "evidences":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Measure_evidences(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "tasks":
 			field := field
 
@@ -34128,16 +34654,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createEvidence":
+		case "deleteEvidence":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createEvidence(ctx, field)
+				return ec._Mutation_deleteEvidence(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "deleteEvidence":
+		case "uploadTaskEvidence":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteEvidence(ctx, field)
+				return ec._Mutation_uploadTaskEvidence(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "uploadMeasureEvidence":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_uploadMeasureEvidence(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -36965,6 +37498,84 @@ func (ec *executionContext) _UpdateVendorPayload(ctx context.Context, sel ast.Se
 	return out
 }
 
+var uploadMeasureEvidencePayloadImplementors = []string{"UploadMeasureEvidencePayload"}
+
+func (ec *executionContext) _UploadMeasureEvidencePayload(ctx context.Context, sel ast.SelectionSet, obj *types.UploadMeasureEvidencePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, uploadMeasureEvidencePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UploadMeasureEvidencePayload")
+		case "evidenceEdge":
+			out.Values[i] = ec._UploadMeasureEvidencePayload_evidenceEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var uploadTaskEvidencePayloadImplementors = []string{"UploadTaskEvidencePayload"}
+
+func (ec *executionContext) _UploadTaskEvidencePayload(ctx context.Context, sel ast.SelectionSet, obj *types.UploadTaskEvidencePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, uploadTaskEvidencePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UploadTaskEvidencePayload")
+		case "evidenceEdge":
+			out.Values[i] = ec._UploadTaskEvidencePayload_evidenceEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var uploadVendorComplianceReportPayloadImplementors = []string{"UploadVendorComplianceReportPayload"}
 
 func (ec *executionContext) _UploadVendorComplianceReportPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UploadVendorComplianceReportPayload) graphql.Marshaler {
@@ -38710,25 +39321,6 @@ func (ec *executionContext) marshalNCreateDraftPolicyVersionPayload2ᚖgithubᚗ
 		return graphql.Null
 	}
 	return ec._CreateDraftPolicyVersionPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNCreateEvidenceInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateEvidenceInput(ctx context.Context, v any) (types.CreateEvidenceInput, error) {
-	res, err := ec.unmarshalInputCreateEvidenceInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNCreateEvidencePayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateEvidencePayload(ctx context.Context, sel ast.SelectionSet, v types.CreateEvidencePayload) graphql.Marshaler {
-	return ec._CreateEvidencePayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNCreateEvidencePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateEvidencePayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateEvidencePayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CreateEvidencePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNCreateFrameworkInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateFrameworkInput(ctx context.Context, v any) (types.CreateFrameworkInput, error) {
@@ -40989,6 +41581,44 @@ func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋg
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUploadMeasureEvidenceInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadMeasureEvidenceInput(ctx context.Context, v any) (types.UploadMeasureEvidenceInput, error) {
+	res, err := ec.unmarshalInputUploadMeasureEvidenceInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUploadMeasureEvidencePayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadMeasureEvidencePayload(ctx context.Context, sel ast.SelectionSet, v types.UploadMeasureEvidencePayload) graphql.Marshaler {
+	return ec._UploadMeasureEvidencePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUploadMeasureEvidencePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadMeasureEvidencePayload(ctx context.Context, sel ast.SelectionSet, v *types.UploadMeasureEvidencePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UploadMeasureEvidencePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUploadTaskEvidenceInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadTaskEvidenceInput(ctx context.Context, v any) (types.UploadTaskEvidenceInput, error) {
+	res, err := ec.unmarshalInputUploadTaskEvidenceInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUploadTaskEvidencePayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadTaskEvidencePayload(ctx context.Context, sel ast.SelectionSet, v types.UploadTaskEvidencePayload) graphql.Marshaler {
+	return ec._UploadTaskEvidencePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUploadTaskEvidencePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadTaskEvidencePayload(ctx context.Context, sel ast.SelectionSet, v *types.UploadTaskEvidencePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UploadTaskEvidencePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUploadVendorComplianceReportInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorComplianceReportInput(ctx context.Context, v any) (types.UploadVendorComplianceReportInput, error) {

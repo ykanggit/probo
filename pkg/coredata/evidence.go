@@ -29,7 +29,8 @@ import (
 type (
 	Evidence struct {
 		ID          gid.GID       `db:"id"`
-		TaskID      gid.GID       `db:"task_id"`
+		MeasureID   gid.GID       `db:"measure_id"`
+		TaskID      *gid.GID      `db:"task_id"`
 		State       EvidenceState `db:"state"`
 		ReferenceID string        `db:"reference_id"`
 		Type        EvidenceType  `db:"type"`
@@ -65,6 +66,7 @@ INSERT INTO
     evidences (
         tenant_id,
         id,
+        measure_id,
         task_id,
         reference_id,
         object_key,
@@ -81,6 +83,7 @@ INSERT INTO
 VALUES (
     @tenant_id,
     @evidence_id,
+    @measure_id,
     @task_id,
     @reference_id,
     @object_key,
@@ -104,6 +107,7 @@ WHERE evidences.state = 'REQUESTED';
 	args := pgx.StrictNamedArgs{
 		"tenant_id":    scope.GetTenantID(),
 		"evidence_id":  e.ID,
+		"measure_id":   e.MeasureID,
 		"task_id":      e.TaskID,
 		"reference_id": e.ReferenceID,
 		"object_key":   e.ObjectKey,
@@ -131,6 +135,7 @@ INSERT INTO
     evidences (
         tenant_id,
         id,
+        measure_id,
         task_id,
         reference_id,
         object_key,
@@ -147,6 +152,7 @@ INSERT INTO
 VALUES (
     @tenant_id,
     @evidence_id,
+    @measure_id,
     @task_id,
     @reference_id,
     @object_key,
@@ -165,6 +171,7 @@ VALUES (
 	args := pgx.StrictNamedArgs{
 		"tenant_id":    scope.GetTenantID(),
 		"evidence_id":  e.ID,
+		"measure_id":   e.MeasureID,
 		"task_id":      e.TaskID,
 		"reference_id": e.ReferenceID,
 		"object_key":   e.ObjectKey,
@@ -192,6 +199,7 @@ func (e *Evidence) LoadByID(
 SELECT
     id,
     task_id,
+    measure_id,
     reference_id,
     state,
     type,
@@ -231,6 +239,58 @@ LIMIT 1;
 	return nil
 }
 
+func (e *Evidences) LoadByMeasureID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	measureID gid.GID,
+	cursor *page.Cursor[EvidenceOrderField],
+) error {
+	q := `
+	SELECT
+		id,
+		measure_id,
+		task_id,
+		reference_id,
+		state,
+		type,
+		object_key,
+		mime_type,
+		size,
+		filename,
+		url,
+		description,
+		created_at,
+		updated_at
+	FROM
+		evidences
+	WHERE
+		%s
+		AND measure_id = @measure_id
+		AND %s
+	`
+
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"measure_id": measureID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query evidence: %w", err)
+	}
+
+	evidences, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Evidence])
+	if err != nil {
+		return fmt.Errorf("cannot collect evidence: %w", err)
+	}
+
+	*e = evidences
+
+	return nil
+}
+
 func (e *Evidences) LoadByTaskID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -241,6 +301,7 @@ func (e *Evidences) LoadByTaskID(
 	q := `
 SELECT
     id,
+    measure_id,
     task_id,
     reference_id,
     state,

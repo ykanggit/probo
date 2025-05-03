@@ -37,8 +37,16 @@ type (
 		svc *TenantService
 	}
 
+	File struct {
+		Content     io.Reader
+		Filename    string
+		Size        int64
+		ContentType string
+	}
+
 	RequestEvidenceRequest struct {
-		TaskID      gid.GID
+		MeasureID   *gid.GID
+		TaskID      *gid.GID
 		Type        coredata.EvidenceType
 		Name        string
 		Description string
@@ -51,13 +59,14 @@ type (
 		Filename   *string
 	}
 
-	CreateEvidenceRequest struct {
-		TaskID      gid.GID
-		Name        string
-		Type        coredata.EvidenceType
-		File        io.Reader
-		URL         string
-		Description string
+	UploadTaskEvidenceRequest struct {
+		TaskID gid.GID
+		File   File
+	}
+
+	UploadMeasureEvidenceRequest struct {
+		MeasureID gid.GID
+		File      File
 	}
 )
 
@@ -90,7 +99,6 @@ func (s EvidenceService) Request(
 
 	evidence := &coredata.Evidence{
 		ID:          evidenceID,
-		TaskID:      req.TaskID,
 		State:       coredata.EvidenceStateRequested,
 		Type:        req.Type,
 		Filename:    req.Name,
@@ -99,9 +107,23 @@ func (s EvidenceService) Request(
 		UpdatedAt:   now,
 	}
 
-	err := s.svc.pg.WithConn(
+	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
+			task := &coredata.Task{}
+			if req.TaskID != nil {
+				if err := task.LoadByID(ctx, conn, s.svc.scope, *req.TaskID); err != nil {
+					return fmt.Errorf("cannot load task: %w", err)
+				}
+
+				evidence.TaskID = req.TaskID
+				evidence.MeasureID = task.MeasureID
+			} else if req.MeasureID != nil {
+				evidence.MeasureID = *req.MeasureID
+			} else {
+				return fmt.Errorf("measure id or task id is required")
+			}
+
 			return evidence.Insert(ctx, conn, s.svc.scope)
 		},
 	)
@@ -183,9 +205,9 @@ func (s EvidenceService) Fulfill(
 	return evidence, nil
 }
 
-func (s EvidenceService) Create(
+func (s EvidenceService) UploadTaskEvidence(
 	ctx context.Context,
-	req CreateEvidenceRequest,
+	req UploadTaskEvidenceRequest,
 ) (*coredata.Evidence, error) {
 	now := time.Now()
 	evidenceID := gid.New(s.svc.scope.GetTenantID(), coredata.EvidenceEntityType)
@@ -197,65 +219,129 @@ func (s EvidenceService) Create(
 
 	evidence := &coredata.Evidence{
 		ID:          evidenceID,
-		TaskID:      req.TaskID,
+		TaskID:      &req.TaskID,
 		State:       coredata.EvidenceStateFulfilled,
 		ReferenceID: "custom-evidence-" + referenceID.String(),
-		Type:        req.Type,
-		Filename:    req.Name,
-		URL:         req.URL,
-		Description: req.Description,
+		Type:        coredata.EvidenceTypeFile,
+		Filename:    req.File.Filename,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
 
-	if req.Type == coredata.EvidenceTypeFile {
-		contentType := "application/octet-stream"
-		if req.Name != "" {
-			if detectedType := mime.TypeByExtension(filepath.Ext(req.Name)); detectedType != "" {
-				contentType = detectedType
-			}
-		}
-
-		objectKey, err := uuid.NewV7()
-		if err != nil {
-			return nil, fmt.Errorf("cannot generate object key: %w", err)
-		}
-
-		_, err = s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
-			Bucket:      aws.String(s.svc.bucket),
-			Key:         aws.String(objectKey.String()),
-			Body:        req.File,
-			ContentType: aws.String(contentType),
-		})
-		if err != nil {
-			return nil, fmt.Errorf("cannot upload file to S3: %w", err)
-		}
-
-		headOutput, err := s.svc.s3.HeadObject(ctx, &s3.HeadObjectInput{
-			Bucket: aws.String(s.svc.bucket),
-			Key:    aws.String(objectKey.String()),
-		})
-		if err != nil {
-			return nil, fmt.Errorf("cannot get object metadata: %w", err)
-		}
-
-		evidence.ObjectKey = objectKey.String()
-		evidence.MimeType = contentType
-		evidence.Size = uint64(*headOutput.ContentLength)
-	} else if req.Type == coredata.EvidenceTypeLink {
-		evidence.MimeType = "text/uri-list"
-		evidence.Size = uint64(len(req.URL))
-		evidence.ObjectKey = ""
+	// TODO validate content type
+	if req.File.ContentType == "" {
+		req.File.ContentType = "application/octet-stream"
 	}
 
-	task := &coredata.Task{}
+	objectKey, err := uuid.NewV7()
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate object key: %w", err)
+	}
+
+	_, err = s.svc.s3.PutObject(
+		ctx,
+		&s3.PutObjectInput{
+			Bucket:      aws.String(s.svc.bucket),
+			Key:         aws.String(objectKey.String()),
+			Body:        req.File.Content,
+			ContentType: aws.String(req.File.ContentType),
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("cannot upload file to S3: %w", err)
+	}
+
+	evidence.ObjectKey = objectKey.String()
+	evidence.MimeType = req.File.ContentType
+	evidence.Size = uint64(req.File.Size)
 
 	err = s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
+			task := &coredata.Task{}
+
 			if err := task.LoadByID(ctx, conn, s.svc.scope, req.TaskID); err != nil {
 				return fmt.Errorf("cannot load task %q: %w", req.TaskID, err)
 			}
+
+			evidence.MeasureID = task.MeasureID
+
+			if err := evidence.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert evidence: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		// TODO try do delete file from s3 if it's a file type
+		return nil, err
+	}
+
+	return evidence, nil
+}
+
+func (s EvidenceService) UploadMeasureEvidence(
+	ctx context.Context,
+	req UploadMeasureEvidenceRequest,
+) (*coredata.Evidence, error) {
+	now := time.Now()
+	evidenceID := gid.New(s.svc.scope.GetTenantID(), coredata.EvidenceEntityType)
+
+	referenceID, err := uuid.NewV4()
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate reference id: %w", err)
+	}
+
+	evidence := &coredata.Evidence{
+		ID:          evidenceID,
+		MeasureID:   req.MeasureID,
+		State:       coredata.EvidenceStateFulfilled,
+		ReferenceID: "custom-evidence-" + referenceID.String(),
+		Type:        coredata.EvidenceTypeFile,
+		Filename:    req.File.Filename,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
+
+	// TODO validate content type
+	if req.File.ContentType == "" {
+		req.File.ContentType = "application/octet-stream"
+	}
+
+	objectKey, err := uuid.NewV7()
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate object key: %w", err)
+	}
+
+	_, err = s.svc.s3.PutObject(
+		ctx,
+		&s3.PutObjectInput{
+			Bucket:      aws.String(s.svc.bucket),
+			Key:         aws.String(objectKey.String()),
+			Body:        req.File.Content,
+			ContentType: aws.String(req.File.ContentType),
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("cannot upload file to S3: %w", err)
+	}
+
+	evidence.ObjectKey = objectKey.String()
+	evidence.MimeType = req.File.ContentType
+	evidence.Size = uint64(req.File.Size)
+
+	err = s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			measure := &coredata.Measure{}
+
+			if err := measure.LoadByID(ctx, conn, s.svc.scope, req.MeasureID); err != nil {
+				return fmt.Errorf("cannot load measure %q: %w", req.MeasureID, err)
+			}
+
+			evidence.MeasureID = req.MeasureID
 
 			if err := evidence.Insert(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert evidence: %w", err)
@@ -308,6 +394,33 @@ func (s EvidenceService) GenerateFileURL(
 	}
 
 	return &presignedReq.URL, nil
+}
+
+func (s EvidenceService) ListForMeasureID(
+	ctx context.Context,
+	measureID gid.GID,
+	cursor *page.Cursor[coredata.EvidenceOrderField],
+) (*page.Page[*coredata.Evidence, coredata.EvidenceOrderField], error) {
+	var evidences coredata.Evidences
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return evidences.LoadByMeasureID(
+				ctx,
+				conn,
+				s.svc.scope,
+				measureID,
+				cursor,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(evidences, cursor), nil
 }
 
 func (s EvidenceService) ListForTaskID(

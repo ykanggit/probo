@@ -596,6 +596,14 @@ type Measure implements Node {
   description: String!
   state: MeasureState!
 
+  evidences(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: EvidenceOrder
+  ): EvidenceConnection! @goField(forceResolver: true)
+
   tasks(
     first: Int
     after: CursorKey
@@ -987,8 +995,9 @@ type Mutation {
   # Evidence mutations
   requestEvidence(input: RequestEvidenceInput!): RequestEvidencePayload!
   fulfillEvidence(input: FulfillEvidenceInput!): FulfillEvidencePayload!
-  createEvidence(input: CreateEvidenceInput!): CreateEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
+  uploadTaskEvidence(input: UploadTaskEvidenceInput!): UploadTaskEvidencePayload!
+  uploadMeasureEvidence(input: UploadMeasureEvidenceInput!): UploadMeasureEvidencePayload!
 
   # Vendor Compliance Report mutations
   uploadVendorComplianceReport(
@@ -1651,4 +1660,22 @@ input SendSigningNotificationsInput {
 
 type SendSigningNotificationsPayload {
   success: Boolean!
+}
+
+type UploadTaskEvidencePayload {
+  evidenceEdge: EvidenceEdge!
+}
+
+type UploadMeasureEvidencePayload {
+  evidenceEdge: EvidenceEdge!
+}
+
+input UploadTaskEvidenceInput {
+  taskId: ID!
+  file: Upload!
+}
+
+input UploadMeasureEvidenceInput {
+  measureId: ID!
+  file: Upload!
 }

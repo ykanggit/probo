@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e5042f900955d846dd86ad6b78d60518>>
+ * @generated SignedSource<<4539152ef13af3aca3a79891c5b81a79>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,20 +11,16 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type EvidenceState = "FULFILLED" | "REQUESTED";
 export type EvidenceType = "FILE" | "LINK";
-export type CreateEvidenceInput = {
-  description: string;
-  file?: any | null | undefined;
-  name: string;
+export type UploadTaskEvidenceInput = {
+  file: any;
   taskId: string;
-  type: EvidenceType;
-  url?: string | null | undefined;
 };
-export type MeasureViewCreateEvidenceMutation$variables = {
+export type MeasureViewUploadTaskEvidenceMutation$variables = {
   connections: ReadonlyArray<string>;
-  input: CreateEvidenceInput;
+  input: UploadTaskEvidenceInput;
 };
-export type MeasureViewCreateEvidenceMutation$data = {
-  readonly createEvidence: {
+export type MeasureViewUploadTaskEvidenceMutation$data = {
+  readonly uploadTaskEvidence: {
     readonly evidenceEdge: {
       readonly node: {
         readonly createdAt: string;
@@ -41,9 +37,9 @@ export type MeasureViewCreateEvidenceMutation$data = {
     };
   };
 };
-export type MeasureViewCreateEvidenceMutation = {
-  response: MeasureViewCreateEvidenceMutation$data;
-  variables: MeasureViewCreateEvidenceMutation$variables;
+export type MeasureViewUploadTaskEvidenceMutation = {
+  response: MeasureViewUploadTaskEvidenceMutation$data;
+  variables: MeasureViewUploadTaskEvidenceMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -164,14 +160,14 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "MeasureViewCreateEvidenceMutation",
+    "name": "MeasureViewUploadTaskEvidenceMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "CreateEvidencePayload",
+        "concreteType": "UploadTaskEvidencePayload",
         "kind": "LinkedField",
-        "name": "createEvidence",
+        "name": "uploadTaskEvidence",
         "plural": false,
         "selections": [
           (v3/*: any*/)
@@ -189,14 +185,14 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "MeasureViewCreateEvidenceMutation",
+    "name": "MeasureViewUploadTaskEvidenceMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "CreateEvidencePayload",
+        "concreteType": "UploadTaskEvidencePayload",
         "kind": "LinkedField",
-        "name": "createEvidence",
+        "name": "uploadTaskEvidence",
         "plural": false,
         "selections": [
           (v3/*: any*/),
@@ -222,16 +218,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "25b9947aa09d7b4c60886f149b06cc6e",
+    "cacheID": "2c18eec6e7e3d428ad6fbdf4c52ccf94",
     "id": null,
     "metadata": {},
-    "name": "MeasureViewCreateEvidenceMutation",
+    "name": "MeasureViewUploadTaskEvidenceMutation",
     "operationKind": "mutation",
-    "text": "mutation MeasureViewCreateEvidenceMutation(\n  $input: CreateEvidenceInput!\n) {\n  createEvidence(input: $input) {\n    evidenceEdge {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        type\n        url\n        size\n        state\n        createdAt\n        description\n      }\n    }\n  }\n}\n"
+    "text": "mutation MeasureViewUploadTaskEvidenceMutation(\n  $input: UploadTaskEvidenceInput!\n) {\n  uploadTaskEvidence(input: $input) {\n    evidenceEdge {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        type\n        url\n        size\n        state\n        createdAt\n        description\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "bc59ec67230776eeb60a389a8360b0af";
+(node as any).hash = "3649fc872c9f58d4ffd0181b0316c812";
 
 export default node;
