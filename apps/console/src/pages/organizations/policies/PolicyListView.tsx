@@ -611,7 +611,7 @@ function PolicyListViewContent({
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="py-12 text-center">
+                <td colSpan={6} className="py-12 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <h3 className="text-lg font-medium">No policies found</h3>
                     <p className="text-tertiary">
