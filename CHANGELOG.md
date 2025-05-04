@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Add ISO 27001 document header
+- Add policy downlaod
 
 ### Changed
 

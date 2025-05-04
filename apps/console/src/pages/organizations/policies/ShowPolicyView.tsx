@@ -214,7 +214,7 @@ function ShowPolicyContent({
         });
 
         // Reload the query to refresh the data
-        loadQuery({ policyId: policy.id });
+        loadQuery({ policyId: policy.id, organizationId: organizationId! });
       },
       onError: (error) => {
         toast({
@@ -242,7 +242,7 @@ function ShowPolicyContent({
       setIsVersionHistoryOpen(false);
       // Reload the query to refresh the data
       if (policy.id) {
-        loadQuery({ policyId: policy.id });
+        loadQuery({ policyId: policy.id, organizationId: organizationId! });
       }
     },
     [policy.id, loadQuery, toast],
