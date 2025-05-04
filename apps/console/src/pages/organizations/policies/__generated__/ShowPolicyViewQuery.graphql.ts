@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<351444982c4868267f30cc9fc8a2399a>>
+ * @generated SignedSource<<09afc0438feb0aa6a5a8a95f93d70951>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,6 +12,7 @@ import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type PolicyStatus = "DRAFT" | "PUBLISHED";
 export type ShowPolicyViewQuery$variables = {
+  organizationId: string;
   policyId: string;
 };
 export type ShowPolicyViewQuery$data = {
@@ -46,6 +47,9 @@ export type ShowPolicyViewQuery$data = {
     readonly updatedAt?: string;
     readonly " $fragmentSpreads": FragmentRefs<"SignaturesModal_policyVersions" | "VersionHistoryModal_policyVersions">;
   };
+  readonly organization: {
+    readonly name?: string;
+  };
 };
 export type ShowPolicyViewQuery = {
   response: ShowPolicyViewQuery$data;
@@ -53,70 +57,94 @@ export type ShowPolicyViewQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
+var v0 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "organizationId"
+},
+v1 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "policyId"
+},
+v2 = [
   {
-    "defaultValue": null,
-    "kind": "LocalArgument",
-    "name": "policyId"
+    "kind": "Variable",
+    "name": "id",
+    "variableName": "organizationId"
   }
 ],
-v1 = [
+v3 = {
+  "kind": "InlineFragment",
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "name",
+      "storageKey": null
+    }
+  ],
+  "type": "Organization",
+  "abstractKey": null
+},
+v4 = [
   {
     "kind": "Variable",
     "name": "id",
     "variableName": "policyId"
   }
 ],
-v2 = {
+v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v3 = {
+v6 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "title",
   "storageKey": null
 },
-v4 = {
+v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "description",
   "storageKey": null
 },
-v5 = {
+v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "createdAt",
   "storageKey": null
 },
-v6 = {
+v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "updatedAt",
   "storageKey": null
 },
-v7 = {
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "currentPublishedVersion",
   "storageKey": null
 },
-v8 = {
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "fullName",
   "storageKey": null
 },
-v9 = {
+v12 = {
   "alias": null,
   "args": null,
   "concreteType": "People",
@@ -124,8 +152,8 @@ v9 = {
   "name": "owner",
   "plural": false,
   "selections": [
-    (v2/*: any*/),
-    (v8/*: any*/),
+    (v5/*: any*/),
+    (v11/*: any*/),
     {
       "alias": null,
       "args": null,
@@ -136,70 +164,70 @@ v9 = {
   ],
   "storageKey": null
 },
-v10 = [
+v13 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 1
   }
 ],
-v11 = {
+v14 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "version",
   "storageKey": null
 },
-v12 = {
+v15 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "status",
   "storageKey": null
 },
-v13 = {
+v16 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "content",
   "storageKey": null
 },
-v14 = {
+v17 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "changelog",
   "storageKey": null
 },
-v15 = {
+v18 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "publishedAt",
   "storageKey": null
 },
-v16 = {
+v19 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v17 = [
-  (v8/*: any*/),
-  (v2/*: any*/)
+v20 = [
+  (v11/*: any*/),
+  (v5/*: any*/)
 ],
-v18 = {
+v21 = {
   "alias": null,
   "args": null,
   "concreteType": "People",
   "kind": "LinkedField",
   "name": "publishedBy",
   "plural": false,
-  "selections": (v17/*: any*/),
+  "selections": (v20/*: any*/),
   "storageKey": null
 },
-v19 = [
+v22 = [
   {
     "kind": "Literal",
     "name": "first",
@@ -208,29 +236,44 @@ v19 = [
 ];
 return {
   "fragment": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/)
+    ],
     "kind": "Fragment",
     "metadata": null,
     "name": "ShowPolicyViewQuery",
     "selections": [
       {
-        "alias": null,
-        "args": (v1/*: any*/),
+        "alias": "organization",
+        "args": (v2/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/),
+          (v3/*: any*/)
+        ],
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": (v4/*: any*/),
+        "concreteType": null,
+        "kind": "LinkedField",
+        "name": "node",
+        "plural": false,
+        "selections": [
+          (v5/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
-              (v3/*: any*/),
-              (v4/*: any*/),
-              (v5/*: any*/),
               (v6/*: any*/),
               (v7/*: any*/),
+              (v8/*: any*/),
               (v9/*: any*/),
+              (v10/*: any*/),
+              (v12/*: any*/),
               {
                 "args": null,
                 "kind": "FragmentSpread",
@@ -243,7 +286,7 @@ return {
               },
               {
                 "alias": "latestVersion",
-                "args": (v10/*: any*/),
+                "args": (v13/*: any*/),
                 "concreteType": "PolicyVersionConnection",
                 "kind": "LinkedField",
                 "name": "versions",
@@ -265,12 +308,12 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v2/*: any*/),
-                          (v11/*: any*/),
-                          (v12/*: any*/),
-                          (v13/*: any*/),
+                          (v5/*: any*/),
                           (v14/*: any*/),
                           (v15/*: any*/),
+                          (v16/*: any*/),
+                          (v17/*: any*/),
+                          (v18/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -279,12 +322,12 @@ return {
                             "name": "publishedBy",
                             "plural": false,
                             "selections": [
-                              (v8/*: any*/)
+                              (v11/*: any*/)
                             ],
                             "storageKey": null
                           },
-                          (v5/*: any*/),
-                          (v6/*: any*/)
+                          (v8/*: any*/),
+                          (v9/*: any*/)
                         ],
                         "storageKey": null
                       }
@@ -307,29 +350,46 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v1/*: any*/),
+      (v0/*: any*/)
+    ],
     "kind": "Operation",
     "name": "ShowPolicyViewQuery",
     "selections": [
       {
-        "alias": null,
-        "args": (v1/*: any*/),
+        "alias": "organization",
+        "args": (v2/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v16/*: any*/),
-          (v2/*: any*/),
+          (v19/*: any*/),
+          (v3/*: any*/),
+          (v5/*: any*/)
+        ],
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": (v4/*: any*/),
+        "concreteType": null,
+        "kind": "LinkedField",
+        "name": "node",
+        "plural": false,
+        "selections": [
+          (v19/*: any*/),
+          (v5/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
-              (v3/*: any*/),
-              (v4/*: any*/),
-              (v5/*: any*/),
               (v6/*: any*/),
               (v7/*: any*/),
+              (v8/*: any*/),
               (v9/*: any*/),
+              (v10/*: any*/),
+              (v12/*: any*/),
               {
                 "alias": "policyVersions",
                 "args": [
@@ -360,15 +420,15 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v2/*: any*/),
-                          (v11/*: any*/),
-                          (v12/*: any*/),
+                          (v5/*: any*/),
+                          (v14/*: any*/),
                           (v15/*: any*/),
-                          (v6/*: any*/),
                           (v18/*: any*/),
+                          (v9/*: any*/),
+                          (v21/*: any*/),
                           {
                             "alias": null,
-                            "args": (v19/*: any*/),
+                            "args": (v22/*: any*/),
                             "concreteType": "PolicyVersionSignatureConnection",
                             "kind": "LinkedField",
                             "name": "signatures",
@@ -390,7 +450,7 @@ return {
                                     "name": "node",
                                     "plural": false,
                                     "selections": [
-                                      (v2/*: any*/),
+                                      (v5/*: any*/),
                                       {
                                         "alias": null,
                                         "args": null,
@@ -419,7 +479,7 @@ return {
                                         "kind": "LinkedField",
                                         "name": "signedBy",
                                         "plural": false,
-                                        "selections": (v17/*: any*/),
+                                        "selections": (v20/*: any*/),
                                         "storageKey": null
                                       },
                                       {
@@ -429,10 +489,10 @@ return {
                                         "kind": "LinkedField",
                                         "name": "requestedBy",
                                         "plural": false,
-                                        "selections": (v17/*: any*/),
+                                        "selections": (v20/*: any*/),
                                         "storageKey": null
                                       },
-                                      (v16/*: any*/)
+                                      (v19/*: any*/)
                                     ],
                                     "storageKey": null
                                   },
@@ -476,7 +536,7 @@ return {
                           },
                           {
                             "alias": null,
-                            "args": (v19/*: any*/),
+                            "args": (v22/*: any*/),
                             "filters": null,
                             "handle": "connection",
                             "key": "SignaturesModal_policyVersions_signatures",
@@ -522,14 +582,14 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v2/*: any*/),
-                          (v11/*: any*/),
-                          (v12/*: any*/),
-                          (v13/*: any*/),
+                          (v5/*: any*/),
                           (v14/*: any*/),
                           (v15/*: any*/),
-                          (v6/*: any*/),
-                          (v18/*: any*/)
+                          (v16/*: any*/),
+                          (v17/*: any*/),
+                          (v18/*: any*/),
+                          (v9/*: any*/),
+                          (v21/*: any*/)
                         ],
                         "storageKey": null
                       }
@@ -541,7 +601,7 @@ return {
               },
               {
                 "alias": "latestVersion",
-                "args": (v10/*: any*/),
+                "args": (v13/*: any*/),
                 "concreteType": "PolicyVersionConnection",
                 "kind": "LinkedField",
                 "name": "versions",
@@ -563,15 +623,15 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v2/*: any*/),
-                          (v11/*: any*/),
-                          (v12/*: any*/),
-                          (v13/*: any*/),
+                          (v5/*: any*/),
                           (v14/*: any*/),
                           (v15/*: any*/),
+                          (v16/*: any*/),
+                          (v17/*: any*/),
                           (v18/*: any*/),
-                          (v5/*: any*/),
-                          (v6/*: any*/)
+                          (v21/*: any*/),
+                          (v8/*: any*/),
+                          (v9/*: any*/)
                         ],
                         "storageKey": null
                       }
@@ -591,16 +651,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "751e6cc23218ca2da7b5bf44d3eef59c",
+    "cacheID": "643b6f01d617d7f7fa6995afe4960c3c",
     "id": null,
     "metadata": {},
     "name": "ShowPolicyViewQuery",
     "operationKind": "query",
-    "text": "query ShowPolicyViewQuery(\n  $policyId: ID!\n) {\n  node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      title\n      description\n      createdAt\n      updatedAt\n      currentPublishedVersion\n      owner {\n        id\n        fullName\n        primaryEmailAddress\n      }\n      ...SignaturesModal_policyVersions\n      ...VersionHistoryModal_policyVersions\n      latestVersion: versions(first: 1) {\n        edges {\n          node {\n            id\n            version\n            status\n            content\n            changelog\n            publishedAt\n            publishedBy {\n              fullName\n              id\n            }\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n\nfragment SignaturesModal_policyVersions on Policy {\n  title\n  policyVersions: versions(first: 10) {\n    edges {\n      node {\n        id\n        version\n        status\n        publishedAt\n        updatedAt\n        publishedBy {\n          fullName\n          id\n        }\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n              signedAt\n              requestedAt\n              signedBy {\n                fullName\n                id\n              }\n              requestedBy {\n                fullName\n                id\n              }\n              __typename\n            }\n            cursor\n          }\n          pageInfo {\n            endCursor\n            hasNextPage\n          }\n        }\n      }\n    }\n  }\n}\n\nfragment VersionHistoryModal_policyVersions on Policy {\n  title\n  owner {\n    fullName\n    id\n  }\n  versionHistory: versions(first: 20) {\n    edges {\n      node {\n        id\n        version\n        status\n        content\n        changelog\n        publishedAt\n        updatedAt\n        publishedBy {\n          fullName\n          id\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ShowPolicyViewQuery(\n  $policyId: ID!\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      name\n    }\n    id\n  }\n  node(id: $policyId) {\n    __typename\n    id\n    ... on Policy {\n      title\n      description\n      createdAt\n      updatedAt\n      currentPublishedVersion\n      owner {\n        id\n        fullName\n        primaryEmailAddress\n      }\n      ...SignaturesModal_policyVersions\n      ...VersionHistoryModal_policyVersions\n      latestVersion: versions(first: 1) {\n        edges {\n          node {\n            id\n            version\n            status\n            content\n            changelog\n            publishedAt\n            publishedBy {\n              fullName\n              id\n            }\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n\nfragment SignaturesModal_policyVersions on Policy {\n  title\n  policyVersions: versions(first: 10) {\n    edges {\n      node {\n        id\n        version\n        status\n        publishedAt\n        updatedAt\n        publishedBy {\n          fullName\n          id\n        }\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n              signedAt\n              requestedAt\n              signedBy {\n                fullName\n                id\n              }\n              requestedBy {\n                fullName\n                id\n              }\n              __typename\n            }\n            cursor\n          }\n          pageInfo {\n            endCursor\n            hasNextPage\n          }\n        }\n      }\n    }\n  }\n}\n\nfragment VersionHistoryModal_policyVersions on Policy {\n  title\n  owner {\n    fullName\n    id\n  }\n  versionHistory: versions(first: 20) {\n    edges {\n      node {\n        id\n        version\n        status\n        content\n        changelog\n        publishedAt\n        updatedAt\n        publishedBy {\n          fullName\n          id\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "58adb8690071648aecb252b2f807ea7d";
+(node as any).hash = "56b534c0a468ccee10939c7d6c731bfd";
 
 export default node;

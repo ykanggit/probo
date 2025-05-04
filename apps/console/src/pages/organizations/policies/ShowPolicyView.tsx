@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState, useCallback, ReactNode } from "react";
+import { Suspense, useEffect, useState, useCallback, ReactNode, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import {
   graphql,
@@ -6,6 +6,7 @@ import {
   usePreloadedQuery,
   useQueryLoader,
   useMutation,
+  useFragment,
 } from "react-relay";
 import {
   Clock,
@@ -43,9 +44,18 @@ import {
 import { SignaturesModal } from "./SignaturesModal";
 import { VersionHistoryModal } from "./VersionHistoryModal";
 import rehypeRaw from "rehype-raw";
+import { createRoot } from "react-dom/client";
+import { policyVersionsFragment } from "./SignaturesModal";
+import type { SignaturesModal_policyVersions$key } from "./__generated__/SignaturesModal_policyVersions.graphql";
 
 const policyViewQuery = graphql`
-  query ShowPolicyViewQuery($policyId: ID!) {
+  query ShowPolicyViewQuery($policyId: ID!, $organizationId: ID!) {
+    organization: node(id: $organizationId) {
+      ... on Organization {
+        name
+      }
+    }
+
     node(id: $policyId) {
       id
       ... on Policy {
@@ -131,6 +141,7 @@ function ShowPolicyContent({
   );
   const policy = data.node;
   const { organizationId } = useParams();
+  
   const navigate = useNavigate();
   const { toast } = useToast();
   const [queryRef2, loadQuery] =
@@ -139,6 +150,7 @@ function ShowPolicyContent({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
   const [isSignaturesModalOpen, setIsSignaturesModalOpen] = useState(false);
+  const printContentRef = useRef<HTMLDivElement>(null);
 
   const [publishDraft, isPublishInFlight] =
     useMutation<ShowPolicyViewPublishMutation>(publishPolicyVersionMutation);
@@ -294,11 +306,179 @@ function ShowPolicyContent({
     return format(date, "MMM d, yyyy");
   };
 
+  // Get policy signatures data
+  const policyData = useFragment<SignaturesModal_policyVersions$key>(
+    policyVersionsFragment,
+    policy as unknown as SignaturesModal_policyVersions$key
+  );
+
+  // Handle PDF download
+  const handlePrintPDF = useCallback(() => {
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast({
+        title: "Error",
+        description: "Unable to open print window. Please check your browser settings.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Get version nodes and signatures from the fragment data we have
+    const versionNodes = policyData?.policyVersions?.edges?.map(edge => edge.node) || [];
+    const currentVersion = versionNodes.find(v => v.version === latestVersionNode?.version);
+    const signatures = currentVersion?.signatures?.edges?.map(edge => edge.node) || [];
+    
+    // Create temporary div to render and capture markdown
+    const tempDiv = document.createElement('div');
+    const root = createRoot(tempDiv);
+    
+    // Render the markdown content to HTML
+    root.render(
+      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+        {latestVersionNode?.content || 'No content available'}
+      </ReactMarkdown>
+    );
+    
+    // Give React a moment to render the content
+    setTimeout(() => {
+      const renderedMarkdown = tempDiv.innerHTML;
+
+      // Prepare signatures HTML
+      let signaturesHtml = '<p>No signatures yet</p>';
+      if (signatures.length > 0) {
+        signaturesHtml = `
+          <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+              <tr>
+                <th style="text-align: left; padding: 8px; border: 1px solid #ddd; background-color: #f2f2f2;">Name</th>
+                <th style="text-align: left; padding: 8px; border: 1px solid #ddd; background-color: #f2f2f2;">Status</th>
+                <th style="text-align: left; padding: 8px; border: 1px solid #ddd; background-color: #f2f2f2;">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${signatures.map(sig => `
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #ddd;">${sig.signedBy?.fullName || 'Unknown'}</td>
+                  <td style="padding: 8px; border: 1px solid #ddd;">${sig.state === 'SIGNED' ? 'Signed' : 'Pending'}</td>
+                  <td style="padding: 8px; border: 1px solid #ddd;">${sig.signedAt ? formatDate(sig.signedAt) : 'Not yet signed'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+      
+      // Create the print document content with the policy document data
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>${policy.title || 'Policy Document'}</title>
+            <style>
+              body { font-family: system-ui, -apple-system, sans-serif; margin: 40px; }
+              .header { margin-bottom: 30px; }
+              .content { margin-bottom: 40px; }
+              .footer { border-top: 1px solid #ccc; padding-top: 20px; }
+              .metadata { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 30px; background-color: #f9f9f9; padding: 15px; border-radius: 4px; }
+              .metadata-item { margin-bottom: 5px; }
+              .signature-title { margin-top: 20px; font-weight: bold; font-size: 1.2em; margin-bottom: 10px; }
+              h1 { font-size: 24px; margin-bottom: 20px; }
+              .company-name { font-size: 16px; color: #555; margin-bottom: 5px; }
+              
+              /* Markdown styles */
+              .content h1 { font-size: 1.8em; margin-top: 1em; margin-bottom: 0.5em; }
+              .content h2 { font-size: 1.5em; margin-top: 1em; margin-bottom: 0.5em; }
+              .content h3 { font-size: 1.3em; margin-top: 1em; margin-bottom: 0.5em; }
+              .content h4 { font-size: 1.2em; margin-top: 1em; margin-bottom: 0.5em; }
+              .content h5 { font-size: 1.1em; margin-top: 1em; margin-bottom: 0.5em; }
+              .content h6 { font-size: 1em; margin-top: 1em; margin-bottom: 0.5em; }
+              .content p { margin-bottom: 1em; line-height: 1.6; }
+              .content ul, .content ol { margin-bottom: 1em; padding-left: 2em; }
+              .content li { margin-bottom: 0.5em; }
+              .content blockquote { border-left: 4px solid #ccc; padding-left: 1em; margin-left: 0; }
+              .content pre { background: #f4f4f4; padding: 1em; overflow-x: auto; }
+              .content code { background: #f4f4f4; padding: 0.2em 0.4em; }
+              .content table { border-collapse: collapse; width: 100%; margin-bottom: 1em; }
+              .content th, .content td { border: 1px solid #ccc; padding: 0.5em; }
+              .content th { background: #f4f4f4; }
+              
+              @media print {
+                body { margin: 0; }
+                .page-break { page-break-after: always; }
+                /* Hide browser default headers and footers */
+                @page {
+                  margin: 0;
+                  size: auto;
+                }
+                html {
+                  background-color: #FFFFFF;
+                  margin: 0px;
+                }
+                body {
+                  margin: 40px;
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>${policy.title || 'Policy Document'}</h1>
+              <div class="metadata">
+                <div class="metadata-item"><strong>Version:</strong> ${latestVersionNode?.version || 'N/A'}</div>
+                <div class="metadata-item"><strong>Status:</strong> ${latestVersionNode?.status === 'PUBLISHED' ? 'Published' : 'Draft'}</div>
+                <div class="metadata-item"><strong>Published Date:</strong> ${latestVersionNode?.status === 'PUBLISHED' ? formatDate(latestVersionNode.publishedAt || '') : 'Not yet published'}</div>
+                <div class="metadata-item"><strong>Owner:</strong> ${policy.owner?.fullName || 'Unknown'}</div>
+                <div class="metadata-item"><strong>Last Modified:</strong> ${formatDate(latestVersionNode?.updatedAt)}</div>
+                <div class="metadata-item"><strong>Company:</strong> ${data.organization.name}</div>
+              </div>
+            </div>
+            <div class="content">
+              ${renderedMarkdown}
+            </div>
+            <div class="footer">
+              <div class="signature-title">Signatory</div>
+              ${signaturesHtml}
+            </div>
+          </body>
+        </html>
+      `);
+      
+      // Trigger print
+      printWindow.document.close();
+      printWindow.focus();
+      
+      // Use setTimeout to give the browser time to load any resources
+      setTimeout(() => {
+        printWindow.print();
+        // Optional: close the window after printing
+        // printWindow.close();
+      }, 500);
+      
+      // Clean up
+      root.unmount();
+    }, 100);
+    
+  }, [policy, latestVersionNode, formatDate, toast, policyData, data.organization.name!]);
+
   return (
     <PageTemplate
       title={policy.title!}
       actions={
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full h-9 px-3 gap-1.5 shadow-sm border-[#022A0214] bg-white text-[#141E12]"
+            onClick={handlePrintPDF}
+          >
+            <Download className="h-4 w-4" />
+            <span className="font-medium">Download PDF</span>
+          </Button>
+
           <Button
             variant="outline"
             size="sm"
@@ -473,11 +653,11 @@ function ShowPolicyContent({
 export default function ShowPolicyView() {
   const [queryRef, loadQuery] =
     useQueryLoader<ShowPolicyViewQuery>(policyViewQuery);
-  const { policyId } = useParams();
+  const { policyId, organizationId } = useParams();
 
   useEffect(() => {
-    loadQuery({ policyId: policyId! });
-  }, [loadQuery, policyId]);
+    loadQuery({ policyId: policyId!, organizationId: organizationId! });
+  }, [loadQuery, policyId, organizationId]);
 
   if (!queryRef) {
     return <ShowPolicyViewSkeleton />;
