@@ -1096,8 +1096,6 @@ function MeasureViewContent({
   };
 
   const handleLinkEvidenceSubmit = () => {
-    if (!taskForEvidence) return;
-
     // Validate form
     if (!linkEvidenceName.trim()) {
       toast({
@@ -1117,40 +1115,71 @@ function MeasureViewContent({
       return;
     }
 
-    // Get the evidence connection ID for this task
-    const evidenceConnectionId = getEvidenceConnectionId(taskForEvidence.id);
+    try {
+      console.log("Creating URI file with URL:", linkEvidenceUrl.trim());
+      
+      // Create a URI file with the link
+      const linkContent = linkEvidenceUrl.trim();
+      const fileName = `${linkEvidenceName.trim()}.uri`;
+      const file = new File([linkContent], fileName, { type: "text/uri-list" });
+      
+      console.log("File created:", file.name, file.type, file.size);
 
-    // Use a default description if none is provided
-    const description =
-      linkEvidenceDescription.trim() || `Link to ${linkEvidenceUrl}`;
+      // Show toast for add started
+      toast({
+        title: "Adding link evidence",
+        description: `Adding ${fileName}...`,
+        variant: "default",
+      });
 
-    // Use requestEvidence instead of createEvidence
-    requestEvidence({
-      variables: {
-        input: {
-          taskId: taskForEvidence.id,
-          name: linkEvidenceName,
-          type: "LINK",
-          description: description,
+      // Use the measure evidence connection ID
+      const evidenceConnectionId = getMeasureEvidenceConnectionId();
+      console.log("Evidence connection ID:", evidenceConnectionId);
+
+      // Upload the URI file as evidence
+      uploadMeasureEvidence({
+        variables: {
+          input: {
+            measureId: measureId,
+            file: null,
+          },
+          connections: evidenceConnectionId ? [evidenceConnectionId] : [],
         },
-        connections: evidenceConnectionId ? [evidenceConnectionId] : [],
-      },
-      onCompleted: () => {
-        setTaskForEvidence(null);
-        setEvidenceDialogOpen(false);
-        // Reset form fields
-        setLinkEvidenceName("");
-        setLinkEvidenceUrl("");
-        setLinkEvidenceDescription("");
-      },
-      onError: (error) => {
-        toast({
-          title: "Error adding link evidence",
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
+        uploadables: {
+          "input.file": file,
+        },
+        onCompleted: (response) => {
+          console.log("Upload completed:", response);
+          setTaskForEvidence(null);
+          setEvidenceDialogOpen(false);
+          // Reset form fields
+          setLinkEvidenceName("");
+          setLinkEvidenceUrl("");
+          setLinkEvidenceDescription("");
+          
+          toast({
+            title: "Link evidence added",
+            description: "Link evidence has been added successfully.",
+            variant: "default",
+          });
+        },
+        onError: (error) => {
+          console.error("Error uploading URI file:", error);
+          toast({
+            title: "Error adding link evidence",
+            description: error.message || "Unknown error occurred",
+            variant: "destructive",
+          });
+        },
+      });
+    } catch (error) {
+      console.error("Error in handleLinkEvidenceSubmit:", error);
+      toast({
+        title: "Error creating URI file",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>, taskId: string) => {
@@ -1245,7 +1274,7 @@ function MeasureViewContent({
 
   // Function to get file icon based on mime type and evidence type
   const getFileIcon = (mimeType: string, evidenceType: string) => {
-    if (evidenceType === "LINK") {
+    if (evidenceType === "LINK" || mimeType === "text/uri-list" || mimeType === "text/uri") {
       return <Link2 className="w-4 h-4 text-blue-600" />;
     } else if (mimeType.startsWith("image/")) {
       return <Image className="w-4 h-4 text-blue-500" />;
@@ -1257,6 +1286,20 @@ function MeasureViewContent({
       return <FileText className="w-4 h-4 text-green-600" />;
     } else {
       return <FileGeneric className="w-4 h-4 text-secondary" />;
+    }
+  };
+
+  // Function to get URL from URI file
+  const getUrlFromUriFile = async (fileUrl: string): Promise<string | null> => {
+    try {
+      const response = await fetch(fileUrl);
+      const text = await response.text();
+      // URI files typically have the URL on the first line
+      const firstLine = text.trim().split('\n')[0];
+      return firstLine || null;
+    } catch (error) {
+      console.error("Error extracting URL from URI file:", error);
+      return null;
     }
   };
 
@@ -1285,6 +1328,20 @@ function MeasureViewContent({
             if (!prev) return null;
             return { ...prev, fileUrl: data.node!.fileUrl };
           });
+          
+          // If it's a URI file, fetch and extract the URL
+          if (evidence.mimeType === "text/uri-list" || evidence.mimeType === "text/uri") {
+            getUrlFromUriFile(data.node!.fileUrl!)
+              .then((url) => {
+                if (url) {
+                  window.open(url, "_blank");
+                  setIsPreviewModalOpen(false);
+                }
+              })
+              .catch((error) => {
+                console.error("Error handling URI file:", error);
+              });
+          }
         } else {
           throw new Error("File URL not available in response");
         }
@@ -1379,7 +1436,14 @@ function MeasureViewContent({
   };
 
   const handleFulfillEvidenceWithLink = () => {
-    if (!evidenceToFulfill) return;
+    if (!evidenceToFulfill) {
+      toast({
+        title: "Error",
+        description: "No evidence to fulfill",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Validate URL
     if (!linkEvidenceUrl.trim()) {
@@ -1391,44 +1455,83 @@ function MeasureViewContent({
       return;
     }
 
-    // Get connection ID for the parent task
-    const task = tasks.find((task) =>
-      task.evidences?.edges.some(
-        (edge) => edge?.node?.id === evidenceToFulfill.id
-      )
-    );
+    try {
+      console.log("Creating URI file to fulfill evidence:", evidenceToFulfill.id);
+      
+      // Create a URI file with the link
+      const linkContent = linkEvidenceUrl.trim();
+      // Use provided name or fallback to the original filename
+      const baseName = linkEvidenceName.trim() 
+        ? linkEvidenceName.trim() 
+        : evidenceToFulfill.filename.replace(/\.[^/.]+$/, "");
+      const fileName = `${baseName}.uri`;
+      const file = new File([linkContent], fileName, { type: "text/uri-list" });
+      
+      console.log("File created:", file.name, file.type, file.size);
 
-    const evidenceConnectionId = task?.id
-      ? getEvidenceConnectionId(task.id)
-      : null;
+      // Get connection ID for the parent task
+      const task = tasks.find((task) =>
+        task.evidences?.edges.some(
+          (edge) => edge?.node?.id === evidenceToFulfill.id
+        )
+      );
 
-    fulfillEvidence({
-      variables: {
-        input: {
-          evidenceId: evidenceToFulfill.id,
-          url: linkEvidenceUrl,
+      const evidenceConnectionId = task?.id
+        ? getEvidenceConnectionId(task.id)
+        : getMeasureEvidenceConnectionId();
+        
+      console.log("Using connection ID:", evidenceConnectionId);
+      console.log("Task found:", task?.id);
+
+      // Show toast for upload started
+      toast({
+        title: "Fulfilling evidence with link",
+        description: `Creating link file for ${fileName}...`,
+        variant: "default",
+      });
+
+      // Upload the URI file to fulfill the evidence
+      fulfillEvidence({
+        variables: {
+          input: {
+            evidenceId: evidenceToFulfill.id,
+            file: null,
+          },
+          connections: evidenceConnectionId ? [evidenceConnectionId] : [],
         },
-        connections: evidenceConnectionId ? [evidenceConnectionId] : [],
-      },
-      onCompleted: () => {
-        setFulfillEvidenceDialogOpen(false);
-        setEvidenceToFulfill(null);
-        setLinkEvidenceUrl("");
-        setLinkEvidenceDescription("");
-        toast({
-          title: "Evidence updated",
-          description: "Evidence has been fulfilled with link successfully.",
-          variant: "default",
-        });
-      },
-      onError: (error) => {
-        toast({
-          title: "Error updating evidence",
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
+        uploadables: {
+          "input.file": file,
+        },
+        onCompleted: (response) => {
+          console.log("Evidence fulfilled successfully:", response);
+          setFulfillEvidenceDialogOpen(false);
+          setEvidenceToFulfill(null);
+          setLinkEvidenceName("");
+          setLinkEvidenceUrl("");
+          setLinkEvidenceDescription("");
+          toast({
+            title: "Evidence fulfilled",
+            description: "Evidence has been fulfilled with link successfully.",
+            variant: "default",
+          });
+        },
+        onError: (error) => {
+          console.error("Error fulfilling evidence:", error);
+          toast({
+            title: "Error fulfilling evidence",
+            description: error.message || "Unknown error occurred",
+            variant: "destructive",
+          });
+        },
+      });
+    } catch (error) {
+      console.error("Error in handleFulfillEvidenceWithLink:", error);
+      toast({
+        title: "Error creating URI file",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   const confirmDeleteEvidence = () => {
@@ -2222,10 +2325,15 @@ function MeasureViewContent({
                               </div>
                             </td>
                             <td className="py-3 px-4 text-sm">
-                              {evidence.type === "FILE" ? "Document" : "Link"}
+                              {evidence.type === "FILE" ? 
+                                (evidence.mimeType === "text/uri-list" || evidence.mimeType === "text/uri" ? 
+                                  "Link" : "Document") : 
+                                  "Link"}
                             </td>
                             <td className="py-3 px-4 text-sm">
-                              {evidence.type === "FILE" ? formatFileSize(evidence.size) : "-"}
+                              {evidence.type === "FILE" && 
+                               !(evidence.mimeType === "text/uri-list" || evidence.mimeType === "text/uri") ? 
+                                formatFileSize(evidence.size) : "-"}
                             </td>
                             <td className="py-3 px-4 text-sm">
                               {formatDate(evidence.createdAt)}
@@ -2247,7 +2355,15 @@ function MeasureViewContent({
                                   </button>
                                 ) : evidence.type === "FILE" ? (
                                   <>
-                                    {evidence.mimeType.startsWith("image/") ? (
+                                    {evidence.mimeType === "text/uri-list" || evidence.mimeType === "text/uri" ? (
+                                      <button
+                                        onClick={() => handlePreviewEvidence(evidence)}
+                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                        title="Open Link"
+                                      >
+                                        <Link2 className="w-4 h-4 text-blue-600" />
+                                      </button>
+                                    ) : evidence.mimeType.startsWith("image/") ? (
                                       <button
                                         onClick={() => handlePreviewEvidence(evidence)}
                                         className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
@@ -2438,6 +2554,17 @@ function MeasureViewContent({
             <TabsContent value="link" className="space-y-4 pt-4">
               <div className="space-y-4">
                 <div className="grid w-full items-center gap-1.5">
+                  <Label htmlFor="evidence-name">Name</Label>
+                  <Input
+                    id="evidence-name"
+                    value={linkEvidenceName}
+                    onChange={(e) => setLinkEvidenceName(e.target.value)}
+                    placeholder="Link name"
+                    type="text"
+                  />
+                </div>
+                
+                <div className="grid w-full items-center gap-1.5">
                   <Label htmlFor="evidence-url">URL</Label>
                   <Input
                     id="evidence-url"
@@ -2446,6 +2573,9 @@ function MeasureViewContent({
                     placeholder="https://example.com"
                     type="url"
                   />
+                  <p className="text-xs text-secondary">
+                    This will create a .uri file with the URL inside
+                  </p>
                 </div>
 
                 <div className="grid w-full items-center gap-1.5">
@@ -2472,7 +2602,7 @@ function MeasureViewContent({
               Cancel
             </Button>
             {activeTab === "link" && (
-              <Button onClick={handleLinkEvidenceSubmit}>Add Link</Button>
+              <Button onClick={handleLinkEvidenceSubmit}>Create URI File</Button>
             )}
           </DialogFooter>
         </DialogContent>
@@ -2670,27 +2800,31 @@ function MeasureViewContent({
             <TabsContent value="link" className="space-y-4 pt-4">
               <div className="space-y-4">
                 <div className="grid w-full items-center gap-1.5">
-                  <Label htmlFor="evidence-url">URL</Label>
+                  <Label htmlFor="fulfill-evidence-name">Name</Label>
                   <Input
-                    id="evidence-url"
+                    id="fulfill-evidence-name"
+                    value={linkEvidenceName}
+                    onChange={(e) => setLinkEvidenceName(e.target.value)}
+                    placeholder="Link name (optional)"
+                    type="text"
+                  />
+                  <p className="text-xs text-secondary">
+                    Optional - will use evidence name if not provided
+                  </p>
+                </div>
+                
+                <div className="grid w-full items-center gap-1.5">
+                  <Label htmlFor="fulfill-evidence-url">URL</Label>
+                  <Input
+                    id="fulfill-evidence-url"
                     value={linkEvidenceUrl}
                     onChange={(e) => setLinkEvidenceUrl(e.target.value)}
                     placeholder="https://example.com"
                     type="url"
                   />
-                </div>
-
-                <div className="grid w-full items-center gap-1.5">
-                  <Label htmlFor="evidence-description">
-                    Description (optional)
-                  </Label>
-                  <Textarea
-                    id="evidence-description"
-                    value={linkEvidenceDescription}
-                    onChange={(e) => setLinkEvidenceDescription(e.target.value)}
-                    placeholder="Describe this evidence (optional)"
-                    className="min-h-[100px]"
-                  />
+                  <p className="text-xs text-secondary">
+                    This will create a .uri file with the URL inside
+                  </p>
                 </div>
               </div>
             </TabsContent>
@@ -2705,7 +2839,7 @@ function MeasureViewContent({
             </Button>
             {activeTab === "link" && (
               <Button onClick={handleFulfillEvidenceWithLink}>
-                Submit Link
+                Create URI File
               </Button>
             )}
           </DialogFooter>
