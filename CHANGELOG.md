@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Enable HTML support in Markdown renderer
+
 ## [0.22.0] - 2025-05-04
 
 ### Added
