@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.22.0] - 2025-05-04
+
 ### Added
 
 - Show owner of the policy in list
