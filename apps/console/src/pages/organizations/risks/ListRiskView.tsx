@@ -56,7 +56,7 @@ const RISK_CATEGORIES = [
   "Reputational",
   "Strategic",
   "Technology",
-  "Other"
+  "Other",
 ] as const;
 
 const listRiskViewQuery = graphql`
@@ -138,19 +138,21 @@ const deleteRiskMutation = graphql`
 // Helper function to convert risk score to risk level
 const calculateRiskLevel = (score: number): string => {
   if (score >= 15) return "High";
-  if (score >= 8) return "Medium"; 
+  if (score >= 8) return "Medium";
   return "Low";
 };
 
 // Helper function to get color for risk level that matches the matrix colors
-const getRiskLevelColor = (level: string): {backgroundColor: string, color: string} => {
-  switch(level) {
+const getRiskLevelColor = (
+  level: string,
+): { backgroundColor: string; color: string } => {
+  switch (level) {
     case "High":
-      return {backgroundColor: "#ef4444", color: "#ffffff"}; // red-500
+      return { backgroundColor: "#ef4444", color: "#ffffff" }; // red-500
     case "Medium":
-      return {backgroundColor: "#fcd34d", color: "#000000"}; // yellow-300  
+      return { backgroundColor: "#fcd34d", color: "#000000" }; // yellow-300
     default:
-      return {backgroundColor: "#22c55e", color: "#ffffff"}; // green-500
+      return { backgroundColor: "#22c55e", color: "#ffffff" }; // green-500
   }
 };
 
@@ -234,7 +236,6 @@ const emptyRiskMatrixColors = {
   high: "bg-red-50 text-black",
 };
 
-
 // Risk Matrix Component
 function RiskMatrix({
   risks,
@@ -278,10 +279,10 @@ function RiskMatrix({
   const getCellContent = (impactValue: number, likelihoodValue: number) => {
     return risks.filter((risk) => {
       const likelihood = isResidual
-        ? risk.residualLikelihood ?? risk.inherentLikelihood
+        ? (risk.residualLikelihood ?? risk.inherentLikelihood)
         : risk.inherentLikelihood;
       const impact = isResidual
-        ? risk.residualImpact ?? risk.inherentImpact
+        ? (risk.residualImpact ?? risk.inherentImpact)
         : risk.inherentImpact;
 
       return likelihood === likelihoodValue && impact === impactValue;
@@ -298,13 +299,37 @@ function RiskMatrix({
     // This follows the 5x5 grid with rows representing impact (5 to 1) and columns representing likelihood (1 to 5)
     const colorMatrix = [
       // Impact 5 (Catastrophic) - first row
-      [colorSet.low, colorSet.medium, colorSet.high, colorSet.high, colorSet.high],
+      [
+        colorSet.low,
+        colorSet.medium,
+        colorSet.high,
+        colorSet.high,
+        colorSet.high,
+      ],
       // Impact 4 (Significant) - second row
-      [colorSet.low, colorSet.medium, colorSet.medium, colorSet.high, colorSet.high],
+      [
+        colorSet.low,
+        colorSet.medium,
+        colorSet.medium,
+        colorSet.high,
+        colorSet.high,
+      ],
       // Impact 3 (Moderate) - third row
-      [colorSet.low, colorSet.low, colorSet.medium, colorSet.medium, colorSet.high],
+      [
+        colorSet.low,
+        colorSet.low,
+        colorSet.medium,
+        colorSet.medium,
+        colorSet.high,
+      ],
       // Impact 2 (Low) - fourth row
-      [colorSet.low, colorSet.low, colorSet.low, colorSet.medium, colorSet.medium],
+      [
+        colorSet.low,
+        colorSet.low,
+        colorSet.low,
+        colorSet.medium,
+        colorSet.medium,
+      ],
       // Impact 1 (Negligible) - fifth row
       [colorSet.low, colorSet.low, colorSet.low, colorSet.low, colorSet.low],
     ];
@@ -373,11 +398,14 @@ function RiskMatrix({
             <div className="text-sm pt-1 border-t border-gray-200 mt-1">
               <span className="text-muted-foreground">Risk Level:</span>
               <span className="font-bold ml-1">
-                {calculateRiskLevel(impactValue * likelihoodValue)} ({impactValue * likelihoodValue})
+                {calculateRiskLevel(impactValue * likelihoodValue)} (
+                {impactValue * likelihoodValue})
               </span>
               <span
                 className="ml-2 px-2 py-0.5 text-xs rounded-full font-medium inline-block"
-                style={getRiskLevelColor(calculateRiskLevel(impactValue * likelihoodValue))}
+                style={getRiskLevelColor(
+                  calculateRiskLevel(impactValue * likelihoodValue),
+                )}
               >
                 {calculateRiskLevel(impactValue * likelihoodValue)}
               </span>
@@ -393,15 +421,15 @@ function RiskMatrix({
                     key={risk.id}
                     className="text-sm border-l-2 pl-2"
                     style={{
-                      borderColor:
-                        getRiskLevelColor(
-                          calculateRiskLevel(
-                            isResidual
-                              ? (risk.residualImpact || risk.inherentImpact) *
-                                (risk.residualLikelihood || risk.inherentLikelihood)
-                              : risk.inherentImpact * risk.inherentLikelihood
-                          )
-                        ).backgroundColor
+                      borderColor: getRiskLevelColor(
+                        calculateRiskLevel(
+                          isResidual
+                            ? (risk.residualImpact || risk.inherentImpact) *
+                                (risk.residualLikelihood ||
+                                  risk.inherentLikelihood)
+                            : risk.inherentImpact * risk.inherentLikelihood,
+                        ),
+                      ).backgroundColor,
                     }}
                   >
                     <Link
@@ -516,7 +544,9 @@ function ListRiskViewContent({
   const [showResidualRisk, setShowResidualRisk] = useState(false);
 
   // State for category filters
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
+    new Set(),
+  );
 
   // Setup delete mutation
   const [commitDeleteMutation] =
@@ -540,16 +570,19 @@ function ListRiskViewContent({
   const connectionId = risksConnection?.risks?.__id;
 
   // Get unique categories from existing risks
-  const availableCategories = Array.from(new Set(risks.map(risk => risk.category))).sort();
+  const availableCategories = Array.from(
+    new Set(risks.map((risk) => risk.category)),
+  ).sort();
 
   // Filter risks based on selected categories
-  const filteredRisks = selectedCategories.size === 0 
-    ? risks 
-    : risks.filter(risk => selectedCategories.has(risk.category));
+  const filteredRisks =
+    selectedCategories.size === 0
+      ? risks
+      : risks.filter((risk) => selectedCategories.has(risk.category));
 
   // Handle category toggle
   const toggleCategory = (category: string) => {
-    setSelectedCategories(prev => {
+    setSelectedCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(category)) {
         newSet.delete(category);
@@ -761,9 +794,16 @@ function ListRiskViewContent({
                           >
                             <span
                               className="px-2 py-0.5 text-xs rounded-full font-medium inline-block"
-                              style={getRiskLevelColor(calculateRiskLevel(risk.inherentLikelihood * risk.inherentImpact))}
+                              style={getRiskLevelColor(
+                                calculateRiskLevel(
+                                  risk.inherentLikelihood * risk.inherentImpact,
+                                ),
+                              )}
                             >
-                              {calculateRiskLevel(risk.inherentLikelihood * risk.inherentImpact)} ({risk.inherentLikelihood * risk.inherentImpact})
+                              {calculateRiskLevel(
+                                risk.inherentLikelihood * risk.inherentImpact,
+                              )}{" "}
+                              ({risk.inherentLikelihood * risk.inherentImpact})
                             </span>
                           </Link>
                         </td>
@@ -783,9 +823,18 @@ function ListRiskViewContent({
                             {risk.residualLikelihood && risk.residualImpact ? (
                               <span
                                 className="px-2 py-0.5 text-xs rounded-full font-medium inline-block"
-                                style={getRiskLevelColor(calculateRiskLevel(risk.residualLikelihood * risk.residualImpact))}
+                                style={getRiskLevelColor(
+                                  calculateRiskLevel(
+                                    risk.residualLikelihood *
+                                      risk.residualImpact,
+                                  ),
+                                )}
                               >
-                                {calculateRiskLevel(risk.residualLikelihood * risk.residualImpact)} ({risk.residualLikelihood * risk.residualImpact})
+                                {calculateRiskLevel(
+                                  risk.residualLikelihood * risk.residualImpact,
+                                )}{" "}
+                                ({risk.residualLikelihood * risk.residualImpact}
+                                )
                               </span>
                             ) : (
                               "Not set"

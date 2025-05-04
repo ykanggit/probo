@@ -66,7 +66,7 @@ export default function PeopleSelector({
               <SelectItem key={edge.node.id} value={edge.node.id}>
                 {edge.node.fullName} ({edge.node.primaryEmailAddress})
               </SelectItem>
-            )
+            ),
         )}
       </SelectContent>
     </Select>

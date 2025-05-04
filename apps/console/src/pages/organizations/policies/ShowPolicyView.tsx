@@ -7,7 +7,15 @@ import {
   useQueryLoader,
   useMutation,
 } from "react-relay";
-import { Clock, Download, Edit, Trash2, MoreHorizontal, X, FileSignature } from "lucide-react";
+import {
+  Clock,
+  Download,
+  Edit,
+  Trash2,
+  MoreHorizontal,
+  X,
+  FileSignature,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { PageTemplate } from "@/components/PageTemplate";
@@ -15,7 +23,7 @@ import type { ShowPolicyViewQuery } from "./__generated__/ShowPolicyViewQuery.gr
 import { ShowPolicyViewPublishMutation } from "./__generated__/ShowPolicyViewPublishMutation.graphql";
 import { ShowPolicyViewCreateDraftMutation } from "./__generated__/ShowPolicyViewCreateDraftMutation.graphql";
 import ReactMarkdown from "react-markdown";
-import remarkGfm from 'remark-gfm'
+import remarkGfm from "remark-gfm";
 import { ShowPolicyViewSkeleton } from "./ShowPolicyPage";
 import { format } from "date-fns";
 import {
@@ -96,7 +104,9 @@ const publishPolicyVersionMutation = graphql`
 `;
 
 const createDraftPolicyVersionMutation = graphql`
-  mutation ShowPolicyViewCreateDraftMutation($input: CreateDraftPolicyVersionInput!) {
+  mutation ShowPolicyViewCreateDraftMutation(
+    $input: CreateDraftPolicyVersionInput!
+  ) {
     createDraftPolicyVersion(input: $input) {
       policyVersionEdge {
         node {
@@ -114,29 +124,36 @@ function ShowPolicyContent({
 }: {
   queryRef: PreloadedQuery<ShowPolicyViewQuery>;
 }) {
-  const data = usePreloadedQuery<ShowPolicyViewQuery>(policyViewQuery, queryRef);
+  const data = usePreloadedQuery<ShowPolicyViewQuery>(
+    policyViewQuery,
+    queryRef,
+  );
   const policy = data.node;
   const { organizationId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [queryRef2, loadQuery] = useQueryLoader<ShowPolicyViewQuery>(policyViewQuery);
+  const [queryRef2, loadQuery] =
+    useQueryLoader<ShowPolicyViewQuery>(policyViewQuery);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
   const [isSignaturesModalOpen, setIsSignaturesModalOpen] = useState(false);
 
-  const [publishDraft, isPublishInFlight] = useMutation<ShowPolicyViewPublishMutation>(publishPolicyVersionMutation);
-  const [createDraft, isCreateDraftInFlight] = useMutation<ShowPolicyViewCreateDraftMutation>(createDraftPolicyVersionMutation);
-  
+  const [publishDraft, isPublishInFlight] =
+    useMutation<ShowPolicyViewPublishMutation>(publishPolicyVersionMutation);
+  const [createDraft, isCreateDraftInFlight] =
+    useMutation<ShowPolicyViewCreateDraftMutation>(
+      createDraftPolicyVersionMutation,
+    );
+
   const latestVersionEdge = policy.latestVersion?.edges[0];
   const latestVersionNode = latestVersionEdge?.node;
-  
+
   const isDraft = latestVersionNode?.status === "DRAFT";
 
   useEffect(() => {
     // No need to update selectedVersion state since we're using the VersionHistoryModal component
   }, []);
-  
 
   // Handle delete policy
   const handleDeletePolicy = useCallback(() => {
@@ -157,32 +174,32 @@ function ShowPolicyContent({
       navigate(`/organizations/${organizationId}/policies`);
     }, 1000);
   }, [toast, navigate, organizationId]);
-  
+
   // Navigate to publish flow
   const handlePublish = useCallback(() => {
     if (!policy.id) return;
-    
+
     publishDraft({
       variables: {
         input: {
-          policyId: policy.id
-        }
+          policyId: policy.id,
+        },
       },
       onCompleted: (_, errors) => {
         if (errors) {
           toast({
             title: "Error publishing policy",
             description: errors[0]?.message || "An unknown error occurred",
-            variant: "destructive"
+            variant: "destructive",
           });
           return;
         }
-        
+
         toast({
           title: "Policy published",
           description: `The policy has been published successfully`,
         });
-        
+
         // Reload the query to refresh the data
         loadQuery({ policyId: policy.id });
       },
@@ -190,9 +207,9 @@ function ShowPolicyContent({
         toast({
           title: "Error publishing policy",
           description: error.message || "An unknown error occurred",
-          variant: "destructive"
+          variant: "destructive",
         });
-      }
+      },
     });
   }, [policy.id, publishDraft, toast, loadQuery]);
 
@@ -202,18 +219,21 @@ function ShowPolicyContent({
   }, []);
 
   // Restore version
-  const handleRestoreVersion = useCallback((versionNumber: number) => {
-    // Here you would implement the logic to restore a version
-    toast({
-      title: "Version restored",
-      description: `Version ${versionNumber} has been restored`,
-    });
-    setIsVersionHistoryOpen(false);
-    // Reload the query to refresh the data
-    if (policy.id) {
-      loadQuery({ policyId: policy.id });
-    }
-  }, [policy.id, loadQuery, toast]);
+  const handleRestoreVersion = useCallback(
+    (versionNumber: number) => {
+      // Here you would implement the logic to restore a version
+      toast({
+        title: "Version restored",
+        description: `Version ${versionNumber} has been restored`,
+      });
+      setIsVersionHistoryOpen(false);
+      // Reload the query to refresh the data
+      if (policy.id) {
+        loadQuery({ policyId: policy.id });
+      }
+    },
+    [policy.id, loadQuery, toast],
+  );
 
   // Handle edit policy
   const handleEditPolicy = useCallback(() => {
@@ -224,35 +244,47 @@ function ShowPolicyContent({
       createDraft({
         variables: {
           input: {
-            policyID: policy.id
-          }
+            policyID: policy.id,
+          },
         },
         onCompleted: (response, errors) => {
           if (errors) {
             toast({
               title: "Error creating draft",
               description: errors[0]?.message || "An unknown error occurred",
-              variant: "destructive"
+              variant: "destructive",
             });
             return;
           }
-          
-          const newDraftId = response.createDraftPolicyVersion.policyVersionEdge.node.id;
-          navigate(`/organizations/${organizationId}/policies/${policy.id}/versions/${newDraftId}/edit`);
+
+          const newDraftId =
+            response.createDraftPolicyVersion.policyVersionEdge.node.id;
+          navigate(
+            `/organizations/${organizationId}/policies/${policy.id}/versions/${newDraftId}/edit`,
+          );
         },
         onError: (error) => {
           toast({
             title: "Error creating draft",
             description: error.message || "An unknown error occurred",
-            variant: "destructive"
+            variant: "destructive",
           });
-        }
+        },
       });
     } else {
       // Navigate directly to edit if it's already a draft
-      navigate(`/organizations/${organizationId}/policies/${policy.id}/versions/${latestVersionNode?.id}/edit`);
+      navigate(
+        `/organizations/${organizationId}/policies/${policy.id}/versions/${latestVersionNode?.id}/edit`,
+      );
     }
-  }, [policy.id, latestVersionNode, createDraft, navigate, organizationId, toast]);
+  }, [
+    policy.id,
+    latestVersionNode,
+    createDraft,
+    navigate,
+    organizationId,
+    toast,
+  ]);
 
   // Format date helper
   const formatDate = (dateString?: string) => {
@@ -265,7 +297,7 @@ function ShowPolicyContent({
     <PageTemplate
       title={policy.title!}
       actions={
-        <div className="flex items-center gap-2">          
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -285,7 +317,7 @@ function ShowPolicyContent({
             <FileSignature className="h-4 w-4" />
             <span className="font-medium">Signature history</span>
           </Button>
-          
+
           {isDraft && (
             <Button
               variant="default"
@@ -297,7 +329,7 @@ function ShowPolicyContent({
               <span className="font-medium">Publish version</span>
             </Button>
           )}
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -312,10 +344,12 @@ function ShowPolicyContent({
               <DropdownMenuItem asChild>
                 <div onClick={handleEditPolicy}>
                   <Edit className="mr-2 h-4 w-4" />
-                  {latestVersionNode?.status === "PUBLISHED" ? "Create new draft" : "Edit draft policy"}
+                  {latestVersionNode?.status === "PUBLISHED"
+                    ? "Create new draft"
+                    : "Edit draft policy"}
                 </div>
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={handleDeletePolicy}
                 className="text-danger focus:text-danger focus:bg-danger-bg"
               >
@@ -326,42 +360,44 @@ function ShowPolicyContent({
           </DropdownMenu>
         </div>
       }
-    >        
-        <div className="space-y-4">
-          {latestVersionNode ? (
-            <div className="bg-white rounded-lg border border-solid-b shadow-sm p-6">
-              {latestVersionNode.changelog && (
-                <div className="mb-6 p-4 bg-level-1 rounded-md border border-solid-b">
-                  <div className="text-xs text-tertiary uppercase font-medium mb-1">Change summary</div>
-                  <div className="text-sm text-secondary">
-                    {latestVersionNode.changelog}
-                  </div>
+    >
+      <div className="space-y-4">
+        {latestVersionNode ? (
+          <div className="bg-white rounded-lg border border-solid-b shadow-sm p-6">
+            {latestVersionNode.changelog && (
+              <div className="mb-6 p-4 bg-level-1 rounded-md border border-solid-b">
+                <div className="text-xs text-tertiary uppercase font-medium mb-1">
+                  Change summary
                 </div>
-              )}
-              
-              <div className="prose prose-olive max-w-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {latestVersionNode.content || "No content available"}
-                </ReactMarkdown>
-              </div>
-              
-              <div className="mt-8 pt-4 border-t border-solid-b text-xs text-tertiary flex justify-between items-center">
-                <div>
-                  {latestVersionNode.status === "PUBLISHED" 
-                    ? `Published on ${formatDate(latestVersionNode.publishedAt || "")}${latestVersionNode.publishedBy ? ` by ${latestVersionNode.publishedBy.fullName}` : ''}` 
-                    : `Last modified on ${formatDate(latestVersionNode.updatedAt)} by ${policy.owner?.fullName || 'Unknown'}`}
+                <div className="text-sm text-secondary">
+                  {latestVersionNode.changelog}
                 </div>
               </div>
+            )}
+
+            <div className="prose prose-olive max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {latestVersionNode.content || "No content available"}
+              </ReactMarkdown>
             </div>
-          ) : (
-            <div className="bg-white rounded-lg border border-solid-b shadow-sm p-6 text-center text-tertiary">
-              No content available
+
+            <div className="mt-8 pt-4 border-t border-solid-b text-xs text-tertiary flex justify-between items-center">
+              <div>
+                {latestVersionNode.status === "PUBLISHED"
+                  ? `Published on ${formatDate(latestVersionNode.publishedAt || "")}${latestVersionNode.publishedBy ? ` by ${latestVersionNode.publishedBy.fullName}` : ""}`
+                  : `Last modified on ${formatDate(latestVersionNode.updatedAt)} by ${policy.owner?.fullName || "Unknown"}`}
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg border border-solid-b shadow-sm p-6 text-center text-tertiary">
+            No content available
+          </div>
+        )}
+      </div>
 
       {/* Signatures Modal */}
-      <SignaturesModal 
+      <SignaturesModal
         isOpen={isSignaturesModalOpen}
         onClose={() => setIsSignaturesModalOpen(false)}
         policyRef={policy}
@@ -382,7 +418,8 @@ function ShowPolicyContent({
           <DialogHeader>
             <DialogTitle>Delete Policy</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete the policy "{policy.title}"? This action cannot be undone.
+              Are you sure you want to delete the policy "{policy.title}"? This
+              action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -408,7 +445,8 @@ function ShowPolicyContent({
 }
 
 export default function ShowPolicyView() {
-  const [queryRef, loadQuery] = useQueryLoader<ShowPolicyViewQuery>(policyViewQuery);
+  const [queryRef, loadQuery] =
+    useQueryLoader<ShowPolicyViewQuery>(policyViewQuery);
   const { policyId } = useParams();
 
   useEffect(() => {

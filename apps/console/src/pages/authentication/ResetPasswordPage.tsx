@@ -78,7 +78,7 @@ export default function ResetPasswordPage() {
             token: token.trim(),
             password: password,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
       setError(
         error instanceof Error
           ? error.message
-          : "Failed to reset password. Please try again."
+          : "Failed to reset password. Please try again.",
       );
     } finally {
       setIsLoading(false);

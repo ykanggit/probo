@@ -148,7 +148,7 @@ function PeopleListContent({
 }) {
   const data = usePreloadedQuery<PeopleListViewQueryType>(
     peopleListViewQuery,
-    queryRef
+    queryRef,
   );
   const [, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
@@ -217,10 +217,10 @@ function PeopleListContent({
                     {person?.kind === "EMPLOYEE"
                       ? "Employee"
                       : person?.kind === "CONTRACTOR"
-                      ? "Contractor"
-                      : person?.kind === "SERVICE_ACCOUNT"
-                      ? "Service Account"
-                      : "Vendor"}
+                        ? "Contractor"
+                        : person?.kind === "SERVICE_ACCOUNT"
+                          ? "Service Account"
+                          : "Vendor"}
                   </Badge>
                   <Button
                     variant="ghost"
@@ -230,7 +230,7 @@ function PeopleListContent({
                       e.preventDefault();
                       if (
                         window.confirm(
-                          "Are you sure you want to delete this person?"
+                          "Are you sure you want to delete this person?",
                         )
                       ) {
                         deletePeople({

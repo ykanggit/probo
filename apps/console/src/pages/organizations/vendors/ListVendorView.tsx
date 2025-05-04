@@ -75,7 +75,10 @@ const vendorListFragment = graphql`
           websiteUrl
           createdAt
           updatedAt
-          riskAssessments(first: 1, orderBy: { direction: DESC, field: ASSESSED_AT }) {
+          riskAssessments(
+            first: 1
+            orderBy: { direction: DESC, field: ASSESSED_AT }
+          ) {
             edges {
               node {
                 id
@@ -191,7 +194,7 @@ function ListVendorContent({
   const { toast } = useToast();
   const data = usePreloadedQuery<ListVendorViewQuery>(
     listVendorViewQuery,
-    queryRef
+    queryRef,
   );
   const [, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
@@ -263,18 +266,18 @@ function ListVendorContent({
   // Helper to format date (similar to "Mon, 8 Mar. 2025" in the design)
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
   };
 
   // Get favicon URL from website URL
   const getFaviconUrl = (websiteUrl: string | null | undefined) => {
     if (!websiteUrl) return null;
-    
+
     try {
       const url = new URL(websiteUrl);
       return `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
@@ -304,14 +307,14 @@ function ListVendorContent({
   // Get risk assessment status
   const getRiskAssessmentStatus = (vendor: any) => {
     const latestAssessment = vendor.riskAssessments?.edges[0]?.node;
-    
+
     if (!latestAssessment) {
       return {
         status: "NEEDED",
         dataSensitivity: null,
         businessImpact: null,
         isExpired: false,
-        assessedAt: null
+        assessedAt: null,
       };
     }
 
@@ -324,7 +327,7 @@ function ListVendorContent({
       dataSensitivity: latestAssessment.dataSensitivity,
       businessImpact: latestAssessment.businessImpact,
       isExpired,
-      assessedAt: latestAssessment.assessedAt
+      assessedAt: latestAssessment.assessedAt,
     };
   };
 
@@ -410,12 +413,12 @@ function ListVendorContent({
                   >
                     <div className="flex items-center gap-2">
                       {vendor.websiteUrl && (
-                        <img 
-                          src={getFaviconUrl(vendor.websiteUrl) || ''} 
-                          alt="" 
+                        <img
+                          src={getFaviconUrl(vendor.websiteUrl) || ""}
+                          alt=""
                           className="w-4 h-4"
                           onError={(e) => {
-                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.style.display = "none";
                           }}
                         />
                       )}
@@ -450,7 +453,8 @@ function ListVendorContent({
                 >
                   <div className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
-                    <span className="font-medium">Create new vendor:</span> {searchTerm}
+                    <span className="font-medium">Create new vendor:</span>{" "}
+                    {searchTerm}
                   </div>
                 </button>
               </div>
@@ -538,7 +542,9 @@ function ListVendorContent({
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8 bg-white">
                         {(() => {
-                          const faviconUrl = vendor.websiteUrl ? getFaviconUrl(vendor.websiteUrl) : null;
+                          const faviconUrl = vendor.websiteUrl
+                            ? getFaviconUrl(vendor.websiteUrl)
+                            : null;
                           return faviconUrl ? (
                             <AvatarImage src={faviconUrl} alt={vendor.name} />
                           ) : (
@@ -564,7 +570,9 @@ function ListVendorContent({
                         Assessment expired
                       </Badge>
                     ) : (
-                      <Badge className={`${getRiskBadgeStyle(riskStatus.dataSensitivity)} font-medium text-xs px-2 py-1 rounded-md`}>
+                      <Badge
+                        className={`${getRiskBadgeStyle(riskStatus.dataSensitivity)} font-medium text-xs px-2 py-1 rounded-md`}
+                      >
                         {riskStatus.dataSensitivity || "NONE"}
                       </Badge>
                     )}
@@ -579,13 +587,17 @@ function ListVendorContent({
                         Assessment expired
                       </Badge>
                     ) : (
-                      <Badge className={`${getRiskBadgeStyle(riskStatus.businessImpact)} font-medium text-xs px-2 py-1 rounded-md`}>
+                      <Badge
+                        className={`${getRiskBadgeStyle(riskStatus.businessImpact)} font-medium text-xs px-2 py-1 rounded-md`}
+                      >
                         {riskStatus.businessImpact || "LOW"}
                       </Badge>
                     )}
                   </td>
                   <td className="py-4 px-4">
-                    {riskStatus.assessedAt ? formatDate(riskStatus.assessedAt) : "N/A"}
+                    {riskStatus.assessedAt
+                      ? formatDate(riskStatus.assessedAt)
+                      : "N/A"}
                   </td>
                   <td className="py-4 px-4 text-right">
                     <DropdownMenu>
@@ -605,7 +617,7 @@ function ListVendorContent({
                             e.preventDefault();
                             if (
                               window.confirm(
-                                "Are you sure you want to delete this vendor?"
+                                "Are you sure you want to delete this vendor?",
                               )
                             ) {
                               deleteVendor({

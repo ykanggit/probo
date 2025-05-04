@@ -23,7 +23,7 @@ const navItems = [
 ];
 
 export function NavSecondary(
-  props: React.ComponentPropsWithoutRef<typeof SidebarGroup>
+  props: React.ComponentPropsWithoutRef<typeof SidebarGroup>,
 ) {
   return (
     <SidebarGroup {...props}>

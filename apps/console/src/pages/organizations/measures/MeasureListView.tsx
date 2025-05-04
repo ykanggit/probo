@@ -121,7 +121,7 @@ function MeasureListContent({
 }) {
   const data = usePreloadedQuery<MeasureListViewQueryType>(
     measureListViewQuery,
-    queryRef
+    queryRef,
   ) as unknown as OrganizationData;
 
   const { organizationId } = useParams();
@@ -129,14 +129,15 @@ function MeasureListContent({
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
 
-  const [importMeasure] =
-    useMutation<MeasureListViewImportMeasureMutationType>(importMeasureMutation);
+  const [importMeasure] = useMutation<MeasureListViewImportMeasureMutationType>(
+    importMeasureMutation,
+  );
 
   // Monitor URL hash for changes and update state accordingly
   const [initialHashCategory] = useState(() =>
     window.location.hash.substring(1)
       ? decodeURIComponent(window.location.hash.substring(1))
-      : ""
+      : "",
   );
 
   // Keep track of manually expanded categories
@@ -202,10 +203,10 @@ function MeasureListContent({
 
   // Calculate global progress
   const implementedCount = processedMeasures.filter(
-    (measure: Measure) => measure.status === "complete"
+    (measure: Measure) => measure.status === "complete",
   ).length;
   const notApplicableCount = processedMeasures.filter(
-    (measure: Measure) => measure.status === "not-applicable"
+    (measure: Measure) => measure.status === "not-applicable",
   ).length;
   const totalMeasures = processedMeasures.length;
 
@@ -223,7 +224,7 @@ function MeasureListContent({
       }
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 
   // Group measures by category
@@ -236,7 +237,7 @@ function MeasureListContent({
       acc[measure.category].push(measure);
       return acc;
     },
-    {} as Record<string, Measure[]>
+    {} as Record<string, Measure[]>,
   );
 
   // Function to toggle a category's expanded state
@@ -253,10 +254,10 @@ function MeasureListContent({
   const categories: Category[] = Object.entries(measuresByCategory)
     .map(([categoryName, categoryMeasures]: [string, Measure[]]) => {
       const catImplementedCount = categoryMeasures.filter(
-        (measure) => measure.status === "complete"
+        (measure) => measure.status === "complete",
       ).length;
       const catNotApplicableCount = categoryMeasures.filter(
-        (measure) => measure.status === "not-applicable"
+        (measure) => measure.status === "not-applicable",
       ).length;
       // Consider both "complete" and "not-applicable" as done for category progress
       const catDoneCount = catImplementedCount + catNotApplicableCount;
@@ -271,7 +272,7 @@ function MeasureListContent({
         description: `Measures related to ${categoryName.toLowerCase()}`,
         progress: progress,
         measures: categoryMeasures.sort((a, b) =>
-          (a.name || "").localeCompare(b.name || "")
+          (a.name || "").localeCompare(b.name || ""),
         ),
         doneCount: catDoneCount,
         totalCount: catTotalCount,
@@ -308,7 +309,7 @@ function MeasureListContent({
         connections: [
           ConnectionHandler.getConnectionID(
             data.organization.id,
-            "MeasureListView_measures"
+            "MeasureListView_measures",
           ),
         ],
         input: {
@@ -591,28 +592,28 @@ function MeasureListContent({
                                               </p>
                                               <p>
                                                 {measure.description.startsWith(
-                                                  "##"
+                                                  "##",
                                                 )
                                                   ? measure.description
                                                       .split("\n")
                                                       .find((line) =>
                                                         line.startsWith(
-                                                          "## Why"
-                                                        )
+                                                          "## Why",
+                                                        ),
                                                       )
                                                       ?.replace("## Why?", "")
                                                       ?.replace("## Why", "")
                                                       ?.trim() ||
                                                     measure.description.split(
-                                                      "\n"
+                                                      "\n",
                                                     )[1] ||
                                                     ""
                                                   : measure.description.substring(
                                                       0,
-                                                      180
+                                                      180,
                                                     ) +
-                                                    (measure.description.length >
-                                                    180
+                                                    (measure.description
+                                                      .length > 180
                                                       ? "..."
                                                       : "")}
                                               </p>

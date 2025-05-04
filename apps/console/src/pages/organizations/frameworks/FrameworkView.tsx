@@ -39,7 +39,7 @@ function FrameworkViewContent({
 }) {
   const data = usePreloadedQuery<FrameworkViewQuery>(
     frameworkViewQuery,
-    queryRef
+    queryRef,
   );
 
   if (!data?.node) {

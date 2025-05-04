@@ -75,7 +75,7 @@ function FrameworkLayoutViewContent({
 
   // Setup delete mutation
   const [commitDeleteMutation] = useMutation<FrameworkLayoutViewDeleteMutation>(
-    DeleteFrameworkMutation
+    DeleteFrameworkMutation,
   );
 
   const handleDeleteFramework = useCallback(() => {
@@ -83,7 +83,7 @@ function FrameworkLayoutViewContent({
 
     const connectionId = ConnectionHandler.getConnectionID(
       organizationId!,
-      "FrameworkListView_frameworks"
+      "FrameworkListView_frameworks",
     );
 
     commitDeleteMutation({
@@ -189,7 +189,7 @@ function FrameworkLayoutViewContent({
 export default function FrameworkLayoutView() {
   const { frameworkId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<FrameworkLayoutViewQueryType>(
-    FrameworkLayoutViewQuery
+    FrameworkLayoutViewQuery,
   );
 
   useEffect(() => {

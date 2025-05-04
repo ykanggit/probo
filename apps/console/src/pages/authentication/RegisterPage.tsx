@@ -39,7 +39,7 @@ export default function RegisterPage() {
           },
           credentials: "include",
           body: JSON.stringify({ email, password, fullName }),
-        }
+        },
       );
 
       if (!response.ok) {

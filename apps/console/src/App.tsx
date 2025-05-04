@@ -26,7 +26,7 @@ posthog.init(process.env.POSTHOG_KEY!, {
 });
 
 const OrganizationSelectionPage = lazy(
-  () => import("./pages/OrganizationSelectionPage")
+  () => import("./pages/OrganizationSelectionPage"),
 );
 
 function App() {

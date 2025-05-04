@@ -89,7 +89,7 @@ function FrameworkListViewContent({
 export default function FrameworkListView() {
   const { organizationId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<FrameworkListViewQueryType>(
-    FrameworkListViewQuery
+    FrameworkListViewQuery,
   );
 
   if (!queryRef) {

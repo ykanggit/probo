@@ -40,7 +40,7 @@ export function FrameworkImportDropdown() {
   const [loadingFramework, setLoadingFramework] = useState<string | null>(null);
   const [commit, isInFlight] =
     useMutation<ImportFrameworkDialogImportFrameworkMutation>(
-      importFrameworkMutation
+      importFrameworkMutation,
     );
 
   const handleImport = async (frameworkId: string) => {
@@ -56,12 +56,12 @@ export function FrameworkImportDropdown() {
         `${frameworkId}.json`,
         {
           type: "application/json",
-        }
+        },
       );
 
       const connectionId = ConnectionHandler.getConnectionID(
         organizationId!,
-        "FrameworkListView_frameworks"
+        "FrameworkListView_frameworks",
       );
 
       commit({

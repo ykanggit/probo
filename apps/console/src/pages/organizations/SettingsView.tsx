@@ -42,7 +42,6 @@ import type { SettingsViewRemoveUserMutation as SettingsViewRemoveUserMutationTy
 import { PageTemplate } from "@/components/PageTemplate";
 import { SettingsViewSkeleton } from "./SettingsPage";
 
-
 interface AvailableConnector {
   id: string;
   name: string;
@@ -120,7 +119,8 @@ function SettingsViewContent({
   const data = usePreloadedQuery(settingsViewQuery, queryRef);
   const organization = data.organization;
   const users = organization.users?.edges.map((edge) => edge.node) || [];
-  const connectors = organization.connectors?.edges.map((edge) => edge.node) || [];
+  const connectors =
+    organization.connectors?.edges.map((edge) => edge.node) || [];
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -130,26 +130,36 @@ function SettingsViewContent({
   const [inviteFullName, setInviteFullName] = useState("");
   const [isInviting, setIsInviting] = useState(false);
   const [organizationName, setOrganizationName] = useState(
-    organization.name || ""
+    organization.name || "",
   );
   const [isUploading, setIsUploading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
 
-  // Available connectors 
+  // Available connectors
   const availableConnectors: AvailableConnector[] = [
-    { id: "github", name: "GitHub", type: "oauth2", description: "Connect to GitHub repositories and issues" },
-    { id: "slack", name: "Slack", type: "oauth2", description: "Connect to Slack workspace and channels" },
+    {
+      id: "github",
+      name: "GitHub",
+      type: "oauth2",
+      description: "Connect to GitHub repositories and issues",
+    },
+    {
+      id: "slack",
+      name: "Slack",
+      type: "oauth2",
+      description: "Connect to Slack workspace and channels",
+    },
   ];
 
   // Filter out connectors that are already connected
   const connectedConnectorIds = connectors.map((connector) => connector.name);
   const notConnectedConnectors = availableConnectors.filter(
-    (connector) => !connectedConnectorIds.includes(connector.id)
+    (connector) => !connectedConnectorIds.includes(connector.id),
   );
 
   const [updateOrganization] =
     useMutation<SettingsViewUpdateOrganizationMutationType>(
-      updateOrganizationMutation
+      updateOrganizationMutation,
     );
 
   const [inviteUser] =
@@ -161,7 +171,7 @@ function SettingsViewContent({
   const { organizationId } = useParams();
   const [, loadQuery] =
     useQueryLoader<SettingsViewQueryType>(settingsViewQuery);
-    
+
   const handleUpdateName = () => {
     updateOrganization({
       variables: {
@@ -490,7 +500,9 @@ function SettingsViewContent({
             <div className="space-y-6">
               {connectors.length > 0 && (
                 <div>
-                  <h3 className="mb-4 text-sm font-medium">Connected services</h3>
+                  <h3 className="mb-4 text-sm font-medium">
+                    Connected services
+                  </h3>
                   <div className="space-y-4">
                     {connectors.map((connector) => (
                       <div
@@ -506,7 +518,10 @@ function SettingsViewContent({
                               {connector.name}
                             </span>
                             <span className="text-sm text-tertiary">
-                              {connector.type} · Connected on {new Date(connector.createdAt).toLocaleDateString()}
+                              {connector.type} · Connected on{" "}
+                              {new Date(
+                                connector.createdAt,
+                              ).toLocaleDateString()}
                             </span>
                           </div>
                         </div>
@@ -518,7 +533,9 @@ function SettingsViewContent({
 
               {notConnectedConnectors.length > 0 && (
                 <div>
-                  <h3 className="mb-4 text-sm font-medium">Available services</h3>
+                  <h3 className="mb-4 text-sm font-medium">
+                    Available services
+                  </h3>
                   <div className="space-y-4">
                     {notConnectedConnectors.map((connector) => (
                       <div
@@ -541,11 +558,25 @@ function SettingsViewContent({
                         <div className="flex items-center gap-2">
                           <a
                             href={(() => {
-                              const baseUrl = process.env.API_SERVER_HOST || window.location.origin;
-                              const url = new URL('/api/console/v1/connectors/initiate', baseUrl);
-                              url.searchParams.append('organization_id', organization.id);
-                              url.searchParams.append('connector_id', connector.id);
-                              url.searchParams.append('continue', window.location.href);
+                              const baseUrl =
+                                process.env.API_SERVER_HOST ||
+                                window.location.origin;
+                              const url = new URL(
+                                "/api/console/v1/connectors/initiate",
+                                baseUrl,
+                              );
+                              url.searchParams.append(
+                                "organization_id",
+                                organization.id,
+                              );
+                              url.searchParams.append(
+                                "connector_id",
+                                connector.id,
+                              );
+                              url.searchParams.append(
+                                "continue",
+                                window.location.href,
+                              );
                               return url.toString();
                             })()}
                             className="inline-flex items-center justify-center h-9 px-3 text-sm font-medium rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
@@ -559,17 +590,21 @@ function SettingsViewContent({
                 </div>
               )}
 
-              {connectors.length === 0 && notConnectedConnectors.length === 0 && (
-                <div className="flex flex-col items-center justify-center p-8 text-center">
-                  <div className="rounded-full bg-subtle-bg p-3">
-                    <Building2 className="h-6 w-6 text-tertiary" />
+              {connectors.length === 0 &&
+                notConnectedConnectors.length === 0 && (
+                  <div className="flex flex-col items-center justify-center p-8 text-center">
+                    <div className="rounded-full bg-subtle-bg p-3">
+                      <Building2 className="h-6 w-6 text-tertiary" />
+                    </div>
+                    <h3 className="mt-4 text-lg font-medium">
+                      No integrations available
+                    </h3>
+                    <p className="mt-2 text-sm text-tertiary">
+                      There are currently no integrations available for your
+                      workspace.
+                    </p>
                   </div>
-                  <h3 className="mt-4 text-lg font-medium">No integrations available</h3>
-                  <p className="mt-2 text-sm text-tertiary">
-                    There are currently no integrations available for your workspace.
-                  </p>
-                </div>
-              )}
+                )}
             </div>
           </CardContent>
         </Card>

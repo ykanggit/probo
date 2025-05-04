@@ -86,7 +86,7 @@ function EditableField({
           }
           className={cn(
             "w-full resize-none",
-            required && !value && "border-red-500"
+            required && !value && "border-red-500",
           )}
           placeholder={`Enter ${label.toLowerCase()}`}
           rows={4}
@@ -133,7 +133,7 @@ function EditFrameworkViewContent({
 
   const [commit, isInFlight] =
     useMutation<EditFrameworkViewUpdateFrameworkMutation>(
-      updateFrameworkMutation
+      updateFrameworkMutation,
     );
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {

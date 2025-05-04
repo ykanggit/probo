@@ -31,7 +31,7 @@ const BreadCrumbNavLink = ({
             className={cn(
               "text-quaternary",
               isActive && "text-primary",
-              className
+              className,
             )}
           >
             {children}

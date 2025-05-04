@@ -37,7 +37,7 @@ export function FrameworkLayoutViewSkeleton() {
 
 export function FrameworkLayout() {
   const match = useMatch(
-    "organizations/:organizationId/frameworks/:frameworkId/*"
+    "organizations/:organizationId/frameworks/:frameworkId/*",
   );
 
   return (

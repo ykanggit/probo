@@ -211,19 +211,21 @@ const deleteRiskPolicyMappingMutation = graphql`
 // Helper function to convert risk score to risk level
 const calculateRiskLevel = (score: number): string => {
   if (score >= 15) return "High";
-  if (score >= 8) return "Medium"; 
+  if (score >= 8) return "Medium";
   return "Low";
 };
 
 // Helper function to get color for risk level that matches the matrix colors
-const getRiskLevelColor = (level: string): {backgroundColor: string, color: string} => {
-  switch(level) {
+const getRiskLevelColor = (
+  level: string,
+): { backgroundColor: string; color: string } => {
+  switch (level) {
     case "High":
-      return {backgroundColor: "#ef4444", color: "#ffffff"}; // red-500
+      return { backgroundColor: "#ef4444", color: "#ffffff" }; // red-500
     case "Medium":
-      return {backgroundColor: "#fcd34d", color: "#000000"}; // yellow-300  
+      return { backgroundColor: "#fcd34d", color: "#000000" }; // yellow-300
     default:
-      return {backgroundColor: "#22c55e", color: "#ffffff"}; // green-500
+      return { backgroundColor: "#22c55e", color: "#ffffff" }; // green-500
   }
 };
 
@@ -245,26 +247,46 @@ function getLikelihoodLabel(likelihood: number): {
   if (likelihood === 5)
     return {
       label: "Frequent (5)",
-      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
+      style: {
+        backgroundColor: "#fff",
+        color: "black",
+        border: "1px solid #e2e8f0",
+      },
     };
   if (likelihood === 4)
     return {
       label: "Probable (4)",
-      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
+      style: {
+        backgroundColor: "#fff",
+        color: "black",
+        border: "1px solid #e2e8f0",
+      },
     };
   if (likelihood === 3)
     return {
       label: "Occasional (3)",
-      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
+      style: {
+        backgroundColor: "#fff",
+        color: "black",
+        border: "1px solid #e2e8f0",
+      },
     };
   if (likelihood === 2)
     return {
       label: "Remote (2)",
-      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
+      style: {
+        backgroundColor: "#fff",
+        color: "black",
+        border: "1px solid #e2e8f0",
+      },
     };
   return {
     label: "Improbable (1)",
-    style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
+    style: {
+      backgroundColor: "#fff",
+      color: "black",
+      border: "1px solid #e2e8f0",
+    },
   };
 }
 
@@ -275,26 +297,46 @@ function getImpactLabel(impact: number): {
   if (impact === 5)
     return {
       label: "Catastrophic (5)",
-      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
+      style: {
+        backgroundColor: "#fff",
+        color: "black",
+        border: "1px solid #e2e8f0",
+      },
     };
   if (impact === 4)
     return {
       label: "Significant (4)",
-      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
+      style: {
+        backgroundColor: "#fff",
+        color: "black",
+        border: "1px solid #e2e8f0",
+      },
     };
   if (impact === 3)
     return {
       label: "Moderate (3)",
-      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
+      style: {
+        backgroundColor: "#fff",
+        color: "black",
+        border: "1px solid #e2e8f0",
+      },
     };
   if (impact === 2)
     return {
       label: "Low (2)",
-      style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
+      style: {
+        backgroundColor: "#fff",
+        color: "black",
+        border: "1px solid #e2e8f0",
+      },
     };
   return {
     label: "Negligible (1)",
-    style: { backgroundColor: "#fff", color: "black", border: "1px solid #e2e8f0" },
+    style: {
+      backgroundColor: "#fff",
+      color: "black",
+      border: "1px solid #e2e8f0",
+    },
   };
 }
 
@@ -307,7 +349,7 @@ function ShowRiskViewContent({
 }) {
   const data = usePreloadedQuery<ShowRiskViewQuery>(
     showRiskViewQuery,
-    queryRef
+    queryRef,
   );
   const { toast } = useToast();
   const environment = useRelayEnvironment();
@@ -317,14 +359,14 @@ function ShowRiskViewContent({
   const risk = data.node;
   const severity = getRiskSeverity(
     risk.inherentLikelihood!,
-    risk.inherentImpact!
+    risk.inherentImpact!,
   );
 
   // Fix typing for measures
   const measures = risk.measures?.edges?.map((edge) => edge.node) || [];
   const residualSeverity = getRiskSeverity(
     risk.residualLikelihood!,
-    risk.residualImpact!
+    risk.residualImpact!,
   );
 
   // Fix typing for policies
@@ -340,9 +382,9 @@ function ShowRiskViewContent({
   const [measureSearchQuery, setMeasureSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [isLoadingMeasures, setIsLoadingMeasures] = useState(false);
-  const [linkingMeasures, setLinkingMeasures] = useState<Record<string, boolean>>(
-    {}
-  );
+  const [linkingMeasures, setLinkingMeasures] = useState<
+    Record<string, boolean>
+  >({});
   const [unlinkingMeasures, setUnlinkingMeasures] = useState<
     Record<string, boolean>
   >({});
@@ -363,21 +405,21 @@ function ShowRiskViewContent({
   // Setup mutation hooks
   const [createRiskMeasureMapping] =
     useMutation<ShowRiskViewCreateRiskMeasureMappingMutation>(
-      createRiskMeasureMappingMutation
+      createRiskMeasureMappingMutation,
     );
   const [deleteRiskMeasureMapping] =
     useMutation<ShowRiskViewDeleteRiskMeasureMappingMutation>(
-      deleteRiskMeasureMappingMutation
+      deleteRiskMeasureMappingMutation,
     );
 
   // Setup policy mutation hooks
   const [createRiskPolicyMapping] =
     useMutation<ShowRiskViewCreateRiskPolicyMappingMutation>(
-      createRiskPolicyMappingMutation
+      createRiskPolicyMappingMutation,
     );
   const [deleteRiskPolicyMapping] =
     useMutation<ShowRiskViewDeleteRiskPolicyMappingMutation>(
-      deleteRiskPolicyMappingMutation
+      deleteRiskPolicyMappingMutation,
     );
 
   // Clear filters when dialog closes
@@ -411,7 +453,7 @@ function ShowRiskViewContent({
       organizationMeasuresQuery,
       {
         organizationId,
-      }
+      },
     ).subscribe({
       next: (data) => {
         setOrganizationMeasuresData(data);
@@ -441,7 +483,7 @@ function ShowRiskViewContent({
       organizationPoliciesQuery,
       {
         organizationId,
-      }
+      },
     ).subscribe({
       next: (data) => {
         setOrganizationPoliciesData(data);
@@ -463,7 +505,7 @@ function ShowRiskViewContent({
   const getMeasures = useCallback(() => {
     if (!organizationMeasuresData?.organization?.measures?.edges) return [];
     return organizationMeasuresData.organization.measures.edges.map(
-      (edge) => edge.node
+      (edge) => edge.node,
     );
   }, [organizationMeasuresData]);
 
@@ -508,7 +550,7 @@ function ShowRiskViewContent({
   const getPolicies = useCallback(() => {
     if (!organizationPoliciesData?.organization?.policies?.edges) return [];
     return organizationPoliciesData.organization.policies.edges.map(
-      (edge) => edge.node
+      (edge) => edge.node,
     );
   }, [organizationPoliciesData]);
 
@@ -531,7 +573,7 @@ function ShowRiskViewContent({
         NonNullable<
           ShowRiskViewOrganizationMeasuresQuery$data["organization"]
         >["measures"]
-      >["edges"][0]["node"]
+      >["edges"][0]["node"],
     ) => {
       if (!risk.id) return;
 
@@ -593,7 +635,7 @@ function ShowRiskViewContent({
         },
       });
     },
-    [risk.id, createRiskMeasureMapping, toast, environment, loadQuery]
+    [risk.id, createRiskMeasureMapping, toast, environment, loadQuery],
   );
 
   // Handle unlinking a measure from this risk
@@ -603,7 +645,7 @@ function ShowRiskViewContent({
         NonNullable<
           ShowRiskViewOrganizationMeasuresQuery$data["organization"]
         >["measures"]
-      >["edges"][0]["node"]
+      >["edges"][0]["node"],
     ) => {
       if (!risk.id) return;
 
@@ -665,7 +707,7 @@ function ShowRiskViewContent({
         },
       });
     },
-    [risk.id, deleteRiskMeasureMapping, toast, environment, loadQuery]
+    [risk.id, deleteRiskMeasureMapping, toast, environment, loadQuery],
   );
 
   // Handle linking a policy to this risk
@@ -675,7 +717,7 @@ function ShowRiskViewContent({
         NonNullable<
           ShowRiskViewOrganizationPoliciesQuery$data["organization"]
         >["policies"]
-      >["edges"][0]["node"]
+      >["edges"][0]["node"],
     ) => {
       if (!risk.id) return;
 
@@ -737,7 +779,7 @@ function ShowRiskViewContent({
         },
       });
     },
-    [risk.id, createRiskPolicyMapping, toast, environment, loadQuery]
+    [risk.id, createRiskPolicyMapping, toast, environment, loadQuery],
   );
 
   // Handle unlinking a policy from this risk
@@ -747,7 +789,7 @@ function ShowRiskViewContent({
         NonNullable<
           ShowRiskViewOrganizationPoliciesQuery$data["organization"]
         >["policies"]
-      >["edges"][0]["node"]
+      >["edges"][0]["node"],
     ) => {
       if (!risk.id) return;
 
@@ -809,7 +851,7 @@ function ShowRiskViewContent({
         },
       });
     },
-    [risk.id, deleteRiskPolicyMapping, toast, environment, loadQuery]
+    [risk.id, deleteRiskPolicyMapping, toast, environment, loadQuery],
   );
 
   return (
@@ -890,7 +932,7 @@ function ShowRiskViewContent({
                       <span className="w-3 h-3 rounded-full bg-orange-500 mr-2"></span>
                       Initial Assessment
                     </h4>
-                    
+
                     <div className="flex items-center">
                       <div
                         className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
@@ -900,23 +942,24 @@ function ShowRiskViewContent({
                       >
                         {getLikelihoodLabel(risk.inherentLikelihood!).label}
                       </div>
-                      
+
                       <span className="mx-4 text-xl">×</span>
-                      
+
                       <div
                         className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
                         style={getImpactLabel(risk.inherentImpact!).style}
                       >
                         {getImpactLabel(risk.inherentImpact!).label}
                       </div>
-                      
+
                       <span className="mx-4 text-xl">=</span>
-                      
+
                       <div
                         className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
                         style={severity.style}
                       >
-                        {severity.level} ({risk.inherentLikelihood! * risk.inherentImpact!})
+                        {severity.level} (
+                        {risk.inherentLikelihood! * risk.inherentImpact!})
                       </div>
                     </div>
                   </div>
@@ -927,7 +970,7 @@ function ShowRiskViewContent({
                       <span className="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
                       After Treatment
                     </h4>
-                    
+
                     <div className="flex items-center">
                       <div
                         className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
@@ -937,23 +980,24 @@ function ShowRiskViewContent({
                       >
                         {getLikelihoodLabel(risk.residualLikelihood!).label}
                       </div>
-                      
+
                       <span className="mx-4 text-xl">×</span>
-                      
+
                       <div
                         className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
                         style={getImpactLabel(risk.residualImpact!).style}
                       >
                         {getImpactLabel(risk.residualImpact!).label}
                       </div>
-                      
+
                       <span className="mx-4 text-xl">=</span>
-                      
+
                       <div
                         className="px-5 py-2 rounded-md font-medium text-sm flex justify-center items-center whitespace-nowrap"
                         style={residualSeverity.style}
                       >
-                        {residualSeverity.level} ({risk.residualLikelihood! * risk.residualImpact!})
+                        {residualSeverity.level} (
+                        {risk.residualLikelihood! * risk.residualImpact!})
                       </div>
                     </div>
                   </div>
@@ -964,7 +1008,16 @@ function ShowRiskViewContent({
                   risk.inherentImpact !== risk.residualImpact) && (
                   <div className="mt-6 text-center pt-4 border-t">
                     <p className="text-sm text-slate-600">
-                      Risk severity reduced from <span className="font-semibold">{severity.level} ({risk.inherentLikelihood! * risk.inherentImpact!})</span> to <span className="font-semibold">{residualSeverity.level} ({risk.residualLikelihood! * risk.residualImpact!})</span>
+                      Risk severity reduced from{" "}
+                      <span className="font-semibold">
+                        {severity.level} (
+                        {risk.inherentLikelihood! * risk.inherentImpact!})
+                      </span>{" "}
+                      to{" "}
+                      <span className="font-semibold">
+                        {residualSeverity.level} (
+                        {risk.residualLikelihood! * risk.residualImpact!})
+                      </span>
                       {risk.treatment === "MITIGATED" &&
                         risk.measures?.edges &&
                         risk.measures.edges.length > 0 &&
@@ -987,9 +1040,7 @@ function ShowRiskViewContent({
               <CardTitle>Note</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-sm max-w-none">
-                {risk.note}
-              </div>
+              <div className="prose prose-sm max-w-none">{risk.note}</div>
             </CardContent>
           </Card>
         )}
@@ -1153,7 +1204,10 @@ function ShowRiskViewContent({
         </Tabs>
 
         {/* Dialog for linking measures */}
-        <Dialog open={isMeasureDialogOpen} onOpenChange={setIsMeasureDialogOpen}>
+        <Dialog
+          open={isMeasureDialogOpen}
+          onOpenChange={setIsMeasureDialogOpen}
+        >
           <DialogContent className="max-w-3xl">
             <DialogHeader>
               <div className="flex justify-between items-center">
@@ -1209,10 +1263,11 @@ function ShowRiskViewContent({
                     {filteredMeasures().map((measure) => {
                       // For each render, recalculate linked status directly against the current risk data
                       const isLinked = risk.measures?.edges?.some(
-                        (edge) => edge.node.id === measure.id
+                        (edge) => edge.node.id === measure.id,
                       );
                       const isLinking = linkingMeasures[measure.id] || false;
-                      const isUnlinking = unlinkingMeasures[measure.id] || false;
+                      const isUnlinking =
+                        unlinkingMeasures[measure.id] || false;
 
                       return (
                         <div
@@ -1310,7 +1365,7 @@ function ShowRiskViewContent({
                     {filteredPolicies().map((policy) => {
                       // For each render, recalculate linked status directly against the current risk data
                       const isLinked = policies.some(
-                        (riskPolicy) => riskPolicy.id === policy.id
+                        (riskPolicy) => riskPolicy.id === policy.id,
                       );
                       const isLinking = linkingPolicies[policy.id] || false;
                       const isUnlinking = unlinkingPolicies[policy.id] || false;

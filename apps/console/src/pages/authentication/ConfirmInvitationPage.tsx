@@ -79,7 +79,7 @@ export default function ConfirmInvitationPage() {
             token: token.trim(),
             password: password,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -97,7 +97,7 @@ export default function ConfirmInvitationPage() {
       setError(
         error instanceof Error
           ? error.message
-          : "Failed to confirm invitation. Please try again."
+          : "Failed to confirm invitation. Please try again.",
       );
     } finally {
       setIsLoading(false);

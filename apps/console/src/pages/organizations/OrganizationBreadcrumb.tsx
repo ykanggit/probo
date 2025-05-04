@@ -60,7 +60,7 @@ const BreadcrumbNavLink = ({
             className={cn(
               "text-quaternary",
               isActive && "text-primary",
-              className
+              className,
             )}
           >
             {children}
@@ -98,7 +98,7 @@ function BreadCrumbOrganization() {
       }
     `,
     { organizationId: organizationId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (
@@ -146,7 +146,7 @@ function BreadcrumbFrameworkOverview() {
           }
         }
       `,
-      { frameworkId: frameworkId! }
+      { frameworkId: frameworkId! },
     );
 
   return (
@@ -196,7 +196,7 @@ function BreadcrumbVendorOverview() {
         }
       `,
       { vendorId: vendorId! },
-      { fetchPolicy: "store-or-network" }
+      { fetchPolicy: "store-or-network" },
     );
 
   return (
@@ -246,7 +246,7 @@ function BreadcrumbPeopleOverview() {
         }
       `,
       { peopleId: peopleId! },
-      { fetchPolicy: "store-or-network" }
+      { fetchPolicy: "store-or-network" },
     );
 
   return (
@@ -296,7 +296,7 @@ function BreadcrumbPolicyOverview() {
         }
       `,
       { policyId: policyId! },
-      { fetchPolicy: "store-or-network" }
+      { fetchPolicy: "store-or-network" },
     );
 
   return (
@@ -335,7 +335,9 @@ function BreadcrumbMeasureView() {
   const data =
     useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbMeasureViewQuery>(
       graphql`
-        query OrganizationBreadcrumbBreadcrumbMeasureViewQuery($measureId: ID!) {
+        query OrganizationBreadcrumbBreadcrumbMeasureViewQuery(
+          $measureId: ID!
+        ) {
           measure: node(id: $measureId) {
             id
             ... on Measure {
@@ -345,7 +347,7 @@ function BreadcrumbMeasureView() {
           }
         }
       `,
-      { measureId: measureId! }
+      { measureId: measureId! },
     );
 
   return (
@@ -385,7 +387,7 @@ function BreadcrumbControl() {
       }
     `,
     { controlId: controlId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (
@@ -431,7 +433,7 @@ function BreadcrumbRiskShow() {
       }
     `,
     { riskId: riskId! },
-    { fetchPolicy: "store-or-network" }
+    { fetchPolicy: "store-or-network" },
   );
 
   return (

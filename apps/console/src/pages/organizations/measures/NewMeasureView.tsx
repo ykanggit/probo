@@ -36,11 +36,12 @@ export default function NewMeasureView() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    category: ""
+    category: "",
   });
 
-  const [commit, isInFlight] =
-    useMutation<NewMeasureViewCreateMeasureMutation>(createMeasureMutation);
+  const [commit, isInFlight] = useMutation<NewMeasureViewCreateMeasureMutation>(
+    createMeasureMutation,
+  );
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
     setFormData((prev) => ({
@@ -63,7 +64,7 @@ export default function NewMeasureView() {
 
     const connectionId = ConnectionHandler.getConnectionID(
       organizationId!,
-      "MeasureListView_measures"
+      "MeasureListView_measures",
     );
 
     commit({
@@ -72,7 +73,7 @@ export default function NewMeasureView() {
           organizationId: organizationId!,
           name: formData.name,
           description: formData.description,
-          category: formData.category
+          category: formData.category,
         },
         connections: [connectionId],
       },
@@ -92,7 +93,7 @@ export default function NewMeasureView() {
         });
 
         navigate(
-          `/organizations/${organizationId}/measures/${data.createMeasure.measureEdge.node.id}`
+          `/organizations/${organizationId}/measures/${data.createMeasure.measureEdge.node.id}`,
         );
       },
       onError(error) {

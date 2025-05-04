@@ -26,7 +26,7 @@ function ControlViewContent({
 }) {
   const { node } = usePreloadedQuery<ControlViewQuery>(
     controlViewQuery,
-    queryRef
+    queryRef,
   );
 
   return <Control controlKey={node} />;

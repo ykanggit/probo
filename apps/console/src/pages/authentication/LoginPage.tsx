@@ -37,7 +37,7 @@ export default function LoginPage() {
           },
           credentials: "include",
           body: JSON.stringify({ email, password }),
-        }
+        },
       );
 
       if (!response.ok) {

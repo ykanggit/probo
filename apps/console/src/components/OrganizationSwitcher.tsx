@@ -82,7 +82,7 @@ export function OrganizationSwitcher({
   useEffect(() => {
     if (hasOrganizations) {
       const org = data.organizations.edges.find(
-        (edge) => edge.node.id === organizationId
+        (edge) => edge.node.id === organizationId,
       );
       if (org) {
         setCurrentOrganization(org.node);
@@ -104,7 +104,7 @@ export function OrganizationSwitcher({
               variant="ghost"
               className={cn(
                 "gap-2.5",
-                !currentOrganization && "border border-dashed"
+                !currentOrganization && "border border-dashed",
               )}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-highlight-bg">

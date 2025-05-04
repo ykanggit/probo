@@ -107,7 +107,7 @@ function NewRiskForm({
   const [createRisk, isInFlight] = useMutation(createRiskMutation);
 
   const categories = useMemo(
-    () => Array.from(new Set(riskTemplates.map(t => t.category))),
+    () => Array.from(new Set(riskTemplates.map((t) => t.category))),
     [riskTemplates],
   );
 
@@ -115,13 +115,13 @@ function NewRiskForm({
     () =>
       riskTemplates
         .map((t, idx) => ({ ...t, originalIndex: idx }))
-        .filter(t => !selectedCategory || t.category === selectedCategory),
+        .filter((t) => !selectedCategory || t.category === selectedCategory),
     [riskTemplates, selectedCategory],
   );
 
   // Handle category selection
   const selectCategory = (category: string) => {
-    setSelectedCategory(prev => {
+    setSelectedCategory((prev) => {
       if (prev !== category) setSelectedTemplate("");
       return category;
     });
@@ -226,7 +226,7 @@ function NewRiskForm({
         connections: [
           ConnectionHandler.getConnectionID(
             organizationId!,
-            "ListRiskView_risks"
+            "ListRiskView_risks",
           ),
         ],
       },
@@ -289,7 +289,9 @@ function NewRiskForm({
                     categories.map((category) => (
                       <Button
                         key={category}
-                        variant={selectedCategory === category ? "default" : "outline"}
+                        variant={
+                          selectedCategory === category ? "default" : "outline"
+                        }
                         size="sm"
                         onClick={() => selectCategory(category)}
                         className="rounded-full"
@@ -309,8 +311,8 @@ function NewRiskForm({
                   <SelectContent className="max-h-[300px] overflow-y-auto">
                     <SelectItem value="none">Select a template</SelectItem>
                     {filteredRisks.map((template) => (
-                      <SelectItem 
-                        key={template.originalIndex} 
+                      <SelectItem
+                        key={template.originalIndex}
                         value={template.originalIndex.toString()}
                       >
                         {template.name}
@@ -319,7 +321,8 @@ function NewRiskForm({
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-tertiary">
-                  Select a risk template to prefill the form or create a custom risk.
+                  Select a risk template to prefill the form or create a custom
+                  risk.
                 </p>
               </div>
             </div>
@@ -360,7 +363,9 @@ function NewRiskForm({
                 required={true}
               />
               {ownerError && (
-                <p className="text-sm text-destructive mt-1">Please select a risk owner</p>
+                <p className="text-sm text-destructive mt-1">
+                  Please select a risk owner
+                </p>
               )}
             </div>
 

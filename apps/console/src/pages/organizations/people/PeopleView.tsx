@@ -202,7 +202,7 @@ function PeopleViewContent({
                     onClick={() => {
                       const newEmails =
                         formData.additionalEmailAddresses.filter(
-                          (_, i) => i !== index
+                          (_, i) => i !== index,
                         );
                       handleFieldChange("additionalEmailAddresses", newEmails);
                     }}

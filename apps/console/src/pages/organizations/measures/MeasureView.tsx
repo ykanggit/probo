@@ -185,7 +185,8 @@ const measureViewQuery = graphql`
                 fullName
                 primaryEmailAddress
               }
-              evidences(first: 50) @connection(key: "MeasureView_task_evidences") {
+              evidences(first: 50)
+                @connection(key: "MeasureView_task_evidences") {
                 __id
                 edges {
                   node {
@@ -554,9 +555,9 @@ function MeasureViewContent({
 }) {
   const data = usePreloadedQuery<MeasureViewQueryType>(
     measureViewQuery,
-    queryRef
+    queryRef,
   );
-  
+
   // Define a type for the measure with evidences field
   type MeasureWithEvidences = typeof data.measure & {
     evidences?: {
@@ -576,10 +577,10 @@ function MeasureViewContent({
       } | null> | null;
     };
   };
-  
+
   // Cast data.measure to include evidences field
   const measureWithEvidences = data.measure as MeasureWithEvidences;
-  
+
   const navigate = useNavigate();
   const { toast } = useToast();
   const { organizationId, measureId } = useParams<{
@@ -588,7 +589,9 @@ function MeasureViewContent({
   }>();
   const environment = useRelayEnvironment();
 
-  const [commitDeleteMeasure, isDeletingMeasure] = useMutation<any>(deleteMeasureMutation);
+  const [commitDeleteMeasure, isDeletingMeasure] = useMutation<any>(
+    deleteMeasureMutation,
+  );
   const [isDeleteMeasureOpen, setIsDeleteMeasureOpen] = useState(false);
 
   // Add state for main content tabs
@@ -611,7 +614,7 @@ function MeasureViewContent({
     useState<MeasureViewLinkedControlsQuery$data | null>(null);
   const [controlSearchQuery, setControlSearchQuery] = useState("");
   const [selectedFrameworkId, setSelectedFrameworkId] = useState<string | null>(
-    null
+    null,
   );
   const [isLoadingControls, setIsLoadingControls] = useState(false);
   const [isLinkingControl, setIsLinkingControl] = useState(false);
@@ -620,11 +623,11 @@ function MeasureViewContent({
   // Create mutation hooks for control mapping
   const [commitCreateControlMapping] =
     useMutation<MeasureViewCreateControlMappingMutation>(
-      createControlMappingMutation
+      createControlMappingMutation,
     );
   const [commitDeleteControlMapping] =
     useMutation<MeasureViewDeleteControlMappingMutation>(
-      deleteControlMappingMutation
+      deleteControlMappingMutation,
     );
 
   useEffect(() => {
@@ -648,7 +651,7 @@ function MeasureViewContent({
       fetchQuery<MeasureViewLinkedControlsQuery>(
         environment,
         linkedControlsQuery,
-        { measureId }
+        { measureId },
       ).subscribe({
         next: (data) => {
           setLinkedControlsData(data);
@@ -662,7 +665,7 @@ function MeasureViewContent({
 
   // Add state for risks data
   const [risksData, setRisksData] = useState<MeasureViewRisksQuery$data | null>(
-    null
+    null,
   );
 
   // Load risks data when component mounts
@@ -709,7 +712,7 @@ function MeasureViewContent({
   };
 
   const [updateTask] = useMutation<MeasureViewUpdateTaskStateMutationType>(
-    updateTaskStateMutation
+    updateTaskStateMutation,
   );
   const [createTask] =
     useMutation<MeasureViewCreateTaskMutationType>(createTaskMutation);
@@ -717,19 +720,19 @@ function MeasureViewContent({
     useMutation<MeasureViewDeleteTaskMutationType>(deleteTaskMutation);
   const [requestEvidence] = useMutation<any>(requestEvidenceMutation);
   const [deleteEvidence] = useMutation<MeasureViewDeleteEvidenceMutationType>(
-    deleteEvidenceMutation
+    deleteEvidenceMutation,
   );
   const [assignTask] =
     useMutation<MeasureViewAssignTaskMutationType>(assignTaskMutation);
   const [unassignTask] =
     useMutation<MeasureViewUnassignTaskMutationType>(unassignTaskMutation);
   const [fulfillEvidence] = useMutation<MeasureViewFulfillEvidenceMutationType>(
-    fulfillEvidenceMutation
+    fulfillEvidenceMutation,
   );
 
   const [updateMeasureState] =
     useMutation<MeasureViewUpdateMeasureStateMutationType>(
-      updateMeasureStateMutation
+      updateMeasureStateMutation,
     );
 
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
@@ -752,7 +755,7 @@ function MeasureViewContent({
   const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
   const [draggedOverTaskId, setDraggedOverTaskId] = useState<string | null>(
-    null
+    null,
   );
   const [uploadingTaskId, setUploadingTaskId] = useState<string | null>(null);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
@@ -806,14 +809,15 @@ function MeasureViewContent({
 
   // Add state for selected task panel
   const [selectedTask, setSelectedTask] = useState<(typeof tasks)[0] | null>(
-    null
+    null,
   );
 
   // Track if task panel is open
   const [isTaskPanelOpen, setIsTaskPanelOpen] = useState(false);
 
   // Add state for tracking when files are dragged over the evidence zone
-  const [isDraggingOverEvidenceZone, setIsDraggingOverEvidenceZone] = useState(false);
+  const [isDraggingOverEvidenceZone, setIsDraggingOverEvidenceZone] =
+    useState(false);
 
   const tasks = data.measure.tasks?.edges.map((edge) => edge.node) || [];
 
@@ -841,7 +845,7 @@ function MeasureViewContent({
       }
       return null;
     },
-    [tasks]
+    [tasks],
   );
 
   // Add a function to get the measure evidence connection ID
@@ -1073,7 +1077,9 @@ function MeasureViewContent({
           measureId: measureId,
           file: null,
         },
-        connections: getMeasureEvidenceConnectionId() ? [getMeasureEvidenceConnectionId()!] : [],
+        connections: getMeasureEvidenceConnectionId()
+          ? [getMeasureEvidenceConnectionId()!]
+          : [],
       },
       uploadables: {
         "input.file": file,
@@ -1117,12 +1123,12 @@ function MeasureViewContent({
 
     try {
       console.log("Creating URI file with URL:", linkEvidenceUrl.trim());
-      
+
       // Create a URI file with the link
       const linkContent = linkEvidenceUrl.trim();
       const fileName = `${linkEvidenceName.trim()}.uri`;
       const file = new File([linkContent], fileName, { type: "text/uri-list" });
-      
+
       console.log("File created:", file.name, file.type, file.size);
 
       // Show toast for add started
@@ -1156,7 +1162,7 @@ function MeasureViewContent({
           setLinkEvidenceName("");
           setLinkEvidenceUrl("");
           setLinkEvidenceDescription("");
-          
+
           toast({
             title: "Link evidence added",
             description: "Link evidence has been added successfully.",
@@ -1176,7 +1182,8 @@ function MeasureViewContent({
       console.error("Error in handleLinkEvidenceSubmit:", error);
       toast({
         title: "Error creating URI file",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
     }
@@ -1222,7 +1229,9 @@ function MeasureViewContent({
           measureId: measureId,
           file: null,
         },
-        connections: getMeasureEvidenceConnectionId() ? [getMeasureEvidenceConnectionId()!] : [],
+        connections: getMeasureEvidenceConnectionId()
+          ? [getMeasureEvidenceConnectionId()!]
+          : [],
       },
       uploadables: {
         "input.file": file,
@@ -1274,7 +1283,11 @@ function MeasureViewContent({
 
   // Function to get file icon based on mime type and evidence type
   const getFileIcon = (mimeType: string, evidenceType: string) => {
-    if (evidenceType === "LINK" || mimeType === "text/uri-list" || mimeType === "text/uri") {
+    if (
+      evidenceType === "LINK" ||
+      mimeType === "text/uri-list" ||
+      mimeType === "text/uri"
+    ) {
       return <Link2 className="w-4 h-4 text-blue-600" />;
     } else if (mimeType.startsWith("image/")) {
       return <Image className="w-4 h-4 text-blue-500" />;
@@ -1295,7 +1308,7 @@ function MeasureViewContent({
       const response = await fetch(fileUrl);
       const text = await response.text();
       // URI files typically have the URL on the first line
-      const firstLine = text.trim().split('\n')[0];
+      const firstLine = text.trim().split("\n")[0];
       return firstLine || null;
     } catch (error) {
       console.error("Error extracting URL from URI file:", error);
@@ -1328,9 +1341,12 @@ function MeasureViewContent({
             if (!prev) return null;
             return { ...prev, fileUrl: data.node!.fileUrl };
           });
-          
+
           // If it's a URI file, fetch and extract the URL
-          if (evidence.mimeType === "text/uri-list" || evidence.mimeType === "text/uri") {
+          if (
+            evidence.mimeType === "text/uri-list" ||
+            evidence.mimeType === "text/uri"
+          ) {
             getUrlFromUriFile(data.node!.fileUrl!)
               .then((url) => {
                 if (url) {
@@ -1362,7 +1378,7 @@ function MeasureViewContent({
   const handleDeleteEvidence = (
     evidenceId: string,
     filename: string,
-    taskId: string
+    taskId: string,
   ) => {
     setEvidenceToDelete({ id: evidenceId, filename, taskId });
     setIsDeleteEvidenceOpen(true);
@@ -1377,7 +1393,7 @@ function MeasureViewContent({
   };
 
   const handleFulfillEvidenceWithFile = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (!e.target.files || e.target.files.length === 0 || !evidenceToFulfill)
       return;
@@ -1394,7 +1410,7 @@ function MeasureViewContent({
     const evidenceId = evidenceToFulfill.id;
     // Get connection ID for the parent task (assuming it's available in the view)
     const task = tasks.find((task) =>
-      task.evidences?.edges.some((edge) => edge?.node?.id === evidenceId)
+      task.evidences?.edges.some((edge) => edge?.node?.id === evidenceId),
     );
 
     const evidenceConnectionId = task?.id
@@ -1456,30 +1472,33 @@ function MeasureViewContent({
     }
 
     try {
-      console.log("Creating URI file to fulfill evidence:", evidenceToFulfill.id);
-      
+      console.log(
+        "Creating URI file to fulfill evidence:",
+        evidenceToFulfill.id,
+      );
+
       // Create a URI file with the link
       const linkContent = linkEvidenceUrl.trim();
       // Use provided name or fallback to the original filename
-      const baseName = linkEvidenceName.trim() 
-        ? linkEvidenceName.trim() 
+      const baseName = linkEvidenceName.trim()
+        ? linkEvidenceName.trim()
         : evidenceToFulfill.filename.replace(/\.[^/.]+$/, "");
       const fileName = `${baseName}.uri`;
       const file = new File([linkContent], fileName, { type: "text/uri-list" });
-      
+
       console.log("File created:", file.name, file.type, file.size);
 
       // Get connection ID for the parent task
       const task = tasks.find((task) =>
         task.evidences?.edges.some(
-          (edge) => edge?.node?.id === evidenceToFulfill.id
-        )
+          (edge) => edge?.node?.id === evidenceToFulfill.id,
+        ),
       );
 
       const evidenceConnectionId = task?.id
         ? getEvidenceConnectionId(task.id)
         : getMeasureEvidenceConnectionId();
-        
+
       console.log("Using connection ID:", evidenceConnectionId);
       console.log("Task found:", task?.id);
 
@@ -1528,7 +1547,8 @@ function MeasureViewContent({
       console.error("Error in handleFulfillEvidenceWithLink:", error);
       toast({
         title: "Error creating URI file",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
     }
@@ -1538,7 +1558,7 @@ function MeasureViewContent({
     if (!evidenceToDelete) return;
 
     let evidenceConnectionId;
-    
+
     // If taskId is empty, it's a measure-level evidence
     if (!evidenceToDelete.taskId) {
       evidenceConnectionId = getMeasureEvidenceConnectionId();
@@ -1629,7 +1649,7 @@ function MeasureViewContent({
         toast({
           title: "Measure state updated",
           description: `Measure state has been updated to ${formatState(
-            newState
+            newState,
           )}.`,
         });
       },
@@ -1683,7 +1703,7 @@ function MeasureViewContent({
         return { days: "", hours: "", minutes: "" };
       }
     },
-    []
+    [],
   );
 
   // Function to handle saving the updated duration
@@ -1749,19 +1769,7 @@ function MeasureViewContent({
       toast,
       selectedTask,
       setSelectedTask,
-    ]
-  );
-
-  // Function to start editing duration
-  const startEditingDuration = useCallback(
-    (duration: string | null | undefined) => {
-      const { days, hours, minutes } = parseISODuration(duration);
-      setEditTimeEstimateDays(days);
-      setEditTimeEstimateHours(hours);
-      setEditTimeEstimateMinutes(minutes);
-      setIsEditingDuration(true);
-    },
-    [parseISODuration]
+    ],
   );
 
   // Control mapping functions
@@ -1795,7 +1803,7 @@ function MeasureViewContent({
           linkedControlsQuery,
           {
             measureId,
-          }
+          },
         ).subscribe({
           next: (data) => {
             setLinkedControlsData(data);
@@ -1831,7 +1839,7 @@ function MeasureViewContent({
     const frameworks = frameworksData.organization.frameworks.edges;
     if (selectedFrameworkId) {
       const selectedFramework = frameworks.find(
-        (edge) => edge.node.id === selectedFrameworkId
+        (edge) => edge.node.id === selectedFrameworkId,
       );
 
       if (selectedFramework?.node?.controls?.edges) {
@@ -1841,14 +1849,14 @@ function MeasureViewContent({
 
     // If no framework is selected or it doesn't have controls, return controls from all frameworks
     return frameworks.flatMap((framework) =>
-      framework.node.controls.edges.map((edge) => edge.node)
+      framework.node.controls.edges.map((edge) => edge.node),
     );
   }, [frameworksData, selectedFrameworkId]);
 
   const getLinkedControls = useCallback(() => {
     if (!linkedControlsData?.measure?.controls?.edges) return [];
     return (linkedControlsData.measure.controls.edges || []).map(
-      (edge) => edge.node
+      (edge) => edge.node,
     );
   }, [linkedControlsData]);
 
@@ -1857,7 +1865,7 @@ function MeasureViewContent({
       const linkedControls = getLinkedControls();
       return linkedControls.some((control) => control.id === controlId);
     },
-    [getLinkedControls]
+    [getLinkedControls],
   );
 
   const handleLinkControl = useCallback(
@@ -1892,7 +1900,7 @@ function MeasureViewContent({
             linkedControlsQuery,
             {
               measureId,
-            }
+            },
           ).subscribe({
             next: (data) => {
               setLinkedControlsData(data);
@@ -1918,7 +1926,7 @@ function MeasureViewContent({
         },
       });
     },
-    [commitCreateControlMapping, environment, measureId, toast]
+    [commitCreateControlMapping, environment, measureId, toast],
   );
 
   const handleUnlinkControl = useCallback(
@@ -1952,7 +1960,9 @@ function MeasureViewContent({
             measureId,
           }).subscribe({
             next: (data: unknown) => {
-              setLinkedControlsData(data as MeasureViewLinkedControlsQuery$data);
+              setLinkedControlsData(
+                data as MeasureViewLinkedControlsQuery$data,
+              );
             },
             error: (error: Error) => {
               console.error("Error refreshing linked controls:", error);
@@ -1975,7 +1985,7 @@ function MeasureViewContent({
         },
       });
     },
-    [commitDeleteControlMapping, environment, measureId, toast]
+    [commitDeleteControlMapping, environment, measureId, toast],
   );
 
   const handleOpenControlMappingDialog = useCallback(() => {
@@ -1993,7 +2003,7 @@ function MeasureViewContent({
         control.referenceId.toLowerCase().includes(lowerQuery) ||
         control.name.toLowerCase().includes(lowerQuery) ||
         (control.description &&
-          control.description.toLowerCase().includes(lowerQuery))
+          control.description.toLowerCase().includes(lowerQuery)),
     );
   }, [controlSearchQuery, getControls]);
 
@@ -2038,7 +2048,7 @@ function MeasureViewContent({
   const confirmDeleteMeasure = () => {
     const connectionId = ConnectionHandler.getConnectionID(
       organizationId!,
-      "MeasureListView_measures"
+      "MeasureListView_measures",
     );
 
     commitDeleteMeasure({
@@ -2066,7 +2076,9 @@ function MeasureViewContent({
   };
 
   // Add the mutation hook for uploadMeasureEvidence
-  const [uploadMeasureEvidence] = useMutation<any>(uploadMeasureEvidenceMutation);
+  const [uploadMeasureEvidence] = useMutation<any>(
+    uploadMeasureEvidenceMutation,
+  );
 
   // Add a function to handle uploading evidence directly to the measure
   const handleUploadMeasureEvidence = (file: File) => {
@@ -2125,10 +2137,7 @@ function MeasureViewContent({
       title={data.measure?.name || "Measure"}
       actions={
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={handleEditMeasure}
-          >
+          <Button variant="outline" onClick={handleEditMeasure}>
             Edit
           </Button>
           <select
@@ -2156,7 +2165,9 @@ function MeasureViewContent({
         <Card className="mt-4">
           <CardContent className="pt-6">
             <div className="prose prose-gray prose-sm md:prose-base text-secondary max-w-3xl">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{data.measure.description}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {data.measure.description}
+              </ReactMarkdown>
             </div>
           </CardContent>
         </Card>
@@ -2173,9 +2184,15 @@ function MeasureViewContent({
           <TabsTrigger value="evidence" className="flex items-center gap-2">
             <FileText className="w-4 h-4" />
             Evidence
-            {tasks.some(task => task.evidences?.edges && task.evidences.edges.length > 0) && (
+            {tasks.some(
+              (task) =>
+                task.evidences?.edges && task.evidences.edges.length > 0,
+            ) && (
               <span className="ml-1.5 bg-blue-100 text-blue-800 rounded-full text-xs px-2 py-0.5">
-                {tasks.reduce((count, task) => count + (task.evidences?.edges?.length || 0), 0)}
+                {tasks.reduce(
+                  (count, task) => count + (task.evidences?.edges?.length || 0),
+                  0,
+                )}
               </span>
             )}
           </TabsTrigger>
@@ -2220,8 +2237,8 @@ function MeasureViewContent({
                   <FileIcon className="w-4 h-4 mr-2 text-blue-500" />
                   <span>Drag & drop files here to add evidence</span>
                 </div>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   className="flex items-center gap-1"
                   onClick={handleCreateMeasureEvidence}
                 >
@@ -2230,11 +2247,11 @@ function MeasureViewContent({
                 </Button>
               </div>
             </div>
-            
+
             <div
               className={`space-y-4 p-6 border-2 rounded-md transition-all duration-200 relative ${
-                isDraggingOverEvidenceZone 
-                  ? "border-dashed border-blue-400 bg-blue-50 shadow-md" 
+                isDraggingOverEvidenceZone
+                  ? "border-dashed border-blue-400 bg-blue-50 shadow-md"
                   : "border-dashed border-mid-b hover:border-blue-200"
               }`}
               onDragOver={(e) => {
@@ -2248,7 +2265,7 @@ function MeasureViewContent({
                 const rect = e.currentTarget.getBoundingClientRect();
                 const x = e.clientX;
                 const y = e.clientY;
-                
+
                 // Only set to false if cursor is outside the drop zone
                 if (
                   x < rect.left ||
@@ -2264,10 +2281,10 @@ function MeasureViewContent({
                 e.stopPropagation();
                 setIsDraggingOverEvidenceZone(false);
                 setIsDraggingFile(false);
-                
+
                 const files = e.dataTransfer.files;
                 if (files.length === 0) return;
-                
+
                 const file = files[0];
                 handleUploadMeasureEvidence(file);
               }}
@@ -2276,136 +2293,183 @@ function MeasureViewContent({
                 <div className="absolute inset-0 flex items-center justify-center bg-blue-50 bg-opacity-80 rounded-md z-10">
                   <div className="bg-white p-6 rounded-lg shadow-lg text-center">
                     <FileText className="w-12 h-12 text-blue-500 mx-auto mb-2" />
-                    <p className="text-lg font-medium">Drop file to add evidence</p>
+                    <p className="text-lg font-medium">
+                      Drop file to add evidence
+                    </p>
                   </div>
                 </div>
               )}
-              
-              {measureWithEvidences.evidences?.edges && measureWithEvidences.evidences.edges.length > 0 ? (
+
+              {measureWithEvidences.evidences?.edges &&
+              measureWithEvidences.evidences.edges.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead className="bg-invert-bg">
                       <tr className="border-b">
-                        <th className="text-left font-medium text-sm py-3 px-4">File</th>
-                        <th className="text-left font-medium text-sm py-3 px-4">Type</th>
-                        <th className="text-left font-medium text-sm py-3 px-4">Size</th>
-                        <th className="text-left font-medium text-sm py-3 px-4">Created</th>
-                        <th className="text-left font-medium text-sm py-3 px-4">Description</th>
-                        <th className="text-right font-medium text-sm py-3 px-4">Actions</th>
+                        <th className="text-left font-medium text-sm py-3 px-4">
+                          File
+                        </th>
+                        <th className="text-left font-medium text-sm py-3 px-4">
+                          Type
+                        </th>
+                        <th className="text-left font-medium text-sm py-3 px-4">
+                          Size
+                        </th>
+                        <th className="text-left font-medium text-sm py-3 px-4">
+                          Created
+                        </th>
+                        <th className="text-left font-medium text-sm py-3 px-4">
+                          Description
+                        </th>
+                        <th className="text-right font-medium text-sm py-3 px-4">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {measureWithEvidences.evidences.edges.map((evidenceEdge) => {
-                        const evidence = evidenceEdge?.node;
-                        if (!evidence) return null;
-                        
-                        return (
-                          <tr 
-                            key={evidence.id}
-                            className="border-b hover:bg-invert-bg transition-colors"
-                          >
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-2">
-                                <div className="bg-white p-1.5 rounded-md border border-mid-b">
-                                  {getFileIcon(evidence.mimeType, evidence.type)}
-                                </div>
-                                <div className="flex-1 overflow-hidden">
-                                  <div className="text-sm font-medium text-primary flex items-center gap-2 truncate">
-                                    {evidence.filename}
-                                    {evidence.state === "REQUESTED" && (
-                                      <Badge
-                                        variant="outline"
-                                        className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200 shrink-0"
-                                      >
-                                        Requested
-                                      </Badge>
+                      {measureWithEvidences.evidences.edges.map(
+                        (evidenceEdge) => {
+                          const evidence = evidenceEdge?.node;
+                          if (!evidence) return null;
+
+                          return (
+                            <tr
+                              key={evidence.id}
+                              className="border-b hover:bg-invert-bg transition-colors"
+                            >
+                              <td className="py-3 px-4">
+                                <div className="flex items-center gap-2">
+                                  <div className="bg-white p-1.5 rounded-md border border-mid-b">
+                                    {getFileIcon(
+                                      evidence.mimeType,
+                                      evidence.type,
                                     )}
                                   </div>
+                                  <div className="flex-1 overflow-hidden">
+                                    <div className="text-sm font-medium text-primary flex items-center gap-2 truncate">
+                                      {evidence.filename}
+                                      {evidence.state === "REQUESTED" && (
+                                        <Badge
+                                          variant="outline"
+                                          className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200 shrink-0"
+                                        >
+                                          Requested
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4 text-sm">
-                              {evidence.type === "FILE" ? 
-                                (evidence.mimeType === "text/uri-list" || evidence.mimeType === "text/uri" ? 
-                                  "Link" : "Document") : 
-                                  "Link"}
-                            </td>
-                            <td className="py-3 px-4 text-sm">
-                              {evidence.type === "FILE" && 
-                               !(evidence.mimeType === "text/uri-list" || evidence.mimeType === "text/uri") ? 
-                                formatFileSize(evidence.size) : "-"}
-                            </td>
-                            <td className="py-3 px-4 text-sm">
-                              {formatDate(evidence.createdAt)}
-                            </td>
-                            <td className="py-3 px-4 text-sm max-w-xs">
-                              <div className="truncate">
-                                {evidence.description || (evidence.url ? evidence.url : "-")}
-                              </div>
-                            </td>
-                            <td className="py-3 px-4 text-right">
-                              <div className="flex items-center justify-end gap-1">
-                                {evidence.state === "REQUESTED" ? (
-                                  <button
-                                    onClick={() => handleFulfillEvidence(evidence.id, evidence.filename)}
-                                    className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                    title="Fulfill Evidence"
-                                  >
-                                    <Upload className="w-4 h-4 text-green-600" />
-                                  </button>
-                                ) : evidence.type === "FILE" ? (
-                                  <>
-                                    {evidence.mimeType === "text/uri-list" || evidence.mimeType === "text/uri" ? (
-                                      <button
-                                        onClick={() => handlePreviewEvidence(evidence)}
-                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                        title="Open Link"
-                                      >
-                                        <Link2 className="w-4 h-4 text-blue-600" />
-                                      </button>
-                                    ) : evidence.mimeType.startsWith("image/") ? (
-                                      <button
-                                        onClick={() => handlePreviewEvidence(evidence)}
-                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                        title="Preview Image"
-                                      >
-                                        <Eye className="w-4 h-4 text-blue-600" />
-                                      </button>
-                                    ) : (
-                                      <button
-                                        onClick={() => handlePreviewEvidence(evidence)}
-                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                        title="Download"
-                                      >
-                                        <Download className="w-4 h-4 text-blue-600" />
-                                      </button>
-                                    )}
-                                  </>
-                                ) : evidence.url ? (
-                                  <button
-                                    onClick={() => {
-                                      if (evidence.url) {
-                                        window.open(evidence.url, "_blank");
+                              </td>
+                              <td className="py-3 px-4 text-sm">
+                                {evidence.type === "FILE"
+                                  ? evidence.mimeType === "text/uri-list" ||
+                                    evidence.mimeType === "text/uri"
+                                    ? "Link"
+                                    : "Document"
+                                  : "Link"}
+                              </td>
+                              <td className="py-3 px-4 text-sm">
+                                {evidence.type === "FILE" &&
+                                !(
+                                  evidence.mimeType === "text/uri-list" ||
+                                  evidence.mimeType === "text/uri"
+                                )
+                                  ? formatFileSize(evidence.size)
+                                  : "-"}
+                              </td>
+                              <td className="py-3 px-4 text-sm">
+                                {formatDate(evidence.createdAt)}
+                              </td>
+                              <td className="py-3 px-4 text-sm max-w-xs">
+                                <div className="truncate">
+                                  {evidence.description ||
+                                    (evidence.url ? evidence.url : "-")}
+                                </div>
+                              </td>
+                              <td className="py-3 px-4 text-right">
+                                <div className="flex items-center justify-end gap-1">
+                                  {evidence.state === "REQUESTED" ? (
+                                    <button
+                                      onClick={() =>
+                                        handleFulfillEvidence(
+                                          evidence.id,
+                                          evidence.filename,
+                                        )
                                       }
-                                    }}
-                                    className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
-                                    title="Open Link"
+                                      className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                      title="Fulfill Evidence"
+                                    >
+                                      <Upload className="w-4 h-4 text-green-600" />
+                                    </button>
+                                  ) : evidence.type === "FILE" ? (
+                                    <>
+                                      {evidence.mimeType === "text/uri-list" ||
+                                      evidence.mimeType === "text/uri" ? (
+                                        <button
+                                          onClick={() =>
+                                            handlePreviewEvidence(evidence)
+                                          }
+                                          className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                          title="Open Link"
+                                        >
+                                          <Link2 className="w-4 h-4 text-blue-600" />
+                                        </button>
+                                      ) : evidence.mimeType.startsWith(
+                                          "image/",
+                                        ) ? (
+                                        <button
+                                          onClick={() =>
+                                            handlePreviewEvidence(evidence)
+                                          }
+                                          className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                          title="Preview Image"
+                                        >
+                                          <Eye className="w-4 h-4 text-blue-600" />
+                                        </button>
+                                      ) : (
+                                        <button
+                                          onClick={() =>
+                                            handlePreviewEvidence(evidence)
+                                          }
+                                          className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                          title="Download"
+                                        >
+                                          <Download className="w-4 h-4 text-blue-600" />
+                                        </button>
+                                      )}
+                                    </>
+                                  ) : evidence.url ? (
+                                    <button
+                                      onClick={() => {
+                                        if (evidence.url) {
+                                          window.open(evidence.url, "_blank");
+                                        }
+                                      }}
+                                      className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                      title="Open Link"
+                                    >
+                                      <Link2 className="w-4 h-4 text-blue-600" />
+                                    </button>
+                                  ) : null}
+                                  <button
+                                    onClick={() =>
+                                      handleDeleteEvidence(
+                                        evidence.id,
+                                        evidence.filename,
+                                        "",
+                                      )
+                                    }
+                                    className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
+                                    title="Delete"
                                   >
-                                    <Link2 className="w-4 h-4 text-blue-600" />
+                                    <Trash2 className="w-4 h-4 text-red-500" />
                                   </button>
-                                ) : null}
-                                <button
-                                  onClick={() => handleDeleteEvidence(evidence.id, evidence.filename, "")}
-                                  className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
-                                  title="Delete"
-                                >
-                                  <Trash2 className="w-4 h-4 text-red-500" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        },
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -2413,7 +2477,9 @@ function MeasureViewContent({
                 <div className="text-center py-12">
                   <FileIcon className="w-12 h-12 text-tertiary mx-auto mb-3" />
                   <p className="text-lg font-medium">No evidence added yet</p>
-                  <p className="text-secondary mt-1">Drag and drop files here or use the "Add Evidence" button</p>
+                  <p className="text-secondary mt-1">
+                    Drag and drop files here or use the "Add Evidence" button
+                  </p>
                 </div>
               )}
             </div>
@@ -2422,17 +2488,269 @@ function MeasureViewContent({
 
         {/* Tasks Tab Content */}
         <TabsContent value="tasks">
-          {/* Rest of the tasks tab content */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">Tasks</h2>
+              <Button
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={() => setIsCreateTaskOpen(true)}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Task</span>
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {tasks.length > 0 ? (
+                tasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className="p-4 border rounded-md hover:shadow-sm transition-shadow cursor-pointer"
+                    onClick={() => handleTaskClick(task)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="rounded-full w-5 h-5 border flex items-center justify-center cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleTaskState(
+                              task.id,
+                              task.state || "TODO",
+                            );
+                          }}
+                        >
+                          {task.state === "DONE" && (
+                            <Check className="w-3 h-3 text-primary" />
+                          )}
+                        </div>
+                        <h3
+                          className={`font-medium ${task.state === "DONE" ? "line-through text-secondary" : ""}`}
+                        >
+                          {task.name}
+                        </h3>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs ${getStateColor(task.state)}`}
+                        >
+                          {formatState(task.state)}
+                        </Badge>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {task.assignedTo && (
+                          <div className="flex items-center gap-1 text-sm text-secondary bg-invert-bg px-2 py-1 rounded">
+                            <User className="w-3 h-3" />
+                            <span>{task.assignedTo.fullName}</span>
+                          </div>
+                        )}
+                        {task.timeEstimate && (
+                          <div className="text-sm text-secondary">
+                            {formatDuration(task.timeEstimate)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {task.description && (
+                      <div className="mt-2 text-sm text-secondary">
+                        {task.description.length > 150
+                          ? `${task.description.substring(0, 150)}...`
+                          : task.description}
+                      </div>
+                    )}
+
+                    {task.evidences?.edges &&
+                      task.evidences.edges.length > 0 && (
+                        <div className="mt-3 flex items-center gap-1">
+                          <FileText className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm text-secondary">
+                            {task.evidences.edges.length} evidence file(s)
+                          </span>
+                        </div>
+                      )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-12 border-2 border-dashed rounded-md">
+                  <Check className="w-12 h-12 text-tertiary mx-auto mb-3" />
+                  <p className="text-lg font-medium">No tasks added yet</p>
+                  <p className="text-secondary mt-1">
+                    Add tasks to track the implementation of this measure
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </TabsContent>
 
         {/* Controls Tab Content */}
         <TabsContent value="controls">
-          {/* Rest of the controls tab content */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">Controls</h2>
+              <Button
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={handleOpenControlMappingDialog}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Link Control</span>
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {linkedControlsData?.measure?.controls?.edges &&
+              linkedControlsData.measure.controls.edges.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-invert-bg">
+                      <tr className="border-b">
+                        <th className="text-left font-medium text-sm py-3 px-4">
+                          ID
+                        </th>
+                        <th className="text-left font-medium text-sm py-3 px-4">
+                          Name
+                        </th>
+                        <th className="text-right font-medium text-sm py-3 px-4">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {linkedControlsData.measure.controls.edges.map((edge) => {
+                        const control = edge.node;
+                        return (
+                          <tr
+                            key={control.id}
+                            className="border-b hover:bg-invert-bg transition-colors"
+                          >
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-2">
+                                <ShieldCheck className="w-4 h-4 text-green-600" />
+                                <span className="font-medium">
+                                  {control.referenceId}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-3 px-4">{control.name}</td>
+                            <td className="py-3 px-4 text-right">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleUnlinkControl(control.id)}
+                                className="text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
+                              >
+                                <X className="w-4 h-4 mr-1" />
+                                Unlink
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-12 border-2 border-dashed rounded-md">
+                  <ShieldCheck className="w-12 h-12 text-tertiary mx-auto mb-3" />
+                  <p className="text-lg font-medium">No controls linked yet</p>
+                  <p className="text-secondary mt-1">
+                    Link controls from your frameworks to this measure
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </TabsContent>
 
         {/* Risks Tab Content */}
         <TabsContent value="risks">
-          {/* Rest of the risks tab content */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">Linked Risks</h2>
+            </div>
+
+            <div className="space-y-3">
+              {risksData?.measure?.risks?.edges &&
+              risksData.measure.risks.edges.length > 0 ? (
+                risksData.measure.risks.edges.map((edge) => {
+                  const risk = edge.node;
+                  return (
+                    <div
+                      key={risk.id}
+                      className="p-4 border rounded-md hover:shadow-sm transition-shadow"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-amber-500" />
+                          <h3 className="font-medium">{risk.name}</h3>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className={getRiskSeverityColor(
+                              risk.inherentSeverity,
+                            )}
+                          >
+                            Inherent:{" "}
+                            {getRiskSeverityText(risk.inherentSeverity)}
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className={getRiskSeverityColor(
+                              risk.residualSeverity,
+                            )}
+                          >
+                            Residual:{" "}
+                            {getRiskSeverityText(risk.residualSeverity)}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {risk.description && (
+                        <p className="text-sm text-secondary mt-2">
+                          {risk.description.length > 200
+                            ? `${risk.description.substring(0, 200)}...`
+                            : risk.description}
+                        </p>
+                      )}
+
+                      <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
+                        <div>
+                          <p className="text-secondary">Inherent risk:</p>
+                          <p>
+                            Likelihood:{" "}
+                            {formatLikelihood(risk.inherentLikelihood)}
+                          </p>
+                          <p>Impact: {formatImpact(risk.inherentImpact)}</p>
+                        </div>
+                        <div>
+                          <p className="text-secondary">Residual risk:</p>
+                          <p>
+                            Likelihood:{" "}
+                            {formatLikelihood(risk.residualLikelihood)}
+                          </p>
+                          <p>Impact: {formatImpact(risk.residualImpact)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-12 border-2 border-dashed rounded-md">
+                  <AlertTriangle className="w-12 h-12 text-tertiary mx-auto mb-3" />
+                  <p className="text-lg font-medium">
+                    No risks linked to this measure
+                  </p>
+                  <p className="text-secondary mt-1">
+                    This measure is not currently linked to any risks
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
 
@@ -2457,6 +2775,388 @@ function MeasureViewContent({
 
               <div className="flex-1 overflow-auto p-6 space-y-6">
                 {/* Task content here */}
+                <div className="space-y-6">
+                  {/* Task status */}
+                  <div>
+                    <h3 className="text-sm font-medium text-secondary mb-2">
+                      Status
+                    </h3>
+                    <Badge
+                      variant="outline"
+                      className={`${getStateColor(selectedTask.state)}`}
+                    >
+                      {formatState(selectedTask.state)}
+                    </Badge>
+                  </div>
+
+                  {/* Task description */}
+                  {selectedTask.description && (
+                    <div>
+                      <h3 className="text-sm font-medium text-secondary mb-2">
+                        Description
+                      </h3>
+                      <div className="prose prose-gray prose-sm max-w-none text-primary bg-invert-bg p-4 rounded-md border border-mid-b">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {selectedTask.description}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Assigned person */}
+                  <div>
+                    <h3 className="text-sm font-medium text-secondary mb-2">
+                      Assigned To
+                    </h3>
+                    {selectedTask.assignedTo ? (
+                      <div className="flex items-center gap-2">
+                        <div className="bg-blue-100 text-blue-600 rounded-full p-1">
+                          <User className="w-4 h-4" />
+                        </div>
+                        <span>{selectedTask.assignedTo.fullName}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500 p-1 h-auto"
+                          onClick={() => handleUnassignPerson(selectedTask.id)}
+                        >
+                          <UserMinus className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Popover
+                        open={peoplePopoverOpen[selectedTask.id] || false}
+                        onOpenChange={(open) =>
+                          setPeoplePopoverOpen({
+                            ...peoplePopoverOpen,
+                            [selectedTask.id]: open,
+                          })
+                        }
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center gap-1"
+                          >
+                            <UserPlus className="w-4 h-4" />
+                            <span>Assign Person</span>
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="space-y-2">
+                            <div className="relative">
+                              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-tertiary" />
+                              <Input
+                                placeholder="Search people..."
+                                value={peopleSearch[selectedTask.id] || ""}
+                                onChange={(e) =>
+                                  setPeopleSearch({
+                                    ...peopleSearch,
+                                    [selectedTask.id]: e.target.value,
+                                  })
+                                }
+                                className="pl-9"
+                              />
+                            </div>
+                            <div className="max-h-52 overflow-y-auto">
+                              {organizationData?.organization?.peoples?.edges
+                                ?.filter((edge) => {
+                                  const search = (
+                                    peopleSearch[selectedTask.id] || ""
+                                  ).toLowerCase();
+                                  if (!search) return true;
+                                  const person = edge?.node;
+                                  return (
+                                    person?.fullName
+                                      ?.toLowerCase()
+                                      .includes(search) ||
+                                    person?.primaryEmailAddress
+                                      ?.toLowerCase()
+                                      .includes(search)
+                                  );
+                                })
+                                .map((edge) => {
+                                  const person = edge?.node;
+                                  if (!person) return null;
+                                  return (
+                                    <div
+                                      key={person.id}
+                                      className="flex items-center justify-between p-2 hover:bg-invert-bg cursor-pointer rounded-md"
+                                      onClick={() =>
+                                        handleAssignPerson(
+                                          selectedTask.id,
+                                          person.id,
+                                        )
+                                      }
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <User className="w-4 h-4 text-tertiary" />
+                                        <span>{person.fullName}</span>
+                                      </div>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 px-2"
+                                      >
+                                        <UserPlus className="w-3.5 h-3.5" />
+                                      </Button>
+                                    </div>
+                                  );
+                                })}
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    )}
+                  </div>
+
+                  {/* Time estimate */}
+                  <div>
+                    <h3 className="text-sm font-medium text-secondary mb-2">
+                      Time Estimate
+                    </h3>
+                    {isEditingDuration ? (
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <Input
+                              type="number"
+                              min="0"
+                              placeholder="Days"
+                              value={editTimeEstimateDays}
+                              onChange={(e) =>
+                                setEditTimeEstimateDays(e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <Input
+                              type="number"
+                              min="0"
+                              max="23"
+                              placeholder="Hours"
+                              value={editTimeEstimateHours}
+                              onChange={(e) =>
+                                setEditTimeEstimateHours(e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <Input
+                              type="number"
+                              min="0"
+                              max="59"
+                              placeholder="Minutes"
+                              value={editTimeEstimateMinutes}
+                              onChange={(e) =>
+                                setEditTimeEstimateMinutes(e.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsEditingDuration(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleSaveDuration(selectedTask.id)}
+                          >
+                            Save
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <div>
+                          {selectedTask.timeEstimate ? (
+                            <span>
+                              {formatDuration(selectedTask.timeEstimate)}
+                            </span>
+                          ) : (
+                            <span className="text-secondary">
+                              No time estimate
+                            </span>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="p-1 h-auto"
+                          onClick={() => {
+                            // Parse current duration into components
+                            const { days, hours, minutes } = parseISODuration(
+                              selectedTask.timeEstimate,
+                            );
+                            setEditTimeEstimateDays(days);
+                            setEditTimeEstimateHours(hours);
+                            setEditTimeEstimateMinutes(minutes);
+                            setIsEditingDuration(true);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Evidence section */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-medium text-secondary">
+                        Evidence
+                      </h3>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-1"
+                        onClick={() =>
+                          handleCreateEvidence(
+                            selectedTask.id,
+                            selectedTask.name,
+                          )
+                        }
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Add Evidence</span>
+                      </Button>
+                    </div>
+
+                    {selectedTask.evidences?.edges &&
+                    selectedTask.evidences.edges.length > 0 ? (
+                      <div className="space-y-2">
+                        {selectedTask.evidences.edges.map((edge) => {
+                          const evidence = edge?.node;
+                          if (!evidence) return null;
+
+                          return (
+                            <div
+                              key={evidence.id}
+                              className="flex items-center justify-between p-2 rounded-md border border-mid-b hover:bg-invert-bg"
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className="bg-white p-1.5 rounded-md border border-mid-b">
+                                  {getFileIcon(
+                                    evidence.mimeType,
+                                    evidence.type,
+                                  )}
+                                </div>
+                                <div>
+                                  <div className="text-sm font-medium flex items-center gap-2">
+                                    {evidence.filename}
+                                    {evidence.state === "REQUESTED" && (
+                                      <Badge
+                                        variant="outline"
+                                        className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200"
+                                      >
+                                        Requested
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div className="text-xs text-secondary">
+                                    {formatDate(evidence.createdAt)} •{" "}
+                                    {formatFileSize(evidence.size)}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-1">
+                                {evidence.state === "REQUESTED" ? (
+                                  <button
+                                    onClick={() =>
+                                      handleFulfillEvidence(
+                                        evidence.id,
+                                        evidence.filename,
+                                      )
+                                    }
+                                    className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                    title="Fulfill Evidence"
+                                  >
+                                    <Upload className="w-4 h-4 text-green-600" />
+                                  </button>
+                                ) : evidence.type === "FILE" ? (
+                                  <>
+                                    {evidence.mimeType === "text/uri-list" ||
+                                    evidence.mimeType === "text/uri" ? (
+                                      <button
+                                        onClick={() =>
+                                          handlePreviewEvidence(evidence)
+                                        }
+                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                        title="Open Link"
+                                      >
+                                        <Link2 className="w-4 h-4 text-blue-600" />
+                                      </button>
+                                    ) : evidence.mimeType.startsWith(
+                                        "image/",
+                                      ) ? (
+                                      <button
+                                        onClick={() =>
+                                          handlePreviewEvidence(evidence)
+                                        }
+                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                        title="Preview Image"
+                                      >
+                                        <Eye className="w-4 h-4 text-blue-600" />
+                                      </button>
+                                    ) : (
+                                      <button
+                                        onClick={() =>
+                                          handlePreviewEvidence(evidence)
+                                        }
+                                        className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                        title="Download"
+                                      >
+                                        <Download className="w-4 h-4 text-blue-600" />
+                                      </button>
+                                    )}
+                                  </>
+                                ) : evidence.url ? (
+                                  <button
+                                    onClick={() => {
+                                      if (evidence.url) {
+                                        window.open(evidence.url, "_blank");
+                                      }
+                                    }}
+                                    className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
+                                    title="Open Link"
+                                  >
+                                    <Link2 className="w-4 h-4 text-blue-600" />
+                                  </button>
+                                ) : null}
+                                <button
+                                  onClick={() =>
+                                    handleDeleteEvidence(
+                                      evidence.id,
+                                      evidence.filename,
+                                      selectedTask.id,
+                                    )
+                                  }
+                                  className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
+                                  title="Delete"
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-500" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 border-2 border-dashed rounded-md">
+                        <FileIcon className="w-8 h-8 text-tertiary mx-auto mb-2" />
+                        <p className="text-sm text-secondary">
+                          No evidence added to this task yet
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Task actions */}
@@ -2469,7 +3169,7 @@ function MeasureViewContent({
                       onClick={() =>
                         handleToggleTaskState(
                           selectedTask.id,
-                          selectedTask.state || "TODO"
+                          selectedTask.state || "TODO",
                         )
                       }
                     >
@@ -2484,7 +3184,7 @@ function MeasureViewContent({
                         if (selectedTask) {
                           handleToggleTaskState(
                             selectedTask.id,
-                            selectedTask.state || "DONE"
+                            selectedTask.state || "DONE",
                           );
                         }
                       }}
@@ -2563,7 +3263,7 @@ function MeasureViewContent({
                     type="text"
                   />
                 </div>
-                
+
                 <div className="grid w-full items-center gap-1.5">
                   <Label htmlFor="evidence-url">URL</Label>
                   <Input
@@ -2602,7 +3302,9 @@ function MeasureViewContent({
               Cancel
             </Button>
             {activeTab === "link" && (
-              <Button onClick={handleLinkEvidenceSubmit}>Create URI File</Button>
+              <Button onClick={handleLinkEvidenceSubmit}>
+                Create URI File
+              </Button>
             )}
           </DialogFooter>
         </DialogContent>
@@ -2812,7 +3514,7 @@ function MeasureViewContent({
                     Optional - will use evidence name if not provided
                   </p>
                 </div>
-                
+
                 <div className="grid w-full items-center gap-1.5">
                   <Label htmlFor="fulfill-evidence-url">URL</Label>
                   <Input
@@ -2852,7 +3554,8 @@ function MeasureViewContent({
           <DialogHeader>
             <DialogTitle>Delete Measure</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this measure? This action cannot be undone.
+              Are you sure you want to delete this measure? This action cannot
+              be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -2869,6 +3572,232 @@ function MeasureViewContent({
             >
               {isDeletingMeasure ? "Deleting..." : "Delete"}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Control Mapping Dialog */}
+      <Dialog
+        open={isControlMappingDialogOpen}
+        onOpenChange={setIsControlMappingDialogOpen}
+      >
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Link Controls to Measure</DialogTitle>
+            <DialogDescription>
+              Search and select controls to link to this measure.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col flex-1 overflow-hidden mt-4">
+            {/* Framework Selector and Search */}
+            <div className="flex gap-4 mb-4">
+              <div className="flex-1">
+                <Select
+                  value={selectedFrameworkId || "all"}
+                  onValueChange={(value) =>
+                    setSelectedFrameworkId(value !== "all" ? value : null)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a framework" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Frameworks</SelectItem>
+                    {frameworksData?.organization?.frameworks?.edges.map(
+                      (edge) => (
+                        <SelectItem key={edge.node.id} value={edge.node.id}>
+                          {edge.node.name}
+                        </SelectItem>
+                      ),
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-tertiary" />
+                  <Input
+                    placeholder="Search controls..."
+                    value={controlSearchQuery}
+                    onChange={(e) => setControlSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Controls Table */}
+            <div className="flex-1 overflow-y-auto border rounded-md">
+              {isLoadingControls ? (
+                <div className="flex items-center justify-center h-40">
+                  <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                </div>
+              ) : filteredControls().length > 0 ? (
+                <table className="w-full border-collapse">
+                  <thead className="bg-invert-bg">
+                    <tr className="border-b">
+                      <th className="text-left font-medium text-sm py-3 px-4">
+                        ID
+                      </th>
+                      <th className="text-left font-medium text-sm py-3 px-4">
+                        Name
+                      </th>
+                      <th className="text-right font-medium text-sm py-3 px-4">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredControls().map((control) => {
+                      const isLinked = isControlLinked(control.id);
+                      return (
+                        <tr
+                          key={control.id}
+                          className="border-b hover:bg-invert-bg transition-colors"
+                        >
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <ShieldCheck className="w-4 h-4 text-green-600" />
+                              <span className="font-medium">
+                                {control.referenceId}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">{control.name}</td>
+                          <td className="py-3 px-4 text-right">
+                            {isLinked ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleUnlinkControl(control.id)}
+                                disabled={isUnlinkingControl}
+                                className="text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
+                              >
+                                {isUnlinkingControl ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <X className="w-4 h-4 mr-1" />
+                                )}
+                                <span>Unlink</span>
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleLinkControl(control.id)}
+                                disabled={isLinkingControl}
+                                className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
+                              >
+                                {isLinkingControl ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Link2 className="w-4 h-4 mr-1" />
+                                )}
+                                <span>Link</span>
+                              </Button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="text-center py-12">
+                  <ShieldCheck className="w-12 h-12 text-tertiary mx-auto mb-3" />
+                  <p className="text-lg font-medium">No controls found</p>
+                  <p className="text-secondary mt-1">
+                    Try adjusting your search or framework filter
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter className="mt-4">
+            <Button onClick={() => setIsControlMappingDialogOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Task Dialog */}
+      <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>Create New Task</DialogTitle>
+            <DialogDescription>
+              Add a new task to this measure.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="grid w-full items-center gap-1.5">
+              <Label htmlFor="task-name">Task Name</Label>
+              <Input
+                id="task-name"
+                value={newTaskName}
+                onChange={(e) => setNewTaskName(e.target.value)}
+                placeholder="Enter task name"
+              />
+            </div>
+
+            <div className="grid w-full items-center gap-1.5">
+              <Label htmlFor="task-description">Description (optional)</Label>
+              <Textarea
+                id="task-description"
+                value={newTaskDescription}
+                onChange={(e) => setNewTaskDescription(e.target.value)}
+                placeholder="Describe what needs to be done"
+                className="min-h-[100px]"
+              />
+            </div>
+
+            <div>
+              <Label>Time Estimate (optional)</Label>
+              <div className="flex gap-2 mt-1.5">
+                <div className="flex-1">
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="Days"
+                    value={timeEstimateDays}
+                    onChange={(e) => setTimeEstimateDays(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <Input
+                    type="number"
+                    min="0"
+                    max="23"
+                    placeholder="Hours"
+                    value={timeEstimateHours}
+                    onChange={(e) => setTimeEstimateHours(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <Input
+                    type="number"
+                    min="0"
+                    max="59"
+                    placeholder="Minutes"
+                    value={timeEstimateMinutes}
+                    onChange={(e) => setTimeEstimateMinutes(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateTaskOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleCreateTask}>Create Task</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

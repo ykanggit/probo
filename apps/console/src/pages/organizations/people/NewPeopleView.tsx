@@ -100,7 +100,7 @@ function NewPeopleViewContent() {
                 direction: "ASC",
                 field: "FULL_NAME",
               },
-            }
+            },
           ),
           ConnectionHandler.getConnectionID(
             organizationId!,
@@ -110,7 +110,7 @@ function NewPeopleViewContent() {
                 direction: "ASC",
                 field: "FULL_NAME",
               },
-            }
+            },
           ),
           ConnectionHandler.getConnectionID(
             organizationId!,
@@ -120,7 +120,7 @@ function NewPeopleViewContent() {
                 direction: "ASC",
                 field: "FULL_NAME",
               },
-            }
+            },
           ),
         ],
         input: {
@@ -196,7 +196,7 @@ function NewPeopleViewContent() {
                     onClick={() => {
                       const newEmails =
                         formData.additionalEmailAddresses.filter(
-                          (_, i) => i !== index
+                          (_, i) => i !== index,
                         );
                       handleFieldChange("additionalEmailAddresses", newEmails);
                     }}
@@ -243,7 +243,7 @@ function NewPeopleViewContent() {
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.kind === "EMPLOYEE"
                           ? "bg-blue-100 text-blue-900 ring-2 ring-blue-600 ring-offset-2"
-                          : "bg-secondary-bg text-primary hover:bg-h-secondary-bg"
+                          : "bg-secondary-bg text-primary hover:bg-h-secondary-bg",
                       )}
                     >
                       Employee
@@ -255,7 +255,7 @@ function NewPeopleViewContent() {
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.kind === "CONTRACTOR"
                           ? "bg-purple-100 text-purple-900 ring-2 ring-purple-600 ring-offset-2"
-                          : "bg-secondary-bg text-primary hover:bg-h-secondary-bg"
+                          : "bg-secondary-bg text-primary hover:bg-h-secondary-bg",
                       )}
                     >
                       Contractor
@@ -269,7 +269,7 @@ function NewPeopleViewContent() {
                         "rounded-full px-4 py-1 text-sm transition-colors",
                         formData.kind === "SERVICE_ACCOUNT"
                           ? "bg-green-100 text-green-900 ring-2 ring-green-600 ring-offset-2"
-                          : "bg-secondary-bg text-primary hover:bg-h-secondary-bg"
+                          : "bg-secondary-bg text-primary hover:bg-h-secondary-bg",
                       )}
                     >
                       Service Account

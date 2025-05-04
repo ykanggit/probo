@@ -26,7 +26,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import type { PolicyListViewQuery, PolicyListViewQuery$data } from "./__generated__/PolicyListViewQuery.graphql";
+import type {
+  PolicyListViewQuery,
+  PolicyListViewQuery$data,
+} from "./__generated__/PolicyListViewQuery.graphql";
 import type { PolicyListViewDeleteMutation } from "./__generated__/PolicyListViewDeleteMutation.graphql";
 import type { PolicyListViewCreateMutation } from "./__generated__/PolicyListViewCreateMutation.graphql";
 import type { PolicyListViewSendSigningNotificationsMutation } from "./__generated__/PolicyListViewSendSigningNotificationsMutation.graphql";
@@ -54,7 +57,8 @@ const policyListViewQuery = graphql`
     organization: node(id: $organizationId) {
       ... on Organization {
         ...PeopleSelector_organization
-        policies(first: 50, orderBy: {field: TITLE, direction: ASC}) @connection(key: "PolicyListView_policies") {
+        policies(first: 50, orderBy: { field: TITLE, direction: ASC })
+          @connection(key: "PolicyListView_policies") {
           edges {
             node {
               id
@@ -127,7 +131,9 @@ const createPolicyMutation = graphql`
 `;
 
 const sendSigningNotificationsMutation = graphql`
-  mutation PolicyListViewSendSigningNotificationsMutation($input: SendSigningNotificationsInput!) {
+  mutation PolicyListViewSendSigningNotificationsMutation(
+    $input: SendSigningNotificationsInput!
+  ) {
     sendSigningNotifications(input: $input) {
       success
     }
@@ -137,26 +143,33 @@ function PolicyTableRow({
   policy,
   organizationId,
 }: {
-  policy: NonNullable<PolicyListViewQuery$data["organization"]["policies"]>["edges"][0]["node"];
+  policy: NonNullable<
+    PolicyListViewQuery$data["organization"]["policies"]
+  >["edges"][0]["node"];
   organizationId: string;
 }) {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [deletePolicy, isDeleting] = useMutation<PolicyListViewDeleteMutation>(DeletePolicyMutation);
+  const [deletePolicy, isDeleting] =
+    useMutation<PolicyListViewDeleteMutation>(DeletePolicyMutation);
 
   const latestVersion = policy.versions?.edges[0]?.node;
   const status = latestVersion?.status || "DRAFT";
-  
+
   // Get signature counts
   const signatureEdges = latestVersion?.signatures?.edges || [];
   const totalSignatures = signatureEdges.length;
   const signedCount = signatureEdges.filter(
-    edge => edge?.node?.state === "SIGNED"
+    (edge) => edge?.node?.state === "SIGNED",
   ).length;
 
   const handleDeletePolicy = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm("Are you sure you want to delete this policy? This action cannot be undone.")) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this policy? This action cannot be undone.",
+      )
+    ) {
       deletePolicy({
         variables: {
           input: {
@@ -165,7 +178,7 @@ function PolicyTableRow({
           connections: [
             ConnectionHandler.getConnectionID(
               organizationId,
-              "PolicyListView_policies"
+              "PolicyListView_policies",
             ),
           ],
         },
@@ -202,7 +215,7 @@ function PolicyTableRow({
   };
 
   return (
-    <tr 
+    <tr
       className="border-t border-solid-b hover:bg-subtle-bg cursor-pointer"
       onClick={() => {
         navigate(`/organizations/${organizationId}/policies/${policy.id}`);
@@ -228,7 +241,9 @@ function PolicyTableRow({
       </td>
       <td className="py-4 px-6">
         {status === "PUBLISHED" ? (
-          <span className="text-sm text-primary">{signedCount} / {totalSignatures}</span>
+          <span className="text-sm text-primary">
+            {signedCount} / {totalSignatures}
+          </span>
         ) : (
           <span className="text-sm text-tertiary">-</span>
         )}
@@ -236,8 +251,8 @@ function PolicyTableRow({
       <td className="py-4 px-6">
         <Badge
           className={`font-medium border-0 py-0 px-[6px] h-5 text-xs rounded-md ${
-            status === "PUBLISHED" 
-              ? "bg-success-bg text-success" 
+            status === "PUBLISHED"
+              ? "bg-success-bg text-success"
               : "bg-secondary-bg text-tertiary"
           }`}
         >
@@ -292,7 +307,8 @@ function CreatePolicyModal({
   const [content, setContent] = useState("");
   const [ownerId, setOwnerId] = useState<string | null>(null);
 
-  const [createPolicy, isCreating] = useMutation<PolicyListViewCreateMutation>(createPolicyMutation);
+  const [createPolicy, isCreating] =
+    useMutation<PolicyListViewCreateMutation>(createPolicyMutation);
 
   // Reset form fields
   const resetForm = () => {
@@ -319,7 +335,7 @@ function CreatePolicyModal({
       });
       return;
     }
-    
+
     const input = {
       organizationId,
       title,
@@ -334,7 +350,7 @@ function CreatePolicyModal({
           ConnectionHandler.getConnectionID(
             organizationId,
             "PolicyListView_policies",
-            {orderBy: {field: "TITLE", direction: "ASC"}}
+            { orderBy: { field: "TITLE", direction: "ASC" } },
           ),
         ],
       },
@@ -379,7 +395,10 @@ function CreatePolicyModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[1080px] h-[700px] max-h-[700px] p-0 gap-0 flex flex-col">
         <DialogTitle className="sr-only">Create new policy</DialogTitle>
-        <DialogDescription className="sr-only">Form to create a new policy with title, content, and owner information.</DialogDescription>
+        <DialogDescription className="sr-only">
+          Form to create a new policy with title, content, and owner
+          information.
+        </DialogDescription>
         <div className="flex justify-between items-center py-2 px-4 border-b border-solid-b h-[40px]">
           <div className="flex items-center gap-1 text-sm">
             <span className="text-tertiary">Policies</span>
@@ -391,23 +410,23 @@ function CreatePolicyModal({
         <div className="flex flex-1 overflow-hidden">
           <div className="flex-1 p-6 overflow-y-auto">
             <div className="mb-6">
-              <h1 
-                className={`text-4xl leading-tight font-bold outline-none focus:outline-none ${!title ? 'text-gray-400' : 'text-black'}`}
+              <h1
+                className={`text-4xl leading-tight font-bold outline-none focus:outline-none ${!title ? "text-gray-400" : "text-black"}`}
                 contentEditable
                 suppressContentEditableWarning
                 onInput={(e) => {
                   const newText = e.currentTarget.textContent || "";
                   setTitle(newText);
                 }}
-                style={{ WebkitTapHighlightColor: 'transparent' }}
+                style={{ WebkitTapHighlightColor: "transparent" }}
                 onClick={(e) => {
                   if (!title) {
-                    e.currentTarget.textContent = '';
+                    e.currentTarget.textContent = "";
                   }
                 }}
                 onFocus={(e) => {
                   if (e.currentTarget.textContent === "Enter policy title...") {
-                    e.currentTarget.textContent = '';
+                    e.currentTarget.textContent = "";
                   }
                 }}
                 onBlur={(e) => {
@@ -421,8 +440,7 @@ function CreatePolicyModal({
                     el.textContent = title || "Enter policy title...";
                   }
                 }}
-              >
-              </h1>
+              ></h1>
             </div>
             <Textarea
               placeholder="This Privacy Policy outlines how NovaSoft collects, uses, and protects personal information provided by users of its services. By accessing or using our platform, you agree to the collection and use of information in accordance with this policy..."
@@ -433,15 +451,17 @@ function CreatePolicyModal({
           </div>
           <div className="w-[420px] bg-[rgba(5,77,5,0.03)] p-6 flex flex-col gap-4">
             <h3 className="font-medium text-base">Properties</h3>
-            
+
             <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center py-2 border-t border-[rgba(2,42,2,0.08)]">
-                <span className="text-sm font-medium text-tertiary">Status</span>
+                <span className="text-sm font-medium text-tertiary">
+                  Status
+                </span>
                 <div className="bg-[rgba(0,39,0,0.05)] py-1.5 px-2 rounded-lg">
                   <span className="text-sm font-medium">Draft</span>
                 </div>
               </div>
-              
+
               <div className="flex justify-between items-center py-2 border-t border-[rgba(2,42,2,0.08)]">
                 <span className="text-sm font-medium text-tertiary">Owner</span>
                 <div className="relative">
@@ -453,10 +473,16 @@ function CreatePolicyModal({
                   />
                 </div>
               </div>
-              
+
               <div className="flex justify-between items-center py-2 border-t border-[rgba(2,42,2,0.08)]">
-                <span className="text-sm font-medium text-tertiary">Review date</span>
-                <Button size="icon" variant="outline" className="h-8 w-8 rounded-full bg-[rgba(0,39,0,0.05)] border-none">
+                <span className="text-sm font-medium text-tertiary">
+                  Review date
+                </span>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-8 w-8 rounded-full bg-[rgba(0,39,0,0.05)] border-none"
+                >
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
@@ -492,16 +518,19 @@ function PolicyListViewContent({
 }) {
   const data = usePreloadedQuery<PolicyListViewQuery>(
     policyListViewQuery,
-    queryRef
+    queryRef,
   );
   const { organizationId } = useParams();
   const policies =
     data.organization?.policies?.edges.map((edge) => edge?.node) ?? [];
-  
+
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [confirmSigningModalOpen, setConfirmSigningModalOpen] = useState(false);
 
-  const [sendSigningNotifications, isSendingNotifications] = useMutation<PolicyListViewSendSigningNotificationsMutation>(sendSigningNotificationsMutation);
+  const [sendSigningNotifications, isSendingNotifications] =
+    useMutation<PolicyListViewSendSigningNotificationsMutation>(
+      sendSigningNotificationsMutation,
+    );
   const { toast } = useToast();
 
   const handleOpenModal = () => {
@@ -524,7 +553,8 @@ function PolicyListViewContent({
           console.error("Error sending signing notifications:", errors);
           toast({
             title: "Error",
-            description: "Failed to send signing notifications. Please try again.",
+            description:
+              "Failed to send signing notifications. Please try again.",
             variant: "destructive",
           });
           return;
@@ -540,7 +570,8 @@ function PolicyListViewContent({
         console.error("Error sending signing notifications:", error);
         toast({
           title: "Error",
-          description: "Failed to send signing notifications. Please try again.",
+          description:
+            "Failed to send signing notifications. Please try again.",
           variant: "destructive",
         });
       },
@@ -635,13 +666,17 @@ function PolicyListViewContent({
         organizationId={organizationId!}
         organizationRef={data.organization}
       />
-      
+
       {/* Confirmation Modal for Sending Signing Notifications */}
-      <Dialog open={confirmSigningModalOpen} onOpenChange={setConfirmSigningModalOpen}>
+      <Dialog
+        open={confirmSigningModalOpen}
+        onOpenChange={setConfirmSigningModalOpen}
+      >
         <DialogContent className="sm:max-w-[425px]">
           <DialogTitle>Send Signing Notifications</DialogTitle>
           <DialogDescription>
-            This will send signing notifications to all users who have pending policies to sign. Are you sure you want to continue?
+            This will send signing notifications to all users who have pending
+            policies to sign. Are you sure you want to continue?
           </DialogDescription>
           <DialogFooter className="gap-2 mt-4">
             <Button

@@ -33,11 +33,11 @@ export default function OrganizationSelectionPage() {
   const navigate = useNavigate();
   const data = useLazyLoadQuery<OrganizationSelectionPageQuery>(
     organizationSelectionQuery,
-    {}
+    {},
   );
 
   const organizations = data.viewer.organizations.edges.map(
-    (edge) => edge.node
+    (edge) => edge.node,
   );
 
   useEffect(() => {

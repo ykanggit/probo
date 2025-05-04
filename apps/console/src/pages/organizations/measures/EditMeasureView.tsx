@@ -58,7 +58,7 @@ function EditMeasureViewContent({
   const [formData, setFormData] = useState({
     name: measure.name ?? "",
     description: measure.description ?? "",
-    category: measure.category ?? ""
+    category: measure.category ?? "",
   });
 
   const [commit, isInFlight] =
@@ -89,7 +89,7 @@ function EditMeasureViewContent({
           id: measureId!,
           name: formData.name,
           description: formData.description,
-          category: formData.category
+          category: formData.category,
         },
       },
       onCompleted(data, errors) {
@@ -154,7 +154,9 @@ function EditMeasureViewContent({
               type="button"
               variant="outline"
               onClick={() =>
-                navigate(`/organizations/${organizationId}/measures/${measureId}`)
+                navigate(
+                  `/organizations/${organizationId}/measures/${measureId}`,
+                )
               }
             >
               Cancel

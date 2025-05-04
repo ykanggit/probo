@@ -88,7 +88,7 @@ export default function ConfirmEmailPage() {
       setError(
         error instanceof Error
           ? error.message
-          : "Failed to confirm email. Please try again."
+          : "Failed to confirm email. Please try again.",
       );
       setIsLoading(false);
     }

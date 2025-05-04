@@ -20,8 +20,11 @@ import type { VendorViewDeleteComplianceReportMutation as DeleteComplianceReport
 import type { VendorViewUploadComplianceReportMutation as UploadComplianceReportMutationType } from "./__generated__/VendorViewUploadComplianceReportMutation.graphql";
 import type { VendorViewUpdateVendorMutation } from "./__generated__/VendorViewUpdateVendorMutation.graphql";
 import type { VendorViewCreateRiskAssessmentMutation } from "./__generated__/VendorViewCreateRiskAssessmentMutation.graphql";
-import type { BusinessImpact, DataSensitivity } from "./__generated__/VendorViewCreateRiskAssessmentMutation.graphql";
-import type {  VendorViewQuery$data } from "./__generated__/VendorViewQuery.graphql";
+import type {
+  BusinessImpact,
+  DataSensitivity,
+} from "./__generated__/VendorViewCreateRiskAssessmentMutation.graphql";
+import type { VendorViewQuery$data } from "./__generated__/VendorViewQuery.graphql";
 import { useParams } from "react-router";
 import { cn } from "@/lib/utils";
 import { PageTemplate } from "@/components/PageTemplate";
@@ -76,16 +79,16 @@ const vendorViewQuery = graphql`
           edges {
             node {
               id
-          assessedAt
-          expiresAt
-          dataSensitivity
-          businessImpact
-          notes
-          assessedBy {
-            id
-            fullName
-          }
-          createdAt
+              assessedAt
+              expiresAt
+              dataSensitivity
+              businessImpact
+              notes
+              assessedBy {
+                id
+                fullName
+              }
+              createdAt
             }
           }
         }
@@ -232,7 +235,10 @@ function ComplianceReportsTable({
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(null);
       }
     }
@@ -252,11 +258,11 @@ function ComplianceReportsTable({
   // Format date to match Figma design
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
   };
 
@@ -268,17 +274,23 @@ function ComplianceReportsTable({
             <tr className="border-b border-[rgba(2,42,2,0.08)]">
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#818780]">Report name</span>
+                  <span className="text-xs font-semibold text-[#818780]">
+                    Report name
+                  </span>
                 </div>
               </th>
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#818780]">Report date</span>
+                  <span className="text-xs font-semibold text-[#818780]">
+                    Report date
+                  </span>
                 </div>
               </th>
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#818780]">Valid until</span>
+                  <span className="text-xs font-semibold text-[#818780]">
+                    Valid until
+                  </span>
                 </div>
               </th>
               <th className="px-4 py-3 text-right w-16"></th>
@@ -286,7 +298,10 @@ function ComplianceReportsTable({
           </thead>
           <tbody>
             {reports.map((report) => (
-              <tr key={report.id} className="border-b border-[rgba(2,42,2,0.08)]">
+              <tr
+                key={report.id}
+                className="border-b border-[rgba(2,42,2,0.08)]"
+              >
                 <td className="px-4 py-3">
                   <div className="flex flex-col justify-center">
                     <a
@@ -309,23 +324,48 @@ function ComplianceReportsTable({
                 </td>
                 <td className="px-4 py-3">
                   <span className="text-sm font-normal text-[#141E12]">
-                    {report.validUntil ? formatDate(report.validUntil) : 'N/A'}
+                    {report.validUntil ? formatDate(report.validUntil) : "N/A"}
                   </span>
                 </td>
                 <td className="text-right pr-6 py-3">
-                  <div className="relative" ref={showDropdown === report.id ? dropdownRef : null}>
+                  <div
+                    className="relative"
+                    ref={showDropdown === report.id ? dropdownRef : null}
+                  >
                     <button
                       className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-[rgba(2,42,2,0.03)]"
-                      onClick={() => setShowDropdown(showDropdown === report.id ? null : report.id)}
+                      onClick={() =>
+                        setShowDropdown(
+                          showDropdown === report.id ? null : report.id,
+                        )
+                      }
                     >
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z" fill="#141E12"/>
-                        <path d="M3 9.5C3.82843 9.5 4.5 8.82843 4.5 8C4.5 7.17157 3.82843 6.5 3 6.5C2.17157 6.5 1.5 7.17157 1.5 8C1.5 8.82843 2.17157 9.5 3 9.5Z" fill="#141E12"/>
-                        <path d="M13 9.5C13.8284 9.5 14.5 8.82843 14.5 8C14.5 7.17157 13.8284 6.5 13 6.5C12.1716 6.5 11.5 7.17157 11.5 8C11.5 8.82843 12.1716 9.5 13 9.5Z" fill="#141E12"/>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z"
+                          fill="#141E12"
+                        />
+                        <path
+                          d="M3 9.5C3.82843 9.5 4.5 8.82843 4.5 8C4.5 7.17157 3.82843 6.5 3 6.5C2.17157 6.5 1.5 7.17157 1.5 8C1.5 8.82843 2.17157 9.5 3 9.5Z"
+                          fill="#141E12"
+                        />
+                        <path
+                          d="M13 9.5C13.8284 9.5 14.5 8.82843 14.5 8C14.5 7.17157 13.8284 6.5 13 6.5C12.1716 6.5 11.5 7.17157 11.5 8C11.5 8.82843 12.1716 9.5 13 9.5Z"
+                          fill="#141E12"
+                        />
                       </svg>
                     </button>
                     {showDropdown === report.id && (
-                      <div className="absolute right-0 mt-1 bg-white rounded-md shadow-lg border border-[#ECEFEC] z-10" style={{ bottom: '100%', marginBottom: '5px' }}>
+                      <div
+                        className="absolute right-0 mt-1 bg-white rounded-md shadow-lg border border-[#ECEFEC] z-10"
+                        style={{ bottom: "100%", marginBottom: "5px" }}
+                      >
                         <button
                           className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                           onClick={() => {
@@ -343,7 +383,10 @@ function ComplianceReportsTable({
             ))}
             {reports.length === 0 && (
               <tr>
-                <td colSpan={4} className="text-center py-6 text-sm text-[#818780]">
+                <td
+                  colSpan={4}
+                  className="text-center py-6 text-sm text-[#818780]"
+                >
                   No compliance reports uploaded yet
                 </td>
               </tr>
@@ -384,17 +427,24 @@ function CertificationsView({
   onRemove: (tag: string) => void;
 }) {
   // Common security standards
-  const securityStandards = ["SOC 2", "ISO 27001", "HITRUST", "NIST", "SOC 2 Type 2", "SOC 2 Type 1"];
-  
+  const securityStandards = [
+    "SOC 2",
+    "ISO 27001",
+    "HITRUST",
+    "NIST",
+    "SOC 2 Type 2",
+    "SOC 2 Type 1",
+  ];
+
   // Regulatory and legal certifications
   const regulatoryLegal = ["HIPAA", "FERPA", "FISMA", "PIPEDA", "GDPR", "CCPA"];
-  
+
   // Industry-specific certifications
   const industrySpecific = ["FinTech", "MPAA", "GSMA"];
-  
+
   // International & government certifications
   const internationalGov = ["FedRAMP", "ENS High", "IRAP", "CJIS"];
-  
+
   // State for new certification input
   const [showAddModal, setShowAddModal] = useState(false);
   const [newCertification, setNewCertification] = useState("");
@@ -409,12 +459,26 @@ function CertificationsView({
   };
 
   // Get certifications by category
-  const securityCerts = certifications.filter(cert => securityStandards.includes(cert));
-  const regulatoryCerts = certifications.filter(cert => regulatoryLegal.includes(cert));
-  const industryCerts = certifications.filter(cert => industrySpecific.includes(cert));
-  const internationalCerts = certifications.filter(cert => internationalGov.includes(cert));
-  const customCerts = certifications.filter(cert => 
-    ![...securityStandards, ...regulatoryLegal, ...industrySpecific, ...internationalGov].includes(cert)
+  const securityCerts = certifications.filter((cert) =>
+    securityStandards.includes(cert),
+  );
+  const regulatoryCerts = certifications.filter((cert) =>
+    regulatoryLegal.includes(cert),
+  );
+  const industryCerts = certifications.filter((cert) =>
+    industrySpecific.includes(cert),
+  );
+  const internationalCerts = certifications.filter((cert) =>
+    internationalGov.includes(cert),
+  );
+  const customCerts = certifications.filter(
+    (cert) =>
+      ![
+        ...securityStandards,
+        ...regulatoryLegal,
+        ...industrySpecific,
+        ...internationalGov,
+      ].includes(cert),
   );
 
   return (
@@ -426,21 +490,42 @@ function CertificationsView({
           className="rounded-full bg-[rgba(0,39,0,0.05)] text-[#141E12] hover:bg-[rgba(0,39,0,0.08)] h-8 px-3"
           size="sm"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-1.5">
-            <path d="M8 3.5V12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M3.5 8H12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="mr-1.5"
+          >
+            <path
+              d="M8 3.5V12.5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M3.5 8H12.5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
           Add certification
         </Button>
       </div>
-      
+
       <div className="p-5 space-y-6">
         {/* Security Standards */}
         {securityCerts.length > 0 && (
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-[#141E12]">Security Standards</h4>
+            <h4 className="text-sm font-medium text-[#141E12]">
+              Security Standards
+            </h4>
             <div className="flex flex-wrap gap-2">
-              {securityCerts.map(cert => (
+              {securityCerts.map((cert) => (
                 <div
                   key={cert}
                   className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
@@ -450,9 +535,27 @@ function CertificationsView({
                     onClick={() => onRemove(cert)}
                     className="text-[#6B716A] hover:text-[#141E12]"
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 4L4 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4 4L12 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -460,13 +563,15 @@ function CertificationsView({
             </div>
           </div>
         )}
-        
+
         {/* Regulatory & Legal */}
         {regulatoryCerts.length > 0 && (
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-[#141E12]">Regulatory & Legal</h4>
+            <h4 className="text-sm font-medium text-[#141E12]">
+              Regulatory & Legal
+            </h4>
             <div className="flex flex-wrap gap-2">
-              {regulatoryCerts.map(cert => (
+              {regulatoryCerts.map((cert) => (
                 <div
                   key={cert}
                   className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
@@ -476,9 +581,27 @@ function CertificationsView({
                     onClick={() => onRemove(cert)}
                     className="text-[#6B716A] hover:text-[#141E12]"
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 4L4 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4 4L12 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -486,13 +609,15 @@ function CertificationsView({
             </div>
           </div>
         )}
-        
+
         {/* Industry-Specific */}
         {industryCerts.length > 0 && (
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-[#141E12]">Industry-Specific</h4>
+            <h4 className="text-sm font-medium text-[#141E12]">
+              Industry-Specific
+            </h4>
             <div className="flex flex-wrap gap-2">
-              {industryCerts.map(cert => (
+              {industryCerts.map((cert) => (
                 <div
                   key={cert}
                   className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
@@ -502,9 +627,27 @@ function CertificationsView({
                     onClick={() => onRemove(cert)}
                     className="text-[#6B716A] hover:text-[#141E12]"
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 4L4 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4 4L12 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -512,13 +655,15 @@ function CertificationsView({
             </div>
           </div>
         )}
-        
+
         {/* International & Government */}
         {internationalCerts.length > 0 && (
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-[#141E12]">International & Government</h4>
+            <h4 className="text-sm font-medium text-[#141E12]">
+              International & Government
+            </h4>
             <div className="flex flex-wrap gap-2">
-              {internationalCerts.map(cert => (
+              {internationalCerts.map((cert) => (
                 <div
                   key={cert}
                   className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
@@ -528,9 +673,27 @@ function CertificationsView({
                     onClick={() => onRemove(cert)}
                     className="text-[#6B716A] hover:text-[#141E12]"
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 4L4 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4 4L12 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -538,13 +701,15 @@ function CertificationsView({
             </div>
           </div>
         )}
-        
+
         {/* Custom certifications */}
         {customCerts.length > 0 && (
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-[#141E12]">Custom Certifications</h4>
+            <h4 className="text-sm font-medium text-[#141E12]">
+              Custom Certifications
+            </h4>
             <div className="flex flex-wrap gap-2">
-              {customCerts.map(cert => (
+              {customCerts.map((cert) => (
                 <div
                   key={cert}
                   className="flex items-center gap-1 rounded bg-[rgba(5,77,5,0.03)] px-2 py-1.5 text-sm font-medium text-[#6B716A]"
@@ -554,9 +719,27 @@ function CertificationsView({
                     onClick={() => onRemove(cert)}
                     className="text-[#6B716A] hover:text-[#141E12]"
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 4L4 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4 4L12 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -570,25 +753,28 @@ function CertificationsView({
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-medium mb-4">Add Custom Certification</h3>
+            <h3 className="text-lg font-medium mb-4">
+              Add Custom Certification
+            </h3>
             <div className="space-y-4">
               <div>
                 <Label htmlFor="certification-name">Certification Name</Label>
-                <Input 
+                <Input
                   id="certification-name"
-                  value={newCertification} 
+                  value={newCertification}
                   onChange={(e) => setNewCertification(e.target.value)}
                   placeholder="Enter certification name"
                   className="mt-1"
                 />
               </div>
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowAddModal(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAddModal(false)}
+                >
                   Cancel
                 </Button>
-                <Button onClick={handleAddCertification}>
-                  Add
-                </Button>
+                <Button onClick={handleAddCertification}>Add</Button>
               </div>
             </div>
           </div>
@@ -602,7 +788,9 @@ function RiskAssessmentsTable({
   assessments,
   onCreateAssessment,
 }: {
-  assessments: NonNullable<NonNullable<VendorViewQuery$data["node"]>["riskAssessments"]>["edges"];
+  assessments: NonNullable<
+    NonNullable<VendorViewQuery$data["node"]>["riskAssessments"]
+  >["edges"];
   onCreateAssessment: () => void;
 }) {
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
@@ -611,7 +799,10 @@ function RiskAssessmentsTable({
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(null);
       }
     }
@@ -643,22 +834,30 @@ function RiskAssessmentsTable({
             <tr className="border-b border-[rgba(2,42,2,0.08)]">
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#818780]">Assessed By</span>
+                  <span className="text-xs font-semibold text-[#818780]">
+                    Assessed By
+                  </span>
                 </div>
               </th>
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#818780]">Expires</span>
+                  <span className="text-xs font-semibold text-[#818780]">
+                    Expires
+                  </span>
                 </div>
               </th>
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#818780]">Data Sensitivity</span>
+                  <span className="text-xs font-semibold text-[#818780]">
+                    Data Sensitivity
+                  </span>
                 </div>
               </th>
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#818780]">Business Impact</span>
+                  <span className="text-xs font-semibold text-[#818780]">
+                    Business Impact
+                  </span>
                 </div>
               </th>
               <th className="px-4 py-3 text-right w-16"></th>
@@ -669,35 +868,39 @@ function RiskAssessmentsTable({
               const assessment = edge?.node;
               const expired = isExpired(assessment?.expiresAt || "");
               return (
-                <tr 
-                  key={assessment?.id} 
+                <tr
+                  key={assessment?.id}
                   className={cn(
                     "border-b border-[rgba(2,42,2,0.08)]",
-                    expired && "bg-[#F7F7F7] text-[#A0A5A0]"
+                    expired && "bg-[#F7F7F7] text-[#A0A5A0]",
                   )}
                 >
                   <td className="px-4 py-3">
-                    <span className={cn(
-                      "text-sm font-normal",
-                      expired ? "text-[#A0A5A0]" : "text-[#141E12]"
-                    )}>
-                      {assessment?.assessedBy?.fullName || 'N/A'} (<span 
+                    <span
                       className={cn(
                         "text-sm font-normal",
-                        expired ? "text-[#A0A5A0]" : "text-[#141E12]"
+                        expired ? "text-[#A0A5A0]" : "text-[#141E12]",
                       )}
-                      title={formatDate(assessment?.assessedAt || "")}
                     >
-                      {formatRelativeDate(assessment?.assessedAt || "")}
-                    </span>)
+                      {assessment?.assessedBy?.fullName || "N/A"} (
+                      <span
+                        className={cn(
+                          "text-sm font-normal",
+                          expired ? "text-[#A0A5A0]" : "text-[#141E12]",
+                        )}
+                        title={formatDate(assessment?.assessedAt || "")}
+                      >
+                        {formatRelativeDate(assessment?.assessedAt || "")}
+                      </span>
+                      )
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center">
-                      <span 
+                      <span
                         className={cn(
                           "text-sm font-normal",
-                          expired ? "text-[#A0A5A0]" : "text-[#141E12]"
+                          expired ? "text-[#A0A5A0]" : "text-[#141E12]",
                         )}
                         title={formatDate(assessment?.expiresAt || "")}
                       >
@@ -711,35 +914,68 @@ function RiskAssessmentsTable({
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={cn(
-                      "text-sm font-normal",
-                      expired ? "text-[#A0A5A0]" : "text-[#141E12]"
-                    )}>
-                      {assessment?.dataSensitivity.charAt(0) + assessment?.dataSensitivity.slice(1).toLowerCase()}
+                    <span
+                      className={cn(
+                        "text-sm font-normal",
+                        expired ? "text-[#A0A5A0]" : "text-[#141E12]",
+                      )}
+                    >
+                      {assessment?.dataSensitivity.charAt(0) +
+                        assessment?.dataSensitivity.slice(1).toLowerCase()}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={cn(
-                      "text-sm font-normal",
-                      expired ? "text-[#A0A5A0]" : "text-[#141E12]"
-                    )}>
-                      {assessment?.businessImpact.charAt(0) + assessment?.businessImpact.slice(1).toLowerCase()}
+                    <span
+                      className={cn(
+                        "text-sm font-normal",
+                        expired ? "text-[#A0A5A0]" : "text-[#141E12]",
+                      )}
+                    >
+                      {assessment?.businessImpact.charAt(0) +
+                        assessment?.businessImpact.slice(1).toLowerCase()}
                     </span>
                   </td>
                   <td className="text-right pr-6 py-3">
-                    <div className="relative" ref={showDropdown === assessment?.id ? dropdownRef : null}>
+                    <div
+                      className="relative"
+                      ref={showDropdown === assessment?.id ? dropdownRef : null}
+                    >
                       <button
                         className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-[rgba(2,42,2,0.03)]"
-                        onClick={() => setShowDropdown(showDropdown === assessment?.id ? null : assessment?.id)}
+                        onClick={() =>
+                          setShowDropdown(
+                            showDropdown === assessment?.id
+                              ? null
+                              : assessment?.id,
+                          )
+                        }
                       >
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z" fill={expired ? "#A0A5A0" : "#141E12"}/>
-                          <path d="M3 9.5C3.82843 9.5 4.5 8.82843 4.5 8C4.5 7.17157 3.82843 6.5 3 6.5C2.17157 6.5 1.5 7.17157 1.5 8C1.5 8.82843 2.17157 9.5 3 9.5Z" fill={expired ? "#A0A5A0" : "#141E12"}/>
-                          <path d="M13 9.5C13.8284 9.5 14.5 8.82843 14.5 8C14.5 7.17157 13.8284 6.5 13 6.5C12.1716 6.5 11.5 7.17157 11.5 8C11.5 8.82843 12.1716 9.5 13 9.5Z" fill={expired ? "#A0A5A0" : "#141E12"}/>
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z"
+                            fill={expired ? "#A0A5A0" : "#141E12"}
+                          />
+                          <path
+                            d="M3 9.5C3.82843 9.5 4.5 8.82843 4.5 8C4.5 7.17157 3.82843 6.5 3 6.5C2.17157 6.5 1.5 7.17157 1.5 8C1.5 8.82843 2.17157 9.5 3 9.5Z"
+                            fill={expired ? "#A0A5A0" : "#141E12"}
+                          />
+                          <path
+                            d="M13 9.5C13.8284 9.5 14.5 8.82843 14.5 8C14.5 7.17157 13.8284 6.5 13 6.5C12.1716 6.5 11.5 7.17157 11.5 8C11.5 8.82843 12.1716 9.5 13 9.5Z"
+                            fill={expired ? "#A0A5A0" : "#141E12"}
+                          />
                         </svg>
                       </button>
                       {showDropdown === assessment?.id && (
-                        <div className="absolute right-0 mt-1 bg-white rounded-md shadow-lg border border-[#ECEFEC] z-10" style={{ bottom: '100%', marginBottom: '5px' }}>
+                        <div
+                          className="absolute right-0 mt-1 bg-white rounded-md shadow-lg border border-[#ECEFEC] z-10"
+                          style={{ bottom: "100%", marginBottom: "5px" }}
+                        >
                           <button
                             className="w-full text-left px-4 py-2 text-sm hover:bg-[rgba(2,42,2,0.03)]"
                             onClick={() => {
@@ -758,7 +994,10 @@ function RiskAssessmentsTable({
             })}
             {assessments?.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center py-6 text-sm text-[#818780]">
+                <td
+                  colSpan={7}
+                  className="text-center py-6 text-sm text-[#818780]"
+                >
                   No risk assessments created yet
                 </td>
               </tr>
@@ -797,7 +1036,8 @@ function RiskAssessmentModal({
   }) => void;
   businessOwnerId: string | null;
 }) {
-  const [dataSensitivity, setDataSensitivity] = useState<DataSensitivity>("LOW");
+  const [dataSensitivity, setDataSensitivity] =
+    useState<DataSensitivity>("LOW");
   const [businessImpact, setBusinessImpact] = useState<BusinessImpact>("LOW");
   const [notes, setNotes] = useState("");
 
@@ -809,9 +1049,9 @@ function RiskAssessmentModal({
       setNotes("");
     }
   }, [isOpen]);
-  
+
   if (!isOpen) return null;
-  
+
   const handleSubmit = () => {
     onSubmit({
       dataSensitivity,
@@ -824,34 +1064,58 @@ function RiskAssessmentModal({
   const dataSensitivityOptions = [
     { value: "NONE", label: "None", description: "No sensitive data" },
     { value: "LOW", label: "Low", description: "Public or non-sensitive data" },
-    { value: "MEDIUM", label: "Medium", description: "Internal/restricted data" },
+    {
+      value: "MEDIUM",
+      label: "Medium",
+      description: "Internal/restricted data",
+    },
     { value: "HIGH", label: "High", description: "Confidential data" },
-    { value: "CRITICAL", label: "Critical", description: "Regulated/PII/financial data" },
+    {
+      value: "CRITICAL",
+      label: "Critical",
+      description: "Regulated/PII/financial data",
+    },
   ];
 
   // Business impact descriptions from vendor_risk_assessment.go
   const businessImpactOptions = [
     { value: "LOW", label: "Low", description: "Minimal impact on business" },
-    { value: "MEDIUM", label: "Medium", description: "Moderate impact on business" },
-    { value: "HIGH", label: "High", description: "Significant business impact" },
-    { value: "CRITICAL", label: "Critical", description: "Critical to business operations" },
+    {
+      value: "MEDIUM",
+      label: "Medium",
+      description: "Moderate impact on business",
+    },
+    {
+      value: "HIGH",
+      label: "High",
+      description: "Significant business impact",
+    },
+    {
+      value: "CRITICAL",
+      label: "Critical",
+      description: "Critical to business operations",
+    },
   ];
-  
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <h3 className="text-lg font-medium mb-4">Create Risk Assessment</h3>
-        
+
         <div className="space-y-6">
           <div>
-            <Label htmlFor="data-sensitivity" className="mb-2 block">Data Sensitivity</Label>
+            <Label htmlFor="data-sensitivity" className="mb-2 block">
+              Data Sensitivity
+            </Label>
             <select
               id="data-sensitivity"
               value={dataSensitivity}
-              onChange={(e) => setDataSensitivity(e.target.value as DataSensitivity)}
+              onChange={(e) =>
+                setDataSensitivity(e.target.value as DataSensitivity)
+              }
               className="w-full rounded-md border border-[#ECEFEC] px-3 py-2 focus:border-[#054D05] focus:ring-[#054D05]"
             >
-              {dataSensitivityOptions.map(option => (
+              {dataSensitivityOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -859,26 +1123,40 @@ function RiskAssessmentModal({
             </select>
             <div className="mt-2 p-3 bg-[rgba(5,77,5,0.03)] rounded-md">
               <p className="text-sm text-[#141E12] font-medium mb-1">
-                {dataSensitivityOptions.find(o => o.value === dataSensitivity)?.label}: 
+                {
+                  dataSensitivityOptions.find(
+                    (o) => o.value === dataSensitivity,
+                  )?.label
+                }
+                :
               </p>
               <p className="text-sm text-[#6B716A]">
-                {dataSensitivityOptions.find(o => o.value === dataSensitivity)?.description}
+                {
+                  dataSensitivityOptions.find(
+                    (o) => o.value === dataSensitivity,
+                  )?.description
+                }
               </p>
               <p className="mt-2 text-xs text-[#6B716A]">
-                Select the level of sensitivity for the data this vendor processes or stores.
+                Select the level of sensitivity for the data this vendor
+                processes or stores.
               </p>
             </div>
           </div>
-          
+
           <div>
-            <Label htmlFor="business-impact" className="mb-2 block">Business Impact</Label>
+            <Label htmlFor="business-impact" className="mb-2 block">
+              Business Impact
+            </Label>
             <select
               id="business-impact"
               value={businessImpact}
-              onChange={(e) => setBusinessImpact(e.target.value as BusinessImpact)}
+              onChange={(e) =>
+                setBusinessImpact(e.target.value as BusinessImpact)
+              }
               className="w-full rounded-md border border-[#ECEFEC] px-3 py-2 focus:border-[#054D05] focus:ring-[#054D05]"
             >
-              {businessImpactOptions.map(option => (
+              {businessImpactOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -886,19 +1164,29 @@ function RiskAssessmentModal({
             </select>
             <div className="mt-2 p-3 bg-[rgba(5,77,5,0.03)] rounded-md">
               <p className="text-sm text-[#141E12] font-medium mb-1">
-                {businessImpactOptions.find(o => o.value === businessImpact)?.label}: 
+                {
+                  businessImpactOptions.find((o) => o.value === businessImpact)
+                    ?.label
+                }
+                :
               </p>
               <p className="text-sm text-[#6B716A]">
-                {businessImpactOptions.find(o => o.value === businessImpact)?.description}
+                {
+                  businessImpactOptions.find((o) => o.value === businessImpact)
+                    ?.description
+                }
               </p>
               <p className="mt-2 text-xs text-[#6B716A]">
-                Select the impact on your business if this vendor experiences an outage or data breach.
+                Select the impact on your business if this vendor experiences an
+                outage or data breach.
               </p>
             </div>
           </div>
-          
+
           <div>
-            <Label htmlFor="notes" className="mb-2 block">Notes</Label>
+            <Label htmlFor="notes" className="mb-2 block">
+              Notes
+            </Label>
             <textarea
               id="notes"
               value={notes}
@@ -907,19 +1195,20 @@ function RiskAssessmentModal({
               placeholder="Add any additional notes about this risk assessment"
             />
             <p className="mt-2 text-xs text-[#6B716A]">
-              Add any context or details about this risk assessment that might be helpful for future reference.
+              Add any context or details about this risk assessment that might
+              be helpful for future reference.
             </p>
           </div>
-          
+
           <div className="flex justify-end gap-2 pt-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={onClose}
               className="border-[#ECEFEC] text-[#141E12]"
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleSubmit}
               className="bg-[#054D05] text-white hover:bg-[#054D05]/90"
             >
@@ -939,7 +1228,9 @@ function VendorViewContent({
 }) {
   const { organizationId } = useParams();
   const data = usePreloadedQuery(vendorViewQuery, queryRef);
-  const [activeTab, setActiveTab] = useState<'overview' | 'certifications' | 'complianceReports' | 'riskAssessments'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "certifications" | "complianceReports" | "riskAssessments"
+  >("overview");
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
   const [showRiskAssessmentModal, setShowRiskAssessmentModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -963,15 +1254,15 @@ function VendorViewContent({
     useMutation<VendorViewUpdateVendorMutation>(updateVendorMutation);
   const [deleteVendorComplianceReport] =
     useMutation<DeleteComplianceReportMutationType>(
-      deleteComplianceReportMutation
+      deleteComplianceReportMutation,
     );
   const [uploadVendorComplianceReport] =
     useMutation<UploadComplianceReportMutationType>(
-      uploadComplianceReportMutation
+      uploadComplianceReportMutation,
     );
   const [createRiskAssessment] =
     useMutation<VendorViewCreateRiskAssessmentMutation>(
-      createRiskAssessmentMutation
+      createRiskAssessmentMutation,
     );
   const [, loadQuery] = useQueryLoader<VendorViewQueryType>(vendorViewQuery);
   const { toast } = useToast();
@@ -1034,40 +1325,46 @@ function VendorViewContent({
   };
 
   // Auto-save handler specifically for certifications
-  const handleCertificationChange = useCallback((newCertifications: string[]) => {
-    // Update local state
-    setFormData(prev => ({
-      ...prev,
-      certifications: newCertifications,
-    }));
-    
-    // Auto-save the changes immediately
-    const formattedData = {
-      id: data.node.id!,
-      certifications: newCertifications,
-    };
+  const handleCertificationChange = useCallback(
+    (newCertifications: string[]) => {
+      // Update local state
+      setFormData((prev) => ({
+        ...prev,
+        certifications: newCertifications,
+      }));
 
-    updateVendor({
-      variables: {
-        input: formattedData,
-      },
-      onCompleted: () => {
-        toast({
-          title: "Success",
-          description: "Certifications updated",
-          variant: "default",
-        });
-        loadQuery({ vendorId: data.node.id!, organizationId: organizationId! });
-      },
-      onError: (error) => {
-        toast({
-          title: "Error",
-          description: error.message || "Failed to update certifications",
-          variant: "destructive",
-        });
-      },
-    });
-  }, [updateVendor, data.node.id, loadQuery, toast, organizationId]);
+      // Auto-save the changes immediately
+      const formattedData = {
+        id: data.node.id!,
+        certifications: newCertifications,
+      };
+
+      updateVendor({
+        variables: {
+          input: formattedData,
+        },
+        onCompleted: () => {
+          toast({
+            title: "Success",
+            description: "Certifications updated",
+            variant: "default",
+          });
+          loadQuery({
+            vendorId: data.node.id!,
+            organizationId: organizationId!,
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Error",
+            description: error.message || "Failed to update certifications",
+            variant: "destructive",
+          });
+        },
+      });
+    },
+    [updateVendor, data.node.id, loadQuery, toast, organizationId],
+  );
 
   const handleCancel = () => {
     setFormData({
@@ -1097,7 +1394,7 @@ function VendorViewContent({
           connections: [
             ConnectionHandler.getConnectionID(
               data.node.id!,
-              "VendorView_complianceReports"
+              "VendorView_complianceReports",
             ),
           ],
           input: {
@@ -1130,7 +1427,7 @@ function VendorViewContent({
       loadQuery,
       toast,
       organizationId,
-    ]
+    ],
   );
 
   const handleUploadReport = useCallback(
@@ -1167,7 +1464,7 @@ function VendorViewContent({
             connections: [
               ConnectionHandler.getConnectionID(
                 data.node.id!,
-                "VendorView_complianceReports"
+                "VendorView_complianceReports",
               ),
             ],
             input: {
@@ -1209,61 +1506,74 @@ function VendorViewContent({
       loadQuery,
       toast,
       organizationId,
-    ]
+    ],
   );
 
   const handleCreateRiskAssessment = useCallback(() => {
     setShowRiskAssessmentModal(true);
   }, []);
-  
-  const handleRiskAssessmentSubmit = useCallback((formValues: {
-    dataSensitivity: DataSensitivity;
-    businessImpact: BusinessImpact;
-    notes: string;
-  }) => {
-    const nextYear = new Date();
-    nextYear.setFullYear(nextYear.getFullYear() + 1);
-    
-    createRiskAssessment({
-      variables: {
-        connections: [
-          ConnectionHandler.getConnectionID(
-            data.node.id!,
-            "VendorView_riskAssessments"
-          ),
-        ],
-        input: {
-          vendorId: data.node.id!,
-          assessedBy: data.viewer.user.people?.id!,
-          expiresAt: nextYear.toISOString(),
-          dataSensitivity: formValues.dataSensitivity,
-          businessImpact: formValues.businessImpact,
-          notes: formValues.notes || "Risk assessment",
+
+  const handleRiskAssessmentSubmit = useCallback(
+    (formValues: {
+      dataSensitivity: DataSensitivity;
+      businessImpact: BusinessImpact;
+      notes: string;
+    }) => {
+      const nextYear = new Date();
+      nextYear.setFullYear(nextYear.getFullYear() + 1);
+
+      createRiskAssessment({
+        variables: {
+          connections: [
+            ConnectionHandler.getConnectionID(
+              data.node.id!,
+              "VendorView_riskAssessments",
+            ),
+          ],
+          input: {
+            vendorId: data.node.id!,
+            assessedBy: data.viewer.user.people?.id!,
+            expiresAt: nextYear.toISOString(),
+            dataSensitivity: formValues.dataSensitivity,
+            businessImpact: formValues.businessImpact,
+            notes: formValues.notes || "Risk assessment",
+          },
         },
-      },
-      onCompleted: () => {
-        toast({
-          title: "Success",
-          description: "Risk assessment created successfully",
-          variant: "default",
-        });
-        setShowRiskAssessmentModal(false);
-        loadQuery({
-          vendorId: data.node.id!,
-          organizationId: organizationId!,
-        }, {
-          fetchPolicy: "network-only",
-        });
-      },
-      onError: (error) => {
-        toast({
-          title: "Error",
-          description: error.message || "Failed to create risk assessment",
-          variant: "destructive",
-        });
-      },
-    });
-  }, [createRiskAssessment, data.node.id, data.viewer.user.people?.id, loadQuery, toast, organizationId]);
+        onCompleted: () => {
+          toast({
+            title: "Success",
+            description: "Risk assessment created successfully",
+            variant: "default",
+          });
+          setShowRiskAssessmentModal(false);
+          loadQuery(
+            {
+              vendorId: data.node.id!,
+              organizationId: organizationId!,
+            },
+            {
+              fetchPolicy: "network-only",
+            },
+          );
+        },
+        onError: (error) => {
+          toast({
+            title: "Error",
+            description: error.message || "Failed to create risk assessment",
+            variant: "destructive",
+          });
+        },
+      });
+    },
+    [
+      createRiskAssessment,
+      data.node.id,
+      data.viewer.user.people?.id,
+      loadQuery,
+      toast,
+      organizationId,
+    ],
+  );
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return "N/A";
@@ -1276,7 +1586,7 @@ function VendorViewContent({
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'overview':
+      case "overview":
         return (
           <div className="space-y-6">
             <div className="flex flex-wrap gap-x-12 gap-y-4 items-start mb-6">
@@ -1286,7 +1596,9 @@ function VendorViewContent({
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-secondary">Joined</p>
-                <p className="text-sm text-tertiary">{formatDate(data.node.createdAt)}</p>
+                <p className="text-sm text-tertiary">
+                  {formatDate(data.node.createdAt)}
+                </p>
               </div>
             </div>
 
@@ -1303,63 +1615,82 @@ function VendorViewContent({
                       <input
                         type="text"
                         value={formData.name}
-                        onChange={(e) => handleFieldChange("name", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange("name", e.target.value)
+                        }
                         className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 p-0"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-[#6B716A]">Description</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Description
+                    </p>
                     <div className="rounded-lg bg-[rgba(5,77,5,0.03)] px-2 py-1.5">
                       <textarea
                         value={formData.description}
                         onChange={(e) => {
                           handleFieldChange("description", e.target.value);
-                          e.target.style.height = '0';
-                          e.target.style.height = (e.target.scrollHeight) + 'px';
+                          e.target.style.height = "0";
+                          e.target.style.height = e.target.scrollHeight + "px";
                         }}
                         className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 resize-none outline-none focus:ring-0 focus-visible:ring-0 p-0"
-                        style={{ 
-                          overflow: 'hidden',
-                          height: 'auto',
-                          minHeight: '1.5em',
+                        style={{
+                          overflow: "hidden",
+                          height: "auto",
+                          minHeight: "1.5em",
                         }}
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-[#6B716A]">Legal name</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Legal name
+                    </p>
                     <div className="rounded-lg bg-[rgba(5,77,5,0.03)] px-2 py-1.5">
                       <input
                         type="text"
                         value={formData.legalName}
-                        onChange={(e) => handleFieldChange("legalName", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange("legalName", e.target.value)
+                        }
                         className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 p-0"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-[#6B716A]">Headquarter Address</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Headquarter Address
+                    </p>
                     <div className="rounded-lg bg-[rgba(5,77,5,0.03)] px-2 py-1.5">
                       <input
                         type="text"
                         value={formData.headquarterAddress}
-                        onChange={(e) => handleFieldChange("headquarterAddress", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            "headquarterAddress",
+                            e.target.value,
+                          )
+                        }
                         className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 p-0"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-[#6B716A]">Website URL</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Website URL
+                    </p>
                     <div className="rounded-lg bg-[rgba(5,77,5,0.03)] px-2 py-1.5">
                       <input
                         type="text"
                         value={formData.websiteUrl}
-                        onChange={(e) => handleFieldChange("websiteUrl", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange("websiteUrl", e.target.value)
+                        }
                         className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 p-0"
                       />
                     </div>
@@ -1375,14 +1706,18 @@ function VendorViewContent({
                 <div className="p-5 space-y-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-[#6B716A]">Business Owner</p>
+                      <p className="text-sm font-medium text-[#6B716A]">
+                        Business Owner
+                      </p>
                       <HelpCircle className="h-4 w-4 text-tertiary" />
                     </div>
                     <div className="bg-[rgba(5,77,5,0.03)] rounded-lg p-1">
                       <PeopleSelector
                         organizationRef={data.organization}
                         selectedPersonId={formData.businessOwnerId}
-                        onSelect={(value) => handleFieldChange("businessOwnerId", value)}
+                        onSelect={(value) =>
+                          handleFieldChange("businessOwnerId", value)
+                        }
                         placeholder="Select"
                       />
                     </div>
@@ -1390,14 +1725,18 @@ function VendorViewContent({
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-[#6B716A]">Security Owner</p>
+                      <p className="text-sm font-medium text-[#6B716A]">
+                        Security Owner
+                      </p>
                       <HelpCircle className="h-4 w-4 text-tertiary" />
                     </div>
                     <div className="bg-[rgba(5,77,5,0.03)] rounded-lg p-1">
                       <PeopleSelector
                         organizationRef={data.organization}
                         selectedPersonId={formData.securityOwnerId}
-                        onSelect={(value) => handleFieldChange("securityOwnerId", value)}
+                        onSelect={(value) =>
+                          handleFieldChange("securityOwnerId", value)
+                        }
                         placeholder="Select"
                       />
                     </div>
@@ -1412,11 +1751,15 @@ function VendorViewContent({
                 </div>
                 <div className="divide-y">
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
-                    <p className="text-sm font-medium text-[#6B716A]">Status Page URL</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Status Page URL
+                    </p>
                     <div className="flex items-center space-x-2 w-full">
                       <Input
                         value={formData.statusPageUrl}
-                        onChange={(e) => handleFieldChange("statusPageUrl", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange("statusPageUrl", e.target.value)
+                        }
                         className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
                       />
                       {formData.statusPageUrl && (
@@ -1426,21 +1769,49 @@ function VendorViewContent({
                           rel="noopener noreferrer"
                           className="text-primary hover:underline"
                         >
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6.66667 9.33333L13.3333 2.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M8.66667 2.66667H13.3333V7.33333"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </a>
                       )}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
-                    <p className="text-sm font-medium text-[#6B716A]">Terms of Service URL</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Terms of Service URL
+                    </p>
                     <div className="flex items-center space-x-2 w-full">
                       <Input
                         value={formData.termsOfServiceUrl}
-                        onChange={(e) => handleFieldChange("termsOfServiceUrl", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange("termsOfServiceUrl", e.target.value)
+                        }
                         className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
                       />
                       {formData.termsOfServiceUrl && (
@@ -1450,21 +1821,49 @@ function VendorViewContent({
                           rel="noopener noreferrer"
                           className="text-primary hover:underline"
                         >
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6.66667 9.33333L13.3333 2.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M8.66667 2.66667H13.3333V7.33333"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </a>
                       )}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
-                    <p className="text-sm font-medium text-[#6B716A]">Privacy Policy URL</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Privacy Policy URL
+                    </p>
                     <div className="flex items-center space-x-2 w-full">
                       <Input
                         value={formData.privacyPolicyUrl}
-                        onChange={(e) => handleFieldChange("privacyPolicyUrl", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange("privacyPolicyUrl", e.target.value)
+                        }
                         className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
                       />
                       {formData.privacyPolicyUrl && (
@@ -1474,21 +1873,52 @@ function VendorViewContent({
                           rel="noopener noreferrer"
                           className="text-primary hover:underline"
                         >
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6.66667 9.33333L13.3333 2.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M8.66667 2.66667H13.3333V7.33333"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </a>
                       )}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
-                    <p className="text-sm font-medium text-[#6B716A]">Service Level Agreement URL</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Service Level Agreement URL
+                    </p>
                     <div className="flex items-center space-x-2 w-full">
                       <Input
                         value={formData.serviceLevelAgreementUrl}
-                        onChange={(e) => handleFieldChange("serviceLevelAgreementUrl", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            "serviceLevelAgreementUrl",
+                            e.target.value,
+                          )
+                        }
                         className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
                       />
                       {formData.serviceLevelAgreementUrl && (
@@ -1498,21 +1928,52 @@ function VendorViewContent({
                           rel="noopener noreferrer"
                           className="text-primary hover:underline"
                         >
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6.66667 9.33333L13.3333 2.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M8.66667 2.66667H13.3333V7.33333"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </a>
                       )}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
-                    <p className="text-sm font-medium text-[#6B716A]">Data Processing Agreement URL</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Data Processing Agreement URL
+                    </p>
                     <div className="flex items-center space-x-2 w-full">
                       <Input
                         value={formData.dataProcessingAgreementUrl}
-                        onChange={(e) => handleFieldChange("dataProcessingAgreementUrl", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            "dataProcessingAgreementUrl",
+                            e.target.value,
+                          )
+                        }
                         className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
                       />
                       {formData.dataProcessingAgreementUrl && (
@@ -1522,21 +1983,49 @@ function VendorViewContent({
                           rel="noopener noreferrer"
                           className="text-primary hover:underline"
                         >
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6.66667 9.33333L13.3333 2.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M8.66667 2.66667H13.3333V7.33333"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </a>
                       )}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
-                    <p className="text-sm font-medium text-[#6B716A]">Security Page URL</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Security Page URL
+                    </p>
                     <div className="flex items-center space-x-2 w-full">
                       <Input
                         value={formData.securityPageUrl}
-                        onChange={(e) => handleFieldChange("securityPageUrl", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange("securityPageUrl", e.target.value)
+                        }
                         className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
                       />
                       {formData.securityPageUrl && (
@@ -1546,21 +2035,49 @@ function VendorViewContent({
                           rel="noopener noreferrer"
                           className="text-primary hover:underline"
                         >
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6.66667 9.33333L13.3333 2.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M8.66667 2.66667H13.3333V7.33333"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </a>
                       )}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
-                    <p className="text-sm font-medium text-[#6B716A]">Trust Page URL</p>
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Trust Page URL
+                    </p>
                     <div className="flex items-center space-x-2 w-full">
                       <Input
                         value={formData.trustPageUrl}
-                        onChange={(e) => handleFieldChange("trustPageUrl", e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange("trustPageUrl", e.target.value)
+                        }
                         className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
                       />
                       {formData.trustPageUrl && (
@@ -1570,10 +2087,34 @@ function VendorViewContent({
                           rel="noopener noreferrer"
                           className="text-primary hover:underline"
                         >
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8.66667 2.66667H13.3333V7.33333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6.66667 9.33333L13.3333 2.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M8.66667 2.66667H13.3333V7.33333"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </a>
                       )}
@@ -1584,36 +2125,37 @@ function VendorViewContent({
             </div>
           </div>
         );
-      case 'certifications':
+      case "certifications":
         return (
           <CertificationsView
             certifications={[...formData.certifications]}
-            onAdd={(cert) => 
+            onAdd={(cert) =>
               handleCertificationChange([
-                ...formData.certifications.filter(c => c !== cert),
+                ...formData.certifications.filter((c) => c !== cert),
                 cert,
               ])
             }
             onRemove={(cert) =>
               handleCertificationChange(
-                formData.certifications.filter((c) => c !== cert)
+                formData.certifications.filter((c) => c !== cert),
               )
             }
           />
         );
-      case 'complianceReports':
+      case "complianceReports":
         return (
           <div className="space-y-4">
             <ComplianceReportsTable
               reports={
-                data.node.complianceReports?.edges.map((edge) => edge.node) ?? []
+                data.node.complianceReports?.edges.map((edge) => edge.node) ??
+                []
               }
               onDelete={handleDeleteReport}
               onUpload={handleUploadReport}
             />
           </div>
         );
-      case 'riskAssessments':
+      case "riskAssessments":
         return (
           <div className="space-y-4">
             <RiskAssessmentsTable
@@ -1629,76 +2171,80 @@ function VendorViewContent({
 
   return (
     <PageTemplate title={formData.name}>
-        <div className="border-b mb-6">
-          <div className="flex">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={cn("px-4 py-3 text-sm font-medium border-b-2 -mb-px", 
-                activeTab === 'overview' 
-                  ? "border-primary text-primary" 
-                  : "border-transparent text-secondary hover:text-primary hover:border-secondary"
-              )}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab('certifications')}
-              className={cn("px-4 py-3 text-sm font-medium border-b-2 -mb-px", 
-                activeTab === 'certifications' 
-                  ? "border-primary text-primary" 
-                  : "border-transparent text-secondary hover:text-primary hover:border-secondary"
-              )}
-            >
-              Certifications
-            </button>
-            <button
-              onClick={() => setActiveTab('complianceReports')}
-              className={cn("px-4 py-3 text-sm font-medium border-b-2 -mb-px", 
-                activeTab === 'complianceReports' 
-                  ? "border-primary text-primary" 
-                  : "border-transparent text-secondary hover:text-primary hover:border-secondary"
-              )}
-            >
-              Compliance reports
-            </button>
-            <button
-              onClick={() => setActiveTab('riskAssessments')}
-              className={cn("px-4 py-3 text-sm font-medium border-b-2 -mb-px", 
-                activeTab === 'riskAssessments' 
-                  ? "border-primary text-primary" 
-                  : "border-transparent text-secondary hover:text-primary hover:border-secondary"
-              )}
-            >
-              Risk assessments
-            </button>
-          </div>
+      <div className="border-b mb-6">
+        <div className="flex">
+          <button
+            onClick={() => setActiveTab("overview")}
+            className={cn(
+              "px-4 py-3 text-sm font-medium border-b-2 -mb-px",
+              activeTab === "overview"
+                ? "border-primary text-primary"
+                : "border-transparent text-secondary hover:text-primary hover:border-secondary",
+            )}
+          >
+            Overview
+          </button>
+          <button
+            onClick={() => setActiveTab("certifications")}
+            className={cn(
+              "px-4 py-3 text-sm font-medium border-b-2 -mb-px",
+              activeTab === "certifications"
+                ? "border-primary text-primary"
+                : "border-transparent text-secondary hover:text-primary hover:border-secondary",
+            )}
+          >
+            Certifications
+          </button>
+          <button
+            onClick={() => setActiveTab("complianceReports")}
+            className={cn(
+              "px-4 py-3 text-sm font-medium border-b-2 -mb-px",
+              activeTab === "complianceReports"
+                ? "border-primary text-primary"
+                : "border-transparent text-secondary hover:text-primary hover:border-secondary",
+            )}
+          >
+            Compliance reports
+          </button>
+          <button
+            onClick={() => setActiveTab("riskAssessments")}
+            className={cn(
+              "px-4 py-3 text-sm font-medium border-b-2 -mb-px",
+              activeTab === "riskAssessments"
+                ? "border-primary text-primary"
+                : "border-transparent text-secondary hover:text-primary hover:border-secondary",
+            )}
+          >
+            Risk assessments
+          </button>
         </div>
+      </div>
 
-        {/* Tab content */}
-        {renderTabContent()}
+      {/* Tab content */}
+      {renderTabContent()}
 
-        {/* Save/cancel buttons */}
-        {hasChanges && (
-          <div className="mt-6 flex justify-end gap-2">
-            <Button variant="outline" onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              className="bg-primary text-invert hover:bg-primary/90"
-            >
-              Save Changes
-            </Button>
-          </div>
-        )}
-        
-        {/* Risk Assessment Modal */}
-        <RiskAssessmentModal
-          isOpen={showRiskAssessmentModal}
-          onClose={() => setShowRiskAssessmentModal(false)}
-          onSubmit={handleRiskAssessmentSubmit}
-          businessOwnerId={formData.businessOwnerId}
-        />
+      {/* Save/cancel buttons */}
+      {hasChanges && (
+        <div className="mt-6 flex justify-end gap-2">
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            className="bg-primary text-invert hover:bg-primary/90"
+          >
+            Save Changes
+          </Button>
+        </div>
+      )}
+
+      {/* Risk Assessment Modal */}
+      <RiskAssessmentModal
+        isOpen={showRiskAssessmentModal}
+        onClose={() => setShowRiskAssessmentModal(false)}
+        onSubmit={handleRiskAssessmentSubmit}
+        businessOwnerId={formData.businessOwnerId}
+      />
     </PageTemplate>
   );
 }

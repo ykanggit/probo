@@ -54,7 +54,10 @@ export function OrganizationsRoutes() {
         <Route path="vendors/:vendorId" element={<VendorPage />} />
         <Route path="policies" element={<PolicyListPage />} />
         <Route path="policies/:policyId" element={<ShowPolicyPage />} />
-        <Route path="policies/:policyId/versions/:versionId/edit" element={<EditPolicyPage />} />
+        <Route
+          path="policies/:policyId/versions/:versionId/edit"
+          element={<EditPolicyPage />}
+        />
         <Route path="risks" element={<ListRiskPage />} />
         <Route path="risks/new" element={<NewRiskPage />} />
         <Route path="risks/:riskId" element={<ShowRiskView />} />

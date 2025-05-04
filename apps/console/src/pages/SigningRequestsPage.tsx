@@ -3,7 +3,14 @@ import { useSearchParams } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { buildEndpoint } from "../utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -24,12 +31,12 @@ type SigningResponse = {
 export default function SigningRequestsPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
-  
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [signingData, setSigningData] = useState<SigningResponse | null>(null);
   const [currentDocIndex, setCurrentDocIndex] = useState(0);
-  
+
   // Fetch documents to sign using the token
   useEffect(() => {
     if (!token) {
@@ -40,13 +47,16 @@ export default function SigningRequestsPage() {
 
     async function fetchDocuments() {
       try {
-        const response = await fetch(buildEndpoint("/api/console/v1/policies/signing-requests"), {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
+        const response = await fetch(
+          buildEndpoint("/api/console/v1/policies/signing-requests"),
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           },
-        });
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch signing documents");
@@ -54,18 +64,20 @@ export default function SigningRequestsPage() {
 
         const documents: Document[] = await response.json();
         // Transform the API response to match our internal structure
-        const enhancedDocuments = documents.map(doc => ({
+        const enhancedDocuments = documents.map((doc) => ({
           ...doc,
-          signed: false
+          signed: false,
         }));
-        
+
         setSigningData({
           documents: enhancedDocuments,
           requesterName: "Requester", // Default values as they're not in the API response
-          requesterOrganization: "Organization"
+          requesterOrganization: "Organization",
         });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
+        setError(
+          err instanceof Error ? err.message : "An unknown error occurred",
+        );
       } finally {
         setLoading(false);
       }
@@ -77,17 +89,22 @@ export default function SigningRequestsPage() {
   // Handle document signing
   const handleSignDocument = async () => {
     if (!signingData || !token) return;
-    
+
     const docToSign = signingData.documents[currentDocIndex];
-    
+
     try {
-      const response = await fetch(buildEndpoint(`/api/console/v1/policies/signing-requests/${docToSign.policy_version_id}/sign`), {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        buildEndpoint(
+          `/api/console/v1/policies/signing-requests/${docToSign.policy_version_id}/sign`,
+        ),
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Failed to sign document");
@@ -124,7 +141,7 @@ export default function SigningRequestsPage() {
   // Calculate progress
   const getSignedCount = () => {
     if (!signingData) return 0;
-    return signingData.documents.filter(doc => doc.signed).length;
+    return signingData.documents.filter((doc) => doc.signed).length;
   };
 
   const getProgressPercentage = () => {
@@ -139,7 +156,9 @@ export default function SigningRequestsPage() {
         <Card className="w-full max-w-3xl">
           <CardHeader>
             <CardTitle>Loading Signing Requests</CardTitle>
-            <CardDescription>Please wait while we fetch your documents...</CardDescription>
+            <CardDescription>
+              Please wait while we fetch your documents...
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -170,7 +189,9 @@ export default function SigningRequestsPage() {
         <Card className="w-full max-w-3xl">
           <CardHeader>
             <CardTitle>No Documents to Sign</CardTitle>
-            <CardDescription>There are no documents requiring your signature at this time.</CardDescription>
+            <CardDescription>
+              There are no documents requiring your signature at this time.
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -187,24 +208,28 @@ export default function SigningRequestsPage() {
       <Helmet>
         <title>Document Signing - Probo</title>
       </Helmet>
-      
+
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-2">Document Signing Request</h1>
         <p className="text-muted-foreground">
-          From {signingData.requesterName} at {signingData.requesterOrganization}
+          From {signingData.requesterName} at{" "}
+          {signingData.requesterOrganization}
         </p>
-        
+
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-muted-foreground">
-              {getSignedCount()} of {signingData.documents.length} documents signed
+              {getSignedCount()} of {signingData.documents.length} documents
+              signed
             </span>
-            <span className="text-sm font-medium">{Math.round(getProgressPercentage())}%</span>
+            <span className="text-sm font-medium">
+              {Math.round(getProgressPercentage())}%
+            </span>
           </div>
           <Progress value={getProgressPercentage()} className="h-2" />
         </div>
       </div>
-      
+
       <Card className="w-full">
         <CardHeader>
           <CardTitle>{currentDoc.title}</CardTitle>
@@ -212,31 +237,29 @@ export default function SigningRequestsPage() {
             Document {currentDocIndex + 1} of {signingData.documents.length}
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <div className="border rounded-md p-4 min-h-[400px] bg-muted/20">
             <div className="prose prose-olive max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{currentDoc.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {currentDoc.content}
+              </ReactMarkdown>
             </div>
           </div>
         </CardContent>
-        
+
         <CardFooter className="flex justify-between">
           {currentDoc.signed ? (
             <div className="flex items-center gap-2">
               <div className="text-sm text-green-600 font-medium">✓ Signed</div>
               {!isLastDocument && (
-                <Button onClick={handleNextDocument}>
-                  Next Document
-                </Button>
+                <Button onClick={handleNextDocument}>Next Document</Button>
               )}
             </div>
           ) : (
-            <Button onClick={handleSignDocument}>
-              Sign Document
-            </Button>
+            <Button onClick={handleSignDocument}>Sign Document</Button>
           )}
-          
+
           {allSigned && (
             <div className="text-green-600 font-medium">
               All documents have been signed
@@ -246,4 +269,4 @@ export default function SigningRequestsPage() {
       </Card>
     </div>
   );
-} 
+}

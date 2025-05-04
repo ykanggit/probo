@@ -19,7 +19,11 @@ import { PageTemplate } from "@/components/PageTemplate";
 import { EditPolicyViewSkeleton } from "./EditPolicyPage";
 
 const editPolicyViewQuery = graphql`
-  query EditPolicyViewQuery($policyId: ID!, $organizationId: ID!, $policyVersionId: ID!) {
+  query EditPolicyViewQuery(
+    $policyId: ID!
+    $organizationId: ID!
+    $policyVersionId: ID!
+  ) {
     policyVersion: node(id: $policyVersionId) {
       id
       ... on PolicyVersion {
@@ -63,7 +67,7 @@ function EditPolicyViewContent({
   const { organizationId, policyId, versionId } = useParams();
   const data = usePreloadedQuery<EditPolicyViewQuery>(
     editPolicyViewQuery,
-    queryRef
+    queryRef,
   );
 
   const [content, setContent] = useState(data.policyVersion.content || "");
@@ -140,7 +144,7 @@ function EditPolicyViewContent({
               variant="outline"
               onClick={() =>
                 navigate(
-                  `/organizations/${organizationId}/policies/${policyId}`
+                  `/organizations/${organizationId}/policies/${policyId}`,
                 )
               }
             >
@@ -175,7 +179,7 @@ export default function EditPolicyView() {
 
   return (
     <Suspense fallback={<EditPolicyViewSkeleton />}>
-      <EditPolicyViewContent queryRef={queryRef}/>
+      <EditPolicyViewContent queryRef={queryRef} />
     </Suspense>
   );
 }

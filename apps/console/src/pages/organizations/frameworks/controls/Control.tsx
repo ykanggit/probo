@@ -233,8 +233,12 @@ export function Control({
   const [isUnlinkingPolicy, setIsUnlinkingPolicy] = useState(false);
 
   // Create mutation hooks
-  const [commitCreateMeasureMapping] = useMutation(createMeasureMappingMutation);
-  const [commitDeleteMeasureMapping] = useMutation(deleteMeasureMappingMutation);
+  const [commitCreateMeasureMapping] = useMutation(
+    createMeasureMappingMutation,
+  );
+  const [commitDeleteMeasureMapping] = useMutation(
+    deleteMeasureMappingMutation,
+  );
   const [commitCreatePolicyMapping] = useMutation(createPolicyMappingMutation);
   const [commitDeletePolicyMapping] = useMutation(deletePolicyMappingMutation);
 
@@ -269,16 +273,20 @@ export function Control({
       organizationMeasuresQuery,
       {
         organizationId,
-      }
+      },
     ).subscribe({
       next: (data) => {
         setOrganizationMeasuresData(data);
       },
       complete: () => {
         // Fetch linked measures for this control
-        fetchQuery<ControlLinkedMeasuresQuery>(environment, linkedMeasuresQuery, {
-          controlId: control.id,
-        }).subscribe({
+        fetchQuery<ControlLinkedMeasuresQuery>(
+          environment,
+          linkedMeasuresQuery,
+          {
+            controlId: control.id,
+          },
+        ).subscribe({
           next: (data) => {
             setLinkedMeasuresData(data);
             setIsLoadingMeasures(false);
@@ -310,7 +318,7 @@ export function Control({
   const getMeasures = useCallback(() => {
     if (!organizationMeasuresData?.organization?.measures?.edges) return [];
     return organizationMeasuresData.organization.measures.edges.map(
-      (edge) => edge.node
+      (edge) => edge.node,
     );
   }, [organizationMeasuresData]);
 
@@ -324,7 +332,7 @@ export function Control({
       const linkedMeasures = getLinkedMeasures();
       return linkedMeasures.some((measure) => measure.id === measureId);
     },
-    [getLinkedMeasures]
+    [getLinkedMeasures],
   );
 
   const getMeasureCategories = useCallback(() => {
@@ -397,7 +405,7 @@ export function Control({
             linkedMeasuresQuery,
             {
               controlId: control.id,
-            }
+            },
           ).subscribe({
             next: (data) => {
               setLinkedMeasuresData(data);
@@ -423,7 +431,7 @@ export function Control({
         },
       });
     },
-    [commitCreateMeasureMapping, control.id, environment, toast]
+    [commitCreateMeasureMapping, control.id, environment, toast],
   );
 
   const handleUnlinkMeasure = useCallback(
@@ -458,7 +466,7 @@ export function Control({
             linkedMeasuresQuery,
             {
               controlId: control.id,
-            }
+            },
           ).subscribe({
             next: (data) => {
               setLinkedMeasuresData(data);
@@ -484,7 +492,7 @@ export function Control({
         },
       });
     },
-    [commitDeleteMeasureMapping, control.id, environment, toast]
+    [commitDeleteMeasureMapping, control.id, environment, toast],
   );
 
   const handleOpenMeasureMappingDialog = useCallback(() => {
@@ -523,7 +531,7 @@ export function Control({
       organizationPoliciesQuery,
       {
         organizationId,
-      }
+      },
     ).subscribe({
       next: (data) => {
         setOrganizationPoliciesData(data);
@@ -535,7 +543,7 @@ export function Control({
           linkedPoliciesQuery,
           {
             controlId: control.id,
-          }
+          },
         ).subscribe({
           next: (data) => {
             setLinkedPoliciesData(data);
@@ -568,7 +576,7 @@ export function Control({
   const getPolicies = useCallback(() => {
     if (!organizationPoliciesData?.organization?.policies?.edges) return [];
     return organizationPoliciesData.organization.policies.edges.map(
-      (edge) => edge.node
+      (edge) => edge.node,
     );
   }, [organizationPoliciesData]);
 
@@ -582,7 +590,7 @@ export function Control({
       const linkedPolicies = getLinkedPolicies();
       return linkedPolicies.some((policy) => policy.id === policyId);
     },
-    [getLinkedPolicies]
+    [getLinkedPolicies],
   );
 
   const filteredPolicies = useCallback(() => {
@@ -634,7 +642,7 @@ export function Control({
             linkedPoliciesQuery,
             {
               controlId: control.id,
-            }
+            },
           ).subscribe({
             next: (data) => {
               setLinkedPoliciesData(data);
@@ -660,7 +668,7 @@ export function Control({
         },
       });
     },
-    [commitCreatePolicyMapping, control.id, environment, toast]
+    [commitCreatePolicyMapping, control.id, environment, toast],
   );
 
   const handleUnlinkPolicy = useCallback(
@@ -695,7 +703,7 @@ export function Control({
             linkedPoliciesQuery,
             {
               controlId: control.id,
-            }
+            },
           ).subscribe({
             next: (data) => {
               setLinkedPoliciesData(data);
@@ -721,7 +729,7 @@ export function Control({
         },
       });
     },
-    [commitDeletePolicyMapping, control.id, environment, toast]
+    [commitDeletePolicyMapping, control.id, environment, toast],
   );
 
   const handleOpenPolicyMappingDialog = useCallback(() => {
@@ -871,7 +879,7 @@ export function Control({
                                 <td className="py-3 px-4">
                                   <div
                                     className={`px-2 py-0.5 rounded-full text-xs ${getStateColor(
-                                      measure.state
+                                      measure.state,
                                     )} inline-block`}
                                   >
                                     {formatState(measure.state)}
@@ -984,7 +992,7 @@ export function Control({
                         <td className="py-3 px-4">
                           <div
                             className={`px-2 py-0.5 rounded-full text-xs ${getStateColor(
-                              measure.state
+                              measure.state,
                             )} inline-block`}
                           >
                             {formatState(measure.state)}
@@ -1076,7 +1084,9 @@ export function Control({
                         <thead className="sticky top-0 bg-white">
                           <tr className="border-b text-left text-sm text-secondary bg-invert-bg">
                             <th className="py-3 px-4 font-medium">Name</th>
-                            <th className="py-3 px-4 font-medium">Review Date</th>
+                            <th className="py-3 px-4 font-medium">
+                              Review Date
+                            </th>
                             <th className="py-3 px-4 font-medium text-right">
                               Actions
                             </th>
@@ -1103,7 +1113,7 @@ export function Control({
                                 <td className="py-3 px-4">
                                   {policy.updatedAt
                                     ? new Date(
-                                        policy.updatedAt
+                                        policy.updatedAt,
                                       ).toLocaleDateString()
                                     : "Not set"}
                                 </td>

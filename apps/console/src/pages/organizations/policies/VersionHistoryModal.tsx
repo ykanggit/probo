@@ -40,26 +40,27 @@ interface VersionHistoryModalProps {
   onRestoreVersion?: (versionNumber: number) => void;
 }
 
-export function VersionHistoryModal({ 
-  isOpen, 
-  onClose, 
+export function VersionHistoryModal({
+  isOpen,
+  onClose,
   policyRef,
-  onRestoreVersion 
+  onRestoreVersion,
 }: VersionHistoryModalProps) {
   const data = useFragment<VersionHistoryModal_policyVersions$key>(
     policyVersionsFragment,
-    policyRef
+    policyRef,
   );
-  
+
   // Safely access and extract version nodes
-  const versionNodes = data?.versionHistory?.edges?.map(edge => edge.node) || [];
-  
+  const versionNodes =
+    data?.versionHistory?.edges?.map((edge) => edge.node) || [];
+
   // Sort versions by version number (descending)
   const versions = [...versionNodes].sort((a, b) => b.version - a.version);
-  
+
   const latestVersion = versions.length > 0 ? versions[0].version : 0;
   const [selectedVersion, setSelectedVersion] = useState<number>(latestVersion);
-  
+
   // Format time helper for version history
   const formatDateTime = (dateString?: string | null) => {
     if (!dateString) return "N/A";
@@ -76,20 +77,33 @@ export function VersionHistoryModal({
             <h2 className="text-lg font-semibold p-6 pb-4">Version history</h2>
             <div className="overflow-y-auto">
               {versions.map((version) => (
-                <div 
+                <div
                   key={version.id}
-                  className={`flex items-center gap-3 p-6 py-4 cursor-pointer ${selectedVersion === version.version ? 'bg-slate-50' : ''}`}
+                  className={`flex items-center gap-3 p-6 py-4 cursor-pointer ${selectedVersion === version.version ? "bg-slate-50" : ""}`}
                   onClick={() => setSelectedVersion(version.version)}
                 >
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src="" alt={version.publishedBy?.fullName || data.owner?.fullName || ""} />
+                    <AvatarImage
+                      src=""
+                      alt={
+                        version.publishedBy?.fullName ||
+                        data.owner?.fullName ||
+                        ""
+                      }
+                    />
                     <AvatarFallback>
-                      {(version.publishedBy?.fullName || data.owner?.fullName || "").charAt(0)}
+                      {(
+                        version.publishedBy?.fullName ||
+                        data.owner?.fullName ||
+                        ""
+                      ).charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">Version {version.version}</span>
+                      <span className="font-medium">
+                        Version {version.version}
+                      </span>
                       {version.status === "PUBLISHED" ? (
                         <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800">
                           Published
@@ -101,37 +115,38 @@ export function VersionHistoryModal({
                       )}
                     </div>
                     <div className="text-sm text-tertiary">
-                      {version.publishedBy?.fullName || data.owner?.fullName || "Unknown"} • {formatDateTime(version.publishedAt || version.updatedAt)}
+                      {version.publishedBy?.fullName ||
+                        data.owner?.fullName ||
+                        "Unknown"}{" "}
+                      •{" "}
+                      {formatDateTime(version.publishedAt || version.updatedAt)}
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          
+
           {/* Content Area */}
           <div className="flex-1 p-6 relative overflow-y-auto">
             <h2 className="text-2xl font-semibold mb-6">{data.title}</h2>
-            
+
             <div className="prose prose-olive max-w-none">
               {selectedVersion && (
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {versions.find(v => v.version === selectedVersion)?.content || "No content available"}
+                  {versions.find((v) => v.version === selectedVersion)
+                    ?.content || "No content available"}
                 </ReactMarkdown>
               )}
             </div>
           </div>
         </div>
-        
+
         <div className="flex justify-end p-4 border-t border-solid-b mt-auto">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="mr-2"
-          >
+          <Button variant="outline" onClick={onClose} className="mr-2">
             Cancel
           </Button>
-          
+
           {onRestoreVersion && (
             <Button
               variant="default"
@@ -145,4 +160,4 @@ export function VersionHistoryModal({
       </DialogContent>
     </Dialog>
   );
-} 
+}

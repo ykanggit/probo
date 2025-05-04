@@ -9,10 +9,10 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function OrganizationLayout() {
   const controlMatch = useMatch(
-    "organizations/:organizationId/frameworks/:frameworkId/controls/*"
+    "organizations/:organizationId/frameworks/:frameworkId/controls/*",
   );
   const frameworkMatch = useMatch(
-    "organizations/:organizationId/frameworks/:frameworkId"
+    "organizations/:organizationId/frameworks/:frameworkId",
   );
 
   return (
@@ -28,7 +28,7 @@ export default function OrganizationLayout() {
             "p-8 h-screen overflow-auto",
             controlMatch || frameworkMatch
               ? "w-full"
-              : "mx-auto w-2xl md:w-3xl lg:w-5xl xl:w-6xl 2xl:w-7xl"
+              : "mx-auto w-2xl md:w-3xl lg:w-5xl xl:w-6xl 2xl:w-7xl",
           )}
         >
           <header className="flex shrink-0 items-center gap-2 mb-7">

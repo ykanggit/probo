@@ -70,7 +70,7 @@ function EditableField({
           }
           className={cn(
             "w-full resize-none",
-            required && !value && "border-red-500"
+            required && !value && "border-red-500",
           )}
           placeholder={`Enter ${label.toLowerCase()}`}
           rows={4}
@@ -102,7 +102,7 @@ function NewFrameworkViewContent() {
 
   const [commit, isInFlight] =
     useMutation<NewFrameworkViewCreateFrameworkMutation>(
-      createFrameworkMutation
+      createFrameworkMutation,
     );
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
@@ -126,7 +126,7 @@ function NewFrameworkViewContent() {
 
     const connectionId = ConnectionHandler.getConnectionID(
       organizationId!,
-      "FrameworkListPage_frameworks"
+      "FrameworkListPage_frameworks",
     );
 
     commit({
@@ -154,7 +154,7 @@ function NewFrameworkViewContent() {
         });
 
         navigate(
-          `/organizations/${organizationId}/frameworks/${data.createFramework.frameworkEdge.node.id}`
+          `/organizations/${organizationId}/frameworks/${data.createFramework.frameworkEdge.node.id}`,
         );
       },
       onError(error) {

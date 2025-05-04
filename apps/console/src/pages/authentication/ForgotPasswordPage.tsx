@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email }),
-        }
+        },
       );
 
       if (!response.ok) {

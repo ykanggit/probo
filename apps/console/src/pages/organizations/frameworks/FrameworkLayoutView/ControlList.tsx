@@ -34,7 +34,7 @@ export function ControlList(props: ControlListProps) {
   const { className, fragmentKey } = props;
   const { controls } = useFragment<ControlList_List$key>(
     controlListFragment,
-    fragmentKey
+    fragmentKey,
   );
 
   if (controls.edges.length === 0) {
@@ -45,7 +45,7 @@ export function ControlList(props: ControlListProps) {
     <aside
       className={cn(
         "shrink-0 w-70 border-r h-full overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-level-0 [&::-webkit-scrollbar-thumb]:bg-highlight-bg [&::-webkit-scrollbar-thumb]:rounded-xs",
-        className
+        className,
       )}
     >
       {controls.edges.map(({ node: control }, i) => (
@@ -55,7 +55,7 @@ export function ControlList(props: ControlListProps) {
           className={({ isActive }) =>
             cn(
               "block pl-8 pr-4 py-4 border-b hover:bg-h-subtle-bg",
-              (isActive || (i === 0 && !controlId)) && "bg-subtle-bg"
+              (isActive || (i === 0 && !controlId)) && "bg-subtle-bg",
             )
           }
         >
@@ -65,7 +65,7 @@ export function ControlList(props: ControlListProps) {
                 <div
                   className={cn(
                     "inline-block font-mono text-sm px-1 py-0.25 rounded-sm bg-highlight-bg border font-semibold",
-                    isActive && "font-bold bg-active-bg border-mid-b"
+                    isActive && "font-bold bg-active-bg border-mid-b",
                   )}
                 >
                   {control.referenceId}
@@ -73,7 +73,7 @@ export function ControlList(props: ControlListProps) {
                 <div
                   className={cn(
                     "text-sm leading-none break-words mt-2",
-                    isActive && "font-medium"
+                    isActive && "font-medium",
                   )}
                 >
                   {control.name.length > maxControlNameLength
