@@ -364,32 +364,57 @@ function ShowPolicyContent({
     >
       <div className="space-y-4">
         {latestVersionNode ? (
-          <div className="bg-white rounded-lg border border-solid-b shadow-sm p-6">
-            {latestVersionNode.changelog && (
-              <div className="mb-6 p-4 bg-level-1 rounded-md border border-solid-b">
-                <div className="text-xs text-tertiary uppercase font-medium mb-1">
-                  Change summary
+          <>
+            <div className="bg-gray-50 rounded-lg border border-solid-b shadow-sm p-6 mb-4">
+              <div className="grid grid-cols-2 gap-y-3">
+                <div>
+                  <span className="font-medium">Document Title:</span> {policy.title}
                 </div>
-                <div className="text-sm text-secondary">
-                  {latestVersionNode.changelog}
+                <div>
+                  <span className="font-medium">Version:</span> {latestVersionNode.version || "N/A"}
+                </div>
+                <div>
+                  <span className="font-medium">Status:</span> {latestVersionNode.status === "PUBLISHED" ? "Published" : "Draft"}
+                </div>
+                <div>
+                  <span className="font-medium">Published Date:</span> {latestVersionNode.status === "PUBLISHED" ? formatDate(latestVersionNode.publishedAt || "") : "Not yet published"}
+                </div>
+                <div>
+                  <span className="font-medium">Owner:</span> {policy.owner?.fullName || "Unknown"}
+                </div>
+                <div>
+                  <span className="font-medium">Last Modified:</span> {formatDate(latestVersionNode.updatedAt)}
                 </div>
               </div>
-            )}
-
-            <div className="prose prose-olive max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                {latestVersionNode.content || "No content available"}
-              </ReactMarkdown>
             </div>
 
-            <div className="mt-8 pt-4 border-t border-solid-b text-xs text-tertiary flex justify-between items-center">
-              <div>
-                {latestVersionNode.status === "PUBLISHED"
-                  ? `Published on ${formatDate(latestVersionNode.publishedAt || "")}${latestVersionNode.publishedBy ? ` by ${latestVersionNode.publishedBy.fullName}` : ""}`
-                  : `Last modified on ${formatDate(latestVersionNode.updatedAt)} by ${policy.owner?.fullName || "Unknown"}`}
+            <div className="bg-white rounded-lg border border-solid-b shadow-sm p-6">
+              {latestVersionNode.changelog && (
+                <div className="mb-6 p-4 bg-level-1 rounded-md border border-solid-b">
+                  <div className="text-xs text-tertiary uppercase font-medium mb-1">
+                    Change summary
+                  </div>
+                  <div className="text-sm text-secondary">
+                    {latestVersionNode.changelog}
+                  </div>
+                </div>
+              )}
+
+              <div className="prose prose-olive max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                  {latestVersionNode.content || "No content available"}
+                </ReactMarkdown>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-solid-b text-xs text-tertiary flex justify-between items-center">
+                <div>
+                  {latestVersionNode.status === "PUBLISHED"
+                    ? `Published on ${formatDate(latestVersionNode.publishedAt || "")}${latestVersionNode.publishedBy ? ` by ${latestVersionNode.publishedBy.fullName}` : ""}`
+                    : `Last modified on ${formatDate(latestVersionNode.updatedAt)} by ${policy.owner?.fullName || "Unknown"}`}
+                </div>
               </div>
             </div>
-          </div>
+          </>
         ) : (
           <div className="bg-white rounded-lg border border-solid-b shadow-sm p-6 text-center text-tertiary">
             No content available
