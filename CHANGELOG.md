@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.23.0] - 2025-05-04
+
+### Added
+
+- Add ISO 27001 document header
+
 ### Changed
 
 - Enable HTML support in Markdown renderer
