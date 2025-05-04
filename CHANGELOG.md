@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Show owner of the policy in list
+- Show number of singatures in the policy list
+
+### Changed
+
+- Link evidences to measure
+
 ## [0.21.0] - 2025-05-01
 
 ### Changed
