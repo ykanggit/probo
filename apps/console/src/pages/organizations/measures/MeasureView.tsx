@@ -1071,15 +1071,13 @@ function MeasureViewContent({
     // Get the evidence connection ID for this task
     const evidenceConnectionId = getEvidenceConnectionId(taskForEvidence.id);
 
-    uploadMeasureEvidence({
+    uploadTaskEvidence({
       variables: {
         input: {
-          measureId: measureId,
+          taskId: taskForEvidence.id,
           file: null,
         },
-        connections: getMeasureEvidenceConnectionId()
-          ? [getMeasureEvidenceConnectionId()!]
-          : [],
+        connections: evidenceConnectionId ? [evidenceConnectionId] : [],
       },
       uploadables: {
         "input.file": file,
@@ -1138,46 +1136,84 @@ function MeasureViewContent({
         variant: "default",
       });
 
-      // Use the measure evidence connection ID
-      const evidenceConnectionId = getMeasureEvidenceConnectionId();
-      console.log("Evidence connection ID:", evidenceConnectionId);
-
-      // Upload the URI file as evidence
-      uploadMeasureEvidence({
-        variables: {
-          input: {
-            measureId: measureId,
-            file: null,
+      if (taskForEvidence) {
+        // This is a task-specific evidence
+        const evidenceConnectionId = getEvidenceConnectionId(taskForEvidence.id);
+        
+        // Upload the URI file as task evidence
+        uploadTaskEvidence({
+          variables: {
+            input: {
+              taskId: taskForEvidence.id,
+              file: null,
+            },
+            connections: evidenceConnectionId ? [evidenceConnectionId] : [],
           },
-          connections: evidenceConnectionId ? [evidenceConnectionId] : [],
-        },
-        uploadables: {
-          "input.file": file,
-        },
-        onCompleted: (response) => {
-          console.log("Upload completed:", response);
-          setTaskForEvidence(null);
-          setEvidenceDialogOpen(false);
-          // Reset form fields
-          setLinkEvidenceName("");
-          setLinkEvidenceUrl("");
-          setLinkEvidenceDescription("");
+          uploadables: {
+            "input.file": file,
+          },
+          onCompleted: () => {
+            setTaskForEvidence(null);
+            setEvidenceDialogOpen(false);
+            // Reset form fields
+            setLinkEvidenceName("");
+            setLinkEvidenceUrl("");
+            setLinkEvidenceDescription("");
 
-          toast({
-            title: "Link evidence added",
-            description: "Link evidence has been added successfully.",
-            variant: "default",
-          });
-        },
-        onError: (error) => {
-          console.error("Error uploading URI file:", error);
-          toast({
-            title: "Error adding link evidence",
-            description: error.message || "Unknown error occurred",
-            variant: "destructive",
-          });
-        },
-      });
+            toast({
+              title: "Link evidence added",
+              description: "Link evidence has been added successfully.",
+              variant: "default",
+            });
+          },
+          onError: (error) => {
+            console.error("Error uploading URI file:", error);
+            toast({
+              title: "Error adding link evidence",
+              description: error.message || "Unknown error occurred",
+              variant: "destructive",
+            });
+          },
+        });
+      } else {
+        // This is a measure-level evidence
+        const evidenceConnectionId = getMeasureEvidenceConnectionId();
+        
+        // Upload the URI file as measure evidence
+        uploadMeasureEvidence({
+          variables: {
+            input: {
+              measureId: measureId,
+              file: null,
+            },
+            connections: evidenceConnectionId ? [evidenceConnectionId] : [],
+          },
+          uploadables: {
+            "input.file": file,
+          },
+          onCompleted: () => {
+            setEvidenceDialogOpen(false);
+            // Reset form fields
+            setLinkEvidenceName("");
+            setLinkEvidenceUrl("");
+            setLinkEvidenceDescription("");
+
+            toast({
+              title: "Link evidence added",
+              description: "Link evidence has been added successfully.",
+              variant: "default",
+            });
+          },
+          onError: (error) => {
+            console.error("Error uploading URI file:", error);
+            toast({
+              title: "Error adding link evidence",
+              description: error.message || "Unknown error occurred",
+              variant: "destructive",
+            });
+          },
+        });
+      }
     } catch (error) {
       console.error("Error in handleLinkEvidenceSubmit:", error);
       toast({
@@ -1222,16 +1258,16 @@ function MeasureViewContent({
       variant: "default",
     });
 
-    // Instead of using task-specific upload, use measure-level evidence
-    uploadMeasureEvidence({
+    // Get the evidence connection ID for this task
+    const evidenceConnectionId = getEvidenceConnectionId(taskId);
+
+    uploadTaskEvidence({
       variables: {
         input: {
-          measureId: measureId,
+          taskId: taskId,
           file: null,
         },
-        connections: getMeasureEvidenceConnectionId()
-          ? [getMeasureEvidenceConnectionId()!]
-          : [],
+        connections: evidenceConnectionId ? [evidenceConnectionId] : [],
       },
       uploadables: {
         "input.file": file,
@@ -2184,12 +2220,11 @@ function MeasureViewContent({
           <TabsTrigger value="evidence" className="flex items-center gap-2">
             <FileText className="w-4 h-4" />
             Evidence
-            {tasks.some(
-              (task) =>
-                task.evidences?.edges && task.evidences.edges.length > 0,
-            ) && (
+            {((measureWithEvidences.evidences?.edges && measureWithEvidences.evidences.edges.length > 0) || 
+              tasks.some((task) => task.evidences?.edges && task.evidences.edges.length > 0)) && (
               <span className="ml-1.5 bg-blue-100 text-blue-800 rounded-full text-xs px-2 py-0.5">
-                {tasks.reduce(
+                {(measureWithEvidences.evidences?.edges?.length || 0) + 
+                 tasks.reduce(
                   (count, task) => count + (task.evidences?.edges?.length || 0),
                   0,
                 )}
