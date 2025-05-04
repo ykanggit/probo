@@ -14,6 +14,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from 'rehype-raw';
 
 type Document = {
   policy_version_id: string;
@@ -241,7 +242,8 @@ export default function SigningRequestsPage() {
         <CardContent>
           <div className="border rounded-md p-4 min-h-[400px] bg-muted/20">
             <div className="prose prose-olive max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}
+              >
                 {currentDoc.content}
               </ReactMarkdown>
             </div>

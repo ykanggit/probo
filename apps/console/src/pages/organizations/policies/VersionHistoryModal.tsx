@@ -7,6 +7,7 @@ import ReactMarkdown from "react-markdown";
 import { graphql, useFragment } from "react-relay";
 import type { VersionHistoryModal_policyVersions$key } from "./__generated__/VersionHistoryModal_policyVersions.graphql";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 
 export const policyVersionsFragment = graphql`
   fragment VersionHistoryModal_policyVersions on Policy {
@@ -133,7 +134,7 @@ export function VersionHistoryModal({
 
             <div className="prose prose-olive max-w-none">
               {selectedVersion && (
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                   {versions.find((v) => v.version === selectedVersion)
                     ?.content || "No content available"}
                 </ReactMarkdown>

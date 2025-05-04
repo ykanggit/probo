@@ -108,6 +108,7 @@ import { MeasureViewRisksQuery$data } from "./__generated__/MeasureViewRisksQuer
 import { MeasureViewRisksQuery } from "./__generated__/MeasureViewRisksQuery.graphql";
 import { MeasureViewDeleteMeasureMutation } from "./__generated__/MeasureViewDeleteMeasureMutation.graphql";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string): string => {
@@ -2201,7 +2202,7 @@ function MeasureViewContent({
         <Card className="mt-4">
           <CardContent className="pt-6">
             <div className="prose prose-gray prose-sm md:prose-base text-secondary max-w-3xl">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                 {data.measure.description}
               </ReactMarkdown>
             </div>
@@ -2831,7 +2832,7 @@ function MeasureViewContent({
                         Description
                       </h3>
                       <div className="prose prose-gray prose-sm max-w-none text-primary bg-invert-bg p-4 rounded-md border border-mid-b">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                           {selectedTask.description}
                         </ReactMarkdown>
                       </div>

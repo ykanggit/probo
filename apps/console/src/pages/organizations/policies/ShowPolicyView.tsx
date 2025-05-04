@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/dialog";
 import { SignaturesModal } from "./SignaturesModal";
 import { VersionHistoryModal } from "./VersionHistoryModal";
+import rehypeRaw from "rehype-raw";
 
 const policyViewQuery = graphql`
   query ShowPolicyViewQuery($policyId: ID!) {
@@ -376,7 +377,7 @@ function ShowPolicyContent({
             )}
 
             <div className="prose prose-olive max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                 {latestVersionNode.content || "No content available"}
               </ReactMarkdown>
             </div>
