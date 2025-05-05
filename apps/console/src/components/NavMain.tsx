@@ -2,9 +2,11 @@
 
 import {
   ChevronRight,
-  ClipboardList,
-  Shield,
+  SquareCheck,
+  Inbox,
+  Store,
   type LucideIcon,
+  Flame,
 } from "lucide-react";
 import { Link, useLocation, useParams } from "react-router";
 
@@ -134,15 +136,22 @@ export function NavMain() {
 function getNavItems(organizationId?: string): NavItem[] {
   return [
     {
+      title: "Tasks",
+      icon: Inbox,
+      url: organizationId
+        ? `/organizations/${organizationId}/dashboard`
+        : undefined,
+    },
+    {
       title: "Measures",
-      icon: ClipboardList,
+      icon: SquareCheck,
       url: organizationId
         ? `/organizations/${organizationId}/measures`
         : undefined,
     },
     {
       title: "Risks",
-      icon: Shield,
+      icon: Flame,
       url: organizationId
         ? `/organizations/${organizationId}/risks`
         : undefined,
@@ -162,7 +171,7 @@ function getNavItems(organizationId?: string): NavItem[] {
     {
       title: "Vendors",
       url: `/organizations/${organizationId}/vendors`,
-      icon: ToyBrick,
+      icon: Store,
     },
     {
       title: "Policies",
