@@ -15,6 +15,7 @@
 package probo
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -26,6 +27,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/filevalidation"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 	"go.gearno.de/crypto/uuid"
@@ -34,7 +36,8 @@ import (
 
 type (
 	EvidenceService struct {
-		svc *TenantService
+		svc           *TenantService
+		fileValidator *filevalidation.FileValidator
 	}
 
 	File struct {
@@ -153,12 +156,40 @@ func (s EvidenceService) Fulfill(
 			if req.File != nil {
 				evidence.Type = coredata.EvidenceTypeFile
 
+				var fileSize int64
+				var fileContent io.ReadSeeker
+
+				if seeker, ok := req.File.(io.Seeker); ok {
+					size, err := seeker.Seek(0, io.SeekEnd)
+					if err != nil {
+						return fmt.Errorf("cannot determine file size: %w", err)
+					}
+
+					_, err = seeker.Seek(0, io.SeekStart)
+					if err != nil {
+						return fmt.Errorf("cannot reset file position: %w", err)
+					}
+					fileSize = size
+					fileContent = req.File.(io.ReadSeeker)
+				} else {
+					buf, err := io.ReadAll(req.File)
+					if err != nil {
+						return fmt.Errorf("cannot read file: %w", err)
+					}
+					fileSize = int64(len(buf))
+					fileContent = bytes.NewReader(buf)
+				}
+
 				contentType := "application/octet-stream"
 				if req.Filename != nil {
 					evidence.Filename = *req.Filename
 					if detectedType := mime.TypeByExtension(filepath.Ext(*req.Filename)); detectedType != "" {
 						contentType = detectedType
 					}
+				}
+
+				if err := s.fileValidator.Validate(evidence.Filename, contentType, fileSize); err != nil {
+					return err
 				}
 
 				objectKey, err := uuid.NewV7()
@@ -169,7 +200,7 @@ func (s EvidenceService) Fulfill(
 				_, err = s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
 					Bucket:      aws.String(s.svc.bucket),
 					Key:         aws.String(objectKey.String()),
-					Body:        req.File,
+					Body:        fileContent,
 					ContentType: aws.String(contentType),
 				})
 				if err != nil {
@@ -228,9 +259,12 @@ func (s EvidenceService) UploadTaskEvidence(
 		UpdatedAt:   now,
 	}
 
-	// TODO validate content type
 	if req.File.ContentType == "" {
 		req.File.ContentType = "application/octet-stream"
+	}
+
+	if err := s.fileValidator.Validate(req.File.Filename, req.File.ContentType, req.File.Size); err != nil {
+		return nil, err
 	}
 
 	objectKey, err := uuid.NewV7()
@@ -305,9 +339,12 @@ func (s EvidenceService) UploadMeasureEvidence(
 		UpdatedAt:   now,
 	}
 
-	// TODO validate content type
 	if req.File.ContentType == "" {
 		req.File.ContentType = "application/octet-stream"
+	}
+
+	if err := s.fileValidator.Validate(req.File.Filename, req.File.ContentType, req.File.Size); err != nil {
+		return nil, err
 	}
 
 	objectKey, err := uuid.NewV7()

@@ -15,15 +15,19 @@
 package probo
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
+	"mime"
 	"net/url"
+	"path/filepath"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/filevalidation"
 	"github.com/getprobo/probo/pkg/gid"
 	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
@@ -31,7 +35,8 @@ import (
 
 type (
 	OrganizationService struct {
-		svc *TenantService
+		svc           *TenantService
+		fileValidator *filevalidation.FileValidator
 	}
 
 	CreateOrganizationRequest struct {
@@ -39,9 +44,12 @@ type (
 	}
 
 	UpdateOrganizationRequest struct {
-		ID   gid.GID
-		Name *string
-		File io.Reader
+		ID          gid.GID
+		Name        *string
+		File        io.Reader
+		Filename    string
+		FileSize    int64
+		ContentType string
 	}
 )
 
@@ -128,10 +136,54 @@ func (s OrganizationService) Update(
 					return fmt.Errorf("cannot generate object key: %w", err)
 				}
 
+				var fileSize int64
+				var fileContent io.ReadSeeker
+				filename := req.Filename
+				contentType := req.ContentType
+
+				if seeker, ok := req.File.(io.Seeker); ok {
+					if req.FileSize <= 0 {
+						size, err := seeker.Seek(0, io.SeekEnd)
+						if err != nil {
+							return fmt.Errorf("cannot determine file size: %w", err)
+						}
+						fileSize = size
+
+						_, err = seeker.Seek(0, io.SeekStart)
+						if err != nil {
+							return fmt.Errorf("cannot reset file position: %w", err)
+						}
+					} else {
+						fileSize = req.FileSize
+					}
+					fileContent = req.File.(io.ReadSeeker)
+				} else {
+					buf, err := io.ReadAll(req.File)
+					if err != nil {
+						return fmt.Errorf("cannot read file: %w", err)
+					}
+					fileSize = int64(len(buf))
+					fileContent = bytes.NewReader(buf)
+				}
+
+				if contentType == "" {
+					contentType = "application/octet-stream"
+					if filename != "" {
+						if detectedType := mime.TypeByExtension(filepath.Ext(filename)); detectedType != "" {
+							contentType = detectedType
+						}
+					}
+				}
+
+				if err := s.fileValidator.Validate(filename, contentType, fileSize); err != nil {
+					return err
+				}
+
 				_, err = s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
-					Bucket: aws.String(s.svc.bucket),
-					Key:    aws.String(objectKey.String()),
-					Body:   req.File,
+					Bucket:      aws.String(s.svc.bucket),
+					Key:         aws.String(objectKey.String()),
+					Body:        fileContent,
+					ContentType: aws.String(contentType),
 				})
 
 				if err != nil {

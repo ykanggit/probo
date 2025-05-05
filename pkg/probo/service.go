@@ -21,6 +21,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/crypto/cipher"
+	"github.com/getprobo/probo/pkg/filevalidation"
 	"github.com/getprobo/probo/pkg/gid"
 	"go.gearno.de/kit/pg"
 )
@@ -97,11 +98,25 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.Frameworks = &FrameworkService{svc: tenantService}
 	tenantService.Measures = &MeasureService{svc: tenantService}
 	tenantService.Tasks = &TaskService{svc: tenantService}
-	tenantService.Evidences = &EvidenceService{svc: tenantService}
+	tenantService.Evidences = &EvidenceService{
+		svc: tenantService,
+		fileValidator: filevalidation.NewValidator(
+			filevalidation.CategoryDocument,
+			filevalidation.CategorySpreadsheet,
+			filevalidation.CategoryPresentation,
+			filevalidation.CategoryImage,
+			filevalidation.CategoryVideo,
+		),
+	}
 	tenantService.Peoples = &PeopleService{svc: tenantService}
 	tenantService.Vendors = &VendorService{svc: tenantService}
 	tenantService.Policies = &PolicyService{svc: tenantService}
-	tenantService.Organizations = &OrganizationService{svc: tenantService}
+	tenantService.Organizations = &OrganizationService{
+		svc: tenantService,
+		fileValidator: filevalidation.NewValidator(
+			filevalidation.CategoryImage,
+		),
+	}
 	tenantService.Controls = &ControlService{svc: tenantService}
 	tenantService.Risks = &RiskService{svc: tenantService}
 	tenantService.VendorComplianceReports = &VendorComplianceReportService{svc: tenantService}
