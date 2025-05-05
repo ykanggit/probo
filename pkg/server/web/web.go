@@ -18,20 +18,21 @@ import (
 	"compress/gzip"
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/getprobo/probo/apps/console"
 )
 
 type Server struct {
 	spaFS        http.FileSystem
-	indexContent []byte
+	etags        map[string]string
 	indexETag    string
+	indexContent []byte
 }
 
 func NewServer() (*Server, error) {
@@ -40,31 +41,69 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
+	etags := make(map[string]string)
+
+	err = fs.WalkDir(
+		subFS,
+		".",
+		func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if d.IsDir() {
+				return nil
+			}
+
+			info, err := d.Info()
+			if err != nil {
+				return err
+			}
+
+			content := make([]byte, info.Size())
+			file, err := subFS.Open(path)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
+			_, err = file.Read(content)
+			if err != nil {
+				return err
+			}
+
+			hash := md5.Sum(content)
+			etag := hex.EncodeToString(hash[:])
+			etags["/"+path] = etag
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate etags: %w", err)
+	}
+
+	indexETag, ok := etags["/index.html"]
+	if !ok {
+		return nil, errors.New("index.html not found")
+	}
+
 	indexFile, err := subFS.Open("index.html")
 	if err != nil {
 		return nil, err
 	}
-	defer indexFile.Close()
 
-	stat, err := indexFile.Stat()
+	indexContent, err := io.ReadAll(indexFile)
 	if err != nil {
 		return nil, err
 	}
-
-	indexContent := make([]byte, stat.Size())
-	_, err = indexFile.Read(indexContent)
-	if err != nil {
-		return nil, err
-	}
-
-	// Generate ETag for index.html
-	hash := md5.Sum(indexContent)
-	indexETag := hex.EncodeToString(hash[:])
 
 	return &Server{
 		spaFS:        http.FS(subFS),
-		indexContent: indexContent,
 		indexETag:    indexETag,
+		indexContent: indexContent,
+		etags:        etags,
 	}, nil
 }
 
@@ -72,66 +111,78 @@ func (s *Server) ServeSPA(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
 	f, err := s.spaFS.Open(path)
-	if err == nil {
-		defer f.Close()
+	if err != nil {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().Set("ETag", `"`+s.indexETag+`"`)
 
-		info, err := f.Stat()
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		if r.Header.Get("If-None-Match") == `"`+s.indexETag+`"` {
+			w.WriteHeader(http.StatusNotModified)
 			return
 		}
 
-		etag := fmt.Sprintf(`"%x-%x"`, info.Size(), info.ModTime().Unix())
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
 
-		lastModified := info.ModTime().Format(http.TimeFormat)
-
-		w.Header().Set("ETag", etag)
-		w.Header().Set("Last-Modified", lastModified)
-
-		if matchETag := r.Header.Get("If-None-Match"); matchETag != "" {
-			if matchETag == etag {
-				w.WriteHeader(http.StatusNotModified)
-				return
-			}
-		}
-
-		if modifiedSince := r.Header.Get("If-Modified-Since"); modifiedSince != "" {
-			if t, err := time.Parse(http.TimeFormat, modifiedSince); err == nil {
-				if info.ModTime().Unix() <= t.Unix() {
-					w.WriteHeader(http.StatusNotModified)
-					return
-				}
-			}
-		}
-
-		if strings.HasSuffix(path, ".js") || strings.HasSuffix(path, ".css") ||
-			strings.HasSuffix(path, ".png") || strings.HasSuffix(path, ".jpg") ||
-			strings.HasSuffix(path, ".svg") || strings.HasSuffix(path, ".woff2") {
-			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable") // 1 year
-		} else {
-			w.Header().Set("Cache-Control", "public, max-age=3600") // 1 hour
-		}
-
-		w.Header().Set("Transfer-Encoding", "chunked")
-
-		// Serve the file
-		http.FileServer(s.spaFS).ServeHTTP(w, r)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Header().Set("ETag", `"`+s.indexETag+`"`)
-
-	if r.Header.Get("If-None-Match") == `"`+s.indexETag+`"` {
-		w.WriteHeader(http.StatusNotModified)
+		w.WriteHeader(http.StatusOK)
+		w.Write(s.indexContent)
 		return
 	}
 
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
+	defer f.Close()
 
-	w.WriteHeader(http.StatusOK)
-	w.Write(s.indexContent)
+	info, err := f.Stat()
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	if info.IsDir() {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().Set("ETag", `"`+s.indexETag+`"`)
+
+		if r.Header.Get("If-None-Match") == `"`+s.indexETag+`"` {
+			w.WriteHeader(http.StatusNotModified)
+			return
+		}
+
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(s.indexContent)
+		return
+	}
+
+	etag, ok := s.etags[path]
+	if !ok {
+		fmt.Printf("XXX %+#v\n", path)
+
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("ETag", etag)
+
+	if matchETag := r.Header.Get("If-None-Match"); matchETag != "" {
+		if matchETag == etag {
+			w.WriteHeader(http.StatusNotModified)
+			return
+		}
+	}
+
+	if strings.HasSuffix(path, ".js") || strings.HasSuffix(path, ".css") ||
+		strings.HasSuffix(path, ".png") || strings.HasSuffix(path, ".jpg") ||
+		strings.HasSuffix(path, ".svg") || strings.HasSuffix(path, ".woff2") {
+		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+	} else {
+		w.Header().Set("Cache-Control", "public, max-age=3600")
+	}
+
+	w.Header().Set("Transfer-Encoding", "chunked")
+
+	http.FileServer(s.spaFS).ServeHTTP(w, r)
 }
 
 type gzipResponseWriter struct {
