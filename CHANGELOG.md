@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.23.1] - 2025-05-04
+
+### Fixed
+
+- Fix http cache etag
+- Fix cannot delete measure
+
 ## [0.23.0] - 2025-05-04
 
 ### Added
