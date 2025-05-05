@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Security
+
+- Add filetype validation for end-user upload
+
 ## [0.23.1] - 2025-05-04
 
 ### Fixed
