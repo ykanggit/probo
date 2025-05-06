@@ -119,8 +119,12 @@ func (s EvidenceService) Request(
 					return fmt.Errorf("cannot load task: %w", err)
 				}
 
+				if task.MeasureID == nil {
+					return fmt.Errorf("task %q has no measure", req.TaskID)
+				}
+
 				evidence.TaskID = req.TaskID
-				evidence.MeasureID = task.MeasureID
+				evidence.MeasureID = *task.MeasureID
 			} else if req.MeasureID != nil {
 				evidence.MeasureID = *req.MeasureID
 			} else {
@@ -298,7 +302,11 @@ func (s EvidenceService) UploadTaskEvidence(
 				return fmt.Errorf("cannot load task %q: %w", req.TaskID, err)
 			}
 
-			evidence.MeasureID = task.MeasureID
+			if task.MeasureID == nil {
+				return fmt.Errorf("task %q has no measure", req.TaskID)
+			}
+
+			evidence.MeasureID = *task.MeasureID
 
 			if err := evidence.Insert(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert evidence: %w", err)

@@ -168,14 +168,15 @@ func (s MeasureService) Import(
 					taskID := gid.New(organizationID.TenantID(), coredata.TaskEntityType)
 
 					task := &coredata.Task{
-						ID:          taskID,
-						MeasureID:   measure.ID,
-						Name:        req.Measures[i].Tasks[j].Name,
-						Description: req.Measures[i].Tasks[j].Description,
-						ReferenceID: req.Measures[i].Tasks[j].ReferenceID,
-						State:       coredata.TaskStateTodo,
-						CreatedAt:   now,
-						UpdatedAt:   now,
+						ID:             taskID,
+						OrganizationID: organizationID,
+						MeasureID:      &measure.ID,
+						Name:           req.Measures[i].Tasks[j].Name,
+						Description:    req.Measures[i].Tasks[j].Description,
+						ReferenceID:    req.Measures[i].Tasks[j].ReferenceID,
+						State:          coredata.TaskStateTodo,
+						CreatedAt:      now,
+						UpdatedAt:      now,
 					}
 
 					if err := task.Upsert(ctx, tx, s.svc.scope); err != nil {

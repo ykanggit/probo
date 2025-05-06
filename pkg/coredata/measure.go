@@ -30,7 +30,6 @@ import (
 type (
 	Measure struct {
 		ID             gid.GID      `db:"id"`
-		TenantID       gid.TenantID `db:"tenant_id"`
 		OrganizationID gid.GID      `db:"organization_id"`
 		Category       string       `db:"category"`
 		Name           string       `db:"name"`
@@ -82,7 +81,6 @@ WITH msrs AS (
 )
 SELECT
 	id,
-	tenant_id,
 	organization_id,
 	category,
 	name,
@@ -146,7 +144,6 @@ WITH mtgtns AS (
 )
 SELECT
 	id,
-	tenant_id,
 	organization_id,
 	category,
 	name,
@@ -191,7 +188,6 @@ func (m *Measures) LoadByOrganizationID(
 	q := `
 SELECT
     id,
-	tenant_id,
     organization_id,
 	category,
     name,
@@ -237,7 +233,6 @@ func (m *Measure) LoadByID(
 	q := `
 SELECT
     id,
-	tenant_id,
     organization_id,
     category,
     name,
@@ -311,7 +306,6 @@ ON CONFLICT (organization_id, reference_id) DO UPDATE SET
     category = @category,
     updated_at = @updated_at
 RETURNING
-	tenant_id,
     id,
     organization_id,
 	category,

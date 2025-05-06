@@ -94,6 +94,7 @@ type ComplexityRoot struct {
 	Control struct {
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
+		Framework   func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Measures    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) int
 		Name        func(childComplexity int) int
@@ -235,9 +236,11 @@ type ComplexityRoot struct {
 		FileURL     func(childComplexity int) int
 		Filename    func(childComplexity int) int
 		ID          func(childComplexity int) int
+		Measure     func(childComplexity int) int
 		MimeType    func(childComplexity int) int
 		Size        func(childComplexity int) int
 		State       func(childComplexity int) int
+		Task        func(childComplexity int) int
 		Type        func(childComplexity int) int
 		URL         func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
@@ -254,12 +257,13 @@ type ComplexityRoot struct {
 	}
 
 	Framework struct {
-		Controls    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) int
-		CreatedAt   func(childComplexity int) int
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
+		Controls     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) int
+		CreatedAt    func(childComplexity int) int
+		Description  func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Name         func(childComplexity int) int
+		Organization func(childComplexity int) int
+		UpdatedAt    func(childComplexity int) int
 	}
 
 	FrameworkConnection struct {
@@ -377,6 +381,7 @@ type ComplexityRoot struct {
 		Peoples    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) int
 		Policies   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) int
 		Risks      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) int
+		Tasks      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) int
 		UpdatedAt  func(childComplexity int) int
 		Users      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrderBy) int
 		Vendors    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) int
@@ -425,6 +430,7 @@ type ComplexityRoot struct {
 		CurrentPublishedVersion func(childComplexity int) int
 		Description             func(childComplexity int) int
 		ID                      func(childComplexity int) int
+		Organization            func(childComplexity int) int
 		Owner                   func(childComplexity int) int
 		Title                   func(childComplexity int) int
 		UpdatedAt               func(childComplexity int) int
@@ -521,6 +527,7 @@ type ComplexityRoot struct {
 		Measures           func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) int
 		Name               func(childComplexity int) int
 		Note               func(childComplexity int) int
+		Organization       func(childComplexity int) int
 		Owner              func(childComplexity int) int
 		Policies           func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) int
 		ResidualImpact     func(childComplexity int) int
@@ -555,7 +562,9 @@ type ComplexityRoot struct {
 		Description  func(childComplexity int) int
 		Evidences    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) int
 		ID           func(childComplexity int) int
+		Measure      func(childComplexity int) int
 		Name         func(childComplexity int) int
+		Organization func(childComplexity int) int
 		State        func(childComplexity int) int
 		TimeEstimate func(childComplexity int) int
 		UpdatedAt    func(childComplexity int) int
@@ -653,6 +662,7 @@ type ComplexityRoot struct {
 		ID                         func(childComplexity int) int
 		LegalName                  func(childComplexity int) int
 		Name                       func(childComplexity int) int
+		Organization               func(childComplexity int) int
 		PrivacyPolicyURL           func(childComplexity int) int
 		RiskAssessments            func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorRiskAssessmentOrder) int
 		SecurityOwner              func(childComplexity int) int
@@ -728,13 +738,18 @@ type ComplexityRoot struct {
 }
 
 type ControlResolver interface {
+	Framework(ctx context.Context, obj *types.Control) (*types.Framework, error)
 	Measures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error)
 	Policies(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error)
 }
 type EvidenceResolver interface {
 	FileURL(ctx context.Context, obj *types.Evidence) (*string, error)
+
+	Task(ctx context.Context, obj *types.Evidence) (*types.Task, error)
+	Measure(ctx context.Context, obj *types.Evidence) (*types.Measure, error)
 }
 type FrameworkResolver interface {
+	Organization(ctx context.Context, obj *types.Framework) (*types.Organization, error)
 	Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
 }
 type MeasureResolver interface {
@@ -806,9 +821,11 @@ type OrganizationResolver interface {
 	Policies(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error)
 	Measures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error)
 	Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error)
+	Tasks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
 }
 type PolicyResolver interface {
 	Owner(ctx context.Context, obj *types.Policy) (*types.People, error)
+	Organization(ctx context.Context, obj *types.Policy) (*types.Organization, error)
 	Versions(ctx context.Context, obj *types.Policy, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyVersionOrderBy, filter *types.PolicyVersionFilter) (*types.PolicyVersionConnection, error)
 	Controls(ctx context.Context, obj *types.Policy, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
 }
@@ -831,18 +848,22 @@ type QueryResolver interface {
 }
 type RiskResolver interface {
 	Owner(ctx context.Context, obj *types.Risk) (*types.People, error)
+	Organization(ctx context.Context, obj *types.Risk) (*types.Organization, error)
 	Measures(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error)
 	Policies(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) (*types.PolicyConnection, error)
 	Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error)
 }
 type TaskResolver interface {
 	AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error)
+	Organization(ctx context.Context, obj *types.Task) (*types.Organization, error)
+	Measure(ctx context.Context, obj *types.Task) (*types.Measure, error)
 	Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error)
 }
 type UserResolver interface {
 	People(ctx context.Context, obj *types.User, organizationID gid.GID) (*types.People, error)
 }
 type VendorResolver interface {
+	Organization(ctx context.Context, obj *types.Vendor) (*types.Organization, error)
 	ComplianceReports(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) (*types.VendorComplianceReportConnection, error)
 	RiskAssessments(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorRiskAssessmentOrder) (*types.VendorRiskAssessmentConnection, error)
 	BusinessOwner(ctx context.Context, obj *types.Vendor) (*types.People, error)
@@ -971,6 +992,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Control.Description(childComplexity), true
+
+	case "Control.framework":
+		if e.complexity.Control.Framework == nil {
+			break
+		}
+
+		return e.complexity.Control.Framework(childComplexity), true
 
 	case "Control.id":
 		if e.complexity.Control.ID == nil {
@@ -1297,6 +1325,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Evidence.ID(childComplexity), true
 
+	case "Evidence.measure":
+		if e.complexity.Evidence.Measure == nil {
+			break
+		}
+
+		return e.complexity.Evidence.Measure(childComplexity), true
+
 	case "Evidence.mimeType":
 		if e.complexity.Evidence.MimeType == nil {
 			break
@@ -1317,6 +1352,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Evidence.State(childComplexity), true
+
+	case "Evidence.task":
+		if e.complexity.Evidence.Task == nil {
+			break
+		}
+
+		return e.complexity.Evidence.Task(childComplexity), true
 
 	case "Evidence.type":
 		if e.complexity.Evidence.Type == nil {
@@ -1406,6 +1448,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Framework.Name(childComplexity), true
+
+	case "Framework.organization":
+		if e.complexity.Framework.Organization == nil {
+			break
+		}
+
+		return e.complexity.Framework.Organization(childComplexity), true
 
 	case "Framework.updatedAt":
 		if e.complexity.Framework.UpdatedAt == nil {
@@ -2307,6 +2356,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Organization.Risks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.RiskOrderBy)), true
 
+	case "Organization.tasks":
+		if e.complexity.Organization.Tasks == nil {
+			break
+		}
+
+		args, err := ec.field_Organization_tasks_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Organization.Tasks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.TaskOrderBy)), true
+
 	case "Organization.updatedAt":
 		if e.complexity.Organization.UpdatedAt == nil {
 			break
@@ -2510,6 +2571,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Policy.ID(childComplexity), true
+
+	case "Policy.organization":
+		if e.complexity.Policy.Organization == nil {
+			break
+		}
+
+		return e.complexity.Policy.Organization(childComplexity), true
 
 	case "Policy.owner":
 		if e.complexity.Policy.Owner == nil {
@@ -2914,6 +2982,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Risk.Note(childComplexity), true
 
+	case "Risk.organization":
+		if e.complexity.Risk.Organization == nil {
+			break
+		}
+
+		return e.complexity.Risk.Organization(childComplexity), true
+
 	case "Risk.owner":
 		if e.complexity.Risk.Owner == nil {
 			break
@@ -3057,12 +3132,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.ID(childComplexity), true
 
+	case "Task.measure":
+		if e.complexity.Task.Measure == nil {
+			break
+		}
+
+		return e.complexity.Task.Measure(childComplexity), true
+
 	case "Task.name":
 		if e.complexity.Task.Name == nil {
 			break
 		}
 
 		return e.complexity.Task.Name(childComplexity), true
+
+	case "Task.organization":
+		if e.complexity.Task.Organization == nil {
+			break
+		}
+
+		return e.complexity.Task.Organization(childComplexity), true
 
 	case "Task.state":
 		if e.complexity.Task.State == nil {
@@ -3353,6 +3442,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Vendor.Name(childComplexity), true
+
+	case "Vendor.organization":
+		if e.complexity.Vendor.Organization == nil {
+			break
+		}
+
+		return e.complexity.Vendor.Organization(childComplexity), true
 
 	case "Vendor.privacyPolicyUrl":
 		if e.complexity.Vendor.PrivacyPolicyURL == nil {
@@ -4310,6 +4406,14 @@ type Organization implements Node {
     orderBy: RiskOrder
   ): RiskConnection! @goField(forceResolver: true)
 
+  tasks(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: TaskOrder
+  ): TaskConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -4346,6 +4450,8 @@ type Vendor implements Node {
   id: ID!
   name: String!
   description: String
+
+  organization: Organization! @goField(forceResolver: true)
 
   complianceReports(
     first: Int
@@ -4387,10 +4493,8 @@ type VendorComplianceReport implements Node {
   reportDate: Datetime!
   validUntil: Datetime
   reportName: String!
-
   fileUrl: String! @goField(forceResolver: true)
   fileSize: Int!
-
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -4399,6 +4503,8 @@ type Framework implements Node {
   id: ID!
   name: String!
   description: String!
+
+  organization: Organization! @goField(forceResolver: true)
 
   controls(
     first: Int
@@ -4417,6 +4523,8 @@ type Control implements Node {
   referenceId: String!
   name: String!
   description: String!
+
+  framework: Framework! @goField(forceResolver: true)
 
   measures(
     first: Int
@@ -4489,6 +4597,9 @@ type Task implements Node {
   timeEstimate: Duration
   assignedTo: People @goField(forceResolver: true)
 
+  organization: Organization! @goField(forceResolver: true)
+  measure: Measure @goField(forceResolver: true)
+
   evidences(
     first: Int
     after: CursorKey
@@ -4512,6 +4623,9 @@ type Evidence implements Node {
   url: String
   description: String!
 
+  task: Task @goField(forceResolver: true)
+  measure: Measure! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -4522,6 +4636,7 @@ type Policy implements Node {
   description: String!
   currentPublishedVersion: Int
   owner: People! @goField(forceResolver: true)
+  organization: Organization! @goField(forceResolver: true)
 
   versions(
     first: Int
@@ -4559,6 +4674,7 @@ type Risk implements Node {
   note: String!
 
   owner: People @goField(forceResolver: true)
+  organization: Organization! @goField(forceResolver: true)
 
   measures(
     first: Int
@@ -4989,7 +5105,8 @@ input ImportMeasureInput {
 }
 
 input CreateTaskInput {
-  measureId: ID!
+  organizationId: ID!
+  measureId: ID
   name: String!
   description: String!
   timeEstimate: Duration
@@ -7944,6 +8061,101 @@ func (ec *executionContext) field_Organization_risks_argsOrderBy(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Organization_tasks_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Organization_tasks_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Organization_tasks_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Organization_tasks_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Organization_tasks_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Organization_tasks_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_Organization_tasks_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_tasks_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_tasks_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_tasks_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_tasks_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.TaskOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOTaskOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.TaskOrderBy
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Organization_users_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -9322,6 +9534,10 @@ func (ec *executionContext) fieldContext_AssignTaskPayload_task(_ context.Contex
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
 			case "assignedTo":
 				return ec.fieldContext_Task_assignedTo(ctx, field)
+			case "organization":
+				return ec.fieldContext_Task_organization(ctx, field)
+			case "measure":
+				return ec.fieldContext_Task_measure(ctx, field)
 			case "evidences":
 				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
@@ -9979,6 +10195,66 @@ func (ec *executionContext) fieldContext_Control_description(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Control_framework(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_framework(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Control().Framework(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Framework)
+	fc.Result = res
+	return ec.marshalNFramework2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_framework(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Framework_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Framework_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Framework_description(ctx, field)
+			case "organization":
+				return ec.fieldContext_Framework_organization(ctx, field)
+			case "controls":
+				return ec.fieldContext_Framework_controls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Framework_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Framework_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Framework", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Control_measures(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Control_measures(ctx, field)
 	if err != nil {
@@ -10384,6 +10660,8 @@ func (ec *executionContext) fieldContext_ControlEdge_node(_ context.Context, fie
 				return ec.fieldContext_Control_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Control_description(ctx, field)
+			case "framework":
+				return ec.fieldContext_Control_framework(ctx, field)
 			case "measures":
 				return ec.fieldContext_Control_measures(ctx, field)
 			case "policies":
@@ -12181,6 +12459,139 @@ func (ec *executionContext) fieldContext_Evidence_description(_ context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Evidence_task(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_task(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Evidence().Task(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.Task)
+	fc.Result = res
+	return ec.marshalOTask2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTask(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_task(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Task_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Task_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Task_description(ctx, field)
+			case "state":
+				return ec.fieldContext_Task_state(ctx, field)
+			case "timeEstimate":
+				return ec.fieldContext_Task_timeEstimate(ctx, field)
+			case "assignedTo":
+				return ec.fieldContext_Task_assignedTo(ctx, field)
+			case "organization":
+				return ec.fieldContext_Task_organization(ctx, field)
+			case "measure":
+				return ec.fieldContext_Task_measure(ctx, field)
+			case "evidences":
+				return ec.fieldContext_Task_evidences(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Evidence_measure(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Evidence_measure(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Evidence().Measure(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Measure)
+	fc.Result = res
+	return ec.marshalNMeasure2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasure(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Evidence_measure(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Evidence",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Measure_id(ctx, field)
+			case "category":
+				return ec.fieldContext_Measure_category(ctx, field)
+			case "name":
+				return ec.fieldContext_Measure_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Measure_description(ctx, field)
+			case "state":
+				return ec.fieldContext_Measure_state(ctx, field)
+			case "evidences":
+				return ec.fieldContext_Measure_evidences(ctx, field)
+			case "tasks":
+				return ec.fieldContext_Measure_tasks(ctx, field)
+			case "risks":
+				return ec.fieldContext_Measure_risks(ctx, field)
+			case "controls":
+				return ec.fieldContext_Measure_controls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Measure_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Measure_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Measure", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Evidence_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Evidence) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Evidence_createdAt(ctx, field)
 	if err != nil {
@@ -12474,6 +12885,10 @@ func (ec *executionContext) fieldContext_EvidenceEdge_node(_ context.Context, fi
 				return ec.fieldContext_Evidence_url(ctx, field)
 			case "description":
 				return ec.fieldContext_Evidence_description(ctx, field)
+			case "task":
+				return ec.fieldContext_Evidence_task(ctx, field)
+			case "measure":
+				return ec.fieldContext_Evidence_measure(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Evidence_createdAt(ctx, field)
 			case "updatedAt":
@@ -12612,6 +13027,80 @@ func (ec *executionContext) fieldContext_Framework_description(_ context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Framework_organization(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Framework_organization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Framework().Organization(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Organization)
+	fc.Result = res
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Framework_organization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Framework",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Organization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Organization_name(ctx, field)
+			case "logoUrl":
+				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "connectors":
+				return ec.fieldContext_Organization_connectors(ctx, field)
+			case "frameworks":
+				return ec.fieldContext_Organization_frameworks(ctx, field)
+			case "vendors":
+				return ec.fieldContext_Organization_vendors(ctx, field)
+			case "peoples":
+				return ec.fieldContext_Organization_peoples(ctx, field)
+			case "policies":
+				return ec.fieldContext_Organization_policies(ctx, field)
+			case "measures":
+				return ec.fieldContext_Organization_measures(ctx, field)
+			case "risks":
+				return ec.fieldContext_Organization_risks(ctx, field)
+			case "tasks":
+				return ec.fieldContext_Organization_tasks(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Organization_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Organization_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -12959,6 +13448,8 @@ func (ec *executionContext) fieldContext_FrameworkEdge_node(_ context.Context, f
 				return ec.fieldContext_Framework_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Framework_description(ctx, field)
+			case "organization":
+				return ec.fieldContext_Framework_organization(ctx, field)
 			case "controls":
 				return ec.fieldContext_Framework_controls(ctx, field)
 			case "createdAt":
@@ -17564,6 +18055,67 @@ func (ec *executionContext) fieldContext_Organization_risks(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Organization_tasks(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_tasks(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Organization().Tasks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.TaskOrderBy))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TaskConnection)
+	fc.Result = res
+	return ec.marshalNTaskConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_tasks(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_TaskConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_TaskConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TaskConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Organization_tasks_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Organization_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Organization_createdAt(ctx, field)
 	if err != nil {
@@ -17861,6 +18413,8 @@ func (ec *executionContext) fieldContext_OrganizationEdge_node(_ context.Context
 				return ec.fieldContext_Organization_measures(ctx, field)
 			case "risks":
 				return ec.fieldContext_Organization_risks(ctx, field)
+			case "tasks":
+				return ec.fieldContext_Organization_tasks(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Organization_createdAt(ctx, field)
 			case "updatedAt":
@@ -18791,6 +19345,80 @@ func (ec *executionContext) fieldContext_Policy_owner(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Policy_organization(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Policy_organization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Policy().Organization(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Organization)
+	fc.Result = res
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Policy_organization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Policy",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Organization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Organization_name(ctx, field)
+			case "logoUrl":
+				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "connectors":
+				return ec.fieldContext_Organization_connectors(ctx, field)
+			case "frameworks":
+				return ec.fieldContext_Organization_frameworks(ctx, field)
+			case "vendors":
+				return ec.fieldContext_Organization_vendors(ctx, field)
+			case "peoples":
+				return ec.fieldContext_Organization_peoples(ctx, field)
+			case "policies":
+				return ec.fieldContext_Organization_policies(ctx, field)
+			case "measures":
+				return ec.fieldContext_Organization_measures(ctx, field)
+			case "risks":
+				return ec.fieldContext_Organization_risks(ctx, field)
+			case "tasks":
+				return ec.fieldContext_Organization_tasks(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Organization_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Organization_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Policy_versions(ctx context.Context, field graphql.CollectedField, obj *types.Policy) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Policy_versions(ctx, field)
 	if err != nil {
@@ -19198,6 +19826,8 @@ func (ec *executionContext) fieldContext_PolicyEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Policy_currentPublishedVersion(ctx, field)
 			case "owner":
 				return ec.fieldContext_Policy_owner(ctx, field)
+			case "organization":
+				return ec.fieldContext_Policy_organization(ctx, field)
 			case "versions":
 				return ec.fieldContext_Policy_versions(ctx, field)
 			case "controls":
@@ -19306,6 +19936,8 @@ func (ec *executionContext) fieldContext_PolicyVersion_policy(_ context.Context,
 				return ec.fieldContext_Policy_currentPublishedVersion(ctx, field)
 			case "owner":
 				return ec.fieldContext_Policy_owner(ctx, field)
+			case "organization":
+				return ec.fieldContext_Policy_organization(ctx, field)
 			case "versions":
 				return ec.fieldContext_Policy_versions(ctx, field)
 			case "controls":
@@ -20738,6 +21370,8 @@ func (ec *executionContext) fieldContext_PublishPolicyVersionPayload_policy(_ co
 				return ec.fieldContext_Policy_currentPublishedVersion(ctx, field)
 			case "owner":
 				return ec.fieldContext_Policy_owner(ctx, field)
+			case "organization":
+				return ec.fieldContext_Policy_organization(ctx, field)
 			case "versions":
 				return ec.fieldContext_Policy_versions(ctx, field)
 			case "controls":
@@ -21720,6 +22354,80 @@ func (ec *executionContext) fieldContext_Risk_owner(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Risk_organization(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Risk_organization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Risk().Organization(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Organization)
+	fc.Result = res
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Risk_organization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Risk",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Organization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Organization_name(ctx, field)
+			case "logoUrl":
+				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "connectors":
+				return ec.fieldContext_Organization_connectors(ctx, field)
+			case "frameworks":
+				return ec.fieldContext_Organization_frameworks(ctx, field)
+			case "vendors":
+				return ec.fieldContext_Organization_vendors(ctx, field)
+			case "peoples":
+				return ec.fieldContext_Organization_peoples(ctx, field)
+			case "policies":
+				return ec.fieldContext_Organization_policies(ctx, field)
+			case "measures":
+				return ec.fieldContext_Organization_measures(ctx, field)
+			case "risks":
+				return ec.fieldContext_Organization_risks(ctx, field)
+			case "tasks":
+				return ec.fieldContext_Organization_tasks(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Organization_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Organization_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Risk_measures(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Risk_measures(ctx, field)
 	if err != nil {
@@ -22204,6 +22912,8 @@ func (ec *executionContext) fieldContext_RiskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Risk_note(ctx, field)
 			case "owner":
 				return ec.fieldContext_Risk_owner(ctx, field)
+			case "organization":
+				return ec.fieldContext_Risk_organization(ctx, field)
 			case "measures":
 				return ec.fieldContext_Risk_measures(ctx, field)
 			case "policies":
@@ -22627,6 +23337,145 @@ func (ec *executionContext) fieldContext_Task_assignedTo(_ context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Task_organization(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_organization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().Organization(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Organization)
+	fc.Result = res
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_organization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Organization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Organization_name(ctx, field)
+			case "logoUrl":
+				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "connectors":
+				return ec.fieldContext_Organization_connectors(ctx, field)
+			case "frameworks":
+				return ec.fieldContext_Organization_frameworks(ctx, field)
+			case "vendors":
+				return ec.fieldContext_Organization_vendors(ctx, field)
+			case "peoples":
+				return ec.fieldContext_Organization_peoples(ctx, field)
+			case "policies":
+				return ec.fieldContext_Organization_policies(ctx, field)
+			case "measures":
+				return ec.fieldContext_Organization_measures(ctx, field)
+			case "risks":
+				return ec.fieldContext_Organization_risks(ctx, field)
+			case "tasks":
+				return ec.fieldContext_Organization_tasks(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Organization_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Organization_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Task_measure(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_measure(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().Measure(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.Measure)
+	fc.Result = res
+	return ec.marshalOMeasure2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasure(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_measure(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Measure_id(ctx, field)
+			case "category":
+				return ec.fieldContext_Measure_category(ctx, field)
+			case "name":
+				return ec.fieldContext_Measure_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Measure_description(ctx, field)
+			case "state":
+				return ec.fieldContext_Measure_state(ctx, field)
+			case "evidences":
+				return ec.fieldContext_Measure_evidences(ctx, field)
+			case "tasks":
+				return ec.fieldContext_Measure_tasks(ctx, field)
+			case "risks":
+				return ec.fieldContext_Measure_risks(ctx, field)
+			case "controls":
+				return ec.fieldContext_Measure_controls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Measure_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Measure_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Measure", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Task_evidences(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_evidences(ctx, field)
 	if err != nil {
@@ -22975,6 +23824,10 @@ func (ec *executionContext) fieldContext_TaskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
 			case "assignedTo":
 				return ec.fieldContext_Task_assignedTo(ctx, field)
+			case "organization":
+				return ec.fieldContext_Task_organization(ctx, field)
+			case "measure":
+				return ec.fieldContext_Task_measure(ctx, field)
 			case "evidences":
 				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
@@ -23039,6 +23892,10 @@ func (ec *executionContext) fieldContext_UnassignTaskPayload_task(_ context.Cont
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
 			case "assignedTo":
 				return ec.fieldContext_Task_assignedTo(ctx, field)
+			case "organization":
+				return ec.fieldContext_Task_organization(ctx, field)
+			case "measure":
+				return ec.fieldContext_Task_measure(ctx, field)
 			case "evidences":
 				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
@@ -23097,6 +23954,8 @@ func (ec *executionContext) fieldContext_UpdateFrameworkPayload_framework(_ cont
 				return ec.fieldContext_Framework_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Framework_description(ctx, field)
+			case "organization":
+				return ec.fieldContext_Framework_organization(ctx, field)
 			case "controls":
 				return ec.fieldContext_Framework_controls(ctx, field)
 			case "createdAt":
@@ -23239,6 +24098,8 @@ func (ec *executionContext) fieldContext_UpdateOrganizationPayload_organization(
 				return ec.fieldContext_Organization_measures(ctx, field)
 			case "risks":
 				return ec.fieldContext_Organization_risks(ctx, field)
+			case "tasks":
+				return ec.fieldContext_Organization_tasks(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Organization_createdAt(ctx, field)
 			case "updatedAt":
@@ -23359,6 +24220,8 @@ func (ec *executionContext) fieldContext_UpdatePolicyPayload_policy(_ context.Co
 				return ec.fieldContext_Policy_currentPublishedVersion(ctx, field)
 			case "owner":
 				return ec.fieldContext_Policy_owner(ctx, field)
+			case "organization":
+				return ec.fieldContext_Policy_organization(ctx, field)
 			case "versions":
 				return ec.fieldContext_Policy_versions(ctx, field)
 			case "controls":
@@ -23507,6 +24370,8 @@ func (ec *executionContext) fieldContext_UpdateRiskPayload_risk(_ context.Contex
 				return ec.fieldContext_Risk_note(ctx, field)
 			case "owner":
 				return ec.fieldContext_Risk_owner(ctx, field)
+			case "organization":
+				return ec.fieldContext_Risk_organization(ctx, field)
 			case "measures":
 				return ec.fieldContext_Risk_measures(ctx, field)
 			case "policies":
@@ -23575,6 +24440,10 @@ func (ec *executionContext) fieldContext_UpdateTaskPayload_task(_ context.Contex
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
 			case "assignedTo":
 				return ec.fieldContext_Task_assignedTo(ctx, field)
+			case "organization":
+				return ec.fieldContext_Task_organization(ctx, field)
+			case "measure":
+				return ec.fieldContext_Task_measure(ctx, field)
 			case "evidences":
 				return ec.fieldContext_Task_evidences(ctx, field)
 			case "createdAt":
@@ -23633,6 +24502,8 @@ func (ec *executionContext) fieldContext_UpdateVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Vendor_description(ctx, field)
+			case "organization":
+				return ec.fieldContext_Vendor_organization(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
 			case "riskAssessments":
@@ -24442,6 +25313,80 @@ func (ec *executionContext) fieldContext_Vendor_description(_ context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_organization(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_organization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Vendor().Organization(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Organization)
+	fc.Result = res
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_organization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Organization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Organization_name(ctx, field)
+			case "logoUrl":
+				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "connectors":
+				return ec.fieldContext_Organization_connectors(ctx, field)
+			case "frameworks":
+				return ec.fieldContext_Organization_frameworks(ctx, field)
+			case "vendors":
+				return ec.fieldContext_Organization_vendors(ctx, field)
+			case "peoples":
+				return ec.fieldContext_Organization_peoples(ctx, field)
+			case "policies":
+				return ec.fieldContext_Organization_policies(ctx, field)
+			case "measures":
+				return ec.fieldContext_Organization_measures(ctx, field)
+			case "risks":
+				return ec.fieldContext_Organization_risks(ctx, field)
+			case "tasks":
+				return ec.fieldContext_Organization_tasks(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Organization_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Organization_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -25314,6 +26259,8 @@ func (ec *executionContext) fieldContext_VendorComplianceReport_vendor(_ context
 				return ec.fieldContext_Vendor_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Vendor_description(ctx, field)
+			case "organization":
+				return ec.fieldContext_Vendor_organization(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
 			case "riskAssessments":
@@ -26065,6 +27012,8 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Vendor_description(ctx, field)
+			case "organization":
+				return ec.fieldContext_Vendor_organization(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
 			case "riskAssessments":
@@ -26195,6 +27144,8 @@ func (ec *executionContext) fieldContext_VendorRiskAssessment_vendor(_ context.C
 				return ec.fieldContext_Vendor_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Vendor_description(ctx, field)
+			case "organization":
+				return ec.fieldContext_Vendor_organization(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
 			case "riskAssessments":
@@ -29606,16 +30557,23 @@ func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"measureId", "name", "description", "timeEstimate", "assignedToId"}
+	fieldsInOrder := [...]string{"organizationId", "measureId", "name", "description", "timeEstimate", "assignedToId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
 		case "measureId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("measureId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -32198,6 +33156,42 @@ func (ec *executionContext) _Control(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "framework":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Control_framework(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "measures":
 			field := field
 
@@ -33608,6 +34602,75 @@ func (ec *executionContext) _Evidence(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "task":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Evidence_task(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "measure":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Evidence_measure(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Evidence_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -33755,6 +34818,42 @@ func (ec *executionContext) _Framework(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "organization":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Framework_organization(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "controls":
 			field := field
 
@@ -35110,6 +36209,42 @@ func (ec *executionContext) _Organization(ctx context.Context, sel ast.Selection
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "tasks":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Organization_tasks(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Organization_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -35474,6 +36609,42 @@ func (ec *executionContext) _Policy(ctx context.Context, sel ast.SelectionSet, o
 					}
 				}()
 				res = ec._Policy_owner(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "organization":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Policy_organization(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -36573,6 +37744,42 @@ func (ec *executionContext) _Risk(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "organization":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Risk_organization(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "measures":
 			field := field
 
@@ -36928,6 +38135,75 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._Task_assignedTo(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "organization":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_organization(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "measure":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_measure(ctx, field, obj)
 				return res
 			}
 
@@ -37818,6 +39094,42 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "description":
 			out.Values[i] = ec._Vendor_description(ctx, field, obj)
+		case "organization":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Vendor_organization(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "complianceReports":
 			field := field
 
@@ -40009,6 +41321,10 @@ var (
 	}
 )
 
+func (ec *executionContext) marshalNFramework2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v types.Framework) graphql.Marshaler {
+	return ec._Framework(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNFramework2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v *types.Framework) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -40218,6 +41534,10 @@ func (ec *executionContext) marshalNInviteUserPayload2ᚖgithubᚗcomᚋgetprobo
 	return ec._InviteUserPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNMeasure2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasure(ctx context.Context, sel ast.SelectionSet, v types.Measure) graphql.Marshaler {
+	return ec._Measure(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNMeasure2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasure(ctx context.Context, sel ast.SelectionSet, v *types.Measure) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -40388,6 +41708,10 @@ var (
 		page.OrderDirectionDesc: "DESC",
 	}
 )
+
+func (ec *executionContext) marshalNOrganization2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx context.Context, sel ast.SelectionSet, v types.Organization) graphql.Marshaler {
+	return ec._Organization(ctx, sel, &v)
+}
 
 func (ec *executionContext) marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx context.Context, sel ast.SelectionSet, v *types.Organization) graphql.Marshaler {
 	if v == nil {
@@ -42456,6 +43780,13 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
+func (ec *executionContext) marshalOMeasure2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasure(ctx context.Context, sel ast.SelectionSet, v *types.Measure) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Measure(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOMeasureOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasureOrderBy(ctx context.Context, v any) (*types.MeasureOrderBy, error) {
 	if v == nil {
 		return nil, nil
@@ -42699,6 +44030,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOTask2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTask(ctx context.Context, sel ast.SelectionSet, v *types.Task) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Task(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOTaskOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskOrderBy(ctx context.Context, v any) (*types.TaskOrderBy, error) {

@@ -139,7 +139,7 @@ function getNavItems(organizationId?: string): NavItem[] {
       title: "Tasks",
       icon: Inbox,
       url: organizationId
-        ? `/organizations/${organizationId}/dashboard`
+        ? `/organizations/${organizationId}/tasks`
         : undefined,
     },
     {

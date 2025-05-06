@@ -982,6 +982,7 @@ function MeasureViewContent({
       variables: {
         connections: [`${data.measure.tasks?.__id}`],
         input: {
+          organizationId: organizationId!,
           measureId: data.measure.id,
           name: newTaskName,
           description: newTaskDescription,

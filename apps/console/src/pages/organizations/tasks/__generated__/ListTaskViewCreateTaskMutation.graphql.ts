@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b53893b96884bbc49ad8f2dbdb22e2ea>>
+ * @generated SignedSource<<84a35602a155b0f1fa8504cf32c10932>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,21 +18,24 @@ export type CreateTaskInput = {
   organizationId: string;
   timeEstimate?: any | null | undefined;
 };
-export type MeasureViewCreateTaskMutation$variables = {
+export type ListTaskViewCreateTaskMutation$variables = {
   connections: ReadonlyArray<string>;
   input: CreateTaskInput;
 };
-export type MeasureViewCreateTaskMutation$data = {
+export type ListTaskViewCreateTaskMutation$data = {
   readonly createTask: {
     readonly taskEdge: {
       readonly node: {
         readonly assignedTo: {
           readonly fullName: string;
           readonly id: string;
-          readonly primaryEmailAddress: string;
         } | null | undefined;
         readonly description: string;
         readonly id: string;
+        readonly measure: {
+          readonly id: string;
+          readonly name: string;
+        } | null | undefined;
         readonly name: string;
         readonly state: TaskState;
         readonly timeEstimate: any | null | undefined;
@@ -40,9 +43,9 @@ export type MeasureViewCreateTaskMutation$data = {
     };
   };
 };
-export type MeasureViewCreateTaskMutation = {
-  response: MeasureViewCreateTaskMutation$data;
-  variables: MeasureViewCreateTaskMutation$variables;
+export type ListTaskViewCreateTaskMutation = {
+  response: ListTaskViewCreateTaskMutation$data;
+  variables: ListTaskViewCreateTaskMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -73,6 +76,13 @@ v3 = {
 v4 = {
   "alias": null,
   "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+},
+v5 = {
+  "alias": null,
+  "args": null,
   "concreteType": "TaskEdge",
   "kind": "LinkedField",
   "name": "taskEdge",
@@ -87,18 +97,19 @@ v4 = {
       "plural": false,
       "selections": [
         (v3/*: any*/),
+        (v4/*: any*/),
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "name",
+          "name": "description",
           "storageKey": null
         },
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "description",
+          "name": "state",
           "storageKey": null
         },
         {
@@ -111,8 +122,14 @@ v4 = {
         {
           "alias": null,
           "args": null,
-          "kind": "ScalarField",
-          "name": "state",
+          "concreteType": "Measure",
+          "kind": "LinkedField",
+          "name": "measure",
+          "plural": false,
+          "selections": [
+            (v3/*: any*/),
+            (v4/*: any*/)
+          ],
           "storageKey": null
         },
         {
@@ -129,13 +146,6 @@ v4 = {
               "args": null,
               "kind": "ScalarField",
               "name": "fullName",
-              "storageKey": null
-            },
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "primaryEmailAddress",
               "storageKey": null
             }
           ],
@@ -155,7 +165,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "MeasureViewCreateTaskMutation",
+    "name": "ListTaskViewCreateTaskMutation",
     "selections": [
       {
         "alias": null,
@@ -165,7 +175,7 @@ return {
         "name": "createTask",
         "plural": false,
         "selections": [
-          (v4/*: any*/)
+          (v5/*: any*/)
         ],
         "storageKey": null
       }
@@ -180,7 +190,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "MeasureViewCreateTaskMutation",
+    "name": "ListTaskViewCreateTaskMutation",
     "selections": [
       {
         "alias": null,
@@ -190,7 +200,7 @@ return {
         "name": "createTask",
         "plural": false,
         "selections": [
-          (v4/*: any*/),
+          (v5/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -213,16 +223,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "53b934e0e7a3d4abf8789ad8672687df",
+    "cacheID": "7b9680f637411402ff51239a43b44a14",
     "id": null,
     "metadata": {},
-    "name": "MeasureViewCreateTaskMutation",
+    "name": "ListTaskViewCreateTaskMutation",
     "operationKind": "mutation",
-    "text": "mutation MeasureViewCreateTaskMutation(\n  $input: CreateTaskInput!\n) {\n  createTask(input: $input) {\n    taskEdge {\n      node {\n        id\n        name\n        description\n        timeEstimate\n        state\n        assignedTo {\n          id\n          fullName\n          primaryEmailAddress\n        }\n      }\n    }\n  }\n}\n"
+    "text": "mutation ListTaskViewCreateTaskMutation(\n  $input: CreateTaskInput!\n) {\n  createTask(input: $input) {\n    taskEdge {\n      node {\n        id\n        name\n        description\n        state\n        timeEstimate\n        measure {\n          id\n          name\n        }\n        assignedTo {\n          id\n          fullName\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "0df98f5aee4233dc4ffedcff8256891a";
+(node as any).hash = "43ccaf49d31ec84dcf3b6b3f2e3a851c";
 
 export default node;

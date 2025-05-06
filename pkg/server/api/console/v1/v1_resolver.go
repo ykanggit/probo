@@ -20,6 +20,23 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
+// Framework is the resolver for the framework field.
+func (r *controlResolver) Framework(ctx context.Context, obj *types.Control) (*types.Framework, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	control, err := svc.Controls.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get control: %w", err))
+	}
+
+	framework, err := svc.Frameworks.Get(ctx, control.FrameworkID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get framework: %w", err))
+	}
+
+	return types.NewFramework(framework), nil
+}
+
 // Measures is the resolver for the measures field.
 func (r *controlResolver) Measures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -85,6 +102,61 @@ func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*s
 
 	result := *fileURL
 	return &result, nil
+}
+
+// Task is the resolver for the task field.
+func (r *evidenceResolver) Task(ctx context.Context, obj *types.Evidence) (*types.Task, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	evidence, err := svc.Evidences.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot load evidence: %w", err)
+	}
+
+	if evidence.TaskID == nil {
+		return nil, fmt.Errorf("evidence is not associated with a task")
+	}
+
+	task, err := svc.Tasks.Get(ctx, *evidence.TaskID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot load task: %w", err)
+	}
+
+	return types.NewTask(task), nil
+}
+
+// Measure is the resolver for the measure field.
+func (r *evidenceResolver) Measure(ctx context.Context, obj *types.Evidence) (*types.Measure, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	evidence, err := svc.Evidences.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot load evidence: %w", err)
+	}
+
+	measure, err := svc.Measures.Get(ctx, evidence.MeasureID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot load measure: %w", err)
+	}
+
+	return types.NewMeasure(measure), nil
+}
+
+// Organization is the resolver for the organization field.
+func (r *frameworkResolver) Organization(ctx context.Context, obj *types.Framework) (*types.Organization, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	framework, err := svc.Frameworks.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot load framework: %w", err)
+	}
+
+	organization, err := svc.Organizations.Get(ctx, framework.OrganizationID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot load organization: %w", err)
+	}
+
+	return types.NewOrganization(organization), nil
 }
 
 // Controls is the resolver for the controls field.
@@ -689,10 +761,11 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 	svc := GetTenantService(ctx, r.proboSvc, input.MeasureID.TenantID())
 
 	task, err := svc.Tasks.Create(ctx, probo.CreateTaskRequest{
-		MeasureID:    input.MeasureID,
-		Name:         input.Name,
-		Description:  input.Description,
-		TimeEstimate: input.TimeEstimate,
+		MeasureID:      input.MeasureID,
+		OrganizationID: input.OrganizationID,
+		Name:           input.Name,
+		Description:    input.Description,
+		TimeEstimate:   input.TimeEstimate,
 	})
 	if err != nil {
 		panic(fmt.Errorf("cannot create task: %w", err))
@@ -1416,6 +1489,31 @@ func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organizatio
 	return types.NewRiskConnection(page), nil
 }
 
+// Tasks is the resolver for the tasks field.
+func (r *organizationResolver) Tasks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.TaskOrderField]{
+		Field:     coredata.TaskOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.TaskOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Tasks.ListForOrganizationID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list organization tasks: %w", err))
+	}
+
+	return types.NewTaskConnection(page), nil
+}
+
 // Owner is the resolver for the owner field.
 func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.People, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -1432,6 +1530,23 @@ func (r *policyResolver) Owner(ctx context.Context, obj *types.Policy) (*types.P
 	}
 
 	return types.NewPeople(owner), nil
+}
+
+// Organization is the resolver for the organization field.
+func (r *policyResolver) Organization(ctx context.Context, obj *types.Policy) (*types.Organization, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	policy, err := svc.Policies.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get policy: %w", err))
+	}
+
+	organization, err := svc.Organizations.Get(ctx, policy.OrganizationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get organization: %w", err))
+	}
+
+	return types.NewOrganization(organization), nil
 }
 
 // Versions is the resolver for the versions field.
@@ -1727,6 +1842,23 @@ func (r *riskResolver) Owner(ctx context.Context, obj *types.Risk) (*types.Peopl
 	return types.NewPeople(owner), nil
 }
 
+// Organization is the resolver for the organization field.
+func (r *riskResolver) Organization(ctx context.Context, obj *types.Risk) (*types.Organization, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	risk, err := svc.Risks.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get risk: %w", err))
+	}
+
+	organization, err := svc.Organizations.Get(ctx, risk.OrganizationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get organization: %w", err))
+	}
+
+	return types.NewOrganization(organization), nil
+}
+
 // Measures is the resolver for the measures field.
 func (r *riskResolver) Measures(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -1823,6 +1955,40 @@ func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.
 	return types.NewPeople(people), nil
 }
 
+// Organization is the resolver for the organization field.
+func (r *taskResolver) Organization(ctx context.Context, obj *types.Task) (*types.Organization, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	task, err := svc.Tasks.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get task: %w", err))
+	}
+
+	organization, err := svc.Organizations.Get(ctx, task.OrganizationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get organization: %w", err))
+	}
+
+	return types.NewOrganization(organization), nil
+}
+
+// Measure is the resolver for the measure field.
+func (r *taskResolver) Measure(ctx context.Context, obj *types.Task) (*types.Measure, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	task, err := svc.Tasks.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get task: %w", err))
+	}
+
+	measure, err := svc.Measures.Get(ctx, *task.MeasureID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get measure: %w", err))
+	}
+
+	return types.NewMeasure(measure), nil
+}
+
 // Evidences is the resolver for the evidences field.
 func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -1857,6 +2023,23 @@ func (r *userResolver) People(ctx context.Context, obj *types.User, organization
 	}
 
 	return types.NewPeople(people), nil
+}
+
+// Organization is the resolver for the organization field.
+func (r *vendorResolver) Organization(ctx context.Context, obj *types.Vendor) (*types.Organization, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	vendor, err := svc.Vendors.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get vendor: %w", err))
+	}
+
+	organization, err := svc.Organizations.Get(ctx, vendor.OrganizationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get organization: %w", err))
+	}
+
+	return types.NewOrganization(organization), nil
 }
 
 // ComplianceReports is the resolver for the complianceReports field.

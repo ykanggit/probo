@@ -27,12 +27,14 @@ import { ListRiskPage } from "./risks/ListRiskPage";
 import ShowRiskView from "./risks/ShowRiskView";
 import { ListVendorPage } from "./vendors/ListVendorPage";
 import { VendorPage } from "./vendors/VendorPage";
+import { ListTaskPage } from "./tasks/ListTaskPage";
 
 export function OrganizationsRoutes() {
   return (
     <Routes>
       <Route path=":organizationId/*" element={<OrganizationLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="tasks" element={<ListTaskPage />} />
         <Route path="people" element={<PeopleListPage />} />
         <Route path="people/new" element={<NewPeoplePage />} />
         <Route path="people/:peopleId" element={<PeoplePage />} />

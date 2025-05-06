@@ -29,16 +29,17 @@ import (
 
 type (
 	Task struct {
-		ID           gid.GID        `db:"id"`
-		MeasureID    gid.GID        `db:"measure_id"`
-		Name         string         `db:"name"`
-		Description  string         `db:"description"`
-		State        TaskState      `db:"state"`
-		ReferenceID  string         `db:"reference_id"`
-		TimeEstimate *time.Duration `db:"time_estimate"`
-		AssignedToID *gid.GID       `db:"assigned_to"`
-		CreatedAt    time.Time      `db:"created_at"`
-		UpdatedAt    time.Time      `db:"updated_at"`
+		ID             gid.GID        `db:"id"`
+		OrganizationID gid.GID        `db:"organization_id"`
+		MeasureID      *gid.GID       `db:"measure_id"`
+		Name           string         `db:"name"`
+		Description    string         `db:"description"`
+		State          TaskState      `db:"state"`
+		ReferenceID    string         `db:"reference_id"`
+		TimeEstimate   *time.Duration `db:"time_estimate"`
+		AssignedToID   *gid.GID       `db:"assigned_to"`
+		CreatedAt      time.Time      `db:"created_at"`
+		UpdatedAt      time.Time      `db:"updated_at"`
 	}
 
 	Tasks []*Task
@@ -62,6 +63,7 @@ func (c *Task) LoadByID(
 	q := `
 SELECT
     id,
+	organization_id,
     measure_id,
     name,
     description,
@@ -109,6 +111,7 @@ INSERT INTO
     tasks (
         tenant_id,
         id,
+		organization_id,
         measure_id,
         name,
         description,
@@ -122,6 +125,7 @@ INSERT INTO
 VALUES (
     @tenant_id,
     @task_id,
+	@organization_id,
     @measure_id,
     @name,
     @description,
@@ -135,17 +139,18 @@ VALUES (
 `
 
 	args := pgx.StrictNamedArgs{
-		"tenant_id":     scope.GetTenantID(),
-		"task_id":       c.ID,
-		"measure_id":    c.MeasureID,
-		"name":          c.Name,
-		"description":   c.Description,
-		"reference_id":  c.ReferenceID,
-		"state":         c.State,
-		"time_estimate": c.TimeEstimate,
-		"assigned_to":   c.AssignedToID,
-		"created_at":    c.CreatedAt,
-		"updated_at":    c.UpdatedAt,
+		"tenant_id":       scope.GetTenantID(),
+		"task_id":         c.ID,
+		"organization_id": c.OrganizationID,
+		"measure_id":      c.MeasureID,
+		"name":            c.Name,
+		"description":     c.Description,
+		"reference_id":    c.ReferenceID,
+		"state":           c.State,
+		"time_estimate":   c.TimeEstimate,
+		"assigned_to":     c.AssignedToID,
+		"created_at":      c.CreatedAt,
+		"updated_at":      c.UpdatedAt,
 	}
 	_, err := conn.Exec(ctx, q, args)
 	return err
@@ -161,6 +166,7 @@ INSERT INTO
     tasks (
         tenant_id,
         id,
+		organization_id,
         measure_id,
         name,
         description,
@@ -174,6 +180,7 @@ INSERT INTO
 VALUES (
     @tenant_id,
     @task_id,
+	@organization_id,
     @measure_id,
     @name,
     @description,
@@ -190,6 +197,7 @@ ON CONFLICT (measure_id, reference_id) DO UPDATE SET
     updated_at = @updated_at
 RETURNING
     id,
+    organization_id,
     measure_id,
     name,
     description,
@@ -202,17 +210,18 @@ RETURNING
 `
 
 	args := pgx.StrictNamedArgs{
-		"tenant_id":     scope.GetTenantID(),
-		"task_id":       c.ID,
-		"measure_id":    c.MeasureID,
-		"name":          c.Name,
-		"description":   c.Description,
-		"reference_id":  c.ReferenceID,
-		"state":         c.State,
-		"time_estimate": c.TimeEstimate,
-		"assigned_to":   c.AssignedToID,
-		"created_at":    c.CreatedAt,
-		"updated_at":    c.UpdatedAt,
+		"tenant_id":       scope.GetTenantID(),
+		"task_id":         c.ID,
+		"organization_id": c.OrganizationID,
+		"measure_id":      c.MeasureID,
+		"name":            c.Name,
+		"description":     c.Description,
+		"reference_id":    c.ReferenceID,
+		"state":           c.State,
+		"time_estimate":   c.TimeEstimate,
+		"assigned_to":     c.AssignedToID,
+		"created_at":      c.CreatedAt,
+		"updated_at":      c.UpdatedAt,
 	}
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -229,6 +238,54 @@ RETURNING
 	return nil
 }
 
+func (c *Tasks) LoadByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+	cursor *page.Cursor[TaskOrderField],
+) error {
+	q := `
+	SELECT
+		id,
+		measure_id,
+		organization_id,
+		name,
+		description,
+		state,
+		reference_id,
+		time_estimate,
+		assigned_to,
+		created_at,
+		updated_at
+	FROM
+		tasks
+	WHERE
+		%s
+		AND organization_id = @organization_id
+		AND %s
+	`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query tasks: %w", err)
+	}
+
+	tasks, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Task])
+	if err != nil {
+		return fmt.Errorf("cannot collect tasks: %w", err)
+	}
+
+	*c = tasks
+
+	return nil
+}
+
 func (c *Tasks) LoadByMeasureID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -240,6 +297,7 @@ func (c *Tasks) LoadByMeasureID(
 SELECT
     id,
     measure_id,
+	organization_id,
     name,
     description,
     state,
@@ -288,7 +346,8 @@ SET
   description = @description,
   state = @state,
   time_estimate = @time_estimate,
-  updated_at = @updated_at
+  updated_at = @updated_at,
+  assigned_to = @assigned_to
 WHERE %s
     AND id = @task_id
 `
@@ -301,108 +360,13 @@ WHERE %s
 		"state":         c.State,
 		"time_estimate": c.TimeEstimate,
 		"updated_at":    c.UpdatedAt,
+		"assigned_to":   c.AssignedToID,
 	}
 
 	maps.Copy(args, scope.SQLArguments())
 
 	_, err := conn.Exec(ctx, q, args)
 	return err
-}
-
-func (c *Task) AssignTo(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-	assignTo gid.GID,
-) error {
-	q := `
-UPDATE tasks SET
-    assigned_to = @assigned_to,
-    updated_at = @updated_at
-WHERE %s
-    AND id = @task_id
-RETURNING 
-    id,
-    measure_id,
-    name,
-    description,
-    reference_id,
-    state,
-    time_estimate,
-    assigned_to,
-    created_at,
-    updated_at
-`
-	q = fmt.Sprintf(q, scope.SQLFragment())
-
-	args := pgx.NamedArgs{
-		"task_id":     c.ID,
-		"assigned_to": assignTo,
-		"updated_at":  time.Now(),
-	}
-
-	maps.Copy(args, scope.SQLArguments())
-
-	rows, err := conn.Query(ctx, q, args)
-	if err != nil {
-		return fmt.Errorf("cannot query tasks: %w", err)
-	}
-
-	task, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Task])
-	if err != nil {
-		return fmt.Errorf("cannot collect tasks: %w", err)
-	}
-
-	*c = task
-
-	return nil
-}
-
-func (c *Task) Unassign(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-) error {
-	q := `
-UPDATE tasks SET
-    assigned_to = NULL,
-    updated_at = @updated_at
-WHERE %s
-    AND id = @task_id
-RETURNING 
-    id,
-    measure_id,
-    name,
-    description,
-    reference_id,
-    state,
-    time_estimate,
-    assigned_to,
-    created_at,
-    updated_at
-`
-	q = fmt.Sprintf(q, scope.SQLFragment())
-
-	args := pgx.NamedArgs{
-		"task_id":    c.ID,
-		"updated_at": time.Now(),
-	}
-
-	maps.Copy(args, scope.SQLArguments())
-
-	rows, err := conn.Query(ctx, q, args)
-	if err != nil {
-		return fmt.Errorf("cannot query tasks: %w", err)
-	}
-
-	task, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Task])
-	if err != nil {
-		return fmt.Errorf("cannot collect tasks: %w", err)
-	}
-
-	*c = task
-
-	return nil
 }
 
 func (c *Task) Delete(

@@ -67,6 +67,7 @@ type Control struct {
 	ReferenceID string             `json:"referenceId"`
 	Name        string             `json:"name"`
 	Description string             `json:"description"`
+	Framework   *Framework         `json:"framework"`
 	Measures    *MeasureConnection `json:"measures"`
 	Policies    *PolicyConnection  `json:"policies"`
 	CreatedAt   time.Time          `json:"createdAt"`
@@ -215,11 +216,12 @@ type CreateRiskPolicyMappingPayload struct {
 }
 
 type CreateTaskInput struct {
-	MeasureID    gid.GID        `json:"measureId"`
-	Name         string         `json:"name"`
-	Description  string         `json:"description"`
-	TimeEstimate *time.Duration `json:"timeEstimate,omitempty"`
-	AssignedToID *gid.GID       `json:"assignedToId,omitempty"`
+	OrganizationID gid.GID        `json:"organizationId"`
+	MeasureID      *gid.GID       `json:"measureId,omitempty"`
+	Name           string         `json:"name"`
+	Description    string         `json:"description"`
+	TimeEstimate   *time.Duration `json:"timeEstimate,omitempty"`
+	AssignedToID   *gid.GID       `json:"assignedToId,omitempty"`
 }
 
 type CreateTaskPayload struct {
@@ -389,6 +391,8 @@ type Evidence struct {
 	Filename    string                 `json:"filename"`
 	URL         *string                `json:"url,omitempty"`
 	Description string                 `json:"description"`
+	Task        *Task                  `json:"task,omitempty"`
+	Measure     *Measure               `json:"measure"`
 	CreatedAt   time.Time              `json:"createdAt"`
 	UpdatedAt   time.Time              `json:"updatedAt"`
 }
@@ -407,12 +411,13 @@ type EvidenceEdge struct {
 }
 
 type Framework struct {
-	ID          gid.GID            `json:"id"`
-	Name        string             `json:"name"`
-	Description string             `json:"description"`
-	Controls    *ControlConnection `json:"controls"`
-	CreatedAt   time.Time          `json:"createdAt"`
-	UpdatedAt   time.Time          `json:"updatedAt"`
+	ID           gid.GID            `json:"id"`
+	Name         string             `json:"name"`
+	Description  string             `json:"description"`
+	Organization *Organization      `json:"organization"`
+	Controls     *ControlConnection `json:"controls"`
+	CreatedAt    time.Time          `json:"createdAt"`
+	UpdatedAt    time.Time          `json:"updatedAt"`
 }
 
 func (Framework) IsNode()             {}
@@ -509,6 +514,7 @@ type Organization struct {
 	Policies   *PolicyConnection    `json:"policies"`
 	Measures   *MeasureConnection   `json:"measures"`
 	Risks      *RiskConnection      `json:"risks"`
+	Tasks      *TaskConnection      `json:"tasks"`
 	CreatedAt  time.Time            `json:"createdAt"`
 	UpdatedAt  time.Time            `json:"updatedAt"`
 }
@@ -567,6 +573,7 @@ type Policy struct {
 	Description             string                   `json:"description"`
 	CurrentPublishedVersion *int                     `json:"currentPublishedVersion,omitempty"`
 	Owner                   *People                  `json:"owner"`
+	Organization            *Organization            `json:"organization"`
 	Versions                *PolicyVersionConnection `json:"versions"`
 	Controls                *ControlConnection       `json:"controls"`
 	CreatedAt               time.Time                `json:"createdAt"`
@@ -702,6 +709,7 @@ type Risk struct {
 	ResidualSeverity   int                    `json:"residualSeverity"`
 	Note               string                 `json:"note"`
 	Owner              *People                `json:"owner,omitempty"`
+	Organization       *Organization          `json:"organization"`
 	Measures           *MeasureConnection     `json:"measures"`
 	Policies           *PolicyConnection      `json:"policies"`
 	Controls           *ControlConnection     `json:"controls"`
@@ -742,6 +750,8 @@ type Task struct {
 	State        coredata.TaskState  `json:"state"`
 	TimeEstimate *time.Duration      `json:"timeEstimate,omitempty"`
 	AssignedTo   *People             `json:"assignedTo,omitempty"`
+	Organization *Organization       `json:"organization"`
+	Measure      *Measure            `json:"measure,omitempty"`
 	Evidences    *EvidenceConnection `json:"evidences"`
 	CreatedAt    time.Time           `json:"createdAt"`
 	UpdatedAt    time.Time           `json:"updatedAt"`
@@ -943,6 +953,7 @@ type Vendor struct {
 	ID                         gid.GID                           `json:"id"`
 	Name                       string                            `json:"name"`
 	Description                *string                           `json:"description,omitempty"`
+	Organization               *Organization                     `json:"organization"`
 	ComplianceReports          *VendorComplianceReportConnection `json:"complianceReports"`
 	RiskAssessments            *VendorRiskAssessmentConnection   `json:"riskAssessments"`
 	BusinessOwner              *People                           `json:"businessOwner,omitempty"`

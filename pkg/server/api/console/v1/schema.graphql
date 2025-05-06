@@ -461,6 +461,14 @@ type Organization implements Node {
     orderBy: RiskOrder
   ): RiskConnection! @goField(forceResolver: true)
 
+  tasks(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: TaskOrder
+  ): TaskConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -497,6 +505,8 @@ type Vendor implements Node {
   id: ID!
   name: String!
   description: String
+
+  organization: Organization! @goField(forceResolver: true)
 
   complianceReports(
     first: Int
@@ -538,10 +548,8 @@ type VendorComplianceReport implements Node {
   reportDate: Datetime!
   validUntil: Datetime
   reportName: String!
-
   fileUrl: String! @goField(forceResolver: true)
   fileSize: Int!
-
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -550,6 +558,8 @@ type Framework implements Node {
   id: ID!
   name: String!
   description: String!
+
+  organization: Organization! @goField(forceResolver: true)
 
   controls(
     first: Int
@@ -568,6 +578,8 @@ type Control implements Node {
   referenceId: String!
   name: String!
   description: String!
+
+  framework: Framework! @goField(forceResolver: true)
 
   measures(
     first: Int
@@ -640,6 +652,9 @@ type Task implements Node {
   timeEstimate: Duration
   assignedTo: People @goField(forceResolver: true)
 
+  organization: Organization! @goField(forceResolver: true)
+  measure: Measure @goField(forceResolver: true)
+
   evidences(
     first: Int
     after: CursorKey
@@ -663,6 +678,9 @@ type Evidence implements Node {
   url: String
   description: String!
 
+  task: Task @goField(forceResolver: true)
+  measure: Measure! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -673,6 +691,7 @@ type Policy implements Node {
   description: String!
   currentPublishedVersion: Int
   owner: People! @goField(forceResolver: true)
+  organization: Organization! @goField(forceResolver: true)
 
   versions(
     first: Int
@@ -710,6 +729,7 @@ type Risk implements Node {
   note: String!
 
   owner: People @goField(forceResolver: true)
+  organization: Organization! @goField(forceResolver: true)
 
   measures(
     first: Int
@@ -1140,7 +1160,8 @@ input ImportMeasureInput {
 }
 
 input CreateTaskInput {
-  measureId: ID!
+  organizationId: ID!
+  measureId: ID
   name: String!
   description: String!
   timeEstimate: Duration

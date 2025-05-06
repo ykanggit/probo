@@ -32,11 +32,12 @@ type (
 	}
 
 	CreateTaskRequest struct {
-		MeasureID    gid.GID
-		Name         string
-		Description  string
-		TimeEstimate *time.Duration
-		AssignedToID *gid.GID
+		OrganizationID gid.GID
+		MeasureID      *gid.GID
+		Name           string
+		Description    string
+		TimeEstimate   *time.Duration
+		AssignedToID   *gid.GID
 	}
 
 	UpdateTaskRequest struct {
@@ -61,21 +62,23 @@ func (s TaskService) Create(
 	}
 
 	task := &coredata.Task{
-		ID:           taskID,
-		MeasureID:    req.MeasureID,
-		Name:         req.Name,
-		Description:  req.Description,
-		TimeEstimate: req.TimeEstimate,
-		AssignedToID: req.AssignedToID,
-		State:        coredata.TaskStateTodo,
-		ReferenceID:  "custom-task-" + referenceID.String(),
-		CreatedAt:    now,
-		UpdatedAt:    now,
+		ID:             taskID,
+		OrganizationID: req.OrganizationID,
+		MeasureID:      req.MeasureID,
+		Name:           req.Name,
+		Description:    req.Description,
+		TimeEstimate:   req.TimeEstimate,
+		AssignedToID:   req.AssignedToID,
+		State:          coredata.TaskStateTodo,
+		ReferenceID:    "custom-task-" + referenceID.String(),
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
 
 	err = s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
+
 			if err := task.Insert(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert task: %w", err)
 			}
@@ -119,7 +122,18 @@ func (s TaskService) Assign(
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return task.AssignTo(ctx, conn, s.svc.scope, assignedToID)
+			if err := task.LoadByID(ctx, conn, s.svc.scope, taskID); err != nil {
+				return fmt.Errorf("cannot load task %q: %w", taskID, err)
+			}
+
+			task.AssignedToID = &assignedToID
+			task.UpdatedAt = time.Now()
+
+			if err := task.Update(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot assign task %q to %q: %w", taskID, assignedToID, err)
+			}
+
+			return nil
 		},
 	)
 	if err != nil {
@@ -133,12 +147,23 @@ func (s TaskService) Unassign(
 	ctx context.Context,
 	taskID gid.GID,
 ) (*coredata.Task, error) {
-	task := &coredata.Task{ID: taskID}
+	task := &coredata.Task{}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return task.Unassign(ctx, conn, s.svc.scope)
+			if err := task.LoadByID(ctx, conn, s.svc.scope, taskID); err != nil {
+				return fmt.Errorf("cannot load task %q: %w", taskID, err)
+			}
+
+			task.AssignedToID = nil
+			task.UpdatedAt = time.Now()
+
+			if err := task.Update(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot unassign task %q: %w", taskID, err)
+			}
+
+			return nil
 		},
 	)
 	if err != nil {
@@ -152,7 +177,8 @@ func (s TaskService) Update(
 	ctx context.Context,
 	req UpdateTaskRequest,
 ) (*coredata.Task, error) {
-	task := &coredata.Task{ID: req.TaskID}
+
+	task := &coredata.Task{}
 
 	err := s.svc.pg.WithTx(
 		ctx,
@@ -210,6 +236,26 @@ func (s TaskService) Delete(
 	}
 
 	return nil
+}
+
+func (s TaskService) ListForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+	cursor *page.Cursor[coredata.TaskOrderField],
+) (*page.Page[*coredata.Task, coredata.TaskOrderField], error) {
+	var tasks coredata.Tasks
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return tasks.LoadByOrganizationID(ctx, conn, s.svc.scope, organizationID, cursor)
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(tasks, cursor), nil
 }
 
 func (s TaskService) ListForMeasureID(
