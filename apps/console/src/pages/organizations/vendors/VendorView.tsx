@@ -795,6 +795,8 @@ function RiskAssessmentsTable({
 }) {
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [selectedAssessment, setSelectedAssessment] = useState<any>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -825,6 +827,13 @@ function RiskAssessmentsTable({
   };
 
   const isExpired = (expiresAt: string) => isPast(new Date(expiresAt));
+
+  // Handle click on view details
+  const handleViewDetails = (assessment: any) => {
+    setSelectedAssessment(assessment);
+    setShowDetailsModal(true);
+    setShowDropdown(null);
+  };
 
   return (
     <div className="space-y-4">
@@ -978,10 +987,7 @@ function RiskAssessmentsTable({
                         >
                           <button
                             className="w-full text-left px-4 py-2 text-sm hover:bg-[rgba(2,42,2,0.03)]"
-                            onClick={() => {
-                              // View or edit functionality can be added here
-                              setShowDropdown(null);
-                            }}
+                            onClick={() => handleViewDetails(assessment)}
                           >
                             View details
                           </button>
@@ -1016,6 +1022,132 @@ function RiskAssessmentsTable({
         <p className="mt-2 text-sm text-[#6B716A]">
           Create a new risk assessment for this vendor
         </p>
+      </div>
+
+      {/* Risk Assessment Details Modal */}
+      {showDetailsModal && selectedAssessment && (
+        <RiskAssessmentDetailsModal
+          assessment={selectedAssessment}
+          onClose={() => setShowDetailsModal(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function RiskAssessmentDetailsModal({
+  assessment,
+  onClose,
+}: {
+  assessment: any;
+  onClose: () => void;
+}) {
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return format(date, "MMMM d, yyyy");
+  };
+
+  // Data sensitivity descriptions
+  const dataSensitivityDescriptions: Record<string, string> = {
+    NONE: "No sensitive data",
+    LOW: "Public or non-sensitive data",
+    MEDIUM: "Internal/restricted data",
+    HIGH: "Confidential data",
+    CRITICAL: "Regulated/PII/financial data",
+  };
+
+  // Business impact descriptions
+  const businessImpactDescriptions: Record<string, string> = {
+    LOW: "Minimal impact on business",
+    MEDIUM: "Moderate impact on business",
+    HIGH: "Significant business impact",
+    CRITICAL: "Critical to business operations",
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium">Risk Assessment Details</h3>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            className="h-8 w-8 rounded-full"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="text-sm font-medium text-[#6B716A] mb-1">Assessed By</h4>
+              <div className="flex items-center space-x-2">
+                <User className="h-5 w-5 text-[#6B716A]" />
+                <p className="text-sm font-medium">{assessment.assessedBy?.fullName || "N/A"}</p>
+              </div>
+              <p className="text-xs text-[#818780] mt-1">
+                {formatDate(assessment.assessedAt || "")}
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-medium text-[#6B716A] mb-1">Valid Until</h4>
+              <p className="text-sm font-medium">
+                {formatDate(assessment.expiresAt || "")}
+              </p>
+              {isPast(new Date(assessment.expiresAt || "")) && (
+                <p className="text-xs text-red-500 mt-1">
+                  Assessment has expired
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-medium text-[#6B716A] mb-2">Data Sensitivity</h4>
+            <div className="p-3 bg-[rgba(5,77,5,0.03)] rounded-md">
+              <p className="text-sm font-medium text-[#141E12]">
+                {assessment.dataSensitivity.charAt(0) + assessment.dataSensitivity.slice(1).toLowerCase()}
+              </p>
+              <p className="text-sm text-[#6B716A] mt-1">
+                {dataSensitivityDescriptions[assessment.dataSensitivity] || ""}
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-medium text-[#6B716A] mb-2">Business Impact</h4>
+            <div className="p-3 bg-[rgba(5,77,5,0.03)] rounded-md">
+              <p className="text-sm font-medium text-[#141E12]">
+                {assessment.businessImpact.charAt(0) + assessment.businessImpact.slice(1).toLowerCase()}
+              </p>
+              <p className="text-sm text-[#6B716A] mt-1">
+                {businessImpactDescriptions[assessment.businessImpact] || ""}
+              </p>
+            </div>
+          </div>
+
+          {assessment.notes && (
+            <div>
+              <h4 className="text-sm font-medium text-[#6B716A] mb-2">Notes</h4>
+              <div className="p-3 bg-[rgba(5,77,5,0.03)] rounded-md">
+                <p className="text-sm text-[#141E12] whitespace-pre-wrap">{assessment.notes}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end mt-4">
+            <Button 
+              onClick={onClose}
+              className="bg-[#054D05] text-white hover:bg-[#054D05]/90"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
