@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### [0.24.0] - 2025-05-06
+
+### Added
+
+- Task page list
+
+### Changed
+
+- Task is now linked to organization
+
+### Fixed
+
+- Fix cannot see vendor assessment note
+
 ### Security
 
 - Add filetype validation for end-user upload
