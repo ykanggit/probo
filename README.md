@@ -1,7 +1,7 @@
 <div align="center">
 <h1>Probo - Open Source Compliance</h1>
 
-![probo banner](.github/cover.png)
+![probo banner](.github/cover_v3.png)
 
 [![Discord](https://img.shields.io/discord/1326589224811757568?color=7289da&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/8qfdJYfvpY)
 [![GitHub License](https://img.shields.io/github/license/getprobo/probo)](LICENSE)
