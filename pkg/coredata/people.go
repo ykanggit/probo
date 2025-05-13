@@ -16,6 +16,7 @@ package coredata
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"maps"
 	"time"
@@ -40,7 +41,15 @@ type (
 	}
 
 	Peoples []*People
+
+	ErrPeopleNotFound struct {
+		Identifier string
+	}
 )
+
+func (e ErrPeopleNotFound) Error() string {
+	return fmt.Sprintf("people not found: %s", e.Identifier)
+}
 
 func (p People) CursorKey(orderBy PeopleOrderField) page.CursorKey {
 	switch orderBy {
@@ -98,6 +107,55 @@ LIMIT 1;
 	return nil
 }
 
+func (p *People) LoadByEmail(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	primaryEmailAddress string,
+) error {
+	q := `
+	SELECT
+		id,
+		organization_id,
+		kind,
+		user_id,
+		full_name,
+		primary_email_address,
+		additional_email_addresses,
+		created_at,
+		updated_at
+	FROM
+		peoples
+	WHERE
+		%s
+		AND primary_email_address = @primary_email_address
+	LIMIT 1;
+	`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"primary_email_address": primaryEmailAddress}
+	maps.Copy(args, scope.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query people: %w", err)
+	}
+
+	people, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[People])
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return &ErrPeopleNotFound{Identifier: primaryEmailAddress}
+		}
+
+		return fmt.Errorf("cannot collect people: %w", err)
+	}
+
+	*p = people
+
+	return nil
+}
+
 func (p *People) LoadByUserID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -135,6 +193,10 @@ LIMIT 1;
 
 	people, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[People])
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return &ErrPeopleNotFound{Identifier: userID.String()}
+		}
+
 		return fmt.Errorf("cannot collect people: %w", err)
 	}
 

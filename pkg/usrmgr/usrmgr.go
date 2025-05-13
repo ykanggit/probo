@@ -660,6 +660,34 @@ func (s Service) InviteUser(
 				return fmt.Errorf("cannot insert user organization: %w", err)
 			}
 
+			people := &coredata.People{}
+			scope := coredata.NewScope(organizationID.TenantID())
+			if err := people.LoadByEmail(ctx, tx, scope, emailAddress); err != nil {
+				var errPeopleNotFound *coredata.ErrPeopleNotFound
+
+				if errors.As(err, &errPeopleNotFound) {
+					people = &coredata.People{
+						ID:                       gid.New(organizationID.TenantID(), coredata.PeopleEntityType),
+						OrganizationID:           organizationID,
+						UserID:                   &user.ID,
+						FullName:                 fullName,
+						PrimaryEmailAddress:      emailAddress,
+						Kind:                     coredata.PeopleKindContractor,
+						AdditionalEmailAddresses: []string{},
+						CreatedAt:                time.Now(),
+						UpdatedAt:                time.Now(),
+					}
+
+					if err := people.Insert(ctx, tx, scope); err != nil {
+						return fmt.Errorf("cannot insert people: %w", err)
+					}
+
+					return nil
+				}
+
+				return fmt.Errorf("cannot load people by email: %w", err)
+			}
+
 			return nil
 		},
 	)
