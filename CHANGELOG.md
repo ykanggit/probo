@@ -4,9 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Allow data and text file for evidences
+
 ### Fixed
 
 - Fix missing people when inviting user already in other organization
+- Fix cannot upload organization logo
 
 ### [0.24.0] - 2025-05-06
 
