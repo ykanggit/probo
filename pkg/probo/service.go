@@ -104,6 +104,8 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 			filevalidation.CategoryDocument,
 			filevalidation.CategorySpreadsheet,
 			filevalidation.CategoryPresentation,
+			filevalidation.CategoryData,
+			filevalidation.CategoryText,
 			filevalidation.CategoryImage,
 			filevalidation.CategoryVideo,
 		),
