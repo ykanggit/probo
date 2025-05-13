@@ -44,12 +44,9 @@ type (
 	}
 
 	UpdateOrganizationRequest struct {
-		ID          gid.GID
-		Name        *string
-		File        io.Reader
-		Filename    string
-		FileSize    int64
-		ContentType string
+		ID   gid.GID
+		Name *string
+		File *File
 	}
 )
 
@@ -138,11 +135,11 @@ func (s OrganizationService) Update(
 
 				var fileSize int64
 				var fileContent io.ReadSeeker
-				filename := req.Filename
-				contentType := req.ContentType
+				filename := req.File.Filename
+				contentType := req.File.ContentType
 
-				if seeker, ok := req.File.(io.Seeker); ok {
-					if req.FileSize <= 0 {
+				if seeker, ok := req.File.Content.(io.Seeker); ok {
+					if req.File.Size <= 0 {
 						size, err := seeker.Seek(0, io.SeekEnd)
 						if err != nil {
 							return fmt.Errorf("cannot determine file size: %w", err)
@@ -154,11 +151,11 @@ func (s OrganizationService) Update(
 							return fmt.Errorf("cannot reset file position: %w", err)
 						}
 					} else {
-						fileSize = req.FileSize
+						fileSize = req.File.Size
 					}
-					fileContent = req.File.(io.ReadSeeker)
+					fileContent = req.File.Content.(io.ReadSeeker)
 				} else {
-					buf, err := io.ReadAll(req.File)
+					buf, err := io.ReadAll(req.File.Content)
 					if err != nil {
 						return fmt.Errorf("cannot read file: %w", err)
 					}

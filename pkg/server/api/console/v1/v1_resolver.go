@@ -334,7 +334,12 @@ func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.U
 	}
 
 	if input.Logo != nil {
-		req.File = input.Logo.File
+		req.File = &probo.File{
+			Filename:    input.Logo.Filename,
+			ContentType: input.Logo.ContentType,
+			Size:        input.Logo.Size,
+			Content:     input.Logo.File,
+		}
 	}
 
 	organization, err := svc.Organizations.Update(ctx, req)
