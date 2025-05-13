@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix missing people when inviting user already in other organization
+
 ### [0.24.0] - 2025-05-06
 
 ### Added
