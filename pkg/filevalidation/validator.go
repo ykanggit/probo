@@ -78,6 +78,8 @@ var FileTypes = []FileType{
 	{MimeType: "application/json", Extensions: []string{".json"}, Category: CategoryData},
 	{MimeType: "text/yaml", Extensions: []string{".yaml", ".yml"}, Category: CategoryData},
 	{MimeType: "text/json", Extensions: []string{".json"}, Category: CategoryData},
+	{MimeType: "text/csv", Extensions: []string{".csv"}, Category: CategoryData},
+	{MimeType: "application/csv", Extensions: []string{".csv"}, Category: CategoryData},
 
 	// Video types
 	{MimeType: "video/mp4", Extensions: []string{".mp4"}, Category: CategoryVideo},
