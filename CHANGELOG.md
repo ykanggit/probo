@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### [0.25.0] - 2025-05-13
+
 ### Changed
 
 - Allow data and text file for evidences
