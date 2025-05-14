@@ -83,8 +83,6 @@ func (c *OAuth2Connector) Initiate(ctx context.Context, connectorID string, orga
 	redirectQuery.Set("connector_id", connectorID)
 	redirectQuery.Set("continue", r.URL.Query().Get("continue"))
 
-	fmt.Printf("\n\n\n%s\n\n\n", r.URL.Query().Get("continue"))
-
 	redirectURI.RawQuery = redirectQuery.Encode()
 
 	authCodeQuery := url.Values{}
