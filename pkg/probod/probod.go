@@ -168,7 +168,7 @@ func (impl *Implm) Run(
 
 	s3Client := s3.NewFromConfig(awsConfig)
 
-	err = migrator.NewMigrator(pgClient, coredata.Migrations).Run(ctx, "migrations")
+	err = migrator.NewMigrator(pgClient, coredata.Migrations, l.Named("migrations")).Run(ctx, "migrations")
 	if err != nil {
 		return fmt.Errorf("cannot migrate database schema: %w", err)
 	}
