@@ -26,6 +26,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"go.gearno.de/kit/httpserver"
+	"go.gearno.de/kit/log"
 )
 
 type (
@@ -36,6 +37,7 @@ type (
 		Auth              console_v1.AuthConfig
 		ConnectorRegistry *connector.ConnectorRegistry
 		SafeRedirect      *saferedirect.SafeRedirect
+		Logger            *log.Logger
 	}
 
 	Server struct {
@@ -105,7 +107,17 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.Use(cors.Handler(corsOpts))
 
 	// Mount the console API with authentication
-	router.Mount("/console/v1", console_v1.NewMux(s.cfg.Probo, s.cfg.Usrmgr, s.cfg.Auth, s.cfg.ConnectorRegistry, s.cfg.SafeRedirect))
+	router.Mount(
+		"/console/v1",
+		console_v1.NewMux(
+			s.cfg.Logger.Named("console.v1"),
+			s.cfg.Probo,
+			s.cfg.Usrmgr,
+			s.cfg.Auth,
+			s.cfg.ConnectorRegistry,
+			s.cfg.SafeRedirect,
+		),
+	)
 
 	router.ServeHTTP(w, r)
 }

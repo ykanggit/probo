@@ -41,6 +41,7 @@ import (
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
 	"github.com/vektah/gqlparser/v2/gqlerror"
+	"go.gearno.de/kit/log"
 )
 
 type (
@@ -77,7 +78,14 @@ func UserFromContext(ctx context.Context) *coredata.User {
 	return user
 }
 
-func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig, connectorRegistry *connector.ConnectorRegistry, safeRedirect *saferedirect.SafeRedirect) *chi.Mux {
+func NewMux(
+	logger *log.Logger,
+	proboSvc *probo.Service,
+	usrmgrSvc *usrmgr.Service,
+	authCfg AuthConfig,
+	connectorRegistry *connector.ConnectorRegistry,
+	safeRedirect *saferedirect.SafeRedirect,
+) *chi.Mux {
 	r := chi.NewMux()
 
 	r.Get(
@@ -197,12 +205,12 @@ func NewMux(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConf
 	}))
 
 	r.Get("/", playground.Handler("GraphQL", "/api/console/v1/query"))
-	r.Post("/query", graphqlHandler(proboSvc, usrmgrSvc, authCfg))
+	r.Post("/query", graphqlHandler(logger, proboSvc, usrmgrSvc, authCfg))
 
 	return r
 }
 
-func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.HandlerFunc {
+func graphqlHandler(logger *log.Logger, proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.HandlerFunc {
 	var mb int64 = 1 << 20
 
 	es := schema.NewExecutableSchema(
@@ -225,8 +233,8 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 	srv.Use(extension.Introspection{})
 	srv.Use(tracingExtension{})
 	srv.SetRecoverFunc(func(ctx context.Context, err any) error {
-		panicValue := ctx.Value(panicValueContextKey).(*any)
-		*panicValue = err
+		logger.Error("resolver panic", log.Any("error", err))
+
 		return fmt.Errorf("resolver panic: %v", err)
 	})
 
@@ -253,20 +261,7 @@ func graphqlHandler(proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg 
 		},
 	)
 
-	return WithSession(usrmgrSvc, authCfg, func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-
-		// Hack to capture the panic value, because gqlgen execute resolver in a different goroutine.
-		// And I want use the go.gearno.de/kit/httpserver built in panic recovery.
-		var panicValue any
-		ctx = context.WithValue(ctx, panicValueContextKey, &panicValue)
-
-		srv.ServeHTTP(w, r.WithContext(ctx))
-
-		if panicValue != nil {
-			panic(panicValue)
-		}
-	})
+	return WithSession(usrmgrSvc, authCfg, srv.ServeHTTP)
 }
 
 func WithSession(usrmgrSvc *usrmgr.Service, authCfg AuthConfig, next http.HandlerFunc) http.HandlerFunc {

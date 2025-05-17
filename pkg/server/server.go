@@ -27,6 +27,7 @@ import (
 	"github.com/getprobo/probo/pkg/server/web"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
+	"go.gearno.de/kit/log"
 )
 
 // Config holds the configuration for the server
@@ -37,6 +38,7 @@ type Config struct {
 	Auth              console_v1.AuthConfig
 	ConnectorRegistry *connector.ConnectorRegistry
 	SafeRedirect      *saferedirect.SafeRedirect
+	Logger            *log.Logger
 }
 
 // Server represents the main server that handles both API and frontend requests
@@ -56,6 +58,7 @@ func NewServer(cfg Config) (*Server, error) {
 		Auth:              cfg.Auth,
 		ConnectorRegistry: cfg.ConnectorRegistry,
 		SafeRedirect:      cfg.SafeRedirect,
+		Logger:            cfg.Logger.Named("api"),
 	}
 	apiServer, err := api.NewServer(apiCfg)
 	if err != nil {

@@ -217,6 +217,7 @@ func (impl *Implm) Run(
 			Usrmgr:            usrmgrService,
 			ConnectorRegistry: defaultConnectorRegistry,
 			SafeRedirect:      &saferedirect.SafeRedirect{AllowedHost: impl.cfg.Hostname},
+			Logger:            l.Named("http.server"),
 			Auth: console_v1.AuthConfig{
 				CookieName:      impl.cfg.Auth.Cookie.Name,
 				CookieDomain:    impl.cfg.Auth.Cookie.Domain,
