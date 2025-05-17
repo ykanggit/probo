@@ -16,6 +16,11 @@ jobs:
     permissions:
       contents: "read"
       packages: "write"
+    env:
+      DOCKER_BUILD_FLAGS: "--push"
+      DOCKER_TAG_NAME: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
+      TRIVY_SKIP_DB_UPDATE: "true"
+      TRIVY_SKIP_JAVA_DB_UPDATE: "true"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "docker/setup-qemu-action@v2"
@@ -26,9 +31,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - run: "make docker-build"
-        env:
-          DOCKER_BUILD_FLAGS: "--push"
-          DOCKER_TAG_NAME: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
+      - uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'ghcr.io/getprobo/probo:${{ env.DOCKER_TAG_NAME }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   build:
     name: "build"
     runs-on: "ubuntu-22.04"
