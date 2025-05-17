@@ -4,7 +4,7 @@ COPY . .
 RUN npm ci
 RUN npm run build
 
-FROM golang:1.23 AS backend-builder
+FROM golang:1.24 AS backend-builder
 WORKDIR /workdir
 COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod \
