@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### [0.26.0] - 2025-05-20
+
+### Added
+
+- Add docker image security scan
+- Show latest risk updated date
+- Log error when GraphQL resolver failed
+
+### Security
+
+- Update Golang dependencies
+- Update to latest Ubuntu LTS
+- Update to latest Golang version
+
 ### [0.25.0] - 2025-05-13
 
 ### Changed
@@ -72,6 +86,7 @@ All notable changes to this project will be documented in this file.
 ## [0.20.1] - 2025-05-01
 
 ### Changed
+
 - New vendors in the built-in lists
 
 ## [0.20.0] - 2025-05-01
@@ -104,6 +119,7 @@ All notable changes to this project will be documented in this file.
 ## [0.19.0] - 2025-04-30
 
 ### Changed
+
 - New vendors in the built-in lists
 
 ### Security
@@ -212,7 +228,6 @@ Fix typo `mesure` instead of `measure`
 ### Changed
 
 - Update risk library with new risks
-
 
 ### Security
 
