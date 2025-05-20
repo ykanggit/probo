@@ -256,6 +256,10 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	ExportAuditPayload struct {
+		Success func(childComplexity int) int
+	}
+
 	Framework struct {
 		Controls     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) int
 		CreatedAt    func(childComplexity int) int
@@ -347,6 +351,7 @@ type ComplexityRoot struct {
 		DeleteTask                   func(childComplexity int, input types.DeleteTaskInput) int
 		DeleteVendor                 func(childComplexity int, input types.DeleteVendorInput) int
 		DeleteVendorComplianceReport func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
+		ExportAudit                  func(childComplexity int, input types.ExportAuditInput) int
 		FulfillEvidence              func(childComplexity int, input types.FulfillEvidenceInput) int
 		ImportFramework              func(childComplexity int, input types.ImportFrameworkInput) int
 		ImportMeasure                func(childComplexity int, input types.ImportMeasureInput) int
@@ -810,6 +815,7 @@ type MutationResolver interface {
 	RequestSignature(ctx context.Context, input types.RequestSignatureInput) (*types.RequestSignaturePayload, error)
 	SendSigningNotifications(ctx context.Context, input types.SendSigningNotificationsInput) (*types.SendSigningNotificationsPayload, error)
 	CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error)
+	ExportAudit(ctx context.Context, input types.ExportAuditInput) (*types.ExportAuditPayload, error)
 }
 type OrganizationResolver interface {
 	LogoURL(ctx context.Context, obj *types.Organization) (*string, error)
@@ -1409,6 +1415,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.EvidenceEdge.Node(childComplexity), true
 
+	case "ExportAuditPayload.success":
+		if e.complexity.ExportAuditPayload.Success == nil {
+			break
+		}
+
+		return e.complexity.ExportAuditPayload.Success(childComplexity), true
+
 	case "Framework.controls":
 		if e.complexity.Framework.Controls == nil {
 			break
@@ -2003,6 +2016,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteVendorComplianceReport(childComplexity, args["input"].(types.DeleteVendorComplianceReportInput)), true
+
+	case "Mutation.exportAudit":
+		if e.complexity.Mutation.ExportAudit == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_exportAudit_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ExportAudit(childComplexity, args["input"].(types.ExportAuditInput)), true
 
 	case "Mutation.fulfillEvidence":
 		if e.complexity.Mutation.FulfillEvidence == nil {
@@ -3810,6 +3835,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeleteVendorComplianceReportInput,
 		ec.unmarshalInputDeleteVendorInput,
 		ec.unmarshalInputEvidenceOrder,
+		ec.unmarshalInputExportAuditInput,
 		ec.unmarshalInputFrameworkOrder,
 		ec.unmarshalInputFulfillEvidenceInput,
 		ec.unmarshalInputImportFrameworkInput,
@@ -3957,7 +3983,6 @@ directive @goModel(
 
 directive @goEnum(value: String) on ENUM_VALUE
 
-
 # Scalars
 scalar CursorKey
 scalar Void
@@ -4042,7 +4067,9 @@ enum PolicyStatus
   DRAFT
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft")
   PUBLISHED
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusPublished")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusPublished"
+    )
 }
 
 enum EvidenceType
@@ -4194,27 +4221,36 @@ enum DataSensitivity
   LOW
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityLow")
   MEDIUM
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityMedium")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityMedium"
+    )
   HIGH
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityHigh")
   CRITICAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityCritical")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityCritical"
+    )
 }
 
 enum BusinessImpact
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.BusinessImpact") {
-  LOW
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactLow")
+  LOW @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactLow")
   MEDIUM
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactMedium")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactMedium"
+    )
   HIGH
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactHigh")
   CRITICAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactCritical")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactCritical"
+    )
 }
 
 enum PolicyVersionOrderField
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderField") {
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderField"
+  ) {
   VERSION
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderFieldVersion"
@@ -4961,8 +4997,12 @@ type Mutation {
   requestEvidence(input: RequestEvidenceInput!): RequestEvidencePayload!
   fulfillEvidence(input: FulfillEvidenceInput!): FulfillEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
-  uploadTaskEvidence(input: UploadTaskEvidenceInput!): UploadTaskEvidencePayload!
-  uploadMeasureEvidence(input: UploadMeasureEvidenceInput!): UploadMeasureEvidencePayload!
+  uploadTaskEvidence(
+    input: UploadTaskEvidenceInput!
+  ): UploadTaskEvidencePayload!
+  uploadMeasureEvidence(
+    input: UploadMeasureEvidenceInput!
+  ): UploadMeasureEvidencePayload!
 
   # Vendor Compliance Report mutations
   uploadVendorComplianceReport(
@@ -4975,13 +5015,25 @@ type Mutation {
   # Policy mutations
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
-  publishPolicyVersion(input: PublishPolicyVersionInput!): PublishPolicyVersionPayload!
-  createDraftPolicyVersion(input: CreateDraftPolicyVersionInput!): CreateDraftPolicyVersionPayload!
-  updatePolicyVersion(input: UpdatePolicyVersionInput!): UpdatePolicyVersionPayload!
+  publishPolicyVersion(
+    input: PublishPolicyVersionInput!
+  ): PublishPolicyVersionPayload!
+  createDraftPolicyVersion(
+    input: CreateDraftPolicyVersionInput!
+  ): CreateDraftPolicyVersionPayload!
+  updatePolicyVersion(
+    input: UpdatePolicyVersionInput!
+  ): UpdatePolicyVersionPayload!
   requestSignature(input: RequestSignatureInput!): RequestSignaturePayload!
-  sendSigningNotifications(input: SendSigningNotificationsInput!): SendSigningNotificationsPayload!
+  sendSigningNotifications(
+    input: SendSigningNotificationsInput!
+  ): SendSigningNotificationsPayload!
 
-  createVendorRiskAssessment(input: CreateVendorRiskAssessmentInput!): CreateVendorRiskAssessmentPayload!
+  createVendorRiskAssessment(
+    input: CreateVendorRiskAssessmentInput!
+  ): CreateVendorRiskAssessmentPayload!
+
+  exportAudit(input: ExportAuditInput!): ExportAuditPayload!
 }
 
 # Input Types
@@ -5476,7 +5528,9 @@ type VendorRiskAssessment implements Node {
 }
 
 enum VendorRiskAssessmentOrderField
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderField") {
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderField"
+  ) {
   CREATED_AT
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderFieldCreatedAt"
@@ -5550,7 +5604,9 @@ input PolicyVersionSignatureOrder {
 }
 
 enum PolicyVersionSignatureState
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureState") {
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureState"
+  ) {
   REQUESTED
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureStateRequested"
@@ -5562,7 +5618,9 @@ enum PolicyVersionSignatureState
 }
 
 enum PolicyVersionSignatureOrderField
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderField") {
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderField"
+  ) {
   CREATED_AT
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderFieldCreatedAt"
@@ -5644,6 +5702,14 @@ input UploadTaskEvidenceInput {
 input UploadMeasureEvidenceInput {
   measureId: ID!
   file: Upload!
+}
+
+input ExportAuditInput {
+  frameworkId: ID!
+}
+
+type ExportAuditPayload {
+  success: Boolean!
 }
 `, BuiltIn: false},
 }
@@ -7005,6 +7071,29 @@ func (ec *executionContext) field_Mutation_deleteVendor_argsInput(
 	}
 
 	var zeroVal types.DeleteVendorInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_exportAudit_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_exportAudit_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_exportAudit_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.ExportAuditInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNExportAuditInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportAuditInput(ctx, tmp)
+	}
+
+	var zeroVal types.ExportAuditInput
 	return zeroVal, nil
 }
 
@@ -12900,6 +12989,50 @@ func (ec *executionContext) fieldContext_EvidenceEdge_node(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _ExportAuditPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.ExportAuditPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExportAuditPayload_success(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Success, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExportAuditPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExportAuditPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Framework_id(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Framework_id(ctx, field)
 	if err != nil {
@@ -17432,6 +17565,65 @@ func (ec *executionContext) fieldContext_Mutation_createVendorRiskAssessment(ctx
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createVendorRiskAssessment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_exportAudit(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_exportAudit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ExportAudit(rctx, fc.Args["input"].(types.ExportAuditInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ExportAuditPayload)
+	fc.Result = res
+	return ec.marshalNExportAuditPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportAuditPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_exportAudit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_ExportAuditPayload_success(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ExportAuditPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_exportAudit_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -31253,6 +31445,33 @@ func (ec *executionContext) unmarshalInputEvidenceOrder(ctx context.Context, obj
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputExportAuditInput(ctx context.Context, obj any) (types.ExportAuditInput, error) {
+	var it types.ExportAuditInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"frameworkId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "frameworkId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("frameworkId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FrameworkID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputFrameworkOrder(ctx context.Context, obj any) (types.FrameworkOrderBy, error) {
 	var it types.FrameworkOrderBy
 	asMap := map[string]any{}
@@ -34792,6 +35011,45 @@ func (ec *executionContext) _EvidenceEdge(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var exportAuditPayloadImplementors = []string{"ExportAuditPayload"}
+
+func (ec *executionContext) _ExportAuditPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ExportAuditPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, exportAuditPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ExportAuditPayload")
+		case "success":
+			out.Values[i] = ec._ExportAuditPayload_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var frameworkImplementors = []string{"Framework", "Node"}
 
 func (ec *executionContext) _Framework(ctx context.Context, sel ast.SelectionSet, obj *types.Framework) graphql.Marshaler {
@@ -35840,6 +36098,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createVendorRiskAssessment":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createVendorRiskAssessment(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "exportAudit":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_exportAudit(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -41330,6 +41595,25 @@ var (
 		coredata.EvidenceTypeLink: "LINK",
 	}
 )
+
+func (ec *executionContext) unmarshalNExportAuditInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportAuditInput(ctx context.Context, v any) (types.ExportAuditInput, error) {
+	res, err := ec.unmarshalInputExportAuditInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNExportAuditPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportAuditPayload(ctx context.Context, sel ast.SelectionSet, v types.ExportAuditPayload) graphql.Marshaler {
+	return ec._ExportAuditPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNExportAuditPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportAuditPayload(ctx context.Context, sel ast.SelectionSet, v *types.ExportAuditPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ExportAuditPayload(ctx, sel, v)
+}
 
 func (ec *executionContext) marshalNFramework2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v types.Framework) graphql.Marshaler {
 	return ec._Framework(ctx, sel, &v)

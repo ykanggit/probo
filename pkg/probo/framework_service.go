@@ -17,8 +17,13 @@ package probo
 import (
 	"context"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
@@ -237,4 +242,158 @@ func (s FrameworkService) Import(
 	}
 
 	return framework, nil
+}
+
+func (s FrameworkService) ExportAudit(
+	ctx context.Context,
+	frameworkID gid.GID,
+) ([]*coredata.Control, error) {
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			framework := &coredata.Framework{}
+			if err := framework.LoadByID(ctx, conn, s.svc.scope, frameworkID); err != nil {
+				return fmt.Errorf("cannot load framework: %w", err)
+			}
+
+			now := time.Now()
+			exportDir := filepath.Join(os.TempDir(), "probo-export", framework.Name, now.Format("2006-01-02-15-04-05"))
+
+			if err := os.MkdirAll(exportDir, 0755); err != nil {
+				return fmt.Errorf("cannot create export directory: %w", err)
+			}
+
+			fmt.Println("Exporting framework", framework.Name, "to", exportDir)
+
+			cursor := page.NewCursor(
+				0,
+				nil,
+				page.Head,
+				page.OrderBy[coredata.ControlOrderField]{
+					Field:     coredata.ControlOrderFieldCreatedAt,
+					Direction: page.OrderDirectionAsc,
+				},
+			)
+
+			controls := coredata.Controls{}
+			if err := controls.LoadByFrameworkID(ctx, conn, s.svc.scope, frameworkID, cursor); err != nil {
+				return fmt.Errorf("cannot load controls: %w", err)
+			}
+
+			for _, control := range controls {
+				controlDir := filepath.Join(exportDir, control.ReferenceID)
+				if err := os.MkdirAll(controlDir, 0755); err != nil {
+					return fmt.Errorf("cannot create control directory: %w", err)
+				}
+
+				measures := coredata.Measures{}
+				cursor := page.NewCursor(
+					0,
+					nil,
+					page.Head,
+					page.OrderBy[coredata.MeasureOrderField]{
+						Field:     coredata.MeasureOrderFieldCreatedAt,
+						Direction: page.OrderDirectionAsc,
+					},
+				)
+
+				if err := measures.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor); err != nil {
+					return fmt.Errorf("cannot load measures: %w", err)
+				}
+
+				policies := coredata.Policies{}
+
+				cursor2 := page.NewCursor(
+					0,
+					nil,
+					page.Head,
+					page.OrderBy[coredata.PolicyOrderField]{
+						Field:     coredata.PolicyOrderFieldCreatedAt,
+						Direction: page.OrderDirectionAsc,
+					},
+				)
+
+				if err := policies.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor2); err != nil {
+					return fmt.Errorf("cannot load policies: %w", err)
+				}
+
+				for _, policy := range policies {
+					policyDir := filepath.Join(controlDir, policy.Title)
+					if err := os.MkdirAll(policyDir, 0755); err != nil {
+						return fmt.Errorf("cannot create policy directory: %w", err)
+					}
+
+					version := coredata.PolicyVersion{}
+					if err := version.LoadLatestVersion(ctx, conn, s.svc.scope, policy.ID); err != nil {
+						return fmt.Errorf("cannot load policy version: %w", err)
+					}
+
+					policyFile := filepath.Join(policyDir, "policy.md")
+					if err := os.WriteFile(policyFile, []byte(version.Content), 0644); err != nil {
+						return fmt.Errorf("cannot write policy file: %w", err)
+					}
+				}
+
+				for _, measure := range measures {
+					measureDir := filepath.Join(controlDir, measure.Name)
+					if err := os.MkdirAll(measureDir, 0755); err != nil {
+						return fmt.Errorf("cannot create measure directory: %w", err)
+					}
+
+					evidences := coredata.Evidences{}
+					cursor := page.NewCursor(
+						0,
+						nil,
+						page.Head,
+						page.OrderBy[coredata.EvidenceOrderField]{
+							Field:     coredata.EvidenceOrderFieldCreatedAt,
+							Direction: page.OrderDirectionAsc,
+						},
+					)
+
+					if err := evidences.LoadByMeasureID(ctx, conn, s.svc.scope, measure.ID, cursor); err != nil {
+						return fmt.Errorf("cannot load evidences: %w", err)
+					}
+
+					for _, evidence := range evidences {
+						evidenceFile := filepath.Join(measureDir, evidence.Filename)
+
+						if evidence.Type == coredata.EvidenceTypeFile && evidence.ObjectKey != "" {
+							output, err := s.svc.s3.GetObject(
+								ctx,
+								&s3.GetObjectInput{
+									Bucket: aws.String(s.svc.bucket),
+									Key:    aws.String(evidence.ObjectKey),
+								},
+							)
+							if err != nil {
+								return fmt.Errorf("cannot download evidence file: %w", err)
+							}
+
+							defer output.Body.Close()
+
+							file, err := os.Create(evidenceFile)
+							if err != nil {
+								return fmt.Errorf("cannot create evidence file: %w", err)
+							}
+							defer file.Close()
+
+							_, err = io.Copy(file, output.Body)
+							if err != nil {
+								return fmt.Errorf("cannot write evidence file: %w", err)
+							}
+						}
+					}
+				}
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }

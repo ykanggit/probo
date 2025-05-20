@@ -23,6 +23,7 @@ import type { FrameworkLayoutViewDeleteMutation } from "./__generated__/Framewor
 import { PageTemplate } from "@/components/PageTemplate";
 import { FrameworkLayoutViewSkeleton } from "./FrameworkLayout";
 import { ControlList } from "./FrameworkLayoutView/ControlList";
+import { FrameworkLayoutViewExportAuditMutation } from "./__generated__/FrameworkLayoutViewExportAuditMutation.graphql";
 
 const FrameworkLayoutViewQuery = graphql`
   query FrameworkLayoutViewQuery($frameworkId: ID!) {
@@ -60,6 +61,14 @@ const DeleteFrameworkMutation = graphql`
   }
 `;
 
+const exportAuditMutation = graphql`
+  mutation FrameworkLayoutViewExportAuditMutation($input: ExportAuditInput!) {
+    exportAudit(input: $input) {
+      success
+    }
+  }
+`;
+
 function FrameworkLayoutViewContent({
   queryRef,
 }: {
@@ -73,17 +82,28 @@ function FrameworkLayoutViewContent({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [exportAudit, _] =
+    useMutation<FrameworkLayoutViewExportAuditMutation>(exportAuditMutation);
+
   // Setup delete mutation
   const [commitDeleteMutation] = useMutation<FrameworkLayoutViewDeleteMutation>(
-    DeleteFrameworkMutation,
+    DeleteFrameworkMutation
   );
+
+  const handleExportAudit = useCallback(() => {
+    exportAudit({
+      variables: {
+        input: { frameworkId: framework.id },
+      },
+    });
+  }, [exportAudit, framework.id]);
 
   const handleDeleteFramework = useCallback(() => {
     setIsDeleting(true);
 
     const connectionId = ConnectionHandler.getConnectionID(
       organizationId!,
-      "FrameworkListView_frameworks",
+      "FrameworkListView_frameworks"
     );
 
     commitDeleteMutation({
@@ -140,6 +160,9 @@ function FrameworkLayoutViewContent({
               Edit Framework
             </Link>
           </Button>
+          <Button variant="secondary" onClick={() => handleExportAudit()}>
+            Export Audit
+          </Button>
           <Button
             variant="destructive"
             onClick={() => setIsDeleteDialogOpen(true)}
@@ -189,7 +212,7 @@ function FrameworkLayoutViewContent({
 export default function FrameworkLayoutView() {
   const { frameworkId } = useParams();
   const [queryRef, loadQuery] = useQueryLoader<FrameworkLayoutViewQueryType>(
-    FrameworkLayoutViewQuery,
+    FrameworkLayoutViewQuery
   );
 
   useEffect(() => {

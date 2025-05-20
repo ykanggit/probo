@@ -411,6 +411,14 @@ type EvidenceEdge struct {
 	Node   *Evidence      `json:"node"`
 }
 
+type ExportAuditInput struct {
+	FrameworkID gid.GID `json:"frameworkId"`
+}
+
+type ExportAuditPayload struct {
+	Success bool `json:"success"`
+}
+
 type Framework struct {
 	ID           gid.GID            `json:"id"`
 	Name         string             `json:"name"`

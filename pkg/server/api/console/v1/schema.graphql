@@ -12,7 +12,6 @@ directive @goModel(
 
 directive @goEnum(value: String) on ENUM_VALUE
 
-
 # Scalars
 scalar CursorKey
 scalar Void
@@ -97,7 +96,9 @@ enum PolicyStatus
   DRAFT
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusDraft")
   PUBLISHED
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusPublished")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PolicyStatusPublished"
+    )
 }
 
 enum EvidenceType
@@ -249,27 +250,36 @@ enum DataSensitivity
   LOW
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityLow")
   MEDIUM
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityMedium")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityMedium"
+    )
   HIGH
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityHigh")
   CRITICAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityCritical")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataSensitivityCritical"
+    )
 }
 
 enum BusinessImpact
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.BusinessImpact") {
-  LOW
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactLow")
+  LOW @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactLow")
   MEDIUM
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactMedium")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactMedium"
+    )
   HIGH
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactHigh")
   CRITICAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactCritical")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.BusinessImpactCritical"
+    )
 }
 
 enum PolicyVersionOrderField
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderField") {
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderField"
+  ) {
   VERSION
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionOrderFieldVersion"
@@ -1016,8 +1026,12 @@ type Mutation {
   requestEvidence(input: RequestEvidenceInput!): RequestEvidencePayload!
   fulfillEvidence(input: FulfillEvidenceInput!): FulfillEvidencePayload!
   deleteEvidence(input: DeleteEvidenceInput!): DeleteEvidencePayload!
-  uploadTaskEvidence(input: UploadTaskEvidenceInput!): UploadTaskEvidencePayload!
-  uploadMeasureEvidence(input: UploadMeasureEvidenceInput!): UploadMeasureEvidencePayload!
+  uploadTaskEvidence(
+    input: UploadTaskEvidenceInput!
+  ): UploadTaskEvidencePayload!
+  uploadMeasureEvidence(
+    input: UploadMeasureEvidenceInput!
+  ): UploadMeasureEvidencePayload!
 
   # Vendor Compliance Report mutations
   uploadVendorComplianceReport(
@@ -1030,13 +1044,25 @@ type Mutation {
   # Policy mutations
   createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
   deletePolicy(input: DeletePolicyInput!): DeletePolicyPayload!
-  publishPolicyVersion(input: PublishPolicyVersionInput!): PublishPolicyVersionPayload!
-  createDraftPolicyVersion(input: CreateDraftPolicyVersionInput!): CreateDraftPolicyVersionPayload!
-  updatePolicyVersion(input: UpdatePolicyVersionInput!): UpdatePolicyVersionPayload!
+  publishPolicyVersion(
+    input: PublishPolicyVersionInput!
+  ): PublishPolicyVersionPayload!
+  createDraftPolicyVersion(
+    input: CreateDraftPolicyVersionInput!
+  ): CreateDraftPolicyVersionPayload!
+  updatePolicyVersion(
+    input: UpdatePolicyVersionInput!
+  ): UpdatePolicyVersionPayload!
   requestSignature(input: RequestSignatureInput!): RequestSignaturePayload!
-  sendSigningNotifications(input: SendSigningNotificationsInput!): SendSigningNotificationsPayload!
+  sendSigningNotifications(
+    input: SendSigningNotificationsInput!
+  ): SendSigningNotificationsPayload!
 
-  createVendorRiskAssessment(input: CreateVendorRiskAssessmentInput!): CreateVendorRiskAssessmentPayload!
+  createVendorRiskAssessment(
+    input: CreateVendorRiskAssessmentInput!
+  ): CreateVendorRiskAssessmentPayload!
+
+  exportAudit(input: ExportAuditInput!): ExportAuditPayload!
 }
 
 # Input Types
@@ -1531,7 +1557,9 @@ type VendorRiskAssessment implements Node {
 }
 
 enum VendorRiskAssessmentOrderField
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderField") {
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderField"
+  ) {
   CREATED_AT
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.VendorRiskAssessmentOrderFieldCreatedAt"
@@ -1605,7 +1633,9 @@ input PolicyVersionSignatureOrder {
 }
 
 enum PolicyVersionSignatureState
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureState") {
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureState"
+  ) {
   REQUESTED
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureStateRequested"
@@ -1617,7 +1647,9 @@ enum PolicyVersionSignatureState
 }
 
 enum PolicyVersionSignatureOrderField
-  @goModel(model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderField") {
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderField"
+  ) {
   CREATED_AT
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PolicyVersionSignatureOrderFieldCreatedAt"
@@ -1699,4 +1731,12 @@ input UploadTaskEvidenceInput {
 input UploadMeasureEvidenceInput {
   measureId: ID!
   file: Upload!
+}
+
+input ExportAuditInput {
+  frameworkId: ID!
+}
+
+type ExportAuditPayload {
+  success: Boolean!
 }

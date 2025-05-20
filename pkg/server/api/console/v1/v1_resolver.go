@@ -1289,6 +1289,19 @@ func (r *mutationResolver) CreateVendorRiskAssessment(ctx context.Context, input
 	}, nil
 }
 
+// ExportAudit is the resolver for the exportAudit field.
+func (r *mutationResolver) ExportAudit(ctx context.Context, input types.ExportAuditInput) (*types.ExportAuditPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.FrameworkID.TenantID())
+	_, err := svc.Frameworks.ExportAudit(ctx, input.FrameworkID)
+	if err != nil {
+		panic(fmt.Errorf("cannot export audit: %w", err))
+	}
+
+	return &types.ExportAuditPayload{
+		Success: true,
+	}, nil
+}
+
 // LogoURL is the resolver for the logoUrl field.
 func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organization) (*string, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
