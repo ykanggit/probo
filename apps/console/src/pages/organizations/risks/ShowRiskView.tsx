@@ -217,7 +217,7 @@ const calculateRiskLevel = (score: number): string => {
 
 // Helper function to get color for risk level that matches the matrix colors
 const getRiskLevelColor = (
-  level: string,
+  level: string
 ): { backgroundColor: string; color: string } => {
   switch (level) {
     case "High":
@@ -349,7 +349,7 @@ function ShowRiskViewContent({
 }) {
   const data = usePreloadedQuery<ShowRiskViewQuery>(
     showRiskViewQuery,
-    queryRef,
+    queryRef
   );
   const { toast } = useToast();
   const environment = useRelayEnvironment();
@@ -359,14 +359,14 @@ function ShowRiskViewContent({
   const risk = data.node;
   const severity = getRiskSeverity(
     risk.inherentLikelihood!,
-    risk.inherentImpact!,
+    risk.inherentImpact!
   );
 
   // Fix typing for measures
   const measures = risk.measures?.edges?.map((edge) => edge.node) || [];
   const residualSeverity = getRiskSeverity(
     risk.residualLikelihood!,
-    risk.residualImpact!,
+    risk.residualImpact!
   );
 
   // Fix typing for policies
@@ -405,21 +405,21 @@ function ShowRiskViewContent({
   // Setup mutation hooks
   const [createRiskMeasureMapping] =
     useMutation<ShowRiskViewCreateRiskMeasureMappingMutation>(
-      createRiskMeasureMappingMutation,
+      createRiskMeasureMappingMutation
     );
   const [deleteRiskMeasureMapping] =
     useMutation<ShowRiskViewDeleteRiskMeasureMappingMutation>(
-      deleteRiskMeasureMappingMutation,
+      deleteRiskMeasureMappingMutation
     );
 
   // Setup policy mutation hooks
   const [createRiskPolicyMapping] =
     useMutation<ShowRiskViewCreateRiskPolicyMappingMutation>(
-      createRiskPolicyMappingMutation,
+      createRiskPolicyMappingMutation
     );
   const [deleteRiskPolicyMapping] =
     useMutation<ShowRiskViewDeleteRiskPolicyMappingMutation>(
-      deleteRiskPolicyMappingMutation,
+      deleteRiskPolicyMappingMutation
     );
 
   // Clear filters when dialog closes
@@ -453,7 +453,7 @@ function ShowRiskViewContent({
       organizationMeasuresQuery,
       {
         organizationId,
-      },
+      }
     ).subscribe({
       next: (data) => {
         setOrganizationMeasuresData(data);
@@ -483,7 +483,7 @@ function ShowRiskViewContent({
       organizationPoliciesQuery,
       {
         organizationId,
-      },
+      }
     ).subscribe({
       next: (data) => {
         setOrganizationPoliciesData(data);
@@ -505,7 +505,7 @@ function ShowRiskViewContent({
   const getMeasures = useCallback(() => {
     if (!organizationMeasuresData?.organization?.measures?.edges) return [];
     return organizationMeasuresData.organization.measures.edges.map(
-      (edge) => edge.node,
+      (edge) => edge.node
     );
   }, [organizationMeasuresData]);
 
@@ -550,7 +550,7 @@ function ShowRiskViewContent({
   const getPolicies = useCallback(() => {
     if (!organizationPoliciesData?.organization?.policies?.edges) return [];
     return organizationPoliciesData.organization.policies.edges.map(
-      (edge) => edge.node,
+      (edge) => edge.node
     );
   }, [organizationPoliciesData]);
 
@@ -573,7 +573,7 @@ function ShowRiskViewContent({
         NonNullable<
           ShowRiskViewOrganizationMeasuresQuery$data["organization"]
         >["measures"]
-      >["edges"][0]["node"],
+      >["edges"][0]["node"]
     ) => {
       if (!risk.id) return;
 
@@ -635,7 +635,7 @@ function ShowRiskViewContent({
         },
       });
     },
-    [risk.id, createRiskMeasureMapping, toast, environment, loadQuery],
+    [risk.id, createRiskMeasureMapping, toast, environment, loadQuery]
   );
 
   // Handle unlinking a measure from this risk
@@ -645,7 +645,7 @@ function ShowRiskViewContent({
         NonNullable<
           ShowRiskViewOrganizationMeasuresQuery$data["organization"]
         >["measures"]
-      >["edges"][0]["node"],
+      >["edges"][0]["node"]
     ) => {
       if (!risk.id) return;
 
@@ -707,7 +707,7 @@ function ShowRiskViewContent({
         },
       });
     },
-    [risk.id, deleteRiskMeasureMapping, toast, environment, loadQuery],
+    [risk.id, deleteRiskMeasureMapping, toast, environment, loadQuery]
   );
 
   // Handle linking a policy to this risk
@@ -717,7 +717,7 @@ function ShowRiskViewContent({
         NonNullable<
           ShowRiskViewOrganizationPoliciesQuery$data["organization"]
         >["policies"]
-      >["edges"][0]["node"],
+      >["edges"][0]["node"]
     ) => {
       if (!risk.id) return;
 
@@ -779,7 +779,7 @@ function ShowRiskViewContent({
         },
       });
     },
-    [risk.id, createRiskPolicyMapping, toast, environment, loadQuery],
+    [risk.id, createRiskPolicyMapping, toast, environment, loadQuery]
   );
 
   // Handle unlinking a policy from this risk
@@ -789,7 +789,7 @@ function ShowRiskViewContent({
         NonNullable<
           ShowRiskViewOrganizationPoliciesQuery$data["organization"]
         >["policies"]
-      >["edges"][0]["node"],
+      >["edges"][0]["node"]
     ) => {
       if (!risk.id) return;
 
@@ -851,7 +851,7 @@ function ShowRiskViewContent({
         },
       });
     },
-    [risk.id, deleteRiskPolicyMapping, toast, environment, loadQuery],
+    [risk.id, deleteRiskPolicyMapping, toast, environment, loadQuery]
   );
 
   return (
@@ -916,6 +916,23 @@ function ShowRiskViewContent({
                       ) : (
                         "Unassigned"
                       )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center">
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase">
+                      Last Updated
+                    </p>
+                    <p className="text-base font-medium mt-1">
+                      {risk.updatedAt
+                        ? new Date(risk.updatedAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
+                        : "N/A"}
                     </p>
                   </div>
                 </div>
@@ -1263,7 +1280,7 @@ function ShowRiskViewContent({
                     {filteredMeasures().map((measure) => {
                       // For each render, recalculate linked status directly against the current risk data
                       const isLinked = risk.measures?.edges?.some(
-                        (edge) => edge.node.id === measure.id,
+                        (edge) => edge.node.id === measure.id
                       );
                       const isLinking = linkingMeasures[measure.id] || false;
                       const isUnlinking =
@@ -1365,7 +1382,7 @@ function ShowRiskViewContent({
                     {filteredPolicies().map((policy) => {
                       // For each render, recalculate linked status directly against the current risk data
                       const isLinked = policies.some(
-                        (riskPolicy) => riskPolicy.id === policy.id,
+                        (riskPolicy) => riskPolicy.id === policy.id
                       );
                       const isLinking = linkingPolicies[policy.id] || false;
                       const isUnlinking = unlinkingPolicies[policy.id] || false;
