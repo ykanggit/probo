@@ -38,8 +38,10 @@ type (
 		OwnerID            *gid.GID      `db:"owner_id"`
 		InherentLikelihood int           `db:"inherent_likelihood"`
 		InherentImpact     int           `db:"inherent_impact"`
+		InherentRiskScore  int           `db:"inherent_risk_score"`
 		ResidualLikelihood int           `db:"residual_likelihood"`
 		ResidualImpact     int           `db:"residual_impact"`
+		ResidualRiskScore  int           `db:"residual_risk_score"`
 		CreatedAt          time.Time     `db:"created_at"`
 		UpdatedAt          time.Time     `db:"updated_at"`
 	}
@@ -54,14 +56,6 @@ func (r *Risk) CursorKey(orderBy RiskOrderField) page.CursorKey {
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
-}
-
-func (r *Risk) InherentRiskScore() int {
-	return r.InherentLikelihood * r.InherentImpact
-}
-
-func (r *Risk) ResidualRiskScore() int {
-	return r.ResidualLikelihood * r.ResidualImpact
 }
 
 func (r *Risks) LoadByMeasureID(
@@ -85,8 +79,10 @@ WITH rsks AS (
 		r.note,
 		r.inherent_likelihood,
 		r.inherent_impact,
+		r.inherent_risk_score,
 		r.residual_likelihood,
 		r.residual_impact,
+		r.residual_risk_score,
 		r.created_at,
 		r.updated_at
 	FROM
@@ -107,8 +103,10 @@ SELECT
 	note,
 	inherent_likelihood,
 	inherent_impact,
+	inherent_risk_score,
 	residual_likelihood,
 	residual_impact,
+	residual_risk_score,
 	created_at,
 	updated_at
 FROM
@@ -154,8 +152,10 @@ SELECT
 	note,
 	inherent_likelihood,
 	inherent_impact,
+	inherent_risk_score,
 	residual_likelihood,
 	residual_impact,
+	residual_risk_score,
 	category,
 	created_at,
 	updated_at
@@ -203,8 +203,10 @@ SELECT
 	note,
 	inherent_likelihood,
 	inherent_impact,
+	inherent_risk_score,
 	residual_likelihood,
 	residual_impact,
+	residual_risk_score,
 	created_at,
 	updated_at
 FROM risks
