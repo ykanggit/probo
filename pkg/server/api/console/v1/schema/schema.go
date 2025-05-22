@@ -257,7 +257,7 @@ type ComplexityRoot struct {
 	}
 
 	ExportAuditPayload struct {
-		Success func(childComplexity int) int
+		URL func(childComplexity int) int
 	}
 
 	Framework struct {
@@ -1415,12 +1415,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.EvidenceEdge.Node(childComplexity), true
 
-	case "ExportAuditPayload.success":
-		if e.complexity.ExportAuditPayload.Success == nil {
+	case "ExportAuditPayload.url":
+		if e.complexity.ExportAuditPayload.URL == nil {
 			break
 		}
 
-		return e.complexity.ExportAuditPayload.Success(childComplexity), true
+		return e.complexity.ExportAuditPayload.URL(childComplexity), true
 
 	case "Framework.controls":
 		if e.complexity.Framework.Controls == nil {
@@ -5709,7 +5709,7 @@ input ExportAuditInput {
 }
 
 type ExportAuditPayload {
-  success: Boolean!
+  url: String!
 }
 `, BuiltIn: false},
 }
@@ -12989,8 +12989,8 @@ func (ec *executionContext) fieldContext_EvidenceEdge_node(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _ExportAuditPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.ExportAuditPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ExportAuditPayload_success(ctx, field)
+func (ec *executionContext) _ExportAuditPayload_url(ctx context.Context, field graphql.CollectedField, obj *types.ExportAuditPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExportAuditPayload_url(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -13003,7 +13003,7 @@ func (ec *executionContext) _ExportAuditPayload_success(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
+		return obj.URL, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13015,19 +13015,19 @@ func (ec *executionContext) _ExportAuditPayload_success(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ExportAuditPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ExportAuditPayload_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ExportAuditPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -17610,8 +17610,8 @@ func (ec *executionContext) fieldContext_Mutation_exportAudit(ctx context.Contex
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "success":
-				return ec.fieldContext_ExportAuditPayload_success(ctx, field)
+			case "url":
+				return ec.fieldContext_ExportAuditPayload_url(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ExportAuditPayload", field.Name)
 		},
@@ -35022,8 +35022,8 @@ func (ec *executionContext) _ExportAuditPayload(ctx context.Context, sel ast.Sel
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ExportAuditPayload")
-		case "success":
-			out.Values[i] = ec._ExportAuditPayload_success(ctx, field, obj)
+		case "url":
+			out.Values[i] = ec._ExportAuditPayload_url(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

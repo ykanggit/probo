@@ -22,6 +22,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"archive/tar"
+	"compress/gzip"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/coredata"
@@ -247,7 +250,10 @@ func (s FrameworkService) Import(
 func (s FrameworkService) ExportAudit(
 	ctx context.Context,
 	frameworkID gid.GID,
-) ([]*coredata.Control, error) {
+) (string, error) {
+	var archivePath string
+	var objectKey string
+
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
@@ -387,13 +393,102 @@ func (s FrameworkService) ExportAudit(
 				}
 			}
 
+			archivePath = exportDir + ".tar.gz"
+			if err := createTarGzArchive(exportDir, archivePath); err != nil {
+				return fmt.Errorf("cannot create archive: %w", err)
+			}
+			defer os.Remove(archivePath)
+
+			file, err := os.Open(archivePath)
+			if err != nil {
+				return fmt.Errorf("cannot open archive file: %w", err)
+			}
+			defer file.Close()
+
+			objectKey = fmt.Sprintf("exports/%s/%s.tar.gz", frameworkID, now.Format("2006-01-02-15-04-05"))
+			_, err = s.svc.s3.PutObject(
+				ctx,
+				&s3.PutObjectInput{
+					Bucket: aws.String(s.svc.bucket),
+					Key:    aws.String(objectKey),
+					Body:   file,
+				},
+			)
+			if err != nil {
+				return fmt.Errorf("cannot upload archive to S3: %w", err)
+			}
+
 			return nil
 		},
 	)
 
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return nil, nil
+	presignClient := s3.NewPresignClient(s.svc.s3)
+
+	presignedReq, err := presignClient.PresignGetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(s.svc.bucket),
+		Key:    aws.String(objectKey),
+	}, func(opts *s3.PresignOptions) {
+		opts.Expires = 15 * time.Minute
+	})
+	if err != nil {
+		return "", fmt.Errorf("cannot generate presigned URL: %w", err)
+	}
+
+	return presignedReq.URL, nil
+}
+
+func createTarGzArchive(sourceDir, targetFile string) error {
+	tarFile, err := os.Create(targetFile)
+	if err != nil {
+		return fmt.Errorf("could not create archive file: %w", err)
+	}
+	defer tarFile.Close()
+
+	gzipWriter := io.Writer(tarFile)
+	gzw := gzip.NewWriter(gzipWriter)
+	defer gzw.Close()
+
+	tarWriter := tar.NewWriter(gzw)
+	defer tarWriter.Close()
+
+	err = filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		header, err := tar.FileInfoHeader(info, info.Name())
+		if err != nil {
+			return fmt.Errorf("could not create tar header: %w", err)
+		}
+
+		relPath, err := filepath.Rel(sourceDir, path)
+		if err != nil {
+			return fmt.Errorf("could not get relative path: %w", err)
+		}
+		header.Name = relPath
+
+		if err := tarWriter.WriteHeader(header); err != nil {
+			return fmt.Errorf("could not write tar header: %w", err)
+		}
+
+		if info.Mode().IsRegular() {
+			file, err := os.Open(path)
+			if err != nil {
+				return fmt.Errorf("could not open file %s: %w", path, err)
+			}
+			defer file.Close()
+
+			if _, err := io.Copy(tarWriter, file); err != nil {
+				return fmt.Errorf("could not copy file content: %w", err)
+			}
+		}
+
+		return nil
+	})
+
+	return err
 }

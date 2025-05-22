@@ -1292,13 +1292,13 @@ func (r *mutationResolver) CreateVendorRiskAssessment(ctx context.Context, input
 // ExportAudit is the resolver for the exportAudit field.
 func (r *mutationResolver) ExportAudit(ctx context.Context, input types.ExportAuditInput) (*types.ExportAuditPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.FrameworkID.TenantID())
-	_, err := svc.Frameworks.ExportAudit(ctx, input.FrameworkID)
+	fileUrl, err := svc.Frameworks.ExportAudit(ctx, input.FrameworkID)
 	if err != nil {
 		panic(fmt.Errorf("cannot export audit: %w", err))
 	}
 
 	return &types.ExportAuditPayload{
-		Success: true,
+		URL: fileUrl,
 	}, nil
 }
 

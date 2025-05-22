@@ -416,7 +416,7 @@ type ExportAuditInput struct {
 }
 
 type ExportAuditPayload struct {
-	Success bool `json:"success"`
+	URL string `json:"url"`
 }
 
 type Framework struct {

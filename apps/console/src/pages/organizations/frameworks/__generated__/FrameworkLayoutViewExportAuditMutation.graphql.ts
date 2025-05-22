@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c25a5f65159da12ec86ca608b7583a67>>
+ * @generated SignedSource<<1517cf7236f96500239781562cff66e4>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,7 +17,7 @@ export type FrameworkLayoutViewExportAuditMutation$variables = {
 };
 export type FrameworkLayoutViewExportAuditMutation$data = {
   readonly exportAudit: {
-    readonly success: boolean;
+    readonly url: string;
   };
 };
 export type FrameworkLayoutViewExportAuditMutation = {
@@ -52,7 +52,7 @@ v1 = [
         "alias": null,
         "args": null,
         "kind": "ScalarField",
-        "name": "success",
+        "name": "url",
         "storageKey": null
       }
     ],
@@ -77,16 +77,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "a0f656b50acde2ef3c3fef73e2155e9f",
+    "cacheID": "0dfccdfa75539c4621ec1bf7aab05ad2",
     "id": null,
     "metadata": {},
     "name": "FrameworkLayoutViewExportAuditMutation",
     "operationKind": "mutation",
-    "text": "mutation FrameworkLayoutViewExportAuditMutation(\n  $input: ExportAuditInput!\n) {\n  exportAudit(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation FrameworkLayoutViewExportAuditMutation(\n  $input: ExportAuditInput!\n) {\n  exportAudit(input: $input) {\n    url\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "b7347f4f8e292580e056793df6c270a5";
+(node as any).hash = "28679b1a4e375eb17a72e9e236f2e2ee";
 
 export default node;

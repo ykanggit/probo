@@ -64,7 +64,7 @@ const DeleteFrameworkMutation = graphql`
 const exportAuditMutation = graphql`
   mutation FrameworkLayoutViewExportAuditMutation($input: ExportAuditInput!) {
     exportAudit(input: $input) {
-      success
+      url
     }
   }
 `;
