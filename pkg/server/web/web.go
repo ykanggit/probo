@@ -180,8 +180,6 @@ func (s *Server) ServeSPA(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "public, max-age=3600")
 	}
 
-	w.Header().Set("Transfer-Encoding", "chunked")
-
 	http.FileServer(s.spaFS).ServeHTTP(w, r)
 }
 
