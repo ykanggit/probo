@@ -712,10 +712,10 @@ type Risk struct {
 	Treatment          coredata.RiskTreatment `json:"treatment"`
 	InherentLikelihood int                    `json:"inherentLikelihood"`
 	InherentImpact     int                    `json:"inherentImpact"`
-	InherentSeverity   int                    `json:"inherentSeverity"`
+	InherentRiskScore  int                    `json:"inherentRiskScore"`
 	ResidualLikelihood int                    `json:"residualLikelihood"`
 	ResidualImpact     int                    `json:"residualImpact"`
-	ResidualSeverity   int                    `json:"residualSeverity"`
+	ResidualRiskScore  int                    `json:"residualRiskScore"`
 	Note               string                 `json:"note"`
 	Owner              *People                `json:"owner,omitempty"`
 	Organization       *Organization          `json:"organization"`

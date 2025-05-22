@@ -528,7 +528,7 @@ type ComplexityRoot struct {
 		ID                 func(childComplexity int) int
 		InherentImpact     func(childComplexity int) int
 		InherentLikelihood func(childComplexity int) int
-		InherentSeverity   func(childComplexity int) int
+		InherentRiskScore  func(childComplexity int) int
 		Measures           func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) int
 		Name               func(childComplexity int) int
 		Note               func(childComplexity int) int
@@ -537,7 +537,7 @@ type ComplexityRoot struct {
 		Policies           func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PolicyOrderBy) int
 		ResidualImpact     func(childComplexity int) int
 		ResidualLikelihood func(childComplexity int) int
-		ResidualSeverity   func(childComplexity int) int
+		ResidualRiskScore  func(childComplexity int) int
 		Treatment          func(childComplexity int) int
 		UpdatedAt          func(childComplexity int) int
 	}
@@ -2974,12 +2974,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Risk.InherentLikelihood(childComplexity), true
 
-	case "Risk.inherentSeverity":
-		if e.complexity.Risk.InherentSeverity == nil {
+	case "Risk.inherentRiskScore":
+		if e.complexity.Risk.InherentRiskScore == nil {
 			break
 		}
 
-		return e.complexity.Risk.InherentSeverity(childComplexity), true
+		return e.complexity.Risk.InherentRiskScore(childComplexity), true
 
 	case "Risk.measures":
 		if e.complexity.Risk.Measures == nil {
@@ -3047,12 +3047,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Risk.ResidualLikelihood(childComplexity), true
 
-	case "Risk.residualSeverity":
-		if e.complexity.Risk.ResidualSeverity == nil {
+	case "Risk.residualRiskScore":
+		if e.complexity.Risk.ResidualRiskScore == nil {
 			break
 		}
 
-		return e.complexity.Risk.ResidualSeverity(childComplexity), true
+		return e.complexity.Risk.ResidualRiskScore(childComplexity), true
 
 	case "Risk.treatment":
 		if e.complexity.Risk.Treatment == nil {
@@ -4703,10 +4703,10 @@ type Risk implements Node {
   treatment: RiskTreatment!
   inherentLikelihood: Int!
   inherentImpact: Int!
-  inherentSeverity: Int!
+  inherentRiskScore: Int!
   residualLikelihood: Int!
   residualImpact: Int!
-  residualSeverity: Int!
+  residualRiskScore: Int!
   note: String!
 
   owner: People @goField(forceResolver: true)
@@ -22269,8 +22269,8 @@ func (ec *executionContext) fieldContext_Risk_inherentImpact(_ context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Risk_inherentSeverity(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Risk_inherentSeverity(ctx, field)
+func (ec *executionContext) _Risk_inherentRiskScore(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Risk_inherentRiskScore(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -22283,7 +22283,7 @@ func (ec *executionContext) _Risk_inherentSeverity(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.InherentSeverity, nil
+		return obj.InherentRiskScore, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -22300,7 +22300,7 @@ func (ec *executionContext) _Risk_inherentSeverity(ctx context.Context, field gr
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Risk_inherentSeverity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Risk_inherentRiskScore(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Risk",
 		Field:      field,
@@ -22401,8 +22401,8 @@ func (ec *executionContext) fieldContext_Risk_residualImpact(_ context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Risk_residualSeverity(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Risk_residualSeverity(ctx, field)
+func (ec *executionContext) _Risk_residualRiskScore(ctx context.Context, field graphql.CollectedField, obj *types.Risk) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Risk_residualRiskScore(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -22415,7 +22415,7 @@ func (ec *executionContext) _Risk_residualSeverity(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ResidualSeverity, nil
+		return obj.ResidualRiskScore, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -22432,7 +22432,7 @@ func (ec *executionContext) _Risk_residualSeverity(ctx context.Context, field gr
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Risk_residualSeverity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Risk_residualRiskScore(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Risk",
 		Field:      field,
@@ -23092,14 +23092,14 @@ func (ec *executionContext) fieldContext_RiskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Risk_inherentLikelihood(ctx, field)
 			case "inherentImpact":
 				return ec.fieldContext_Risk_inherentImpact(ctx, field)
-			case "inherentSeverity":
-				return ec.fieldContext_Risk_inherentSeverity(ctx, field)
+			case "inherentRiskScore":
+				return ec.fieldContext_Risk_inherentRiskScore(ctx, field)
 			case "residualLikelihood":
 				return ec.fieldContext_Risk_residualLikelihood(ctx, field)
 			case "residualImpact":
 				return ec.fieldContext_Risk_residualImpact(ctx, field)
-			case "residualSeverity":
-				return ec.fieldContext_Risk_residualSeverity(ctx, field)
+			case "residualRiskScore":
+				return ec.fieldContext_Risk_residualRiskScore(ctx, field)
 			case "note":
 				return ec.fieldContext_Risk_note(ctx, field)
 			case "owner":
@@ -24550,14 +24550,14 @@ func (ec *executionContext) fieldContext_UpdateRiskPayload_risk(_ context.Contex
 				return ec.fieldContext_Risk_inherentLikelihood(ctx, field)
 			case "inherentImpact":
 				return ec.fieldContext_Risk_inherentImpact(ctx, field)
-			case "inherentSeverity":
-				return ec.fieldContext_Risk_inherentSeverity(ctx, field)
+			case "inherentRiskScore":
+				return ec.fieldContext_Risk_inherentRiskScore(ctx, field)
 			case "residualLikelihood":
 				return ec.fieldContext_Risk_residualLikelihood(ctx, field)
 			case "residualImpact":
 				return ec.fieldContext_Risk_residualImpact(ctx, field)
-			case "residualSeverity":
-				return ec.fieldContext_Risk_residualSeverity(ctx, field)
+			case "residualRiskScore":
+				return ec.fieldContext_Risk_residualRiskScore(ctx, field)
 			case "note":
 				return ec.fieldContext_Risk_note(ctx, field)
 			case "owner":
@@ -37951,8 +37951,8 @@ func (ec *executionContext) _Risk(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "inherentSeverity":
-			out.Values[i] = ec._Risk_inherentSeverity(ctx, field, obj)
+		case "inherentRiskScore":
+			out.Values[i] = ec._Risk_inherentRiskScore(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -37966,8 +37966,8 @@ func (ec *executionContext) _Risk(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "residualSeverity":
-			out.Values[i] = ec._Risk_residualSeverity(ctx, field, obj)
+		case "residualRiskScore":
+			out.Values[i] = ec._Risk_residualRiskScore(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}

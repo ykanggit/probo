@@ -485,10 +485,10 @@ const measureRisksQuery = graphql`
               description
               inherentLikelihood
               inherentImpact
-              inherentSeverity
+              inherentRiskScore
               residualLikelihood
               residualImpact
-              residualSeverity
+              residualRiskScore
               createdAt
               updatedAt
             }
@@ -556,7 +556,7 @@ function MeasureViewContent({
 }) {
   const data = usePreloadedQuery<MeasureViewQueryType>(
     measureViewQuery,
-    queryRef,
+    queryRef
   );
 
   // Define a type for the measure with evidences field
@@ -591,7 +591,7 @@ function MeasureViewContent({
   const environment = useRelayEnvironment();
 
   const [commitDeleteMeasure, isDeletingMeasure] = useMutation<any>(
-    deleteMeasureMutation,
+    deleteMeasureMutation
   );
   const [isDeleteMeasureOpen, setIsDeleteMeasureOpen] = useState(false);
 
@@ -615,7 +615,7 @@ function MeasureViewContent({
     useState<MeasureViewLinkedControlsQuery$data | null>(null);
   const [controlSearchQuery, setControlSearchQuery] = useState("");
   const [selectedFrameworkId, setSelectedFrameworkId] = useState<string | null>(
-    null,
+    null
   );
   const [isLoadingControls, setIsLoadingControls] = useState(false);
   const [isLinkingControl, setIsLinkingControl] = useState(false);
@@ -624,11 +624,11 @@ function MeasureViewContent({
   // Create mutation hooks for control mapping
   const [commitCreateControlMapping] =
     useMutation<MeasureViewCreateControlMappingMutation>(
-      createControlMappingMutation,
+      createControlMappingMutation
     );
   const [commitDeleteControlMapping] =
     useMutation<MeasureViewDeleteControlMappingMutation>(
-      deleteControlMappingMutation,
+      deleteControlMappingMutation
     );
 
   useEffect(() => {
@@ -652,7 +652,7 @@ function MeasureViewContent({
       fetchQuery<MeasureViewLinkedControlsQuery>(
         environment,
         linkedControlsQuery,
-        { measureId },
+        { measureId }
       ).subscribe({
         next: (data) => {
           setLinkedControlsData(data);
@@ -666,7 +666,7 @@ function MeasureViewContent({
 
   // Add state for risks data
   const [risksData, setRisksData] = useState<MeasureViewRisksQuery$data | null>(
-    null,
+    null
   );
 
   // Load risks data when component mounts
@@ -713,7 +713,7 @@ function MeasureViewContent({
   };
 
   const [updateTask] = useMutation<MeasureViewUpdateTaskStateMutationType>(
-    updateTaskStateMutation,
+    updateTaskStateMutation
   );
   const [createTask] =
     useMutation<MeasureViewCreateTaskMutationType>(createTaskMutation);
@@ -721,19 +721,19 @@ function MeasureViewContent({
     useMutation<MeasureViewDeleteTaskMutationType>(deleteTaskMutation);
   const [requestEvidence] = useMutation<any>(requestEvidenceMutation);
   const [deleteEvidence] = useMutation<MeasureViewDeleteEvidenceMutationType>(
-    deleteEvidenceMutation,
+    deleteEvidenceMutation
   );
   const [assignTask] =
     useMutation<MeasureViewAssignTaskMutationType>(assignTaskMutation);
   const [unassignTask] =
     useMutation<MeasureViewUnassignTaskMutationType>(unassignTaskMutation);
   const [fulfillEvidence] = useMutation<MeasureViewFulfillEvidenceMutationType>(
-    fulfillEvidenceMutation,
+    fulfillEvidenceMutation
   );
 
   const [updateMeasureState] =
     useMutation<MeasureViewUpdateMeasureStateMutationType>(
-      updateMeasureStateMutation,
+      updateMeasureStateMutation
     );
 
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
@@ -756,7 +756,7 @@ function MeasureViewContent({
   const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
   const [draggedOverTaskId, setDraggedOverTaskId] = useState<string | null>(
-    null,
+    null
   );
   const [uploadingTaskId, setUploadingTaskId] = useState<string | null>(null);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
@@ -810,7 +810,7 @@ function MeasureViewContent({
 
   // Add state for selected task panel
   const [selectedTask, setSelectedTask] = useState<(typeof tasks)[0] | null>(
-    null,
+    null
   );
 
   // Track if task panel is open
@@ -846,7 +846,7 @@ function MeasureViewContent({
       }
       return null;
     },
-    [tasks],
+    [tasks]
   );
 
   // Add a function to get the measure evidence connection ID
@@ -1140,8 +1140,10 @@ function MeasureViewContent({
 
       if (taskForEvidence) {
         // This is a task-specific evidence
-        const evidenceConnectionId = getEvidenceConnectionId(taskForEvidence.id);
-        
+        const evidenceConnectionId = getEvidenceConnectionId(
+          taskForEvidence.id
+        );
+
         // Upload the URI file as task evidence
         uploadTaskEvidence({
           variables: {
@@ -1180,7 +1182,7 @@ function MeasureViewContent({
       } else {
         // This is a measure-level evidence
         const evidenceConnectionId = getMeasureEvidenceConnectionId();
-        
+
         // Upload the URI file as measure evidence
         uploadMeasureEvidence({
           variables: {
@@ -1416,7 +1418,7 @@ function MeasureViewContent({
   const handleDeleteEvidence = (
     evidenceId: string,
     filename: string,
-    taskId: string,
+    taskId: string
   ) => {
     setEvidenceToDelete({ id: evidenceId, filename, taskId });
     setIsDeleteEvidenceOpen(true);
@@ -1431,7 +1433,7 @@ function MeasureViewContent({
   };
 
   const handleFulfillEvidenceWithFile = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (!e.target.files || e.target.files.length === 0 || !evidenceToFulfill)
       return;
@@ -1448,7 +1450,7 @@ function MeasureViewContent({
     const evidenceId = evidenceToFulfill.id;
     // Get connection ID for the parent task (assuming it's available in the view)
     const task = tasks.find((task) =>
-      task.evidences?.edges.some((edge) => edge?.node?.id === evidenceId),
+      task.evidences?.edges.some((edge) => edge?.node?.id === evidenceId)
     );
 
     const evidenceConnectionId = task?.id
@@ -1512,7 +1514,7 @@ function MeasureViewContent({
     try {
       console.log(
         "Creating URI file to fulfill evidence:",
-        evidenceToFulfill.id,
+        evidenceToFulfill.id
       );
 
       // Create a URI file with the link
@@ -1529,8 +1531,8 @@ function MeasureViewContent({
       // Get connection ID for the parent task
       const task = tasks.find((task) =>
         task.evidences?.edges.some(
-          (edge) => edge?.node?.id === evidenceToFulfill.id,
-        ),
+          (edge) => edge?.node?.id === evidenceToFulfill.id
+        )
       );
 
       const evidenceConnectionId = task?.id
@@ -1687,7 +1689,7 @@ function MeasureViewContent({
         toast({
           title: "Measure state updated",
           description: `Measure state has been updated to ${formatState(
-            newState,
+            newState
           )}.`,
         });
       },
@@ -1741,7 +1743,7 @@ function MeasureViewContent({
         return { days: "", hours: "", minutes: "" };
       }
     },
-    [],
+    []
   );
 
   // Function to handle saving the updated duration
@@ -1807,7 +1809,7 @@ function MeasureViewContent({
       toast,
       selectedTask,
       setSelectedTask,
-    ],
+    ]
   );
 
   // Control mapping functions
@@ -1841,7 +1843,7 @@ function MeasureViewContent({
           linkedControlsQuery,
           {
             measureId,
-          },
+          }
         ).subscribe({
           next: (data) => {
             setLinkedControlsData(data);
@@ -1877,7 +1879,7 @@ function MeasureViewContent({
     const frameworks = frameworksData.organization.frameworks.edges;
     if (selectedFrameworkId) {
       const selectedFramework = frameworks.find(
-        (edge) => edge.node.id === selectedFrameworkId,
+        (edge) => edge.node.id === selectedFrameworkId
       );
 
       if (selectedFramework?.node?.controls?.edges) {
@@ -1887,14 +1889,14 @@ function MeasureViewContent({
 
     // If no framework is selected or it doesn't have controls, return controls from all frameworks
     return frameworks.flatMap((framework) =>
-      framework.node.controls.edges.map((edge) => edge.node),
+      framework.node.controls.edges.map((edge) => edge.node)
     );
   }, [frameworksData, selectedFrameworkId]);
 
   const getLinkedControls = useCallback(() => {
     if (!linkedControlsData?.measure?.controls?.edges) return [];
     return (linkedControlsData.measure.controls.edges || []).map(
-      (edge) => edge.node,
+      (edge) => edge.node
     );
   }, [linkedControlsData]);
 
@@ -1903,7 +1905,7 @@ function MeasureViewContent({
       const linkedControls = getLinkedControls();
       return linkedControls.some((control) => control.id === controlId);
     },
-    [getLinkedControls],
+    [getLinkedControls]
   );
 
   const handleLinkControl = useCallback(
@@ -1938,7 +1940,7 @@ function MeasureViewContent({
             linkedControlsQuery,
             {
               measureId,
-            },
+            }
           ).subscribe({
             next: (data) => {
               setLinkedControlsData(data);
@@ -1964,7 +1966,7 @@ function MeasureViewContent({
         },
       });
     },
-    [commitCreateControlMapping, environment, measureId, toast],
+    [commitCreateControlMapping, environment, measureId, toast]
   );
 
   const handleUnlinkControl = useCallback(
@@ -1999,7 +2001,7 @@ function MeasureViewContent({
           }).subscribe({
             next: (data: unknown) => {
               setLinkedControlsData(
-                data as MeasureViewLinkedControlsQuery$data,
+                data as MeasureViewLinkedControlsQuery$data
               );
             },
             error: (error: Error) => {
@@ -2023,7 +2025,7 @@ function MeasureViewContent({
         },
       });
     },
-    [commitDeleteControlMapping, environment, measureId, toast],
+    [commitDeleteControlMapping, environment, measureId, toast]
   );
 
   const handleOpenControlMappingDialog = useCallback(() => {
@@ -2041,7 +2043,7 @@ function MeasureViewContent({
         control.referenceId.toLowerCase().includes(lowerQuery) ||
         control.name.toLowerCase().includes(lowerQuery) ||
         (control.description &&
-          control.description.toLowerCase().includes(lowerQuery)),
+          control.description.toLowerCase().includes(lowerQuery))
     );
   }, [controlSearchQuery, getControls]);
 
@@ -2086,7 +2088,7 @@ function MeasureViewContent({
   const confirmDeleteMeasure = () => {
     const connectionId = ConnectionHandler.getConnectionID(
       organizationId!,
-      "MeasureListView_measures",
+      "MeasureListView_measures"
     );
 
     commitDeleteMeasure({
@@ -2115,7 +2117,7 @@ function MeasureViewContent({
 
   // Add the mutation hook for uploadMeasureEvidence
   const [uploadMeasureEvidence] = useMutation<any>(
-    uploadMeasureEvidenceMutation,
+    uploadMeasureEvidenceMutation
   );
 
   // Add a function to handle uploading evidence directly to the measure
@@ -2203,7 +2205,10 @@ function MeasureViewContent({
         <Card className="mt-4">
           <CardContent className="pt-6">
             <div className="prose prose-gray prose-sm md:prose-base text-secondary max-w-3xl">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw]}
+              >
                 {data.measure.description}
               </ReactMarkdown>
             </div>
@@ -2222,14 +2227,19 @@ function MeasureViewContent({
           <TabsTrigger value="evidence" className="flex items-center gap-2">
             <FileText className="w-4 h-4" />
             Evidence
-            {((measureWithEvidences.evidences?.edges && measureWithEvidences.evidences.edges.length > 0) || 
-              tasks.some((task) => task.evidences?.edges && task.evidences.edges.length > 0)) && (
+            {((measureWithEvidences.evidences?.edges &&
+              measureWithEvidences.evidences.edges.length > 0) ||
+              tasks.some(
+                (task) =>
+                  task.evidences?.edges && task.evidences.edges.length > 0
+              )) && (
               <span className="ml-1.5 bg-blue-100 text-blue-800 rounded-full text-xs px-2 py-0.5">
-                {(measureWithEvidences.evidences?.edges?.length || 0) + 
-                 tasks.reduce(
-                  (count, task) => count + (task.evidences?.edges?.length || 0),
-                  0,
-                )}
+                {(measureWithEvidences.evidences?.edges?.length || 0) +
+                  tasks.reduce(
+                    (count, task) =>
+                      count + (task.evidences?.edges?.length || 0),
+                    0
+                  )}
               </span>
             )}
           </TabsTrigger>
@@ -2379,7 +2389,7 @@ function MeasureViewContent({
                                   <div className="bg-white p-1.5 rounded-md border border-mid-b">
                                     {getFileIcon(
                                       evidence.mimeType,
-                                      evidence.type,
+                                      evidence.type
                                     )}
                                   </div>
                                   <div className="flex-1 overflow-hidden">
@@ -2430,7 +2440,7 @@ function MeasureViewContent({
                                       onClick={() =>
                                         handleFulfillEvidence(
                                           evidence.id,
-                                          evidence.filename,
+                                          evidence.filename
                                         )
                                       }
                                       className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
@@ -2452,7 +2462,7 @@ function MeasureViewContent({
                                           <Link2 className="w-4 h-4 text-blue-600" />
                                         </button>
                                       ) : evidence.mimeType.startsWith(
-                                          "image/",
+                                          "image/"
                                         ) ? (
                                         <button
                                           onClick={() =>
@@ -2493,7 +2503,7 @@ function MeasureViewContent({
                                       handleDeleteEvidence(
                                         evidence.id,
                                         evidence.filename,
-                                        "",
+                                        ""
                                       )
                                     }
                                     className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
@@ -2505,7 +2515,7 @@ function MeasureViewContent({
                               </td>
                             </tr>
                           );
-                        },
+                        }
                       )}
                     </tbody>
                   </table>
@@ -2554,7 +2564,7 @@ function MeasureViewContent({
                             e.stopPropagation();
                             handleToggleTaskState(
                               task.id,
-                              task.state || "TODO",
+                              task.state || "TODO"
                             );
                           }}
                         >
@@ -2563,7 +2573,11 @@ function MeasureViewContent({
                           )}
                         </div>
                         <h3
-                          className={`font-medium ${task.state === "DONE" ? "line-through text-secondary" : ""}`}
+                          className={`font-medium ${
+                            task.state === "DONE"
+                              ? "line-through text-secondary"
+                              : ""
+                          }`}
                         >
                           {task.name}
                         </h3>
@@ -2728,20 +2742,20 @@ function MeasureViewContent({
                           <Badge
                             variant="outline"
                             className={getRiskSeverityColor(
-                              risk.inherentSeverity,
+                              risk.inherentRiskScore
                             )}
                           >
                             Inherent:{" "}
-                            {getRiskSeverityText(risk.inherentSeverity)}
+                            {getRiskSeverityText(risk.inherentRiskScore)}
                           </Badge>
                           <Badge
                             variant="outline"
                             className={getRiskSeverityColor(
-                              risk.residualSeverity,
+                              risk.residualRiskScore
                             )}
                           >
                             Residual:{" "}
-                            {getRiskSeverityText(risk.residualSeverity)}
+                            {getRiskSeverityText(risk.residualRiskScore)}
                           </Badge>
                         </div>
                       </div>
@@ -2833,7 +2847,10 @@ function MeasureViewContent({
                         Description
                       </h3>
                       <div className="prose prose-gray prose-sm max-w-none text-primary bg-invert-bg p-4 rounded-md border border-mid-b">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[rehypeRaw]}
+                        >
                           {selectedTask.description}
                         </ReactMarkdown>
                       </div>
@@ -2923,7 +2940,7 @@ function MeasureViewContent({
                                       onClick={() =>
                                         handleAssignPerson(
                                           selectedTask.id,
-                                          person.id,
+                                          person.id
                                         )
                                       }
                                     >
@@ -3028,7 +3045,7 @@ function MeasureViewContent({
                           onClick={() => {
                             // Parse current duration into components
                             const { days, hours, minutes } = parseISODuration(
-                              selectedTask.timeEstimate,
+                              selectedTask.timeEstimate
                             );
                             setEditTimeEstimateDays(days);
                             setEditTimeEstimateHours(hours);
@@ -3055,7 +3072,7 @@ function MeasureViewContent({
                         onClick={() =>
                           handleCreateEvidence(
                             selectedTask.id,
-                            selectedTask.name,
+                            selectedTask.name
                           )
                         }
                       >
@@ -3080,7 +3097,7 @@ function MeasureViewContent({
                                 <div className="bg-white p-1.5 rounded-md border border-mid-b">
                                   {getFileIcon(
                                     evidence.mimeType,
-                                    evidence.type,
+                                    evidence.type
                                   )}
                                 </div>
                                 <div>
@@ -3108,7 +3125,7 @@ function MeasureViewContent({
                                     onClick={() =>
                                       handleFulfillEvidence(
                                         evidence.id,
-                                        evidence.filename,
+                                        evidence.filename
                                       )
                                     }
                                     className="p-1.5 rounded-full hover:bg-white hover:shadow-sm transition-all"
@@ -3130,7 +3147,7 @@ function MeasureViewContent({
                                         <Link2 className="w-4 h-4 text-blue-600" />
                                       </button>
                                     ) : evidence.mimeType.startsWith(
-                                        "image/",
+                                        "image/"
                                       ) ? (
                                       <button
                                         onClick={() =>
@@ -3171,7 +3188,7 @@ function MeasureViewContent({
                                     handleDeleteEvidence(
                                       evidence.id,
                                       evidence.filename,
-                                      selectedTask.id,
+                                      selectedTask.id
                                     )
                                   }
                                   className="p-1.5 rounded-full hover:bg-red-50 hover:shadow-sm transition-all"
@@ -3206,7 +3223,7 @@ function MeasureViewContent({
                       onClick={() =>
                         handleToggleTaskState(
                           selectedTask.id,
-                          selectedTask.state || "TODO",
+                          selectedTask.state || "TODO"
                         )
                       }
                     >
@@ -3221,7 +3238,7 @@ function MeasureViewContent({
                         if (selectedTask) {
                           handleToggleTaskState(
                             selectedTask.id,
-                            selectedTask.state || "DONE",
+                            selectedTask.state || "DONE"
                           );
                         }
                       }}
@@ -3646,7 +3663,7 @@ function MeasureViewContent({
                         <SelectItem key={edge.node.id} value={edge.node.id}>
                           {edge.node.name}
                         </SelectItem>
-                      ),
+                      )
                     )}
                   </SelectContent>
                 </Select>

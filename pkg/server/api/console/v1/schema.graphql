@@ -732,10 +732,10 @@ type Risk implements Node {
   treatment: RiskTreatment!
   inherentLikelihood: Int!
   inherentImpact: Int!
-  inherentSeverity: Int!
+  inherentRiskScore: Int!
   residualLikelihood: Int!
   residualImpact: Int!
-  residualSeverity: Int!
+  residualRiskScore: Int!
   note: String!
 
   owner: People @goField(forceResolver: true)

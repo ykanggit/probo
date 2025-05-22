@@ -56,11 +56,11 @@ func (r *Risk) CursorKey(orderBy RiskOrderField) page.CursorKey {
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
-func (r *Risk) InherentSeverity() int {
+func (r *Risk) InherentRiskScore() int {
 	return r.InherentLikelihood * r.InherentImpact
 }
 
-func (r *Risk) ResidualSeverity() int {
+func (r *Risk) ResidualRiskScore() int {
 	return r.ResidualLikelihood * r.ResidualImpact
 }
 
