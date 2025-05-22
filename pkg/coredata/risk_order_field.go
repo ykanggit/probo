@@ -19,7 +19,13 @@ type (
 )
 
 const (
-	RiskOrderFieldCreatedAt RiskOrderField = "CREATED_AT"
+	RiskOrderFieldCreatedAt         RiskOrderField = "CREATED_AT"
+	RiskOrderFieldUpdatedAt         RiskOrderField = "UPDATED_AT"
+	RiskOrderFieldName              RiskOrderField = "NAME"
+	RiskOrderFieldCategory          RiskOrderField = "CATEGORY"
+	RiskOrderFieldTreatment         RiskOrderField = "TREATMENT"
+	RiskOrderFieldInitialRiskScore  RiskOrderField = "INITIAL_RISK_SCORE"
+	RiskOrderFieldResidualRiskScore RiskOrderField = "RESIDUAL_RISK_SCORE"
 )
 
 func (p RiskOrderField) Column() string {

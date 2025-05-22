@@ -4173,6 +4173,28 @@ enum RiskOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldCreatedAt"
     )
+  UPDATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldUpdatedAt"
+    )
+  NAME
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldName")
+  CATEGORY
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldCategory"
+    )
+  TREATMENT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldTreatment"
+    )
+  INITIAL_RISK_SCORE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldInitialRiskScore"
+    )
+  RESIDUAL_RISK_SCORE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldResidualRiskScore"
+    )
 }
 
 enum EvidenceOrderField
@@ -42806,10 +42828,22 @@ func (ec *executionContext) marshalNRiskOrderField2githubᚗcomᚋgetproboᚋpro
 
 var (
 	unmarshalNRiskOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskOrderField = map[string]coredata.RiskOrderField{
-		"CREATED_AT": coredata.RiskOrderFieldCreatedAt,
+		"CREATED_AT":          coredata.RiskOrderFieldCreatedAt,
+		"UPDATED_AT":          coredata.RiskOrderFieldUpdatedAt,
+		"NAME":                coredata.RiskOrderFieldName,
+		"CATEGORY":            coredata.RiskOrderFieldCategory,
+		"TREATMENT":           coredata.RiskOrderFieldTreatment,
+		"INITIAL_RISK_SCORE":  coredata.RiskOrderFieldInitialRiskScore,
+		"RESIDUAL_RISK_SCORE": coredata.RiskOrderFieldResidualRiskScore,
 	}
 	marshalNRiskOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskOrderField = map[coredata.RiskOrderField]string{
-		coredata.RiskOrderFieldCreatedAt: "CREATED_AT",
+		coredata.RiskOrderFieldCreatedAt:         "CREATED_AT",
+		coredata.RiskOrderFieldUpdatedAt:         "UPDATED_AT",
+		coredata.RiskOrderFieldName:              "NAME",
+		coredata.RiskOrderFieldCategory:          "CATEGORY",
+		coredata.RiskOrderFieldTreatment:         "TREATMENT",
+		coredata.RiskOrderFieldInitialRiskScore:  "INITIAL_RISK_SCORE",
+		coredata.RiskOrderFieldResidualRiskScore: "RESIDUAL_RISK_SCORE",
 	}
 )
 

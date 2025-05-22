@@ -53,6 +53,16 @@ func (r *Risk) CursorKey(orderBy RiskOrderField) page.CursorKey {
 	switch orderBy {
 	case RiskOrderFieldCreatedAt:
 		return page.CursorKey{ID: r.ID, Value: r.CreatedAt}
+	case RiskOrderFieldName:
+		return page.CursorKey{ID: r.ID, Value: r.Name}
+	case RiskOrderFieldCategory:
+		return page.CursorKey{ID: r.ID, Value: r.Category}
+	case RiskOrderFieldTreatment:
+		return page.CursorKey{ID: r.ID, Value: r.Treatment}
+	case RiskOrderFieldInitialRiskScore:
+		return page.CursorKey{ID: r.ID, Value: r.InherentRiskScore}
+	case RiskOrderFieldResidualRiskScore:
+		return page.CursorKey{ID: r.ID, Value: r.ResidualRiskScore}
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
