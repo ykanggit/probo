@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Rename severity into risk score
+
+### Fixed
+
+- Fix conflict http header fields
+
 ### [0.26.0] - 2025-05-20
 
 ### Added
