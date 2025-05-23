@@ -250,6 +250,7 @@ func (f Framework) Delete(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
+	frameworkID gid.GID,
 ) error {
 	q := `
 DELETE
@@ -260,7 +261,7 @@ WHERE
     AND id = @framework_id;
 `
 
-	args := pgx.StrictNamedArgs{"framework_id": f.ID}
+	args := pgx.StrictNamedArgs{"framework_id": frameworkID}
 	maps.Copy(args, scope.SQLArguments())
 	q = fmt.Sprintf(q, scope.SQLFragment())
 

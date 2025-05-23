@@ -69,22 +69,31 @@ func (s FrameworkService) Create(
 	req CreateFrameworkRequest,
 ) (*coredata.Framework, error) {
 	now := time.Now()
-	frameworkID := gid.New(s.svc.scope.GetTenantID(), coredata.FrameworkEntityType)
+	organization := &coredata.Organization{}
 
 	framework := &coredata.Framework{
-		ID:             frameworkID,
-		OrganizationID: req.OrganizationID,
-		Name:           req.Name,
-		Description:    req.Description,
-		ReferenceID:    slug.Make(req.Name),
-		CreatedAt:      now,
-		UpdatedAt:      now,
+		ID:          gid.New(s.svc.scope.GetTenantID(), coredata.FrameworkEntityType),
+		Name:        req.Name,
+		Description: req.Description,
+		ReferenceID: slug.Make(req.Name),
+		CreatedAt:   now,
+		UpdatedAt:   now,
 	}
 
-	err := s.svc.pg.WithConn(
+	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return framework.Insert(ctx, conn, s.svc.scope)
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.OrganizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			framework.OrganizationID = organization.ID
+
+			if err := framework.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert framework: %w", err)
+			}
+
+			return nil
 		},
 	)
 
@@ -101,17 +110,27 @@ func (s FrameworkService) ListForOrganizationID(
 	cursor *page.Cursor[coredata.FrameworkOrderField],
 ) (*page.Page[*coredata.Framework, coredata.FrameworkOrderField], error) {
 	var frameworks coredata.Frameworks
+	organization := &coredata.Organization{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return frameworks.LoadByOrganizationID(
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, organizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			err := frameworks.LoadByOrganizationID(
 				ctx,
 				conn,
 				s.svc.scope,
-				organizationID,
+				organization.ID,
 				cursor,
 			)
+			if err != nil {
+				return fmt.Errorf("cannot load frameworks: %w", err)
+			}
+
+			return nil
 		},
 	)
 
@@ -177,12 +196,12 @@ func (s FrameworkService) Delete(
 	ctx context.Context,
 	frameworkID gid.GID,
 ) error {
-	framework := &coredata.Framework{ID: frameworkID}
+	framework := &coredata.Framework{}
 
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return framework.Delete(ctx, conn, s.svc.scope)
+			return framework.Delete(ctx, conn, s.svc.scope, frameworkID)
 		},
 	)
 }
@@ -192,46 +211,47 @@ func (s FrameworkService) Import(
 	organizationID gid.GID,
 	req ImportFrameworkRequest,
 ) (*coredata.Framework, error) {
+	var framework *coredata.Framework
 	frameworkID := gid.New(organizationID.TenantID(), coredata.FrameworkEntityType)
-
 	now := time.Now()
-	framework := &coredata.Framework{
-		ID:             frameworkID,
-		OrganizationID: organizationID,
-		ReferenceID:    req.Framework.ID,
-		Name:           req.Framework.Name,
-		CreatedAt:      now,
-		UpdatedAt:      now,
-	}
-
-	importedControls := coredata.Controls{}
-	for _, control := range req.Framework.Controls {
-		controlID := gid.New(organizationID.TenantID(), coredata.ControlEntityType)
-
-		now := time.Now()
-		control := &coredata.Control{
-			ID:          controlID,
-			TenantID:    organizationID.TenantID(),
-			FrameworkID: frameworkID,
-			ReferenceID: control.ID,
-			Name:        control.Name,
-			Description: control.Description,
-			CreatedAt:   now,
-			UpdatedAt:   now,
-		}
-
-		importedControls = append(importedControls, control)
-	}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
+			organization := &coredata.Organization{}
+			if err := organization.LoadByID(ctx, tx, s.svc.scope, organizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			framework = &coredata.Framework{
+				ID:             frameworkID,
+				OrganizationID: organization.ID,
+				ReferenceID:    req.Framework.ID,
+				Name:           req.Framework.Name,
+				CreatedAt:      now,
+				UpdatedAt:      now,
+			}
+
 			if err := framework.Insert(ctx, tx, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert framework: %w", err)
 			}
 
-			for _, importedControl := range importedControls {
-				if err := importedControl.Insert(ctx, tx, s.svc.scope); err != nil {
+			for _, control := range req.Framework.Controls {
+				controlID := gid.New(organization.ID.TenantID(), coredata.ControlEntityType)
+
+				now := time.Now()
+				control := &coredata.Control{
+					ID:          controlID,
+					TenantID:    organizationID.TenantID(),
+					FrameworkID: frameworkID,
+					ReferenceID: control.ID,
+					Name:        control.Name,
+					Description: control.Description,
+					CreatedAt:   now,
+					UpdatedAt:   now,
+				}
+
+				if err := control.Insert(ctx, tx, s.svc.scope); err != nil {
 					return fmt.Errorf("cannot insert control: %w", err)
 				}
 			}
