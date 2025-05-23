@@ -127,13 +127,14 @@ func (s *PolicyService) Create(
 	policyID := gid.New(s.svc.scope.GetTenantID(), coredata.PolicyEntityType)
 	policyVersionID := gid.New(s.svc.scope.GetTenantID(), coredata.PolicyVersionEntityType)
 
+	organization := &coredata.Organization{}
+	people := &coredata.People{}
+
 	policy := &coredata.Policy{
-		ID:             policyID,
-		OrganizationID: req.OrganizationID,
-		OwnerID:        req.OwnerID,
-		Title:          req.Title,
-		CreatedAt:      now,
-		UpdatedAt:      now,
+		ID:        policyID,
+		Title:     req.Title,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
 	policyVersion := &coredata.PolicyVersion{
@@ -149,6 +150,17 @@ func (s *PolicyService) Create(
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.OrganizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			if err := people.LoadByID(ctx, conn, s.svc.scope, req.OwnerID); err != nil {
+				return fmt.Errorf("cannot load people: %w", err)
+			}
+
+			policy.OrganizationID = organization.ID
+			policy.OwnerID = people.ID
+
 			if err := policy.Insert(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert policy: %w", err)
 			}

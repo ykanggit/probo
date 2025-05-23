@@ -86,15 +86,20 @@ func (s VendorService) ListForOrganizationID(
 	cursor *page.Cursor[coredata.VendorOrderField],
 ) (*page.Page[*coredata.Vendor, coredata.VendorOrderField], error) {
 	var vendors coredata.Vendors
+	organization := &coredata.Organization{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, organizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
 			return vendors.LoadByOrganizationID(
 				ctx,
 				conn,
 				s.svc.scope,
-				organizationID,
+				organization.ID,
 				cursor,
 			)
 		},
@@ -192,12 +197,22 @@ func (s VendorService) Update(
 				vendor.TrustPageURL = req.TrustPageURL
 			}
 
+			businessOwner := &coredata.People{}
+			if err := businessOwner.LoadByID(ctx, conn, s.svc.scope, *req.BusinessOwnerID); err != nil {
+				return fmt.Errorf("cannot load business owner: %w", err)
+			}
+
 			if req.BusinessOwnerID != nil {
-				vendor.BusinessOwnerID = req.BusinessOwnerID
+				vendor.BusinessOwnerID = &businessOwner.ID
+			}
+
+			securityOwner := &coredata.People{}
+			if err := securityOwner.LoadByID(ctx, conn, s.svc.scope, *req.SecurityOwnerID); err != nil {
+				return fmt.Errorf("cannot load security owner: %w", err)
 			}
 
 			if req.SecurityOwnerID != nil {
-				vendor.SecurityOwnerID = req.SecurityOwnerID
+				vendor.SecurityOwnerID = &securityOwner.ID
 			}
 
 			vendor.UpdatedAt = time.Now()
@@ -255,40 +270,57 @@ func (s VendorService) Create(
 	req CreateVendorRequest,
 ) (*coredata.Vendor, error) {
 	now := time.Now()
-	vendorID := gid.New(s.svc.scope.GetTenantID(), coredata.VendorEntityType)
-
-	organization := &coredata.Organization{}
-	vendor := &coredata.Vendor{
-		ID:                         vendorID,
-		OrganizationID:             req.OrganizationID,
-		Name:                       req.Name,
-		CreatedAt:                  now,
-		UpdatedAt:                  now,
-		Description:                req.Description,
-		HeadquarterAddress:         req.HeadquarterAddress,
-		LegalName:                  req.LegalName,
-		WebsiteURL:                 req.WebsiteURL,
-		PrivacyPolicyURL:           req.PrivacyPolicyURL,
-		ServiceLevelAgreementURL:   req.ServiceLevelAgreementURL,
-		DataProcessingAgreementURL: req.DataProcessingAgreementURL,
-		Certifications:             req.Certifications,
-		SecurityPageURL:            req.SecurityPageURL,
-		TrustPageURL:               req.TrustPageURL,
-		StatusPageURL:              req.StatusPageURL,
-		TermsOfServiceURL:          req.TermsOfServiceURL,
-	}
-
-	if req.Category != nil {
-		vendor.Category = *req.Category
-	} else {
-		vendor.Category = "Other"
-	}
+	var vendor *coredata.Vendor
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
+			vendor := &coredata.Vendor{
+				ID:                         gid.New(s.svc.scope.GetTenantID(), coredata.VendorEntityType),
+				Name:                       req.Name,
+				CreatedAt:                  now,
+				UpdatedAt:                  now,
+				Description:                req.Description,
+				HeadquarterAddress:         req.HeadquarterAddress,
+				LegalName:                  req.LegalName,
+				WebsiteURL:                 req.WebsiteURL,
+				PrivacyPolicyURL:           req.PrivacyPolicyURL,
+				ServiceLevelAgreementURL:   req.ServiceLevelAgreementURL,
+				DataProcessingAgreementURL: req.DataProcessingAgreementURL,
+				Certifications:             req.Certifications,
+				SecurityPageURL:            req.SecurityPageURL,
+				TrustPageURL:               req.TrustPageURL,
+				StatusPageURL:              req.StatusPageURL,
+				TermsOfServiceURL:          req.TermsOfServiceURL,
+			}
+
+			organization := &coredata.Organization{}
 			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.OrganizationID); err != nil {
 				return fmt.Errorf("cannot load organization %q: %w", req.OrganizationID, err)
+			}
+
+			vendor.OrganizationID = organization.ID
+
+			if req.BusinessOwnerID != nil {
+				businessOwner := &coredata.People{}
+				if err := businessOwner.LoadByID(ctx, conn, s.svc.scope, *req.BusinessOwnerID); err != nil {
+					return fmt.Errorf("cannot load business owner: %w", err)
+				}
+				vendor.BusinessOwnerID = &businessOwner.ID
+			}
+
+			if req.SecurityOwnerID != nil {
+				securityOwner := &coredata.People{}
+				if err := securityOwner.LoadByID(ctx, conn, s.svc.scope, *req.SecurityOwnerID); err != nil {
+					return fmt.Errorf("cannot load security owner: %w", err)
+				}
+				vendor.SecurityOwnerID = &securityOwner.ID
+			}
+
+			if req.Category != nil {
+				vendor.Category = *req.Category
+			} else {
+				vendor.Category = "Other"
 			}
 
 			if err := vendor.Insert(ctx, conn, s.svc.scope); err != nil {
