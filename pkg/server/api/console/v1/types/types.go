@@ -94,7 +94,8 @@ type CreateControlMeasureMappingInput struct {
 }
 
 type CreateControlMeasureMappingPayload struct {
-	Success bool `json:"success"`
+	ControlEdge *ControlEdge `json:"controlEdge"`
+	MeasureEdge *MeasureEdge `json:"measureEdge"`
 }
 
 type CreateControlPolicyMappingInput struct {
@@ -103,7 +104,8 @@ type CreateControlPolicyMappingInput struct {
 }
 
 type CreateControlPolicyMappingPayload struct {
-	Success bool `json:"success"`
+	ControlEdge *ControlEdge `json:"controlEdge"`
+	PolicyEdge  *PolicyEdge  `json:"policyEdge"`
 }
 
 type CreateDraftPolicyVersionInput struct {
@@ -274,7 +276,8 @@ type DeleteControlMeasureMappingInput struct {
 }
 
 type DeleteControlMeasureMappingPayload struct {
-	Success bool `json:"success"`
+	DeletedControlID gid.GID `json:"deletedControlId"`
+	DeletedMeasureID gid.GID `json:"deletedMeasureId"`
 }
 
 type DeleteControlPolicyMappingInput struct {
@@ -283,7 +286,8 @@ type DeleteControlPolicyMappingInput struct {
 }
 
 type DeleteControlPolicyMappingPayload struct {
-	Success bool `json:"success"`
+	DeletedControlID gid.GID `json:"deletedControlId"`
+	DeletedPolicyID  gid.GID `json:"deletedPolicyId"`
 }
 
 type DeleteEvidenceInput struct {

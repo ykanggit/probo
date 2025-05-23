@@ -103,6 +103,8 @@ func (cm ControlMeasure) Delete(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
+	controlID gid.GID,
+	measureID gid.GID,
 ) error {
 	q := `
 DELETE
@@ -115,8 +117,8 @@ WHERE
 `
 
 	args := pgx.StrictNamedArgs{
-		"control_id": cm.ControlID,
-		"measure_id": cm.MeasureID,
+		"control_id": controlID,
+		"measure_id": measureID,
 	}
 	maps.Copy(args, scope.SQLArguments())
 	q = fmt.Sprintf(q, scope.SQLFragment())

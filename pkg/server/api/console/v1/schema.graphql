@@ -1468,19 +1468,23 @@ type UnassignTaskPayload {
 }
 
 type CreateControlMeasureMappingPayload {
-  success: Boolean!
+  controlEdge: ControlEdge!
+  measureEdge: MeasureEdge!
 }
 
 type CreateControlPolicyMappingPayload {
-  success: Boolean!
+  controlEdge: ControlEdge!
+  policyEdge: PolicyEdge!
 }
 
 type DeleteControlMeasureMappingPayload {
-  success: Boolean!
+  deletedControlId: ID!
+  deletedMeasureId: ID!
 }
 
 type DeleteControlPolicyMappingPayload {
-  success: Boolean!
+  deletedControlId: ID!
+  deletedPolicyId: ID!
 }
 
 type CreateRiskPayload {

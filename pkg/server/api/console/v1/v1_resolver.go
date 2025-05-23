@@ -709,13 +709,14 @@ func (r *mutationResolver) DeleteMeasure(ctx context.Context, input types.Delete
 func (r *mutationResolver) CreateControlMeasureMapping(ctx context.Context, input types.CreateControlMeasureMappingInput) (*types.CreateControlMeasureMappingPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.MeasureID.TenantID())
 
-	err := svc.Controls.CreateMeasureMapping(ctx, input.ControlID, input.MeasureID)
+	control, measure, err := svc.Controls.CreateMeasureMapping(ctx, input.ControlID, input.MeasureID)
 	if err != nil {
 		panic(fmt.Errorf("cannot create control measure mapping: %w", err))
 	}
 
 	return &types.CreateControlMeasureMappingPayload{
-		Success: true,
+		ControlEdge: types.NewControlEdge(control, coredata.ControlOrderFieldCreatedAt),
+		MeasureEdge: types.NewMeasureEdge(measure, coredata.MeasureOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -723,13 +724,14 @@ func (r *mutationResolver) CreateControlMeasureMapping(ctx context.Context, inpu
 func (r *mutationResolver) CreateControlPolicyMapping(ctx context.Context, input types.CreateControlPolicyMappingInput) (*types.CreateControlPolicyMappingPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.PolicyID.TenantID())
 
-	err := svc.Controls.CreatePolicyMapping(ctx, input.ControlID, input.PolicyID)
+	control, policy, err := svc.Controls.CreatePolicyMapping(ctx, input.ControlID, input.PolicyID)
 	if err != nil {
 		panic(fmt.Errorf("cannot create control policy mapping: %w", err))
 	}
 
 	return &types.CreateControlPolicyMappingPayload{
-		Success: true,
+		ControlEdge: types.NewControlEdge(control, coredata.ControlOrderFieldCreatedAt),
+		PolicyEdge:  types.NewPolicyEdge(policy, coredata.PolicyOrderFieldTitle),
 	}, nil
 }
 
@@ -737,13 +739,14 @@ func (r *mutationResolver) CreateControlPolicyMapping(ctx context.Context, input
 func (r *mutationResolver) DeleteControlMeasureMapping(ctx context.Context, input types.DeleteControlMeasureMappingInput) (*types.DeleteControlMeasureMappingPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.MeasureID.TenantID())
 
-	err := svc.Controls.DeleteMeasureMapping(ctx, input.ControlID, input.MeasureID)
+	control, measure, err := svc.Controls.DeleteMeasureMapping(ctx, input.ControlID, input.MeasureID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete control measure mapping: %w", err))
 	}
 
 	return &types.DeleteControlMeasureMappingPayload{
-		Success: true,
+		DeletedControlID: control.ID,
+		DeletedMeasureID: measure.ID,
 	}, nil
 }
 
@@ -751,13 +754,14 @@ func (r *mutationResolver) DeleteControlMeasureMapping(ctx context.Context, inpu
 func (r *mutationResolver) DeleteControlPolicyMapping(ctx context.Context, input types.DeleteControlPolicyMappingInput) (*types.DeleteControlPolicyMappingPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.PolicyID.TenantID())
 
-	err := svc.Controls.DeletePolicyMapping(ctx, input.ControlID, input.PolicyID)
+	control, policy, err := svc.Controls.DeletePolicyMapping(ctx, input.ControlID, input.PolicyID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete control policy mapping: %w", err))
 	}
 
 	return &types.DeleteControlPolicyMappingPayload{
-		Success: true,
+		DeletedControlID: control.ID,
+		DeletedPolicyID:  policy.ID,
 	}, nil
 }
 

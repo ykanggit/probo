@@ -114,11 +114,13 @@ type ComplexityRoot struct {
 	}
 
 	CreateControlMeasureMappingPayload struct {
-		Success func(childComplexity int) int
+		ControlEdge func(childComplexity int) int
+		MeasureEdge func(childComplexity int) int
 	}
 
 	CreateControlPolicyMappingPayload struct {
-		Success func(childComplexity int) int
+		ControlEdge func(childComplexity int) int
+		PolicyEdge  func(childComplexity int) int
 	}
 
 	CreateDraftPolicyVersionPayload struct {
@@ -177,11 +179,13 @@ type ComplexityRoot struct {
 	}
 
 	DeleteControlMeasureMappingPayload struct {
-		Success func(childComplexity int) int
+		DeletedControlID func(childComplexity int) int
+		DeletedMeasureID func(childComplexity int) int
 	}
 
 	DeleteControlPolicyMappingPayload struct {
-		Success func(childComplexity int) int
+		DeletedControlID func(childComplexity int) int
+		DeletedPolicyID  func(childComplexity int) int
 	}
 
 	DeleteEvidencePayload struct {
@@ -1090,19 +1094,33 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.ControlEdge.Node(childComplexity), true
 
-	case "CreateControlMeasureMappingPayload.success":
-		if e.complexity.CreateControlMeasureMappingPayload.Success == nil {
+	case "CreateControlMeasureMappingPayload.controlEdge":
+		if e.complexity.CreateControlMeasureMappingPayload.ControlEdge == nil {
 			break
 		}
 
-		return e.complexity.CreateControlMeasureMappingPayload.Success(childComplexity), true
+		return e.complexity.CreateControlMeasureMappingPayload.ControlEdge(childComplexity), true
 
-	case "CreateControlPolicyMappingPayload.success":
-		if e.complexity.CreateControlPolicyMappingPayload.Success == nil {
+	case "CreateControlMeasureMappingPayload.measureEdge":
+		if e.complexity.CreateControlMeasureMappingPayload.MeasureEdge == nil {
 			break
 		}
 
-		return e.complexity.CreateControlPolicyMappingPayload.Success(childComplexity), true
+		return e.complexity.CreateControlMeasureMappingPayload.MeasureEdge(childComplexity), true
+
+	case "CreateControlPolicyMappingPayload.controlEdge":
+		if e.complexity.CreateControlPolicyMappingPayload.ControlEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateControlPolicyMappingPayload.ControlEdge(childComplexity), true
+
+	case "CreateControlPolicyMappingPayload.policyEdge":
+		if e.complexity.CreateControlPolicyMappingPayload.PolicyEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateControlPolicyMappingPayload.PolicyEdge(childComplexity), true
 
 	case "CreateDraftPolicyVersionPayload.policyVersionEdge":
 		if e.complexity.CreateDraftPolicyVersionPayload.PolicyVersionEdge == nil {
@@ -1216,19 +1234,33 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.CreateVendorRiskAssessmentPayload.VendorRiskAssessmentEdge(childComplexity), true
 
-	case "DeleteControlMeasureMappingPayload.success":
-		if e.complexity.DeleteControlMeasureMappingPayload.Success == nil {
+	case "DeleteControlMeasureMappingPayload.deletedControlId":
+		if e.complexity.DeleteControlMeasureMappingPayload.DeletedControlID == nil {
 			break
 		}
 
-		return e.complexity.DeleteControlMeasureMappingPayload.Success(childComplexity), true
+		return e.complexity.DeleteControlMeasureMappingPayload.DeletedControlID(childComplexity), true
 
-	case "DeleteControlPolicyMappingPayload.success":
-		if e.complexity.DeleteControlPolicyMappingPayload.Success == nil {
+	case "DeleteControlMeasureMappingPayload.deletedMeasureId":
+		if e.complexity.DeleteControlMeasureMappingPayload.DeletedMeasureID == nil {
 			break
 		}
 
-		return e.complexity.DeleteControlPolicyMappingPayload.Success(childComplexity), true
+		return e.complexity.DeleteControlMeasureMappingPayload.DeletedMeasureID(childComplexity), true
+
+	case "DeleteControlPolicyMappingPayload.deletedControlId":
+		if e.complexity.DeleteControlPolicyMappingPayload.DeletedControlID == nil {
+			break
+		}
+
+		return e.complexity.DeleteControlPolicyMappingPayload.DeletedControlID(childComplexity), true
+
+	case "DeleteControlPolicyMappingPayload.deletedPolicyId":
+		if e.complexity.DeleteControlPolicyMappingPayload.DeletedPolicyID == nil {
+			break
+		}
+
+		return e.complexity.DeleteControlPolicyMappingPayload.DeletedPolicyID(childComplexity), true
 
 	case "DeleteEvidencePayload.deletedEvidenceId":
 		if e.complexity.DeleteEvidencePayload.DeletedEvidenceID == nil {
@@ -5471,19 +5503,23 @@ type UnassignTaskPayload {
 }
 
 type CreateControlMeasureMappingPayload {
-  success: Boolean!
+  controlEdge: ControlEdge!
+  measureEdge: MeasureEdge!
 }
 
 type CreateControlPolicyMappingPayload {
-  success: Boolean!
+  controlEdge: ControlEdge!
+  policyEdge: PolicyEdge!
 }
 
 type DeleteControlMeasureMappingPayload {
-  success: Boolean!
+  deletedControlId: ID!
+  deletedMeasureId: ID!
 }
 
 type DeleteControlPolicyMappingPayload {
-  success: Boolean!
+  deletedControlId: ID!
+  deletedPolicyId: ID!
 }
 
 type CreateRiskPayload {
@@ -10824,8 +10860,8 @@ func (ec *executionContext) fieldContext_ControlEdge_node(_ context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _CreateControlMeasureMappingPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlMeasureMappingPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_CreateControlMeasureMappingPayload_success(ctx, field)
+func (ec *executionContext) _CreateControlMeasureMappingPayload_controlEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlMeasureMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateControlMeasureMappingPayload_controlEdge(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10838,7 +10874,7 @@ func (ec *executionContext) _CreateControlMeasureMappingPayload_success(ctx cont
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
+		return obj.ControlEdge, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10850,26 +10886,32 @@ func (ec *executionContext) _CreateControlMeasureMappingPayload_success(ctx cont
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*types.ControlEdge)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlEdge(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_CreateControlMeasureMappingPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_CreateControlMeasureMappingPayload_controlEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CreateControlMeasureMappingPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_ControlEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_ControlEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlEdge", field.Name)
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _CreateControlPolicyMappingPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlPolicyMappingPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_CreateControlPolicyMappingPayload_success(ctx, field)
+func (ec *executionContext) _CreateControlMeasureMappingPayload_measureEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlMeasureMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateControlMeasureMappingPayload_measureEdge(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10882,7 +10924,7 @@ func (ec *executionContext) _CreateControlPolicyMappingPayload_success(ctx conte
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
+		return obj.MeasureEdge, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10894,19 +10936,125 @@ func (ec *executionContext) _CreateControlPolicyMappingPayload_success(ctx conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*types.MeasureEdge)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNMeasureEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasureEdge(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_CreateControlPolicyMappingPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_CreateControlMeasureMappingPayload_measureEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateControlMeasureMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_MeasureEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_MeasureEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MeasureEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateControlPolicyMappingPayload_controlEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlPolicyMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateControlPolicyMappingPayload_controlEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ControlEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ControlEdge)
+	fc.Result = res
+	return ec.marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateControlPolicyMappingPayload_controlEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CreateControlPolicyMappingPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_ControlEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_ControlEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateControlPolicyMappingPayload_policyEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlPolicyMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateControlPolicyMappingPayload_policyEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PolicyEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PolicyEdge)
+	fc.Result = res
+	return ec.marshalNPolicyEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPolicyEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateControlPolicyMappingPayload_policyEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateControlPolicyMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_PolicyEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_PolicyEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PolicyEdge", field.Name)
 		},
 	}
 	return fc, nil
@@ -11712,8 +11860,8 @@ func (ec *executionContext) fieldContext_CreateVendorRiskAssessmentPayload_vendo
 	return fc, nil
 }
 
-func (ec *executionContext) _DeleteControlMeasureMappingPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.DeleteControlMeasureMappingPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteControlMeasureMappingPayload_success(ctx, field)
+func (ec *executionContext) _DeleteControlMeasureMappingPayload_deletedControlId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteControlMeasureMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteControlMeasureMappingPayload_deletedControlId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11726,7 +11874,7 @@ func (ec *executionContext) _DeleteControlMeasureMappingPayload_success(ctx cont
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
+		return obj.DeletedControlID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11738,26 +11886,26 @@ func (ec *executionContext) _DeleteControlMeasureMappingPayload_success(ctx cont
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(gid.GID)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_DeleteControlMeasureMappingPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_DeleteControlMeasureMappingPayload_deletedControlId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteControlMeasureMappingPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _DeleteControlPolicyMappingPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.DeleteControlPolicyMappingPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteControlPolicyMappingPayload_success(ctx, field)
+func (ec *executionContext) _DeleteControlMeasureMappingPayload_deletedMeasureId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteControlMeasureMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteControlMeasureMappingPayload_deletedMeasureId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11770,7 +11918,7 @@ func (ec *executionContext) _DeleteControlPolicyMappingPayload_success(ctx conte
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
+		return obj.DeletedMeasureID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11782,19 +11930,107 @@ func (ec *executionContext) _DeleteControlPolicyMappingPayload_success(ctx conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(gid.GID)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_DeleteControlPolicyMappingPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_DeleteControlMeasureMappingPayload_deletedMeasureId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteControlMeasureMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteControlPolicyMappingPayload_deletedControlId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteControlPolicyMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteControlPolicyMappingPayload_deletedControlId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedControlID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteControlPolicyMappingPayload_deletedControlId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteControlPolicyMappingPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteControlPolicyMappingPayload_deletedPolicyId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteControlPolicyMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteControlPolicyMappingPayload_deletedPolicyId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedPolicyID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteControlPolicyMappingPayload_deletedPolicyId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteControlPolicyMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -16035,8 +16271,10 @@ func (ec *executionContext) fieldContext_Mutation_createControlMeasureMapping(ct
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "success":
-				return ec.fieldContext_CreateControlMeasureMappingPayload_success(ctx, field)
+			case "controlEdge":
+				return ec.fieldContext_CreateControlMeasureMappingPayload_controlEdge(ctx, field)
+			case "measureEdge":
+				return ec.fieldContext_CreateControlMeasureMappingPayload_measureEdge(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreateControlMeasureMappingPayload", field.Name)
 		},
@@ -16094,8 +16332,10 @@ func (ec *executionContext) fieldContext_Mutation_createControlPolicyMapping(ctx
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "success":
-				return ec.fieldContext_CreateControlPolicyMappingPayload_success(ctx, field)
+			case "controlEdge":
+				return ec.fieldContext_CreateControlPolicyMappingPayload_controlEdge(ctx, field)
+			case "policyEdge":
+				return ec.fieldContext_CreateControlPolicyMappingPayload_policyEdge(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreateControlPolicyMappingPayload", field.Name)
 		},
@@ -16153,8 +16393,10 @@ func (ec *executionContext) fieldContext_Mutation_deleteControlMeasureMapping(ct
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "success":
-				return ec.fieldContext_DeleteControlMeasureMappingPayload_success(ctx, field)
+			case "deletedControlId":
+				return ec.fieldContext_DeleteControlMeasureMappingPayload_deletedControlId(ctx, field)
+			case "deletedMeasureId":
+				return ec.fieldContext_DeleteControlMeasureMappingPayload_deletedMeasureId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type DeleteControlMeasureMappingPayload", field.Name)
 		},
@@ -16212,8 +16454,10 @@ func (ec *executionContext) fieldContext_Mutation_deleteControlPolicyMapping(ctx
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "success":
-				return ec.fieldContext_DeleteControlPolicyMappingPayload_success(ctx, field)
+			case "deletedControlId":
+				return ec.fieldContext_DeleteControlPolicyMappingPayload_deletedControlId(ctx, field)
+			case "deletedPolicyId":
+				return ec.fieldContext_DeleteControlPolicyMappingPayload_deletedPolicyId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type DeleteControlPolicyMappingPayload", field.Name)
 		},
@@ -33881,8 +34125,13 @@ func (ec *executionContext) _CreateControlMeasureMappingPayload(ctx context.Cont
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CreateControlMeasureMappingPayload")
-		case "success":
-			out.Values[i] = ec._CreateControlMeasureMappingPayload_success(ctx, field, obj)
+		case "controlEdge":
+			out.Values[i] = ec._CreateControlMeasureMappingPayload_controlEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "measureEdge":
+			out.Values[i] = ec._CreateControlMeasureMappingPayload_measureEdge(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -33920,8 +34169,13 @@ func (ec *executionContext) _CreateControlPolicyMappingPayload(ctx context.Conte
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CreateControlPolicyMappingPayload")
-		case "success":
-			out.Values[i] = ec._CreateControlPolicyMappingPayload_success(ctx, field, obj)
+		case "controlEdge":
+			out.Values[i] = ec._CreateControlPolicyMappingPayload_controlEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "policyEdge":
+			out.Values[i] = ec._CreateControlPolicyMappingPayload_policyEdge(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -34481,8 +34735,13 @@ func (ec *executionContext) _DeleteControlMeasureMappingPayload(ctx context.Cont
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteControlMeasureMappingPayload")
-		case "success":
-			out.Values[i] = ec._DeleteControlMeasureMappingPayload_success(ctx, field, obj)
+		case "deletedControlId":
+			out.Values[i] = ec._DeleteControlMeasureMappingPayload_deletedControlId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletedMeasureId":
+			out.Values[i] = ec._DeleteControlMeasureMappingPayload_deletedMeasureId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -34520,8 +34779,13 @@ func (ec *executionContext) _DeleteControlPolicyMappingPayload(ctx context.Conte
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteControlPolicyMappingPayload")
-		case "success":
-			out.Values[i] = ec._DeleteControlPolicyMappingPayload_success(ctx, field, obj)
+		case "deletedControlId":
+			out.Values[i] = ec._DeleteControlPolicyMappingPayload_deletedControlId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletedPolicyId":
+			out.Values[i] = ec._DeleteControlPolicyMappingPayload_deletedPolicyId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

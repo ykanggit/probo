@@ -71,6 +71,8 @@ func (cp ControlPolicy) Delete(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
+	controlID gid.GID,
+	policyID gid.GID,
 ) error {
 	q := `
 DELETE
@@ -83,8 +85,8 @@ WHERE
 `
 
 	args := pgx.StrictNamedArgs{
-		"control_id": cp.ControlID,
-		"policy_id":  cp.PolicyID,
+		"control_id": controlID,
+		"policy_id":  policyID,
 	}
 	maps.Copy(args, scope.SQLArguments())
 

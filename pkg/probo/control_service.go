@@ -111,7 +111,7 @@ func (s ControlService) CreateMeasureMapping(
 	ctx context.Context,
 	controlID gid.GID,
 	measureID gid.GID,
-) error {
+) (*coredata.Control, *coredata.Measure, error) {
 	controlMeasure := &coredata.ControlMeasure{
 		ControlID: controlID,
 		MeasureID: measureID,
@@ -122,7 +122,7 @@ func (s ControlService) CreateMeasureMapping(
 	control := &coredata.Control{}
 	measure := &coredata.Measure{}
 
-	return s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
@@ -136,24 +136,23 @@ func (s ControlService) CreateMeasureMapping(
 			return controlMeasure.Insert(ctx, conn, s.svc.scope)
 		},
 	)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot create control measure mapping: %w", err)
+	}
+
+	return control, measure, nil
 }
 
 func (s ControlService) DeleteMeasureMapping(
 	ctx context.Context,
 	controlID gid.GID,
 	measureID gid.GID,
-) error {
-	controlMeasure := &coredata.ControlMeasure{
-		ControlID: controlID,
-		MeasureID: measureID,
-		TenantID:  s.svc.scope.GetTenantID(),
-		CreatedAt: time.Now(),
-	}
-
+) (*coredata.Control, *coredata.Measure, error) {
 	control := &coredata.Control{}
 	measure := &coredata.Measure{}
 
-	return s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
@@ -164,27 +163,31 @@ func (s ControlService) DeleteMeasureMapping(
 				return fmt.Errorf("cannot load measure: %w", err)
 			}
 
-			return controlMeasure.Delete(ctx, conn, s.svc.scope)
+			controlMeasure := &coredata.ControlMeasure{}
+			if err := controlMeasure.Delete(ctx, conn, s.svc.scope, control.ID, measure.ID); err != nil {
+				return fmt.Errorf("cannot delete control measure mapping: %w", err)
+			}
+
+			return nil
 		},
 	)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot delete control measure mapping: %w", err)
+	}
+
+	return control, measure, nil
 }
 
 func (s ControlService) CreatePolicyMapping(
 	ctx context.Context,
 	controlID gid.GID,
 	policyID gid.GID,
-) error {
-	controlPolicy := &coredata.ControlPolicy{
-		ControlID: controlID,
-		PolicyID:  policyID,
-		TenantID:  s.svc.scope.GetTenantID(),
-		CreatedAt: time.Now(),
-	}
-
+) (*coredata.Control, *coredata.Policy, error) {
 	control := &coredata.Control{}
 	policy := &coredata.Policy{}
 
-	return s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
@@ -195,27 +198,37 @@ func (s ControlService) CreatePolicyMapping(
 				return fmt.Errorf("cannot load policy: %w", err)
 			}
 
-			return controlPolicy.Insert(ctx, conn, s.svc.scope)
+			controlPolicy := &coredata.ControlPolicy{
+				ControlID: control.ID,
+				PolicyID:  policy.ID,
+				TenantID:  s.svc.scope.GetTenantID(),
+				CreatedAt: time.Now(),
+			}
+
+			if err := controlPolicy.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert control policy: %w", err)
+			}
+
+			return nil
 		},
 	)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot create control policy mapping: %w", err)
+	}
+
+	return control, policy, nil
 }
 
 func (s ControlService) DeletePolicyMapping(
 	ctx context.Context,
 	controlID gid.GID,
 	policyID gid.GID,
-) error {
-	controlPolicy := &coredata.ControlPolicy{
-		ControlID: controlID,
-		PolicyID:  policyID,
-		TenantID:  s.svc.scope.GetTenantID(),
-		CreatedAt: time.Now(),
-	}
-
+) (*coredata.Control, *coredata.Policy, error) {
 	control := &coredata.Control{}
 	policy := &coredata.Policy{}
 
-	return s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
@@ -226,9 +239,20 @@ func (s ControlService) DeletePolicyMapping(
 				return fmt.Errorf("cannot load policy: %w", err)
 			}
 
-			return controlPolicy.Delete(ctx, conn, s.svc.scope)
+			controlPolicy := &coredata.ControlPolicy{}
+			if err := controlPolicy.Delete(ctx, conn, s.svc.scope, control.ID, policy.ID); err != nil {
+				return fmt.Errorf("cannot delete control policy mapping: %w", err)
+			}
+
+			return nil
 		},
 	)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot delete control policy mapping: %w", err)
+	}
+
+	return control, policy, nil
 }
 
 func (s ControlService) Create(
