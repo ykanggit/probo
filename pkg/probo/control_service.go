@@ -61,10 +61,15 @@ func (s ControlService) ListForPolicyID(
 	cursor *page.Cursor[coredata.ControlOrderField],
 ) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
+	policy := &coredata.Policy{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := policy.LoadByID(ctx, conn, s.svc.scope, policyID); err != nil {
+				return fmt.Errorf("cannot load policy: %w", err)
+			}
+
 			return controls.LoadByPolicyID(ctx, conn, s.svc.scope, policyID, cursor)
 		},
 	)
@@ -82,10 +87,15 @@ func (s ControlService) ListForMeasureID(
 	cursor *page.Cursor[coredata.ControlOrderField],
 ) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
+	measure := &coredata.Measure{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := measure.LoadByID(ctx, conn, s.svc.scope, measureID); err != nil {
+				return fmt.Errorf("cannot load measure: %w", err)
+			}
+
 			return controls.LoadByMeasureID(ctx, conn, s.svc.scope, measureID, cursor)
 		},
 	)
@@ -109,9 +119,20 @@ func (s ControlService) CreateMeasureMapping(
 		CreatedAt: time.Now(),
 	}
 
+	control := &coredata.Control{}
+	measure := &coredata.Measure{}
+
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
+				return fmt.Errorf("cannot load control: %w", err)
+			}
+
+			if err := measure.LoadByID(ctx, conn, s.svc.scope, measureID); err != nil {
+				return fmt.Errorf("cannot load measure: %w", err)
+			}
+
 			return controlMeasure.Insert(ctx, conn, s.svc.scope)
 		},
 	)
@@ -129,9 +150,20 @@ func (s ControlService) DeleteMeasureMapping(
 		CreatedAt: time.Now(),
 	}
 
+	control := &coredata.Control{}
+	measure := &coredata.Measure{}
+
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
+				return fmt.Errorf("cannot load control: %w", err)
+			}
+
+			if err := measure.LoadByID(ctx, conn, s.svc.scope, measureID); err != nil {
+				return fmt.Errorf("cannot load measure: %w", err)
+			}
+
 			return controlMeasure.Delete(ctx, conn, s.svc.scope)
 		},
 	)
@@ -149,9 +181,20 @@ func (s ControlService) CreatePolicyMapping(
 		CreatedAt: time.Now(),
 	}
 
+	control := &coredata.Control{}
+	policy := &coredata.Policy{}
+
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
+				return fmt.Errorf("cannot load control: %w", err)
+			}
+
+			if err := policy.LoadByID(ctx, conn, s.svc.scope, policyID); err != nil {
+				return fmt.Errorf("cannot load policy: %w", err)
+			}
+
 			return controlPolicy.Insert(ctx, conn, s.svc.scope)
 		},
 	)
@@ -169,9 +212,20 @@ func (s ControlService) DeletePolicyMapping(
 		CreatedAt: time.Now(),
 	}
 
+	control := &coredata.Control{}
+	policy := &coredata.Policy{}
+
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
+				return fmt.Errorf("cannot load control: %w", err)
+			}
+
+			if err := policy.LoadByID(ctx, conn, s.svc.scope, policyID); err != nil {
+				return fmt.Errorf("cannot load policy: %w", err)
+			}
+
 			return controlPolicy.Delete(ctx, conn, s.svc.scope)
 		},
 	)
@@ -182,6 +236,7 @@ func (s ControlService) Create(
 	req CreateControlRequest,
 ) (*coredata.Control, error) {
 	now := time.Now()
+	framework := &coredata.Framework{}
 
 	control := &coredata.Control{
 		ID:          req.ID,
@@ -193,9 +248,15 @@ func (s ControlService) Create(
 		UpdatedAt:   now,
 	}
 
-	err := s.svc.pg.WithConn(
+	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := framework.LoadByID(ctx, conn, s.svc.scope, req.FrameworkID); err != nil {
+				return fmt.Errorf("cannot load framework: %w", err)
+			}
+
+			control.FrameworkID = framework.ID
+
 			return control.Insert(ctx, conn, s.svc.scope)
 		},
 	)
@@ -271,15 +332,20 @@ func (s ControlService) ListForFrameworkID(
 	cursor *page.Cursor[coredata.ControlOrderField],
 ) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
+	framework := &coredata.Framework{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := framework.LoadByID(ctx, conn, s.svc.scope, frameworkID); err != nil {
+				return fmt.Errorf("cannot load framework: %w", err)
+			}
+
 			return controls.LoadByFrameworkID(
 				ctx,
 				conn,
 				s.svc.scope,
-				frameworkID,
+				framework.ID,
 				cursor,
 			)
 		},
@@ -298,11 +364,16 @@ func (s ControlService) ListForRiskID(
 	cursor *page.Cursor[coredata.ControlOrderField],
 ) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
+	risk := &coredata.Risk{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return controls.LoadByRiskID(ctx, conn, s.svc.scope, riskID, cursor)
+			if err := risk.LoadByID(ctx, conn, s.svc.scope, riskID); err != nil {
+				return fmt.Errorf("cannot load risk: %w", err)
+			}
+
+			return controls.LoadByRiskID(ctx, conn, s.svc.scope, risk.ID, cursor)
 		},
 	)
 
