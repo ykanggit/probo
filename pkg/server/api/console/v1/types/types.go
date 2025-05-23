@@ -200,7 +200,8 @@ type CreateRiskMeasureMappingInput struct {
 }
 
 type CreateRiskMeasureMappingPayload struct {
-	Success bool `json:"success"`
+	RiskEdge    *RiskEdge    `json:"riskEdge"`
+	MeasureEdge *MeasureEdge `json:"measureEdge"`
 }
 
 type CreateRiskPayload struct {
@@ -342,7 +343,8 @@ type DeleteRiskMeasureMappingInput struct {
 }
 
 type DeleteRiskMeasureMappingPayload struct {
-	Success bool `json:"success"`
+	DeletedMeasureID gid.GID `json:"deletedMeasureId"`
+	DeletedRiskID    gid.GID `json:"deletedRiskId"`
 }
 
 type DeleteRiskPayload struct {

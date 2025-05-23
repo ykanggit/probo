@@ -151,7 +151,8 @@ type ComplexityRoot struct {
 	}
 
 	CreateRiskMeasureMappingPayload struct {
-		Success func(childComplexity int) int
+		MeasureEdge func(childComplexity int) int
+		RiskEdge    func(childComplexity int) int
 	}
 
 	CreateRiskPayload struct {
@@ -207,7 +208,8 @@ type ComplexityRoot struct {
 	}
 
 	DeleteRiskMeasureMappingPayload struct {
-		Success func(childComplexity int) int
+		DeletedMeasureID func(childComplexity int) int
+		DeletedRiskID    func(childComplexity int) int
 	}
 
 	DeleteRiskPayload struct {
@@ -1156,12 +1158,19 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.CreatePolicyPayload.PolicyVersionEdge(childComplexity), true
 
-	case "CreateRiskMeasureMappingPayload.success":
-		if e.complexity.CreateRiskMeasureMappingPayload.Success == nil {
+	case "CreateRiskMeasureMappingPayload.measureEdge":
+		if e.complexity.CreateRiskMeasureMappingPayload.MeasureEdge == nil {
 			break
 		}
 
-		return e.complexity.CreateRiskMeasureMappingPayload.Success(childComplexity), true
+		return e.complexity.CreateRiskMeasureMappingPayload.MeasureEdge(childComplexity), true
+
+	case "CreateRiskMeasureMappingPayload.riskEdge":
+		if e.complexity.CreateRiskMeasureMappingPayload.RiskEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateRiskMeasureMappingPayload.RiskEdge(childComplexity), true
 
 	case "CreateRiskPayload.riskEdge":
 		if e.complexity.CreateRiskPayload.RiskEdge == nil {
@@ -1254,12 +1263,19 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.DeletePolicyPayload.DeletedPolicyID(childComplexity), true
 
-	case "DeleteRiskMeasureMappingPayload.success":
-		if e.complexity.DeleteRiskMeasureMappingPayload.Success == nil {
+	case "DeleteRiskMeasureMappingPayload.deletedMeasureId":
+		if e.complexity.DeleteRiskMeasureMappingPayload.DeletedMeasureID == nil {
 			break
 		}
 
-		return e.complexity.DeleteRiskMeasureMappingPayload.Success(childComplexity), true
+		return e.complexity.DeleteRiskMeasureMappingPayload.DeletedMeasureID(childComplexity), true
+
+	case "DeleteRiskMeasureMappingPayload.deletedRiskId":
+		if e.complexity.DeleteRiskMeasureMappingPayload.DeletedRiskID == nil {
+			break
+		}
+
+		return e.complexity.DeleteRiskMeasureMappingPayload.DeletedRiskID(childComplexity), true
 
 	case "DeleteRiskPayload.deletedRiskId":
 		if e.complexity.DeleteRiskPayload.DeletedRiskID == nil {
@@ -5467,11 +5483,13 @@ type DeleteRiskPayload {
 }
 
 type CreateRiskMeasureMappingPayload {
-  success: Boolean!
+  riskEdge: RiskEdge!
+  measureEdge: MeasureEdge!
 }
 
 type DeleteRiskMeasureMappingPayload {
-  success: Boolean!
+  deletedMeasureId: ID!
+  deletedRiskId: ID!
 }
 
 type CreateRiskPolicyMappingPayload {
@@ -11276,8 +11294,8 @@ func (ec *executionContext) fieldContext_CreatePolicyPayload_policyVersionEdge(_
 	return fc, nil
 }
 
-func (ec *executionContext) _CreateRiskMeasureMappingPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.CreateRiskMeasureMappingPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_CreateRiskMeasureMappingPayload_success(ctx, field)
+func (ec *executionContext) _CreateRiskMeasureMappingPayload_riskEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateRiskMeasureMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateRiskMeasureMappingPayload_riskEdge(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11290,7 +11308,7 @@ func (ec *executionContext) _CreateRiskMeasureMappingPayload_success(ctx context
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
+		return obj.RiskEdge, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11302,19 +11320,75 @@ func (ec *executionContext) _CreateRiskMeasureMappingPayload_success(ctx context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*types.RiskEdge)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNRiskEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRiskEdge(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_CreateRiskMeasureMappingPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_CreateRiskMeasureMappingPayload_riskEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CreateRiskMeasureMappingPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_RiskEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_RiskEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type RiskEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateRiskMeasureMappingPayload_measureEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateRiskMeasureMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateRiskMeasureMappingPayload_measureEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MeasureEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.MeasureEdge)
+	fc.Result = res
+	return ec.marshalNMeasureEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasureEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateRiskMeasureMappingPayload_measureEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateRiskMeasureMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_MeasureEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_MeasureEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MeasureEdge", field.Name)
 		},
 	}
 	return fc, nil
@@ -11916,8 +11990,8 @@ func (ec *executionContext) fieldContext_DeletePolicyPayload_deletedPolicyId(_ c
 	return fc, nil
 }
 
-func (ec *executionContext) _DeleteRiskMeasureMappingPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.DeleteRiskMeasureMappingPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteRiskMeasureMappingPayload_success(ctx, field)
+func (ec *executionContext) _DeleteRiskMeasureMappingPayload_deletedMeasureId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteRiskMeasureMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteRiskMeasureMappingPayload_deletedMeasureId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11930,7 +12004,7 @@ func (ec *executionContext) _DeleteRiskMeasureMappingPayload_success(ctx context
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
+		return obj.DeletedMeasureID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11942,19 +12016,63 @@ func (ec *executionContext) _DeleteRiskMeasureMappingPayload_success(ctx context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(gid.GID)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_DeleteRiskMeasureMappingPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_DeleteRiskMeasureMappingPayload_deletedMeasureId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteRiskMeasureMappingPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteRiskMeasureMappingPayload_deletedRiskId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteRiskMeasureMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteRiskMeasureMappingPayload_deletedRiskId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedRiskID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteRiskMeasureMappingPayload_deletedRiskId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteRiskMeasureMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -16507,8 +16625,10 @@ func (ec *executionContext) fieldContext_Mutation_createRiskMeasureMapping(ctx c
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "success":
-				return ec.fieldContext_CreateRiskMeasureMappingPayload_success(ctx, field)
+			case "riskEdge":
+				return ec.fieldContext_CreateRiskMeasureMappingPayload_riskEdge(ctx, field)
+			case "measureEdge":
+				return ec.fieldContext_CreateRiskMeasureMappingPayload_measureEdge(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreateRiskMeasureMappingPayload", field.Name)
 		},
@@ -16566,8 +16686,10 @@ func (ec *executionContext) fieldContext_Mutation_deleteRiskMeasureMapping(ctx c
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "success":
-				return ec.fieldContext_DeleteRiskMeasureMappingPayload_success(ctx, field)
+			case "deletedMeasureId":
+				return ec.fieldContext_DeleteRiskMeasureMappingPayload_deletedMeasureId(ctx, field)
+			case "deletedRiskId":
+				return ec.fieldContext_DeleteRiskMeasureMappingPayload_deletedRiskId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type DeleteRiskMeasureMappingPayload", field.Name)
 		},
@@ -33993,8 +34115,13 @@ func (ec *executionContext) _CreateRiskMeasureMappingPayload(ctx context.Context
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CreateRiskMeasureMappingPayload")
-		case "success":
-			out.Values[i] = ec._CreateRiskMeasureMappingPayload_success(ctx, field, obj)
+		case "riskEdge":
+			out.Values[i] = ec._CreateRiskMeasureMappingPayload_riskEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "measureEdge":
+			out.Values[i] = ec._CreateRiskMeasureMappingPayload_measureEdge(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -34539,8 +34666,13 @@ func (ec *executionContext) _DeleteRiskMeasureMappingPayload(ctx context.Context
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteRiskMeasureMappingPayload")
-		case "success":
-			out.Values[i] = ec._DeleteRiskMeasureMappingPayload_success(ctx, field, obj)
+		case "deletedMeasureId":
+			out.Values[i] = ec._DeleteRiskMeasureMappingPayload_deletedMeasureId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletedRiskId":
+			out.Values[i] = ec._DeleteRiskMeasureMappingPayload_deletedRiskId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

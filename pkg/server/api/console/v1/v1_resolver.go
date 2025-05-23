@@ -919,13 +919,14 @@ func (r *mutationResolver) DeleteRisk(ctx context.Context, input types.DeleteRis
 func (r *mutationResolver) CreateRiskMeasureMapping(ctx context.Context, input types.CreateRiskMeasureMappingInput) (*types.CreateRiskMeasureMappingPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
 
-	err := svc.Risks.CreateMeasureMapping(ctx, input.RiskID, input.MeasureID)
+	risk, measure, err := svc.Risks.CreateMeasureMapping(ctx, input.RiskID, input.MeasureID)
 	if err != nil {
 		panic(fmt.Errorf("cannot create risk measure mapping: %w", err))
 	}
 
 	return &types.CreateRiskMeasureMappingPayload{
-		Success: true,
+		RiskEdge:    types.NewRiskEdge(risk, coredata.RiskOrderFieldCreatedAt),
+		MeasureEdge: types.NewMeasureEdge(measure, coredata.MeasureOrderFieldCreatedAt),
 	}, nil
 }
 
@@ -933,13 +934,14 @@ func (r *mutationResolver) CreateRiskMeasureMapping(ctx context.Context, input t
 func (r *mutationResolver) DeleteRiskMeasureMapping(ctx context.Context, input types.DeleteRiskMeasureMappingInput) (*types.DeleteRiskMeasureMappingPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
 
-	err := svc.Risks.DeleteMeasureMapping(ctx, input.RiskID, input.MeasureID)
+	risk, measure, err := svc.Risks.DeleteMeasureMapping(ctx, input.RiskID, input.MeasureID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete risk measure mapping: %w", err))
 	}
 
 	return &types.DeleteRiskMeasureMappingPayload{
-		Success: true,
+		DeletedRiskID:    risk.ID,
+		DeletedMeasureID: measure.ID,
 	}, nil
 }
 

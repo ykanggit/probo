@@ -124,40 +124,74 @@ func (s RiskService) CreateMeasureMapping(
 	ctx context.Context,
 	riskID gid.GID,
 	measureID gid.GID,
-) error {
-	riskMeasure := &coredata.RiskMeasure{
-		RiskID:    riskID,
-		MeasureID: measureID,
-		TenantID:  s.svc.scope.GetTenantID(),
-		CreatedAt: time.Now(),
-	}
+) (*coredata.Risk, *coredata.Measure, error) {
+	measure := &coredata.Measure{}
+	risk := &coredata.Risk{}
 
-	return s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := risk.LoadByID(ctx, conn, s.svc.scope, riskID); err != nil {
+				return fmt.Errorf("cannot load risk: %w", err)
+			}
+
+			if err := measure.LoadByID(ctx, conn, s.svc.scope, measureID); err != nil {
+				return fmt.Errorf("cannot load measure: %w", err)
+			}
+
+			riskMeasure := &coredata.RiskMeasure{
+				RiskID:    risk.ID,
+				MeasureID: measure.ID,
+				TenantID:  s.svc.scope.GetTenantID(),
+				CreatedAt: time.Now(),
+			}
+
 			return riskMeasure.Insert(ctx, conn, s.svc.scope)
 		},
 	)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot create risk measure mapping: %w", err)
+	}
+
+	return risk, measure, nil
 }
 
 func (s RiskService) DeleteMeasureMapping(
 	ctx context.Context,
 	riskID gid.GID,
 	measureID gid.GID,
-) error {
-	riskMeasure := &coredata.RiskMeasure{
-		RiskID:    riskID,
-		MeasureID: measureID,
-		TenantID:  s.svc.scope.GetTenantID(),
-		CreatedAt: time.Now(),
-	}
+) (*coredata.Risk, *coredata.Measure, error) {
+	risk := &coredata.Risk{}
+	measure := &coredata.Measure{}
 
-	return s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := risk.LoadByID(ctx, conn, s.svc.scope, riskID); err != nil {
+				return fmt.Errorf("cannot load risk: %w", err)
+			}
+
+			if err := measure.LoadByID(ctx, conn, s.svc.scope, measureID); err != nil {
+				return fmt.Errorf("cannot load measure: %w", err)
+			}
+
+			riskMeasure := &coredata.RiskMeasure{
+				RiskID:    riskID,
+				MeasureID: measureID,
+				TenantID:  s.svc.scope.GetTenantID(),
+				CreatedAt: time.Now(),
+			}
+
 			return riskMeasure.Delete(ctx, conn, s.svc.scope)
 		},
 	)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot delete risk measure mapping: %w", err)
+	}
+
+	return risk, measure, nil
 }
 
 func (s RiskService) Create(
@@ -198,6 +232,13 @@ func (s RiskService) Create(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if req.OwnerID != nil {
+				people := coredata.People{}
+				if err := people.LoadByID(ctx, conn, s.svc.scope, *req.OwnerID); err != nil {
+					return fmt.Errorf("cannot load owner: %w", err)
+				}
+			}
+
 			return risk.Insert(ctx, conn, s.svc.scope)
 		},
 	)
