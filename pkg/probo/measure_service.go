@@ -75,11 +75,21 @@ func (s MeasureService) ListForRiskID(
 	cursor *page.Cursor[coredata.MeasureOrderField],
 ) (*page.Page[*coredata.Measure, coredata.MeasureOrderField], error) {
 	var measures coredata.Measures
+	risk := &coredata.Risk{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return measures.LoadByRiskID(ctx, conn, s.svc.scope, riskID, cursor)
+			if err := risk.LoadByID(ctx, conn, s.svc.scope, riskID); err != nil {
+				return fmt.Errorf("cannot load risk: %w", err)
+			}
+
+			err := measures.LoadByRiskID(ctx, conn, s.svc.scope, risk.ID, cursor)
+			if err != nil {
+				return fmt.Errorf("cannot load measures: %w", err)
+			}
+
+			return nil
 		},
 	)
 
@@ -96,11 +106,21 @@ func (s MeasureService) ListForControlID(
 	cursor *page.Cursor[coredata.MeasureOrderField],
 ) (*page.Page[*coredata.Measure, coredata.MeasureOrderField], error) {
 	var measures coredata.Measures
+	control := &coredata.Control{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return measures.LoadByControlID(ctx, conn, s.svc.scope, controlID, cursor)
+			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
+				return fmt.Errorf("cannot load control: %w", err)
+			}
+
+			err := measures.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor)
+			if err != nil {
+				return fmt.Errorf("cannot load measures: %w", err)
+			}
+
+			return nil
 		},
 	)
 
@@ -137,18 +157,23 @@ func (s MeasureService) Import(
 	req ImportMeasureRequest,
 ) (*page.Page[*coredata.Measure, coredata.MeasureOrderField], error) {
 	importedMeasures := coredata.Measures{}
+	organization := &coredata.Organization{}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
+			if err := organization.LoadByID(ctx, tx, s.svc.scope, organizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
 			for i := range req.Measures {
 				now := time.Now()
 
-				measureID := gid.New(organizationID.TenantID(), coredata.MeasureEntityType)
+				measureID := gid.New(organization.ID.TenantID(), coredata.MeasureEntityType)
 
 				measure := &coredata.Measure{
 					ID:             measureID,
-					OrganizationID: organizationID,
+					OrganizationID: organization.ID,
 					Name:           req.Measures[i].Name,
 					Description:    "",
 					Category:       req.Measures[i].Category,
@@ -165,7 +190,7 @@ func (s MeasureService) Import(
 				}
 
 				for j := range req.Measures[i].Tasks {
-					taskID := gid.New(organizationID.TenantID(), coredata.TaskEntityType)
+					taskID := gid.New(organization.ID.TenantID(), coredata.TaskEntityType)
 
 					task := &coredata.Task{
 						ID:             taskID,
@@ -298,17 +323,27 @@ func (s MeasureService) ListForOrganizationID(
 	cursor *page.Cursor[coredata.MeasureOrderField],
 ) (*page.Page[*coredata.Measure, coredata.MeasureOrderField], error) {
 	var measures coredata.Measures
+	organization := &coredata.Organization{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return measures.LoadByOrganizationID(
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, organizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			err := measures.LoadByOrganizationID(
 				ctx,
 				conn,
 				s.svc.scope,
-				organizationID,
+				organization.ID,
 				cursor,
 			)
+			if err != nil {
+				return fmt.Errorf("cannot load measures: %w", err)
+			}
+
+			return nil
 		},
 	)
 
@@ -324,28 +359,33 @@ func (s MeasureService) Create(
 	req CreateMeasureRequest,
 ) (*coredata.Measure, error) {
 	now := time.Now()
-	measureID := gid.New(s.svc.scope.GetTenantID(), coredata.MeasureEntityType)
+	var measure *coredata.Measure
+	organization := &coredata.Organization{}
 
 	referenceID, err := uuid.NewV4()
 	if err != nil {
 		return nil, fmt.Errorf("cannot generate reference id: %w", err)
 	}
 
-	measure := &coredata.Measure{
-		ID:             measureID,
-		OrganizationID: req.OrganizationID,
-		Name:           req.Name,
-		Description:    req.Description,
-		Category:       req.Category,
-		ReferenceID:    "custom-measure-" + referenceID.String(),
-		State:          coredata.MeasureStateNotStarted,
-		CreatedAt:      now,
-		UpdatedAt:      now,
-	}
-
 	err = s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.OrganizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			measure = &coredata.Measure{
+				ID:             gid.New(organization.ID.TenantID(), coredata.MeasureEntityType),
+				OrganizationID: organization.ID,
+				Name:           req.Name,
+				Description:    req.Description,
+				Category:       req.Category,
+				ReferenceID:    "custom-measure-" + referenceID.String(),
+				State:          coredata.MeasureStateNotStarted,
+				CreatedAt:      now,
+				UpdatedAt:      now,
+			}
+
 			if err := measure.Insert(ctx, conn, s.svc.scope); err != nil {
 				return fmt.Errorf("cannot insert measure: %w", err)
 			}
@@ -366,9 +406,9 @@ func (s MeasureService) Delete(
 	measureID gid.GID,
 ) error {
 	return s.svc.pg.WithTx(ctx, func(conn pg.Conn) error {
-		measure := &coredata.Measure{ID: measureID}
+		measure := &coredata.Measure{}
 
-		if err := measure.Delete(ctx, conn, s.svc.scope); err != nil {
+		if err := measure.Delete(ctx, conn, s.svc.scope, measureID); err != nil {
 			return fmt.Errorf("cannot delete measure: %w", err)
 		}
 

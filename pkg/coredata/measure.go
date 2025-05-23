@@ -431,6 +431,7 @@ func (m *Measure) Delete(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
+	measureID gid.GID,
 ) error {
 	q := `
 DELETE FROM measures
@@ -439,7 +440,7 @@ WHERE %s
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"measure_id": m.ID}
+	args := pgx.StrictNamedArgs{"measure_id": measureID}
 	maps.Copy(args, scope.SQLArguments())
 
 	_, err := conn.Exec(ctx, q, args)
