@@ -431,7 +431,11 @@ const createControlMappingMutation = graphql`
     $input: CreateControlMeasureMappingInput!
   ) {
     createControlMeasureMapping(input: $input) {
-      success
+      controlEdge {
+        node {
+          id
+        }
+      }
     }
   }
 `;
@@ -441,7 +445,7 @@ const deleteControlMappingMutation = graphql`
     $input: DeleteControlMeasureMappingInput!
   ) {
     deleteControlMeasureMapping(input: $input) {
-      success
+      deletedMeasureId
     }
   }
 `;

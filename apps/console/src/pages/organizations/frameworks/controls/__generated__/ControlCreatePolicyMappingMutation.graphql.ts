@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d614f25231ff53581f96021c5b52628a>>
+ * @generated SignedSource<<9e8a7131004ab3ef4f20c36c904bd9db>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,7 +18,11 @@ export type ControlCreatePolicyMappingMutation$variables = {
 };
 export type ControlCreatePolicyMappingMutation$data = {
   readonly createControlPolicyMapping: {
-    readonly success: boolean;
+    readonly controlEdge: {
+      readonly node: {
+        readonly id: string;
+      };
+    };
   };
 };
 export type ControlCreatePolicyMappingMutation = {
@@ -52,8 +56,30 @@ v1 = [
       {
         "alias": null,
         "args": null,
-        "kind": "ScalarField",
-        "name": "success",
+        "concreteType": "ControlEdge",
+        "kind": "LinkedField",
+        "name": "controlEdge",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "Control",
+            "kind": "LinkedField",
+            "name": "node",
+            "plural": false,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "id",
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
+          }
+        ],
         "storageKey": null
       }
     ],
@@ -78,16 +104,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "bde220ef49867cec6b77bffc06878258",
+    "cacheID": "d2cf3e45fcc9109399c3b80addb03b20",
     "id": null,
     "metadata": {},
     "name": "ControlCreatePolicyMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlCreatePolicyMappingMutation(\n  $input: CreateControlPolicyMappingInput!\n) {\n  createControlPolicyMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation ControlCreatePolicyMappingMutation(\n  $input: CreateControlPolicyMappingInput!\n) {\n  createControlPolicyMapping(input: $input) {\n    controlEdge {\n      node {\n        id\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "8e6ef41146efb59340331e16ce0493d6";
+(node as any).hash = "9deabb78c91eca04673b23cf5d0b68f5";
 
 export default node;

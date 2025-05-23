@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9136dd4c154f9e4b2ba8b91316edbf4a>>
+ * @generated SignedSource<<c903592f9282d20a2a8d28f0907be974>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,7 +18,7 @@ export type MeasureViewDeleteControlMappingMutation$variables = {
 };
 export type MeasureViewDeleteControlMappingMutation$data = {
   readonly deleteControlMeasureMapping: {
-    readonly success: boolean;
+    readonly deletedMeasureId: string;
   };
 };
 export type MeasureViewDeleteControlMappingMutation = {
@@ -53,7 +53,7 @@ v1 = [
         "alias": null,
         "args": null,
         "kind": "ScalarField",
-        "name": "success",
+        "name": "deletedMeasureId",
         "storageKey": null
       }
     ],
@@ -78,16 +78,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "8e779137f0502f324968a4c414bff2e6",
+    "cacheID": "7cdb64662f8f7c05b6ab0698c234970f",
     "id": null,
     "metadata": {},
     "name": "MeasureViewDeleteControlMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation MeasureViewDeleteControlMappingMutation(\n  $input: DeleteControlMeasureMappingInput!\n) {\n  deleteControlMeasureMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation MeasureViewDeleteControlMappingMutation(\n  $input: DeleteControlMeasureMappingInput!\n) {\n  deleteControlMeasureMapping(input: $input) {\n    deletedMeasureId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "7c74e8e787022c1c51fbfc38388445e4";
+(node as any).hash = "73049774597ac1235e58527f7aa46564";
 
 export default node;

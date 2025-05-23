@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ac6b4af30ca3e03181512667a7ee6d76>>
+ * @generated SignedSource<<87f06a7e4f736af29d5dafddd750eaff>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,7 +18,11 @@ export type ShowRiskViewCreateRiskMeasureMappingMutation$variables = {
 };
 export type ShowRiskViewCreateRiskMeasureMappingMutation$data = {
   readonly createRiskMeasureMapping: {
-    readonly success: boolean;
+    readonly riskEdge: {
+      readonly node: {
+        readonly id: string;
+      };
+    };
   };
 };
 export type ShowRiskViewCreateRiskMeasureMappingMutation = {
@@ -52,8 +56,30 @@ v1 = [
       {
         "alias": null,
         "args": null,
-        "kind": "ScalarField",
-        "name": "success",
+        "concreteType": "RiskEdge",
+        "kind": "LinkedField",
+        "name": "riskEdge",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "Risk",
+            "kind": "LinkedField",
+            "name": "node",
+            "plural": false,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "id",
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
+          }
+        ],
         "storageKey": null
       }
     ],
@@ -78,16 +104,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "f9e85548eb6e6aeb601fc36f92803ab6",
+    "cacheID": "d767dfb986b187e7eaad1e442e9a2822",
     "id": null,
     "metadata": {},
     "name": "ShowRiskViewCreateRiskMeasureMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation ShowRiskViewCreateRiskMeasureMappingMutation(\n  $input: CreateRiskMeasureMappingInput!\n) {\n  createRiskMeasureMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation ShowRiskViewCreateRiskMeasureMappingMutation(\n  $input: CreateRiskMeasureMappingInput!\n) {\n  createRiskMeasureMapping(input: $input) {\n    riskEdge {\n      node {\n        id\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "6246bbb8af3e7c1a2e968eb5482c91ce";
+(node as any).hash = "11529c76ce2bb6c0d0b6813c51f3ae9d";
 
 export default node;

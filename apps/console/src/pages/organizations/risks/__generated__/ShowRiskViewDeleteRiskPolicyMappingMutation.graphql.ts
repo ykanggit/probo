@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d11690667058b0e7d271b815f510c44c>>
+ * @generated SignedSource<<8f8d550cd2bbc73744ba0b7a97720a49>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,7 +18,7 @@ export type ShowRiskViewDeleteRiskPolicyMappingMutation$variables = {
 };
 export type ShowRiskViewDeleteRiskPolicyMappingMutation$data = {
   readonly deleteRiskPolicyMapping: {
-    readonly success: boolean;
+    readonly deletedPolicyId: string;
   };
 };
 export type ShowRiskViewDeleteRiskPolicyMappingMutation = {
@@ -53,7 +53,7 @@ v1 = [
         "alias": null,
         "args": null,
         "kind": "ScalarField",
-        "name": "success",
+        "name": "deletedPolicyId",
         "storageKey": null
       }
     ],
@@ -78,16 +78,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "a3e208ccc9b5c1248450edaec7ef8417",
+    "cacheID": "d10c9ccbc01259fb7fea2bf463d6ecc6",
     "id": null,
     "metadata": {},
     "name": "ShowRiskViewDeleteRiskPolicyMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation ShowRiskViewDeleteRiskPolicyMappingMutation(\n  $input: DeleteRiskPolicyMappingInput!\n) {\n  deleteRiskPolicyMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation ShowRiskViewDeleteRiskPolicyMappingMutation(\n  $input: DeleteRiskPolicyMappingInput!\n) {\n  deleteRiskPolicyMapping(input: $input) {\n    deletedPolicyId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5e6b5677587f3c8bad3cec9d751952e1";
+(node as any).hash = "26177c99b1c35723f913637a1d6ac54b";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<369cb72e422d254a5e4956d17c47a8ae>>
+ * @generated SignedSource<<97db419e0a721e3a40619b1dbe4f9cde>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,7 +18,11 @@ export type ControlCreateMeasureMappingMutation$variables = {
 };
 export type ControlCreateMeasureMappingMutation$data = {
   readonly createControlMeasureMapping: {
-    readonly success: boolean;
+    readonly controlEdge: {
+      readonly node: {
+        readonly id: string;
+      };
+    };
   };
 };
 export type ControlCreateMeasureMappingMutation = {
@@ -52,8 +56,30 @@ v1 = [
       {
         "alias": null,
         "args": null,
-        "kind": "ScalarField",
-        "name": "success",
+        "concreteType": "ControlEdge",
+        "kind": "LinkedField",
+        "name": "controlEdge",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "Control",
+            "kind": "LinkedField",
+            "name": "node",
+            "plural": false,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "id",
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
+          }
+        ],
         "storageKey": null
       }
     ],
@@ -78,16 +104,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "5ff3b52a5f40607556617a17e44dc3b1",
+    "cacheID": "47a25e6c0c8c8695cf742b3cb5dfc90e",
     "id": null,
     "metadata": {},
     "name": "ControlCreateMeasureMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlCreateMeasureMappingMutation(\n  $input: CreateControlMeasureMappingInput!\n) {\n  createControlMeasureMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation ControlCreateMeasureMappingMutation(\n  $input: CreateControlMeasureMappingInput!\n) {\n  createControlMeasureMapping(input: $input) {\n    controlEdge {\n      node {\n        id\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "2c0061b6e180971d0e0f8b8b5c44d566";
+(node as any).hash = "4d5a5c705066af948f689da7e1ae491e";
 
 export default node;

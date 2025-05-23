@@ -169,7 +169,11 @@ const createRiskMeasureMappingMutation = graphql`
     $input: CreateRiskMeasureMappingInput!
   ) {
     createRiskMeasureMapping(input: $input) {
-      success
+      riskEdge {
+        node {
+          id
+        }
+      }
     }
   }
 `;
@@ -180,7 +184,7 @@ const deleteRiskMeasureMappingMutation = graphql`
     $input: DeleteRiskMeasureMappingInput!
   ) {
     deleteRiskMeasureMapping(input: $input) {
-      success
+      deletedMeasureId
     }
   }
 `;
@@ -191,7 +195,11 @@ const createRiskPolicyMappingMutation = graphql`
     $input: CreateRiskPolicyMappingInput!
   ) {
     createRiskPolicyMapping(input: $input) {
-      success
+      riskEdge {
+        node {
+          id
+        }
+      }
     }
   }
 `;
@@ -202,7 +210,7 @@ const deleteRiskPolicyMappingMutation = graphql`
     $input: DeleteRiskPolicyMappingInput!
   ) {
     deleteRiskPolicyMapping(input: $input) {
-      success
+      deletedPolicyId
     }
   }
 `;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5988b98a6e2ae42a565e51fc13fa5c91>>
+ * @generated SignedSource<<16f8815c8b1db694fb8cd18be95c3f53>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,7 +18,7 @@ export type ControlDeletePolicyMappingMutation$variables = {
 };
 export type ControlDeletePolicyMappingMutation$data = {
   readonly deleteControlPolicyMapping: {
-    readonly success: boolean;
+    readonly deletedPolicyId: string;
   };
 };
 export type ControlDeletePolicyMappingMutation = {
@@ -53,7 +53,7 @@ v1 = [
         "alias": null,
         "args": null,
         "kind": "ScalarField",
-        "name": "success",
+        "name": "deletedPolicyId",
         "storageKey": null
       }
     ],
@@ -78,16 +78,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "3b84cd899eee67303695eae81d1ba453",
+    "cacheID": "ae87d43859683362f6c7024e7f371425",
     "id": null,
     "metadata": {},
     "name": "ControlDeletePolicyMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation ControlDeletePolicyMappingMutation(\n  $input: DeleteControlPolicyMappingInput!\n) {\n  deleteControlPolicyMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation ControlDeletePolicyMappingMutation(\n  $input: DeleteControlPolicyMappingInput!\n) {\n  deleteControlPolicyMapping(input: $input) {\n    deletedPolicyId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "e706f52dac09ef3fcadeb588ccd0274d";
+(node as any).hash = "39306cd73fd5af5c603272f0bba45a8f";
 
 export default node;

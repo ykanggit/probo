@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<441cfaaf785e0628a8c954249ef87bdf>>
+ * @generated SignedSource<<b762c4de95c264178aa53ec0db98a973>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,7 +18,11 @@ export type MeasureViewCreateControlMappingMutation$variables = {
 };
 export type MeasureViewCreateControlMappingMutation$data = {
   readonly createControlMeasureMapping: {
-    readonly success: boolean;
+    readonly controlEdge: {
+      readonly node: {
+        readonly id: string;
+      };
+    };
   };
 };
 export type MeasureViewCreateControlMappingMutation = {
@@ -52,8 +56,30 @@ v1 = [
       {
         "alias": null,
         "args": null,
-        "kind": "ScalarField",
-        "name": "success",
+        "concreteType": "ControlEdge",
+        "kind": "LinkedField",
+        "name": "controlEdge",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "Control",
+            "kind": "LinkedField",
+            "name": "node",
+            "plural": false,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "id",
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
+          }
+        ],
         "storageKey": null
       }
     ],
@@ -78,16 +104,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "ea74e0148d320dbfb79859bb6286427b",
+    "cacheID": "27359a60a5a935f7d707c11d25c5d656",
     "id": null,
     "metadata": {},
     "name": "MeasureViewCreateControlMappingMutation",
     "operationKind": "mutation",
-    "text": "mutation MeasureViewCreateControlMappingMutation(\n  $input: CreateControlMeasureMappingInput!\n) {\n  createControlMeasureMapping(input: $input) {\n    success\n  }\n}\n"
+    "text": "mutation MeasureViewCreateControlMappingMutation(\n  $input: CreateControlMeasureMappingInput!\n) {\n  createControlMeasureMapping(input: $input) {\n    controlEdge {\n      node {\n        id\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "dfe964679c82f9c47d418122595989a8";
+(node as any).hash = "8621dd4bf5bdb9d06c1451004493fac9";
 
 export default node;
