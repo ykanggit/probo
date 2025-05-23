@@ -71,6 +71,8 @@ func (rm RiskMeasure) Delete(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
+	riskID gid.GID,
+	measureID gid.GID,
 ) error {
 	q := `
 DELETE
@@ -85,8 +87,8 @@ WHERE
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
-		"risk_id":    rm.RiskID,
-		"measure_id": rm.MeasureID,
+		"risk_id":    riskID,
+		"measure_id": measureID,
 	}
 	maps.Copy(args, scope.SQLArguments())
 

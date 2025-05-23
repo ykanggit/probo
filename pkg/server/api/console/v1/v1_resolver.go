@@ -949,13 +949,14 @@ func (r *mutationResolver) DeleteRiskMeasureMapping(ctx context.Context, input t
 func (r *mutationResolver) CreateRiskPolicyMapping(ctx context.Context, input types.CreateRiskPolicyMappingInput) (*types.CreateRiskPolicyMappingPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
 
-	err := svc.Risks.CreatePolicyMapping(ctx, input.RiskID, input.PolicyID)
+	risk, policy, err := svc.Risks.CreatePolicyMapping(ctx, input.RiskID, input.PolicyID)
 	if err != nil {
 		panic(fmt.Errorf("cannot create risk policy mapping: %w", err))
 	}
 
 	return &types.CreateRiskPolicyMappingPayload{
-		Success: true,
+		RiskEdge:   types.NewRiskEdge(risk, coredata.RiskOrderFieldCreatedAt),
+		PolicyEdge: types.NewPolicyEdge(policy, coredata.PolicyOrderFieldTitle),
 	}, nil
 }
 
@@ -963,13 +964,14 @@ func (r *mutationResolver) CreateRiskPolicyMapping(ctx context.Context, input ty
 func (r *mutationResolver) DeleteRiskPolicyMapping(ctx context.Context, input types.DeleteRiskPolicyMappingInput) (*types.DeleteRiskPolicyMappingPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
 
-	err := svc.Risks.DeletePolicyMapping(ctx, input.RiskID, input.PolicyID)
+	risk, policy, err := svc.Risks.DeletePolicyMapping(ctx, input.RiskID, input.PolicyID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete risk policy mapping: %w", err))
 	}
 
 	return &types.DeleteRiskPolicyMappingPayload{
-		Success: true,
+		DeletedRiskID:   risk.ID,
+		DeletedPolicyID: policy.ID,
 	}, nil
 }
 

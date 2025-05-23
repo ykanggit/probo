@@ -1506,11 +1506,13 @@ type DeleteRiskMeasureMappingPayload {
 }
 
 type CreateRiskPolicyMappingPayload {
-  success: Boolean!
+  riskEdge: RiskEdge!
+  policyEdge: PolicyEdge!
 }
 
 type DeleteRiskPolicyMappingPayload {
-  success: Boolean!
+  deletedRiskId: ID!
+  deletedPolicyId: ID!
 }
 
 type RequestEvidencePayload {

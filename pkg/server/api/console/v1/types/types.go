@@ -214,7 +214,8 @@ type CreateRiskPolicyMappingInput struct {
 }
 
 type CreateRiskPolicyMappingPayload struct {
-	Success bool `json:"success"`
+	RiskEdge   *RiskEdge   `json:"riskEdge"`
+	PolicyEdge *PolicyEdge `json:"policyEdge"`
 }
 
 type CreateTaskInput struct {
@@ -357,7 +358,8 @@ type DeleteRiskPolicyMappingInput struct {
 }
 
 type DeleteRiskPolicyMappingPayload struct {
-	Success bool `json:"success"`
+	DeletedRiskID   gid.GID `json:"deletedRiskId"`
+	DeletedPolicyID gid.GID `json:"deletedPolicyId"`
 }
 
 type DeleteTaskInput struct {

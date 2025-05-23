@@ -324,15 +324,14 @@ func (r *Risk) Delete(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
+	riskID gid.GID,
 ) error {
 	q := `
 DELETE FROM risks WHERE %s AND id = @id
 `
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{
-		"id": r.ID,
-	}
+	args := pgx.StrictNamedArgs{"id": riskID}
 	maps.Copy(args, scope.SQLArguments())
 
 	_, err := conn.Exec(ctx, q, args)

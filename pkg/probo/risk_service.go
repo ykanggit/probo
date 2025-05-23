@@ -84,40 +84,68 @@ func (s RiskService) CreatePolicyMapping(
 	ctx context.Context,
 	riskID gid.GID,
 	policyID gid.GID,
-) error {
-	riskPolicy := &coredata.RiskPolicy{
-		RiskID:    riskID,
-		PolicyID:  policyID,
-		TenantID:  s.svc.scope.GetTenantID(),
-		CreatedAt: time.Now(),
-	}
+) (*coredata.Risk, *coredata.Policy, error) {
+	risk := &coredata.Risk{}
+	policy := &coredata.Policy{}
 
-	return s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := risk.LoadByID(ctx, conn, s.svc.scope, riskID); err != nil {
+				return fmt.Errorf("cannot load risk: %w", err)
+			}
+
+			if err := policy.LoadByID(ctx, conn, s.svc.scope, policyID); err != nil {
+				return fmt.Errorf("cannot load policy: %w", err)
+			}
+
+			riskPolicy := &coredata.RiskPolicy{
+				RiskID:    risk.ID,
+				PolicyID:  policy.ID,
+				TenantID:  s.svc.scope.GetTenantID(),
+				CreatedAt: time.Now(),
+			}
+
 			return riskPolicy.Insert(ctx, conn, s.svc.scope)
 		},
 	)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot create risk policy mapping: %w", err)
+	}
+
+	return risk, policy, nil
 }
 
 func (s RiskService) DeletePolicyMapping(
 	ctx context.Context,
 	riskID gid.GID,
 	policyID gid.GID,
-) error {
-	riskPolicy := &coredata.RiskPolicy{
-		RiskID:    riskID,
-		PolicyID:  policyID,
-		TenantID:  s.svc.scope.GetTenantID(),
-		CreatedAt: time.Now(),
-	}
+) (*coredata.Risk, *coredata.Policy, error) {
+	riskPolicy := &coredata.RiskPolicy{}
+	risk := &coredata.Risk{}
+	policy := &coredata.Policy{}
 
-	return s.svc.pg.WithConn(
+	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return riskPolicy.Delete(ctx, conn, s.svc.scope)
+			if err := risk.LoadByID(ctx, conn, s.svc.scope, riskID); err != nil {
+				return fmt.Errorf("cannot load risk: %w", err)
+			}
+
+			if err := policy.LoadByID(ctx, conn, s.svc.scope, policyID); err != nil {
+				return fmt.Errorf("cannot load policy: %w", err)
+			}
+
+			return riskPolicy.Delete(ctx, conn, s.svc.scope, risk.ID, policy.ID)
 		},
 	)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot delete risk policy mapping: %w", err)
+	}
+
+	return risk, policy, nil
 }
 
 func (s RiskService) CreateMeasureMapping(
@@ -183,7 +211,7 @@ func (s RiskService) DeleteMeasureMapping(
 				CreatedAt: time.Now(),
 			}
 
-			return riskMeasure.Delete(ctx, conn, s.svc.scope)
+			return riskMeasure.Delete(ctx, conn, s.svc.scope, risk.ID, measure.ID)
 		},
 	)
 
@@ -199,10 +227,11 @@ func (s RiskService) Create(
 	req CreateRiskRequest,
 ) (*coredata.Risk, error) {
 	now := time.Now()
-	riskID := gid.New(s.svc.scope.GetTenantID(), coredata.RiskEntityType)
+	people := coredata.People{}
+	organization := coredata.Organization{}
 
 	risk := &coredata.Risk{
-		ID:                 riskID,
+		ID:                 gid.New(s.svc.scope.GetTenantID(), coredata.RiskEntityType),
 		OrganizationID:     req.OrganizationID,
 		Name:               req.Name,
 		Description:        req.Description,
@@ -232,8 +261,11 @@ func (s RiskService) Create(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.OrganizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
 			if req.OwnerID != nil {
-				people := coredata.People{}
 				if err := people.LoadByID(ctx, conn, s.svc.scope, *req.OwnerID); err != nil {
 					return fmt.Errorf("cannot load owner: %w", err)
 				}
@@ -312,6 +344,11 @@ func (s RiskService) Update(
 			}
 
 			if req.OwnerID != nil {
+				people := coredata.People{}
+				if err := people.LoadByID(ctx, conn, s.svc.scope, *req.OwnerID); err != nil {
+					return fmt.Errorf("cannot load owner: %w", err)
+				}
+
 				risk.OwnerID = req.OwnerID
 			}
 
@@ -343,12 +380,12 @@ func (s RiskService) Delete(
 	ctx context.Context,
 	riskID gid.GID,
 ) error {
-	risk := &coredata.Risk{ID: riskID}
+	risk := &coredata.Risk{}
 
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return risk.Delete(ctx, conn, s.svc.scope)
+			return risk.Delete(ctx, conn, s.svc.scope, riskID)
 		},
 	)
 }
