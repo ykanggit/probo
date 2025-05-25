@@ -25,6 +25,8 @@ const createPeopleMutation = graphql`
           primaryEmailAddress
           additionalEmailAddresses
           kind
+          contractStartDate
+          contractEndDate
         }
       }
     }
@@ -77,6 +79,8 @@ function NewPeopleViewContent() {
     primaryEmailAddress: "",
     additionalEmailAddresses: [] as string[],
     kind: "EMPLOYEE" as "EMPLOYEE" | "CONTRACTOR" | "SERVICE_ACCOUNT",
+    contractStartDate: "",
+    contractEndDate: "",
   });
 
   const handleFieldChange = (field: keyof typeof formData, value: unknown) => {
@@ -129,6 +133,8 @@ function NewPeopleViewContent() {
           primaryEmailAddress: formData.primaryEmailAddress,
           additionalEmailAddresses: formData.additionalEmailAddresses,
           kind: formData.kind,
+          contractStartDate: formData.contractStartDate ? new Date(formData.contractStartDate).toISOString() : null,
+          contractEndDate: formData.contractEndDate ? new Date(formData.contractEndDate).toISOString() : null,
         },
       },
       onCompleted: () => {
@@ -276,6 +282,20 @@ function NewPeopleViewContent() {
                     </button>
                   </div>
                 </div>
+
+                <EditableField
+                  label="Contract Start Date"
+                  value={formData.contractStartDate}
+                  type="date"
+                  onChange={(value) => handleFieldChange("contractStartDate", value)}
+                />
+
+                <EditableField
+                  label="Contract End Date"
+                  value={formData.contractEndDate}
+                  type="date"
+                  onChange={(value) => handleFieldChange("contractEndDate", value)}
+                />
               </div>
             </div>
           </Card>

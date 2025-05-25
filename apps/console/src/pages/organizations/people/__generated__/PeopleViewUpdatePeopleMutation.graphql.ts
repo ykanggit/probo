@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<552b78c5e34c5ce2065dd1190f47f632>>
+ * @generated SignedSource<<86a82de5c4344cc14a120155388e4a6f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,6 +12,8 @@ import { ConcreteRequest } from 'relay-runtime';
 export type PeopleKind = "CONTRACTOR" | "EMPLOYEE" | "SERVICE_ACCOUNT";
 export type UpdatePeopleInput = {
   additionalEmailAddresses?: ReadonlyArray<string> | null | undefined;
+  contractEndDate?: string | null | undefined;
+  contractStartDate?: string | null | undefined;
   fullName?: string | null | undefined;
   id: string;
   kind?: PeopleKind | null | undefined;
@@ -24,6 +26,8 @@ export type PeopleViewUpdatePeopleMutation$data = {
   readonly updatePeople: {
     readonly people: {
       readonly additionalEmailAddresses: ReadonlyArray<string>;
+      readonly contractEndDate: string | null | undefined;
+      readonly contractStartDate: string | null | undefined;
       readonly fullName: string;
       readonly id: string;
       readonly kind: PeopleKind;
@@ -107,6 +111,20 @@ v1 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
+            "name": "contractStartDate",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "contractEndDate",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
           }
@@ -135,16 +153,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "d09fc02a745b951e278cd492343e49f1",
+    "cacheID": "398ebbc7659400cbc5d0a750ee7e66b5",
     "id": null,
     "metadata": {},
     "name": "PeopleViewUpdatePeopleMutation",
     "operationKind": "mutation",
-    "text": "mutation PeopleViewUpdatePeopleMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation PeopleViewUpdatePeopleMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      contractStartDate\n      contractEndDate\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "15fece3e846bd713533b9e91a1ceffe2";
+(node as any).hash = "686c8546329ae29bd2880b0b1da9f20c";
 
 export default node;

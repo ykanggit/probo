@@ -35,6 +35,8 @@ const peopleViewQuery = graphql`
         primaryEmailAddress
         additionalEmailAddresses
         kind
+        contractStartDate
+        contractEndDate
         createdAt
         updatedAt
       }
@@ -51,6 +53,8 @@ const updatePeopleMutation = graphql`
         primaryEmailAddress
         additionalEmailAddresses
         kind
+        contractStartDate
+        contractEndDate
         updatedAt
       }
     }
@@ -100,19 +104,34 @@ function PeopleViewContent({
     primaryEmailAddress: data.node.primaryEmailAddress || "",
     additionalEmailAddresses: data.node.additionalEmailAddresses || [],
     kind: data.node.kind,
+    contractStartDate: data.node.contractStartDate
+      ? new Date(data.node.contractStartDate).toISOString().split('T')[0]
+      : "",
+    contractEndDate: data.node.contractEndDate
+      ? new Date(data.node.contractEndDate).toISOString().split('T')[0]
+      : "",
   });
   const [commit] = useMutation(updatePeopleMutation);
   const [, loadQuery] = useQueryLoader<PeopleViewQueryType>(peopleViewQuery);
   const { toast } = useToast();
-
   const hasChanges = editedFields.size > 0;
 
   const handleSave = useCallback(() => {
+    const formattedData = {
+      ...formData,
+      contractStartDate: formData.contractStartDate
+        ? new Date(formData.contractStartDate).toISOString()
+        : null,
+      contractEndDate: formData.contractEndDate
+        ? new Date(formData.contractEndDate).toISOString()
+        : null,
+    };
+
     commit({
       variables: {
         input: {
           id: data.node.id,
-          ...formData,
+          ...formattedData,
         },
       },
       onCompleted: () => {
@@ -157,6 +176,12 @@ function PeopleViewContent({
       primaryEmailAddress: data.node.primaryEmailAddress || "",
       additionalEmailAddresses: data.node.additionalEmailAddresses || [],
       kind: data.node.kind,
+      contractStartDate: data.node.contractStartDate
+        ? new Date(data.node.contractStartDate).toISOString().split('T')[0]
+        : "",
+      contractEndDate: data.node.contractEndDate
+        ? new Date(data.node.contractEndDate).toISOString().split('T')[0]
+        : "",
     });
     setEditedFields(new Set());
   };
@@ -256,6 +281,29 @@ function PeopleViewContent({
                     </SelectContent>
                   </Select>
                 </div>
+                <EditableField
+                  label="Contract Start Date"
+                  value={formData.contractStartDate || ""}
+                  type="date"
+                  onChange={(value) =>
+                    handleFieldChange(
+                      "contractStartDate" as keyof typeof formData,
+                      value,
+                    )
+                  }
+                />
+
+                <EditableField
+                  label="Contract End Date"
+                  value={formData.contractEndDate || ""}
+                  type="date"
+                  onChange={(value) =>
+                    handleFieldChange(
+                      "contractEndDate" as keyof typeof formData,
+                      value,
+                    )
+                  }
+                />
               </div>
             </div>
           </Card>

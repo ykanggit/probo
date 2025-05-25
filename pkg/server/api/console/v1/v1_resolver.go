@@ -424,6 +424,8 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 		PrimaryEmailAddress:      input.PrimaryEmailAddress,
 		AdditionalEmailAddresses: []string{},
 		Kind:                     input.Kind,
+		ContractStartDate:        input.ContractStartDate,
+		ContractEndDate:          input.ContractEndDate,
 	})
 
 	if err != nil {
@@ -445,6 +447,8 @@ func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdateP
 		PrimaryEmailAddress:      input.PrimaryEmailAddress,
 		AdditionalEmailAddresses: &input.AdditionalEmailAddresses,
 		Kind:                     input.Kind,
+		ContractStartDate:        &input.ContractStartDate,
+		ContractEndDate:          &input.ContractEndDate,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot update people: %w", err)

@@ -37,6 +37,8 @@ type (
 		FullName                 *string
 		PrimaryEmailAddress      *string
 		AdditionalEmailAddresses *[]string
+		ContractStartDate        **time.Time
+		ContractEndDate          **time.Time
 	}
 
 	CreatePeopleRequest struct {
@@ -46,6 +48,8 @@ type (
 		PrimaryEmailAddress      string
 		AdditionalEmailAddresses []string
 		Kind                     coredata.PeopleKind
+		ContractStartDate        *time.Time
+		ContractEndDate          *time.Time
 	}
 )
 
@@ -149,6 +153,14 @@ func (s PeopleService) Update(
 				people.AdditionalEmailAddresses = *req.AdditionalEmailAddresses
 			}
 
+			if req.ContractStartDate != nil {
+				people.ContractStartDate = *req.ContractStartDate
+			}
+
+			if req.ContractEndDate != nil {
+				people.ContractEndDate = *req.ContractEndDate
+			}
+
 			people.UpdatedAt = time.Now()
 
 			return people.Update(ctx, conn, s.svc.scope)
@@ -176,6 +188,8 @@ func (s PeopleService) Create(
 		PrimaryEmailAddress:      req.PrimaryEmailAddress,
 		AdditionalEmailAddresses: req.AdditionalEmailAddresses,
 		UserID:                   req.UserID,
+		ContractStartDate:        req.ContractStartDate,
+		ContractEndDate:          req.ContractEndDate,
 		CreatedAt:                now,
 		UpdatedAt:                now,
 	}

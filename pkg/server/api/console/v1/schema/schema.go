@@ -419,6 +419,8 @@ type ComplexityRoot struct {
 
 	People struct {
 		AdditionalEmailAddresses func(childComplexity int) int
+		ContractEndDate          func(childComplexity int) int
+		ContractStartDate        func(childComplexity int) int
 		CreatedAt                func(childComplexity int) int
 		FullName                 func(childComplexity int) int
 		ID                       func(childComplexity int) int
@@ -2551,6 +2553,20 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.People.AdditionalEmailAddresses(childComplexity), true
 
+	case "People.contractEndDate":
+		if e.complexity.People.ContractEndDate == nil {
+			break
+		}
+
+		return e.complexity.People.ContractEndDate(childComplexity), true
+
+	case "People.contractStartDate":
+		if e.complexity.People.ContractStartDate == nil {
+			break
+		}
+
+		return e.complexity.People.ContractStartDate(childComplexity), true
+
 	case "People.createdAt":
 		if e.complexity.People.CreatedAt == nil {
 			break
@@ -4564,6 +4580,8 @@ type People implements Node {
   primaryEmailAddress: String!
   additionalEmailAddresses: [String!]!
   kind: PeopleKind!
+  contractStartDate: Datetime
+  contractEndDate: Datetime
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -5187,6 +5205,8 @@ input CreatePeopleInput {
   primaryEmailAddress: String!
   additionalEmailAddresses: [String!]
   kind: PeopleKind!
+  contractStartDate: Datetime
+  contractEndDate: Datetime
 }
 
 input UpdatePeopleInput {
@@ -5195,6 +5215,8 @@ input UpdatePeopleInput {
   primaryEmailAddress: String
   additionalEmailAddresses: [String!]
   kind: PeopleKind
+  contractStartDate: Datetime
+  contractEndDate: Datetime
 }
 
 input DeletePeopleInput {
@@ -19518,6 +19540,88 @@ func (ec *executionContext) fieldContext_People_kind(_ context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _People_contractStartDate(ctx context.Context, field graphql.CollectedField, obj *types.People) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_People_contractStartDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ContractStartDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_People_contractStartDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "People",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _People_contractEndDate(ctx context.Context, field graphql.CollectedField, obj *types.People) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_People_contractEndDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ContractEndDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_People_contractEndDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "People",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _People_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.People) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_People_createdAt(ctx, field)
 	if err != nil {
@@ -19803,6 +19907,10 @@ func (ec *executionContext) fieldContext_PeopleEdge_node(_ context.Context, fiel
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -20036,6 +20144,10 @@ func (ec *executionContext) fieldContext_Policy_owner(_ context.Context, field g
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -20938,6 +21050,10 @@ func (ec *executionContext) fieldContext_PolicyVersion_publishedBy(_ context.Con
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -21499,6 +21615,10 @@ func (ec *executionContext) fieldContext_PolicyVersionSignature_signedBy(_ conte
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -21644,6 +21764,10 @@ func (ec *executionContext) fieldContext_PolicyVersionSignature_requestedBy(_ co
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -23045,6 +23169,10 @@ func (ec *executionContext) fieldContext_Risk_owner(_ context.Context, field gra
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -24028,6 +24156,10 @@ func (ec *executionContext) fieldContext_Task_assignedTo(_ context.Context, fiel
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -24862,6 +24994,10 @@ func (ec *executionContext) fieldContext_UpdatePeoplePayload_people(_ context.Co
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -25663,6 +25799,10 @@ func (ec *executionContext) fieldContext_User_people(ctx context.Context, field 
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -26262,6 +26402,10 @@ func (ec *executionContext) fieldContext_Vendor_businessOwner(_ context.Context,
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -26319,6 +26463,10 @@ func (ec *executionContext) fieldContext_Vendor_securityOwner(_ context.Context,
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -27982,6 +28130,10 @@ func (ec *executionContext) fieldContext_VendorRiskAssessment_assessedBy(_ conte
 				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
 			case "kind":
 				return ec.fieldContext_People_kind(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_People_createdAt(ctx, field)
 			case "updatedAt":
@@ -30991,7 +31143,7 @@ func (ec *executionContext) unmarshalInputCreatePeopleInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "fullName", "primaryEmailAddress", "additionalEmailAddresses", "kind"}
+	fieldsInOrder := [...]string{"organizationId", "fullName", "primaryEmailAddress", "additionalEmailAddresses", "kind", "contractStartDate", "contractEndDate"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -31033,6 +31185,20 @@ func (ec *executionContext) unmarshalInputCreatePeopleInput(ctx context.Context,
 				return it, err
 			}
 			it.Kind = data
+		case "contractStartDate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractStartDate"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContractStartDate = data
+		case "contractEndDate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractEndDate"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContractEndDate = data
 		}
 	}
 
@@ -32813,7 +32979,7 @@ func (ec *executionContext) unmarshalInputUpdatePeopleInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "fullName", "primaryEmailAddress", "additionalEmailAddresses", "kind"}
+	fieldsInOrder := [...]string{"id", "fullName", "primaryEmailAddress", "additionalEmailAddresses", "kind", "contractStartDate", "contractEndDate"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -32855,6 +33021,20 @@ func (ec *executionContext) unmarshalInputUpdatePeopleInput(ctx context.Context,
 				return it, err
 			}
 			it.Kind = data
+		case "contractStartDate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractStartDate"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContractStartDate = data
+		case "contractEndDate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractEndDate"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContractEndDate = data
 		}
 	}
 
@@ -37265,6 +37445,10 @@ func (ec *executionContext) _People(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "contractStartDate":
+			out.Values[i] = ec._People_contractStartDate(ctx, field, obj)
+		case "contractEndDate":
+			out.Values[i] = ec._People_contractEndDate(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._People_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

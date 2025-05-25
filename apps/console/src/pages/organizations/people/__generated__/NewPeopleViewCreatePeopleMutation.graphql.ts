@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<76fb19bfca9165a9c40d0b306e53c1de>>
+ * @generated SignedSource<<ca6b9dbed6835dd4a9705fe3a90c4b19>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,6 +12,8 @@ import { ConcreteRequest } from 'relay-runtime';
 export type PeopleKind = "CONTRACTOR" | "EMPLOYEE" | "SERVICE_ACCOUNT";
 export type CreatePeopleInput = {
   additionalEmailAddresses?: ReadonlyArray<string> | null | undefined;
+  contractEndDate?: string | null | undefined;
+  contractStartDate?: string | null | undefined;
   fullName: string;
   kind: PeopleKind;
   organizationId: string;
@@ -26,6 +28,8 @@ export type NewPeopleViewCreatePeopleMutation$data = {
     readonly peopleEdge: {
       readonly node: {
         readonly additionalEmailAddresses: ReadonlyArray<string>;
+        readonly contractEndDate: string | null | undefined;
+        readonly contractStartDate: string | null | undefined;
         readonly fullName: string;
         readonly id: string;
         readonly kind: PeopleKind;
@@ -107,6 +111,20 @@ v3 = {
           "kind": "ScalarField",
           "name": "kind",
           "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "contractStartDate",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "contractEndDate",
+          "storageKey": null
         }
       ],
       "storageKey": null
@@ -180,16 +198,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d9cfab5066a89013eef581dc016daf57",
+    "cacheID": "85e329e6fd79fbc4094dd8bf03223456",
     "id": null,
     "metadata": {},
     "name": "NewPeopleViewCreatePeopleMutation",
     "operationKind": "mutation",
-    "text": "mutation NewPeopleViewCreatePeopleMutation(\n  $input: CreatePeopleInput!\n) {\n  createPeople(input: $input) {\n    peopleEdge {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        additionalEmailAddresses\n        kind\n      }\n    }\n  }\n}\n"
+    "text": "mutation NewPeopleViewCreatePeopleMutation(\n  $input: CreatePeopleInput!\n) {\n  createPeople(input: $input) {\n    peopleEdge {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        additionalEmailAddresses\n        kind\n        contractStartDate\n        contractEndDate\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "fd4b7a5907702712c654005de2a98996";
+(node as any).hash = "6afa87e237975e9574e42b46139bef29";
 
 export default node;

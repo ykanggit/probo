@@ -36,6 +36,8 @@ type (
 		FullName                 string     `db:"full_name"`
 		PrimaryEmailAddress      string     `db:"primary_email_address"`
 		AdditionalEmailAddresses []string   `db:"additional_email_addresses"`
+		ContractStartDate        *time.Time `db:"contract_start_date"`
+		ContractEndDate          *time.Time `db:"contract_end_date"`
 		CreatedAt                time.Time  `db:"created_at"`
 		UpdatedAt                time.Time  `db:"updated_at"`
 	}
@@ -77,6 +79,8 @@ SELECT
     full_name,
     primary_email_address,
     additional_email_addresses,
+    contract_start_date,
+    contract_end_date,
     created_at,
     updated_at
 FROM
@@ -122,6 +126,8 @@ func (p *People) LoadByEmail(
 		full_name,
 		primary_email_address,
 		additional_email_addresses,
+		contract_start_date,
+		contract_end_date,
 		created_at,
 		updated_at
 	FROM
@@ -171,6 +177,8 @@ SELECT
     full_name,
     primary_email_address,
     additional_email_addresses,
+    contract_start_date,
+    contract_end_date,
     created_at,
     updated_at
 FROM
@@ -221,6 +229,8 @@ INSERT INTO
         full_name,
         primary_email_address,
         additional_email_addresses,
+        contract_start_date,
+        contract_end_date,
         created_at,
         updated_at
     )
@@ -233,6 +243,8 @@ VALUES (
     @full_name,
     @primary_email_address,
     @additional_email_addresses,
+    @contract_start_date,
+    @contract_end_date,
     @created_at,
     @updated_at
 )
@@ -247,6 +259,8 @@ VALUES (
 		"full_name":                  p.FullName,
 		"primary_email_address":      p.PrimaryEmailAddress,
 		"additional_email_addresses": p.AdditionalEmailAddresses,
+		"contract_start_date":        p.ContractStartDate,
+		"contract_end_date":          p.ContractEndDate,
 		"created_at":                 p.CreatedAt,
 		"updated_at":                 p.UpdatedAt,
 	}
@@ -288,6 +302,8 @@ SELECT
     full_name,
     primary_email_address,
     additional_email_addresses,
+    contract_start_date,
+    contract_end_date,
     created_at,
     updated_at
 FROM
@@ -331,6 +347,8 @@ UPDATE peoples SET
 	primary_email_address = @primary_email_address,
 	additional_email_addresses = @additional_email_addresses,
 	kind = @kind,
+	contract_start_date = @contract_start_date,
+	contract_end_date = @contract_end_date,
 	updated_at = @updated_at
 WHERE %s
     AND id = @people_id
@@ -344,6 +362,8 @@ WHERE %s
 		"primary_email_address":      p.PrimaryEmailAddress,
 		"additional_email_addresses": p.AdditionalEmailAddresses,
 		"kind":                       p.Kind,
+		"contract_start_date":        p.ContractStartDate,
+		"contract_end_date":          p.ContractEndDate,
 		"updated_at":                 p.UpdatedAt,
 	}
 	maps.Copy(args, scope.SQLArguments())
@@ -381,6 +401,8 @@ SELECT
 	full_name,
 	primary_email_address,
 	additional_email_addresses,
+	contract_start_date,
+	contract_end_date,
 	created_at,
 	updated_at
 FROM
