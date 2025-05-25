@@ -50,6 +50,7 @@ func NewPeople(p *coredata.People) *People {
 		PrimaryEmailAddress:      p.PrimaryEmailAddress,
 		AdditionalEmailAddresses: p.AdditionalEmailAddresses,
 		Kind:                     p.Kind,
+		Position:                 p.Position,
 		ContractStartDate:        p.ContractStartDate,
 		ContractEndDate:          p.ContractEndDate,
 		CreatedAt:                p.CreatedAt,

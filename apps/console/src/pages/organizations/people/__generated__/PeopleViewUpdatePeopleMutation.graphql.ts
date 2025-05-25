@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<86a82de5c4344cc14a120155388e4a6f>>
+ * @generated SignedSource<<ca7c481401202c2276b4212dfffd54d4>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,6 +17,7 @@ export type UpdatePeopleInput = {
   fullName?: string | null | undefined;
   id: string;
   kind?: PeopleKind | null | undefined;
+  position?: string | null | undefined;
   primaryEmailAddress?: string | null | undefined;
 };
 export type PeopleViewUpdatePeopleMutation$variables = {
@@ -31,6 +32,7 @@ export type PeopleViewUpdatePeopleMutation$data = {
       readonly fullName: string;
       readonly id: string;
       readonly kind: PeopleKind;
+      readonly position: string | null | undefined;
       readonly primaryEmailAddress: string;
       readonly updatedAt: string;
     };
@@ -111,6 +113,13 @@ v1 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
+            "name": "position",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
             "name": "contractStartDate",
             "storageKey": null
           },
@@ -153,16 +162,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "398ebbc7659400cbc5d0a750ee7e66b5",
+    "cacheID": "d3bc10093e65e1a612f22687ee2fffed",
     "id": null,
     "metadata": {},
     "name": "PeopleViewUpdatePeopleMutation",
     "operationKind": "mutation",
-    "text": "mutation PeopleViewUpdatePeopleMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      contractStartDate\n      contractEndDate\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation PeopleViewUpdatePeopleMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      position\n      contractStartDate\n      contractEndDate\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "686c8546329ae29bd2880b0b1da9f20c";
+(node as any).hash = "af9cd62a7e73738d72e3ab9ad5ecdc10";
 
 export default node;

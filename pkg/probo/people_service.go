@@ -37,6 +37,7 @@ type (
 		FullName                 *string
 		PrimaryEmailAddress      *string
 		AdditionalEmailAddresses *[]string
+		Position                 **string
 		ContractStartDate        **time.Time
 		ContractEndDate          **time.Time
 	}
@@ -48,6 +49,7 @@ type (
 		PrimaryEmailAddress      string
 		AdditionalEmailAddresses []string
 		Kind                     coredata.PeopleKind
+		Position                 *string
 		ContractStartDate        *time.Time
 		ContractEndDate          *time.Time
 	}
@@ -153,6 +155,10 @@ func (s PeopleService) Update(
 				people.AdditionalEmailAddresses = *req.AdditionalEmailAddresses
 			}
 
+			if req.Position != nil {
+				people.Position = *req.Position
+			}
+
 			if req.ContractStartDate != nil {
 				people.ContractStartDate = *req.ContractStartDate
 			}
@@ -200,6 +206,7 @@ func (s PeopleService) Create(
 		PrimaryEmailAddress:      req.PrimaryEmailAddress,
 		AdditionalEmailAddresses: req.AdditionalEmailAddresses,
 		UserID:                   req.UserID,
+		Position:                 req.Position,
 		ContractStartDate:        req.ContractStartDate,
 		ContractEndDate:          req.ContractEndDate,
 		CreatedAt:                now,

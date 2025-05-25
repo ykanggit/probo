@@ -164,6 +164,7 @@ type CreatePeopleInput struct {
 	PrimaryEmailAddress      string              `json:"primaryEmailAddress"`
 	AdditionalEmailAddresses []string            `json:"additionalEmailAddresses,omitempty"`
 	Kind                     coredata.PeopleKind `json:"kind"`
+	Position                 *string             `json:"position,omitempty"`
 	ContractStartDate        *time.Time          `json:"contractStartDate,omitempty"`
 	ContractEndDate          *time.Time          `json:"contractEndDate,omitempty"`
 }
@@ -569,6 +570,7 @@ type People struct {
 	PrimaryEmailAddress      string              `json:"primaryEmailAddress"`
 	AdditionalEmailAddresses []string            `json:"additionalEmailAddresses"`
 	Kind                     coredata.PeopleKind `json:"kind"`
+	Position                 *string             `json:"position,omitempty"`
 	ContractStartDate        *time.Time          `json:"contractStartDate,omitempty"`
 	ContractEndDate          *time.Time          `json:"contractEndDate,omitempty"`
 	CreatedAt                time.Time           `json:"createdAt"`
@@ -837,6 +839,7 @@ type UpdatePeopleInput struct {
 	PrimaryEmailAddress      *string              `json:"primaryEmailAddress,omitempty"`
 	AdditionalEmailAddresses []string             `json:"additionalEmailAddresses,omitempty"`
 	Kind                     *coredata.PeopleKind `json:"kind,omitempty"`
+	Position                 *string              `json:"position,omitempty"`
 	ContractStartDate        *time.Time           `json:"contractStartDate,omitempty"`
 	ContractEndDate          *time.Time           `json:"contractEndDate,omitempty"`
 }

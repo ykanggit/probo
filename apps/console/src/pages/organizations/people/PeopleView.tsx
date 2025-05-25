@@ -35,6 +35,7 @@ const peopleViewQuery = graphql`
         primaryEmailAddress
         additionalEmailAddresses
         kind
+        position
         contractStartDate
         contractEndDate
         createdAt
@@ -53,6 +54,7 @@ const updatePeopleMutation = graphql`
         primaryEmailAddress
         additionalEmailAddresses
         kind
+        position
         contractStartDate
         contractEndDate
         updatedAt
@@ -104,6 +106,7 @@ function PeopleViewContent({
     primaryEmailAddress: data.node.primaryEmailAddress || "",
     additionalEmailAddresses: data.node.additionalEmailAddresses || [],
     kind: data.node.kind,
+    position: data.node.position || "",
     contractStartDate: data.node.contractStartDate
       ? new Date(data.node.contractStartDate).toISOString().split('T')[0]
       : "",
@@ -119,6 +122,7 @@ function PeopleViewContent({
   const handleSave = useCallback(() => {
     const formattedData = {
       ...formData,
+      position: formData.position,
       contractStartDate: formData.contractStartDate
         ? new Date(formData.contractStartDate).toISOString()
         : null,
@@ -184,6 +188,7 @@ function PeopleViewContent({
       primaryEmailAddress: data.node.primaryEmailAddress || "",
       additionalEmailAddresses: data.node.additionalEmailAddresses || [],
       kind: data.node.kind,
+      position: data.node.position || "",
       contractStartDate: data.node.contractStartDate
         ? new Date(data.node.contractStartDate).toISOString().split('T')[0]
         : "",
@@ -289,6 +294,12 @@ function PeopleViewContent({
                     </SelectContent>
                   </Select>
                 </div>
+                <EditableField
+                  label="Position"
+                  value={formData.position}
+                  type="text"
+                  onChange={(value) => handleFieldChange("position", value)}
+                />
                 <EditableField
                   label="Contract Start Date"
                   value={formData.contractStartDate || ""}

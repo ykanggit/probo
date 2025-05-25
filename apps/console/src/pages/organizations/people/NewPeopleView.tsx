@@ -79,6 +79,7 @@ function NewPeopleViewContent() {
     primaryEmailAddress: "",
     additionalEmailAddresses: [] as string[],
     kind: "EMPLOYEE" as "EMPLOYEE" | "CONTRACTOR" | "SERVICE_ACCOUNT",
+    position: "",
     contractStartDate: "",
     contractEndDate: "",
   });
@@ -133,6 +134,7 @@ function NewPeopleViewContent() {
           primaryEmailAddress: formData.primaryEmailAddress,
           additionalEmailAddresses: formData.additionalEmailAddresses,
           kind: formData.kind,
+          position: formData.position,
           contractStartDate: formData.contractStartDate ? new Date(formData.contractStartDate).toISOString() : null,
           contractEndDate: formData.contractEndDate ? new Date(formData.contractEndDate).toISOString() : null,
         },
@@ -293,6 +295,13 @@ function NewPeopleViewContent() {
                     </button>
                   </div>
                 </div>
+
+                <EditableField
+                  label="Position"
+                  value={formData.position}
+                  type="text"
+                  onChange={(value) => handleFieldChange("position", value)}
+                />
 
                 <EditableField
                   label="Contract Start Date"

@@ -529,6 +529,7 @@ type People implements Node {
   primaryEmailAddress: String!
   additionalEmailAddresses: [String!]!
   kind: PeopleKind!
+  position: String
   contractStartDate: Datetime
   contractEndDate: Datetime
   createdAt: Datetime!
@@ -1154,6 +1155,7 @@ input CreatePeopleInput {
   primaryEmailAddress: String!
   additionalEmailAddresses: [String!]
   kind: PeopleKind!
+  position: String
   contractStartDate: Datetime
   contractEndDate: Datetime
 }
@@ -1164,6 +1166,7 @@ input UpdatePeopleInput {
   primaryEmailAddress: String
   additionalEmailAddresses: [String!]
   kind: PeopleKind
+  position: String
   contractStartDate: Datetime
   contractEndDate: Datetime
 }

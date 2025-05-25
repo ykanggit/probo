@@ -36,6 +36,7 @@ type (
 		FullName                 string     `db:"full_name"`
 		PrimaryEmailAddress      string     `db:"primary_email_address"`
 		AdditionalEmailAddresses []string   `db:"additional_email_addresses"`
+		Position                 *string    `db:"position"`
 		ContractStartDate        *time.Time `db:"contract_start_date"`
 		ContractEndDate          *time.Time `db:"contract_end_date"`
 		CreatedAt                time.Time  `db:"created_at"`
@@ -79,6 +80,7 @@ SELECT
     full_name,
     primary_email_address,
     additional_email_addresses,
+    position,
     contract_start_date,
     contract_end_date,
     created_at,
@@ -126,6 +128,7 @@ func (p *People) LoadByEmail(
 		full_name,
 		primary_email_address,
 		additional_email_addresses,
+		position,
 		contract_start_date,
 		contract_end_date,
 		created_at,
@@ -177,6 +180,7 @@ SELECT
     full_name,
     primary_email_address,
     additional_email_addresses,
+    position,
     contract_start_date,
     contract_end_date,
     created_at,
@@ -229,6 +233,7 @@ INSERT INTO
         full_name,
         primary_email_address,
         additional_email_addresses,
+        position,
         contract_start_date,
         contract_end_date,
         created_at,
@@ -243,6 +248,7 @@ VALUES (
     @full_name,
     @primary_email_address,
     @additional_email_addresses,
+    @position,
     @contract_start_date,
     @contract_end_date,
     @created_at,
@@ -259,6 +265,7 @@ VALUES (
 		"full_name":                  p.FullName,
 		"primary_email_address":      p.PrimaryEmailAddress,
 		"additional_email_addresses": p.AdditionalEmailAddresses,
+		"position":                   p.Position,
 		"contract_start_date":        p.ContractStartDate,
 		"contract_end_date":          p.ContractEndDate,
 		"created_at":                 p.CreatedAt,
@@ -302,6 +309,7 @@ SELECT
     full_name,
     primary_email_address,
     additional_email_addresses,
+    position,
     contract_start_date,
     contract_end_date,
     created_at,
@@ -347,6 +355,7 @@ UPDATE peoples SET
 	primary_email_address = @primary_email_address,
 	additional_email_addresses = @additional_email_addresses,
 	kind = @kind,
+	position = @position,
 	contract_start_date = @contract_start_date,
 	contract_end_date = @contract_end_date,
 	updated_at = @updated_at
@@ -362,6 +371,7 @@ WHERE %s
 		"primary_email_address":      p.PrimaryEmailAddress,
 		"additional_email_addresses": p.AdditionalEmailAddresses,
 		"kind":                       p.Kind,
+		"position":                   p.Position,
 		"contract_start_date":        p.ContractStartDate,
 		"contract_end_date":          p.ContractEndDate,
 		"updated_at":                 p.UpdatedAt,
@@ -401,6 +411,7 @@ SELECT
 	full_name,
 	primary_email_address,
 	additional_email_addresses,
+	position,
 	contract_start_date,
 	contract_end_date,
 	created_at,

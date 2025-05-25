@@ -424,6 +424,7 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 		PrimaryEmailAddress:      input.PrimaryEmailAddress,
 		AdditionalEmailAddresses: []string{},
 		Kind:                     input.Kind,
+		Position:                 input.Position,
 		ContractStartDate:        input.ContractStartDate,
 		ContractEndDate:          input.ContractEndDate,
 	})
@@ -447,6 +448,7 @@ func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdateP
 		PrimaryEmailAddress:      input.PrimaryEmailAddress,
 		AdditionalEmailAddresses: &input.AdditionalEmailAddresses,
 		Kind:                     input.Kind,
+		Position:                 &input.Position,
 		ContractStartDate:        &input.ContractStartDate,
 		ContractEndDate:          &input.ContractEndDate,
 	})

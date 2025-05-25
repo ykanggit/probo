@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ca6b9dbed6835dd4a9705fe3a90c4b19>>
+ * @generated SignedSource<<b40eaab1027be24a4646edc68e88ad55>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,6 +17,7 @@ export type CreatePeopleInput = {
   fullName: string;
   kind: PeopleKind;
   organizationId: string;
+  position?: string | null | undefined;
   primaryEmailAddress: string;
 };
 export type NewPeopleViewCreatePeopleMutation$variables = {

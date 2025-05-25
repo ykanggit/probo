@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<891422de01f5f1b88dc80d294c116c24>>
+ * @generated SignedSource<<37efdd3db937745faa9302820895d0d6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -22,6 +22,7 @@ export type PeopleViewQuery$data = {
     readonly fullName?: string;
     readonly id?: string;
     readonly kind?: PeopleKind;
+    readonly position?: string | null | undefined;
     readonly primaryEmailAddress?: string;
     readonly updatedAt?: string;
   };
@@ -85,24 +86,31 @@ v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "contractStartDate",
+  "name": "position",
   "storageKey": null
 },
 v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "contractEndDate",
+  "name": "contractStartDate",
   "storageKey": null
 },
 v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "createdAt",
+  "name": "contractEndDate",
   "storageKey": null
 },
 v10 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "createdAt",
+  "storageKey": null
+},
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
@@ -135,7 +143,8 @@ return {
               (v7/*: any*/),
               (v8/*: any*/),
               (v9/*: any*/),
-              (v10/*: any*/)
+              (v10/*: any*/),
+              (v11/*: any*/)
             ],
             "type": "People",
             "abstractKey": null
@@ -179,7 +188,8 @@ return {
               (v7/*: any*/),
               (v8/*: any*/),
               (v9/*: any*/),
-              (v10/*: any*/)
+              (v10/*: any*/),
+              (v11/*: any*/)
             ],
             "type": "People",
             "abstractKey": null
@@ -190,16 +200,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "1a6ca0fa62d60fd18c26a5e3c868f41f",
+    "cacheID": "1ded40b8c43eb2a616f68f73e57d8e9f",
     "id": null,
     "metadata": {},
     "name": "PeopleViewQuery",
     "operationKind": "query",
-    "text": "query PeopleViewQuery(\n  $peopleId: ID!\n) {\n  node(id: $peopleId) {\n    __typename\n    ... on People {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      contractStartDate\n      contractEndDate\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
+    "text": "query PeopleViewQuery(\n  $peopleId: ID!\n) {\n  node(id: $peopleId) {\n    __typename\n    ... on People {\n      id\n      fullName\n      primaryEmailAddress\n      additionalEmailAddresses\n      kind\n      position\n      contractStartDate\n      contractEndDate\n      createdAt\n      updatedAt\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "473792157216aa14cc6e4e3e0393090b";
+(node as any).hash = "406c23468d2624429d4174a37ff4abc1";
 
 export default node;
