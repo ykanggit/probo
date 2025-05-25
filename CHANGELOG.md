@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Rename severity into risk score
+- Add contract dates fields
 
 ### Fixed
 
