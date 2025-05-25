@@ -6,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NewPeopleViewCreatePeopleMutation } from "./__generated__/NewPeopleViewCreatePeopleMutation.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
@@ -51,7 +50,6 @@ function EditableField({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <HelpCircle className="h-4 w-4 text-tertiary" />
         <Label className="text-sm">{label}</Label>
       </div>
       <div className="space-y-2">
@@ -194,7 +192,6 @@ function NewPeopleViewContent() {
 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <HelpCircle className="h-4 w-4 text-tertiary" />
               <Label className="text-sm">Additional Email Addresses</Label>
             </div>
             <div className="space-y-2">
@@ -251,7 +248,6 @@ function NewPeopleViewContent() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <HelpCircle className="h-4 w-4 text-tertiary" />
                     <Label className="text-sm">Kind</Label>
                   </div>
                   <div className="flex gap-2">

@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { HelpCircle } from "lucide-react";
 import {
   graphql,
   PreloadedQuery,
@@ -79,7 +78,6 @@ function EditableField({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <HelpCircle className="h-4 w-4 text-tertiary" />
         <Label className="text-sm">{label}</Label>
       </div>
       <div className="space-y-2">
@@ -220,7 +218,6 @@ function PeopleViewContent({
 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <HelpCircle className="h-4 w-4 text-tertiary" />
               <Label className="text-sm">Additional Email Addresses</Label>
             </div>
             <div className="space-y-2">
@@ -275,7 +272,6 @@ function PeopleViewContent({
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <HelpCircle className="h-4 w-4 text-tertiary" />
                     <Label className="text-sm">Kind</Label>
                   </div>
                   <Select
