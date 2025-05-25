@@ -146,12 +146,6 @@ function NewPeopleViewContent() {
         navigate(`/organizations/${organizationId}/people`);
       },
       onError: (error) => {
-        toast({
-          title: "Error",
-          description: error.message || "Failed to create person",
-          variant: "destructive",
-        });
-
         const defaultErrorValues = {
           title: "Error",
           description: error.message || "Failed to save changes",
