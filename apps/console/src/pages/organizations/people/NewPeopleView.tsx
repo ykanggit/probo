@@ -151,6 +151,23 @@ function NewPeopleViewContent() {
           description: error.message || "Failed to create person",
           variant: "destructive",
         });
+
+        const defaultErrorValues = {
+          title: "Error",
+          description: error.message || "Failed to save changes",
+          variant: "destructive" as const
+        };
+
+        if (error.message?.includes("contract end date must be after or equal to start date")) {
+          toast({
+            ...defaultErrorValues,
+            description:
+              "Contract end date must be after or equal to start date.",
+          });
+        }
+        else {
+          toast(defaultErrorValues);
+        }
       },
     });
   };

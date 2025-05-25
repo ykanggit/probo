@@ -143,20 +143,28 @@ function PeopleViewContent({
         setEditedFields(new Set());
       },
       onError: (error) => {
+        const defaultErrorValues = {
+          title: "Error",
+          description: error.message || "Failed to save changes",
+          variant: "destructive" as const
+        };
+
         if (error.message?.includes("concurrent modification")) {
           toast({
-            title: "Error",
-            description:
-              "Someone else modified this person. Reloading latest data.",
-            variant: "destructive",
+            ...defaultErrorValues,
+            description: "Someone else modified this person. Reloading latest data.",
           });
           loadQuery({ peopleId: data.node.id! });
-        } else {
+        }
+        else if (error.message?.includes("contract end date must be after or equal to start date")) {
           toast({
-            title: "Error",
-            description: error.message || "Failed to save changes",
-            variant: "destructive",
+            ...defaultErrorValues,
+            description:
+              "Contract end date must be after or equal to start date.",
           });
+        }
+        else {
+          toast(defaultErrorValues);
         }
       },
     });

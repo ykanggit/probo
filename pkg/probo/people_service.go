@@ -161,6 +161,12 @@ func (s PeopleService) Update(
 				people.ContractEndDate = *req.ContractEndDate
 			}
 
+			if people.ContractStartDate != nil && people.ContractEndDate != nil {
+				if people.ContractEndDate.Before(*people.ContractStartDate) {
+					return fmt.Errorf("contract end date must be after or equal to start date")
+				}
+			}
+
 			people.UpdatedAt = time.Now()
 
 			return people.Update(ctx, conn, s.svc.scope)
@@ -176,6 +182,12 @@ func (s PeopleService) Create(
 	ctx context.Context,
 	req CreatePeopleRequest,
 ) (*coredata.People, error) {
+	if req.ContractStartDate != nil && req.ContractEndDate != nil {
+		if req.ContractEndDate.Before(*req.ContractStartDate) {
+			return nil, fmt.Errorf("contract end date must be after or equal to start date")
+		}
+	}
+
 	now := time.Now()
 	peopleID := gid.New(s.svc.scope.GetTenantID(), coredata.PeopleEntityType)
 
