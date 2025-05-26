@@ -197,21 +197,19 @@ func (s VendorService) Update(
 				vendor.TrustPageURL = req.TrustPageURL
 			}
 
-			businessOwner := &coredata.People{}
-			if err := businessOwner.LoadByID(ctx, conn, s.svc.scope, *req.BusinessOwnerID); err != nil {
-				return fmt.Errorf("cannot load business owner: %w", err)
-			}
-
 			if req.BusinessOwnerID != nil {
+				businessOwner := &coredata.People{}
+				if err := businessOwner.LoadByID(ctx, conn, s.svc.scope, *req.BusinessOwnerID); err != nil {
+					return fmt.Errorf("cannot load business owner: %w", err)
+				}
 				vendor.BusinessOwnerID = &businessOwner.ID
 			}
 
-			securityOwner := &coredata.People{}
-			if err := securityOwner.LoadByID(ctx, conn, s.svc.scope, *req.SecurityOwnerID); err != nil {
-				return fmt.Errorf("cannot load security owner: %w", err)
-			}
-
 			if req.SecurityOwnerID != nil {
+				securityOwner := &coredata.People{}
+				if err := securityOwner.LoadByID(ctx, conn, s.svc.scope, *req.SecurityOwnerID); err != nil {
+					return fmt.Errorf("cannot load security owner: %w", err)
+				}
 				vendor.SecurityOwnerID = &securityOwner.ID
 			}
 
