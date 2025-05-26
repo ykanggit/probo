@@ -15,6 +15,7 @@ import { useState } from "react";
 const AVAILABLE_FRAMEWORKS = [
   { id: "ISO27001-2022", name: "ISO/IEC 27001:2022" },
   { id: "SOC2", name: "SOC 2" },
+  { id: "HIPAAA", name: "HIPAA" },
 ];
 
 const importFrameworkMutation = graphql`
@@ -40,7 +41,7 @@ export function FrameworkImportDropdown() {
   const [loadingFramework, setLoadingFramework] = useState<string | null>(null);
   const [commit, isInFlight] =
     useMutation<ImportFrameworkDialogImportFrameworkMutation>(
-      importFrameworkMutation,
+      importFrameworkMutation
     );
 
   const handleImport = async (frameworkId: string) => {
@@ -56,12 +57,12 @@ export function FrameworkImportDropdown() {
         `${frameworkId}.json`,
         {
           type: "application/json",
-        },
+        }
       );
 
       const connectionId = ConnectionHandler.getConnectionID(
         organizationId!,
-        "FrameworkListView_frameworks",
+        "FrameworkListView_frameworks"
       );
 
       commit({

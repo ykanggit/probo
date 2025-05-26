@@ -1,0 +1,246 @@
+{
+  "id": "HIPAA",
+  "name": "HIPAA",
+  "controls": [
+    {
+      "id": "164.308(a)(1)(ii)(A)",
+      "name": "Administrative Safeguards - Risk Analysis: Conduct an accurate and thorough assessment of the potential risks and vulnerabilities to the confidentiality, integrity, and availability of electronic protected health information (ePHI) held by the covered entity."
+    },
+    {
+      "id": "164.308(a)(1)(ii)(B)",
+      "name": "Administrative Safeguards - Risk Management: Implement security measures sufficient to reduce risks and vulnerabilities to a reasonable and appropriate level to comply with § 164.306(a)."
+    },
+    {
+      "id": "164.308(a)(1)(ii)(D)",
+      "name": "Administrative Safeguards - Information System Activity Review: Implement procedures to regularly review records of information system activity, such as audit logs, access reports, and security incident tracking reports."
+    },
+    {
+      "id": "164.308(a)(2)",
+      "name": "Administrative Safeguards - Assigned Security Responsibility: Implement policies and procedures for selection of and responsibilities for position.. Identify the security official who is responsible for the development and implementation of the policies and procedures required by this subpart for the entity."
+    },
+    {
+      "id": "164.308(a)(3)(ii)(A)",
+      "name": "Administrative Safeguards - Authorization and/or Supervision: Implement procedures for the authorization and/or supervision of workforce members who work with ePHI or in locations where it might be accessed."
+    },
+    {
+      "id": "164.308(a)(4)(ii)(B)",
+      "name": "Administrative Safeguards - Access Authorization: Implement policies and procedures for granting access to ePHI, for example, through access to a workstation, transaction, program, process, or other mechanisms."
+    },
+    {
+      "id": "164.308(a)(4)(ii)(C)",
+      "name": "Administrative Safeguards - Access Establishment and Modification: Implement policies and procedures that, based upon the entity's access authorization policies, establish, document, review, and modify a user's right of access to a workstation, transaction, program, or process."
+    },
+    {
+      "id": "164.308(a)(5)(ii)(B)",
+      "name": "Administrative Safeguards - Protection from Malicious Software: Implement procedures for guarding against, detecting, and reporting malicious software."
+    },
+    {
+      "id": "164.308(a)(5)(ii)(D)",
+      "name": "Administrative Safeguards - Password Management: Implement procedures for creating, changing, and safeguarding passwords."
+    },
+    {
+      "id": "164.308(a)(8)",
+      "name": "Administrative Safeguards - Evaluation: Implement policies and procedures to perform a periodic technical and non-technical evaluation, based initially upon the standards implemented under this rule and subsequently, in response to environmental or operational changes affecting the security of ePHI, that establishes the extent to which an entity's security policies and procedures meet the requirements of this subpart."
+    },
+    {
+      "id": "164.310(d)(1)",
+      "name": "Physical Safeguards - Device and Media Controls: Implement policies and procedures that govern the receipt and removal of hardware and electronic media that contain ePHI into and out of a facility, and the movement of these items within the facility."
+    },
+    {
+      "id": "164.310(d)(2)(iii)",
+      "name": "Physical Safeguards - Accountability: Implement procedures to maintain a record of the movements of hardware and electronic media and any person responsible therefore."
+    },
+    {
+      "id": "164.312(a)(2)(i)",
+      "name": "Technical Safeguards - Unique User Identification: Implement procedures to assign a unique name and/or number for identifying and tracking user identity."
+    },
+    {
+      "id": "164.312(a)(2)(iii)",
+      "name": "Technical Safeguards - Automatic Logoff: Implement electronic procedures that terminate an electronic session after a predetermined time of inactivity."
+    },
+    {
+      "id": "164.312(a)(2)(iv)",
+      "name": "Technical Safeguards - Encryption and Decryption: Implement procedures to describe a mechanism to encrypt and decrypt ePHI."
+    },
+    {
+      "id": "164.312(c)(2)",
+      "name": "Technical Safeguards - Mechanism to Authenticate ElectronicPHI: Implement electronic mechanisms to corroborate that ePHI has not been altered or destroyed in an unauthorized manner."
+    },
+    {
+      "id": "164.312(d)",
+      "name": "Technical Safeguards - Person or Entity Authentication: Implement procedures to verify that a person or entity seeking access to ePHI is the one claimed."
+    },
+    {
+      "id": "164.316(b)(2)(iii)",
+      "name": "Policies & Procedures and Documentation Requirements - Updates: Review documentation periodically, and update as needed, in response to environmental or operational changes affecting the security of the ePHI."
+    },
+    {
+      "id": "164.308(a)(1)(i)",
+      "name": "Administrative Safeguards - Security Management Process: Implement policies and procedures to prevent, detect, contain and correct security violations."
+    },
+    {
+      "id": "164.308(a)(1)(ii)(C)",
+      "name": "Administrative Safeguards - Sanction Policy: Apply appropriate sanctions against workforce members who fail to comply with the security policies and procedures of the covered entity."
+    },
+    {
+      "id": "164.308(a)(3)(i)",
+      "name": "Administrative Safeguards - Workforce Security: Implement policies and procedures to ensure that all members of its workforce have appropriate access to ePHI, as provided under paragraph (a)(4) of this section, and to prevent those workforce members who do not have access under paragraph (a)(4)of this section from obtaining access to ePHI."
+    },
+    {
+      "id": "164.308(a)(3)(ii)(B)",
+      "name": "Administrative Safeguards - Workforce Clearance Procedure: Implement procedures to determine that the access of a workforce member to ePHI."
+    },
+    {
+      "id": "164.308(a)(3)(ii)(C)",
+      "name": "Administrative Safeguards - Termination Procedures: Implement procedures for terminating access to ePHI when the employment of a workforce member ends or as required by determinations made as specified in paragraph (a)(3)(ii)(B) of this section."
+    },
+    {
+      "id": "164.308(a)(4)(i)",
+      "name": "Administrative Safeguards - Information Access Management: Implement policies and procedures for authorizing access to ePHI that are consistent with the applicable requirements of subpart E of this part."
+    },
+    {
+      "id": "164.308(a)(4)(ii)(A)",
+      "name": "Administrative Safeguards - Isolating Health Care Clearinghouse Function: If a health care clearinghouse is part of a larger organization, the clearinghouse must implement policies and procedures that protect the ePHI of the clearinghouse from unauthorized access by the larger organization."
+    },
+    {
+      "id": "164.308(a)(5)(i)",
+      "name": "Administrative Safeguards - Security Awareness and Training: Implement a security awareness and training program for all members of its workforce (including management)."
+    },
+    {
+      "id": "164.308(a)(5)(ii)(A)",
+      "name": "Administrative Safeguards - Security Reminders: Implement policies and procedures for periodic security updates."
+    },
+    {
+      "id": "164.308(a)(5)(ii)(C)",
+      "name": "Administrative Safeguards - Log-in Monitoring: Implement procedures for monitoring log-in attempts and reporting discrepancies."
+    },
+    {
+      "id": "164.308(a)(6)(i)",
+      "name": "Administrative Safeguards - Security Incident Procedures: Implement policies and procedures to address security incidents."
+    },
+    {
+      "id": "164.308(a)(6)(ii)",
+      "name": "Administrative Safeguards - Response and Reporting: Identify and respond to suspected or known security incidents; mitigate, to the extent practicable, harmful effects of security incidents that are known to the covered entity; and document security incidents and their outcomes."
+    },
+    {
+      "id": "164.308(a)(7)(i)",
+      "name": "Administrative Safeguards - Contingency Plan: Establish (and implement as needed) policies and procedures for responding to an emergency or other occurrences (for example, fire, vandalism, system failure, and natural disaster) that damages systems that contain ePHI."
+    },
+    {
+      "id": "164.308(a)(7)(ii)(A)",
+      "name": "Administrative Safeguards - Data Backup Plan: Establish and implement procedures to create and maintain retrievable exact copies of ePHI."
+    },
+    {
+      "id": "164.308(a)(7)(ii)(B)",
+      "name": "Administrative Safeguards - Disaster Recovery Plan: Establish (and implement as needed) procedures to restore any loss of data."
+    },
+    {
+      "id": "164.308(a)(5)(ii)(C)",
+      "name": "Administrative Safeguards - Emergency Mode Operation Plan: Establish (and implement as needed)procedures to enable continuation of critical business processes for protection of the security of ePHI while operating in emergency mode."
+    },
+    {
+      "id": "164.308(a)(7)(ii)(D)",
+      "name": "Administrative Safeguards - Testing and Revision Procedure: Implement procedures for periodic testing and revision of contingency plans."
+    },
+    {
+      "id": "164.308(a)(7)(ii)(E)",
+      "name": "Administrative Safeguards - Applications and Data Criticality Analysis: Implement policies and procedures to assess the relative criticality of specific applications and data in support of other contingency plan components."
+    },
+    {
+      "id": "164.308(b)(1)",
+      "name": "Administrative Safeguards - Business Associate Contracts and Other Arrangements: Implement policy to document rules for business associate (BA) identification and process to assure compliance with assuring compliance BA requirements."
+    },
+    {
+      "id": "164.308(b)(4)",
+      "name": "Administrative Safeguards - Written Contract or Other Arrangement: Document the satisfactory assurances required by paragraph (b)(1) of this section through a written contract or other arrangement with the BA that meets the applicable requirements of § 164.314(a)."
+    },
+    {
+      "id": "164.310(a)(1)",
+      "name": "Physical Safeguards - Facility Access Controls: Implement policies and procedures to limit physical access to its electronic information systems and the facility or facilities in which they are housed, while ensuring that properly authorized access is allowed."
+    },
+    {
+      "id": "164.310(a)(2)(i)",
+      "name": "Physical Safeguards - Contingency Operations: Establish (and implement as needed) procedures that allow facility access in support of restoration of lost data under the disaster recovery plan and emergency mode operations plan in the event of an emergency."
+    },
+    {
+      "id": "164.310(a)(2)(ii)",
+      "name": "Physical Safeguards - Facility Security Plan: Implement policies and procedures to safeguard the facility and the equipment therein from unauthorized physical access, tampering, and theft."
+    },
+    {
+      "id": "164.310(a)(2)(iii)",
+      "name": "Physical Safeguards - Access Control and Validation Procedures: Implement procedures to control and validate a person's access to facilities based on their role or function, including visitor control, and control of access to software programs for testing and revision."
+    },
+    {
+      "id": "164.310(a)(2)(iv)",
+      "name": "Physical Safeguards - Maintenance Records: Implement policies and procedures to document repairs and modifications to the physical components of a facility, which are related to security (for example, hardware, walls, doors, and locks)."
+    },
+    {
+      "id": "164.310(b)",
+      "name": "Physical Safeguards - Workstation Use: Implement policies and procedures to ensure that workstations and other computer systems that may be used to send, receive, store or access ePHI are only used in a secure and legitimate manner.. Implement policies and procedures that specify the proper functions to be performed, the manner in which those functions are to be performed, and the physical attributes of the surroundings of a specific workstation or class of workstation that can access ePHI."
+    },
+    {
+      "id": "164.310(c)",
+      "name": "Physical Safeguards - Workstation Security: Implement policies and procedures to ensure that all members of the workforce have appropriate access to ePHI and to prevent workforce members who do not have access from obtaining access to ePHI.. Implement physical safeguards for all workstations that access ePHI, to restrict access to authorized users."
+    },
+    {
+      "id": "164.310(d)(2)(i)",
+      "name": "Physical Safeguards - Disposal: Implement policies and procedures to address the final disposition of ePHI, and/or the hardware or electronic media on which it is stored."
+    },
+    {
+      "id": "164.310(d)(2)(ii)",
+      "name": "Physical Safeguards - Media Re-Use: Implement procedures for removal of ePHI from electronic media before the media are made available for re-use."
+    },
+    {
+      "id": "164.310(d)(2)(iv)",
+      "name": "Physical Safeguards - Data Backup and Storage: Implement policies and procedures to create a retrievable, exact copy of ePHI, when needed, before movement of equipment."
+    },
+    {
+      "id": "164.312(a)(1)",
+      "name": "Technical Safeguards - Access Control: Implement technical policies and procedures for electronic information systems that maintain ePHI to allow access only to those persons or software programs that have been granted access rights as specified in Sec. 164.308(a)(4)."
+    },
+    {
+      "id": "164.312(a)(2)(ii)",
+      "name": "Technical Safeguards - Emergency Access Procedure: Establish (and implement as needed)procedures for obtaining necessary ePHI during an emergency."
+    },
+    {
+      "id": "164.312(b)",
+      "name": "Technical Safeguards - Audit Controls: Implement hardware, software, and/or procedural mechanisms that record and examine activity in information systems that contain or use ePHI."
+    },
+    {
+      "id": "164.312(c)(1)",
+      "name": "Technical Safeguards - Integrity: Implement policies and procedures to protect electronic protected health information from improper alteration or destruction."
+    },
+    {
+      "id": "164.312(e)(1)",
+      "name": "Technical Safeguards - Transmission Security: Implement technical security policies and procedures measures to guard against unauthorized access to ePHI that is being transmitted over an electronic communications network."
+    },
+    {
+      "id": "164.312(e)(2)(i)",
+      "name": "Technical Safeguards - Integrity Controls: An implement security measure to ensure that electronically transmitted ePHI is not improperly modified without detection until disposed of."
+    },
+    {
+      "id": "164.312(e)(2)(ii)",
+      "name": "Technical Safeguards - Encryption: Implement a mechanism to encrypt ePHIwhenever deemed appropriate."
+    },
+    {
+      "id": "164.316(a)",
+      "name": "Policies & Procedures and Documentation Requirements - Policies and Procedures: Implement reasonable and appropriate policies and procedures to comply with the standards, implementation specifications, or other requirements of this subpart, taking into account those factors specified in Sec. 164.306(b)(2)(i), (ii), (iii), and (iv). This standard is not to be construed to permit or excuse an action that violates any other standard, implementation specification, or other requirements of this subpart. A covered entity may change its policies and procedures at any time, provided that the changes are documented and are implemented in accordance with this subpart."
+    },
+    {
+      "id": "164.316(b)(1)(i)",
+      "name": "Policies & Procedures and Documentation Requirements - Documentation: Maintain the policies and procedures implemented to comply with this subpart in written (which may be electronic) form."
+    },
+    {
+      "id": "164.316(b)(1)(ii)",
+      "name": "Policies & Procedures and Documentation Requirements - Documentation: If an action, activity, or assessment is required by this subpart to be documented, maintain a written (which may be electronic) record of the action, activity, or assessment."
+    },
+    {
+      "id": "164.316(b)(2)(i)",
+      "name": "Policies & Procedures and Documentation Requirements - Time Limit: Retain the documentation required by paragraph(b)(1) of this section for 6 years from the date of its creation or the date when it last was in effect, whichever is later."
+    },
+    {
+      "id": "164.316(b)(2)(ii)",
+      "name": "Policies & Procedures and Documentation Requirements - Availability: Make documentation available to those persons responsible for implementing the procedures to which the documentation pertains."
+    }
+  ]
+}
