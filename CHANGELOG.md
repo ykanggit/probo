@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix 5xx when create new vendor
+
 ## [0.27.1] - 2025-05-25
 
 ### Fixed
