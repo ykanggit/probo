@@ -6,3 +6,7 @@ probod:
     access-key-id: "probod"
     secret-access-key: "thisisnotasecret"
     endpoint: "http://127.0.0.1:9000"
+  openai:
+    api-key: "thisisnotasecret"
+    temperature: 0.1
+    model-name: "gpt-4o"

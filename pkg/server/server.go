@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/getprobo/probo/pkg/agents"
 	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/saferedirect"
@@ -37,6 +38,7 @@ type Config struct {
 	Usrmgr            *usrmgr.Service
 	Auth              console_v1.AuthConfig
 	ConnectorRegistry *connector.ConnectorRegistry
+	VendorAssessment  *agents.VendorAssessment
 	SafeRedirect      *saferedirect.SafeRedirect
 	Logger            *log.Logger
 }

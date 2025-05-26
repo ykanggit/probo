@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/getprobo/probo/pkg/agents"
 	"github.com/getprobo/probo/pkg/awsconfig"
 	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/coredata"
@@ -59,6 +60,7 @@ type (
 		AWS           awsConfig            `json:"aws"`
 		Mailer        mailerConfig         `json:"mailer"`
 		Connectors    []connectorConfig    `json:"connectors"`
+		OpenAI        openaiConfig         `json:"openai"`
 	}
 )
 
@@ -185,6 +187,14 @@ func (impl *Implm) Run(
 		}
 	}
 
+	vendorAssessmentConfig := agents.Config{
+		OpenAIAPIKey: impl.cfg.OpenAI.APIKey,
+		Temperature:  impl.cfg.OpenAI.Temperature,
+		ModelName:    impl.cfg.OpenAI.ModelName,
+	}
+
+	vendorAssessment := agents.NewVendorAssessment(l.Named("vendor-assessment"), vendorAssessmentConfig)
+
 	usrmgrService, err := usrmgr.NewService(
 		ctx,
 		pgClient,
@@ -205,6 +215,7 @@ func (impl *Implm) Run(
 		impl.cfg.AWS.Bucket,
 		impl.cfg.Hostname,
 		impl.cfg.Auth.Cookie.Secret,
+		vendorAssessmentConfig,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot create probo service: %w", err)
@@ -216,6 +227,7 @@ func (impl *Implm) Run(
 			Probo:             proboService,
 			Usrmgr:            usrmgrService,
 			ConnectorRegistry: defaultConnectorRegistry,
+			VendorAssessment:  vendorAssessment,
 			SafeRedirect:      &saferedirect.SafeRedirect{AllowedHost: impl.cfg.Hostname},
 			Logger:            l.Named("http.server"),
 			Auth: console_v1.AuthConfig{

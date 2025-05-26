@@ -1088,6 +1088,8 @@ type Mutation {
   ): CreateVendorRiskAssessmentPayload!
 
   exportAudit(input: ExportAuditInput!): ExportAuditPayload!
+
+  assessVendor(input: AssessVendorInput!): AssessVendorPayload!
 }
 
 # Input Types
@@ -1778,4 +1780,13 @@ input ExportAuditInput {
 
 type ExportAuditPayload {
   url: String!
+}
+
+input AssessVendorInput {
+  id: ID!
+  websiteUrl: String!
+}
+
+type AssessVendorPayload {
+  vendor: Vendor!
 }

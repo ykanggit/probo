@@ -16,6 +16,7 @@ require (
 	github.com/go-chi/cors v1.2.1
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/jhillyerd/enmime v1.3.0
+	github.com/openai/openai-go v1.1.0
 	github.com/prometheus/client_golang v1.22.0
 	github.com/vektah/gqlparser/v2 v2.5.27
 	go.gearno.de/crypto/uuid v0.1.0
@@ -64,6 +65,10 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sosodev/duration v1.3.1 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
+	github.com/tidwall/gjson v1.18.0 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.1 // indirect
+	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/urfave/cli/v2 v2.27.6 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	go.gearno.de/x/panicf v0.1.1 // indirect

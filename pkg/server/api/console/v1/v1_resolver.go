@@ -1316,6 +1316,23 @@ func (r *mutationResolver) ExportAudit(ctx context.Context, input types.ExportAu
 	}, nil
 }
 
+// AssessVendor is the resolver for the assessVendor field.
+func (r *mutationResolver) AssessVendor(ctx context.Context, input types.AssessVendorInput) (*types.AssessVendorPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+
+	vendor, err := svc.Vendors.Assess(ctx, probo.AssessVendorRequest{
+		ID:         input.ID,
+		WebsiteURL: input.WebsiteURL,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot assess vendor: %w", err)
+	}
+
+	return &types.AssessVendorPayload{
+		Vendor: types.NewVendor(vendor),
+	}, nil
+}
+
 // LogoURL is the resolver for the logoUrl field.
 func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organization) (*string, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())

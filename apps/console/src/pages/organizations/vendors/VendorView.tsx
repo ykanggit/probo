@@ -20,6 +20,7 @@ import type { VendorViewDeleteComplianceReportMutation as DeleteComplianceReport
 import type { VendorViewUploadComplianceReportMutation as UploadComplianceReportMutationType } from "./__generated__/VendorViewUploadComplianceReportMutation.graphql";
 import type { VendorViewUpdateVendorMutation } from "./__generated__/VendorViewUpdateVendorMutation.graphql";
 import type { VendorViewCreateRiskAssessmentMutation } from "./__generated__/VendorViewCreateRiskAssessmentMutation.graphql";
+import type { VendorViewAssessVendorMutation } from "./__generated__/VendorViewAssessVendorMutation.graphql";
 import type {
   BusinessImpact,
   DataSensitivity,
@@ -31,6 +32,7 @@ import { PageTemplate } from "@/components/PageTemplate";
 import { VendorViewSkeleton } from "./VendorPage";
 import PeopleSelector from "@/components/PeopleSelector";
 import { formatDistanceToNow, format, isPast } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const vendorViewQuery = graphql`
   query VendorViewQuery($vendorId: ID!, $organizationId: ID!) {
@@ -191,6 +193,38 @@ const createRiskAssessmentMutation = graphql`
           }
           createdAt
         }
+      }
+    }
+  }
+`;
+
+const assessVendorMutation = graphql`
+  mutation VendorViewAssessVendorMutation($input: AssessVendorInput!) {
+    assessVendor(input: $input) {
+      vendor {
+        id
+        name
+        description
+        statusPageUrl
+        termsOfServiceUrl
+        privacyPolicyUrl
+        serviceLevelAgreementUrl
+        dataProcessingAgreementUrl
+        securityPageUrl
+        trustPageUrl
+        certifications
+        headquarterAddress
+        legalName
+        websiteUrl
+        businessOwner {
+          id
+          fullName
+        }
+        securityOwner {
+          id
+          fullName
+        }
+        updatedAt
       }
     }
   }
@@ -1070,9 +1104,9 @@ function RiskAssessmentDetailsModal({
       <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Risk Assessment Details</h3>
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
             className="h-8 w-8 rounded-full"
           >
@@ -1092,7 +1126,7 @@ function RiskAssessmentDetailsModal({
                 {formatDate(assessment.assessedAt || "")}
               </p>
             </div>
-            
+
             <div>
               <h4 className="text-sm font-medium text-[#6B716A] mb-1">Valid Until</h4>
               <p className="text-sm font-medium">
@@ -1140,7 +1174,7 @@ function RiskAssessmentDetailsModal({
           )}
 
           <div className="flex justify-end mt-4">
-            <Button 
+            <Button
               onClick={onClose}
               className="bg-[#054D05] text-white hover:bg-[#054D05]/90"
             >
@@ -1398,6 +1432,13 @@ function VendorViewContent({
     );
   const [, loadQuery] = useQueryLoader<VendorViewQueryType>(vendorViewQuery);
   const { toast } = useToast();
+  const [isAssessDialogOpen, setIsAssessDialogOpen] = useState(false);
+
+  const [websiteUrl, setWebsiteUrl] = useState("");
+
+  const [commitAssessVendor, isInFlight] = useMutation<VendorViewAssessVendorMutation>(
+    assessVendorMutation
+  );
 
   const hasChanges = editedFields.size > 0;
 
@@ -2301,8 +2342,92 @@ function VendorViewContent({
     }
   };
 
+  const handleAssessVendor = useCallback(() => {
+    if (!websiteUrl) {
+      toast({
+        title: "Error",
+        description: "Please enter a website URL",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    commitAssessVendor({
+      variables: {
+        input: {
+          id: data.node.id!,
+          websiteUrl,
+        },
+      },
+      onCompleted: (response) => {
+        const newData = response.assessVendor.vendor;
+        const changedFields = new Set<string>();
+
+        // Compare and track changes
+        Object.entries(newData).forEach(([key, value]) => {
+          if (value != null && key !== 'id' && formData[key as keyof typeof formData] !== value) {
+            changedFields.add(key);
+          }
+        });
+
+        setFormData(prevData => {
+          const newFormData = {
+            ...prevData,
+            name: newData.name || prevData.name,
+            description: newData.description || prevData.description,
+            statusPageUrl: newData.statusPageUrl || prevData.statusPageUrl,
+            termsOfServiceUrl: newData.termsOfServiceUrl || prevData.termsOfServiceUrl,
+            privacyPolicyUrl: newData.privacyPolicyUrl || prevData.privacyPolicyUrl,
+            serviceLevelAgreementUrl: newData.serviceLevelAgreementUrl || prevData.serviceLevelAgreementUrl,
+            dataProcessingAgreementUrl: newData.dataProcessingAgreementUrl || prevData.dataProcessingAgreementUrl,
+            securityPageUrl: newData.securityPageUrl || prevData.securityPageUrl,
+            trustPageUrl: newData.trustPageUrl || prevData.trustPageUrl,
+            certifications: newData.certifications || prevData.certifications,
+            headquarterAddress: newData.headquarterAddress || prevData.headquarterAddress,
+            legalName: newData.legalName || prevData.legalName,
+            websiteUrl: newData.websiteUrl || prevData.websiteUrl,
+          };
+          return newFormData;
+        });
+
+        setEditedFields(prev => {
+          const newSet = new Set(prev);
+          changedFields.forEach(field => newSet.add(field));
+          return newSet;
+        });
+
+        toast({
+          title: "Success",
+          description: changedFields.size > 0
+            ? "Vendor has been assessed. Review and save the changes."
+            : "Vendor data has been assessed. No changes were found.",
+        });
+
+        setIsAssessDialogOpen(false);
+        setWebsiteUrl("");
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  }, [commitAssessVendor, data.node.id, websiteUrl, toast, formData]);
   return (
-    <PageTemplate title={formData.name}>
+    <PageTemplate
+      title={formData.name}
+      actions={
+        <Button
+          className="rounded-full bg-[rgba(0,39,0,0.05)] text-[#141E12] hover:bg-[rgba(0,39,0,0.08)] h-8 px-3"
+          size="sm"
+          onClick={() => setIsAssessDialogOpen(true)}
+        >
+          Assessement From Website
+        </Button>
+      }
+    >
       <div className="border-b mb-6">
         <div className="flex">
           <button
@@ -2377,12 +2502,71 @@ function VendorViewContent({
         onSubmit={handleRiskAssessmentSubmit}
         businessOwnerId={formData.businessOwnerId}
       />
+
+      {/* Assessement From Website Modal */}
+      <Dialog open={isAssessDialogOpen} onOpenChange={setIsAssessDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Assessement From Website</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              placeholder="Enter website URL"
+              value={websiteUrl}
+              onChange={(e) => setWebsiteUrl(e.target.value)}
+              disabled={isInFlight}
+            />
+            {isInFlight && (
+              <div className="flex items-center justify-center text-sm text-[#6B716A]">
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#054D05]"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Assessing vendor data...
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsAssessDialogOpen(false)}
+              disabled={isInFlight}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAssessVendor}
+              disabled={isInFlight}
+              className={isInFlight ? "opacity-50 cursor-not-allowed" : ""}
+            >
+              {isInFlight ? "Processing..." : "Assess"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageTemplate>
   );
 }
 
 export default function VendorView() {
   const { vendorId, organizationId } = useParams();
+
   const [queryRef, loadQuery] =
     useQueryLoader<VendorViewQueryType>(vendorViewQuery);
 

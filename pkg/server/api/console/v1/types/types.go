@@ -20,6 +20,15 @@ type Node interface {
 	GetID() gid.GID
 }
 
+type AssessVendorInput struct {
+	ID         gid.GID `json:"id"`
+	WebsiteURL string  `json:"websiteUrl"`
+}
+
+type AssessVendorPayload struct {
+	Vendor *Vendor `json:"vendor"`
+}
+
 type AssignTaskInput struct {
 	TaskID       gid.GID `json:"taskId"`
 	AssignedToID gid.GID `json:"assignedToId"`

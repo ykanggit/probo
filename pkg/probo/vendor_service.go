@@ -70,6 +70,11 @@ type (
 		SecurityOwnerID            *gid.GID
 	}
 
+	AssessVendorRequest struct {
+		ID         gid.GID
+		WebsiteURL string
+	}
+
 	CreateVendorRiskAssessmentRequest struct {
 		VendorID        gid.GID
 		AssessedByID    gid.GID
@@ -420,4 +425,35 @@ func (s VendorService) GetRiskAssessment(
 	}
 
 	return vendorRiskAssessment, nil
+}
+
+func (s VendorService) Assess(
+	ctx context.Context,
+	req AssessVendorRequest,
+) (*coredata.Vendor, error) {
+	vendorInfo, err := s.svc.vendorAssessment.Fetch(ctx, req.WebsiteURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to assess vendor info: %w", err)
+	}
+
+	vendor := &coredata.Vendor{
+		ID:                         req.ID,
+		Name:                       vendorInfo.Name,
+		WebsiteURL:                 &req.WebsiteURL,
+		Description:                &vendorInfo.Description,
+		Category:                   vendorInfo.Category,
+		HeadquarterAddress:         &vendorInfo.HeadquarterAddress,
+		LegalName:                  &vendorInfo.LegalName,
+		PrivacyPolicyURL:           &vendorInfo.PrivacyPolicyURL,
+		ServiceLevelAgreementURL:   &vendorInfo.ServiceLevelAgreementURL,
+		DataProcessingAgreementURL: &vendorInfo.DataProcessingAgreementURL,
+		SecurityPageURL:            &vendorInfo.SecurityPageURL,
+		TrustPageURL:               &vendorInfo.TrustPageURL,
+		TermsOfServiceURL:          &vendorInfo.TermsOfServiceURL,
+		StatusPageURL:              &vendorInfo.StatusPageURL,
+		Certifications:             vendorInfo.Certifications,
+		UpdatedAt:                  time.Now(),
+	}
+
+	return vendor, nil
 }
