@@ -408,6 +408,13 @@ function ListVendorContent({
                               "The vendor has been added successfully",
                           });
                         },
+                        onError: (error) => {
+                          toast({
+                            title: "Error",
+                            description: error.message || "Failed to create vendor",
+                            variant: "destructive",
+                          });
+                        }
                       });
                     }}
                   >

@@ -270,30 +270,28 @@ func (s VendorService) Create(
 	req CreateVendorRequest,
 ) (*coredata.Vendor, error) {
 	now := time.Now()
-	var vendor *coredata.Vendor
+	vendor := &coredata.Vendor{
+		ID:                         gid.New(s.svc.scope.GetTenantID(), coredata.VendorEntityType),
+		Name:                       req.Name,
+		CreatedAt:                  now,
+		UpdatedAt:                  now,
+		Description:                req.Description,
+		HeadquarterAddress:         req.HeadquarterAddress,
+		LegalName:                  req.LegalName,
+		WebsiteURL:                 req.WebsiteURL,
+		PrivacyPolicyURL:           req.PrivacyPolicyURL,
+		ServiceLevelAgreementURL:   req.ServiceLevelAgreementURL,
+		DataProcessingAgreementURL: req.DataProcessingAgreementURL,
+		Certifications:             req.Certifications,
+		SecurityPageURL:            req.SecurityPageURL,
+		TrustPageURL:               req.TrustPageURL,
+		StatusPageURL:              req.StatusPageURL,
+		TermsOfServiceURL:          req.TermsOfServiceURL,
+	}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			vendor := &coredata.Vendor{
-				ID:                         gid.New(s.svc.scope.GetTenantID(), coredata.VendorEntityType),
-				Name:                       req.Name,
-				CreatedAt:                  now,
-				UpdatedAt:                  now,
-				Description:                req.Description,
-				HeadquarterAddress:         req.HeadquarterAddress,
-				LegalName:                  req.LegalName,
-				WebsiteURL:                 req.WebsiteURL,
-				PrivacyPolicyURL:           req.PrivacyPolicyURL,
-				ServiceLevelAgreementURL:   req.ServiceLevelAgreementURL,
-				DataProcessingAgreementURL: req.DataProcessingAgreementURL,
-				Certifications:             req.Certifications,
-				SecurityPageURL:            req.SecurityPageURL,
-				TrustPageURL:               req.TrustPageURL,
-				StatusPageURL:              req.StatusPageURL,
-				TermsOfServiceURL:          req.TermsOfServiceURL,
-			}
-
 			organization := &coredata.Organization{}
 			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.OrganizationID); err != nil {
 				return fmt.Errorf("cannot load organization %q: %w", req.OrganizationID, err)
