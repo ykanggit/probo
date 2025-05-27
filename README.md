@@ -75,8 +75,8 @@ Probo is designed to be accessible, transparent, and community-driven.
    # Build the project
    make build
 
-   # Start the application
-   bin/probod
+   # Start the application using development settings
+   bin/probod -cfg-file cfg/dev.yaml
    ```
 
 The application will be available at:
