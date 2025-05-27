@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Add automatic vendor assessment
+
 ### Fixed
 
 - Fix 5xx when create new vendor
