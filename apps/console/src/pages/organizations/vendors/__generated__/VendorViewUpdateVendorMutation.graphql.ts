@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9089536ddf16d713cfc68bd20f8f8caf>>
+ * @generated SignedSource<<687421f6528edb3fe7623b14cda888d7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,9 +9,10 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type VendorCategory = "ANALYTICS" | "CLOUD_MONITORING" | "CLOUD_PROVIDER" | "COLLABORATION" | "CUSTOMER_SUPPORT" | "DATA_STORAGE_AND_PROCESSING" | "DOCUMENT_MANAGEMENT" | "EMPLOYEE_MANAGEMENT" | "ENGINEERING" | "FINANCE" | "IDENTITY_PROVIDER" | "IT" | "MARKETING" | "OFFICE_OPERATIONS" | "OTHER" | "PASSWORD_MANAGEMENT" | "PRODUCT_AND_DESIGN" | "PROFESSIONAL_SERVICES" | "RECRUITING" | "SALES" | "SECURITY" | "VERSION_CONTROL";
 export type UpdateVendorInput = {
   businessOwnerId?: string | null | undefined;
-  category?: string | null | undefined;
+  category?: VendorCategory | null | undefined;
   certifications?: ReadonlyArray<string> | null | undefined;
   dataProcessingAgreementUrl?: string | null | undefined;
   description?: string | null | undefined;
@@ -38,6 +39,7 @@ export type VendorViewUpdateVendorMutation$data = {
         readonly fullName: string;
         readonly id: string;
       } | null | undefined;
+      readonly category: VendorCategory;
       readonly certifications: ReadonlyArray<string>;
       readonly dataProcessingAgreementUrl: string | null | undefined;
       readonly description: string | null | undefined;
@@ -208,6 +210,13 @@ v3 = [
           {
             "alias": null,
             "args": null,
+            "kind": "ScalarField",
+            "name": "category",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
             "concreteType": "People",
             "kind": "LinkedField",
             "name": "businessOwner",
@@ -257,16 +266,16 @@ return {
     "selections": (v3/*: any*/)
   },
   "params": {
-    "cacheID": "c539b8cd35be693bea445fa86c473bfd",
+    "cacheID": "8ead09e0003d808fcf2d2bc8ca19c8b2",
     "id": null,
     "metadata": {},
     "name": "VendorViewUpdateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      category\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "478f755b8d9a6b7f7deec1b3a1c71d07";
+(node as any).hash = "90aa0b06cde30ea8a7deb711d5ba0c69";
 
 export default node;

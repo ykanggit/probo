@@ -75,12 +75,36 @@ const (
 		- terms_of_service_url: URL to terms of service page
 		- status_page_url: URL to system status page
 		- certifications: Array of security/compliance certifications (e.g., ["SOC2", "ISO27001"])
+		- category: One of the following enum values:
+			- "ANALYTICS"
+			- "CLOUD_MONITORING"
+			- "CLOUD_PROVIDER"
+			- "COLLABORATION"
+			- "CUSTOMER_SUPPORT"
+			- "DATA_STORAGE_AND_PROCESSING"
+			- "DOCUMENT_MANAGEMENT"
+			- "EMPLOYEE_MANAGEMENT"
+			- "ENGINEERING"
+			- "FINANCE"
+			- "IDENTITY_PROVIDER"
+			- "IT"
+			- "MARKETING"
+			- "OFFICE_OPERATIONS"
+			- "OTHER"
+			- "PASSWORD_MANAGEMENT"
+			- "PRODUCT_AND_DESIGN"
+			- "PROFESSIONAL_SERVICES"
+			- "RECRUITING"
+			- "SALES"
+			- "SECURITY"
+			- "VERSION_CONTROL"
 
 		# SOP
 		- Please ensure the output is clean, standardized JSON.
 		- Use web search to gather info, if you cannot find what you are looking for, just return an empty string instead
 		- For URLs, return the full URL if found, otherwise an empty string
 		- For certifications, return an empty array if none found
+		- For category, if you cannot determine the category, use "OTHER"
 
 		# **Example output format:**
 		Respond ONLY with a JSON object. No explanation, no markdown, no preamble. Like this:
@@ -96,7 +120,8 @@ const (
 			"trust_page_url": "https://stripe.com/trust",
 			"terms_of_service_url": "https://stripe.com/terms",
 			"status_page_url": "https://status.stripe.com",
-			"certifications": ["SOC1", "SOC2", "PCI DSS Level 1", "ISO 27001"]
+			"certifications": ["SOC1", "SOC2", "PCI DSS Level 1", "ISO 27001"],
+			"category": "FINANCE"
 		}
 
 		### Company url:

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c911b01b560dfe4143e7ffd06650ff58>>
+ * @generated SignedSource<<a8dc580c053c9091819cb2d348c0b3e0>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,9 +9,10 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type VendorCategory = "ANALYTICS" | "CLOUD_MONITORING" | "CLOUD_PROVIDER" | "COLLABORATION" | "CUSTOMER_SUPPORT" | "DATA_STORAGE_AND_PROCESSING" | "DOCUMENT_MANAGEMENT" | "EMPLOYEE_MANAGEMENT" | "ENGINEERING" | "FINANCE" | "IDENTITY_PROVIDER" | "IT" | "MARKETING" | "OFFICE_OPERATIONS" | "OTHER" | "PASSWORD_MANAGEMENT" | "PRODUCT_AND_DESIGN" | "PROFESSIONAL_SERVICES" | "RECRUITING" | "SALES" | "SECURITY" | "VERSION_CONTROL";
 export type CreateVendorInput = {
   businessOwnerId?: string | null | undefined;
-  category?: string | null | undefined;
+  category?: VendorCategory | null | undefined;
   certifications?: ReadonlyArray<string> | null | undefined;
   dataProcessingAgreementUrl?: string | null | undefined;
   description?: string | null | undefined;

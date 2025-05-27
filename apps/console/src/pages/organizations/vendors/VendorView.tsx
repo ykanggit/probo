@@ -18,7 +18,7 @@ import { Suspense, useEffect, useState, useCallback, useRef } from "react";
 import type { VendorViewQuery as VendorViewQueryType } from "./__generated__/VendorViewQuery.graphql";
 import type { VendorViewDeleteComplianceReportMutation as DeleteComplianceReportMutationType } from "./__generated__/VendorViewDeleteComplianceReportMutation.graphql";
 import type { VendorViewUploadComplianceReportMutation as UploadComplianceReportMutationType } from "./__generated__/VendorViewUploadComplianceReportMutation.graphql";
-import type { VendorViewUpdateVendorMutation } from "./__generated__/VendorViewUpdateVendorMutation.graphql";
+import type { VendorViewUpdateVendorMutation, VendorCategory } from "./__generated__/VendorViewUpdateVendorMutation.graphql";
 import type { VendorViewCreateRiskAssessmentMutation } from "./__generated__/VendorViewCreateRiskAssessmentMutation.graphql";
 import type { VendorViewAssessVendorMutation } from "./__generated__/VendorViewAssessVendorMutation.graphql";
 import type {
@@ -33,6 +33,36 @@ import { VendorViewSkeleton } from "./VendorPage";
 import PeopleSelector from "@/components/PeopleSelector";
 import { formatDistanceToNow, format, isPast } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+interface VendorCategoryOption {
+  value: VendorCategory;
+  label: string;
+}
+
+const VENDOR_CATEGORIES: VendorCategoryOption[] = [
+  { value: "ANALYTICS", label: "Analytics" },
+  { value: "CLOUD_MONITORING", label: "Cloud Monitoring" },
+  { value: "CLOUD_PROVIDER", label: "Cloud Provider" },
+  { value: "COLLABORATION", label: "Collaboration" },
+  { value: "CUSTOMER_SUPPORT", label: "Customer Support" },
+  { value: "DATA_STORAGE_AND_PROCESSING", label: "Data Storage and Processing" },
+  { value: "DOCUMENT_MANAGEMENT", label: "Document Management" },
+  { value: "EMPLOYEE_MANAGEMENT", label: "Employee Management" },
+  { value: "ENGINEERING", label: "Engineering" },
+  { value: "FINANCE", label: "Finance" },
+  { value: "IDENTITY_PROVIDER", label: "Identity Provider" },
+  { value: "IT", label: "IT" },
+  { value: "MARKETING", label: "Marketing" },
+  { value: "OFFICE_OPERATIONS", label: "Office Operations" },
+  { value: "OTHER", label: "Other" },
+  { value: "PASSWORD_MANAGEMENT", label: "Password Management" },
+  { value: "PRODUCT_AND_DESIGN", label: "Product and Design" },
+  { value: "PROFESSIONAL_SERVICES", label: "Professional Services" },
+  { value: "RECRUITING", label: "Recruiting" },
+  { value: "SALES", label: "Sales" },
+  { value: "SECURITY", label: "Security" },
+  { value: "VERSION_CONTROL", label: "Version Control" }
+];
 
 const vendorViewQuery = graphql`
   query VendorViewQuery($vendorId: ID!, $organizationId: ID!) {
@@ -52,6 +82,7 @@ const vendorViewQuery = graphql`
         headquarterAddress
         legalName
         websiteUrl
+        category
         businessOwner {
           id
           fullName
@@ -127,6 +158,7 @@ const updateVendorMutation = graphql`
         headquarterAddress
         legalName
         websiteUrl
+        category
         businessOwner {
           id
           fullName
@@ -216,6 +248,7 @@ const assessVendorMutation = graphql`
         headquarterAddress
         legalName
         websiteUrl
+        category
         businessOwner {
           id
           fullName
@@ -1415,6 +1448,7 @@ function VendorViewContent({
     websiteUrl: data.node.websiteUrl || "",
     businessOwnerId: data.node.businessOwner?.id || null,
     securityOwnerId: data.node.securityOwner?.id || null,
+    category: data.node.category || null,
   });
   const [updateVendor] =
     useMutation<VendorViewUpdateVendorMutation>(updateVendorMutation);
@@ -1447,6 +1481,7 @@ function VendorViewContent({
       ...formData,
       businessOwnerId: formData.businessOwnerId || undefined,
       securityOwnerId: formData.securityOwnerId || undefined,
+      category: formData.category as VendorCategory | null,
     };
 
     updateVendor({
@@ -1556,6 +1591,7 @@ function VendorViewContent({
       websiteUrl: data.node.websiteUrl || "",
       businessOwnerId: data.node.businessOwner?.id || null,
       securityOwnerId: data.node.securityOwner?.id || null,
+      category: data.node.category || null,
     });
     setEditedFields(new Set());
   };
@@ -1817,7 +1853,25 @@ function VendorViewContent({
                       />
                     </div>
                   </div>
-
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-[#6B716A]">Category</p>
+                    <div className="rounded-lg bg-[rgba(5,77,5,0.03)] px-2 py-1.5">
+                      <select
+                        value={formData.category || ""}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          handleFieldChange("category", value ? (value as VendorCategory) : null);
+                        }}
+                        className="w-full font-geist font-medium text-[16px] leading-[1.5em] text-[#141E12] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 p-0"
+                      >
+                        {VENDOR_CATEGORIES.map(({ value, label }) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-[#6B716A]">
                       Legal name
@@ -2386,6 +2440,7 @@ function VendorViewContent({
             headquarterAddress: newData.headquarterAddress || prevData.headquarterAddress,
             legalName: newData.legalName || prevData.legalName,
             websiteUrl: newData.websiteUrl || prevData.websiteUrl,
+            category: newData.category || prevData.category,
           };
           return newFormData;
         });

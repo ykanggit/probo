@@ -84,11 +84,7 @@ func (i *BusinessImpact) UnmarshalJSON(data []byte) error {
 }
 
 func (i *BusinessImpact) UnmarshalText(text []byte) error {
-	var s string
-	if err := json.Unmarshal(text, &s); err != nil {
-		return err
-	}
-
+	s := string(text)
 	switch s {
 	case "LOW":
 		*i = BusinessImpactLow

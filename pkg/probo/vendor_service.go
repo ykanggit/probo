@@ -37,7 +37,7 @@ type (
 		HeadquarterAddress         *string
 		LegalName                  *string
 		WebsiteURL                 *string
-		Category                   *string
+		Category                   *coredata.VendorCategory
 		PrivacyPolicyURL           *string
 		ServiceLevelAgreementURL   *string
 		DataProcessingAgreementURL *string
@@ -58,7 +58,7 @@ type (
 		LegalName                  *string
 		WebsiteURL                 *string
 		TermsOfServiceURL          *string
-		Category                   *string
+		Category                   *coredata.VendorCategory
 		PrivacyPolicyURL           *string
 		ServiceLevelAgreementURL   *string
 		DataProcessingAgreementURL *string
@@ -160,6 +160,8 @@ func (s VendorService) Update(
 
 			if req.Category != nil {
 				vendor.Category = *req.Category
+			} else {
+				vendor.Category = coredata.VendorCategoryOther
 			}
 
 			if req.SecurityPageURL != nil {
@@ -321,7 +323,7 @@ func (s VendorService) Create(
 			if req.Category != nil {
 				vendor.Category = *req.Category
 			} else {
-				vendor.Category = "Other"
+				vendor.Category = coredata.VendorCategoryOther
 			}
 
 			if err := vendor.Insert(ctx, conn, s.svc.scope); err != nil {
@@ -441,7 +443,7 @@ func (s VendorService) Assess(
 		Name:                       vendorInfo.Name,
 		WebsiteURL:                 &req.WebsiteURL,
 		Description:                &vendorInfo.Description,
-		Category:                   vendorInfo.Category,
+		Category:                   coredata.VendorCategory(vendorInfo.Category),
 		HeadquarterAddress:         &vendorInfo.HeadquarterAddress,
 		LegalName:                  &vendorInfo.LegalName,
 		PrivacyPolicyURL:           &vendorInfo.PrivacyPolicyURL,

@@ -18,7 +18,7 @@ import Fuse from "fuse.js";
 import { useToast } from "@/hooks/use-toast";
 import { PageTemplate } from "@/components/PageTemplate";
 import { ListVendorViewSkeleton } from "./ListVendorPage";
-import { ListVendorViewCreateVendorMutation } from "./__generated__/ListVendorViewCreateVendorMutation.graphql";
+import { ListVendorViewCreateVendorMutation, VendorCategory } from "./__generated__/ListVendorViewCreateVendorMutation.graphql";
 import { ListVendorViewPaginationQuery } from "./__generated__/ListVendorViewPaginationQuery.graphql";
 import { ListVendorView_vendors$key } from "./__generated__/ListVendorView_vendors.graphql";
 import { ListVendorViewQuery } from "./__generated__/ListVendorViewQuery.graphql";
@@ -385,7 +385,7 @@ function ListVendorContent({
                             headquarterAddress: vendor.headquarterAddress,
                             legalName: vendor.legalName,
                             websiteUrl: vendor.websiteUrl,
-                            category: vendor.category,
+                            category: vendor.category as VendorCategory || null,
                             privacyPolicyUrl: vendor.privacyPolicyUrl,
                             serviceLevelAgreementUrl:
                               vendor.serviceLevelAgreementUrl,

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<71c7ed1be8cf0477074d6cf130143626>>
+ * @generated SignedSource<<f0c7d1514ae65ab5cef017af474f5825>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type VendorCategory = "ANALYTICS" | "CLOUD_MONITORING" | "CLOUD_PROVIDER" | "COLLABORATION" | "CUSTOMER_SUPPORT" | "DATA_STORAGE_AND_PROCESSING" | "DOCUMENT_MANAGEMENT" | "EMPLOYEE_MANAGEMENT" | "ENGINEERING" | "FINANCE" | "IDENTITY_PROVIDER" | "IT" | "MARKETING" | "OFFICE_OPERATIONS" | "OTHER" | "PASSWORD_MANAGEMENT" | "PRODUCT_AND_DESIGN" | "PROFESSIONAL_SERVICES" | "RECRUITING" | "SALES" | "SECURITY" | "VERSION_CONTROL";
 export type AssessVendorInput = {
   id: string;
   websiteUrl: string;
@@ -23,6 +24,7 @@ export type VendorViewAssessVendorMutation$data = {
         readonly fullName: string;
         readonly id: string;
       } | null | undefined;
+      readonly category: VendorCategory;
       readonly certifications: ReadonlyArray<string>;
       readonly dataProcessingAgreementUrl: string | null | undefined;
       readonly description: string | null | undefined;
@@ -193,6 +195,13 @@ v3 = [
           {
             "alias": null,
             "args": null,
+            "kind": "ScalarField",
+            "name": "category",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
             "concreteType": "People",
             "kind": "LinkedField",
             "name": "businessOwner",
@@ -242,16 +251,16 @@ return {
     "selections": (v3/*: any*/)
   },
   "params": {
-    "cacheID": "ccc16b2de8f7f3936458cd4823a14992",
+    "cacheID": "592ee741d52ee98a1e10330e97a14707",
     "id": null,
     "metadata": {},
     "name": "VendorViewAssessVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorViewAssessVendorMutation(\n  $input: AssessVendorInput!\n) {\n  assessVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation VendorViewAssessVendorMutation(\n  $input: AssessVendorInput!\n) {\n  assessVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      category\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ed23d00ce5a44aa6bfd43a072552ed1c";
+(node as any).hash = "8dddda77f031533f207ac903d883a902";
 
 export default node;

@@ -59,6 +59,7 @@ func NewVendor(v *coredata.Vendor) *Vendor {
 		HeadquarterAddress:         v.HeadquarterAddress,
 		LegalName:                  v.LegalName,
 		WebsiteURL:                 v.WebsiteURL,
+		Category:                   v.Category,
 		UpdatedAt:                  v.UpdatedAt,
 		CreatedAt:                  v.CreatedAt,
 	}

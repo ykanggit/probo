@@ -674,6 +674,7 @@ type ComplexityRoot struct {
 
 	Vendor struct {
 		BusinessOwner              func(childComplexity int) int
+		Category                   func(childComplexity int) int
 		Certifications             func(childComplexity int) int
 		ComplianceReports          func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) int
 		CreatedAt                  func(childComplexity int) int
@@ -3513,6 +3514,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Vendor.BusinessOwner(childComplexity), true
 
+	case "Vendor.category":
+		if e.complexity.Vendor.Category == nil {
+			break
+		}
+
+		return e.complexity.Vendor.Category(childComplexity), true
+
 	case "Vendor.certifications":
 		if e.complexity.Vendor.Certifications == nil {
 			break
@@ -4397,6 +4405,31 @@ enum PolicyVersionOrderField
     )
 }
 
+enum VendorCategory @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorCategory") {
+  ANALYTICS @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryAnalytics")
+  CLOUD_MONITORING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudMonitoring")
+  CLOUD_PROVIDER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudProvider")
+  COLLABORATION @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCollaboration")
+  CUSTOMER_SUPPORT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCustomerSupport")
+  DATA_STORAGE_AND_PROCESSING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDataStorageAndProcessing")
+  DOCUMENT_MANAGEMENT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDocumentManagement")
+  EMPLOYEE_MANAGEMENT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEmployeeManagement")
+  ENGINEERING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEngineering")
+  FINANCE @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryFinance")
+  IDENTITY_PROVIDER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryIdentityProvider")
+  IT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryIT")
+  MARKETING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryMarketing")
+  OFFICE_OPERATIONS @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOfficeOperations")
+  OTHER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOther")
+  PASSWORD_MANAGEMENT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryPasswordManagement")
+  PRODUCT_AND_DESIGN @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProductAndDesign")
+  PROFESSIONAL_SERVICES @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProfessionalServices")
+  RECRUITING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryRecruiting")
+  SALES @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySales")
+  SECURITY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySecurity")
+  VERSION_CONTROL @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryVersionControl")
+}
+
 # Order Input Types
 input UserOrder
   @goModel(
@@ -4624,6 +4657,7 @@ type People implements Node {
 type Vendor implements Node {
   id: ID!
   name: String!
+  category: VendorCategory!
   description: String
 
   organization: Organization! @goField(forceResolver: true)
@@ -5200,7 +5234,7 @@ input CreateVendorInput {
   legalName: String
   websiteUrl: String
   privacyPolicyUrl: String
-  category: String
+  category: VendorCategory
   serviceLevelAgreementUrl: String
   dataProcessingAgreementUrl: String
   certifications: [String!]
@@ -5224,7 +5258,7 @@ input UpdateVendorInput {
   websiteUrl: String
   legalName: String
   headquarterAddress: String
-  category: String
+  category: VendorCategory
   certifications: [String!]
   securityPageUrl: String
   trustPageUrl: String
@@ -9802,6 +9836,8 @@ func (ec *executionContext) fieldContext_AssessVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Vendor_name(ctx, field)
+			case "category":
+				return ec.fieldContext_Vendor_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "organization":
@@ -25613,6 +25649,8 @@ func (ec *executionContext) fieldContext_UpdateVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Vendor_name(ctx, field)
+			case "category":
+				return ec.fieldContext_Vendor_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "organization":
@@ -26391,6 +26429,50 @@ func (ec *executionContext) fieldContext_Vendor_name(_ context.Context, field gr
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_category(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_category(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Category, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.VendorCategory)
+	fc.Result = res
+	return ec.marshalNVendorCategory2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_category(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type VendorCategory does not have child fields")
 		},
 	}
 	return fc, nil
@@ -27388,6 +27470,8 @@ func (ec *executionContext) fieldContext_VendorComplianceReport_vendor(_ context
 				return ec.fieldContext_Vendor_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Vendor_name(ctx, field)
+			case "category":
+				return ec.fieldContext_Vendor_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "organization":
@@ -28141,6 +28225,8 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Vendor_name(ctx, field)
+			case "category":
+				return ec.fieldContext_Vendor_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "organization":
@@ -28273,6 +28359,8 @@ func (ec *executionContext) fieldContext_VendorRiskAssessment_vendor(_ context.C
 				return ec.fieldContext_Vendor_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Vendor_name(ctx, field)
+			case "category":
+				return ec.fieldContext_Vendor_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Vendor_description(ctx, field)
 			case "organization":
@@ -31869,7 +31957,7 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 			it.PrivacyPolicyURL = data
 		case "category":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOVendorCategory2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -33706,7 +33794,7 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 			it.HeadquarterAddress = data
 		case "category":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOVendorCategory2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -40470,6 +40558,11 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "category":
+			out.Values[i] = ec._Vendor_category(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "description":
 			out.Values[i] = ec._Vendor_description(ctx, field, obj)
 		case "organization":
@@ -44539,6 +44632,74 @@ func (ec *executionContext) marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋ
 	return ec._Vendor(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNVendorCategory2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory(ctx context.Context, v any) (coredata.VendorCategory, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNVendorCategory2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNVendorCategory2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory(ctx context.Context, sel ast.SelectionSet, v coredata.VendorCategory) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalString(marshalNVendorCategory2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNVendorCategory2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory = map[string]coredata.VendorCategory{
+		"ANALYTICS":                   coredata.VendorCategoryAnalytics,
+		"CLOUD_MONITORING":            coredata.VendorCategoryCloudMonitoring,
+		"CLOUD_PROVIDER":              coredata.VendorCategoryCloudProvider,
+		"COLLABORATION":               coredata.VendorCategoryCollaboration,
+		"CUSTOMER_SUPPORT":            coredata.VendorCategoryCustomerSupport,
+		"DATA_STORAGE_AND_PROCESSING": coredata.VendorCategoryDataStorageAndProcessing,
+		"DOCUMENT_MANAGEMENT":         coredata.VendorCategoryDocumentManagement,
+		"EMPLOYEE_MANAGEMENT":         coredata.VendorCategoryEmployeeManagement,
+		"ENGINEERING":                 coredata.VendorCategoryEngineering,
+		"FINANCE":                     coredata.VendorCategoryFinance,
+		"IDENTITY_PROVIDER":           coredata.VendorCategoryIdentityProvider,
+		"IT":                          coredata.VendorCategoryIT,
+		"MARKETING":                   coredata.VendorCategoryMarketing,
+		"OFFICE_OPERATIONS":           coredata.VendorCategoryOfficeOperations,
+		"OTHER":                       coredata.VendorCategoryOther,
+		"PASSWORD_MANAGEMENT":         coredata.VendorCategoryPasswordManagement,
+		"PRODUCT_AND_DESIGN":          coredata.VendorCategoryProductAndDesign,
+		"PROFESSIONAL_SERVICES":       coredata.VendorCategoryProfessionalServices,
+		"RECRUITING":                  coredata.VendorCategoryRecruiting,
+		"SALES":                       coredata.VendorCategorySales,
+		"SECURITY":                    coredata.VendorCategorySecurity,
+		"VERSION_CONTROL":             coredata.VendorCategoryVersionControl,
+	}
+	marshalNVendorCategory2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory = map[coredata.VendorCategory]string{
+		coredata.VendorCategoryAnalytics:                "ANALYTICS",
+		coredata.VendorCategoryCloudMonitoring:          "CLOUD_MONITORING",
+		coredata.VendorCategoryCloudProvider:            "CLOUD_PROVIDER",
+		coredata.VendorCategoryCollaboration:            "COLLABORATION",
+		coredata.VendorCategoryCustomerSupport:          "CUSTOMER_SUPPORT",
+		coredata.VendorCategoryDataStorageAndProcessing: "DATA_STORAGE_AND_PROCESSING",
+		coredata.VendorCategoryDocumentManagement:       "DOCUMENT_MANAGEMENT",
+		coredata.VendorCategoryEmployeeManagement:       "EMPLOYEE_MANAGEMENT",
+		coredata.VendorCategoryEngineering:              "ENGINEERING",
+		coredata.VendorCategoryFinance:                  "FINANCE",
+		coredata.VendorCategoryIdentityProvider:         "IDENTITY_PROVIDER",
+		coredata.VendorCategoryIT:                       "IT",
+		coredata.VendorCategoryMarketing:                "MARKETING",
+		coredata.VendorCategoryOfficeOperations:         "OFFICE_OPERATIONS",
+		coredata.VendorCategoryOther:                    "OTHER",
+		coredata.VendorCategoryPasswordManagement:       "PASSWORD_MANAGEMENT",
+		coredata.VendorCategoryProductAndDesign:         "PRODUCT_AND_DESIGN",
+		coredata.VendorCategoryProfessionalServices:     "PROFESSIONAL_SERVICES",
+		coredata.VendorCategoryRecruiting:               "RECRUITING",
+		coredata.VendorCategorySales:                    "SALES",
+		coredata.VendorCategorySecurity:                 "SECURITY",
+		coredata.VendorCategoryVersionControl:           "VERSION_CONTROL",
+	}
+)
+
 func (ec *executionContext) marshalNVendorComplianceReport2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorComplianceReport(ctx context.Context, sel ast.SelectionSet, v *types.VendorComplianceReport) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -45589,6 +45750,76 @@ func (ec *executionContext) unmarshalOUserOrder2ᚖgithubᚗcomᚋgetproboᚋpro
 	res, err := ec.unmarshalInputUserOrder(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
+
+func (ec *executionContext) unmarshalOVendorCategory2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory(ctx context.Context, v any) (*coredata.VendorCategory, error) {
+	if v == nil {
+		return nil, nil
+	}
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalOVendorCategory2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOVendorCategory2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory(ctx context.Context, sel ast.SelectionSet, v *coredata.VendorCategory) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalString(marshalOVendorCategory2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory[*v])
+	return res
+}
+
+var (
+	unmarshalOVendorCategory2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory = map[string]coredata.VendorCategory{
+		"ANALYTICS":                   coredata.VendorCategoryAnalytics,
+		"CLOUD_MONITORING":            coredata.VendorCategoryCloudMonitoring,
+		"CLOUD_PROVIDER":              coredata.VendorCategoryCloudProvider,
+		"COLLABORATION":               coredata.VendorCategoryCollaboration,
+		"CUSTOMER_SUPPORT":            coredata.VendorCategoryCustomerSupport,
+		"DATA_STORAGE_AND_PROCESSING": coredata.VendorCategoryDataStorageAndProcessing,
+		"DOCUMENT_MANAGEMENT":         coredata.VendorCategoryDocumentManagement,
+		"EMPLOYEE_MANAGEMENT":         coredata.VendorCategoryEmployeeManagement,
+		"ENGINEERING":                 coredata.VendorCategoryEngineering,
+		"FINANCE":                     coredata.VendorCategoryFinance,
+		"IDENTITY_PROVIDER":           coredata.VendorCategoryIdentityProvider,
+		"IT":                          coredata.VendorCategoryIT,
+		"MARKETING":                   coredata.VendorCategoryMarketing,
+		"OFFICE_OPERATIONS":           coredata.VendorCategoryOfficeOperations,
+		"OTHER":                       coredata.VendorCategoryOther,
+		"PASSWORD_MANAGEMENT":         coredata.VendorCategoryPasswordManagement,
+		"PRODUCT_AND_DESIGN":          coredata.VendorCategoryProductAndDesign,
+		"PROFESSIONAL_SERVICES":       coredata.VendorCategoryProfessionalServices,
+		"RECRUITING":                  coredata.VendorCategoryRecruiting,
+		"SALES":                       coredata.VendorCategorySales,
+		"SECURITY":                    coredata.VendorCategorySecurity,
+		"VERSION_CONTROL":             coredata.VendorCategoryVersionControl,
+	}
+	marshalOVendorCategory2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory = map[coredata.VendorCategory]string{
+		coredata.VendorCategoryAnalytics:                "ANALYTICS",
+		coredata.VendorCategoryCloudMonitoring:          "CLOUD_MONITORING",
+		coredata.VendorCategoryCloudProvider:            "CLOUD_PROVIDER",
+		coredata.VendorCategoryCollaboration:            "COLLABORATION",
+		coredata.VendorCategoryCustomerSupport:          "CUSTOMER_SUPPORT",
+		coredata.VendorCategoryDataStorageAndProcessing: "DATA_STORAGE_AND_PROCESSING",
+		coredata.VendorCategoryDocumentManagement:       "DOCUMENT_MANAGEMENT",
+		coredata.VendorCategoryEmployeeManagement:       "EMPLOYEE_MANAGEMENT",
+		coredata.VendorCategoryEngineering:              "ENGINEERING",
+		coredata.VendorCategoryFinance:                  "FINANCE",
+		coredata.VendorCategoryIdentityProvider:         "IDENTITY_PROVIDER",
+		coredata.VendorCategoryIT:                       "IT",
+		coredata.VendorCategoryMarketing:                "MARKETING",
+		coredata.VendorCategoryOfficeOperations:         "OFFICE_OPERATIONS",
+		coredata.VendorCategoryOther:                    "OTHER",
+		coredata.VendorCategoryPasswordManagement:       "PASSWORD_MANAGEMENT",
+		coredata.VendorCategoryProductAndDesign:         "PRODUCT_AND_DESIGN",
+		coredata.VendorCategoryProfessionalServices:     "PROFESSIONAL_SERVICES",
+		coredata.VendorCategoryRecruiting:               "RECRUITING",
+		coredata.VendorCategorySales:                    "SALES",
+		coredata.VendorCategorySecurity:                 "SECURITY",
+		coredata.VendorCategoryVersionControl:           "VERSION_CONTROL",
+	}
+)
 
 func (ec *executionContext) unmarshalOVendorComplianceReportOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorComplianceReportOrderBy(ctx context.Context, v any) (*types.VendorComplianceReportOrderBy, error) {
 	if v == nil {

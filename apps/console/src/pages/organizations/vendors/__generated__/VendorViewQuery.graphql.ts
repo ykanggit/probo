@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2a33eeb4651f6afe0a8f06f44c0f2711>>
+ * @generated SignedSource<<a24deac1363fef61e3bc8f1a5b3d1848>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,6 +12,7 @@ import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type BusinessImpact = "CRITICAL" | "HIGH" | "LOW" | "MEDIUM";
 export type DataSensitivity = "CRITICAL" | "HIGH" | "LOW" | "MEDIUM" | "NONE";
+export type VendorCategory = "ANALYTICS" | "CLOUD_MONITORING" | "CLOUD_PROVIDER" | "COLLABORATION" | "CUSTOMER_SUPPORT" | "DATA_STORAGE_AND_PROCESSING" | "DOCUMENT_MANAGEMENT" | "EMPLOYEE_MANAGEMENT" | "ENGINEERING" | "FINANCE" | "IDENTITY_PROVIDER" | "IT" | "MARKETING" | "OFFICE_OPERATIONS" | "OTHER" | "PASSWORD_MANAGEMENT" | "PRODUCT_AND_DESIGN" | "PROFESSIONAL_SERVICES" | "RECRUITING" | "SALES" | "SECURITY" | "VERSION_CONTROL";
 export type VendorViewQuery$variables = {
   organizationId: string;
   vendorId: string;
@@ -22,6 +23,7 @@ export type VendorViewQuery$data = {
       readonly fullName: string;
       readonly id: string;
     } | null | undefined;
+    readonly category?: VendorCategory;
     readonly certifications?: ReadonlyArray<string>;
     readonly complianceReports?: {
       readonly edges: ReadonlyArray<{
@@ -209,62 +211,69 @@ v17 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
+  "name": "category",
+  "storageKey": null
+},
+v18 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
   "name": "fullName",
   "storageKey": null
 },
-v18 = [
+v19 = [
   (v3/*: any*/),
-  (v17/*: any*/)
+  (v18/*: any*/)
 ],
-v19 = {
+v20 = {
   "alias": null,
   "args": null,
   "concreteType": "People",
   "kind": "LinkedField",
   "name": "businessOwner",
   "plural": false,
-  "selections": (v18/*: any*/),
+  "selections": (v19/*: any*/),
   "storageKey": null
 },
-v20 = {
+v21 = {
   "alias": null,
   "args": null,
   "concreteType": "People",
   "kind": "LinkedField",
   "name": "securityOwner",
   "plural": false,
-  "selections": (v18/*: any*/),
-  "storageKey": null
-},
-v21 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "createdAt",
+  "selections": (v19/*: any*/),
   "storageKey": null
 },
 v22 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "updatedAt",
+  "name": "createdAt",
   "storageKey": null
 },
 v23 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "__typename",
+  "name": "updatedAt",
   "storageKey": null
 },
 v24 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "cursor",
+  "name": "__typename",
   "storageKey": null
 },
 v25 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "cursor",
+  "storageKey": null
+},
+v26 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -289,7 +298,7 @@ v25 = {
   ],
   "storageKey": null
 },
-v26 = [
+v27 = [
   {
     "alias": null,
     "args": null,
@@ -342,18 +351,18 @@ v26 = [
             "name": "fileSize",
             "storageKey": null
           },
-          (v21/*: any*/),
-          (v23/*: any*/)
+          (v22/*: any*/),
+          (v24/*: any*/)
         ],
         "storageKey": null
       },
-      (v24/*: any*/)
+      (v25/*: any*/)
     ],
     "storageKey": null
   },
-  (v25/*: any*/)
+  (v26/*: any*/)
 ],
-v27 = [
+v28 = [
   {
     "alias": null,
     "args": null,
@@ -413,28 +422,28 @@ v27 = [
             "kind": "LinkedField",
             "name": "assessedBy",
             "plural": false,
-            "selections": (v18/*: any*/),
+            "selections": (v19/*: any*/),
             "storageKey": null
           },
-          (v21/*: any*/),
-          (v23/*: any*/)
+          (v22/*: any*/),
+          (v24/*: any*/)
         ],
         "storageKey": null
       },
-      (v24/*: any*/)
+      (v25/*: any*/)
     ],
     "storageKey": null
   },
-  (v25/*: any*/)
+  (v26/*: any*/)
 ],
-v28 = [
+v29 = [
   {
     "kind": "Variable",
     "name": "id",
     "variableName": "organizationId"
   }
 ],
-v29 = {
+v30 = {
   "alias": null,
   "args": [
     {
@@ -452,16 +461,16 @@ v29 = {
   ],
   "storageKey": null
 },
-v30 = {
+v31 = {
   "kind": "Literal",
   "name": "first",
   "value": 100
 },
-v31 = [
-  (v30/*: any*/)
-],
 v32 = [
-  (v30/*: any*/),
+  (v31/*: any*/)
+],
+v33 = [
+  (v31/*: any*/),
   {
     "kind": "Literal",
     "name": "orderBy",
@@ -506,10 +515,11 @@ return {
               (v14/*: any*/),
               (v15/*: any*/),
               (v16/*: any*/),
-              (v19/*: any*/),
+              (v17/*: any*/),
               (v20/*: any*/),
               (v21/*: any*/),
               (v22/*: any*/),
+              (v23/*: any*/),
               {
                 "alias": "complianceReports",
                 "args": null,
@@ -517,7 +527,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__VendorView_complianceReports_connection",
                 "plural": false,
-                "selections": (v26/*: any*/),
+                "selections": (v27/*: any*/),
                 "storageKey": null
               },
               {
@@ -527,7 +537,7 @@ return {
                 "kind": "LinkedField",
                 "name": "__VendorView_riskAssessments_connection",
                 "plural": false,
-                "selections": (v27/*: any*/),
+                "selections": (v28/*: any*/),
                 "storageKey": null
               }
             ],
@@ -539,7 +549,7 @@ return {
       },
       {
         "alias": "organization",
-        "args": (v28/*: any*/),
+        "args": (v29/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
@@ -569,7 +579,7 @@ return {
             "name": "user",
             "plural": false,
             "selections": [
-              (v29/*: any*/)
+              (v30/*: any*/)
             ],
             "storageKey": null
           }
@@ -597,7 +607,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v23/*: any*/),
+          (v24/*: any*/),
           (v3/*: any*/),
           {
             "kind": "InlineFragment",
@@ -615,23 +625,24 @@ return {
               (v14/*: any*/),
               (v15/*: any*/),
               (v16/*: any*/),
-              (v19/*: any*/),
+              (v17/*: any*/),
               (v20/*: any*/),
               (v21/*: any*/),
               (v22/*: any*/),
+              (v23/*: any*/),
               {
                 "alias": null,
-                "args": (v31/*: any*/),
+                "args": (v32/*: any*/),
                 "concreteType": "VendorComplianceReportConnection",
                 "kind": "LinkedField",
                 "name": "complianceReports",
                 "plural": false,
-                "selections": (v26/*: any*/),
+                "selections": (v27/*: any*/),
                 "storageKey": "complianceReports(first:100)"
               },
               {
                 "alias": null,
-                "args": (v31/*: any*/),
+                "args": (v32/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "VendorView_complianceReports",
@@ -640,17 +651,17 @@ return {
               },
               {
                 "alias": null,
-                "args": (v31/*: any*/),
+                "args": (v32/*: any*/),
                 "concreteType": "VendorRiskAssessmentConnection",
                 "kind": "LinkedField",
                 "name": "riskAssessments",
                 "plural": false,
-                "selections": (v27/*: any*/),
+                "selections": (v28/*: any*/),
                 "storageKey": "riskAssessments(first:100)"
               },
               {
                 "alias": null,
-                "args": (v31/*: any*/),
+                "args": (v32/*: any*/),
                 "filters": null,
                 "handle": "connection",
                 "key": "VendorView_riskAssessments",
@@ -666,20 +677,20 @@ return {
       },
       {
         "alias": "organization",
-        "args": (v28/*: any*/),
+        "args": (v29/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v23/*: any*/),
+          (v24/*: any*/),
           (v3/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v32/*: any*/),
+                "args": (v33/*: any*/),
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
                 "name": "peoples",
@@ -702,7 +713,7 @@ return {
                         "plural": false,
                         "selections": [
                           (v3/*: any*/),
-                          (v17/*: any*/),
+                          (v18/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -710,21 +721,21 @@ return {
                             "name": "primaryEmailAddress",
                             "storageKey": null
                           },
-                          (v23/*: any*/)
+                          (v24/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v24/*: any*/)
+                      (v25/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v25/*: any*/)
+                  (v26/*: any*/)
                 ],
                 "storageKey": "peoples(first:100,orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
               },
               {
                 "alias": null,
-                "args": (v32/*: any*/),
+                "args": (v33/*: any*/),
                 "filters": [
                   "orderBy"
                 ],
@@ -756,7 +767,7 @@ return {
             "name": "user",
             "plural": false,
             "selections": [
-              (v29/*: any*/),
+              (v30/*: any*/),
               (v3/*: any*/)
             ],
             "storageKey": null
@@ -768,7 +779,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d80a66271806001a76348db9398ae760",
+    "cacheID": "83601f58c499976a22f7dec4312d147b",
     "id": null,
     "metadata": {
       "connection": [
@@ -794,11 +805,11 @@ return {
     },
     "name": "VendorViewQuery",
     "operationKind": "query",
-    "text": "query VendorViewQuery(\n  $vendorId: ID!\n  $organizationId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      createdAt\n      updatedAt\n      complianceReports(first: 100) {\n        edges {\n          node {\n            id\n            reportName\n            reportDate\n            validUntil\n            fileUrl\n            fileSize\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      riskAssessments(first: 100) {\n        edges {\n          node {\n            id\n            assessedAt\n            expiresAt\n            dataSensitivity\n            businessImpact\n            notes\n            assessedBy {\n              id\n              fullName\n            }\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n  viewer {\n    user {\n      people(organizationId: $organizationId) {\n        id\n      }\n      id\n    }\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query VendorViewQuery(\n  $vendorId: ID!\n  $organizationId: ID!\n) {\n  node(id: $vendorId) {\n    __typename\n    ... on Vendor {\n      id\n      name\n      description\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      category\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      createdAt\n      updatedAt\n      complianceReports(first: 100) {\n        edges {\n          node {\n            id\n            reportName\n            reportDate\n            validUntil\n            fileUrl\n            fileSize\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      riskAssessments(first: 100) {\n        edges {\n          node {\n            id\n            assessedAt\n            expiresAt\n            dataSensitivity\n            businessImpact\n            notes\n            assessedBy {\n              id\n              fullName\n            }\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ...PeopleSelector_organization\n    id\n  }\n  viewer {\n    user {\n      people(organizationId: $organizationId) {\n        id\n      }\n      id\n    }\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "97cacb4f4410588114fc82abc78d9140";
+(node as any).hash = "812a334dc26fb2961aae24862496ff0c";
 
 export default node;
