@@ -4,9 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Changed
+### Added
 
 - Add automatic vendor assessment
+- Add vendor category fields
 
 ### Fixed
 
