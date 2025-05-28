@@ -76,6 +76,8 @@ const vendorViewQuery = graphql`
         privacyPolicyUrl
         serviceLevelAgreementUrl
         dataProcessingAgreementUrl
+        businessAssociateAgreementUrl
+        subprocessorsListUrl
         securityPageUrl
         trustPageUrl
         certifications
@@ -152,6 +154,8 @@ const updateVendorMutation = graphql`
         privacyPolicyUrl
         serviceLevelAgreementUrl
         dataProcessingAgreementUrl
+        businessAssociateAgreementUrl
+        subprocessorsListUrl
         securityPageUrl
         trustPageUrl
         certifications
@@ -242,6 +246,8 @@ const assessVendorMutation = graphql`
         privacyPolicyUrl
         serviceLevelAgreementUrl
         dataProcessingAgreementUrl
+        businessAssociateAgreementUrl
+        subprocessorsListUrl
         securityPageUrl
         trustPageUrl
         certifications
@@ -1440,6 +1446,8 @@ function VendorViewContent({
     privacyPolicyUrl: data.node.privacyPolicyUrl || "",
     serviceLevelAgreementUrl: data.node.serviceLevelAgreementUrl || "",
     dataProcessingAgreementUrl: data.node.dataProcessingAgreementUrl || "",
+    businessAssociateAgreementUrl: data.node.businessAssociateAgreementUrl || "",
+    subprocessorsListUrl: data.node.subprocessorsListUrl || "",
     securityPageUrl: data.node.securityPageUrl || "",
     trustPageUrl: data.node.trustPageUrl || "",
     certifications: data.node.certifications || [],
@@ -1583,6 +1591,8 @@ function VendorViewContent({
       privacyPolicyUrl: data.node.privacyPolicyUrl || "",
       serviceLevelAgreementUrl: data.node.serviceLevelAgreementUrl || "",
       dataProcessingAgreementUrl: data.node.dataProcessingAgreementUrl || "",
+      businessAssociateAgreementUrl: data.node.businessAssociateAgreementUrl || "",
+      subprocessorsListUrl: data.node.subprocessorsListUrl || "",
       securityPageUrl: data.node.securityPageUrl || "",
       trustPageUrl: data.node.trustPageUrl || "",
       certifications: data.node.certifications || [],
@@ -2190,6 +2200,116 @@ function VendorViewContent({
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
                     <p className="text-sm font-medium text-[#6B716A]">
+                      Business Associate Agreement URL
+                    </p>
+                    <div className="flex items-center space-x-2 w-full">
+                      <Input
+                        value={formData.businessAssociateAgreementUrl}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            "businessAssociateAgreementUrl",
+                            e.target.value,
+                          )
+                        }
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
+                      />
+                      {formData.businessAssociateAgreementUrl && (
+                        <a
+                          href={formData.businessAssociateAgreementUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6.66667 9.33333L13.3333 2.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M8.66667 2.66667H13.3333V7.33333"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
+                    <p className="text-sm font-medium text-[#6B716A]">
+                      Subprocessors List URL
+                    </p>
+                    <div className="flex items-center space-x-2 w-full">
+                      <Input
+                        value={formData.subprocessorsListUrl}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            "subprocessorsListUrl",
+                            e.target.value,
+                          )
+                        }
+                        className="border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 flex-1"
+                      />
+                      {formData.subprocessorsListUrl && (
+                        <a
+                          href={formData.subprocessorsListUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6.66667 9.33333L13.3333 2.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M8.66667 2.66667H13.3333V7.33333"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M13.3333 9.33333V12.6667C13.3333 13.0203 13.1929 13.3594 12.9428 13.6095C12.6928 13.8595 12.3536 14 12 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6.66667"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] py-4 px-5">
+                    <p className="text-sm font-medium text-[#6B716A]">
                       Data Processing Agreement URL
                     </p>
                     <div className="flex items-center space-x-2 w-full">
@@ -2434,6 +2554,8 @@ function VendorViewContent({
             privacyPolicyUrl: newData.privacyPolicyUrl || prevData.privacyPolicyUrl,
             serviceLevelAgreementUrl: newData.serviceLevelAgreementUrl || prevData.serviceLevelAgreementUrl,
             dataProcessingAgreementUrl: newData.dataProcessingAgreementUrl || prevData.dataProcessingAgreementUrl,
+            businessAssociateAgreementUrl: newData.businessAssociateAgreementUrl || prevData.businessAssociateAgreementUrl,
+            subprocessorsListUrl: newData.subprocessorsListUrl || prevData.subprocessorsListUrl,
             securityPageUrl: newData.securityPageUrl || prevData.securityPageUrl,
             trustPageUrl: newData.trustPageUrl || prevData.trustPageUrl,
             certifications: newData.certifications || prevData.certifications,

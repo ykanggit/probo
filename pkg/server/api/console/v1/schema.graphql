@@ -593,6 +593,8 @@ type Vendor implements Node {
   privacyPolicyUrl: String
   serviceLevelAgreementUrl: String
   dataProcessingAgreementUrl: String
+  businessAssociateAgreementUrl: String
+  subprocessorsListUrl: String
   certifications: [String!]!
   securityPageUrl: String
   trustPageUrl: String
@@ -1144,6 +1146,8 @@ input CreateVendorInput {
   category: VendorCategory
   serviceLevelAgreementUrl: String
   dataProcessingAgreementUrl: String
+  businessAssociateAgreementUrl: String
+  subprocessorsListUrl: String
   certifications: [String!]
   securityPageUrl: String
   trustPageUrl: String
@@ -1162,6 +1166,8 @@ input UpdateVendorInput {
   privacyPolicyUrl: String
   serviceLevelAgreementUrl: String
   dataProcessingAgreementUrl: String
+  businessAssociateAgreementUrl: String
+  subprocessorsListUrl: String
   websiteUrl: String
   legalName: String
   headquarterAddress: String

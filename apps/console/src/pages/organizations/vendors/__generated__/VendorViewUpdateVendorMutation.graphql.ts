@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<687421f6528edb3fe7623b14cda888d7>>
+ * @generated SignedSource<<1869215126a875b4693649fdbd2fdd9c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,6 +11,7 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type VendorCategory = "ANALYTICS" | "CLOUD_MONITORING" | "CLOUD_PROVIDER" | "COLLABORATION" | "CUSTOMER_SUPPORT" | "DATA_STORAGE_AND_PROCESSING" | "DOCUMENT_MANAGEMENT" | "EMPLOYEE_MANAGEMENT" | "ENGINEERING" | "FINANCE" | "IDENTITY_PROVIDER" | "IT" | "MARKETING" | "OFFICE_OPERATIONS" | "OTHER" | "PASSWORD_MANAGEMENT" | "PRODUCT_AND_DESIGN" | "PROFESSIONAL_SERVICES" | "RECRUITING" | "SALES" | "SECURITY" | "VERSION_CONTROL";
 export type UpdateVendorInput = {
+  businessAssociateAgreementUrl?: string | null | undefined;
   businessOwnerId?: string | null | undefined;
   category?: VendorCategory | null | undefined;
   certifications?: ReadonlyArray<string> | null | undefined;
@@ -25,6 +26,7 @@ export type UpdateVendorInput = {
   securityPageUrl?: string | null | undefined;
   serviceLevelAgreementUrl?: string | null | undefined;
   statusPageUrl?: string | null | undefined;
+  subprocessorsListUrl?: string | null | undefined;
   termsOfServiceUrl?: string | null | undefined;
   trustPageUrl?: string | null | undefined;
   websiteUrl?: string | null | undefined;
@@ -35,6 +37,7 @@ export type VendorViewUpdateVendorMutation$variables = {
 export type VendorViewUpdateVendorMutation$data = {
   readonly updateVendor: {
     readonly vendor: {
+      readonly businessAssociateAgreementUrl: string | null | undefined;
       readonly businessOwner: {
         readonly fullName: string;
         readonly id: string;
@@ -55,6 +58,7 @@ export type VendorViewUpdateVendorMutation$data = {
       readonly securityPageUrl: string | null | undefined;
       readonly serviceLevelAgreementUrl: string | null | undefined;
       readonly statusPageUrl: string | null | undefined;
+      readonly subprocessorsListUrl: string | null | undefined;
       readonly termsOfServiceUrl: string | null | undefined;
       readonly trustPageUrl: string | null | undefined;
       readonly updatedAt: string;
@@ -169,6 +173,20 @@ v3 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
+            "name": "businessAssociateAgreementUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "subprocessorsListUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
             "name": "securityPageUrl",
             "storageKey": null
           },
@@ -266,16 +284,16 @@ return {
     "selections": (v3/*: any*/)
   },
   "params": {
-    "cacheID": "8ead09e0003d808fcf2d2bc8ca19c8b2",
+    "cacheID": "dd590c1e78969f50f0f36352d70e0aa2",
     "id": null,
     "metadata": {},
     "name": "VendorViewUpdateVendorMutation",
     "operationKind": "mutation",
-    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      category\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation VendorViewUpdateVendorMutation(\n  $input: UpdateVendorInput!\n) {\n  updateVendor(input: $input) {\n    vendor {\n      id\n      name\n      description\n      statusPageUrl\n      termsOfServiceUrl\n      privacyPolicyUrl\n      serviceLevelAgreementUrl\n      dataProcessingAgreementUrl\n      businessAssociateAgreementUrl\n      subprocessorsListUrl\n      securityPageUrl\n      trustPageUrl\n      certifications\n      headquarterAddress\n      legalName\n      websiteUrl\n      category\n      businessOwner {\n        id\n        fullName\n      }\n      securityOwner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "90aa0b06cde30ea8a7deb711d5ba0c69";
+(node as any).hash = "61c12bb5fe14c4499601363ae8070e6d";
 
 export default node;

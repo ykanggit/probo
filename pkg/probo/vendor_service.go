@@ -31,43 +31,47 @@ type (
 	}
 
 	CreateVendorRequest struct {
-		OrganizationID             gid.GID
-		Name                       string
-		Description                *string
-		HeadquarterAddress         *string
-		LegalName                  *string
-		WebsiteURL                 *string
-		Category                   *coredata.VendorCategory
-		PrivacyPolicyURL           *string
-		ServiceLevelAgreementURL   *string
-		DataProcessingAgreementURL *string
-		Certifications             []string
-		SecurityPageURL            *string
-		TrustPageURL               *string
-		TermsOfServiceURL          *string
-		StatusPageURL              *string
-		BusinessOwnerID            *gid.GID
-		SecurityOwnerID            *gid.GID
+		OrganizationID                gid.GID
+		Name                          string
+		Description                   *string
+		HeadquarterAddress            *string
+		LegalName                     *string
+		WebsiteURL                    *string
+		Category                      *coredata.VendorCategory
+		PrivacyPolicyURL              *string
+		ServiceLevelAgreementURL      *string
+		DataProcessingAgreementURL    *string
+		BusinessAssociateAgreementURL *string
+		SubprocessorsListURL          *string
+		Certifications                []string
+		SecurityPageURL               *string
+		TrustPageURL                  *string
+		TermsOfServiceURL             *string
+		StatusPageURL                 *string
+		BusinessOwnerID               *gid.GID
+		SecurityOwnerID               *gid.GID
 	}
 
 	UpdateVendorRequest struct {
-		ID                         gid.GID
-		Name                       *string
-		Description                *string
-		HeadquarterAddress         *string
-		LegalName                  *string
-		WebsiteURL                 *string
-		TermsOfServiceURL          *string
-		Category                   *coredata.VendorCategory
-		PrivacyPolicyURL           *string
-		ServiceLevelAgreementURL   *string
-		DataProcessingAgreementURL *string
-		Certifications             []string
-		SecurityPageURL            *string
-		TrustPageURL               *string
-		StatusPageURL              *string
-		BusinessOwnerID            *gid.GID
-		SecurityOwnerID            *gid.GID
+		ID                            gid.GID
+		Name                          *string
+		Description                   *string
+		HeadquarterAddress            *string
+		LegalName                     *string
+		WebsiteURL                    *string
+		TermsOfServiceURL             *string
+		Category                      *coredata.VendorCategory
+		PrivacyPolicyURL              *string
+		ServiceLevelAgreementURL      *string
+		DataProcessingAgreementURL    *string
+		BusinessAssociateAgreementURL *string
+		SubprocessorsListURL          *string
+		Certifications                []string
+		SecurityPageURL               *string
+		TrustPageURL                  *string
+		StatusPageURL                 *string
+		BusinessOwnerID               *gid.GID
+		SecurityOwnerID               *gid.GID
 	}
 
 	AssessVendorRequest struct {
@@ -156,6 +160,14 @@ func (s VendorService) Update(
 
 			if req.DataProcessingAgreementURL != nil {
 				vendor.DataProcessingAgreementURL = req.DataProcessingAgreementURL
+			}
+
+			if req.BusinessAssociateAgreementURL != nil {
+				vendor.BusinessAssociateAgreementURL = req.BusinessAssociateAgreementURL
+			}
+
+			if req.SubprocessorsListURL != nil {
+				vendor.SubprocessorsListURL = req.SubprocessorsListURL
 			}
 
 			if req.Category != nil {
@@ -276,22 +288,24 @@ func (s VendorService) Create(
 ) (*coredata.Vendor, error) {
 	now := time.Now()
 	vendor := &coredata.Vendor{
-		ID:                         gid.New(s.svc.scope.GetTenantID(), coredata.VendorEntityType),
-		Name:                       req.Name,
-		CreatedAt:                  now,
-		UpdatedAt:                  now,
-		Description:                req.Description,
-		HeadquarterAddress:         req.HeadquarterAddress,
-		LegalName:                  req.LegalName,
-		WebsiteURL:                 req.WebsiteURL,
-		PrivacyPolicyURL:           req.PrivacyPolicyURL,
-		ServiceLevelAgreementURL:   req.ServiceLevelAgreementURL,
-		DataProcessingAgreementURL: req.DataProcessingAgreementURL,
-		Certifications:             req.Certifications,
-		SecurityPageURL:            req.SecurityPageURL,
-		TrustPageURL:               req.TrustPageURL,
-		StatusPageURL:              req.StatusPageURL,
-		TermsOfServiceURL:          req.TermsOfServiceURL,
+		ID:                            gid.New(s.svc.scope.GetTenantID(), coredata.VendorEntityType),
+		Name:                          req.Name,
+		CreatedAt:                     now,
+		UpdatedAt:                     now,
+		Description:                   req.Description,
+		HeadquarterAddress:            req.HeadquarterAddress,
+		LegalName:                     req.LegalName,
+		WebsiteURL:                    req.WebsiteURL,
+		PrivacyPolicyURL:              req.PrivacyPolicyURL,
+		ServiceLevelAgreementURL:      req.ServiceLevelAgreementURL,
+		DataProcessingAgreementURL:    req.DataProcessingAgreementURL,
+		BusinessAssociateAgreementURL: req.BusinessAssociateAgreementURL,
+		SubprocessorsListURL:          req.SubprocessorsListURL,
+		Certifications:                req.Certifications,
+		SecurityPageURL:               req.SecurityPageURL,
+		TrustPageURL:                  req.TrustPageURL,
+		StatusPageURL:                 req.StatusPageURL,
+		TermsOfServiceURL:             req.TermsOfServiceURL,
 	}
 
 	err := s.svc.pg.WithTx(
@@ -439,22 +453,24 @@ func (s VendorService) Assess(
 	}
 
 	vendor := &coredata.Vendor{
-		ID:                         req.ID,
-		Name:                       vendorInfo.Name,
-		WebsiteURL:                 &req.WebsiteURL,
-		Description:                &vendorInfo.Description,
-		Category:                   coredata.VendorCategory(vendorInfo.Category),
-		HeadquarterAddress:         &vendorInfo.HeadquarterAddress,
-		LegalName:                  &vendorInfo.LegalName,
-		PrivacyPolicyURL:           &vendorInfo.PrivacyPolicyURL,
-		ServiceLevelAgreementURL:   &vendorInfo.ServiceLevelAgreementURL,
-		DataProcessingAgreementURL: &vendorInfo.DataProcessingAgreementURL,
-		SecurityPageURL:            &vendorInfo.SecurityPageURL,
-		TrustPageURL:               &vendorInfo.TrustPageURL,
-		TermsOfServiceURL:          &vendorInfo.TermsOfServiceURL,
-		StatusPageURL:              &vendorInfo.StatusPageURL,
-		Certifications:             vendorInfo.Certifications,
-		UpdatedAt:                  time.Now(),
+		ID:                            req.ID,
+		Name:                          vendorInfo.Name,
+		WebsiteURL:                    &req.WebsiteURL,
+		Description:                   &vendorInfo.Description,
+		Category:                      coredata.VendorCategory(vendorInfo.Category),
+		HeadquarterAddress:            &vendorInfo.HeadquarterAddress,
+		LegalName:                     &vendorInfo.LegalName,
+		PrivacyPolicyURL:              &vendorInfo.PrivacyPolicyURL,
+		ServiceLevelAgreementURL:      &vendorInfo.ServiceLevelAgreementURL,
+		DataProcessingAgreementURL:    &vendorInfo.DataProcessingAgreementURL,
+		BusinessAssociateAgreementURL: &vendorInfo.BusinessAssociateAgreementURL,
+		SubprocessorsListURL:          &vendorInfo.SubprocessorsListURL,
+		SecurityPageURL:               &vendorInfo.SecurityPageURL,
+		TrustPageURL:                  &vendorInfo.TrustPageURL,
+		TermsOfServiceURL:             &vendorInfo.TermsOfServiceURL,
+		StatusPageURL:                 &vendorInfo.StatusPageURL,
+		Certifications:                vendorInfo.Certifications,
+		UpdatedAt:                     time.Now(),
 	}
 
 	return vendor, nil

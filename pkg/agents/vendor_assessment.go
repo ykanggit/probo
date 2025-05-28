@@ -39,19 +39,21 @@ type (
 	}
 
 	vendorInfo struct {
-		Name                       string   `json:"name"`
-		Description                string   `json:"description"`
-		Category                   string   `json:"category"`
-		HeadquarterAddress         string   `json:"headquarter_address"`
-		LegalName                  string   `json:"legal_name"`
-		PrivacyPolicyURL           string   `json:"privacy_policy_url"`
-		ServiceLevelAgreementURL   string   `json:"service_level_agreement_url"`
-		DataProcessingAgreementURL string   `json:"data_processing_agreement_url"`
-		SecurityPageURL            string   `json:"security_page_url"`
-		TrustPageURL               string   `json:"trust_page_url"`
-		TermsOfServiceURL          string   `json:"terms_of_service_url"`
-		StatusPageURL              string   `json:"status_page_url"`
-		Certifications             []string `json:"certifications"`
+		Name                          string   `json:"name"`
+		Description                   string   `json:"description"`
+		Category                      string   `json:"category"`
+		HeadquarterAddress            string   `json:"headquarter_address"`
+		LegalName                     string   `json:"legal_name"`
+		PrivacyPolicyURL              string   `json:"privacy_policy_url"`
+		ServiceLevelAgreementURL      string   `json:"service_level_agreement_url"`
+		DataProcessingAgreementURL    string   `json:"data_processing_agreement_url"`
+		BusinessAssociateAgreementURL string   `json:"business_associate_agreement_url"`
+		SubprocessorsListURL          string   `json:"subprocessors_list_url"`
+		SecurityPageURL               string   `json:"security_page_url"`
+		TrustPageURL                  string   `json:"trust_page_url"`
+		TermsOfServiceURL             string   `json:"terms_of_service_url"`
+		StatusPageURL                 string   `json:"status_page_url"`
+		Certifications                []string `json:"certifications"`
 	}
 )
 
@@ -70,6 +72,8 @@ const (
 		- privacy_policy_url: URL to privacy policy page
 		- service_level_agreement_url: URL to SLA page
 		- data_processing_agreement_url: URL to DPA page
+		- business_associate_agreement_url: URL to BAA page
+		- subprocessors_list_url: URL to subprocessors/subcontractors list page
 		- security_page_url: URL to security information page
 		- trust_page_url: URL to trust/compliance page
 		- terms_of_service_url: URL to terms of service page
@@ -116,11 +120,15 @@ const (
 			"privacy_policy_url": "https://stripe.com/privacy",
 			"service_level_agreement_url": "https://stripe.com/sla",
 			"data_processing_agreement_url": "https://stripe.com/dpa",
+			"business_associate_agreement_url": "https://stripe.com/baa",
+			"subprocessors_list_url": "https://stripe.com/subprocessors",
 			"security_page_url": "https://stripe.com/security",
 			"trust_page_url": "https://stripe.com/trust",
 			"terms_of_service_url": "https://stripe.com/terms",
 			"status_page_url": "https://status.stripe.com",
-			"certifications": ["SOC1", "SOC2", "PCI DSS Level 1", "ISO 27001"],
+			"business_associate_agreement_url": "https://stripe.com/baa",
+			"subprocessors_list_url": "https://stripe.com/subprocessors",
+			"certifications": ["SOC1", "SOC2", "PCI DSS Level 1", "ISO 27001"]
 			"category": "FINANCE"
 		}
 

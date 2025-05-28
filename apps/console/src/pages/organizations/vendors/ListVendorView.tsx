@@ -387,10 +387,10 @@ function ListVendorContent({
                             websiteUrl: vendor.websiteUrl,
                             category: vendor.category as VendorCategory || null,
                             privacyPolicyUrl: vendor.privacyPolicyUrl,
-                            serviceLevelAgreementUrl:
-                              vendor.serviceLevelAgreementUrl,
-                            dataProcessingAgreementUrl:
-                              vendor.dataProcessingAgreementUrl,
+                            serviceLevelAgreementUrl: vendor.serviceLevelAgreementUrl,
+                            dataProcessingAgreementUrl: vendor.dataProcessingAgreementUrl,
+                            businessAssociateAgreementUrl: vendor.businessAssociateAgreementUrl,
+                            subprocessorsListUrl: vendor.subprocessorsListUrl,
                             certifications: vendor.certifications,
                             securityPageUrl: vendor.securityPageUrl,
                             trustPageUrl: vendor.trustPageUrl,
