@@ -8,11 +8,12 @@ All notable changes to this project will be documented in this file.
 
 - Add automatic vendor assessment
 - Add vendor category fields
+- Add vendor business associate agreement url and subprocessors list url
 
 ### Fixed
 
 - Fix 5xx when create new vendor
-- Fxi 5xx when update a vendor
+- Fix 5xx when update a vendor
 
 ## [0.27.1] - 2025-05-25
 
