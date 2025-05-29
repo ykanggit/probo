@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Add url input type for vendor assessement
+
 ## [0.28.0] - 2025-05-29
 
 ### Added
