@@ -358,5 +358,55 @@
     "category": "Technology",
     "name": "Security exposure due to AI-generated code vulnerabilities",
     "description": "AI-generated code that lacks proper validation introduces security flaws or backdoors into production systems"
+  },
+  {
+    "category": "Health",
+    "name": "HIPAA violation via unauthorized access to patient data",
+    "description": "Unauthorized employees or third parties accessing patient data without proper access control can lead to serious HIPAA violations"
+  },
+  {
+    "category": "Health",
+    "name": "Data breach via insecure storage of ePHI",
+    "description": "Storing patient data without encryption or adequate security controls may lead to unauthorized access and mandatory breach reporting"
+  },
+  {
+    "category": "Health",
+    "name": "Audit failure via incomplete HIPAA documentation",
+    "description": "Missing policies, procedures, or risk assessments can result in non-compliance findings during a HIPAA audit or investigation"
+  },
+  {
+    "category": "Health",
+    "name": "Breach notification failure via delayed incident reporting",
+    "description": "Failing to report a breach involving ePHI within the HIPAA-required timeframe can lead to additional fines and reputational damage"
+  },
+  {
+    "category": "Health",
+    "name": "Vendor risk via non-compliant business associates",
+    "description": "Third-party service providers handling ePHI without a business associate agreement (BAA) or proper controls can expose your organization to liability"
+  },
+  {
+    "category": "Health",
+    "name": "Workflow interruption via over-restriction of access controls",
+    "description": "Excessive limitations on access to ePHI may impair operations or delay care, especially in time-sensitive environments"
+  },
+  {
+    "category": "Health",
+    "name": "Privacy complaint via improper ePHI disclosure",
+    "description": "Accidental or inappropriate sharing of patient data with unauthorized individuals (e.g. marketing or external partners) may trigger complaints and investigations"
+  },
+  {
+    "category": "Health",
+    "name": "Data retention risk via inconsistent retention policies",
+    "description": "Retaining ePHI longer than necessary — or deleting it prematurely — can violate regulations or impair patient services"
+  },
+  {
+    "category": "Health",
+    "name": "Phishing compromise via targeted credential attacks",
+    "description": "Phishing emails aimed at accessing login credentials to systems containing ePHI can lead to unauthorized data access and regulatory breaches"
+  },
+  {
+    "category": "Health",
+    "name": "Security drift via outdated risk analysis",
+    "description": "Not regularly updating your HIPAA security risk assessment may result in blind spots in new systems, vendors, or workflows"
   }
 ]
