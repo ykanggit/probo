@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.28.0] - 2025-05-29
+
 ### Added
 
 - Add automatic vendor assessment
