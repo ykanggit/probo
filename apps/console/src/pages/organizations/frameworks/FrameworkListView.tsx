@@ -10,7 +10,7 @@ import { Link, useParams } from "react-router";
 import type { FrameworkListViewQuery as FrameworkListViewQueryType } from "./__generated__/FrameworkListViewQuery.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
 import { FrameworkListViewSkeleton } from "./FrameworkListPage";
-import { FrameworkImportDropdown } from "./ImportFrameworkDialog";
+import { FrameworkImportDropdown, FrameworkImportButton } from "./ImportFrameworkDialog";
 
 const FrameworkListViewQuery = graphql`
   query FrameworkListViewQuery($organizationId: ID!) {
@@ -44,7 +44,12 @@ function FrameworkListViewContent({
     <PageTemplate
       title="Frameworks"
       description="Manage your compliance frameworks"
-      actions={<FrameworkImportDropdown />}
+      actions={
+        <div className="flex gap-4">
+          <FrameworkImportButton />
+          <FrameworkImportDropdown />
+        </div>
+      }
     >
       <div className="space-y-6">
         <Card>

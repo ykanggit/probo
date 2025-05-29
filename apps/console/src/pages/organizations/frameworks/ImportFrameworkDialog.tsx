@@ -10,7 +10,7 @@ import { useNavigate, useParams } from "react-router";
 import { ConnectionHandler, graphql, useMutation } from "react-relay";
 import { useToast } from "@/hooks/use-toast";
 import { ImportFrameworkDialogImportFrameworkMutation } from "./__generated__/ImportFrameworkDialogImportFrameworkMutation.graphql";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const AVAILABLE_FRAMEWORKS = [
   { id: "ISO27001-2022", name: "ISO/IEC 27001:2022" },
@@ -156,5 +156,106 @@ export function FrameworkImportDropdown() {
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+export function FrameworkImportButton() {
+  const { organizationId } = useParams();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [commit] = useMutation<ImportFrameworkDialogImportFrameworkMutation>(
+    importFrameworkMutation
+  );
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+
+    const connectionId = ConnectionHandler.getConnectionID(
+      organizationId!,
+      "FrameworkListView_frameworks"
+    );
+
+    commit({
+      variables: {
+        input: {
+          organizationId: organizationId!,
+          file: null,
+        },
+        connections: [connectionId],
+      },
+      uploadables: {
+        "input.file": file,
+      },
+      onCompleted(data, errors) {
+        setIsImporting(false);
+        if (errors) {
+          const error = errors[0];
+          let errorMessage = error.message || "Failed to import framework";
+
+          if (error?.message?.includes("already exists")) {
+            errorMessage = `A framework with this name already exists. Please choose a different name.`;
+          }
+
+          toast({
+            title: "Error",
+            description: errorMessage,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        toast({
+          title: "Success",
+          description: "Framework imported successfully",
+        });
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      },
+      onError(error) {
+        setIsImporting(false);
+        let errorMessage = error.message || "Failed to import framework";
+
+        if (error.message?.includes("already exists")) {
+          errorMessage = `A framework with this name already exists. Please choose a different name.`;
+        }
+
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  return (
+    <>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+        accept=".json"
+      />
+      <Button
+        variant="secondary"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={isImporting}
+      >
+        {isImporting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Importing...
+          </>
+        ) : (
+          "Import Framework"
+        )}
+      </Button>
+    </>
   );
 }
