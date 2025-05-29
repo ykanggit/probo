@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- New add vendor UI
+
 ### Fixed
 
 - Add url input type for vendor assessement
