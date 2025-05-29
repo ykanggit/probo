@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add framework import from json
+
 ### Changed
 
 - New add vendor UI
