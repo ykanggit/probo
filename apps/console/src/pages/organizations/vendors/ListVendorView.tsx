@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState, useTransition } from "react";
+import { Suspense, useEffect, useState, useTransition, useRef } from "react";
 import {
   graphql,
   PreloadedQuery,
@@ -199,7 +199,7 @@ function ListVendorContent({
   const [, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
-  const [showAddVendorDropdown, setShowAddVendorDropdown] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filteredVendors, setFilteredVendors] = useState<Vendors>([]);
   const [vendorsData, setVendorsData] = useState<Vendors>([]);
   const [isLoadingVendors, setIsLoadingVendors] = useState(false);
@@ -208,6 +208,7 @@ function ListVendorContent({
   const [deleteVendor] =
     useMutation<ListVendorViewDeleteVendorMutation>(deleteVendorMutation);
   const { organizationId } = useParams();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const loadVendorsData = async () => {
@@ -255,12 +256,117 @@ function ListVendorContent({
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
+    setSelectedIndex(-1);
     if (value.trim() === "") {
       setFilteredVendors([]);
     } else {
       const results = fuse.search(value).map((result) => result.item);
       setFilteredVendors(results);
     }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!searchTerm.trim()) return;
+
+    const totalOptions = filteredVendors.length + 1; // +1 for "Create new vendor" option
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev => (prev + 1) % totalOptions);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev => (prev - 1 + totalOptions) % totalOptions);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex === -1) {
+          // No suggestion selected, create new vendor
+          handleCreateNewVendor();
+        } else if (selectedIndex === filteredVendors.length) {
+          // Create new vendor option selected
+          handleCreateNewVendor();
+        } else {
+          // Select existing vendor
+          handleSelectVendor(filteredVendors[selectedIndex]);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setSearchTerm("");
+        setFilteredVendors([]);
+        setSelectedIndex(-1);
+        searchInputRef.current?.focus();
+        break;
+    }
+  };
+
+  const handleCreateNewVendor = () => {
+    createVendor({
+      variables: {
+        connections: [vendorsConnection.vendors.__id],
+        input: {
+          organizationId: data.organization.id,
+          name: searchTerm.trim(),
+          description: "",
+        },
+      },
+      onCompleted() {
+        setSearchTerm("");
+        setFilteredVendors([]);
+        setSelectedIndex(-1);
+        searchInputRef.current?.focus();
+        toast({
+          title: "Vendor created",
+          description: "The new vendor has been created successfully",
+        });
+      },
+    });
+  };
+
+  const handleSelectVendor = (vendor: Vendor) => {
+    createVendor({
+      variables: {
+        connections: [vendorsConnection.vendors.__id],
+        input: {
+          organizationId: data.organization.id,
+          name: vendor.name,
+          description: vendor.description,
+          headquarterAddress: vendor.headquarterAddress,
+          legalName: vendor.legalName,
+          websiteUrl: vendor.websiteUrl,
+          category: vendor.category as VendorCategory || null,
+          privacyPolicyUrl: vendor.privacyPolicyUrl,
+          serviceLevelAgreementUrl: vendor.serviceLevelAgreementUrl,
+          dataProcessingAgreementUrl: vendor.dataProcessingAgreementUrl,
+          businessAssociateAgreementUrl: vendor.businessAssociateAgreementUrl,
+          subprocessorsListUrl: vendor.subprocessorsListUrl,
+          certifications: vendor.certifications,
+          securityPageUrl: vendor.securityPageUrl,
+          trustPageUrl: vendor.trustPageUrl,
+          statusPageUrl: vendor.statusPageUrl,
+          termsOfServiceUrl: vendor.termsOfServiceUrl,
+        },
+      },
+      onCompleted() {
+        setSearchTerm("");
+        setFilteredVendors([]);
+        setSelectedIndex(-1);
+        searchInputRef.current?.focus();
+        toast({
+          title: "Vendor added",
+          description: "The vendor has been added successfully",
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to create vendor",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   // Helper to format date (similar to "Mon, 8 Mar. 2025" in the design)
@@ -334,141 +440,71 @@ function ListVendorContent({
   return (
     <PageTemplate
       title="Vendors"
-      actions={
-        <Button
-          className="flex items-center gap-2"
-          onClick={() => setShowAddVendorDropdown(!showAddVendorDropdown)}
-        >
-          <Plus className="h-4 w-4" />
-          Add vendor
-        </Button>
-      }
     >
-      {showAddVendorDropdown && (
-        <div className="mb-6 p-4 border rounded-xl bg-white relative">
-          <div className="flex items-center gap-2 mb-4">
-            <Store className="h-5 w-5" />
-            <h3 className="font-medium">Add a vendor</h3>
-          </div>
-          <div className="flex gap-2 relative">
-            <Input
-              type="text"
-              placeholder="Type vendor's name"
-              value={searchTerm}
-              style={{ borderRadius: "0.3rem" }}
-              onChange={handleSearchChange}
-              disabled={isLoadingVendors}
-            />
-            {isLoadingVendors && (
-              <div className="absolute inset-0 flex items-center justify-center bg-background/50">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-              </div>
-            )}
+      <div className="mb-6 p-4 border rounded-xl bg-white relative">
+        <div className="flex items-center gap-2 mb-4">
+          <Store className="h-5 w-5" />
+          <h3 className="font-medium">Add a vendor</h3>
+        </div>
+        <div className="flex gap-2 relative">
+          <Input
+            type="text"
+            placeholder="Type vendor's name"
+            value={searchTerm}
+            style={{ borderRadius: "0.3rem" }}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
+            disabled={isLoadingVendors}
+            ref={searchInputRef}
+          />
+          {isLoadingVendors && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          )}
 
-            {searchTerm.trim() !== "" && (
-              <div
-                style={{ borderRadius: "0.3rem" }}
-                className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-white shadow-md z-10"
-              >
-                {filteredVendors.map((vendor) => (
-                  <button
-                    key={vendor.name}
-                    className="w-full px-3 py-2 text-left hover:bg-gray-50"
-                    onClick={() => {
-                      createVendor({
-                        variables: {
-                          connections: [vendorsConnection.vendors.__id],
-                          input: {
-                            organizationId: data.organization.id,
-                            name: vendor.name,
-                            description: vendor.description,
-                            headquarterAddress: vendor.headquarterAddress,
-                            legalName: vendor.legalName,
-                            websiteUrl: vendor.websiteUrl,
-                            category: vendor.category as VendorCategory || null,
-                            privacyPolicyUrl: vendor.privacyPolicyUrl,
-                            serviceLevelAgreementUrl: vendor.serviceLevelAgreementUrl,
-                            dataProcessingAgreementUrl: vendor.dataProcessingAgreementUrl,
-                            businessAssociateAgreementUrl: vendor.businessAssociateAgreementUrl,
-                            subprocessorsListUrl: vendor.subprocessorsListUrl,
-                            certifications: vendor.certifications,
-                            securityPageUrl: vendor.securityPageUrl,
-                            trustPageUrl: vendor.trustPageUrl,
-                            statusPageUrl: vendor.statusPageUrl,
-                            termsOfServiceUrl: vendor.termsOfServiceUrl,
-                          },
-                        },
-                        onCompleted() {
-                          setSearchTerm("");
-                          setFilteredVendors([]);
-                          setShowAddVendorDropdown(false);
-                          toast({
-                            title: "Vendor added",
-                            description:
-                              "The vendor has been added successfully",
-                          });
-                        },
-                        onError: (error) => {
-                          toast({
-                            title: "Error",
-                            description: error.message || "Failed to create vendor",
-                            variant: "destructive",
-                          });
-                        }
-                      });
-                    }}
-                  >
-                    <div className="flex items-center gap-2">
-                      {vendor.websiteUrl && (
-                        <img
-                          src={getFaviconUrl(vendor.websiteUrl) || ""}
-                          alt=""
-                          className="w-4 h-4"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
-                      )}
-                      {vendor.name}
-                    </div>
-                  </button>
-                ))}
+          {searchTerm.trim() !== "" && (
+            <div
+              style={{ borderRadius: "0.3rem" }}
+              className="absolute top-full left-0 mt-1 w-[calc(100%-100px)] max-h-48 overflow-y-auto border bg-white shadow-md z-10"
+            >
+              {filteredVendors.map((vendor, index) => (
                 <button
-                  className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 border-t"
-                  onClick={(e) => {
-                    createVendor({
-                      variables: {
-                        connections: [vendorsConnection.vendors.__id],
-                        input: {
-                          organizationId: data.organization.id,
-                          name: searchTerm.trim(),
-                          description: "",
-                        },
-                      },
-                      onCompleted() {
-                        setSearchTerm("");
-                        setFilteredVendors([]);
-                        setShowAddVendorDropdown(false);
-                        toast({
-                          title: "Vendor created",
-                          description:
-                            "The new vendor has been created successfully",
-                        });
-                      },
-                    });
-                  }}
+                  key={vendor.name}
+                  className={`w-full px-3 py-2 text-left hover:bg-gray-50 ${selectedIndex === index ? 'bg-gray-100' : ''}`}
+                  onClick={() => handleSelectVendor(vendor)}
+                  onMouseEnter={() => setSelectedIndex(index)}
                 >
                   <div className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    <span className="font-medium">Create new vendor:</span>{" "}
-                    {searchTerm}
+                    {vendor.websiteUrl && (
+                      <img
+                        src={getFaviconUrl(vendor.websiteUrl) || ""}
+                        alt=""
+                        className="w-4 h-4"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    )}
+                    {vendor.name}
                   </div>
                 </button>
-              </div>
-            )}
-          </div>
+              ))}
+              <button
+                className={`w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 border-t ${selectedIndex === filteredVendors.length ? 'bg-gray-100' : ''}`}
+                onClick={handleCreateNewVendor}
+                onMouseEnter={() => setSelectedIndex(filteredVendors.length)}
+              >
+                <div className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  <span className="font-medium">Create new vendor:</span>{" "}
+                  {searchTerm}
+                </div>
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       <div className="rounded-xl border overflow-hidden">
         <table className="w-full bg-white">
