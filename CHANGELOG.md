@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix HIPAA import
+
 ## [0.29.0] - 2025-05-29
 
 ### Added
