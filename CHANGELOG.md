@@ -4,8 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.29.0] - 2025-05-29
+
 ### Added
 
+- HIPAA releated risks
 - Add framework import from json
 
 ### Changed
