@@ -14,25 +14,38 @@
 
 package coredata
 
-const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MeasureEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ConnectorEntityType
-	VendorRiskAssessmentEntityType
-	VendorEntityType
-	PeopleEntityType
-	VendorComplianceReportEntityType
-	DocumentEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
-	DocumentVersionEntityType
-	DocumentVersionSignatureEntityType
-	AssetEntityType
-	DatumEntityType
+import (
+	"fmt"
 )
+
+type DatumOrderField string
+
+const (
+	DatumOrderFieldCreatedAt       DatumOrderField = "CREATED_AT"
+	DatumOrderFieldName            DatumOrderField = "NAME"
+	DatumOrderFieldDataSensitivity DatumOrderField = "DATA_SENSITIVITY"
+)
+
+func (p DatumOrderField) Column() string {
+	return string(p)
+}
+
+func (p DatumOrderField) String() string {
+	return string(p)
+}
+
+func (p DatumOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *DatumOrderField) UnmarshalText(text []byte) error {
+	val := string(text)
+	switch val {
+	case string(DatumOrderFieldCreatedAt),
+		string(DatumOrderFieldName),
+		string(DatumOrderFieldDataSensitivity):
+		*p = DatumOrderField(val)
+		return nil
+	}
+	return fmt.Errorf("invalid DatumOrderField value: %q", val)
+}

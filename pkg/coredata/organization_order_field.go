@@ -19,7 +19,9 @@ type (
 )
 
 const (
+	OrganizationOrderFieldName      OrganizationOrderField = "NAME"
 	OrganizationOrderFieldCreatedAt OrganizationOrderField = "CREATED_AT"
+	OrganizationOrderFieldUpdatedAt OrganizationOrderField = "UPDATED_AT"
 )
 
 func (p OrganizationOrderField) Column() string {

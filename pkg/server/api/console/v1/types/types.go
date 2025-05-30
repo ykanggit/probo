@@ -3,10 +3,6 @@
 package types
 
 import (
-	"bytes"
-	"fmt"
-	"io"
-	"strconv"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -27,6 +23,15 @@ type AddAssetVendorInput struct {
 
 type AddAssetVendorPayload struct {
 	Asset *Asset `json:"asset"`
+}
+
+type AddDatumVendorInput struct {
+	DatumID  gid.GID `json:"datumId"`
+	VendorID gid.GID `json:"vendorId"`
+}
+
+type AddDatumVendorPayload struct {
+	Datum *Datum `json:"datum"`
 }
 
 type AssessVendorInput struct {
@@ -171,6 +176,18 @@ type CreateControlMeasureMappingInput struct {
 type CreateControlMeasureMappingPayload struct {
 	ControlEdge *ControlEdge `json:"controlEdge"`
 	MeasureEdge *MeasureEdge `json:"measureEdge"`
+}
+
+type CreateDatumInput struct {
+	OrganizationID  gid.GID                  `json:"organizationId"`
+	Name            string                   `json:"name"`
+	DataSensitivity coredata.DataSensitivity `json:"dataSensitivity"`
+	OwnerID         gid.GID                  `json:"ownerId"`
+	VendorIds       []gid.GID                `json:"vendorIds,omitempty"`
+}
+
+type CreateDatumPayload struct {
+	DatumEdge *DatumEdge `json:"datumEdge"`
 }
 
 type CreateDocumentInput struct {
@@ -341,6 +358,35 @@ type CreateVendorRiskAssessmentPayload struct {
 	VendorRiskAssessmentEdge *VendorRiskAssessmentEdge `json:"vendorRiskAssessmentEdge"`
 }
 
+type Datum struct {
+	ID              gid.GID                  `json:"id"`
+	Name            string                   `json:"name"`
+	DataSensitivity coredata.DataSensitivity `json:"dataSensitivity"`
+	Owner           *People                  `json:"owner"`
+	Vendors         *VendorConnection        `json:"vendors"`
+	Organization    *Organization            `json:"organization"`
+	CreatedAt       time.Time                `json:"createdAt"`
+	UpdatedAt       time.Time                `json:"updatedAt"`
+}
+
+func (Datum) IsNode()             {}
+func (this Datum) GetID() gid.GID { return this.ID }
+
+type DatumConnection struct {
+	Edges    []*DatumEdge `json:"edges"`
+	PageInfo *PageInfo    `json:"pageInfo"`
+}
+
+type DatumEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Datum         `json:"node"`
+}
+
+type DatumOrder struct {
+	Direction page.OrderDirection      `json:"direction"`
+	Field     coredata.DatumOrderField `json:"field"`
+}
+
 type DeleteAssetInput struct {
 	AssetID gid.GID `json:"assetId"`
 }
@@ -367,6 +413,14 @@ type DeleteControlMeasureMappingInput struct {
 type DeleteControlMeasureMappingPayload struct {
 	DeletedControlID gid.GID `json:"deletedControlId"`
 	DeletedMeasureID gid.GID `json:"deletedMeasureId"`
+}
+
+type DeleteDatumInput struct {
+	DatumID gid.GID `json:"datumId"`
+}
+
+type DeleteDatumPayload struct {
+	DeletedDatumID gid.GID `json:"deletedDatumId"`
 }
 
 type DeleteDocumentInput struct {
@@ -700,6 +754,7 @@ type Organization struct {
 	Risks      *RiskConnection      `json:"risks"`
 	Tasks      *TaskConnection      `json:"tasks"`
 	Assets     *AssetConnection     `json:"assets"`
+	Data       *DatumConnection     `json:"data"`
 	CreatedAt  time.Time            `json:"createdAt"`
 	UpdatedAt  time.Time            `json:"updatedAt"`
 }
@@ -718,8 +773,8 @@ type OrganizationEdge struct {
 }
 
 type OrganizationOrder struct {
-	Direction page.OrderDirection    `json:"direction"`
-	Field     OrganizationOrderField `json:"field"`
+	Direction page.OrderDirection             `json:"direction"`
+	Field     coredata.OrganizationOrderField `json:"field"`
 }
 
 type PageInfo struct {
@@ -774,6 +829,15 @@ type RemoveAssetVendorInput struct {
 
 type RemoveAssetVendorPayload struct {
 	Asset *Asset `json:"asset"`
+}
+
+type RemoveDatumVendorInput struct {
+	DatumID  gid.GID `json:"datumId"`
+	VendorID gid.GID `json:"vendorId"`
+}
+
+type RemoveDatumVendorPayload struct {
+	Datum *Datum `json:"datum"`
 }
 
 type RemoveUserInput struct {
@@ -901,6 +965,18 @@ type UpdateAssetInput struct {
 
 type UpdateAssetPayload struct {
 	Asset *Asset `json:"asset"`
+}
+
+type UpdateDatumInput struct {
+	ID              gid.GID                   `json:"id"`
+	Name            *string                   `json:"name,omitempty"`
+	DataSensitivity *coredata.DataSensitivity `json:"dataSensitivity,omitempty"`
+	OwnerID         *gid.GID                  `json:"ownerId,omitempty"`
+	VendorIds       []gid.GID                 `json:"vendorIds,omitempty"`
+}
+
+type UpdateDatumPayload struct {
+	Datum *Datum `json:"datum"`
 }
 
 type UpdateDocumentInput struct {
@@ -1180,61 +1256,4 @@ type Viewer struct {
 	ID            gid.GID                 `json:"id"`
 	User          *User                   `json:"user"`
 	Organizations *OrganizationConnection `json:"organizations"`
-}
-
-type OrganizationOrderField string
-
-const (
-	OrganizationOrderFieldName      OrganizationOrderField = "NAME"
-	OrganizationOrderFieldCreatedAt OrganizationOrderField = "CREATED_AT"
-	OrganizationOrderFieldUpdatedAt OrganizationOrderField = "UPDATED_AT"
-)
-
-var AllOrganizationOrderField = []OrganizationOrderField{
-	OrganizationOrderFieldName,
-	OrganizationOrderFieldCreatedAt,
-	OrganizationOrderFieldUpdatedAt,
-}
-
-func (e OrganizationOrderField) IsValid() bool {
-	switch e {
-	case OrganizationOrderFieldName, OrganizationOrderFieldCreatedAt, OrganizationOrderFieldUpdatedAt:
-		return true
-	}
-	return false
-}
-
-func (e OrganizationOrderField) String() string {
-	return string(e)
-}
-
-func (e *OrganizationOrderField) UnmarshalGQL(v any) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = OrganizationOrderField(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid OrganizationOrderField", str)
-	}
-	return nil
-}
-
-func (e OrganizationOrderField) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-func (e *OrganizationOrderField) UnmarshalJSON(b []byte) error {
-	s, err := strconv.Unquote(string(b))
-	if err != nil {
-		return err
-	}
-	return e.UnmarshalGQL(s)
-}
-
-func (e OrganizationOrderField) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
-	e.MarshalGQL(&buf)
-	return buf.Bytes(), nil
 }
