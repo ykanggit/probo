@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useTransition } from "react";
+import { Suspense, useEffect, useTransition, useRef } from "react";
 import {
   graphql,
   PreloadedQuery,
@@ -155,6 +155,7 @@ function PeopleListContent({
   const [deletePeople] =
     useMutation<PeopleListViewDeletePeopleMutation>(deletePeopleMutation);
   const { organizationId } = useParams();
+  const isPaginationUpdate = useRef(false);
 
   const {
     data: peoplesConnection,
@@ -258,6 +259,7 @@ function PeopleListContent({
           hasMore={hasPrevious}
           onLoadMore={() => {
             startTransition(() => {
+              isPaginationUpdate.current = true;
               setSearchParams((prev) => {
                 prev.set("before", pageInfo?.startCursor || "");
                 prev.delete("after");
@@ -272,6 +274,7 @@ function PeopleListContent({
           hasMore={hasNext}
           onLoadMore={() => {
             startTransition(() => {
+              isPaginationUpdate.current = true;
               setSearchParams((prev) => {
                 prev.set("after", pageInfo?.endCursor || "");
                 prev.delete("before");
@@ -290,12 +293,18 @@ export default function PeopleListView() {
   const [searchParams] = useSearchParams();
   const [queryRef, loadQuery] =
     useQueryLoader<PeopleListViewQueryType>(peopleListViewQuery);
-
   const { organizationId } = useParams();
+  const isPaginationUpdate = useRef(false);
 
   useEffect(() => {
     const after = searchParams.get("after");
     const before = searchParams.get("before");
+
+    // Skip the query if this was triggered by pagination
+    if (isPaginationUpdate.current) {
+      isPaginationUpdate.current = false;
+      return;
+    }
 
     loadQuery({
       organizationId: organizationId!,

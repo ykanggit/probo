@@ -20,6 +20,65 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
+// Owner is the resolver for the owner field.
+func (r *assetResolver) Owner(ctx context.Context, obj *types.Asset) (*types.People, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	asset, err := svc.Assets.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get asset: %w", err))
+	}
+
+	owner, err := svc.Peoples.Get(ctx, asset.OwnerID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get owner: %w", err))
+	}
+
+	return types.NewPeople(owner), nil
+}
+
+// Vendors is the resolver for the vendors field.
+func (r *assetResolver) Vendors(ctx context.Context, obj *types.Asset, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.VendorOrderField]{
+		Field:     coredata.VendorOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.VendorOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Assets.ListVendors(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list asset vendors: %w", err))
+	}
+
+	return types.NewVendorConnection(page), nil
+}
+
+// AssetType is the resolver for the assetType field.
+func (r *assetResolver) AssetType(ctx context.Context, obj *types.Asset) (coredata.AssetType, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	asset, err := svc.Assets.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get asset: %w", err))
+	}
+
+	return asset.AssetType, nil
+}
+
+// Organization is the resolver for the organization field.
+func (r *assetResolver) Organization(ctx context.Context, obj *types.Asset) (*types.Organization, error) {
+	panic(fmt.Errorf("not implemented: Organization - organization"))
+}
+
 // Framework is the resolver for the framework field.
 func (r *controlResolver) Framework(ctx context.Context, obj *types.Control) (*types.Framework, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -1557,6 +1616,77 @@ func (r *mutationResolver) AssessVendor(ctx context.Context, input types.AssessV
 	}, nil
 }
 
+// CreateAsset is the resolver for the createAsset field.
+func (r *mutationResolver) CreateAsset(ctx context.Context, input types.CreateAssetInput) (*types.CreateAssetPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+
+	asset, err := svc.Assets.Create(ctx, probo.CreateAssetRequest{
+		OrganizationID:  input.OrganizationID,
+		Name:            input.Name,
+		Amount:          input.Amount,
+		OwnerID:         input.OwnerID,
+		Criticity:       input.Criticity,
+		AssetType:       input.AssetType,
+		DataTypesStored: input.DataTypesStored,
+		VendorIDs:       input.VendorIds,
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot create asset: %w", err)
+	}
+
+	return &types.CreateAssetPayload{
+		AssetEdge: types.NewAssetEdge(asset, coredata.AssetOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateAsset is the resolver for the updateAsset field.
+func (r *mutationResolver) UpdateAsset(ctx context.Context, input types.UpdateAssetInput) (*types.UpdateAssetPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+
+	asset, err := svc.Assets.Update(ctx, probo.UpdateAssetRequest{
+		ID:              input.ID,
+		Name:            input.Name,
+		Amount:          input.Amount,
+		OwnerID:         input.OwnerID,
+		Criticity:       input.Criticity,
+		AssetType:       input.AssetType,
+		DataTypesStored: input.DataTypesStored,
+		VendorIDs:       input.VendorIds,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update asset: %w", err)
+	}
+
+	return &types.UpdateAssetPayload{
+		Asset: types.NewAsset(asset),
+	}, nil
+}
+
+// DeleteAsset is the resolver for the deleteAsset field.
+func (r *mutationResolver) DeleteAsset(ctx context.Context, input types.DeleteAssetInput) (*types.DeleteAssetPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.AssetID.TenantID())
+
+	err := svc.Assets.Delete(ctx, input.AssetID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete asset: %w", err)
+	}
+
+	return &types.DeleteAssetPayload{
+		DeletedAssetID: input.AssetID,
+	}, nil
+}
+
+// AddAssetVendor is the resolver for the addAssetVendor field.
+func (r *mutationResolver) AddAssetVendor(ctx context.Context, input types.AddAssetVendorInput) (*types.AddAssetVendorPayload, error) {
+	panic(fmt.Errorf("not implemented: AddAssetVendor - addAssetVendor"))
+}
+
+// RemoveAssetVendor is the resolver for the removeAssetVendor field.
+func (r *mutationResolver) RemoveAssetVendor(ctx context.Context, input types.RemoveAssetVendorInput) (*types.RemoveAssetVendorPayload, error) {
+	panic(fmt.Errorf("not implemented: RemoveAssetVendor - removeAssetVendor"))
+}
+
 // LogoURL is the resolver for the logoUrl field.
 func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organization) (*string, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -1787,6 +1917,31 @@ func (r *organizationResolver) Tasks(ctx context.Context, obj *types.Organizatio
 	return types.NewTaskConnection(page), nil
 }
 
+// Assets is the resolver for the assets field.
+func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrder) (*types.AssetConnection, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.AssetOrderField]{
+		Field:     coredata.AssetOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.AssetOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Assets.ListForOrganizationID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list organization assets: %w", err))
+	}
+
+	return types.NewAssetConnection(page), nil
+}
+
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error) {
 	svc := GetTenantService(ctx, r.proboSvc, id.TenantID())
@@ -1878,6 +2033,12 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 			panic(fmt.Errorf("cannot get document version signature: %w", err))
 		}
 		return types.NewDocumentVersionSignature(documentVersionSignature), nil
+	case coredata.AssetEntityType:
+		asset, err := svc.Assets.Get(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get asset: %w", err))
+		}
+		return types.NewAsset(asset), nil
 	default:
 	}
 
@@ -2190,7 +2351,6 @@ func (r *vendorResolver) BusinessOwner(ctx context.Context, obj *types.Vendor) (
 // SecurityOwner is the resolver for the securityOwner field.
 func (r *vendorResolver) SecurityOwner(ctx context.Context, obj *types.Vendor) (*types.People, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
-
 	vendor, err := svc.Vendors.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("failed to get vendor: %w", err))
@@ -2286,6 +2446,9 @@ func (r *viewerResolver) Organizations(ctx context.Context, obj *types.Viewer, f
 	}, nil
 }
 
+// Asset returns schema.AssetResolver implementation.
+func (r *Resolver) Asset() schema.AssetResolver { return &assetResolver{r} }
+
 // Control returns schema.ControlResolver implementation.
 func (r *Resolver) Control() schema.ControlResolver { return &controlResolver{r} }
 
@@ -2345,6 +2508,7 @@ func (r *Resolver) VendorRiskAssessment() schema.VendorRiskAssessmentResolver {
 // Viewer returns schema.ViewerResolver implementation.
 func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
 
+type assetResolver struct{ *Resolver }
 type controlResolver struct{ *Resolver }
 type documentResolver struct{ *Resolver }
 type documentVersionResolver struct{ *Resolver }

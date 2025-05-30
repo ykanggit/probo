@@ -29,6 +29,7 @@ import (
 type (
 	Vendor struct {
 		ID                            gid.GID        `db:"id"`
+		TenantID                      gid.TenantID   `db:"tenant_id"`
 		OrganizationID                gid.GID        `db:"organization_id"`
 		Name                          string         `db:"name"`
 		Description                   *string        `db:"description"`
@@ -77,6 +78,7 @@ func (v *Vendor) LoadByID(
 	q := `
 SELECT
     id,
+    tenant_id,
     organization_id,
     name,
     description,
@@ -243,6 +245,7 @@ func (v *Vendors) LoadByOrganizationID(
 	q := `
 SELECT
     id,
+    tenant_id,
     organization_id,
     name,
     description,
@@ -383,6 +386,96 @@ func (v Vendor) ExpireNonExpiredRiskAssessments(
 	if err != nil {
 		return fmt.Errorf("cannot expire existing risk assessments: %w", err)
 	}
+
+	return nil
+}
+
+func (v *Vendors) LoadByAssetID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	assetID gid.GID,
+	cursor *page.Cursor[VendorOrderField],
+) error {
+	q := `
+WITH vend AS (
+	SELECT
+		v.id,
+		v.tenant_id,
+		v.organization_id,
+		v.name,
+		v.description,
+		v.category,
+		v.headquarter_address,
+		v.legal_name,
+		v.website_url,
+		v.privacy_policy_url,
+		v.service_level_agreement_url,
+		v.data_processing_agreement_url,
+		v.business_associate_agreement_url,
+		v.subprocessors_list_url,
+		v.certifications,
+		v.business_owner_id,
+		v.security_owner_id,
+		v.status_page_url,
+		v.terms_of_service_url,
+		v.security_page_url,
+		v.trust_page_url,
+		v.created_at,
+		v.updated_at
+	FROM
+		vendors v
+	INNER JOIN
+		asset_vendors av ON v.id = av.vendor_id
+	WHERE
+		av.asset_id = @asset_id
+)
+SELECT
+	id,
+	tenant_id,
+	organization_id,
+	name,
+	description,
+	category,
+	headquarter_address,
+	legal_name,
+	website_url,
+	privacy_policy_url,
+	service_level_agreement_url,
+	data_processing_agreement_url,
+	business_associate_agreement_url,
+	subprocessors_list_url,
+	certifications,
+	business_owner_id,
+	security_owner_id,
+	status_page_url,
+	terms_of_service_url,
+	security_page_url,
+	trust_page_url,
+	created_at,
+	updated_at
+FROM
+	vend
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.NamedArgs{"asset_id": assetID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query vendors: %w", err)
+	}
+
+	vendors, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Vendor])
+	if err != nil {
+		return fmt.Errorf("cannot collect vendors: %w", err)
+	}
+
+	*v = vendors
 
 	return nil
 }

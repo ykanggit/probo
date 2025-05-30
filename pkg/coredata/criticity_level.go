@@ -14,24 +14,10 @@
 
 package coredata
 
+type CriticityLevel string
+
 const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MeasureEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ConnectorEntityType
-	VendorRiskAssessmentEntityType
-	VendorEntityType
-	PeopleEntityType
-	VendorComplianceReportEntityType
-	DocumentEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
-	DocumentVersionEntityType
-	DocumentVersionSignatureEntityType
-	AssetEntityType
+	CriticityLevelLow    CriticityLevel = "LOW"
+	CriticityLevelMedium CriticityLevel = "MEDIUM"
+	CriticityLevelHigh   CriticityLevel = "HIGH"
 )

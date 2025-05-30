@@ -14,6 +14,7 @@ import {
   useEffect,
   useState,
   useTransition,
+  useRef,
 } from "react";
 import type { ListRiskViewQuery } from "./__generated__/ListRiskViewQuery.graphql";
 import { useParams, useSearchParams } from "react-router";
@@ -532,6 +533,7 @@ function ListRiskViewContent({
   const [, startTransition] = useTransition();
   const { organizationId } = useParams<{ organizationId: string }>();
   const { toast } = useToast();
+  const isPaginationUpdate = useRef(false);
 
   // State for delete confirmation dialog
   const [riskToDelete, setRiskToDelete] = useState<{
@@ -656,6 +658,7 @@ function ListRiskViewContent({
           hasMore={hasPrevious}
           onLoadMore={() => {
             startTransition(() => {
+              isPaginationUpdate.current = true;
               setSearchParams((prev) => {
                 prev.set("before", pageInfo?.startCursor || "");
                 prev.delete("after");
@@ -923,6 +926,7 @@ function ListRiskViewContent({
           hasMore={hasNext}
           onLoadMore={() => {
             startTransition(() => {
+              isPaginationUpdate.current = true;
               setSearchParams((prev) => {
                 prev.set("after", pageInfo?.endCursor || "");
                 prev.delete("before");
@@ -941,12 +945,18 @@ export default function ListRiskView() {
   const [searchParams] = useSearchParams();
   const [queryRef, loadQuery] =
     useQueryLoader<ListRiskViewQuery>(listRiskViewQuery);
-
   const { organizationId } = useParams();
+  const isPaginationUpdate = useRef(false);
 
   useEffect(() => {
     const after = searchParams.get("after");
     const before = searchParams.get("before");
+
+    // Skip the query if this was triggered by pagination
+    if (isPaginationUpdate.current) {
+      isPaginationUpdate.current = false;
+      return;
+    }
 
     loadQuery({
       organizationId: organizationId!,

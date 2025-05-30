@@ -209,6 +209,7 @@ function ListVendorContent({
     useMutation<ListVendorViewDeleteVendorMutation>(deleteVendorMutation);
   const { organizationId } = useParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const isPaginationUpdate = useRef(false);
 
   useEffect(() => {
     const loadVendorsData = async () => {
@@ -698,6 +699,7 @@ function ListVendorContent({
         hasMore={hasPrevious}
         onLoadMore={() => {
           startTransition(() => {
+            isPaginationUpdate.current = true;
             setSearchParams((prev) => {
               prev.set("before", pageInfo?.startCursor || "");
               prev.delete("after");
@@ -712,6 +714,7 @@ function ListVendorContent({
         hasMore={hasNext}
         onLoadMore={() => {
           startTransition(() => {
+            isPaginationUpdate.current = true;
             setSearchParams((prev) => {
               prev.set("after", pageInfo?.endCursor || "");
               prev.delete("before");
@@ -729,12 +732,18 @@ export default function ListVendorView() {
   const [searchParams] = useSearchParams();
   const [queryRef, loadQuery] =
     useQueryLoader<ListVendorViewQuery>(listVendorViewQuery);
-
   const { organizationId } = useParams();
+  const isPaginationUpdate = useRef(false);
 
   useEffect(() => {
     const after = searchParams.get("after");
     const before = searchParams.get("before");
+
+    // Skip the query if this was triggered by pagination
+    if (isPaginationUpdate.current) {
+      isPaginationUpdate.current = false;
+      return;
+    }
 
     loadQuery({
       organizationId: organizationId!,
@@ -743,7 +752,7 @@ export default function ListVendorView() {
       last: before ? ITEMS_PER_PAGE : undefined,
       before: before || undefined,
     });
-  }, [loadQuery, organizationId]);
+  }, [loadQuery, organizationId, searchParams]);
 
   if (!queryRef) {
     return <ListVendorViewSkeleton />;

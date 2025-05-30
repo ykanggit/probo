@@ -19,6 +19,7 @@ import { OrganizationBreadcrumbOrganizationQuery } from "./__generated__/Organiz
 import { OrganizationBreadcrumbBreadcrumbMeasureViewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbMeasureViewQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbControlQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbControlQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbRiskShowQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbRiskShowQuery.graphql";
+import { OrganizationBreadcrumbBreadcrumbAssetOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbAssetOverviewQuery.graphql";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 const New = () => {
@@ -451,6 +452,53 @@ function BreadcrumbRiskShow() {
   );
 }
 
+function BreadcrumbAssetList() {
+  const { organizationId } = useParams();
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink to={`/organizations/${organizationId}/assets`}>
+          Assets
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbAssetOverview() {
+  const { organizationId, assetId } = useParams();
+  const data = useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbAssetOverviewQuery>(
+    graphql`
+      query OrganizationBreadcrumbBreadcrumbAssetOverviewQuery($assetId: ID!) {
+        asset: node(id: $assetId) {
+          id
+          ... on Asset {
+            name
+          }
+        }
+      }
+    `,
+    { assetId: assetId! },
+    { fetchPolicy: "store-or-network" },
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/assets/${assetId}`}
+        >
+          {data.asset?.name}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
 export function BreadCrumb() {
   return (
     <Routes>
@@ -543,6 +591,19 @@ export function BreadCrumb() {
             <Route path="edit" element={<Edit />} />
           </Route>
           <Route path="new" element={<New />} />
+        </Route>
+        <Route path="assets" element={<BreadcrumbAssetList />}>
+          <Route path="new" element={<New />} />
+          <Route
+            path=":assetId"
+            element={
+              <Suspense>
+                <BreadcrumbAssetOverview />
+              </Suspense>
+            }
+          >
+            <Route path="edit" element={<Edit />} />
+          </Route>
         </Route>
         <Route
           path="settings"

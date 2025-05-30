@@ -343,6 +343,23 @@ enum DocumentType @goModel(model: "github.com/getprobo/probo/pkg/coredata.Docume
   POLICY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypePolicy")
 }
 
+enum AssetType @goModel(model: "github.com/getprobo/probo/pkg/coredata.AssetType") {
+  PHYSICAL @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetTypePhysical")
+  VIRTUAL @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetTypeVirtual")
+}
+
+enum CriticityLevel @goModel(model: "github.com/getprobo/probo/pkg/coredata.CriticityLevel") {
+  LOW @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelLow")
+  MEDIUM @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelMedium")
+  HIGH @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelHigh")
+}
+
+enum AssetOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.AssetOrderField") {
+  CREATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldCreatedAt")
+  AMOUNT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldAmount")
+  CRITICITY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldCriticity")
+}
+
 # Order Input Types
 input UserOrder
   @goModel(
@@ -531,6 +548,14 @@ type Organization implements Node {
     before: CursorKey
     orderBy: TaskOrder
   ): TaskConnection! @goField(forceResolver: true)
+
+  assets(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: AssetOrder
+  ): AssetConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -1126,6 +1151,12 @@ type Mutation {
   exportAudit(input: ExportAuditInput!): ExportAuditPayload!
 
   assessVendor(input: AssessVendorInput!): AssessVendorPayload!
+
+  createAsset(input: CreateAssetInput!): CreateAssetPayload!
+  updateAsset(input: UpdateAssetInput!): UpdateAssetPayload!
+  deleteAsset(input: DeleteAssetInput!): DeleteAssetPayload!
+  addAssetVendor(input: AddAssetVendorInput!): AddAssetVendorPayload!
+  removeAssetVendor(input: RemoveAssetVendorInput!): RemoveAssetVendorPayload!
 }
 
 # Input Types
@@ -1831,4 +1862,95 @@ input AssessVendorInput {
 
 type AssessVendorPayload {
   vendor: Vendor!
+}
+
+type Asset implements Node {
+  id: ID!
+  name: String!
+  amount: Int!
+  owner: People! @goField(forceResolver: true)
+  vendors(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: VendorOrder
+  ): VendorConnection! @goField(forceResolver: true)
+  criticity: CriticityLevel!
+  assetType: AssetType! @goField(forceResolver: true)
+  dataTypesStored: String!
+  organization: Organization! @goField(forceResolver: true)
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type AssetConnection {
+  edges: [AssetEdge!]!
+  pageInfo: PageInfo!
+}
+
+type AssetEdge {
+  cursor: CursorKey!
+  node: Asset!
+}
+
+input AssetOrder {
+  direction: OrderDirection!
+  field: AssetOrderField!
+}
+
+input CreateAssetInput {
+  organizationId: ID!
+  name: String!
+  amount: Int!
+  ownerId: ID!
+  criticity: CriticityLevel! = MEDIUM
+  assetType: AssetType!
+  dataTypesStored: String!
+  vendorIds: [ID!]
+}
+
+input UpdateAssetInput {
+  id: ID!
+  name: String
+  amount: Int
+  ownerId: ID
+  criticity: CriticityLevel
+  assetType: AssetType
+  dataTypesStored: String
+  vendorIds: [ID!]
+}
+
+input DeleteAssetInput {
+  assetId: ID!
+}
+
+input AddAssetVendorInput {
+  assetId: ID!
+  vendorId: ID!
+}
+
+input RemoveAssetVendorInput {
+  assetId: ID!
+  vendorId: ID!
+}
+
+type CreateAssetPayload {
+  assetEdge: AssetEdge!
+}
+
+type UpdateAssetPayload {
+  asset: Asset!
+}
+
+type DeleteAssetPayload {
+  deletedAssetId: ID!
+}
+
+type AddAssetVendorPayload {
+  asset: Asset!
+}
+
+type RemoveAssetVendorPayload {
+  asset: Asset!
 }

@@ -14,24 +14,19 @@
 
 package coredata
 
+type AssetOrderField string
+
 const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MeasureEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ConnectorEntityType
-	VendorRiskAssessmentEntityType
-	VendorEntityType
-	PeopleEntityType
-	VendorComplianceReportEntityType
-	DocumentEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
-	DocumentVersionEntityType
-	DocumentVersionSignatureEntityType
-	AssetEntityType
+	AssetOrderFieldCreatedAt AssetOrderField = "CREATED_AT"
+	AssetOrderFieldAmount    AssetOrderField = "AMOUNT"
+	AssetOrderFieldCriticity AssetOrderField = "CRITICITY"
+	AssetOrderFieldName      AssetOrderField = "NAME"
 )
+
+func (p AssetOrderField) Column() string {
+	return string(p)
+}
+
+func (p AssetOrderField) String() string {
+	return string(p)
+}

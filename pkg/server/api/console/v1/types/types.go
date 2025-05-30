@@ -20,6 +20,15 @@ type Node interface {
 	GetID() gid.GID
 }
 
+type AddAssetVendorInput struct {
+	AssetID  gid.GID `json:"assetId"`
+	VendorID gid.GID `json:"vendorId"`
+}
+
+type AddAssetVendorPayload struct {
+	Asset *Asset `json:"asset"`
+}
+
 type AssessVendorInput struct {
 	ID         gid.GID `json:"id"`
 	WebsiteURL string  `json:"websiteUrl"`
@@ -27,6 +36,38 @@ type AssessVendorInput struct {
 
 type AssessVendorPayload struct {
 	Vendor *Vendor `json:"vendor"`
+}
+
+type Asset struct {
+	ID              gid.GID                 `json:"id"`
+	Name            string                  `json:"name"`
+	Amount          int                     `json:"amount"`
+	Owner           *People                 `json:"owner"`
+	Vendors         *VendorConnection       `json:"vendors"`
+	Criticity       coredata.CriticityLevel `json:"criticity"`
+	AssetType       coredata.AssetType      `json:"assetType"`
+	DataTypesStored string                  `json:"dataTypesStored"`
+	Organization    *Organization           `json:"organization"`
+	CreatedAt       time.Time               `json:"createdAt"`
+	UpdatedAt       time.Time               `json:"updatedAt"`
+}
+
+func (Asset) IsNode()             {}
+func (this Asset) GetID() gid.GID { return this.ID }
+
+type AssetConnection struct {
+	Edges    []*AssetEdge `json:"edges"`
+	PageInfo *PageInfo    `json:"pageInfo"`
+}
+
+type AssetEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *Asset         `json:"node"`
+}
+
+type AssetOrder struct {
+	Direction page.OrderDirection      `json:"direction"`
+	Field     coredata.AssetOrderField `json:"field"`
 }
 
 type AssignTaskInput struct {
@@ -95,6 +136,21 @@ type ControlConnection struct {
 type ControlEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Control       `json:"node"`
+}
+
+type CreateAssetInput struct {
+	OrganizationID  gid.GID                 `json:"organizationId"`
+	Name            string                  `json:"name"`
+	Amount          int                     `json:"amount"`
+	OwnerID         gid.GID                 `json:"ownerId"`
+	Criticity       coredata.CriticityLevel `json:"criticity"`
+	AssetType       coredata.AssetType      `json:"assetType"`
+	DataTypesStored string                  `json:"dataTypesStored"`
+	VendorIds       []gid.GID               `json:"vendorIds,omitempty"`
+}
+
+type CreateAssetPayload struct {
+	AssetEdge *AssetEdge `json:"assetEdge"`
 }
 
 type CreateControlDocumentMappingInput struct {
@@ -283,6 +339,14 @@ type CreateVendorRiskAssessmentInput struct {
 
 type CreateVendorRiskAssessmentPayload struct {
 	VendorRiskAssessmentEdge *VendorRiskAssessmentEdge `json:"vendorRiskAssessmentEdge"`
+}
+
+type DeleteAssetInput struct {
+	AssetID gid.GID `json:"assetId"`
+}
+
+type DeleteAssetPayload struct {
+	DeletedAssetID gid.GID `json:"deletedAssetId"`
 }
 
 type DeleteControlDocumentMappingInput struct {
@@ -635,6 +699,7 @@ type Organization struct {
 	Measures   *MeasureConnection   `json:"measures"`
 	Risks      *RiskConnection      `json:"risks"`
 	Tasks      *TaskConnection      `json:"tasks"`
+	Assets     *AssetConnection     `json:"assets"`
 	CreatedAt  time.Time            `json:"createdAt"`
 	UpdatedAt  time.Time            `json:"updatedAt"`
 }
@@ -700,6 +765,15 @@ type PublishDocumentVersionPayload struct {
 }
 
 type Query struct {
+}
+
+type RemoveAssetVendorInput struct {
+	AssetID  gid.GID `json:"assetId"`
+	VendorID gid.GID `json:"vendorId"`
+}
+
+type RemoveAssetVendorPayload struct {
+	Asset *Asset `json:"asset"`
 }
 
 type RemoveUserInput struct {
@@ -812,6 +886,21 @@ type UnassignTaskInput struct {
 
 type UnassignTaskPayload struct {
 	Task *Task `json:"task"`
+}
+
+type UpdateAssetInput struct {
+	ID              gid.GID                  `json:"id"`
+	Name            *string                  `json:"name,omitempty"`
+	Amount          *int                     `json:"amount,omitempty"`
+	OwnerID         *gid.GID                 `json:"ownerId,omitempty"`
+	Criticity       *coredata.CriticityLevel `json:"criticity,omitempty"`
+	AssetType       *coredata.AssetType      `json:"assetType,omitempty"`
+	DataTypesStored *string                  `json:"dataTypesStored,omitempty"`
+	VendorIds       []gid.GID                `json:"vendorIds,omitempty"`
+}
+
+type UpdateAssetPayload struct {
+	Asset *Asset `json:"asset"`
 }
 
 type UpdateDocumentInput struct {

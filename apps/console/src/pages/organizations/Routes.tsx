@@ -28,6 +28,9 @@ import ShowRiskView from "./risks/ShowRiskView";
 import { ListVendorPage } from "./vendors/ListVendorPage";
 import { VendorPage } from "./vendors/VendorPage";
 import { ListTaskPage } from "./tasks/ListTaskPage";
+import { AssetsListPage } from "./assets/AssetsListPage";
+import { NewAssetPage } from "./assets/NewAssetPage";
+import { AssetPage } from "./assets/AssetPage";
 
 export function OrganizationsRoutes() {
   return (
@@ -64,6 +67,9 @@ export function OrganizationsRoutes() {
         <Route path="risks/new" element={<NewRiskPage />} />
         <Route path="risks/:riskId" element={<ShowRiskView />} />
         <Route path="risks/:riskId/edit" element={<EditRiskPage />} />
+        <Route path="assets" element={<AssetsListPage />} />
+        <Route path="assets/new" element={<NewAssetPage />} />
+        <Route path="assets/:assetId" element={<AssetPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
