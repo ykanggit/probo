@@ -15,7 +15,7 @@ import { useState, useRef } from "react";
 const AVAILABLE_FRAMEWORKS = [
   { id: "ISO27001-2022", name: "ISO/IEC 27001:2022" },
   { id: "SOC2", name: "SOC 2" },
-  { id: "HIPAAA", name: "HIPAA" },
+  { id: "HIPAA", name: "HIPAA" },
 ];
 
 const importFrameworkMutation = graphql`
