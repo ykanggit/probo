@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.30.0] - 2025-05-31
+
 ### Changed
 
 - Change policies to documents
