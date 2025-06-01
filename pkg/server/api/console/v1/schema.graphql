@@ -216,9 +216,9 @@ enum RiskOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldTreatment"
     )
-  INITIAL_RISK_SCORE
+  INHERENT_RISK_SCORE
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldInitialRiskScore"
+      value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldInherentRiskScore"
     )
   RESIDUAL_RISK_SCORE
     @goEnum(

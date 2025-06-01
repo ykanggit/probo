@@ -24,7 +24,7 @@ const (
 	RiskOrderFieldName              RiskOrderField = "NAME"
 	RiskOrderFieldCategory          RiskOrderField = "CATEGORY"
 	RiskOrderFieldTreatment         RiskOrderField = "TREATMENT"
-	RiskOrderFieldInitialRiskScore  RiskOrderField = "INITIAL_RISK_SCORE"
+	RiskOrderFieldInherentRiskScore RiskOrderField = "INHERENT_RISK_SCORE"
 	RiskOrderFieldResidualRiskScore RiskOrderField = "RESIDUAL_RISK_SCORE"
 )
 

@@ -4347,9 +4347,9 @@ enum RiskOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldTreatment"
     )
-  INITIAL_RISK_SCORE
+  INHERENT_RISK_SCORE
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldInitialRiskScore"
+      value: "github.com/getprobo/probo/pkg/coredata.RiskOrderFieldInherentRiskScore"
     )
   RESIDUAL_RISK_SCORE
     @goEnum(
@@ -44414,7 +44414,7 @@ var (
 		"NAME":                coredata.RiskOrderFieldName,
 		"CATEGORY":            coredata.RiskOrderFieldCategory,
 		"TREATMENT":           coredata.RiskOrderFieldTreatment,
-		"INITIAL_RISK_SCORE":  coredata.RiskOrderFieldInitialRiskScore,
+		"INHERENT_RISK_SCORE": coredata.RiskOrderFieldInherentRiskScore,
 		"RESIDUAL_RISK_SCORE": coredata.RiskOrderFieldResidualRiskScore,
 	}
 	marshalNRiskOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐRiskOrderField = map[coredata.RiskOrderField]string{
@@ -44423,7 +44423,7 @@ var (
 		coredata.RiskOrderFieldName:              "NAME",
 		coredata.RiskOrderFieldCategory:          "CATEGORY",
 		coredata.RiskOrderFieldTreatment:         "TREATMENT",
-		coredata.RiskOrderFieldInitialRiskScore:  "INITIAL_RISK_SCORE",
+		coredata.RiskOrderFieldInherentRiskScore: "INHERENT_RISK_SCORE",
 		coredata.RiskOrderFieldResidualRiskScore: "RESIDUAL_RISK_SCORE",
 	}
 )

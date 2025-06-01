@@ -59,7 +59,7 @@ func (r *Risk) CursorKey(orderBy RiskOrderField) page.CursorKey {
 		return page.CursorKey{ID: r.ID, Value: r.Category}
 	case RiskOrderFieldTreatment:
 		return page.CursorKey{ID: r.ID, Value: r.Treatment}
-	case RiskOrderFieldInitialRiskScore:
+	case RiskOrderFieldInherentRiskScore:
 		return page.CursorKey{ID: r.ID, Value: r.InherentRiskScore}
 	case RiskOrderFieldResidualRiskScore:
 		return page.CursorKey{ID: r.ID, Value: r.ResidualRiskScore}
