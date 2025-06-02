@@ -313,6 +313,7 @@ type CreateTaskInput struct {
 	Description    string         `json:"description"`
 	TimeEstimate   *time.Duration `json:"timeEstimate,omitempty"`
 	AssignedToID   *gid.GID       `json:"assignedToId,omitempty"`
+	Deadline       *time.Time     `json:"deadline,omitempty"`
 }
 
 type CreateTaskPayload struct {
@@ -934,6 +935,7 @@ type Task struct {
 	Description  string              `json:"description"`
 	State        coredata.TaskState  `json:"state"`
 	TimeEstimate *time.Duration      `json:"timeEstimate,omitempty"`
+	Deadline     *time.Time          `json:"deadline,omitempty"`
 	AssignedTo   *People             `json:"assignedTo,omitempty"`
 	Organization *Organization       `json:"organization"`
 	Measure      *Measure            `json:"measure,omitempty"`
@@ -1083,6 +1085,7 @@ type UpdateTaskInput struct {
 	Description  *string             `json:"description,omitempty"`
 	State        *coredata.TaskState `json:"state,omitempty"`
 	TimeEstimate *time.Duration      `json:"timeEstimate,omitempty"`
+	Deadline     *time.Time          `json:"deadline,omitempty"`
 }
 
 type UpdateTaskPayload struct {

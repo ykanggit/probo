@@ -1114,6 +1114,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 		Name:           input.Name,
 		Description:    input.Description,
 		TimeEstimate:   input.TimeEstimate,
+		Deadline:       input.Deadline,
 	})
 	if err != nil {
 		panic(fmt.Errorf("cannot create task: %w", err))
@@ -1134,6 +1135,7 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTas
 		Description:  input.Description,
 		State:        input.State,
 		TimeEstimate: input.TimeEstimate,
+		Deadline:     input.Deadline,
 	})
 	if err != nil {
 		panic(fmt.Errorf("cannot update task: %w", err))

@@ -680,6 +680,7 @@ type ComplexityRoot struct {
 	Task struct {
 		AssignedTo   func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
+		Deadline     func(childComplexity int) int
 		Description  func(childComplexity int) int
 		Evidences    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) int
 		ID           func(childComplexity int) int
@@ -3834,6 +3835,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Task.CreatedAt(childComplexity), true
 
+	case "Task.deadline":
+		if e.complexity.Task.Deadline == nil {
+			break
+		}
+
+		return e.complexity.Task.Deadline(childComplexity), true
+
 	case "Task.description":
 		if e.complexity.Task.Description == nil {
 			break
@@ -5481,6 +5489,7 @@ type Task implements Node {
   description: String!
   state: TaskState!
   timeEstimate: Duration
+  deadline: Datetime
   assignedTo: People @goField(forceResolver: true)
 
   organization: Organization! @goField(forceResolver: true)
@@ -6052,6 +6061,7 @@ input CreateTaskInput {
   description: String!
   timeEstimate: Duration
   assignedToId: ID
+  deadline: Datetime
 }
 
 input UpdateTaskInput {
@@ -6060,6 +6070,7 @@ input UpdateTaskInput {
   description: String
   state: TaskState
   timeEstimate: Duration
+  deadline: Datetime
 }
 
 input DeleteTaskInput {
@@ -12379,6 +12390,8 @@ func (ec *executionContext) fieldContext_AssignTaskPayload_task(_ context.Contex
 				return ec.fieldContext_Task_state(ctx, field)
 			case "timeEstimate":
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Task_deadline(ctx, field)
 			case "assignedTo":
 				return ec.fieldContext_Task_assignedTo(ctx, field)
 			case "organization":
@@ -18910,6 +18923,8 @@ func (ec *executionContext) fieldContext_Evidence_task(_ context.Context, field 
 				return ec.fieldContext_Task_state(ctx, field)
 			case "timeEstimate":
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Task_deadline(ctx, field)
 			case "assignedTo":
 				return ec.fieldContext_Task_assignedTo(ctx, field)
 			case "organization":
@@ -28879,6 +28894,47 @@ func (ec *executionContext) fieldContext_Task_timeEstimate(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Task_deadline(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_deadline(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Deadline, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_deadline(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Task_assignedTo(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_assignedTo(ctx, field)
 	if err != nil {
@@ -29431,6 +29487,8 @@ func (ec *executionContext) fieldContext_TaskEdge_node(_ context.Context, field 
 				return ec.fieldContext_Task_state(ctx, field)
 			case "timeEstimate":
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Task_deadline(ctx, field)
 			case "assignedTo":
 				return ec.fieldContext_Task_assignedTo(ctx, field)
 			case "organization":
@@ -29499,6 +29557,8 @@ func (ec *executionContext) fieldContext_UnassignTaskPayload_task(_ context.Cont
 				return ec.fieldContext_Task_state(ctx, field)
 			case "timeEstimate":
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Task_deadline(ctx, field)
 			case "assignedTo":
 				return ec.fieldContext_Task_assignedTo(ctx, field)
 			case "organization":
@@ -30193,6 +30253,8 @@ func (ec *executionContext) fieldContext_UpdateTaskPayload_task(_ context.Contex
 				return ec.fieldContext_Task_state(ctx, field)
 			case "timeEstimate":
 				return ec.fieldContext_Task_timeEstimate(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Task_deadline(ctx, field)
 			case "assignedTo":
 				return ec.fieldContext_Task_assignedTo(ctx, field)
 			case "organization":
@@ -36789,7 +36851,7 @@ func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "measureId", "name", "description", "timeEstimate", "assignedToId"}
+	fieldsInOrder := [...]string{"organizationId", "measureId", "name", "description", "timeEstimate", "assignedToId", "deadline"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -36838,6 +36900,13 @@ func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, o
 				return it, err
 			}
 			it.AssignedToID = data
+		case "deadline":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadline"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Deadline = data
 		}
 	}
 
@@ -38947,7 +39016,7 @@ func (ec *executionContext) unmarshalInputUpdateTaskInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"taskId", "name", "description", "state", "timeEstimate"}
+	fieldsInOrder := [...]string{"taskId", "name", "description", "state", "timeEstimate", "deadline"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -38989,6 +39058,13 @@ func (ec *executionContext) unmarshalInputUpdateTaskInput(ctx context.Context, o
 				return it, err
 			}
 			it.TimeEstimate = data
+		case "deadline":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadline"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Deadline = data
 		}
 	}
 
@@ -46022,6 +46098,8 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "timeEstimate":
 			out.Values[i] = ec._Task_timeEstimate(ctx, field, obj)
+		case "deadline":
+			out.Values[i] = ec._Task_deadline(ctx, field, obj)
 		case "assignedTo":
 			field := field
 
