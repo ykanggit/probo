@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.30.1] - 2025-06-02
+
+### Added
+
+- Added sort key `updated_at` for vendors
+
+### Fixed
+
+- Fix 5xx on signature request
+- Fix sort key 5xx
+
 ## [0.30.0] - 2025-05-31
 
 ### Changed
