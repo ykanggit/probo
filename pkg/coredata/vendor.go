@@ -59,6 +59,8 @@ func (v Vendor) CursorKey(orderBy VendorOrderField) page.CursorKey {
 	switch orderBy {
 	case VendorOrderFieldCreatedAt:
 		return page.NewCursorKey(v.ID, v.CreatedAt)
+	case VendorOrderFieldUpdatedAt:
+		return page.NewCursorKey(v.ID, v.UpdatedAt)
 	case VendorOrderFieldName:
 		return page.NewCursorKey(v.ID, v.Name)
 	}

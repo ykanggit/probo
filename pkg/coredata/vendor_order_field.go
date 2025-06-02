@@ -20,6 +20,7 @@ type (
 
 const (
 	VendorOrderFieldCreatedAt VendorOrderField = "CREATED_AT"
+	VendorOrderFieldUpdatedAt VendorOrderField = "UPDATED_AT"
 	VendorOrderFieldName      VendorOrderField = "NAME"
 )
 
