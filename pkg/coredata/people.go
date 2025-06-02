@@ -396,7 +396,7 @@ WITH signatories AS (
 	SELECT
 		signed_by
 	FROM
-		policy_version_signatures
+		document_version_signatures
 	WHERE
 	    %s
 		AND state = 'REQUESTED'
