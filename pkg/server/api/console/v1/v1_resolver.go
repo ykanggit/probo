@@ -302,6 +302,23 @@ func (r *documentVersionResolver) Document(ctx context.Context, obj *types.Docum
 	return types.NewDocument(document), nil
 }
 
+// Owner is the resolver for the owner field.
+func (r *documentVersionResolver) Owner(ctx context.Context, obj *types.DocumentVersion) (*types.People, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	documentVersion, err := svc.Documents.GetVersion(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get document version: %w", err))
+	}
+
+	owner, err := svc.Peoples.Get(ctx, documentVersion.OwnerID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get owner: %w", err))
+	}
+
+	return types.NewPeople(owner), nil
+}
+
 // Signatures is the resolver for the signatures field.
 func (r *documentVersionResolver) Signatures(ctx context.Context, obj *types.DocumentVersion, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentVersionSignatureOrder) (*types.DocumentVersionSignatureConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -1491,6 +1508,7 @@ func (r *mutationResolver) UpdateDocument(ctx context.Context, input types.Updat
 		input.ID,
 		input.OwnerID,
 		input.DocumentType,
+		input.Title,
 	)
 
 	if err != nil {
@@ -1526,7 +1544,7 @@ func (r *mutationResolver) PublishDocumentVersion(ctx context.Context, input typ
 		panic(fmt.Errorf("cannot get people: %w", err))
 	}
 
-	document, documentVersion, err := svc.Documents.PublishVersion(ctx, input.DocumentID, people.ID)
+	document, documentVersion, err := svc.Documents.PublishVersion(ctx, input.DocumentID, people.ID, input.Changelog)
 	if err != nil {
 		panic(fmt.Errorf("cannot publish document version: %w", err))
 	}
@@ -1534,6 +1552,20 @@ func (r *mutationResolver) PublishDocumentVersion(ctx context.Context, input typ
 	return &types.PublishDocumentVersionPayload{
 		DocumentVersion: types.NewDocumentVersion(documentVersion),
 		Document:        types.NewDocument(document),
+	}, nil
+}
+
+// GenerateDocumentChangelog is the resolver for the generateDocumentChangelog field.
+func (r *mutationResolver) GenerateDocumentChangelog(ctx context.Context, input types.GenerateDocumentChangelogInput) (*types.GenerateDocumentChangelogPayload, error) {
+	svc := GetTenantService(ctx, r.proboSvc, input.DocumentID.TenantID())
+
+	changelog, err := svc.Documents.GenerateChangelog(ctx, input.DocumentID)
+	if err != nil {
+		panic(fmt.Errorf("cannot generate document changelog: %w", err))
+	}
+
+	return &types.GenerateDocumentChangelogPayload{
+		Changelog: *changelog,
 	}, nil
 }
 

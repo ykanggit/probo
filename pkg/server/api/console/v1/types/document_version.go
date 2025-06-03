@@ -46,6 +46,7 @@ func NewDocumentVersion(documentVersion *coredata.DocumentVersion) *DocumentVers
 	return &DocumentVersion{
 		ID:          documentVersion.ID,
 		Version:     documentVersion.VersionNumber,
+		Title:       documentVersion.Title,
 		Content:     documentVersion.Content,
 		Status:      documentVersion.Status,
 		PublishedAt: documentVersion.PublishedAt,

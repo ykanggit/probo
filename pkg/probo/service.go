@@ -29,13 +29,13 @@ import (
 
 type (
 	Service struct {
-		pg               *pg.Client
-		s3               *s3.Client
-		bucket           string
-		encryptionKey    cipher.EncryptionKey
-		hostname         string
-		tokenSecret      string
-		vendorAssessment agents.Config
+		pg            *pg.Client
+		s3            *s3.Client
+		bucket        string
+		encryptionKey cipher.EncryptionKey
+		hostname      string
+		tokenSecret   string
+		agentConfig   agents.Config
 	}
 
 	TenantService struct {
@@ -46,7 +46,7 @@ type (
 		scope                   coredata.Scoper
 		hostname                string
 		tokenSecret             string
-		vendorAssessment        *agents.VendorAssessment
+		agent                   *agents.Agent
 		Frameworks              *FrameworkService
 		Measures                *MeasureService
 		Tasks                   *TaskService
@@ -72,20 +72,20 @@ func NewService(
 	bucket string,
 	hostname string,
 	tokenSecret string,
-	vendorAssessment agents.Config,
+	agentConfig agents.Config,
 ) (*Service, error) {
 	if bucket == "" {
 		return nil, fmt.Errorf("bucket is required")
 	}
 
 	svc := &Service{
-		pg:               pgClient,
-		s3:               s3Client,
-		bucket:           bucket,
-		encryptionKey:    encryptionKey,
-		hostname:         hostname,
-		tokenSecret:      tokenSecret,
-		vendorAssessment: vendorAssessment,
+		pg:            pgClient,
+		s3:            s3Client,
+		bucket:        bucket,
+		encryptionKey: encryptionKey,
+		hostname:      hostname,
+		tokenSecret:   tokenSecret,
+		agentConfig:   agentConfig,
 	}
 
 	return svc, nil
@@ -93,14 +93,14 @@ func NewService(
 
 func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService := &TenantService{
-		pg:               s.pg,
-		s3:               s.s3,
-		bucket:           s.bucket,
-		encryptionKey:    s.encryptionKey,
-		hostname:         s.hostname,
-		scope:            coredata.NewScope(tenantID),
-		tokenSecret:      s.tokenSecret,
-		vendorAssessment: agents.NewVendorAssessment(nil, s.vendorAssessment),
+		pg:            s.pg,
+		s3:            s.s3,
+		bucket:        s.bucket,
+		encryptionKey: s.encryptionKey,
+		hostname:      s.hostname,
+		scope:         coredata.NewScope(tenantID),
+		tokenSecret:   s.tokenSecret,
+		agent:         agents.NewAgent(nil, s.agentConfig),
 	}
 
 	tenantService.Frameworks = &FrameworkService{svc: tenantService}

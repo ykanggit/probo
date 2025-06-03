@@ -30,6 +30,8 @@ type (
 	DocumentVersion struct {
 		ID            gid.GID        `db:"id"`
 		DocumentID    gid.GID        `db:"document_id"`
+		Title         string         `db:"title"`
+		OwnerID       gid.GID        `db:"owner_id"`
 		VersionNumber int            `db:"version_number"`
 		Content       string         `db:"content"`
 		Changelog     string         `db:"changelog"`
@@ -55,6 +57,8 @@ func (p *DocumentVersions) LoadByDocumentID(
 SELECT
 	id,
 	document_id,
+	title,
+	owner_id,
 	version_number,
 	content,
 	changelog,
@@ -71,10 +75,11 @@ WHERE
 	AND document_id = @document_id
 	AND %s
 `
-
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"document_id": documentID}
+	args := pgx.StrictNamedArgs{
+		"document_id": documentID,
+	}
 	maps.Copy(args, scope.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
@@ -112,6 +117,8 @@ func (p *DocumentVersion) LoadByID(
 SELECT
 	id,
 	document_id,
+	title,
+	owner_id,
 	version_number,
 	content,
 	changelog,
@@ -131,7 +138,9 @@ LIMIT 1;
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"document_version_id": documentVersionID}
+	args := pgx.StrictNamedArgs{
+		"document_version_id": documentVersionID,
+	}
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -159,6 +168,8 @@ INSERT INTO document_versions (
 	tenant_id,
 	id,
 	document_id,
+	title,
+	owner_id,
 	version_number,
 	content,
 	changelog,
@@ -166,10 +177,13 @@ INSERT INTO document_versions (
 	status,
 	created_at,
 	updated_at
-) VALUES (
+)
+VALUES (
 	@tenant_id,
 	@id,
 	@document_id,
+	@title,
+	@owner_id,
 	@version_number,
 	@content,
 	@changelog,
@@ -179,24 +193,24 @@ INSERT INTO document_versions (
 	@updated_at
 )
 `
-
-	now := time.Now()
 	args := pgx.StrictNamedArgs{
 		"tenant_id":      scope.GetTenantID(),
 		"id":             p.ID,
 		"document_id":    p.DocumentID,
+		"title":          p.Title,
+		"owner_id":       p.OwnerID,
 		"version_number": p.VersionNumber,
 		"content":        p.Content,
 		"changelog":      p.Changelog,
 		"created_by":     p.CreatedBy,
 		"status":         p.Status,
-		"created_at":     now,
-		"updated_at":     now,
+		"created_at":     p.CreatedAt,
+		"updated_at":     p.UpdatedAt,
 	}
 
 	_, err := conn.Exec(ctx, q, args)
 	if err != nil {
-		return fmt.Errorf("error creating/updating document version: %w", err)
+		return fmt.Errorf("error creating document version: %w", err)
 	}
 
 	return nil
@@ -213,6 +227,8 @@ func (p *DocumentVersion) LoadByDocumentIDAndVersionNumber(
 SELECT
 	id,
 	document_id,
+	title,
+	owner_id,
 	version_number,
 	content,
 	changelog,
@@ -237,7 +253,6 @@ LIMIT 1;
 		"document_id":    documentID,
 		"version_number": versionNumber,
 	}
-
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -265,6 +280,8 @@ func (p *DocumentVersion) LoadLatestVersion(
 SELECT
 	id,
 	document_id,
+	title,
+	owner_id,
 	version_number,
 	content,
 	changelog,
@@ -282,13 +299,11 @@ WHERE
 ORDER BY created_at DESC
 LIMIT 1;
 `
-
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
 		"document_id": documentID,
 	}
-
 	maps.Copy(args, scope.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -313,6 +328,8 @@ func (p DocumentVersion) Update(
 ) error {
 	q := `
 UPDATE document_versions SET
+	title = @title,
+	owner_id = @owner_id,
 	changelog = @changelog,
 	status = @status,
 	content = @content,
@@ -320,12 +337,15 @@ UPDATE document_versions SET
 	published_at = @published_at,
 	updated_at = @updated_at
 WHERE %s
-	AND id = @document_version_id;`
+	AND id = @document_version_id
+`
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
 		"document_version_id": p.ID,
+		"title":               p.Title,
+		"owner_id":            p.OwnerID,
 		"changelog":           p.Changelog,
 		"status":              p.Status,
 		"content":             p.Content,

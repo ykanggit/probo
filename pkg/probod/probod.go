@@ -187,13 +187,13 @@ func (impl *Implm) Run(
 		}
 	}
 
-	vendorAssessmentConfig := agents.Config{
+	agentConfig := agents.Config{
 		OpenAIAPIKey: impl.cfg.OpenAI.APIKey,
 		Temperature:  impl.cfg.OpenAI.Temperature,
 		ModelName:    impl.cfg.OpenAI.ModelName,
 	}
 
-	vendorAssessment := agents.NewVendorAssessment(l.Named("vendor-assessment"), vendorAssessmentConfig)
+	agent := agents.NewAgent(l.Named("agent"), agentConfig)
 
 	usrmgrService, err := usrmgr.NewService(
 		ctx,
@@ -215,7 +215,7 @@ func (impl *Implm) Run(
 		impl.cfg.AWS.Bucket,
 		impl.cfg.Hostname,
 		impl.cfg.Auth.Cookie.Secret,
-		vendorAssessmentConfig,
+		agentConfig,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot create probo service: %w", err)
@@ -227,7 +227,7 @@ func (impl *Implm) Run(
 			Probo:             proboService,
 			Usrmgr:            usrmgrService,
 			ConnectorRegistry: defaultConnectorRegistry,
-			VendorAssessment:  vendorAssessment,
+			Agent:             agent,
 			SafeRedirect:      &saferedirect.SafeRedirect{AllowedHost: impl.cfg.Hostname},
 			Logger:            l.Named("http.server"),
 			Auth: console_v1.AuthConfig{

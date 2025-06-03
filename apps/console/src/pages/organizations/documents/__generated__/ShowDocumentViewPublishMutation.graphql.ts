@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<91076d34daad785f7fce9f5a2cbc4018>>
+ * @generated SignedSource<<f67241da996f7e38c84c64b99084ed97>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,6 +11,7 @@
 import { ConcreteRequest } from 'relay-runtime';
 export type DocumentStatus = "DRAFT" | "PUBLISHED";
 export type PublishDocumentVersionInput = {
+  changelog?: string | null | undefined;
   documentId: string;
 };
 export type ShowDocumentViewPublishMutation$variables = {
@@ -23,6 +24,7 @@ export type ShowDocumentViewPublishMutation$data = {
       readonly id: string;
     };
     readonly documentVersion: {
+      readonly changelog: string;
       readonly id: string;
       readonly publishedAt: string | null | undefined;
       readonly publishedBy: {
@@ -96,6 +98,13 @@ v6 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
+  "name": "changelog",
+  "storageKey": null
+},
+v7 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
   "name": "fullName",
   "storageKey": null
 };
@@ -126,6 +135,7 @@ return {
               (v2/*: any*/),
               (v4/*: any*/),
               (v5/*: any*/),
+              (v6/*: any*/),
               {
                 "alias": null,
                 "args": null,
@@ -134,7 +144,7 @@ return {
                 "name": "publishedBy",
                 "plural": false,
                 "selections": [
-                  (v6/*: any*/)
+                  (v7/*: any*/)
                 ],
                 "storageKey": null
               }
@@ -174,6 +184,7 @@ return {
               (v2/*: any*/),
               (v4/*: any*/),
               (v5/*: any*/),
+              (v6/*: any*/),
               {
                 "alias": null,
                 "args": null,
@@ -182,7 +193,7 @@ return {
                 "name": "publishedBy",
                 "plural": false,
                 "selections": [
-                  (v6/*: any*/),
+                  (v7/*: any*/),
                   (v2/*: any*/)
                 ],
                 "storageKey": null
@@ -196,16 +207,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "794539aab3ddce5d004e72d10b980ca4",
+    "cacheID": "9e097de4f6f61bd4762e57b4863c573b",
     "id": null,
     "metadata": {},
     "name": "ShowDocumentViewPublishMutation",
     "operationKind": "mutation",
-    "text": "mutation ShowDocumentViewPublishMutation(\n  $input: PublishDocumentVersionInput!\n) {\n  publishDocumentVersion(input: $input) {\n    document {\n      id\n      currentPublishedVersion\n    }\n    documentVersion {\n      id\n      status\n      publishedAt\n      publishedBy {\n        fullName\n        id\n      }\n    }\n  }\n}\n"
+    "text": "mutation ShowDocumentViewPublishMutation(\n  $input: PublishDocumentVersionInput!\n) {\n  publishDocumentVersion(input: $input) {\n    document {\n      id\n      currentPublishedVersion\n    }\n    documentVersion {\n      id\n      status\n      publishedAt\n      changelog\n      publishedBy {\n        fullName\n        id\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "66e590251b58966c2ac09625759332f7";
+(node as any).hash = "9b2033c7f39d178fb9a25828ade6af3c";
 
 export default node;

@@ -69,10 +69,58 @@ func (s *DocumentService) Get(
 	return document, nil
 }
 
+func (s DocumentService) GenerateChangelog(
+	ctx context.Context,
+	documentID gid.GID,
+) (*string, error) {
+	draftVersion := &coredata.DocumentVersion{}
+	publishedVersion := &coredata.DocumentVersion{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := draftVersion.LoadLatestVersion(ctx, conn, s.svc.scope, documentID); err != nil {
+				return fmt.Errorf("cannot load draft version: %w", err)
+			}
+
+			if draftVersion.Status != coredata.DocumentStatusDraft {
+				return fmt.Errorf("latest version is not a draft")
+			}
+
+			document := &coredata.Document{}
+			if err := document.LoadByID(ctx, conn, s.svc.scope, documentID); err != nil {
+				return fmt.Errorf("cannot load document: %w", err)
+			}
+
+			if document.CurrentPublishedVersion == nil {
+				publishedVersion.Content = ""
+			} else {
+				if err := publishedVersion.LoadByDocumentIDAndVersionNumber(ctx, conn, s.svc.scope, documentID, *document.CurrentPublishedVersion); err != nil {
+					return fmt.Errorf("cannot load published version: %w", err)
+				}
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	changelog, err := s.svc.agent.GenerateChangelog(ctx, publishedVersion.Content, draftVersion.Content)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate changelog: %w", err)
+	}
+
+	return changelog, nil
+}
+
 func (s *DocumentService) PublishVersion(
 	ctx context.Context,
 	documentID gid.GID,
 	publishedBy gid.GID,
+	changelog *string,
 ) (*coredata.Document, *coredata.DocumentVersion, error) {
 	document := &coredata.Document{}
 	documentVersion := &coredata.DocumentVersion{}
@@ -91,6 +139,10 @@ func (s *DocumentService) PublishVersion(
 
 			if documentVersion.Status != coredata.DocumentStatusDraft {
 				return fmt.Errorf("cannot publish version")
+			}
+
+			if changelog != nil {
+				documentVersion.Changelog = *changelog
 			}
 
 			document.CurrentPublishedVersion = &documentVersion.VersionNumber
@@ -142,6 +194,8 @@ func (s *DocumentService) Create(
 	documentVersion := &coredata.DocumentVersion{
 		ID:            documentVersionID,
 		DocumentID:    documentID,
+		Title:         req.Title,
+		OwnerID:       req.OwnerID,
 		VersionNumber: 1,
 		Content:       req.Content,
 		Status:        coredata.DocumentStatusDraft,
@@ -149,6 +203,7 @@ func (s *DocumentService) Create(
 		CreatedAt:     now,
 		UpdatedAt:     now,
 	}
+
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
@@ -348,6 +403,7 @@ func (s *DocumentService) UpdateVersion(
 	req UpdateDocumentVersionRequest,
 ) (*coredata.DocumentVersion, error) {
 	documentVersion := &coredata.DocumentVersion{}
+	document := &coredata.Document{}
 
 	err := s.svc.pg.WithTx(
 		ctx,
@@ -356,10 +412,16 @@ func (s *DocumentService) UpdateVersion(
 				return fmt.Errorf("cannot load document version %q: %w", req.ID, err)
 			}
 
+			if err := document.LoadByID(ctx, conn, s.svc.scope, documentVersion.DocumentID); err != nil {
+				return fmt.Errorf("cannot load document %q: %w", documentVersion.DocumentID, err)
+			}
+
 			if documentVersion.Status != coredata.DocumentStatusDraft {
 				return fmt.Errorf("cannot update published version")
 			}
 
+			documentVersion.Title = document.Title
+			documentVersion.OwnerID = document.OwnerID
 			documentVersion.Content = req.Content
 			documentVersion.UpdatedAt = time.Now()
 
@@ -473,12 +535,17 @@ func (s *DocumentService) CreateDraft(
 	draftVersionID := gid.New(s.svc.scope.GetTenantID(), coredata.DocumentVersionEntityType)
 
 	latestVersion := &coredata.DocumentVersion{}
+	document := &coredata.Document{}
 	draftVersion := &coredata.DocumentVersion{}
 	now := time.Now()
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
+			if err := document.LoadByID(ctx, conn, s.svc.scope, documentID); err != nil {
+				return fmt.Errorf("cannot load document: %w", err)
+			}
+
 			if err := latestVersion.LoadLatestVersion(ctx, conn, s.svc.scope, documentID); err != nil {
 				return fmt.Errorf("cannot load latest version: %w", err)
 			}
@@ -489,6 +556,8 @@ func (s *DocumentService) CreateDraft(
 
 			draftVersion.ID = draftVersionID
 			draftVersion.DocumentID = documentID
+			draftVersion.Title = document.Title
+			draftVersion.OwnerID = document.OwnerID
 			draftVersion.VersionNumber = latestVersion.VersionNumber + 1
 			draftVersion.Content = latestVersion.Content
 			draftVersion.Status = coredata.DocumentStatusDraft
@@ -640,6 +709,7 @@ func (s *DocumentService) Update(
 	documentID gid.GID,
 	newOwnerID *gid.GID,
 	documentType *coredata.DocumentType,
+	title *string,
 ) (*coredata.Document, error) {
 	document := &coredata.Document{}
 	people := &coredata.People{}
@@ -662,6 +732,11 @@ func (s *DocumentService) Update(
 			if documentType != nil {
 				document.DocumentType = *documentType
 			}
+
+			if title != nil {
+				document.Title = *title
+			}
+
 			document.UpdatedAt = now
 
 			if err := document.Update(ctx, tx, s.svc.scope); err != nil {

@@ -447,7 +447,7 @@ func (s VendorService) Assess(
 	ctx context.Context,
 	req AssessVendorRequest,
 ) (*coredata.Vendor, error) {
-	vendorInfo, err := s.svc.vendorAssessment.Fetch(ctx, req.WebsiteURL)
+	vendorInfo, err := s.svc.agent.AssessVendor(ctx, req.WebsiteURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to assess vendor info: %w", err)
 	}

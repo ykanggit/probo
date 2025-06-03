@@ -1157,6 +1157,9 @@ type Mutation {
   publishDocumentVersion(
     input: PublishDocumentVersionInput!
   ): PublishDocumentVersionPayload!
+  generateDocumentChangelog(
+    input: GenerateDocumentChangelogInput!
+  ): GenerateDocumentChangelogPayload!
   createDraftDocumentVersion(
     input: CreateDraftDocumentVersionInput!
   ): CreateDraftDocumentVersionPayload!
@@ -1746,6 +1749,8 @@ type DocumentVersion implements Node {
   version: Int!
   content: String!
   changelog: String!
+  title: String!
+  owner: People! @goField(forceResolver: true)
 
   signatures(
     first: Int
@@ -1827,6 +1832,7 @@ type RequestSignaturePayload {
 
 input PublishDocumentVersionInput {
   documentId: ID!
+  changelog: String
 }
 
 type PublishDocumentVersionPayload {
@@ -1883,6 +1889,14 @@ input ExportAuditInput {
 
 type ExportAuditPayload {
   url: String!
+}
+
+input GenerateDocumentChangelogInput {
+  documentId: ID!
+}
+
+type GenerateDocumentChangelogPayload {
+  changelog: String!
 }
 
 input AssessVendorInput {

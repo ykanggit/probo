@@ -22,9 +22,13 @@ export const documentVersionsFragment = graphql`
           version
           status
           content
+          title
           changelog
           publishedAt
           updatedAt
+          owner {
+            fullName
+          }
           publishedBy {
             fullName
           }
@@ -122,6 +126,14 @@ export function VersionHistoryModal({
                       •{" "}
                       {formatDateTime(version.publishedAt || version.updatedAt)}
                     </div>
+                    {version.changelog && (
+                      <div className="text-xs text-tertiary mt-1">
+                        Changelog: {version.changelog}
+                      </div>
+                    )}
+                    <div className="text-xs text-tertiary mt-1">
+                      Owner: {version.owner?.fullName || "Unknown"}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -130,8 +142,12 @@ export function VersionHistoryModal({
 
           {/* Content Area */}
           <div className="flex-1 p-6 relative overflow-y-auto">
-            <h2 className="text-2xl font-semibold mb-6">{data.title}</h2>
-
+            {selectedVersion && (
+              <h2 className="text-2xl font-semibold mb-6">
+                {versions.find((v) => v.version === selectedVersion)
+                  ?.title || data.title}
+              </h2>
+            )}
             <div className="prose prose-olive max-w-none">
               {selectedVersion && (
                 <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>

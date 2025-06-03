@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<bf950636055ed83dd68cd6e513a4d83e>>
+ * @generated SignedSource<<edd3d7d537e2ed956853a8be083189fa>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -30,11 +30,15 @@ export type ShowDocumentViewQuery$data = {
           readonly content: string;
           readonly createdAt: string;
           readonly id: string;
+          readonly owner: {
+            readonly fullName: string;
+          };
           readonly publishedAt: string | null | undefined;
           readonly publishedBy: {
             readonly fullName: string;
           } | null | undefined;
           readonly status: DocumentStatus;
+          readonly title: string;
           readonly updatedAt: string;
           readonly version: number;
         };
@@ -212,20 +216,23 @@ v19 = {
   "name": "publishedAt",
   "storageKey": null
 },
-v20 = {
+v20 = [
+  (v11/*: any*/)
+],
+v21 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v21 = {
+v22 = {
   "kind": "Literal",
   "name": "first",
   "value": 100
 },
-v22 = [
-  (v21/*: any*/),
+v23 = [
+  (v22/*: any*/),
   {
     "kind": "Literal",
     "name": "orderBy",
@@ -235,14 +242,14 @@ v22 = [
     }
   }
 ],
-v23 = {
+v24 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "cursor",
   "storageKey": null
 },
-v24 = {
+v25 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -267,23 +274,33 @@ v24 = {
   ],
   "storageKey": null
 },
-v25 = [
+v26 = [
   (v11/*: any*/),
   (v4/*: any*/)
 ],
-v26 = {
+v27 = {
   "alias": null,
   "args": null,
   "concreteType": "People",
   "kind": "LinkedField",
   "name": "publishedBy",
   "plural": false,
-  "selections": (v25/*: any*/),
+  "selections": (v26/*: any*/),
   "storageKey": null
 },
-v27 = [
-  (v21/*: any*/)
-];
+v28 = [
+  (v22/*: any*/)
+],
+v29 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "People",
+  "kind": "LinkedField",
+  "name": "owner",
+  "plural": false,
+  "selections": (v26/*: any*/),
+  "storageKey": null
+};
 return {
   "fragment": {
     "argumentDefinitions": (v0/*: any*/),
@@ -374,6 +391,17 @@ return {
                           (v17/*: any*/),
                           (v18/*: any*/),
                           (v19/*: any*/),
+                          (v5/*: any*/),
+                          {
+                            "alias": null,
+                            "args": null,
+                            "concreteType": "People",
+                            "kind": "LinkedField",
+                            "name": "owner",
+                            "plural": false,
+                            "selections": (v20/*: any*/),
+                            "storageKey": null
+                          },
                           {
                             "alias": null,
                             "args": null,
@@ -381,9 +409,7 @@ return {
                             "kind": "LinkedField",
                             "name": "publishedBy",
                             "plural": false,
-                            "selections": [
-                              (v11/*: any*/)
-                            ],
+                            "selections": (v20/*: any*/),
                             "storageKey": null
                           },
                           (v7/*: any*/),
@@ -422,7 +448,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v20/*: any*/),
+          (v21/*: any*/),
           (v4/*: any*/),
           {
             "kind": "InlineFragment",
@@ -430,7 +456,7 @@ return {
               (v2/*: any*/),
               {
                 "alias": null,
-                "args": (v22/*: any*/),
+                "args": (v23/*: any*/),
                 "concreteType": "PeopleConnection",
                 "kind": "LinkedField",
                 "name": "peoples",
@@ -455,21 +481,21 @@ return {
                           (v4/*: any*/),
                           (v11/*: any*/),
                           (v12/*: any*/),
-                          (v20/*: any*/)
+                          (v21/*: any*/)
                         ],
                         "storageKey": null
                       },
-                      (v23/*: any*/)
+                      (v24/*: any*/)
                     ],
                     "storageKey": null
                   },
-                  (v24/*: any*/)
+                  (v25/*: any*/)
                 ],
                 "storageKey": "peoples(first:100,orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
               },
               {
                 "alias": null,
-                "args": (v22/*: any*/),
+                "args": (v23/*: any*/),
                 "filters": [
                   "orderBy"
                 ],
@@ -493,7 +519,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v20/*: any*/),
+          (v21/*: any*/),
           (v4/*: any*/),
           {
             "kind": "InlineFragment",
@@ -540,10 +566,10 @@ return {
                           (v16/*: any*/),
                           (v19/*: any*/),
                           (v8/*: any*/),
-                          (v26/*: any*/),
+                          (v27/*: any*/),
                           {
                             "alias": null,
-                            "args": (v27/*: any*/),
+                            "args": (v28/*: any*/),
                             "concreteType": "DocumentVersionSignatureConnection",
                             "kind": "LinkedField",
                             "name": "signatures",
@@ -594,7 +620,7 @@ return {
                                         "kind": "LinkedField",
                                         "name": "signedBy",
                                         "plural": false,
-                                        "selections": (v25/*: any*/),
+                                        "selections": (v26/*: any*/),
                                         "storageKey": null
                                       },
                                       {
@@ -604,24 +630,24 @@ return {
                                         "kind": "LinkedField",
                                         "name": "requestedBy",
                                         "plural": false,
-                                        "selections": (v25/*: any*/),
+                                        "selections": (v26/*: any*/),
                                         "storageKey": null
                                       },
-                                      (v20/*: any*/)
+                                      (v21/*: any*/)
                                     ],
                                     "storageKey": null
                                   },
-                                  (v23/*: any*/)
+                                  (v24/*: any*/)
                                 ],
                                 "storageKey": null
                               },
-                              (v24/*: any*/)
+                              (v25/*: any*/)
                             ],
                             "storageKey": "signatures(first:100)"
                           },
                           {
                             "alias": null,
-                            "args": (v27/*: any*/),
+                            "args": (v28/*: any*/),
                             "filters": null,
                             "handle": "connection",
                             "key": "SignaturesModal_documentVersions_signatures",
@@ -671,10 +697,12 @@ return {
                           (v15/*: any*/),
                           (v16/*: any*/),
                           (v17/*: any*/),
+                          (v5/*: any*/),
                           (v18/*: any*/),
                           (v19/*: any*/),
                           (v8/*: any*/),
-                          (v26/*: any*/)
+                          (v29/*: any*/),
+                          (v27/*: any*/)
                         ],
                         "storageKey": null
                       }
@@ -714,7 +742,9 @@ return {
                           (v17/*: any*/),
                           (v18/*: any*/),
                           (v19/*: any*/),
-                          (v26/*: any*/),
+                          (v5/*: any*/),
+                          (v29/*: any*/),
+                          (v27/*: any*/),
                           (v7/*: any*/),
                           (v8/*: any*/)
                         ],
@@ -736,16 +766,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a1b25325fb4a764d130253f86435efcb",
+    "cacheID": "7e1dfac8673eeb68f1d3821db3ca95c2",
     "id": null,
     "metadata": {},
     "name": "ShowDocumentViewQuery",
     "operationKind": "query",
-    "text": "query ShowDocumentViewQuery(\n  $documentId: ID!\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      name\n      ...PeopleSelector_organization\n    }\n    id\n  }\n  node(id: $documentId) {\n    __typename\n    id\n    ... on Document {\n      title\n      description\n      createdAt\n      updatedAt\n      currentPublishedVersion\n      documentType\n      owner {\n        id\n        fullName\n        primaryEmailAddress\n      }\n      ...SignaturesModal_documentVersions\n      ...VersionHistoryModal_documentVersions\n      latestVersion: versions(first: 1) {\n        edges {\n          node {\n            id\n            version\n            status\n            content\n            changelog\n            publishedAt\n            publishedBy {\n              fullName\n              id\n            }\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment SignaturesModal_documentVersions on Document {\n  title\n  documentVersions: versions(first: 10) {\n    edges {\n      node {\n        id\n        version\n        status\n        publishedAt\n        updatedAt\n        publishedBy {\n          fullName\n          id\n        }\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n              signedAt\n              requestedAt\n              signedBy {\n                fullName\n                id\n              }\n              requestedBy {\n                fullName\n                id\n              }\n              __typename\n            }\n            cursor\n          }\n          pageInfo {\n            endCursor\n            hasNextPage\n          }\n        }\n      }\n    }\n  }\n}\n\nfragment VersionHistoryModal_documentVersions on Document {\n  title\n  owner {\n    fullName\n    id\n  }\n  versionHistory: versions(first: 20) {\n    edges {\n      node {\n        id\n        version\n        status\n        content\n        changelog\n        publishedAt\n        updatedAt\n        publishedBy {\n          fullName\n          id\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query ShowDocumentViewQuery(\n  $documentId: ID!\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      name\n      ...PeopleSelector_organization\n    }\n    id\n  }\n  node(id: $documentId) {\n    __typename\n    id\n    ... on Document {\n      title\n      description\n      createdAt\n      updatedAt\n      currentPublishedVersion\n      documentType\n      owner {\n        id\n        fullName\n        primaryEmailAddress\n      }\n      ...SignaturesModal_documentVersions\n      ...VersionHistoryModal_documentVersions\n      latestVersion: versions(first: 1) {\n        edges {\n          node {\n            id\n            version\n            status\n            content\n            changelog\n            publishedAt\n            title\n            owner {\n              fullName\n              id\n            }\n            publishedBy {\n              fullName\n              id\n            }\n            createdAt\n            updatedAt\n          }\n        }\n      }\n    }\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment SignaturesModal_documentVersions on Document {\n  title\n  documentVersions: versions(first: 10) {\n    edges {\n      node {\n        id\n        version\n        status\n        publishedAt\n        updatedAt\n        publishedBy {\n          fullName\n          id\n        }\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n              signedAt\n              requestedAt\n              signedBy {\n                fullName\n                id\n              }\n              requestedBy {\n                fullName\n                id\n              }\n              __typename\n            }\n            cursor\n          }\n          pageInfo {\n            endCursor\n            hasNextPage\n          }\n        }\n      }\n    }\n  }\n}\n\nfragment VersionHistoryModal_documentVersions on Document {\n  title\n  owner {\n    fullName\n    id\n  }\n  versionHistory: versions(first: 20) {\n    edges {\n      node {\n        id\n        version\n        status\n        content\n        title\n        changelog\n        publishedAt\n        updatedAt\n        owner {\n          fullName\n          id\n        }\n        publishedBy {\n          fullName\n          id\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "96c84ddc6ada95da2302068bae68f825";
+(node as any).hash = "41461d6b97a3672ae58a36fbb5615489";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f884c800d6c27056d14eec073a481151>>
+ * @generated SignedSource<<5cf1d2c84b94cf4c7d35965f67b36191>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -31,6 +31,7 @@ export type ShowDocumentViewUpdateDocumentMutation$data = {
         readonly id: string;
         readonly primaryEmailAddress: string;
       };
+      readonly title: string;
     };
   };
 };
@@ -88,6 +89,13 @@ v2 = [
           {
             "alias": null,
             "args": null,
+            "kind": "ScalarField",
+            "name": "title",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
             "concreteType": "People",
             "kind": "LinkedField",
             "name": "owner",
@@ -136,16 +144,16 @@ return {
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "62cd235bd1903d80012364fbc3358054",
+    "cacheID": "81d866e2f2de8bc1d7d440bfb2c66144",
     "id": null,
     "metadata": {},
     "name": "ShowDocumentViewUpdateDocumentMutation",
     "operationKind": "mutation",
-    "text": "mutation ShowDocumentViewUpdateDocumentMutation(\n  $input: UpdateDocumentInput!\n) {\n  updateDocument(input: $input) {\n    document {\n      id\n      documentType\n      owner {\n        id\n        fullName\n        primaryEmailAddress\n      }\n    }\n  }\n}\n"
+    "text": "mutation ShowDocumentViewUpdateDocumentMutation(\n  $input: UpdateDocumentInput!\n) {\n  updateDocument(input: $input) {\n    document {\n      id\n      documentType\n      title\n      owner {\n        id\n        fullName\n        primaryEmailAddress\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "094ff9193be9f023152588380f5114b5";
+(node as any).hash = "acaf0d38623ccc096f19c9d6c3e05c69";
 
 export default node;

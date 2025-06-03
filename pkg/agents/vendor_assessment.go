@@ -20,24 +20,10 @@ import (
 	"fmt"
 
 	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/option"
 	"github.com/openai/openai-go/packages/param"
-	"go.gearno.de/kit/log"
 )
 
 type (
-	VendorAssessment struct {
-		l      *log.Logger
-		cfg    Config
-		client *openai.Client
-	}
-
-	Config struct {
-		OpenAIAPIKey string
-		Temperature  float64
-		ModelName    string
-	}
-
 	vendorInfo struct {
 		Name                          string   `json:"name"`
 		Description                   string   `json:"description"`
@@ -58,7 +44,7 @@ type (
 )
 
 const (
-	systemPrompt = `
+	assessVendorSystemPrompt = `
 		# Role: You are a compliance assistant.
 
 		# Objective
@@ -136,21 +122,15 @@ const (
 	`
 )
 
-func NewVendorAssessment(l *log.Logger, cfg Config) *VendorAssessment {
-	client := openai.NewClient(option.WithAPIKey(cfg.OpenAIAPIKey))
-
-	return &VendorAssessment{l: l, cfg: cfg, client: &client}
-}
-
-func (va *VendorAssessment) Fetch(ctx context.Context, websiteURL string) (*vendorInfo, error) {
-	model := openai.ChatModel(va.cfg.ModelName)
-	chatCompletion, err := va.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
+func (a *Agent) AssessVendor(ctx context.Context, websiteURL string) (*vendorInfo, error) {
+	model := openai.ChatModel(a.cfg.ModelName)
+	chatCompletion, err := a.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
 		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.SystemMessage(systemPrompt),
+			openai.SystemMessage(assessVendorSystemPrompt),
 			openai.UserMessage(websiteURL),
 		},
 		Model:       model,
-		Temperature: param.NewOpt(va.cfg.Temperature),
+		Temperature: param.NewOpt(a.cfg.Temperature),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse vendor info: %w", err)

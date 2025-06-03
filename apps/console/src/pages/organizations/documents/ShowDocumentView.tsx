@@ -25,7 +25,7 @@ import type { ShowDocumentViewQuery } from "./__generated__/ShowDocumentViewQuer
 import { ShowDocumentViewPublishMutation } from "./__generated__/ShowDocumentViewPublishMutation.graphql";
 import { ShowDocumentViewCreateDraftMutation } from "./__generated__/ShowDocumentViewCreateDraftMutation.graphql";
 import { ShowDocumentViewUpdateDocumentMutation } from "./__generated__/ShowDocumentViewUpdateDocumentMutation.graphql";
-import { ShowDocumentViewUpdateDocumentTypeMutation } from "./__generated__/ShowDocumentViewUpdateDocumentTypeMutation.graphql";
+import { ShowDocumentViewGenerateChangelogMutation } from "./__generated__/ShowDocumentViewGenerateChangelogMutation.graphql";
 import type { DocumentType } from "./__generated__/DocumentListViewCreateMutation.graphql";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -90,6 +90,10 @@ const documentViewQuery = graphql`
               content
               changelog
               publishedAt
+              title
+              owner {
+                fullName
+              }
               publishedBy {
                 fullName
               }
@@ -114,6 +118,7 @@ const publishDocumentVersionMutation = graphql`
         id
         status
         publishedAt
+        changelog
         publishedBy {
           fullName
         }
@@ -144,12 +149,21 @@ const updateDocumentMutation = graphql`
       document {
         id
         documentType
+        title
         owner {
           id
           fullName
           primaryEmailAddress
         }
       }
+    }
+  }
+`;
+
+const generateChangelogMutation = graphql`
+  mutation ShowDocumentViewGenerateChangelogMutation($input: GenerateDocumentChangelogInput!) {
+    generateDocumentChangelog(input: $input) {
+      changelog
     }
   }
 `;
@@ -176,7 +190,17 @@ function ShowDocumentContent({
   const [isSignaturesModalOpen, setIsSignaturesModalOpen] = useState(false);
   const [isEditingOwner, setIsEditingOwner] = useState(false);
   const [isEditingType, setIsEditingType] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(documentValue.title || '');
+  const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
+  const [publishChangelog, setPublishChangelog] = useState('');
+  const [isGeneratingChangelog, setIsGeneratingChangelog] = useState(false);
   const printContentRef = useRef<HTMLDivElement>(null);
+
+  // Keep editedTitle in sync with documentValue.title
+  useEffect(() => {
+    setEditedTitle(documentValue.title || '');
+  }, [documentValue.title]);
 
   const [publishDraft, isPublishInFlight] =
     useMutation<ShowDocumentViewPublishMutation>(publishDocumentVersionMutation);
@@ -186,6 +210,7 @@ function ShowDocumentContent({
     );
   const [updateDocument, isUpdatingDocument] =
     useMutation<ShowDocumentViewUpdateDocumentMutation>(updateDocumentMutation);
+  const [generateChangelog] = useMutation<ShowDocumentViewGenerateChangelogMutation>(generateChangelogMutation);
 
   const latestVersionEdge = documentValue.latestVersion?.edges[0];
   const latestVersionNode = latestVersionEdge?.node;
@@ -300,12 +325,57 @@ function ShowDocumentContent({
 
   // Navigate to publish flow
   const handlePublish = useCallback(() => {
+    setIsPublishDialogOpen(true);
+    setPublishChangelog("");
+
+    // Generate changelog
+    setIsGeneratingChangelog(true);
+
+    generateChangelog({
+      variables: {
+        input: {
+          documentId: documentValue.id,
+        },
+      },
+      onCompleted: (response, errors) => {
+        setIsGeneratingChangelog(false);
+        if (errors) {
+          toast({
+            title: "Error",
+            description: errors[0]?.message || "An unknown error occurred",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const generatedChangelog = response.generateDocumentChangelog.changelog;
+        setPublishChangelog(prev => {
+          if (prev.trim()) {
+            return `${prev}\n${generatedChangelog}`;
+          }
+          return generatedChangelog;
+        });
+      },
+      onError: (error) => {
+        setIsGeneratingChangelog(false);
+        toast({
+          title: "Error",
+          description: error.message || "An unknown error occurred",
+          variant: "destructive",
+        });
+      },
+    });
+  }, [documentValue.id, generateChangelog, toast]);
+
+  // Confirm publish
+  const confirmPublish = useCallback(() => {
     if (!documentValue.id) return;
 
     publishDraft({
       variables: {
         input: {
           documentId: documentValue.id,
+          changelog: publishChangelog,
         },
       },
       onCompleted: (_, errors) => {
@@ -323,6 +393,7 @@ function ShowDocumentContent({
           description: `The document has been published successfully`,
         });
 
+        setIsPublishDialogOpen(false);
         // Reload the query to refresh the data
         loadQuery({ documentId: documentValue.id, organizationId: organizationId! });
       },
@@ -334,7 +405,7 @@ function ShowDocumentContent({
         });
       },
     });
-  }, [documentValue.id, publishDraft, toast, loadQuery]);
+  }, [documentValue.id, publishDraft, toast, loadQuery, publishChangelog, organizationId]);
 
   // Open version history modal
   const handleVersionHistoryClick = useCallback(() => {
@@ -658,7 +729,84 @@ function ShowDocumentContent({
             <div className="bg-gray-50 rounded-lg border border-solid-b shadow-sm p-6 mb-4">
               <div className="grid grid-cols-2 gap-y-3">
                 <div>
-                  <span className="font-medium">Document Title:</span> {documentValue.title}
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Document Title:</span>
+                    {isEditingTitle ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          className="h-9 w-[250px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors"
+                          value={editedTitle}
+                          onChange={(e) => setEditedTitle(e.target.value)}
+                          placeholder="Enter document title"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (editedTitle.trim()) {
+                              updateDocument({
+                                variables: {
+                                  input: {
+                                    id: documentValue.id,
+                                    title: editedTitle.trim(),
+                                  },
+                                },
+                                onCompleted: (_, errors) => {
+                                  if (errors) {
+                                    toast({
+                                      title: "Error updating title",
+                                      description: errors[0]?.message || "An unknown error occurred",
+                                      variant: "destructive",
+                                    });
+                                    return;
+                                  }
+                                  toast({
+                                    title: "Success",
+                                    description: "Document title updated successfully",
+                                  });
+                                  setIsEditingTitle(false);
+                                  loadQuery({ documentId: documentValue.id, organizationId: organizationId! });
+                                },
+                                onError: (error) => {
+                                  toast({
+                                    title: "Error updating title",
+                                    description: error.message || "An unknown error occurred",
+                                    variant: "destructive",
+                                  });
+                                },
+                              });
+                            }
+                          }}
+                          disabled={!editedTitle.trim() || isUpdatingDocument}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setIsEditingTitle(false);
+                            setEditedTitle(documentValue.title || '');
+                          }}
+                          disabled={isUpdatingDocument}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span>{documentValue.title}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setIsEditingTitle(true)}
+                        >
+                          Change
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <span className="font-medium">Version:</span> {latestVersionNode.version || "N/A"}
@@ -826,6 +974,50 @@ function ShowDocumentContent({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Publish Confirmation Dialog */}
+      <Dialog open={isPublishDialogOpen} onOpenChange={setIsPublishDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Publish Document</DialogTitle>
+            <DialogDescription>
+              Please review and edit the changelog before publishing the document.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="changelog">Changelog</Label>
+            <textarea
+              id="changelog"
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={publishChangelog}
+              onChange={(e) => setPublishChangelog(e.target.value)}
+              placeholder="Enter changelog message"
+            />
+            {isGeneratingChangelog && (
+              <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                <span>Generating changelog...</span>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsPublishDialogOpen(false)}
+              disabled={isPublishInFlight}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={confirmPublish}
+              disabled={isPublishInFlight || !publishChangelog.trim()}
+            >
+              {isPublishInFlight ? "Publishing..." : "Publish"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageTemplate>
   );
 }
@@ -834,10 +1026,26 @@ export default function ShowDocumentView() {
   const [queryRef, loadQuery] =
     useQueryLoader<ShowDocumentViewQuery>(documentViewQuery);
   const { documentId, organizationId } = useParams();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    loadQuery({ documentId: documentId!, organizationId: organizationId! });
-  }, [loadQuery, documentId, organizationId]);
+    if (!organizationId || !documentId) {
+      toast({
+        title: "Error",
+        description: "Invalid document or organization ID",
+        variant: "destructive",
+      });
+      navigate("/");
+      return;
+    }
+
+    loadQuery({ documentId, organizationId });
+  }, [loadQuery, documentId, organizationId, toast, navigate]);
+
+  if (!organizationId || !documentId) {
+    return null;
+  }
 
   if (!queryRef) {
     return <ShowDocumentViewSkeleton />;

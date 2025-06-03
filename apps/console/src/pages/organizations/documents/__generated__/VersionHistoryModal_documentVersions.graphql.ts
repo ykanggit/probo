@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a88582302d627481e4214530f287e233>>
+ * @generated SignedSource<<00c4778ab72567e2c573d98bdbbc4c5f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -22,11 +22,15 @@ export type VersionHistoryModal_documentVersions$data = {
         readonly changelog: string;
         readonly content: string;
         readonly id: string;
+        readonly owner: {
+          readonly fullName: string;
+        };
         readonly publishedAt: string | null | undefined;
         readonly publishedBy: {
           readonly fullName: string;
         } | null | undefined;
         readonly status: DocumentStatus;
+        readonly title: string;
         readonly updatedAt: string;
         readonly version: number;
       };
@@ -40,7 +44,14 @@ export type VersionHistoryModal_documentVersions$key = {
 };
 
 const node: ReaderFragment = (function(){
-var v0 = [
+var v0 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "title",
+  "storageKey": null
+},
+v1 = [
   {
     "alias": null,
     "args": null,
@@ -48,30 +59,25 @@ var v0 = [
     "name": "fullName",
     "storageKey": null
   }
-];
+],
+v2 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "People",
+  "kind": "LinkedField",
+  "name": "owner",
+  "plural": false,
+  "selections": (v1/*: any*/),
+  "storageKey": null
+};
 return {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
   "name": "VersionHistoryModal_documentVersions",
   "selections": [
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "title",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "concreteType": "People",
-      "kind": "LinkedField",
-      "name": "owner",
-      "plural": false,
-      "selections": (v0/*: any*/),
-      "storageKey": null
-    },
+    (v0/*: any*/),
+    (v2/*: any*/),
     {
       "alias": "versionHistory",
       "args": [
@@ -130,6 +136,7 @@ return {
                   "name": "content",
                   "storageKey": null
                 },
+                (v0/*: any*/),
                 {
                   "alias": null,
                   "args": null,
@@ -151,6 +158,7 @@ return {
                   "name": "updatedAt",
                   "storageKey": null
                 },
+                (v2/*: any*/),
                 {
                   "alias": null,
                   "args": null,
@@ -158,7 +166,7 @@ return {
                   "kind": "LinkedField",
                   "name": "publishedBy",
                   "plural": false,
-                  "selections": (v0/*: any*/),
+                  "selections": (v1/*: any*/),
                   "storageKey": null
                 }
               ],
@@ -176,6 +184,6 @@ return {
 };
 })();
 
-(node as any).hash = "ffcba061a60a144c663de41a48e784d1";
+(node as any).hash = "344e822be4a3eb20d147ecd1c3ea7ced";
 
 export default node;

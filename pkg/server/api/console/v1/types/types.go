@@ -557,6 +557,8 @@ type DocumentVersion struct {
 	Version     int                                 `json:"version"`
 	Content     string                              `json:"content"`
 	Changelog   string                              `json:"changelog"`
+	Title       string                              `json:"title"`
+	Owner       *People                             `json:"owner"`
 	Signatures  *DocumentVersionSignatureConnection `json:"signatures"`
 	PublishedBy *People                             `json:"publishedBy,omitempty"`
 	PublishedAt *time.Time                          `json:"publishedAt,omitempty"`
@@ -680,6 +682,14 @@ type FulfillEvidenceInput struct {
 
 type FulfillEvidencePayload struct {
 	EvidenceEdge *EvidenceEdge `json:"evidenceEdge"`
+}
+
+type GenerateDocumentChangelogInput struct {
+	DocumentID gid.GID `json:"documentId"`
+}
+
+type GenerateDocumentChangelogPayload struct {
+	Changelog string `json:"changelog"`
 }
 
 type ImportFrameworkInput struct {
@@ -812,6 +822,7 @@ type PeopleEdge struct {
 
 type PublishDocumentVersionInput struct {
 	DocumentID gid.GID `json:"documentId"`
+	Changelog  *string `json:"changelog,omitempty"`
 }
 
 type PublishDocumentVersionPayload struct {

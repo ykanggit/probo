@@ -38,7 +38,7 @@ type Config struct {
 	Usrmgr            *usrmgr.Service
 	Auth              console_v1.AuthConfig
 	ConnectorRegistry *connector.ConnectorRegistry
-	VendorAssessment  *agents.VendorAssessment
+	Agent             *agents.Agent
 	SafeRedirect      *saferedirect.SafeRedirect
 	Logger            *log.Logger
 }

@@ -343,10 +343,12 @@ type ComplexityRoot struct {
 		CreatedAt   func(childComplexity int) int
 		Document    func(childComplexity int) int
 		ID          func(childComplexity int) int
+		Owner       func(childComplexity int) int
 		PublishedAt func(childComplexity int) int
 		PublishedBy func(childComplexity int) int
 		Signatures  func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentVersionSignatureOrder) int
 		Status      func(childComplexity int) int
+		Title       func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 		Version     func(childComplexity int) int
 	}
@@ -437,6 +439,10 @@ type ComplexityRoot struct {
 		EvidenceEdge func(childComplexity int) int
 	}
 
+	GenerateDocumentChangelogPayload struct {
+		Changelog func(childComplexity int) int
+	}
+
 	ImportFrameworkPayload struct {
 		FrameworkEdge func(childComplexity int) int
 	}
@@ -513,6 +519,7 @@ type ComplexityRoot struct {
 		DeleteVendorComplianceReport func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
 		ExportAudit                  func(childComplexity int, input types.ExportAuditInput) int
 		FulfillEvidence              func(childComplexity int, input types.FulfillEvidenceInput) int
+		GenerateDocumentChangelog    func(childComplexity int, input types.GenerateDocumentChangelogInput) int
 		ImportFramework              func(childComplexity int, input types.ImportFrameworkInput) int
 		ImportMeasure                func(childComplexity int, input types.ImportMeasureInput) int
 		InviteUser                   func(childComplexity int, input types.InviteUserInput) int
@@ -889,6 +896,7 @@ type DocumentResolver interface {
 type DocumentVersionResolver interface {
 	Document(ctx context.Context, obj *types.DocumentVersion) (*types.Document, error)
 
+	Owner(ctx context.Context, obj *types.DocumentVersion) (*types.People, error)
 	Signatures(ctx context.Context, obj *types.DocumentVersion, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentVersionSignatureOrder) (*types.DocumentVersionSignatureConnection, error)
 	PublishedBy(ctx context.Context, obj *types.DocumentVersion) (*types.People, error)
 }
@@ -963,6 +971,7 @@ type MutationResolver interface {
 	UpdateDocument(ctx context.Context, input types.UpdateDocumentInput) (*types.UpdateDocumentPayload, error)
 	DeleteDocument(ctx context.Context, input types.DeleteDocumentInput) (*types.DeleteDocumentPayload, error)
 	PublishDocumentVersion(ctx context.Context, input types.PublishDocumentVersionInput) (*types.PublishDocumentVersionPayload, error)
+	GenerateDocumentChangelog(ctx context.Context, input types.GenerateDocumentChangelogInput) (*types.GenerateDocumentChangelogPayload, error)
 	CreateDraftDocumentVersion(ctx context.Context, input types.CreateDraftDocumentVersionInput) (*types.CreateDraftDocumentVersionPayload, error)
 	UpdateDocumentVersion(ctx context.Context, input types.UpdateDocumentVersionInput) (*types.UpdateDocumentVersionPayload, error)
 	RequestSignature(ctx context.Context, input types.RequestSignatureInput) (*types.RequestSignaturePayload, error)
@@ -1897,6 +1906,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.DocumentVersion.ID(childComplexity), true
 
+	case "DocumentVersion.owner":
+		if e.complexity.DocumentVersion.Owner == nil {
+			break
+		}
+
+		return e.complexity.DocumentVersion.Owner(childComplexity), true
+
 	case "DocumentVersion.publishedAt":
 		if e.complexity.DocumentVersion.PublishedAt == nil {
 			break
@@ -1929,6 +1945,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.DocumentVersion.Status(childComplexity), true
+
+	case "DocumentVersion.title":
+		if e.complexity.DocumentVersion.Title == nil {
+			break
+		}
+
+		return e.complexity.DocumentVersion.Title(childComplexity), true
 
 	case "DocumentVersion.updatedAt":
 		if e.complexity.DocumentVersion.UpdatedAt == nil {
@@ -2277,6 +2300,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.FulfillEvidencePayload.EvidenceEdge(childComplexity), true
+
+	case "GenerateDocumentChangelogPayload.changelog":
+		if e.complexity.GenerateDocumentChangelogPayload.Changelog == nil {
+			break
+		}
+
+		return e.complexity.GenerateDocumentChangelogPayload.Changelog(childComplexity), true
 
 	case "ImportFrameworkPayload.frameworkEdge":
 		if e.complexity.ImportFrameworkPayload.FrameworkEdge == nil {
@@ -2891,6 +2921,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.FulfillEvidence(childComplexity, args["input"].(types.FulfillEvidenceInput)), true
+
+	case "Mutation.generateDocumentChangelog":
+		if e.complexity.Mutation.GenerateDocumentChangelog == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_generateDocumentChangelog_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.GenerateDocumentChangelog(childComplexity, args["input"].(types.GenerateDocumentChangelogInput)), true
 
 	case "Mutation.importFramework":
 		if e.complexity.Mutation.ImportFramework == nil {
@@ -4547,6 +4589,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputExportAuditInput,
 		ec.unmarshalInputFrameworkOrder,
 		ec.unmarshalInputFulfillEvidenceInput,
+		ec.unmarshalInputGenerateDocumentChangelogInput,
 		ec.unmarshalInputImportFrameworkInput,
 		ec.unmarshalInputImportMeasureInput,
 		ec.unmarshalInputInviteUserInput,
@@ -5837,6 +5880,9 @@ type Mutation {
   publishDocumentVersion(
     input: PublishDocumentVersionInput!
   ): PublishDocumentVersionPayload!
+  generateDocumentChangelog(
+    input: GenerateDocumentChangelogInput!
+  ): GenerateDocumentChangelogPayload!
   createDraftDocumentVersion(
     input: CreateDraftDocumentVersionInput!
   ): CreateDraftDocumentVersionPayload!
@@ -6426,6 +6472,8 @@ type DocumentVersion implements Node {
   version: Int!
   content: String!
   changelog: String!
+  title: String!
+  owner: People! @goField(forceResolver: true)
 
   signatures(
     first: Int
@@ -6507,6 +6555,7 @@ type RequestSignaturePayload {
 
 input PublishDocumentVersionInput {
   documentId: ID!
+  changelog: String
 }
 
 type PublishDocumentVersionPayload {
@@ -6563,6 +6612,14 @@ input ExportAuditInput {
 
 type ExportAuditPayload {
   url: String!
+}
+
+input GenerateDocumentChangelogInput {
+  documentId: ID!
+}
+
+type GenerateDocumentChangelogPayload {
+  changelog: String!
 }
 
 input AssessVendorInput {
@@ -8796,6 +8853,29 @@ func (ec *executionContext) field_Mutation_fulfillEvidence_argsInput(
 	}
 
 	var zeroVal types.FulfillEvidenceInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_generateDocumentChangelog_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_generateDocumentChangelog_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_generateDocumentChangelog_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.GenerateDocumentChangelogInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNGenerateDocumentChangelogInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGenerateDocumentChangelogInput(ctx, tmp)
+	}
+
+	var zeroVal types.GenerateDocumentChangelogInput
 	return zeroVal, nil
 }
 
@@ -17134,6 +17214,116 @@ func (ec *executionContext) fieldContext_DocumentVersion_changelog(_ context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _DocumentVersion_title(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DocumentVersion_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DocumentVersion_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DocumentVersion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DocumentVersion_owner(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DocumentVersion_owner(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DocumentVersion().Owner(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.People)
+	fc.Result = res
+	return ec.marshalNPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeople(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DocumentVersion_owner(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DocumentVersion",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_People_id(ctx, field)
+			case "fullName":
+				return ec.fieldContext_People_fullName(ctx, field)
+			case "primaryEmailAddress":
+				return ec.fieldContext_People_primaryEmailAddress(ctx, field)
+			case "additionalEmailAddresses":
+				return ec.fieldContext_People_additionalEmailAddresses(ctx, field)
+			case "kind":
+				return ec.fieldContext_People_kind(ctx, field)
+			case "position":
+				return ec.fieldContext_People_position(ctx, field)
+			case "contractStartDate":
+				return ec.fieldContext_People_contractStartDate(ctx, field)
+			case "contractEndDate":
+				return ec.fieldContext_People_contractEndDate(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_People_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_People_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type People", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DocumentVersion_signatures(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersion) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DocumentVersion_signatures(ctx, field)
 	if err != nil {
@@ -17586,6 +17776,10 @@ func (ec *executionContext) fieldContext_DocumentVersionEdge_node(_ context.Cont
 				return ec.fieldContext_DocumentVersion_content(ctx, field)
 			case "changelog":
 				return ec.fieldContext_DocumentVersion_changelog(ctx, field)
+			case "title":
+				return ec.fieldContext_DocumentVersion_title(ctx, field)
+			case "owner":
+				return ec.fieldContext_DocumentVersion_owner(ctx, field)
 			case "signatures":
 				return ec.fieldContext_DocumentVersion_signatures(ctx, field)
 			case "publishedBy":
@@ -17698,6 +17892,10 @@ func (ec *executionContext) fieldContext_DocumentVersionSignature_documentVersio
 				return ec.fieldContext_DocumentVersion_content(ctx, field)
 			case "changelog":
 				return ec.fieldContext_DocumentVersion_changelog(ctx, field)
+			case "title":
+				return ec.fieldContext_DocumentVersion_title(ctx, field)
+			case "owner":
+				return ec.fieldContext_DocumentVersion_owner(ctx, field)
 			case "signatures":
 				return ec.fieldContext_DocumentVersion_signatures(ctx, field)
 			case "publishedBy":
@@ -19763,6 +19961,50 @@ func (ec *executionContext) fieldContext_FulfillEvidencePayload_evidenceEdge(_ c
 				return ec.fieldContext_EvidenceEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EvidenceEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GenerateDocumentChangelogPayload_changelog(ctx context.Context, field graphql.CollectedField, obj *types.GenerateDocumentChangelogPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GenerateDocumentChangelogPayload_changelog(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Changelog, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GenerateDocumentChangelogPayload_changelog(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GenerateDocumentChangelogPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -23473,6 +23715,65 @@ func (ec *executionContext) fieldContext_Mutation_publishDocumentVersion(ctx con
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_generateDocumentChangelog(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_generateDocumentChangelog(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().GenerateDocumentChangelog(rctx, fc.Args["input"].(types.GenerateDocumentChangelogInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.GenerateDocumentChangelogPayload)
+	fc.Result = res
+	return ec.marshalNGenerateDocumentChangelogPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGenerateDocumentChangelogPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_generateDocumentChangelog(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "changelog":
+				return ec.fieldContext_GenerateDocumentChangelogPayload_changelog(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GenerateDocumentChangelogPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_generateDocumentChangelog_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createDraftDocumentVersion(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createDraftDocumentVersion(ctx, field)
 	if err != nil {
@@ -26456,6 +26757,10 @@ func (ec *executionContext) fieldContext_PublishDocumentVersionPayload_documentV
 				return ec.fieldContext_DocumentVersion_content(ctx, field)
 			case "changelog":
 				return ec.fieldContext_DocumentVersion_changelog(ctx, field)
+			case "title":
+				return ec.fieldContext_DocumentVersion_title(ctx, field)
+			case "owner":
+				return ec.fieldContext_DocumentVersion_owner(ctx, field)
 			case "signatures":
 				return ec.fieldContext_DocumentVersion_signatures(ctx, field)
 			case "publishedBy":
@@ -29462,6 +29767,10 @@ func (ec *executionContext) fieldContext_UpdateDocumentVersionPayload_documentVe
 				return ec.fieldContext_DocumentVersion_content(ctx, field)
 			case "changelog":
 				return ec.fieldContext_DocumentVersion_changelog(ctx, field)
+			case "title":
+				return ec.fieldContext_DocumentVersion_title(ctx, field)
+			case "owner":
+				return ec.fieldContext_DocumentVersion_owner(ctx, field)
 			case "signatures":
 				return ec.fieldContext_DocumentVersion_signatures(ctx, field)
 			case "publishedBy":
@@ -37516,6 +37825,33 @@ func (ec *executionContext) unmarshalInputFulfillEvidenceInput(ctx context.Conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputGenerateDocumentChangelogInput(ctx context.Context, obj any) (types.GenerateDocumentChangelogInput, error) {
+	var it types.GenerateDocumentChangelogInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"documentId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "documentId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DocumentID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputImportFrameworkInput(ctx context.Context, obj any) (types.ImportFrameworkInput, error) {
 	var it types.ImportFrameworkInput
 	asMap := map[string]any{}
@@ -37734,7 +38070,7 @@ func (ec *executionContext) unmarshalInputPublishDocumentVersionInput(ctx contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"documentId"}
+	fieldsInOrder := [...]string{"documentId", "changelog"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -37748,6 +38084,13 @@ func (ec *executionContext) unmarshalInputPublishDocumentVersionInput(ctx contex
 				return it, err
 			}
 			it.DocumentID = data
+		case "changelog":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("changelog"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Changelog = data
 		}
 	}
 
@@ -42067,6 +42410,47 @@ func (ec *executionContext) _DocumentVersion(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "title":
+			out.Values[i] = ec._DocumentVersion_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "owner":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DocumentVersion_owner(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "signatures":
 			field := field
 
@@ -43084,6 +43468,45 @@ func (ec *executionContext) _FulfillEvidencePayload(ctx context.Context, sel ast
 	return out
 }
 
+var generateDocumentChangelogPayloadImplementors = []string{"GenerateDocumentChangelogPayload"}
+
+func (ec *executionContext) _GenerateDocumentChangelogPayload(ctx context.Context, sel ast.SelectionSet, obj *types.GenerateDocumentChangelogPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, generateDocumentChangelogPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GenerateDocumentChangelogPayload")
+		case "changelog":
+			out.Values[i] = ec._GenerateDocumentChangelogPayload_changelog(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var importFrameworkPayloadImplementors = []string{"ImportFrameworkPayload"}
 
 func (ec *executionContext) _ImportFrameworkPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ImportFrameworkPayload) graphql.Marshaler {
@@ -43846,6 +44269,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "publishDocumentVersion":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_publishDocumentVersion(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "generateDocumentChangelog":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_generateDocumentChangelog(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -49848,6 +50278,25 @@ func (ec *executionContext) marshalNFulfillEvidencePayload2ᚖgithubᚗcomᚋget
 		return graphql.Null
 	}
 	return ec._FulfillEvidencePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNGenerateDocumentChangelogInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGenerateDocumentChangelogInput(ctx context.Context, v any) (types.GenerateDocumentChangelogInput, error) {
+	res, err := ec.unmarshalInputGenerateDocumentChangelogInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGenerateDocumentChangelogPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGenerateDocumentChangelogPayload(ctx context.Context, sel ast.SelectionSet, v types.GenerateDocumentChangelogPayload) graphql.Marshaler {
+	return ec._GenerateDocumentChangelogPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGenerateDocumentChangelogPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGenerateDocumentChangelogPayload(ctx context.Context, sel ast.SelectionSet, v *types.GenerateDocumentChangelogPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GenerateDocumentChangelogPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, v any) (gid.GID, error) {
