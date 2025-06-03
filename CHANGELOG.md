@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add assets inventory
+- Add data inventory
+
 ## [0.30.1] - 2025-06-02
 
 ### Added
