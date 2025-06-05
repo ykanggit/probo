@@ -375,7 +375,23 @@ function BreadcrumbMeasureView() {
   );
 }
 
-function BreadcrumbControl() {
+function BreadcrumbControlNew() {
+  const { organizationId, frameworkId } = useParams();
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink
+          to={`/organizations/${organizationId}/frameworks/${frameworkId}/controls/new`}
+        >
+          New Control
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+function BreadcrumbControlExisting() {
   const { organizationId, frameworkId, controlId } = useParams();
   const data = useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbControlQuery>(
     graphql`
@@ -383,7 +399,7 @@ function BreadcrumbControl() {
         control: node(id: $controlId) {
           id
           ... on Control {
-            referenceId
+            sectionTitle
           }
         }
       }
@@ -399,10 +415,24 @@ function BreadcrumbControl() {
         <BreadcrumbNavLink
           to={`/organizations/${organizationId}/frameworks/${frameworkId}/controls/${controlId}`}
         >
-          {data.control?.referenceId}
+          {data.control?.sectionTitle}
         </BreadcrumbNavLink>
       </BreadcrumbItem>
     </>
+  );
+}
+
+function BreadcrumbControl() {
+  const { controlId } = useParams();
+
+  if (controlId === "new") {
+    return <BreadcrumbControlNew />;
+  }
+
+  return (
+    <Suspense>
+      <BreadcrumbControlExisting />
+    </Suspense>
   );
 }
 

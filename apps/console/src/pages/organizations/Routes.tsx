@@ -11,6 +11,8 @@ import { FrameworkListPage } from "./frameworks/FrameworkListPage";
 import { FrameworkPage } from "./frameworks/FrameworkPage";
 import { NewFrameworkPage } from "./frameworks/NewFrameworkPage";
 import { ControlPage } from "./frameworks/controls/ControlPage";
+import { EditControlPage } from "./frameworks/controls/EditControlPage";
+import { NewControlPage } from "./frameworks/controls/NewControlPage";
 import { EditMeasurePage } from "./measures/EditMeasurePage";
 import { MeasureListPage } from "./measures/MeasureListPage";
 import { MeasurePage } from "./measures/MeasurePage";
@@ -50,7 +52,9 @@ export function OrganizationsRoutes() {
         <Route path="frameworks/:frameworkId/*">
           <Route element={<FrameworkLayout />}>
             <Route index element={<FrameworkPage />} />
+            <Route path="controls/new" element={<NewControlPage />} />
             <Route path="controls/:controlId" element={<ControlPage />} />
+            <Route path="controls/:controlId/edit" element={<EditControlPage />} />
           </Route>
           <Route path="edit" element={<EditFrameworkPage />} />
           <Route path="*" element={<NotFoundPage />} />

@@ -241,14 +241,14 @@ func (s FrameworkService) Import(
 
 				now := time.Now()
 				control := &coredata.Control{
-					ID:          controlID,
-					TenantID:    organizationID.TenantID(),
-					FrameworkID: frameworkID,
-					ReferenceID: control.ID,
-					Name:        control.Name,
-					Description: control.Description,
-					CreatedAt:   now,
-					UpdatedAt:   now,
+					ID:           controlID,
+					TenantID:     organizationID.TenantID(),
+					FrameworkID:  frameworkID,
+					SectionTitle: control.ID,
+					Name:         control.Name,
+					Description:  control.Description,
+					CreatedAt:    now,
+					UpdatedAt:    now,
 				}
 
 				if err := control.Insert(ctx, tx, s.svc.scope); err != nil {
@@ -307,7 +307,7 @@ func (s FrameworkService) ExportAudit(
 			}
 
 			for _, control := range controls {
-				controlDir := filepath.Join(exportDir, control.ReferenceID)
+				controlDir := filepath.Join(exportDir, filepath.Base(control.SectionTitle))
 				if err := os.MkdirAll(controlDir, 0755); err != nil {
 					return fmt.Errorf("cannot create control directory: %w", err)
 				}
@@ -344,7 +344,7 @@ func (s FrameworkService) ExportAudit(
 				}
 
 				for _, document := range documents {
-					documentDir := filepath.Join(controlDir, document.Title)
+					documentDir := filepath.Join(controlDir, filepath.Base(document.Title))
 					if err := os.MkdirAll(documentDir, 0755); err != nil {
 						return fmt.Errorf("cannot create document directory: %w", err)
 					}
@@ -361,13 +361,13 @@ func (s FrameworkService) ExportAudit(
 				}
 
 				for _, measure := range measures {
-					measureDir := filepath.Join(controlDir, measure.Name)
+					measureDir := filepath.Join(controlDir, filepath.Base(measure.Name))
 					if err := os.MkdirAll(measureDir, 0755); err != nil {
 						return fmt.Errorf("cannot create measure directory: %w", err)
 					}
 
 					evidences := coredata.Evidences{}
-					cursor := page.NewCursor(
+					evidenceCursor := page.NewCursor(
 						0,
 						nil,
 						page.Head,
@@ -377,12 +377,12 @@ func (s FrameworkService) ExportAudit(
 						},
 					)
 
-					if err := evidences.LoadByMeasureID(ctx, conn, s.svc.scope, measure.ID, cursor); err != nil {
+					if err := evidences.LoadByMeasureID(ctx, conn, s.svc.scope, measure.ID, evidenceCursor); err != nil {
 						return fmt.Errorf("cannot load evidences: %w", err)
 					}
 
 					for _, evidence := range evidences {
-						evidenceFile := filepath.Join(measureDir, evidence.Filename)
+						evidenceFile := filepath.Join(measureDir, filepath.Base(evidence.Filename))
 
 						if evidence.Type == coredata.EvidenceTypeFile && evidence.ObjectKey != "" {
 							output, err := s.svc.s3.GetObject(
