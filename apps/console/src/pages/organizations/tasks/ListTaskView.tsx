@@ -47,7 +47,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ListTaskViewOrganizationQuery } from "./__generated__/ListTaskViewOrganizationQuery.graphql";
-import {formatDate, parseISO} from "date-fns";
+import {format as formatDate, parseISO} from "date-fns";
 
 // Function to format ISO8601 duration to human-readable format
 const formatDuration = (isoDuration: string | null | undefined): string => {
@@ -279,7 +279,7 @@ function TaskCard({ task, onClick, onToggleState }: {
             )}
             {task.deadline && (
               <span className="text-xs text-gray-500">
-                {formatDate(task.deadline, "dd MMM yyyy")}
+                {formatDate(parseISO(task.deadline), "dd MMM yyyy")}
               </span>
             )}
           </div>
@@ -407,8 +407,8 @@ function ListTaskContent({
   };
 
   // Filter measures based on search query
-  const filteredMeasures = measures.filter(measure => 
-    measure.name.toLowerCase().includes(measureSearchQuery.toLowerCase()) || 
+  const filteredMeasures = measures.filter(measure =>
+    measure.name.toLowerCase().includes(measureSearchQuery.toLowerCase()) ||
     (measure.description && measure.description.toLowerCase().includes(measureSearchQuery.toLowerCase()))
   );
 
@@ -463,7 +463,7 @@ function ListTaskContent({
           measureId: selectedMeasure?.id || null,
           assignedToId: assignee?.id,
           timeEstimate: formattedTimeEstimate,
-          deadline: deadline
+          deadline: deadline ? deadline.toISOString() : null
         },
         connections: [data.node?.tasks?.__id || ""],
       },
@@ -854,7 +854,7 @@ function ListTaskContent({
                 </div>
 
                 {/* Deadline */}
-                <div className="flex justify-between items-center broder-b border-[rgba(2,42,2,0.08)] py-3">
+                <div className="flex justify-between items-center border-b border-[rgba(2,42,2,0.08)] py-3">
                   <Label className="text-sm font-medium text-gray-500">Deadline</Label>
                   <div className="flex items-center gap-1.5">
                     <Input type="date" value={deadlineString} onChange={handleDeadlineChange}

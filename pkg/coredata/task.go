@@ -72,7 +72,7 @@ SELECT
     reference_id,
     time_estimate,
     assigned_to,
-	deadline,
+    deadline,
     created_at,
     updated_at
 FROM
@@ -121,7 +121,7 @@ INSERT INTO
         state,
         time_estimate,
         assigned_to,
-		deadline,
+        deadline,
         created_at,
         updated_at
     )
@@ -136,7 +136,7 @@ VALUES (
     @state,
     @time_estimate,
     @assigned_to,
-	@deadline,
+    @deadline,
     @created_at,
     @updated_at
 );
@@ -179,7 +179,7 @@ INSERT INTO
         state,
         time_estimate,
         assigned_to,
-		deadline,
+        deadline,
         created_at,
         updated_at
     )
@@ -194,14 +194,15 @@ VALUES (
     @state,
     @time_estimate,
     @assigned_to,
-	@deadline,
+    @deadline,
     @created_at,
     @updated_at
 )
 ON CONFLICT (measure_id, reference_id) DO UPDATE SET
     name = @name,
     description = @description,
-    updated_at = @updated_at
+    updated_at = @updated_at,
+    deadline = @deadline
 RETURNING
     id,
     organization_id,
@@ -212,7 +213,7 @@ RETURNING
     state,
     time_estimate,
     assigned_to,
-	deadline,
+    deadline,
     created_at,
     updated_at
 `
@@ -314,7 +315,7 @@ SELECT
     reference_id,
     time_estimate,
     assigned_to,
-	deadline,
+    deadline,
     created_at,
     updated_at
 FROM

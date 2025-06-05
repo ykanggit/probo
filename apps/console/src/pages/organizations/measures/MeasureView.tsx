@@ -996,7 +996,7 @@ function MeasureViewContent({
           name: newTaskName,
           description: newTaskDescription,
           timeEstimate: isoTimeEstimate === "" ? null : isoTimeEstimate,
-          deadline: newDeadline === "" ? null : formatISO(newDeadline),
+          deadline: newDeadline === "" ? null : formatISO(parseISO(newDeadline)),
         },
       },
       onCompleted: () => {
@@ -1762,7 +1762,7 @@ function MeasureViewContent({
   // Function to handle saving the updated deadline
   const handleSaveDeadline = useCallback(
     (taskId: string) => {
-      const newDeadline = editDeadline === "" ? null : formatISO(editDeadline);
+      const newDeadline = editDeadline === "" ? null : formatISO(parseISO(editDeadline));
       updateTask({
         variables: {
           input: {
@@ -2650,7 +2650,7 @@ function MeasureViewContent({
                         )}
                         {task.deadline && (
                           <div className="text-sm text-secondary">
-                            {formatDate(task.deadline)} 
+                            {formatDate(task.deadline)}
                           </div>
                         )}
                       </div>
@@ -3127,7 +3127,7 @@ function MeasureViewContent({
                                 setEditDeadline(e.target.value)
                               }
                             />
-                          </div>                        
+                          </div>
                         </div>
                         <div className="flex justify-end gap-2">
                           <Button
