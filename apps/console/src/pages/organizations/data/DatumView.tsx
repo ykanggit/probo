@@ -27,6 +27,7 @@ import {
 import PeopleSelector from "@/components/PeopleSelector";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
+import { BreadCrumb } from "../OrganizationBreadcrumb";
 
 const datumViewQuery = graphql`
   query DatumViewQuery($datumId: ID!, $organizationId: ID!) {
@@ -244,110 +245,113 @@ function DatumViewContent({
     .filter((node): node is Vendor => node != null);
 
   return (
-    <PageTemplate title={formData.name || "Data Details"}>
-      <div className="space-y-6">
-        <div className="max-w-4xl space-y-6">
-          <EditableField
-            label="Name"
-            value={formData.name}
-            onChange={(value) => handleFieldChange("name", value)}
-          />
+    <>
+      <BreadCrumb />
+      <PageTemplate title={formData.name || "Data Details"}>
+        <div className="space-y-6">
+          <div className="max-w-4xl space-y-6">
+            <EditableField
+              label="Name"
+              value={formData.name}
+              onChange={(value) => handleFieldChange("name", value)}
+            />
 
-          <Card className="p-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <h2 className="text-lg font-medium">Data Details</h2>
-              </div>
-
+            <Card className="p-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Label className="text-sm">Owner</Label>
-                  </div>
-                  <PeopleSelector
-                    organizationRef={data.organization}
-                    selectedPersonId={formData.ownerId}
-                    onSelect={(value) => handleFieldChange("ownerId", value)}
-                    placeholder="Select data owner"
-                  />
+                  <h2 className="text-lg font-medium">Data Details</h2>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm">Vendors</Label>
-                  <Select
-                    value=""
-                    onValueChange={handleVendorSelect}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select vendors" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {vendors.map((vendor) => (
-                        <SelectItem key={vendor.id} value={vendor.id}>
-                          {vendor.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {formData.selectedVendorIds.map((vendorId) => {
-                      const vendor = vendors.find((v) => v.id === vendorId);
-                      if (!vendor) return null;
-                      return (
-                        <Badge key={vendorId} variant="secondary" className="flex items-center gap-1">
-                          {vendor.name}
-                          <button
-                            type="button"
-                            onClick={() => handleVendorSelect(vendorId)}
-                            className="hover:bg-secondary-hover rounded-full p-0.5"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      );
-                    })}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm">Owner</Label>
+                    </div>
+                    <PeopleSelector
+                      organizationRef={data.organization}
+                      selectedPersonId={formData.ownerId}
+                      onSelect={(value) => handleFieldChange("ownerId", value)}
+                      placeholder="Select data owner"
+                    />
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Label className="text-sm">Data Sensitivity</Label>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Vendors</Label>
+                    <Select
+                      value=""
+                      onValueChange={handleVendorSelect}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select vendors" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {vendors.map((vendor) => (
+                          <SelectItem key={vendor.id} value={vendor.id}>
+                            {vendor.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {formData.selectedVendorIds.map((vendorId) => {
+                        const vendor = vendors.find((v) => v.id === vendorId);
+                        if (!vendor) return null;
+                        return (
+                          <Badge key={vendorId} variant="secondary" className="flex items-center gap-1">
+                            {vendor.name}
+                            <button
+                              type="button"
+                              onClick={() => handleVendorSelect(vendorId)}
+                              className="hover:bg-secondary-hover rounded-full p-0.5"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <Select
-                    value={formData.dataSensitivity}
-                    onValueChange={(value) => handleFieldChange("dataSensitivity", value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select data sensitivity" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="NONE">No sensitive data</SelectItem>
-                      <SelectItem value="LOW">Public or non-sensitive data</SelectItem>
-                      <SelectItem value="MEDIUM">Internal/restricted data</SelectItem>
-                      <SelectItem value="HIGH">Confidential data</SelectItem>
-                      <SelectItem value="CRITICAL">Regulated/PII/financial data</SelectItem>
-                    </SelectContent>
-                  </Select>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm">Data Sensitivity</Label>
+                    </div>
+                    <Select
+                      value={formData.dataSensitivity}
+                      onValueChange={(value) => handleFieldChange("dataSensitivity", value)}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select data sensitivity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NONE">No sensitive data</SelectItem>
+                        <SelectItem value="LOW">Public or non-sensitive data</SelectItem>
+                        <SelectItem value="MEDIUM">Internal/restricted data</SelectItem>
+                        <SelectItem value="HIGH">Confidential data</SelectItem>
+                        <SelectItem value="CRITICAL">Regulated/PII/financial data</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
 
-          <div className="mt-6 flex justify-end gap-2">
-            <Button variant="outline" onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              className="bg-primary text-invert hover:bg-primary/90"
-              disabled={!hasChanges}
-            >
-              Save Changes
-            </Button>
+            <div className="mt-6 flex justify-end gap-2">
+              <Button variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSave}
+                className="bg-primary text-invert hover:bg-primary/90"
+                disabled={!hasChanges}
+              >
+                Save Changes
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-    </PageTemplate>
+      </PageTemplate>
+    </>
   );
 }
 

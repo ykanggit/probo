@@ -13,6 +13,7 @@ import PeopleSelector from "@/components/PeopleSelector";
 import { NewDatumViewSkeleton } from "./NewDatumPage";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
+import { BreadCrumb } from "../OrganizationBreadcrumb";
 
 const newDatumViewQuery = graphql`
   query NewDatumViewQuery($organizationId: ID!) {
@@ -211,91 +212,94 @@ function NewDataViewContent({
     .filter((node): node is Vendor => node != null);
 
   return (
-    <PageTemplate
-      title="Create Data"
-      description="Add new data to your organization"
-    >
-      <form onSubmit={handleSubmit}>
-        <div className="max-w-2xl space-y-6">
-          <EditableField
-            label="Name"
-            value={formData.name}
-            onChange={(value) => handleFieldChange("name", value)}
-            required
-          />
-
-          <div className="space-y-2">
-            <Label className="text-sm">Owner</Label>
-            <PeopleSelector
-              organizationRef={data.organization}
-              selectedPersonId={formData.ownerId}
-              onSelect={(value) => handleFieldChange("ownerId", value)}
-              placeholder="Select data owner"
+    <>
+      <BreadCrumb />
+      <PageTemplate
+        title="Create Data"
+        description="Add new data to your organization"
+      >
+        <form onSubmit={handleSubmit}>
+          <div className="max-w-2xl space-y-6">
+            <EditableField
+              label="Name"
+              value={formData.name}
+              onChange={(value) => handleFieldChange("name", value)}
               required
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label className="text-sm">Vendors</Label>
-            <Select
-              value=""
-              onValueChange={handleVendorSelect}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select vendors" />
-              </SelectTrigger>
-              <SelectContent>
-                {vendors.map((vendor) => (
-                  <SelectItem key={vendor.id} value={vendor.id}>
-                    {vendor.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.selectedVendorIds.map((vendorId) => {
-                const vendor = vendors.find((v) => v.id === vendorId);
-                if (!vendor) return null;
-                return (
-                  <Badge key={vendorId} variant="secondary" className="flex items-center gap-1">
-                    {vendor.name}
-                    <button
-                      type="button"
-                      onClick={() => handleVendorSelect(vendorId)}
-                      className="hover:bg-secondary-hover rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                );
-              })}
+            <div className="space-y-2">
+              <Label className="text-sm">Owner</Label>
+              <PeopleSelector
+                organizationRef={data.organization}
+                selectedPersonId={formData.ownerId}
+                onSelect={(value) => handleFieldChange("ownerId", value)}
+                placeholder="Select data owner"
+                required
+              />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label className="text-sm">Data Sensitivity</Label>
-            <Select
-              value={formData.dataSensitivity}
-              onValueChange={(value: string) =>
-                handleFieldChange("dataSensitivity", value as "NONE" | "LOW" | "MEDIUM" | "HIGH" | "CRITICAL")}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select data sensitivity" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="NONE">No sensitive data</SelectItem>
-                <SelectItem value="LOW">Public or non-sensitive data</SelectItem>
-                <SelectItem value="MEDIUM">Internal/restricted data</SelectItem>
-                <SelectItem value="HIGH">Confidential data</SelectItem>
-                <SelectItem value="CRITICAL">Regulated/PII/financial data</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <div className="space-y-2">
+              <Label className="text-sm">Vendors</Label>
+              <Select
+                value=""
+                onValueChange={handleVendorSelect}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select vendors" />
+                </SelectTrigger>
+                <SelectContent>
+                  {vendors.map((vendor) => (
+                    <SelectItem key={vendor.id} value={vendor.id}>
+                      {vendor.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.selectedVendorIds.map((vendorId) => {
+                  const vendor = vendors.find((v) => v.id === vendorId);
+                  if (!vendor) return null;
+                  return (
+                    <Badge key={vendorId} variant="secondary" className="flex items-center gap-1">
+                      {vendor.name}
+                      <button
+                        type="button"
+                        onClick={() => handleVendorSelect(vendorId)}
+                        className="hover:bg-secondary-hover rounded-full p-0.5"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  );
+                })}
+              </div>
+            </div>
 
-          <Button type="submit">Create Data</Button>
-        </div>
-      </form>
-    </PageTemplate>
+            <div className="space-y-2">
+              <Label className="text-sm">Data Sensitivity</Label>
+              <Select
+                value={formData.dataSensitivity}
+                onValueChange={(value: string) =>
+                  handleFieldChange("dataSensitivity", value as "NONE" | "LOW" | "MEDIUM" | "HIGH" | "CRITICAL")}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select data sensitivity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NONE">No sensitive data</SelectItem>
+                  <SelectItem value="LOW">Public or non-sensitive data</SelectItem>
+                  <SelectItem value="MEDIUM">Internal/restricted data</SelectItem>
+                  <SelectItem value="HIGH">Confidential data</SelectItem>
+                  <SelectItem value="CRITICAL">Regulated/PII/financial data</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button type="submit">Create Data</Button>
+          </div>
+        </form>
+      </PageTemplate>
+    </>
   );
 }
 

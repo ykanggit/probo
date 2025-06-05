@@ -20,6 +20,7 @@ import { OrganizationBreadcrumbBreadcrumbMeasureViewQuery } from "./__generated_
 import { OrganizationBreadcrumbBreadcrumbControlQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbControlQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbRiskShowQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbRiskShowQuery.graphql";
 import { OrganizationBreadcrumbBreadcrumbAssetOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbAssetOverviewQuery.graphql";
+import { OrganizationBreadcrumbBreadcrumbDataOverviewQuery } from "./__generated__/OrganizationBreadcrumbBreadcrumbDataOverviewQuery.graphql";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 const New = () => {
@@ -499,6 +500,51 @@ function BreadcrumbAssetOverview() {
   );
 }
 
+function BreadcrumbDataList() {
+  const { organizationId } = useParams();
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink to={`/organizations/${organizationId}/data`}>
+          Data
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
+function BreadcrumbDataOverview() {
+  const { organizationId, datumId } = useParams();
+  const data = useLazyLoadQuery<OrganizationBreadcrumbBreadcrumbDataOverviewQuery>(
+    graphql`
+      query OrganizationBreadcrumbBreadcrumbDataOverviewQuery($datumId: ID!) {
+        datum: node(id: $datumId) {
+          id
+          ... on Datum {
+            name
+          }
+        }
+      }
+    `,
+    { datumId: datumId! },
+    { fetchPolicy: "store-or-network" },
+  );
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbNavLink to={`/organizations/${organizationId}/data/${datumId || ""}`}>
+          {data.datum?.name}
+        </BreadcrumbNavLink>
+      </BreadcrumbItem>
+      <Outlet />
+    </>
+  );
+}
+
 export function BreadCrumb() {
   return (
     <Routes>
@@ -599,6 +645,19 @@ export function BreadCrumb() {
             element={
               <Suspense>
                 <BreadcrumbAssetOverview />
+              </Suspense>
+            }
+          >
+            <Route path="edit" element={<Edit />} />
+          </Route>
+        </Route>
+        <Route path="data" element={<BreadcrumbDataList />}>
+          <Route path="new" element={<New />} />
+          <Route
+            path=":datumId"
+            element={
+              <Suspense>
+                <BreadcrumbDataOverview />
               </Suspense>
             }
           >

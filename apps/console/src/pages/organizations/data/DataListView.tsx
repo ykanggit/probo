@@ -19,6 +19,7 @@ import { DataListViewPaginationQuery } from "./__generated__/DataListViewPaginat
 import { DataListView_data$key } from "./__generated__/DataListView_data.graphql";
 import { PageTemplate } from "@/components/PageTemplate";
 import { DataListViewSkeleton } from "./DataListPage";
+import { BreadCrumb } from "../OrganizationBreadcrumb";
 
 const ITEMS_PER_PAGE = 25;
 
@@ -185,6 +186,7 @@ function DataListContent({
 
   return (
     <>
+      <BreadCrumb />
       <PageTemplate
         title="Data"
         description="Keep track of your organization's data and their data sensitivity."
