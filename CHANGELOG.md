@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add deadline on tasks
+
 ## [0.31.0] - 2025-06-04
 
 ### Added
