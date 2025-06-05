@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 - Add assets inventory
 - Add data inventory
+- Add title and owner id to document versions
+- Add automatic changelog
 
 ## [0.30.1] - 2025-06-02
 
