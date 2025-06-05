@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -234,7 +235,7 @@ func graphqlHandler(logger *log.Logger, proboSvc *probo.Service, usrmgrSvc *usrm
 	srv.Use(tracingExtension{})
 	srv.SetRecoverFunc(func(ctx context.Context, err any) error {
 		logger := httpserver.LoggerFromContext(ctx)
-		logger.Error("resolver panic", log.Any("error", err))
+		logger.Error("resolver panic", log.Any("error", err), log.Any("stack", string(debug.Stack())))
 
 		return errors.New("internal server error")
 	})

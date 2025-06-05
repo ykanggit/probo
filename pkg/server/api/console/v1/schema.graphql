@@ -1289,6 +1289,9 @@ type Mutation {
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
   importFramework(input: ImportFrameworkInput!): ImportFrameworkPayload!
   deleteFramework(input: DeleteFrameworkInput!): DeleteFrameworkPayload!
+  generateFrameworkStateOfApplicability(
+    input: GenerateFrameworkStateOfApplicabilityInput!
+  ): GenerateFrameworkStateOfApplicabilityPayload!
 
   # Control mutations
   createControl(input: CreateControlInput!): CreateControlPayload!
@@ -1398,6 +1401,14 @@ type Mutation {
 }
 
 # Input Types
+input GenerateFrameworkStateOfApplicabilityInput {
+  frameworkId: ID!
+}
+
+type GenerateFrameworkStateOfApplicabilityPayload {
+  downloadUrl: String!
+}
+
 input CreateOrganizationInput {
   name: String!
 }

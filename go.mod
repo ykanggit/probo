@@ -18,6 +18,7 @@ require (
 	github.com/openai/openai-go v1.1.0
 	github.com/prometheus/client_golang v1.22.0
 	github.com/vektah/gqlparser/v2 v2.5.27
+	github.com/xuri/excelize/v2 v2.9.1
 	go.gearno.de/crypto/uuid v0.1.0
 	go.gearno.de/kit v0.0.0-20250623163305-45b4f6905899
 	go.gearno.de/x/ref v0.0.0-20240502200927-d74926fcb14c
@@ -61,6 +62,8 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.64.0 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
+	github.com/richardlehane/mscfb v1.0.4 // indirect
+	github.com/richardlehane/msoleps v1.0.4 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sosodev/duration v1.3.1 // indirect
@@ -69,8 +72,11 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
+	github.com/tiendc/go-deepcopy v1.6.0 // indirect
 	github.com/urfave/cli/v2 v2.27.6 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
+	github.com/xuri/efp v0.0.1 // indirect
+	github.com/xuri/nfp v0.0.1 // indirect
 	go.gearno.de/x/panicf v0.1.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.35.0 // indirect

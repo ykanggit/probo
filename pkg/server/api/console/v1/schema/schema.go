@@ -456,6 +456,10 @@ type ComplexityRoot struct {
 		Changelog func(childComplexity int) int
 	}
 
+	GenerateFrameworkStateOfApplicabilityPayload struct {
+		DownloadURL func(childComplexity int) int
+	}
+
 	ImportFrameworkPayload struct {
 		FrameworkEdge func(childComplexity int) int
 	}
@@ -494,69 +498,70 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AssessVendor                 func(childComplexity int, input types.AssessVendorInput) int
-		AssignTask                   func(childComplexity int, input types.AssignTaskInput) int
-		ConfirmEmail                 func(childComplexity int, input types.ConfirmEmailInput) int
-		CreateAsset                  func(childComplexity int, input types.CreateAssetInput) int
-		CreateControl                func(childComplexity int, input types.CreateControlInput) int
-		CreateControlDocumentMapping func(childComplexity int, input types.CreateControlDocumentMappingInput) int
-		CreateControlMeasureMapping  func(childComplexity int, input types.CreateControlMeasureMappingInput) int
-		CreateDatum                  func(childComplexity int, input types.CreateDatumInput) int
-		CreateDocument               func(childComplexity int, input types.CreateDocumentInput) int
-		CreateDraftDocumentVersion   func(childComplexity int, input types.CreateDraftDocumentVersionInput) int
-		CreateFramework              func(childComplexity int, input types.CreateFrameworkInput) int
-		CreateMeasure                func(childComplexity int, input types.CreateMeasureInput) int
-		CreateOrganization           func(childComplexity int, input types.CreateOrganizationInput) int
-		CreatePeople                 func(childComplexity int, input types.CreatePeopleInput) int
-		CreateRisk                   func(childComplexity int, input types.CreateRiskInput) int
-		CreateRiskDocumentMapping    func(childComplexity int, input types.CreateRiskDocumentMappingInput) int
-		CreateRiskMeasureMapping     func(childComplexity int, input types.CreateRiskMeasureMappingInput) int
-		CreateTask                   func(childComplexity int, input types.CreateTaskInput) int
-		CreateVendor                 func(childComplexity int, input types.CreateVendorInput) int
-		CreateVendorRiskAssessment   func(childComplexity int, input types.CreateVendorRiskAssessmentInput) int
-		DeleteAsset                  func(childComplexity int, input types.DeleteAssetInput) int
-		DeleteControl                func(childComplexity int, input types.DeleteControlInput) int
-		DeleteControlDocumentMapping func(childComplexity int, input types.DeleteControlDocumentMappingInput) int
-		DeleteControlMeasureMapping  func(childComplexity int, input types.DeleteControlMeasureMappingInput) int
-		DeleteDatum                  func(childComplexity int, input types.DeleteDatumInput) int
-		DeleteDocument               func(childComplexity int, input types.DeleteDocumentInput) int
-		DeleteEvidence               func(childComplexity int, input types.DeleteEvidenceInput) int
-		DeleteFramework              func(childComplexity int, input types.DeleteFrameworkInput) int
-		DeleteMeasure                func(childComplexity int, input types.DeleteMeasureInput) int
-		DeletePeople                 func(childComplexity int, input types.DeletePeopleInput) int
-		DeleteRisk                   func(childComplexity int, input types.DeleteRiskInput) int
-		DeleteRiskDocumentMapping    func(childComplexity int, input types.DeleteRiskDocumentMappingInput) int
-		DeleteRiskMeasureMapping     func(childComplexity int, input types.DeleteRiskMeasureMappingInput) int
-		DeleteTask                   func(childComplexity int, input types.DeleteTaskInput) int
-		DeleteVendor                 func(childComplexity int, input types.DeleteVendorInput) int
-		DeleteVendorComplianceReport func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
-		ExportAudit                  func(childComplexity int, input types.ExportAuditInput) int
-		FulfillEvidence              func(childComplexity int, input types.FulfillEvidenceInput) int
-		GenerateDocumentChangelog    func(childComplexity int, input types.GenerateDocumentChangelogInput) int
-		ImportFramework              func(childComplexity int, input types.ImportFrameworkInput) int
-		ImportMeasure                func(childComplexity int, input types.ImportMeasureInput) int
-		InviteUser                   func(childComplexity int, input types.InviteUserInput) int
-		PublishDocumentVersion       func(childComplexity int, input types.PublishDocumentVersionInput) int
-		RemoveUser                   func(childComplexity int, input types.RemoveUserInput) int
-		RequestEvidence              func(childComplexity int, input types.RequestEvidenceInput) int
-		RequestSignature             func(childComplexity int, input types.RequestSignatureInput) int
-		SendSigningNotifications     func(childComplexity int, input types.SendSigningNotificationsInput) int
-		UnassignTask                 func(childComplexity int, input types.UnassignTaskInput) int
-		UpdateAsset                  func(childComplexity int, input types.UpdateAssetInput) int
-		UpdateControl                func(childComplexity int, input types.UpdateControlInput) int
-		UpdateDatum                  func(childComplexity int, input types.UpdateDatumInput) int
-		UpdateDocument               func(childComplexity int, input types.UpdateDocumentInput) int
-		UpdateDocumentVersion        func(childComplexity int, input types.UpdateDocumentVersionInput) int
-		UpdateFramework              func(childComplexity int, input types.UpdateFrameworkInput) int
-		UpdateMeasure                func(childComplexity int, input types.UpdateMeasureInput) int
-		UpdateOrganization           func(childComplexity int, input types.UpdateOrganizationInput) int
-		UpdatePeople                 func(childComplexity int, input types.UpdatePeopleInput) int
-		UpdateRisk                   func(childComplexity int, input types.UpdateRiskInput) int
-		UpdateTask                   func(childComplexity int, input types.UpdateTaskInput) int
-		UpdateVendor                 func(childComplexity int, input types.UpdateVendorInput) int
-		UploadMeasureEvidence        func(childComplexity int, input types.UploadMeasureEvidenceInput) int
-		UploadTaskEvidence           func(childComplexity int, input types.UploadTaskEvidenceInput) int
-		UploadVendorComplianceReport func(childComplexity int, input types.UploadVendorComplianceReportInput) int
+		AssessVendor                          func(childComplexity int, input types.AssessVendorInput) int
+		AssignTask                            func(childComplexity int, input types.AssignTaskInput) int
+		ConfirmEmail                          func(childComplexity int, input types.ConfirmEmailInput) int
+		CreateAsset                           func(childComplexity int, input types.CreateAssetInput) int
+		CreateControl                         func(childComplexity int, input types.CreateControlInput) int
+		CreateControlDocumentMapping          func(childComplexity int, input types.CreateControlDocumentMappingInput) int
+		CreateControlMeasureMapping           func(childComplexity int, input types.CreateControlMeasureMappingInput) int
+		CreateDatum                           func(childComplexity int, input types.CreateDatumInput) int
+		CreateDocument                        func(childComplexity int, input types.CreateDocumentInput) int
+		CreateDraftDocumentVersion            func(childComplexity int, input types.CreateDraftDocumentVersionInput) int
+		CreateFramework                       func(childComplexity int, input types.CreateFrameworkInput) int
+		CreateMeasure                         func(childComplexity int, input types.CreateMeasureInput) int
+		CreateOrganization                    func(childComplexity int, input types.CreateOrganizationInput) int
+		CreatePeople                          func(childComplexity int, input types.CreatePeopleInput) int
+		CreateRisk                            func(childComplexity int, input types.CreateRiskInput) int
+		CreateRiskDocumentMapping             func(childComplexity int, input types.CreateRiskDocumentMappingInput) int
+		CreateRiskMeasureMapping              func(childComplexity int, input types.CreateRiskMeasureMappingInput) int
+		CreateTask                            func(childComplexity int, input types.CreateTaskInput) int
+		CreateVendor                          func(childComplexity int, input types.CreateVendorInput) int
+		CreateVendorRiskAssessment            func(childComplexity int, input types.CreateVendorRiskAssessmentInput) int
+		DeleteAsset                           func(childComplexity int, input types.DeleteAssetInput) int
+		DeleteControl                         func(childComplexity int, input types.DeleteControlInput) int
+		DeleteControlDocumentMapping          func(childComplexity int, input types.DeleteControlDocumentMappingInput) int
+		DeleteControlMeasureMapping           func(childComplexity int, input types.DeleteControlMeasureMappingInput) int
+		DeleteDatum                           func(childComplexity int, input types.DeleteDatumInput) int
+		DeleteDocument                        func(childComplexity int, input types.DeleteDocumentInput) int
+		DeleteEvidence                        func(childComplexity int, input types.DeleteEvidenceInput) int
+		DeleteFramework                       func(childComplexity int, input types.DeleteFrameworkInput) int
+		DeleteMeasure                         func(childComplexity int, input types.DeleteMeasureInput) int
+		DeletePeople                          func(childComplexity int, input types.DeletePeopleInput) int
+		DeleteRisk                            func(childComplexity int, input types.DeleteRiskInput) int
+		DeleteRiskDocumentMapping             func(childComplexity int, input types.DeleteRiskDocumentMappingInput) int
+		DeleteRiskMeasureMapping              func(childComplexity int, input types.DeleteRiskMeasureMappingInput) int
+		DeleteTask                            func(childComplexity int, input types.DeleteTaskInput) int
+		DeleteVendor                          func(childComplexity int, input types.DeleteVendorInput) int
+		DeleteVendorComplianceReport          func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
+		ExportAudit                           func(childComplexity int, input types.ExportAuditInput) int
+		FulfillEvidence                       func(childComplexity int, input types.FulfillEvidenceInput) int
+		GenerateDocumentChangelog             func(childComplexity int, input types.GenerateDocumentChangelogInput) int
+		GenerateFrameworkStateOfApplicability func(childComplexity int, input types.GenerateFrameworkStateOfApplicabilityInput) int
+		ImportFramework                       func(childComplexity int, input types.ImportFrameworkInput) int
+		ImportMeasure                         func(childComplexity int, input types.ImportMeasureInput) int
+		InviteUser                            func(childComplexity int, input types.InviteUserInput) int
+		PublishDocumentVersion                func(childComplexity int, input types.PublishDocumentVersionInput) int
+		RemoveUser                            func(childComplexity int, input types.RemoveUserInput) int
+		RequestEvidence                       func(childComplexity int, input types.RequestEvidenceInput) int
+		RequestSignature                      func(childComplexity int, input types.RequestSignatureInput) int
+		SendSigningNotifications              func(childComplexity int, input types.SendSigningNotificationsInput) int
+		UnassignTask                          func(childComplexity int, input types.UnassignTaskInput) int
+		UpdateAsset                           func(childComplexity int, input types.UpdateAssetInput) int
+		UpdateControl                         func(childComplexity int, input types.UpdateControlInput) int
+		UpdateDatum                           func(childComplexity int, input types.UpdateDatumInput) int
+		UpdateDocument                        func(childComplexity int, input types.UpdateDocumentInput) int
+		UpdateDocumentVersion                 func(childComplexity int, input types.UpdateDocumentVersionInput) int
+		UpdateFramework                       func(childComplexity int, input types.UpdateFrameworkInput) int
+		UpdateMeasure                         func(childComplexity int, input types.UpdateMeasureInput) int
+		UpdateOrganization                    func(childComplexity int, input types.UpdateOrganizationInput) int
+		UpdatePeople                          func(childComplexity int, input types.UpdatePeopleInput) int
+		UpdateRisk                            func(childComplexity int, input types.UpdateRiskInput) int
+		UpdateTask                            func(childComplexity int, input types.UpdateTaskInput) int
+		UpdateVendor                          func(childComplexity int, input types.UpdateVendorInput) int
+		UploadMeasureEvidence                 func(childComplexity int, input types.UploadMeasureEvidenceInput) int
+		UploadTaskEvidence                    func(childComplexity int, input types.UploadTaskEvidenceInput) int
+		UploadVendorComplianceReport          func(childComplexity int, input types.UploadVendorComplianceReportInput) int
 	}
 
 	Organization struct {
@@ -974,6 +979,7 @@ type MutationResolver interface {
 	UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error)
 	ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error)
 	DeleteFramework(ctx context.Context, input types.DeleteFrameworkInput) (*types.DeleteFrameworkPayload, error)
+	GenerateFrameworkStateOfApplicability(ctx context.Context, input types.GenerateFrameworkStateOfApplicabilityInput) (*types.GenerateFrameworkStateOfApplicabilityPayload, error)
 	CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error)
 	UpdateControl(ctx context.Context, input types.UpdateControlInput) (*types.UpdateControlPayload, error)
 	DeleteControl(ctx context.Context, input types.DeleteControlInput) (*types.DeleteControlPayload, error)
@@ -2389,6 +2395,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.GenerateDocumentChangelogPayload.Changelog(childComplexity), true
 
+	case "GenerateFrameworkStateOfApplicabilityPayload.downloadUrl":
+		if e.complexity.GenerateFrameworkStateOfApplicabilityPayload.DownloadURL == nil {
+			break
+		}
+
+		return e.complexity.GenerateFrameworkStateOfApplicabilityPayload.DownloadURL(childComplexity), true
+
 	case "ImportFrameworkPayload.frameworkEdge":
 		if e.complexity.ImportFrameworkPayload.FrameworkEdge == nil {
 			break
@@ -3009,6 +3022,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.GenerateDocumentChangelog(childComplexity, args["input"].(types.GenerateDocumentChangelogInput)), true
+
+	case "Mutation.generateFrameworkStateOfApplicability":
+		if e.complexity.Mutation.GenerateFrameworkStateOfApplicability == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_generateFrameworkStateOfApplicability_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.GenerateFrameworkStateOfApplicability(childComplexity, args["input"].(types.GenerateFrameworkStateOfApplicabilityInput)), true
 
 	case "Mutation.importFramework":
 		if e.complexity.Mutation.ImportFramework == nil {
@@ -4695,6 +4720,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputFrameworkOrder,
 		ec.unmarshalInputFulfillEvidenceInput,
 		ec.unmarshalInputGenerateDocumentChangelogInput,
+		ec.unmarshalInputGenerateFrameworkStateOfApplicabilityInput,
 		ec.unmarshalInputImportFrameworkInput,
 		ec.unmarshalInputImportMeasureInput,
 		ec.unmarshalInputInviteUserInput,
@@ -6118,6 +6144,9 @@ type Mutation {
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
   importFramework(input: ImportFrameworkInput!): ImportFrameworkPayload!
   deleteFramework(input: DeleteFrameworkInput!): DeleteFrameworkPayload!
+  generateFrameworkStateOfApplicability(
+    input: GenerateFrameworkStateOfApplicabilityInput!
+  ): GenerateFrameworkStateOfApplicabilityPayload!
 
   # Control mutations
   createControl(input: CreateControlInput!): CreateControlPayload!
@@ -6227,6 +6256,14 @@ type Mutation {
 }
 
 # Input Types
+input GenerateFrameworkStateOfApplicabilityInput {
+  frameworkId: ID!
+}
+
+type GenerateFrameworkStateOfApplicabilityPayload {
+  downloadUrl: String!
+}
+
 input CreateOrganizationInput {
   name: String!
 }
@@ -9270,6 +9307,29 @@ func (ec *executionContext) field_Mutation_generateDocumentChangelog_argsInput(
 	}
 
 	var zeroVal types.GenerateDocumentChangelogInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_generateFrameworkStateOfApplicability_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_generateFrameworkStateOfApplicability_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_generateFrameworkStateOfApplicability_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.GenerateFrameworkStateOfApplicabilityInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNGenerateFrameworkStateOfApplicabilityInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGenerateFrameworkStateOfApplicabilityInput(ctx, tmp)
+	}
+
+	var zeroVal types.GenerateFrameworkStateOfApplicabilityInput
 	return zeroVal, nil
 }
 
@@ -20810,6 +20870,50 @@ func (ec *executionContext) fieldContext_GenerateDocumentChangelogPayload_change
 	return fc, nil
 }
 
+func (ec *executionContext) _GenerateFrameworkStateOfApplicabilityPayload_downloadUrl(ctx context.Context, field graphql.CollectedField, obj *types.GenerateFrameworkStateOfApplicabilityPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GenerateFrameworkStateOfApplicabilityPayload_downloadUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DownloadURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GenerateFrameworkStateOfApplicabilityPayload_downloadUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GenerateFrameworkStateOfApplicabilityPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ImportFrameworkPayload_frameworkEdge(ctx context.Context, field graphql.CollectedField, obj *types.ImportFrameworkPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ImportFrameworkPayload_frameworkEdge(ctx, field)
 	if err != nil {
@@ -22653,6 +22757,65 @@ func (ec *executionContext) fieldContext_Mutation_deleteFramework(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteFramework_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_generateFrameworkStateOfApplicability(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_generateFrameworkStateOfApplicability(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().GenerateFrameworkStateOfApplicability(rctx, fc.Args["input"].(types.GenerateFrameworkStateOfApplicabilityInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.GenerateFrameworkStateOfApplicabilityPayload)
+	fc.Result = res
+	return ec.marshalNGenerateFrameworkStateOfApplicabilityPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGenerateFrameworkStateOfApplicabilityPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_generateFrameworkStateOfApplicability(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "downloadUrl":
+				return ec.fieldContext_GenerateFrameworkStateOfApplicabilityPayload_downloadUrl(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GenerateFrameworkStateOfApplicabilityPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_generateFrameworkStateOfApplicability_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -38883,6 +39046,33 @@ func (ec *executionContext) unmarshalInputGenerateDocumentChangelogInput(ctx con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputGenerateFrameworkStateOfApplicabilityInput(ctx context.Context, obj any) (types.GenerateFrameworkStateOfApplicabilityInput, error) {
+	var it types.GenerateFrameworkStateOfApplicabilityInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"frameworkId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "frameworkId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("frameworkId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FrameworkID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputImportFrameworkInput(ctx context.Context, obj any) (types.ImportFrameworkInput, error) {
 	var it types.ImportFrameworkInput
 	asMap := map[string]any{}
@@ -44756,6 +44946,45 @@ func (ec *executionContext) _GenerateDocumentChangelogPayload(ctx context.Contex
 	return out
 }
 
+var generateFrameworkStateOfApplicabilityPayloadImplementors = []string{"GenerateFrameworkStateOfApplicabilityPayload"}
+
+func (ec *executionContext) _GenerateFrameworkStateOfApplicabilityPayload(ctx context.Context, sel ast.SelectionSet, obj *types.GenerateFrameworkStateOfApplicabilityPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, generateFrameworkStateOfApplicabilityPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GenerateFrameworkStateOfApplicabilityPayload")
+		case "downloadUrl":
+			out.Values[i] = ec._GenerateFrameworkStateOfApplicabilityPayload_downloadUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var importFrameworkPayloadImplementors = []string{"ImportFrameworkPayload"}
 
 func (ec *executionContext) _ImportFrameworkPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ImportFrameworkPayload) graphql.Marshaler {
@@ -45330,6 +45559,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteFramework":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteFramework(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "generateFrameworkStateOfApplicability":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_generateFrameworkStateOfApplicability(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -51726,6 +51962,25 @@ func (ec *executionContext) marshalNGenerateDocumentChangelogPayload2ᚖgithub�
 		return graphql.Null
 	}
 	return ec._GenerateDocumentChangelogPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNGenerateFrameworkStateOfApplicabilityInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGenerateFrameworkStateOfApplicabilityInput(ctx context.Context, v any) (types.GenerateFrameworkStateOfApplicabilityInput, error) {
+	res, err := ec.unmarshalInputGenerateFrameworkStateOfApplicabilityInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGenerateFrameworkStateOfApplicabilityPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGenerateFrameworkStateOfApplicabilityPayload(ctx context.Context, sel ast.SelectionSet, v types.GenerateFrameworkStateOfApplicabilityPayload) graphql.Marshaler {
+	return ec._GenerateFrameworkStateOfApplicabilityPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGenerateFrameworkStateOfApplicabilityPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGenerateFrameworkStateOfApplicabilityPayload(ctx context.Context, sel ast.SelectionSet, v *types.GenerateFrameworkStateOfApplicabilityPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GenerateFrameworkStateOfApplicabilityPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, v any) (gid.GID, error) {

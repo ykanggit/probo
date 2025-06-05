@@ -1178,6 +1178,20 @@ func (r *mutationResolver) DeleteFramework(ctx context.Context, input types.Dele
 	}, nil
 }
 
+// GenerateFrameworkStateOfApplicability is the resolver for the generateFrameworkStateOfApplicability field.
+func (r *mutationResolver) GenerateFrameworkStateOfApplicability(ctx context.Context, input types.GenerateFrameworkStateOfApplicabilityInput) (*types.GenerateFrameworkStateOfApplicabilityPayload, error) {
+	prb := r.ProboService(ctx, input.FrameworkID.TenantID())
+
+	soa, err := prb.Frameworks.StateOfApplicability(ctx, input.FrameworkID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate framework SOA: %w", err)
+	}
+
+	return &types.GenerateFrameworkStateOfApplicabilityPayload{
+		DownloadURL: soa,
+	}, nil
+}
+
 // CreateControl is the resolver for the createControl field.
 func (r *mutationResolver) CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error) {
 	prb := r.ProboService(ctx, input.FrameworkID.TenantID())

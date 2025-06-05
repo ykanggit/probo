@@ -26,8 +26,13 @@ import { Navigate, Outlet, useNavigate, useParams } from "react-router";
 import { useOrganizationId } from "/hooks/useOrganizationId";
 import type { FrameworkGraphNodeQuery } from "/hooks/graph/__generated__/FrameworkGraphNodeQuery.graphql";
 import type { FrameworkDetailPageFragment$key } from "./__generated__/FrameworkDetailPageFragment.graphql";
+import type {
+  FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation,
+  FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation$data,
+} from "./__generated__/FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation.graphql";
 import { FrameworkFormDialog } from "./dialogs/FrameworkFormDialog";
 import { FrameworkControlDialog } from "./dialogs/FrameworkControlDialog";
+import { useMutationWithToasts } from "/hooks/useMutationWithToasts";
 
 const frameworkDetailFragment = graphql`
   fragment FrameworkDetailPageFragment on Framework {
@@ -43,6 +48,18 @@ const frameworkDetailFragment = graphql`
           name
         }
       }
+    }
+  }
+`;
+
+const generateFrameworkStateOfApplicabilityMutation = graphql`
+  mutation FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation(
+    $frameworkId: ID!
+  ) {
+    generateFrameworkStateOfApplicability(
+      input: { frameworkId: $frameworkId }
+    ) {
+      downloadUrl
     }
   }
 `;
@@ -70,6 +87,16 @@ export default function FrameworkDetailPage(props: Props) {
     framework,
     ConnectionHandler.getConnectionID(organizationId, connectionListKey)!
   );
+
+  const [generateFrameworkStateOfApplicability] =
+    useMutationWithToasts<FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation>(
+      generateFrameworkStateOfApplicabilityMutation,
+      {
+        errorMessage: "Failed to generate framework state of applicability",
+        successMessage:
+          "Framework state of applicability generated successfully",
+      }
+    );
 
   usePageTitle(`${framework.name} | ${selectedControl?.sectionTitle}`);
   const onDelete = () => {
@@ -107,6 +134,29 @@ export default function FrameworkDetailPage(props: Props) {
           </Button>
         </FrameworkFormDialog>
         <ActionDropdown variant="secondary">
+          <DropdownItem
+            variant="primary"
+            onClick={() => {
+              generateFrameworkStateOfApplicability({
+                variables: { frameworkId: framework.id },
+                onCompleted: (
+                  data: FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation$data
+                ) => {
+                  if (data.generateFrameworkStateOfApplicability.downloadUrl) {
+                    const link = document.createElement("a");
+                    link.href =
+                      data.generateFrameworkStateOfApplicability.downloadUrl;
+                    link.download = `${framework.name}-SOA.pdf`; // You can adjust the filename as needed
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }
+                },
+              });
+            }}
+          >
+            {__("Download SOA")}
+          </DropdownItem>
           <DropdownItem icon={IconTrashCan} variant="danger" onClick={onDelete}>
             {__("Delete")}
           </DropdownItem>

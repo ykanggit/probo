@@ -654,6 +654,14 @@ type GenerateDocumentChangelogPayload struct {
 	Changelog string `json:"changelog"`
 }
 
+type GenerateFrameworkStateOfApplicabilityInput struct {
+	FrameworkID gid.GID `json:"frameworkId"`
+}
+
+type GenerateFrameworkStateOfApplicabilityPayload struct {
+	DownloadURL string `json:"downloadUrl"`
+}
+
 type ImportFrameworkInput struct {
 	OrganizationID gid.GID        `json:"organizationId"`
 	File           graphql.Upload `json:"file"`
