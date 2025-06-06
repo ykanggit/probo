@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Prevent publishing of document versions with no changes
+- Update AI prompt used for changelog generation
+
 ### Added
 
 - Add deadline on tasks
