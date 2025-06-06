@@ -73,6 +73,7 @@ func (s DocumentService) GenerateChangelog(
 	ctx context.Context,
 	documentID gid.GID,
 ) (*string, error) {
+	var changelog *string
 	draftVersion := &coredata.DocumentVersion{}
 	publishedVersion := &coredata.DocumentVersion{}
 
@@ -93,7 +94,8 @@ func (s DocumentService) GenerateChangelog(
 			}
 
 			if document.CurrentPublishedVersion == nil {
-				publishedVersion.Content = ""
+				initialVersionChangelog := "Initial version"
+				changelog = &initialVersionChangelog
 			} else {
 				if err := publishedVersion.LoadByDocumentIDAndVersionNumber(ctx, conn, s.svc.scope, documentID, *document.CurrentPublishedVersion); err != nil {
 					return fmt.Errorf("cannot load published version: %w", err)
@@ -108,9 +110,16 @@ func (s DocumentService) GenerateChangelog(
 		return nil, err
 	}
 
-	changelog, err := s.svc.agent.GenerateChangelog(ctx, publishedVersion.Content, draftVersion.Content)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate changelog: %w", err)
+	if publishedVersion.Content == draftVersion.Content {
+		noDiffChangelog := "No changes detected"
+		changelog = &noDiffChangelog
+	}
+
+	if changelog == nil {
+		changelog, err = s.svc.agent.GenerateChangelog(ctx, publishedVersion.Content, draftVersion.Content)
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate changelog: %w", err)
+		}
 	}
 
 	return changelog, nil
@@ -124,6 +133,7 @@ func (s *DocumentService) PublishVersion(
 ) (*coredata.Document, *coredata.DocumentVersion, error) {
 	document := &coredata.Document{}
 	documentVersion := &coredata.DocumentVersion{}
+	publishedVersion := &coredata.DocumentVersion{}
 	now := time.Now()
 
 	err := s.svc.pg.WithTx(
@@ -139,6 +149,17 @@ func (s *DocumentService) PublishVersion(
 
 			if documentVersion.Status != coredata.DocumentStatusDraft {
 				return fmt.Errorf("cannot publish version")
+			}
+
+			if document.CurrentPublishedVersion != nil {
+				if err := publishedVersion.LoadByDocumentIDAndVersionNumber(ctx, tx, s.svc.scope, documentID, *document.CurrentPublishedVersion); err != nil {
+					return fmt.Errorf("cannot load published version: %w", err)
+				}
+				if publishedVersion.Content == documentVersion.Content &&
+					publishedVersion.Title == documentVersion.Title &&
+					publishedVersion.OwnerID == documentVersion.OwnerID {
+					return fmt.Errorf("cannot publish version: no changes detected")
+				}
 			}
 
 			if changelog != nil {

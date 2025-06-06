@@ -31,10 +31,11 @@ const (
 		Focus on additions, deletions, modifications, and restructuring.
 
 		# Response Format
-		Respond with simple and short phrases that describe the changes, if possible use a single phrase.
+		Respond with ONE simple phrase that describe the changes.
 
 		# Change types
-		Change types can include: "Added", "Removed", "Updated", "Reworded", "Reorganized", "Fixed", etc.
+		If possible use the following words with additional context to describe the change types:
+			"Added", "Removed", "Updated", "Reworded", "Reorganized", "Fixed", etc.
 
 		# SOP
 		- Be objective and neutral in tone.
@@ -43,7 +44,7 @@ const (
 
 		**Example output format:**
 		Respond ONLY with the phrase that describes the changes. No explanation, no markdown, no preamble. Like this:
-			Added Clause about sharing personal information with trusted partners
+			Added clauses about sharing personal information with trusted partners
 	`
 )
 

@@ -398,9 +398,13 @@ function ShowDocumentContent({
         loadQuery({ documentId: documentValue.id, organizationId: organizationId! });
       },
       onError: (error) => {
+        const description = error.message.includes("no changes detected") ?
+          "Draft and published version are identical."
+          : error.message || "An unknown error occurred";
+
         toast({
           title: "Error publishing document",
-          description: error.message || "An unknown error occurred",
+          description,
           variant: "destructive",
         });
       },
