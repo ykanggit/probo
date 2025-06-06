@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Add deadline on tasks
+- Add controls manual create, update, and delete
 
 ## [0.31.0] - 2025-06-04
 
