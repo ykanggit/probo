@@ -384,6 +384,38 @@ func (s ControlService) ListForFrameworkID(
 	return page.NewPage(controls, cursor), nil
 }
 
+func (s ControlService) ListForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+	cursor *page.Cursor[coredata.ControlOrderField],
+) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
+	var controls coredata.Controls
+	organization := &coredata.Organization{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, organizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			return controls.LoadByOrganizationID(
+				ctx,
+				conn,
+				s.svc.scope,
+				organization.ID,
+				cursor,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot list controls: %w", err)
+	}
+
+	return page.NewPage(controls, cursor), nil
+}
+
 func (s ControlService) ListForRiskID(
 	ctx context.Context,
 	riskID gid.GID,

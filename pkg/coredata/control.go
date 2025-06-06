@@ -287,6 +287,65 @@ WHERE
 	return nil
 }
 
+func (c *Controls) LoadByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+	cursor *page.Cursor[ControlOrderField],
+) error {
+	q := `
+WITH ctrl AS (
+	SELECT
+		c.id,
+		c.section_title,
+		c.framework_id,
+		c.tenant_id,
+		c.name,
+		c.description,
+		c.created_at,
+		c.updated_at
+	FROM
+		controls c
+	INNER JOIN
+		frameworks f ON c.framework_id = f.id
+	WHERE
+		f.organization_id = @organization_id
+)
+SELECT
+	id,
+	section_title,
+	framework_id,
+	tenant_id,
+	name,
+	description,
+	created_at,
+	updated_at
+FROM
+	ctrl
+WHERE %s
+    AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.NamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query controls: %w", err)
+	}
+
+	controls, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Control])
+	if err != nil {
+		return fmt.Errorf("cannot collect controls: %w", err)
+	}
+
+	*c = controls
+
+	return nil
+}
+
 func (c *Control) LoadByFrameworkIDAndSectionTitle(
 	ctx context.Context,
 	conn pg.Conn,

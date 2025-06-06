@@ -1973,6 +1973,36 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 	return types.NewFrameworkConnection(page), nil
 }
 
+// Controls is the resolver for the controls field.
+func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
+		Field:     coredata.ControlOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ControlOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := svc.Controls.ListForOrganizationID(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list controls: %w", err)
+	}
+
+	return types.NewControlConnection(page), nil
+}
+
+// // Controls is the resolver for the controls field.
+// func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+// 	panic(fmt.Errorf("not implemented: Controls - controls"))
+// }
+
 // Vendors is the resolver for the vendors field.
 func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())

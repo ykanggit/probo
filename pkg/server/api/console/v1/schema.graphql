@@ -511,6 +511,14 @@ type Organization implements Node {
     orderBy: FrameworkOrder
   ): FrameworkConnection! @goField(forceResolver: true)
 
+  controls(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: ControlOrder
+  ): ControlConnection! @goField(forceResolver: true)
+
   vendors(
     first: Int
     after: CursorKey

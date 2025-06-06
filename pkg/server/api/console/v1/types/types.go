@@ -777,6 +777,7 @@ type Organization struct {
 	Users      *UserConnection      `json:"users"`
 	Connectors *ConnectorConnection `json:"connectors"`
 	Frameworks *FrameworkConnection `json:"frameworks"`
+	Controls   *ControlConnection   `json:"controls"`
 	Vendors    *VendorConnection    `json:"vendors"`
 	Peoples    *PeopleConnection    `json:"peoples"`
 	Documents  *DocumentConnection  `json:"documents"`
