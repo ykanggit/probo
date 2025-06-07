@@ -370,7 +370,7 @@ enum DatumOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.Dat
   DATA_SENSITIVITY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldDataSensitivity")
 }
 
-# Order Input Types
+# Input Types
 input UserOrder
   @goModel(
     model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.UserOrderBy"
@@ -481,6 +481,11 @@ input DocumentVersionFilter {
   status: DocumentStatus
 }
 
+# Input Types for Filtering
+input ControlFilter {
+  query: String
+}
+
 # Core Types
 type Organization implements Node {
   id: ID!
@@ -517,6 +522,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: ControlOrder
+    filter: ControlFilter
   ): ControlConnection! @goField(forceResolver: true)
 
   vendors(
@@ -687,6 +693,7 @@ type Framework implements Node {
     last: Int
     before: CursorKey
     orderBy: ControlOrder
+    filter: ControlFilter
   ): ControlConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -758,6 +765,7 @@ type Measure implements Node {
     last: Int
     before: CursorKey
     orderBy: ControlOrder
+    filter: ControlFilter
   ): ControlConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -830,6 +838,7 @@ type Document implements Node {
     last: Int
     before: CursorKey
     orderBy: ControlOrder
+    filter: ControlFilter
   ): ControlConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -875,6 +884,7 @@ type Risk implements Node {
     last: Int
     before: CursorKey
     orderBy: ControlOrder
+    filter: ControlFilter
   ): ControlConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!

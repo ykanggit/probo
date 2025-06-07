@@ -302,7 +302,7 @@ func (s FrameworkService) ExportAudit(
 			)
 
 			controls := coredata.Controls{}
-			if err := controls.LoadByFrameworkID(ctx, conn, s.svc.scope, frameworkID, cursor); err != nil {
+			if err := controls.LoadByFrameworkID(ctx, conn, s.svc.scope, frameworkID, cursor, coredata.NewControlFilter(nil)); err != nil {
 				return fmt.Errorf("cannot load controls: %w", err)
 			}
 

@@ -261,7 +261,7 @@ func (r *documentResolver) Versions(ctx context.Context, obj *types.Document, fi
 }
 
 // Controls is the resolver for the controls field.
-func (r *documentResolver) Controls(ctx context.Context, obj *types.Document, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+func (r *documentResolver) Controls(ctx context.Context, obj *types.Document, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
@@ -277,7 +277,12 @@ func (r *documentResolver) Controls(ctx context.Context, obj *types.Document, fi
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Controls.ListForDocumentID(ctx, obj.ID, cursor)
+	var controlFilter = coredata.NewControlFilter(nil)
+	if filter != nil {
+		controlFilter = coredata.NewControlFilter(filter.Query)
+	}
+
+	page, err := svc.Controls.ListForDocumentID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list document controls: %w", err))
 	}
@@ -489,7 +494,7 @@ func (r *frameworkResolver) Organization(ctx context.Context, obj *types.Framewo
 }
 
 // Controls is the resolver for the controls field.
-func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
@@ -505,7 +510,12 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Controls.ListForFrameworkID(ctx, obj.ID, cursor)
+	var controlFilter = coredata.NewControlFilter(nil)
+	if filter != nil {
+		controlFilter = coredata.NewControlFilter(filter.Query)
+	}
+
+	page, err := svc.Controls.ListForFrameworkID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list controls: %w", err)
 	}
@@ -589,7 +599,7 @@ func (r *measureResolver) Risks(ctx context.Context, obj *types.Measure, first *
 }
 
 // Controls is the resolver for the controls field.
-func (r *measureResolver) Controls(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+func (r *measureResolver) Controls(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
@@ -605,7 +615,12 @@ func (r *measureResolver) Controls(ctx context.Context, obj *types.Measure, firs
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Controls.ListForMeasureID(ctx, obj.ID, cursor)
+	var controlFilter = coredata.NewControlFilter(nil)
+	if filter != nil {
+		controlFilter = coredata.NewControlFilter(filter.Query)
+	}
+
+	page, err := svc.Controls.ListForMeasureID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list measure controls: %w", err)
 	}
@@ -1974,7 +1989,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 }
 
 // Controls is the resolver for the controls field.
-func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
@@ -1990,18 +2005,18 @@ func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organiza
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Controls.ListForOrganizationID(ctx, obj.ID, cursor)
+	var controlFilter = coredata.NewControlFilter(nil)
+	if filter != nil {
+		controlFilter = coredata.NewControlFilter(filter.Query)
+	}
+
+	page, err := svc.Controls.ListForOrganizationID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list controls: %w", err)
 	}
 
 	return types.NewControlConnection(page), nil
 }
-
-// // Controls is the resolver for the controls field.
-// func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
-// 	panic(fmt.Errorf("not implemented: Controls - controls"))
-// }
 
 // Vendors is the resolver for the vendors field.
 func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error) {
@@ -2412,7 +2427,7 @@ func (r *riskResolver) Documents(ctx context.Context, obj *types.Risk, first *in
 }
 
 // Controls is the resolver for the controls field.
-func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy) (*types.ControlConnection, error) {
+func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
@@ -2428,7 +2443,12 @@ func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Controls.ListForRiskID(ctx, obj.ID, cursor)
+	var controlFilter *coredata.ControlFilter
+	if filter != nil {
+		controlFilter = coredata.NewControlFilter(filter.Query)
+	}
+
+	page, err := svc.Controls.ListForRiskID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list risk controls: %w", err))
 	}

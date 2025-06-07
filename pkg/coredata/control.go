@@ -64,6 +64,7 @@ func (c *Controls) LoadByDocumentID(
 	scope Scoper,
 	documentID gid.GID,
 	cursor *page.Cursor[ControlOrderField],
+	filter *ControlFilter,
 ) error {
 	q := `
 WITH ctrl AS (
@@ -96,11 +97,13 @@ FROM
 	ctrl
 WHERE %s
 	AND %s
+	AND %s
 `
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.NamedArgs{"document_id": documentID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -124,6 +127,7 @@ func (c *Controls) LoadByMeasureID(
 	scope Scoper,
 	measureID gid.GID,
 	cursor *page.Cursor[ControlOrderField],
+	filter *ControlFilter,
 ) error {
 	q := `
 WITH ctrl AS (
@@ -156,11 +160,14 @@ FROM
 	ctrl
 WHERE %s
 	AND %s
+	AND %s
 `
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.NamedArgs{"measure_id": measureID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -183,6 +190,7 @@ func (c *Controls) LoadByRiskID(
 	scope Scoper,
 	riskID gid.GID,
 	cursor *page.Cursor[ControlOrderField],
+	filter *ControlFilter,
 ) error {
 	q := `
 WITH ctrl AS (
@@ -221,11 +229,13 @@ FROM
 	ctrl
 WHERE %s
 	AND %s
+	AND %s
 `
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.NamedArgs{"risk_id": riskID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -249,6 +259,7 @@ func (c *Controls) LoadByFrameworkID(
 	scope Scoper,
 	frameworkID gid.GID,
 	cursor *page.Cursor[ControlOrderField],
+	filter *ControlFilter,
 ) error {
 	q := `
 SELECT
@@ -266,11 +277,14 @@ WHERE
     %s
     AND framework_id = @framework_id
 	AND %s
+	AND %s
 `
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.NamedArgs{"framework_id": frameworkID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -293,6 +307,7 @@ func (c *Controls) LoadByOrganizationID(
 	scope Scoper,
 	organizationID gid.GID,
 	cursor *page.Cursor[ControlOrderField],
+	filter *ControlFilter,
 ) error {
 	q := `
 WITH ctrl AS (
@@ -325,11 +340,14 @@ FROM
 	ctrl
 WHERE %s
     AND %s
+	AND %s
 `
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.NamedArgs{"organization_id": organizationID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {

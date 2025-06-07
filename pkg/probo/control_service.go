@@ -60,6 +60,7 @@ func (s ControlService) ListForDocumentID(
 	ctx context.Context,
 	documentID gid.GID,
 	cursor *page.Cursor[coredata.ControlOrderField],
+	filter *coredata.ControlFilter,
 ) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
 	document := &coredata.Document{}
@@ -71,7 +72,7 @@ func (s ControlService) ListForDocumentID(
 				return fmt.Errorf("cannot load document: %w", err)
 			}
 
-			return controls.LoadByDocumentID(ctx, conn, s.svc.scope, documentID, cursor)
+			return controls.LoadByDocumentID(ctx, conn, s.svc.scope, documentID, cursor, filter)
 		},
 	)
 
@@ -86,6 +87,7 @@ func (s ControlService) ListForMeasureID(
 	ctx context.Context,
 	measureID gid.GID,
 	cursor *page.Cursor[coredata.ControlOrderField],
+	filter *coredata.ControlFilter,
 ) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
 	measure := &coredata.Measure{}
@@ -97,7 +99,7 @@ func (s ControlService) ListForMeasureID(
 				return fmt.Errorf("cannot load measure: %w", err)
 			}
 
-			return controls.LoadByMeasureID(ctx, conn, s.svc.scope, measureID, cursor)
+			return controls.LoadByMeasureID(ctx, conn, s.svc.scope, measureID, cursor, filter)
 		},
 	)
 
@@ -356,6 +358,7 @@ func (s ControlService) ListForFrameworkID(
 	ctx context.Context,
 	frameworkID gid.GID,
 	cursor *page.Cursor[coredata.ControlOrderField],
+	filter *coredata.ControlFilter,
 ) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
 	framework := &coredata.Framework{}
@@ -373,6 +376,7 @@ func (s ControlService) ListForFrameworkID(
 				s.svc.scope,
 				framework.ID,
 				cursor,
+				filter,
 			)
 		},
 	)
@@ -388,6 +392,7 @@ func (s ControlService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
 	cursor *page.Cursor[coredata.ControlOrderField],
+	filter *coredata.ControlFilter,
 ) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
 	organization := &coredata.Organization{}
@@ -405,6 +410,7 @@ func (s ControlService) ListForOrganizationID(
 				s.svc.scope,
 				organization.ID,
 				cursor,
+				filter,
 			)
 		},
 	)
@@ -420,6 +426,7 @@ func (s ControlService) ListForRiskID(
 	ctx context.Context,
 	riskID gid.GID,
 	cursor *page.Cursor[coredata.ControlOrderField],
+	filter *coredata.ControlFilter,
 ) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
 	var controls coredata.Controls
 	risk := &coredata.Risk{}
@@ -431,7 +438,7 @@ func (s ControlService) ListForRiskID(
 				return fmt.Errorf("cannot load risk: %w", err)
 			}
 
-			return controls.LoadByRiskID(ctx, conn, s.svc.scope, risk.ID, cursor)
+			return controls.LoadByRiskID(ctx, conn, s.svc.scope, risk.ID, cursor, filter)
 		},
 	)
 

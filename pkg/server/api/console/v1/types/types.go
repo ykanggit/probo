@@ -143,6 +143,10 @@ type ControlEdge struct {
 	Node   *Control       `json:"node"`
 }
 
+type ControlFilter struct {
+	Query *string `json:"query,omitempty"`
+}
+
 type CreateAssetInput struct {
 	OrganizationID  gid.GID                 `json:"organizationId"`
 	Name            string                  `json:"name"`
