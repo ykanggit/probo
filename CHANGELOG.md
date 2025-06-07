@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.32.0] - 2025-06-07
+
 ### Changed
 
 - Prevent publishing of document versions with no changes
