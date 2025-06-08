@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 
 - Add deadline on tasks
 - Add controls manual create, update, and delete
+- Add backend fulltext search on controls
 
 ## [0.31.0] - 2025-06-04
 
