@@ -67,14 +67,6 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	AddAssetVendorPayload struct {
-		Asset func(childComplexity int) int
-	}
-
-	AddDatumVendorPayload struct {
-		Datum func(childComplexity int) int
-	}
-
 	AssessVendorPayload struct {
 		Vendor func(childComplexity int) int
 	}
@@ -287,10 +279,6 @@ type ComplexityRoot struct {
 		DeletedMeasureID func(childComplexity int) int
 	}
 
-	DeleteOrganizationPayload struct {
-		DeletedOrganizationID func(childComplexity int) int
-	}
-
 	DeletePeoplePayload struct {
 		DeletedPeopleID func(childComplexity int) int
 	}
@@ -488,8 +476,6 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddAssetVendor               func(childComplexity int, input types.AddAssetVendorInput) int
-		AddDatumVendor               func(childComplexity int, input types.AddDatumVendorInput) int
 		AssessVendor                 func(childComplexity int, input types.AssessVendorInput) int
 		AssignTask                   func(childComplexity int, input types.AssignTaskInput) int
 		ConfirmEmail                 func(childComplexity int, input types.ConfirmEmailInput) int
@@ -519,7 +505,6 @@ type ComplexityRoot struct {
 		DeleteEvidence               func(childComplexity int, input types.DeleteEvidenceInput) int
 		DeleteFramework              func(childComplexity int, input types.DeleteFrameworkInput) int
 		DeleteMeasure                func(childComplexity int, input types.DeleteMeasureInput) int
-		DeleteOrganization           func(childComplexity int, input types.DeleteOrganizationInput) int
 		DeletePeople                 func(childComplexity int, input types.DeletePeopleInput) int
 		DeleteRisk                   func(childComplexity int, input types.DeleteRiskInput) int
 		DeleteRiskDocumentMapping    func(childComplexity int, input types.DeleteRiskDocumentMappingInput) int
@@ -534,8 +519,6 @@ type ComplexityRoot struct {
 		ImportMeasure                func(childComplexity int, input types.ImportMeasureInput) int
 		InviteUser                   func(childComplexity int, input types.InviteUserInput) int
 		PublishDocumentVersion       func(childComplexity int, input types.PublishDocumentVersionInput) int
-		RemoveAssetVendor            func(childComplexity int, input types.RemoveAssetVendorInput) int
-		RemoveDatumVendor            func(childComplexity int, input types.RemoveDatumVendorInput) int
 		RemoveUser                   func(childComplexity int, input types.RemoveUserInput) int
 		RequestEvidence              func(childComplexity int, input types.RequestEvidenceInput) int
 		RequestSignature             func(childComplexity int, input types.RequestSignatureInput) int
@@ -626,14 +609,6 @@ type ComplexityRoot struct {
 	Query struct {
 		Node   func(childComplexity int, id gid.GID) int
 		Viewer func(childComplexity int) int
-	}
-
-	RemoveAssetVendorPayload struct {
-		Asset func(childComplexity int) int
-	}
-
-	RemoveDatumVendorPayload struct {
-		Datum func(childComplexity int) int
 	}
 
 	RemoveUserPayload struct {
@@ -943,7 +918,6 @@ type MeasureResolver interface {
 type MutationResolver interface {
 	CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error)
 	UpdateOrganization(ctx context.Context, input types.UpdateOrganizationInput) (*types.UpdateOrganizationPayload, error)
-	DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error)
 	ConfirmEmail(ctx context.Context, input types.ConfirmEmailInput) (*types.ConfirmEmailPayload, error)
 	InviteUser(ctx context.Context, input types.InviteUserInput) (*types.InviteUserPayload, error)
 	RemoveUser(ctx context.Context, input types.RemoveUserInput) (*types.RemoveUserPayload, error)
@@ -1002,13 +976,9 @@ type MutationResolver interface {
 	CreateAsset(ctx context.Context, input types.CreateAssetInput) (*types.CreateAssetPayload, error)
 	UpdateAsset(ctx context.Context, input types.UpdateAssetInput) (*types.UpdateAssetPayload, error)
 	DeleteAsset(ctx context.Context, input types.DeleteAssetInput) (*types.DeleteAssetPayload, error)
-	AddAssetVendor(ctx context.Context, input types.AddAssetVendorInput) (*types.AddAssetVendorPayload, error)
-	RemoveAssetVendor(ctx context.Context, input types.RemoveAssetVendorInput) (*types.RemoveAssetVendorPayload, error)
 	CreateDatum(ctx context.Context, input types.CreateDatumInput) (*types.CreateDatumPayload, error)
 	UpdateDatum(ctx context.Context, input types.UpdateDatumInput) (*types.UpdateDatumPayload, error)
 	DeleteDatum(ctx context.Context, input types.DeleteDatumInput) (*types.DeleteDatumPayload, error)
-	AddDatumVendor(ctx context.Context, input types.AddDatumVendorInput) (*types.AddDatumVendorPayload, error)
-	RemoveDatumVendor(ctx context.Context, input types.RemoveDatumVendorInput) (*types.RemoveDatumVendorPayload, error)
 }
 type OrganizationResolver interface {
 	LogoURL(ctx context.Context, obj *types.Organization) (*string, error)
@@ -1084,20 +1054,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
-
-	case "AddAssetVendorPayload.asset":
-		if e.complexity.AddAssetVendorPayload.Asset == nil {
-			break
-		}
-
-		return e.complexity.AddAssetVendorPayload.Asset(childComplexity), true
-
-	case "AddDatumVendorPayload.datum":
-		if e.complexity.AddDatumVendorPayload.Datum == nil {
-			break
-		}
-
-		return e.complexity.AddDatumVendorPayload.Datum(childComplexity), true
 
 	case "AssessVendorPayload.vendor":
 		if e.complexity.AssessVendorPayload.Vendor == nil {
@@ -1720,13 +1676,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.DeleteMeasurePayload.DeletedMeasureID(childComplexity), true
-
-	case "DeleteOrganizationPayload.deletedOrganizationId":
-		if e.complexity.DeleteOrganizationPayload.DeletedOrganizationID == nil {
-			break
-		}
-
-		return e.complexity.DeleteOrganizationPayload.DeletedOrganizationID(childComplexity), true
 
 	case "DeletePeoplePayload.deletedPeopleId":
 		if e.complexity.DeletePeoplePayload.DeletedPeopleID == nil {
@@ -2489,30 +2438,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.MeasureEdge.Node(childComplexity), true
 
-	case "Mutation.addAssetVendor":
-		if e.complexity.Mutation.AddAssetVendor == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_addAssetVendor_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.AddAssetVendor(childComplexity, args["input"].(types.AddAssetVendorInput)), true
-
-	case "Mutation.addDatumVendor":
-		if e.complexity.Mutation.AddDatumVendor == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_addDatumVendor_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.AddDatumVendor(childComplexity, args["input"].(types.AddDatumVendorInput)), true
-
 	case "Mutation.assessVendor":
 		if e.complexity.Mutation.AssessVendor == nil {
 			break
@@ -2861,18 +2786,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.DeleteMeasure(childComplexity, args["input"].(types.DeleteMeasureInput)), true
 
-	case "Mutation.deleteOrganization":
-		if e.complexity.Mutation.DeleteOrganization == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteOrganization_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteOrganization(childComplexity, args["input"].(types.DeleteOrganizationInput)), true
-
 	case "Mutation.deletePeople":
 		if e.complexity.Mutation.DeletePeople == nil {
 			break
@@ -3040,30 +2953,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.PublishDocumentVersion(childComplexity, args["input"].(types.PublishDocumentVersionInput)), true
-
-	case "Mutation.removeAssetVendor":
-		if e.complexity.Mutation.RemoveAssetVendor == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_removeAssetVendor_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.RemoveAssetVendor(childComplexity, args["input"].(types.RemoveAssetVendorInput)), true
-
-	case "Mutation.removeDatumVendor":
-		if e.complexity.Mutation.RemoveDatumVendor == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_removeDatumVendor_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.RemoveDatumVendor(childComplexity, args["input"].(types.RemoveDatumVendorInput)), true
 
 	case "Mutation.removeUser":
 		if e.complexity.Mutation.RemoveUser == nil {
@@ -3670,20 +3559,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.Viewer(childComplexity), true
-
-	case "RemoveAssetVendorPayload.asset":
-		if e.complexity.RemoveAssetVendorPayload.Asset == nil {
-			break
-		}
-
-		return e.complexity.RemoveAssetVendorPayload.Asset(childComplexity), true
-
-	case "RemoveDatumVendorPayload.datum":
-		if e.complexity.RemoveDatumVendorPayload.Datum == nil {
-			break
-		}
-
-		return e.complexity.RemoveDatumVendorPayload.Datum(childComplexity), true
 
 	case "RemoveUserPayload.success":
 		if e.complexity.RemoveUserPayload.Success == nil {
@@ -4636,8 +4511,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputAddAssetVendorInput,
-		ec.unmarshalInputAddDatumVendorInput,
 		ec.unmarshalInputAssessVendorInput,
 		ec.unmarshalInputAssetOrder,
 		ec.unmarshalInputAssignTaskInput,
@@ -4673,7 +4546,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeleteEvidenceInput,
 		ec.unmarshalInputDeleteFrameworkInput,
 		ec.unmarshalInputDeleteMeasureInput,
-		ec.unmarshalInputDeleteOrganizationInput,
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeleteRiskDocumentMappingInput,
 		ec.unmarshalInputDeleteRiskInput,
@@ -4697,8 +4569,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputOrganizationOrder,
 		ec.unmarshalInputPeopleOrder,
 		ec.unmarshalInputPublishDocumentVersionInput,
-		ec.unmarshalInputRemoveAssetVendorInput,
-		ec.unmarshalInputRemoveDatumVendorInput,
 		ec.unmarshalInputRemoveUserInput,
 		ec.unmarshalInputRequestEvidenceInput,
 		ec.unmarshalInputRequestSignatureInput,
@@ -5908,9 +5778,6 @@ type Mutation {
   updateOrganization(
     input: UpdateOrganizationInput!
   ): UpdateOrganizationPayload!
-  deleteOrganization(
-    input: DeleteOrganizationInput!
-  ): DeleteOrganizationPayload!
 
   # User mutations
   confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
@@ -6034,14 +5901,10 @@ type Mutation {
   createAsset(input: CreateAssetInput!): CreateAssetPayload!
   updateAsset(input: UpdateAssetInput!): UpdateAssetPayload!
   deleteAsset(input: DeleteAssetInput!): DeleteAssetPayload!
-  addAssetVendor(input: AddAssetVendorInput!): AddAssetVendorPayload!
-  removeAssetVendor(input: RemoveAssetVendorInput!): RemoveAssetVendorPayload!
 
   createDatum(input: CreateDatumInput!): CreateDatumPayload!
   updateDatum(input: UpdateDatumInput!): UpdateDatumPayload!
   deleteDatum(input: DeleteDatumInput!): DeleteDatumPayload!
-  addDatumVendor(input: AddDatumVendorInput!): AddDatumVendorPayload!
-  removeDatumVendor(input: RemoveDatumVendorInput!): RemoveDatumVendorPayload!
 }
 
 # Input Types
@@ -6053,10 +5916,6 @@ input UpdateOrganizationInput {
   organizationId: ID!
   name: String
   logo: Upload
-}
-
-input DeleteOrganizationInput {
-  organizationId: ID!
 }
 
 input CreateVendorInput {
@@ -6378,10 +6237,6 @@ type CreateOrganizationPayload {
 
 type UpdateOrganizationPayload {
   organization: Organization!
-}
-
-type DeleteOrganizationPayload {
-  deletedOrganizationId: ID!
 }
 
 type CreateControlPayload {
@@ -6853,16 +6708,6 @@ input DeleteAssetInput {
   assetId: ID!
 }
 
-input AddAssetVendorInput {
-  assetId: ID!
-  vendorId: ID!
-}
-
-input RemoveAssetVendorInput {
-  assetId: ID!
-  vendorId: ID!
-}
-
 type CreateAssetPayload {
   assetEdge: AssetEdge!
 }
@@ -6873,14 +6718,6 @@ type UpdateAssetPayload {
 
 type DeleteAssetPayload {
   deletedAssetId: ID!
-}
-
-type AddAssetVendorPayload {
-  asset: Asset!
-}
-
-type RemoveAssetVendorPayload {
-  asset: Asset!
 }
 
 type Datum implements Node {
@@ -6925,16 +6762,6 @@ input DeleteDatumInput {
   datumId: ID!
 }
 
-input AddDatumVendorInput {
-  datumId: ID!
-  vendorId: ID!
-}
-
-input RemoveDatumVendorInput {
-  datumId: ID!
-  vendorId: ID!
-}
-
 type CreateDatumPayload {
   datumEdge: DatumEdge!
 }
@@ -6945,14 +6772,6 @@ type UpdateDatumPayload {
 
 type DeleteDatumPayload {
   deletedDatumId: ID!
-}
-
-type AddDatumVendorPayload {
-  datum: Datum!
-}
-
-type RemoveDatumVendorPayload {
-  datum: Datum!
 }
 `, BuiltIn: false},
 }
@@ -8174,52 +7993,6 @@ func (ec *executionContext) field_Measure_tasks_argsOrderBy(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_addAssetVendor_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_addAssetVendor_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_addAssetVendor_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (types.AddAssetVendorInput, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNAddAssetVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAddAssetVendorInput(ctx, tmp)
-	}
-
-	var zeroVal types.AddAssetVendorInput
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_addDatumVendor_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_addDatumVendor_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_addDatumVendor_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (types.AddDatumVendorInput, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNAddDatumVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAddDatumVendorInput(ctx, tmp)
-	}
-
-	var zeroVal types.AddDatumVendorInput
-	return zeroVal, nil
-}
-
 func (ec *executionContext) field_Mutation_assessVendor_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -8887,29 +8660,6 @@ func (ec *executionContext) field_Mutation_deleteMeasure_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteOrganization_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_deleteOrganization_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_deleteOrganization_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (types.DeleteOrganizationInput, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNDeleteOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationInput(ctx, tmp)
-	}
-
-	var zeroVal types.DeleteOrganizationInput
-	return zeroVal, nil
-}
-
 func (ec *executionContext) field_Mutation_deletePeople_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -9229,52 +8979,6 @@ func (ec *executionContext) field_Mutation_publishDocumentVersion_argsInput(
 	}
 
 	var zeroVal types.PublishDocumentVersionInput
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_removeAssetVendor_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_removeAssetVendor_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_removeAssetVendor_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (types.RemoveAssetVendorInput, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNRemoveAssetVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveAssetVendorInput(ctx, tmp)
-	}
-
-	var zeroVal types.RemoveAssetVendorInput
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_removeDatumVendor_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_removeDatumVendor_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_removeDatumVendor_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (types.RemoveDatumVendorInput, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNRemoveDatumVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveDatumVendorInput(ctx, tmp)
-	}
-
-	var zeroVal types.RemoveDatumVendorInput
 	return zeroVal, nil
 }
 
@@ -11747,136 +11451,6 @@ func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _AddAssetVendorPayload_asset(ctx context.Context, field graphql.CollectedField, obj *types.AddAssetVendorPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AddAssetVendorPayload_asset(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Asset, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.Asset)
-	fc.Result = res
-	return ec.marshalNAsset2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAsset(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AddAssetVendorPayload_asset(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AddAssetVendorPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Asset_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Asset_name(ctx, field)
-			case "amount":
-				return ec.fieldContext_Asset_amount(ctx, field)
-			case "owner":
-				return ec.fieldContext_Asset_owner(ctx, field)
-			case "vendors":
-				return ec.fieldContext_Asset_vendors(ctx, field)
-			case "criticity":
-				return ec.fieldContext_Asset_criticity(ctx, field)
-			case "assetType":
-				return ec.fieldContext_Asset_assetType(ctx, field)
-			case "dataTypesStored":
-				return ec.fieldContext_Asset_dataTypesStored(ctx, field)
-			case "organization":
-				return ec.fieldContext_Asset_organization(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Asset_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Asset_updatedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Asset", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AddDatumVendorPayload_datum(ctx context.Context, field graphql.CollectedField, obj *types.AddDatumVendorPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AddDatumVendorPayload_datum(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Datum, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.Datum)
-	fc.Result = res
-	return ec.marshalNDatum2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDatum(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AddDatumVendorPayload_datum(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AddDatumVendorPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Datum_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Datum_name(ctx, field)
-			case "dataSensitivity":
-				return ec.fieldContext_Datum_dataSensitivity(ctx, field)
-			case "owner":
-				return ec.fieldContext_Datum_owner(ctx, field)
-			case "vendors":
-				return ec.fieldContext_Datum_vendors(ctx, field)
-			case "organization":
-				return ec.fieldContext_Datum_organization(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Datum_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Datum_updatedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Datum", field.Name)
-		},
-	}
-	return fc, nil
-}
 
 func (ec *executionContext) _AssessVendorPayload_vendor(ctx context.Context, field graphql.CollectedField, obj *types.AssessVendorPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AssessVendorPayload_vendor(ctx, field)
@@ -16204,50 +15778,6 @@ func (ec *executionContext) _DeleteMeasurePayload_deletedMeasureId(ctx context.C
 func (ec *executionContext) fieldContext_DeleteMeasurePayload_deletedMeasureId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteMeasurePayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DeleteOrganizationPayload_deletedOrganizationId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteOrganizationPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DeletedOrganizationID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(gid.GID)
-	fc.Result = res
-	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DeleteOrganizationPayload_deletedOrganizationId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DeleteOrganizationPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -21561,65 +21091,6 @@ func (ec *executionContext) fieldContext_Mutation_updateOrganization(ctx context
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_deleteOrganization(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteOrganization(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteOrganization(rctx, fc.Args["input"].(types.DeleteOrganizationInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.DeleteOrganizationPayload)
-	fc.Result = res
-	return ec.marshalNDeleteOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteOrganization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "deletedOrganizationId":
-				return ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type DeleteOrganizationPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_confirmEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_confirmEmail(ctx, field)
 	if err != nil {
@@ -25062,124 +24533,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteAsset(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_addAssetVendor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_addAssetVendor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddAssetVendor(rctx, fc.Args["input"].(types.AddAssetVendorInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.AddAssetVendorPayload)
-	fc.Result = res
-	return ec.marshalNAddAssetVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAddAssetVendorPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_addAssetVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "asset":
-				return ec.fieldContext_AddAssetVendorPayload_asset(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type AddAssetVendorPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_addAssetVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_removeAssetVendor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_removeAssetVendor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RemoveAssetVendor(rctx, fc.Args["input"].(types.RemoveAssetVendorInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.RemoveAssetVendorPayload)
-	fc.Result = res
-	return ec.marshalNRemoveAssetVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveAssetVendorPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_removeAssetVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "asset":
-				return ec.fieldContext_RemoveAssetVendorPayload_asset(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type RemoveAssetVendorPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_removeAssetVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_createDatum(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createDatum(ctx, field)
 	if err != nil {
@@ -25351,124 +24704,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteDatum(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteDatum_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_addDatumVendor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_addDatumVendor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddDatumVendor(rctx, fc.Args["input"].(types.AddDatumVendorInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.AddDatumVendorPayload)
-	fc.Result = res
-	return ec.marshalNAddDatumVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAddDatumVendorPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_addDatumVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "datum":
-				return ec.fieldContext_AddDatumVendorPayload_datum(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type AddDatumVendorPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_addDatumVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_removeDatumVendor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_removeDatumVendor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RemoveDatumVendor(rctx, fc.Args["input"].(types.RemoveDatumVendorInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.RemoveDatumVendorPayload)
-	fc.Result = res
-	return ec.marshalNRemoveDatumVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveDatumVendorPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_removeDatumVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "datum":
-				return ec.fieldContext_RemoveDatumVendorPayload_datum(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type RemoveDatumVendorPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_removeDatumVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -27840,136 +27075,6 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _RemoveAssetVendorPayload_asset(ctx context.Context, field graphql.CollectedField, obj *types.RemoveAssetVendorPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_RemoveAssetVendorPayload_asset(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Asset, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.Asset)
-	fc.Result = res
-	return ec.marshalNAsset2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAsset(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_RemoveAssetVendorPayload_asset(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "RemoveAssetVendorPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Asset_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Asset_name(ctx, field)
-			case "amount":
-				return ec.fieldContext_Asset_amount(ctx, field)
-			case "owner":
-				return ec.fieldContext_Asset_owner(ctx, field)
-			case "vendors":
-				return ec.fieldContext_Asset_vendors(ctx, field)
-			case "criticity":
-				return ec.fieldContext_Asset_criticity(ctx, field)
-			case "assetType":
-				return ec.fieldContext_Asset_assetType(ctx, field)
-			case "dataTypesStored":
-				return ec.fieldContext_Asset_dataTypesStored(ctx, field)
-			case "organization":
-				return ec.fieldContext_Asset_organization(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Asset_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Asset_updatedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Asset", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _RemoveDatumVendorPayload_datum(ctx context.Context, field graphql.CollectedField, obj *types.RemoveDatumVendorPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_RemoveDatumVendorPayload_datum(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Datum, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.Datum)
-	fc.Result = res
-	return ec.marshalNDatum2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDatum(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_RemoveDatumVendorPayload_datum(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "RemoveDatumVendorPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Datum_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Datum_name(ctx, field)
-			case "dataSensitivity":
-				return ec.fieldContext_Datum_dataSensitivity(ctx, field)
-			case "owner":
-				return ec.fieldContext_Datum_owner(ctx, field)
-			case "vendors":
-				return ec.fieldContext_Datum_vendors(ctx, field)
-			case "organization":
-				return ec.fieldContext_Datum_organization(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Datum_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Datum_updatedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Datum", field.Name)
 		},
 	}
 	return fc, nil
@@ -36693,74 +35798,6 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputAddAssetVendorInput(ctx context.Context, obj any) (types.AddAssetVendorInput, error) {
-	var it types.AddAssetVendorInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"assetId", "vendorId"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "assetId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assetId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AssetID = data
-		case "vendorId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.VendorID = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputAddDatumVendorInput(ctx context.Context, obj any) (types.AddDatumVendorInput, error) {
-	var it types.AddDatumVendorInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"datumId", "vendorId"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "datumId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("datumId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.DatumID = data
-		case "vendorId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.VendorID = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputAssessVendorInput(ctx context.Context, obj any) (types.AssessVendorInput, error) {
 	var it types.AssessVendorInput
 	asMap := map[string]any{}
@@ -38312,33 +37349,6 @@ func (ec *executionContext) unmarshalInputDeleteMeasureInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputDeleteOrganizationInput(ctx context.Context, obj any) (types.DeleteOrganizationInput, error) {
-	var it types.DeleteOrganizationInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"organizationId"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "organizationId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OrganizationID = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputDeletePeopleInput(ctx context.Context, obj any) (types.DeletePeopleInput, error) {
 	var it types.DeletePeopleInput
 	asMap := map[string]any{}
@@ -39080,74 +38090,6 @@ func (ec *executionContext) unmarshalInputPublishDocumentVersionInput(ctx contex
 				return it, err
 			}
 			it.Changelog = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputRemoveAssetVendorInput(ctx context.Context, obj any) (types.RemoveAssetVendorInput, error) {
-	var it types.RemoveAssetVendorInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"assetId", "vendorId"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "assetId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assetId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AssetID = data
-		case "vendorId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.VendorID = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputRemoveDatumVendorInput(ctx context.Context, obj any) (types.RemoveDatumVendorInput, error) {
-	var it types.RemoveDatumVendorInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"datumId", "vendorId"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "datumId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("datumId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.DatumID = data
-		case "vendorId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.VendorID = data
 		}
 	}
 
@@ -40593,84 +39535,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
-
-var addAssetVendorPayloadImplementors = []string{"AddAssetVendorPayload"}
-
-func (ec *executionContext) _AddAssetVendorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.AddAssetVendorPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, addAssetVendorPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AddAssetVendorPayload")
-		case "asset":
-			out.Values[i] = ec._AddAssetVendorPayload_asset(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var addDatumVendorPayloadImplementors = []string{"AddDatumVendorPayload"}
-
-func (ec *executionContext) _AddDatumVendorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.AddDatumVendorPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, addDatumVendorPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AddDatumVendorPayload")
-		case "datum":
-			out.Values[i] = ec._AddDatumVendorPayload_datum(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
 
 var assessVendorPayloadImplementors = []string{"AssessVendorPayload"}
 
@@ -42814,45 +41678,6 @@ func (ec *executionContext) _DeleteMeasurePayload(ctx context.Context, sel ast.S
 			out.Values[i] = graphql.MarshalString("DeleteMeasurePayload")
 		case "deletedMeasureId":
 			out.Values[i] = ec._DeleteMeasurePayload_deletedMeasureId(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var deleteOrganizationPayloadImplementors = []string{"DeleteOrganizationPayload"}
-
-func (ec *executionContext) _DeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteOrganizationPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, deleteOrganizationPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("DeleteOrganizationPayload")
-		case "deletedOrganizationId":
-			out.Values[i] = ec._DeleteOrganizationPayload_deletedOrganizationId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -45080,13 +43905,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "deleteOrganization":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteOrganization(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "confirmEmail":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_confirmEmail(ctx, field)
@@ -45493,20 +44311,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "addAssetVendor":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_addAssetVendor(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "removeAssetVendor":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_removeAssetVendor(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "createDatum":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createDatum(ctx, field)
@@ -45524,20 +44328,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteDatum":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteDatum(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "addDatumVendor":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_addDatumVendor(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "removeDatumVendor":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_removeDatumVendor(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -46498,84 +45288,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var removeAssetVendorPayloadImplementors = []string{"RemoveAssetVendorPayload"}
-
-func (ec *executionContext) _RemoveAssetVendorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.RemoveAssetVendorPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, removeAssetVendorPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("RemoveAssetVendorPayload")
-		case "asset":
-			out.Values[i] = ec._RemoveAssetVendorPayload_asset(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var removeDatumVendorPayloadImplementors = []string{"RemoveDatumVendorPayload"}
-
-func (ec *executionContext) _RemoveDatumVendorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.RemoveDatumVendorPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, removeDatumVendorPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("RemoveDatumVendorPayload")
-		case "datum":
-			out.Values[i] = ec._RemoveDatumVendorPayload_datum(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -49490,44 +48202,6 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) unmarshalNAddAssetVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAddAssetVendorInput(ctx context.Context, v any) (types.AddAssetVendorInput, error) {
-	res, err := ec.unmarshalInputAddAssetVendorInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNAddAssetVendorPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAddAssetVendorPayload(ctx context.Context, sel ast.SelectionSet, v types.AddAssetVendorPayload) graphql.Marshaler {
-	return ec._AddAssetVendorPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNAddAssetVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAddAssetVendorPayload(ctx context.Context, sel ast.SelectionSet, v *types.AddAssetVendorPayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._AddAssetVendorPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNAddDatumVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAddDatumVendorInput(ctx context.Context, v any) (types.AddDatumVendorInput, error) {
-	res, err := ec.unmarshalInputAddDatumVendorInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNAddDatumVendorPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAddDatumVendorPayload(ctx context.Context, sel ast.SelectionSet, v types.AddDatumVendorPayload) graphql.Marshaler {
-	return ec._AddDatumVendorPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNAddDatumVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAddDatumVendorPayload(ctx context.Context, sel ast.SelectionSet, v *types.AddDatumVendorPayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._AddDatumVendorPayload(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNAssessVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssessVendorInput(ctx context.Context, v any) (types.AssessVendorInput, error) {
 	res, err := ec.unmarshalInputAssessVendorInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -50677,25 +49351,6 @@ func (ec *executionContext) marshalNDeleteMeasurePayload2ᚖgithubᚗcomᚋgetpr
 		return graphql.Null
 	}
 	return ec._DeleteMeasurePayload(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNDeleteOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationInput(ctx context.Context, v any) (types.DeleteOrganizationInput, error) {
-	res, err := ec.unmarshalInputDeleteOrganizationInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNDeleteOrganizationPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteOrganizationPayload) graphql.Marshaler {
-	return ec._DeleteOrganizationPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNDeleteOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteOrganizationPayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DeleteOrganizationPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeletePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeletePeopleInput(ctx context.Context, v any) (types.DeletePeopleInput, error) {
@@ -52105,44 +50760,6 @@ func (ec *executionContext) marshalNPublishDocumentVersionPayload2ᚖgithubᚗco
 		return graphql.Null
 	}
 	return ec._PublishDocumentVersionPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNRemoveAssetVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveAssetVendorInput(ctx context.Context, v any) (types.RemoveAssetVendorInput, error) {
-	res, err := ec.unmarshalInputRemoveAssetVendorInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNRemoveAssetVendorPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveAssetVendorPayload(ctx context.Context, sel ast.SelectionSet, v types.RemoveAssetVendorPayload) graphql.Marshaler {
-	return ec._RemoveAssetVendorPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNRemoveAssetVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveAssetVendorPayload(ctx context.Context, sel ast.SelectionSet, v *types.RemoveAssetVendorPayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._RemoveAssetVendorPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNRemoveDatumVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveDatumVendorInput(ctx context.Context, v any) (types.RemoveDatumVendorInput, error) {
-	res, err := ec.unmarshalInputRemoveDatumVendorInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNRemoveDatumVendorPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveDatumVendorPayload(ctx context.Context, sel ast.SelectionSet, v types.RemoveDatumVendorPayload) graphql.Marshaler {
-	return ec._RemoveDatumVendorPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNRemoveDatumVendorPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveDatumVendorPayload(ctx context.Context, sel ast.SelectionSet, v *types.RemoveDatumVendorPayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._RemoveDatumVendorPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNRemoveUserInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRemoveUserInput(ctx context.Context, v any) (types.RemoveUserInput, error) {

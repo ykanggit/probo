@@ -76,7 +76,18 @@ func (r *assetResolver) AssetType(ctx context.Context, obj *types.Asset) (coreda
 
 // Organization is the resolver for the organization field.
 func (r *assetResolver) Organization(ctx context.Context, obj *types.Asset) (*types.Organization, error) {
-	panic(fmt.Errorf("not implemented: Organization - organization"))
+	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+
+	if obj.Organization == nil {
+		return nil, fmt.Errorf("cannot get organization")
+	}
+
+	org, err := svc.Organizations.Get(ctx, obj.Organization.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get organization: %w", err)
+	}
+
+	return types.NewOrganization(org), nil
 }
 
 // Framework is the resolver for the framework field.
@@ -694,11 +705,6 @@ func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.U
 	return &types.UpdateOrganizationPayload{
 		Organization: types.NewOrganization(organization),
 	}, nil
-}
-
-// DeleteOrganization is the resolver for the deleteOrganization field.
-func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error) {
-	panic(fmt.Errorf("not implemented: DeleteOrganization - deleteOrganization"))
 }
 
 // ConfirmEmail is the resolver for the confirmEmail field.
@@ -1833,16 +1839,6 @@ func (r *mutationResolver) DeleteAsset(ctx context.Context, input types.DeleteAs
 	}, nil
 }
 
-// AddAssetVendor is the resolver for the addAssetVendor field.
-func (r *mutationResolver) AddAssetVendor(ctx context.Context, input types.AddAssetVendorInput) (*types.AddAssetVendorPayload, error) {
-	panic(fmt.Errorf("not implemented: AddAssetVendor - addAssetVendor"))
-}
-
-// RemoveAssetVendor is the resolver for the removeAssetVendor field.
-func (r *mutationResolver) RemoveAssetVendor(ctx context.Context, input types.RemoveAssetVendorInput) (*types.RemoveAssetVendorPayload, error) {
-	panic(fmt.Errorf("not implemented: RemoveAssetVendor - removeAssetVendor"))
-}
-
 // CreateDatum is the resolver for the createDatum field.
 func (r *mutationResolver) CreateDatum(ctx context.Context, input types.CreateDatumInput) (*types.CreateDatumPayload, error) {
 	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
@@ -1896,16 +1892,6 @@ func (r *mutationResolver) DeleteDatum(ctx context.Context, input types.DeleteDa
 	return &types.DeleteDatumPayload{
 		DeletedDatumID: input.DatumID,
 	}, nil
-}
-
-// AddDatumVendor is the resolver for the addDatumVendor field.
-func (r *mutationResolver) AddDatumVendor(ctx context.Context, input types.AddDatumVendorInput) (*types.AddDatumVendorPayload, error) {
-	panic(fmt.Errorf("not implemented: AddDatumVendor - addDatumVendor"))
-}
-
-// RemoveDatumVendor is the resolver for the removeDatumVendor field.
-func (r *mutationResolver) RemoveDatumVendor(ctx context.Context, input types.RemoveDatumVendorInput) (*types.RemoveDatumVendorPayload, error) {
-	panic(fmt.Errorf("not implemented: RemoveDatumVendor - removeDatumVendor"))
 }
 
 // LogoURL is the resolver for the logoUrl field.

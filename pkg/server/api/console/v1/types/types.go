@@ -16,24 +16,6 @@ type Node interface {
 	GetID() gid.GID
 }
 
-type AddAssetVendorInput struct {
-	AssetID  gid.GID `json:"assetId"`
-	VendorID gid.GID `json:"vendorId"`
-}
-
-type AddAssetVendorPayload struct {
-	Asset *Asset `json:"asset"`
-}
-
-type AddDatumVendorInput struct {
-	DatumID  gid.GID `json:"datumId"`
-	VendorID gid.GID `json:"vendorId"`
-}
-
-type AddDatumVendorPayload struct {
-	Datum *Datum `json:"datum"`
-}
-
 type AssessVendorInput struct {
 	ID         gid.GID `json:"id"`
 	WebsiteURL string  `json:"websiteUrl"`
@@ -479,14 +461,6 @@ type DeleteMeasurePayload struct {
 	DeletedMeasureID gid.GID `json:"deletedMeasureId"`
 }
 
-type DeleteOrganizationInput struct {
-	OrganizationID gid.GID `json:"organizationId"`
-}
-
-type DeleteOrganizationPayload struct {
-	DeletedOrganizationID gid.GID `json:"deletedOrganizationId"`
-}
-
 type DeletePeopleInput struct {
 	PeopleID gid.GID `json:"peopleId"`
 }
@@ -856,24 +830,6 @@ type PublishDocumentVersionPayload struct {
 }
 
 type Query struct {
-}
-
-type RemoveAssetVendorInput struct {
-	AssetID  gid.GID `json:"assetId"`
-	VendorID gid.GID `json:"vendorId"`
-}
-
-type RemoveAssetVendorPayload struct {
-	Asset *Asset `json:"asset"`
-}
-
-type RemoveDatumVendorInput struct {
-	DatumID  gid.GID `json:"datumId"`
-	VendorID gid.GID `json:"vendorId"`
-}
-
-type RemoveDatumVendorPayload struct {
-	Datum *Datum `json:"datum"`
 }
 
 type RemoveUserInput struct {
