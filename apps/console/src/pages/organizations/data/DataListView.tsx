@@ -60,7 +60,7 @@ const dataListFragment = graphql`
         node {
           id
           name
-          dataSensitivity
+          dataClassification
           owner {
             id
             fullName
@@ -236,29 +236,27 @@ function DataListContent({
                   <div className="flex items-center gap-2">
                     <Badge
                       variant={
-                        item?.dataSensitivity === "NONE"
+                        item?.dataClassification === "PUBLIC"
                           ? "default"
-                          : item?.dataSensitivity === "LOW"
+                          : item?.dataClassification === "INTERNAL"
                           ? "success"
-                          : item?.dataSensitivity === "MEDIUM"
+                          : item?.dataClassification === "CONFIDENTIAL"
                           ? "info"
-                          : item?.dataSensitivity === "HIGH"
+                          : item?.dataClassification === "SECRET"
                           ? "warning"
                           : "destructive"
                       }
                       className="px-3 py-0.5 text-xs font-medium"
                     >
-                      {item?.dataSensitivity === "NONE"
-                        ? "No sensitive data"
-                        : item?.dataSensitivity === "LOW"
-                        ? "Public or non-sensitive data"
-                        : item?.dataSensitivity === "MEDIUM"
-                        ? "Internal/restricted data"
-                        : item?.dataSensitivity === "HIGH"
-                        ? "Confidential data"
-                        : item?.dataSensitivity === "CRITICAL"
-                        ? "Regulated/PII/financial data"
-                        : "No sensitive data"}
+                      {item?.dataClassification === "PUBLIC"
+                        ? "Public"
+                        : item?.dataClassification === "INTERNAL"
+                        ? "Internal"
+                        : item?.dataClassification === "CONFIDENTIAL"
+                        ? "Confidential"
+                        : item?.dataClassification === "SECRET"
+                        ? "Secret"
+                        : "Unknown"}
                     </Badge>
                     <Button
                       variant="ghost"

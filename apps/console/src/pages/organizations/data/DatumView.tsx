@@ -13,7 +13,7 @@ import {
   useMutation,
 } from "react-relay";
 import { Suspense, useEffect, useState, useCallback } from "react";
-import type { DatumViewQuery as DatumViewQueryType } from "./__generated__/DatumViewQuery.graphql";
+import type { DataClassification, DatumViewQuery as DatumViewQueryType } from "./__generated__/DatumViewQuery.graphql";
 import { useParams } from "react-router";
 import { PageTemplate } from "@/components/PageTemplate";
 import { DatumViewSkeleton } from "./DatumPage";
@@ -35,7 +35,7 @@ const datumViewQuery = graphql`
       ... on Datum {
         id
         name
-        dataSensitivity
+        dataClassification
         vendors {
           edges {
             node {
@@ -75,7 +75,7 @@ const updateDatumMutation = graphql`
       datum {
         id
         name
-        dataSensitivity
+        dataClassification
         vendors {
           edges {
             node {
@@ -93,13 +93,13 @@ const updateDatumMutation = graphql`
   }
 `;
 
-type DataSensitivity = "NONE" | "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+// type DataClassification = "PUBLIC" | "INTERNAL" | "CONFIDENTIAL" | "SECRET";
 
 interface Datum {
   readonly id?: string;
   readonly name?: string;
   readonly description?: string;
-  readonly dataSensitivity?: DataSensitivity;
+  readonly dataClassification?: DataClassification;
   readonly owner?: {
     readonly id: string;
     readonly fullName: string;
@@ -171,7 +171,7 @@ function DatumViewContent({
   const organization = data.organization as Organization;
   const [formData, setFormData] = useState({
     name: datum?.name || "",
-    dataSensitivity: datum?.dataSensitivity || "NONE",
+    dataClassification: datum?.dataClassification || "INTERNAL",
     ownerId: datum?.owner?.id || "",
     selectedVendorIds: datum?.vendors?.edges?.map(edge => edge?.node?.id).filter((id): id is string => id != null) || [],
   });
@@ -188,7 +188,7 @@ function DatumViewContent({
         input: {
           id: nodeId,
           name: formData.name,
-          dataSensitivity: formData.dataSensitivity,
+          dataClassification: formData.dataClassification,
           ownerId: formData.ownerId,
           vendorIds: formData.selectedVendorIds.length > 0 ? formData.selectedVendorIds : undefined,
         },
@@ -233,7 +233,7 @@ function DatumViewContent({
     const datum = data.node as Datum | null;
     setFormData({
       name: datum?.name || "",
-      dataSensitivity: datum?.dataSensitivity || "NONE",
+      dataClassification: datum?.dataClassification || "INTERNAL",
       ownerId: datum?.owner?.id || "",
       selectedVendorIds: datum?.vendors?.edges?.map(edge => edge?.node?.id).filter((id): id is string => id != null) || [],
     });
@@ -317,18 +317,17 @@ function DatumViewContent({
                       <Label className="text-sm">Data Sensitivity</Label>
                     </div>
                     <Select
-                      value={formData.dataSensitivity}
-                      onValueChange={(value) => handleFieldChange("dataSensitivity", value)}
+                      value={formData.dataClassification}
+                      onValueChange={(value) => handleFieldChange("dataClassification", value)}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select data sensitivity" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="NONE">No sensitive data</SelectItem>
-                        <SelectItem value="LOW">Public or non-sensitive data</SelectItem>
-                        <SelectItem value="MEDIUM">Internal/restricted data</SelectItem>
-                        <SelectItem value="HIGH">Confidential data</SelectItem>
-                        <SelectItem value="CRITICAL">Regulated/PII/financial data</SelectItem>
+                        <SelectItem value="PUBLIC">Public</SelectItem>
+                        <SelectItem value="INTERNAL">Internal</SelectItem>
+                        <SelectItem value="CONFIDENTIAL">Confidential</SelectItem>
+                        <SelectItem value="SECRET">Secret</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

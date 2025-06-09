@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4aa66259b93ace779a3e38430cf8c1ee>>
+ * @generated SignedSource<<6a2c795f1b3328794d9e3db73151feaa>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,9 +9,9 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type DataSensitivity = "CRITICAL" | "HIGH" | "LOW" | "MEDIUM" | "NONE";
+export type DataClassification = "CONFIDENTIAL" | "INTERNAL" | "PUBLIC" | "SECRET";
 export type UpdateDatumInput = {
-  dataSensitivity?: DataSensitivity | null | undefined;
+  dataClassification?: DataClassification | null | undefined;
   id: string;
   name?: string | null | undefined;
   ownerId?: string | null | undefined;
@@ -23,7 +23,7 @@ export type DatumViewUpdateDatumMutation$variables = {
 export type DatumViewUpdateDatumMutation$data = {
   readonly updateDatum: {
     readonly datum: {
-      readonly dataSensitivity: DataSensitivity;
+      readonly dataClassification: DataClassification;
       readonly id: string;
       readonly name: string;
       readonly owner: {
@@ -96,7 +96,7 @@ v2 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "dataSensitivity",
+            "name": "dataClassification",
             "storageKey": null
           },
           {
@@ -184,16 +184,16 @@ return {
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "1e5b2489558fef74becf57d2457a4891",
+    "cacheID": "ec5c79edccc379aae627f969ec18c55e",
     "id": null,
     "metadata": {},
     "name": "DatumViewUpdateDatumMutation",
     "operationKind": "mutation",
-    "text": "mutation DatumViewUpdateDatumMutation(\n  $input: UpdateDatumInput!\n) {\n  updateDatum(input: $input) {\n    datum {\n      id\n      name\n      dataSensitivity\n      vendors {\n        edges {\n          node {\n            id\n          }\n        }\n      }\n      owner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation DatumViewUpdateDatumMutation(\n  $input: UpdateDatumInput!\n) {\n  updateDatum(input: $input) {\n    datum {\n      id\n      name\n      dataClassification\n      vendors {\n        edges {\n          node {\n            id\n          }\n        }\n      }\n      owner {\n        id\n        fullName\n      }\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ac445fa9f2ccebef8203e0138c794ea8";
+(node as any).hash = "38b1842eb3e3549efc9e961c56c22879";
 
 export default node;

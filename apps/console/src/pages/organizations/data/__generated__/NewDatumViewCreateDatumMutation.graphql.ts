@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5b93fe65ad69563bbcb6e75d0b913eb8>>
+ * @generated SignedSource<<87179d28750a2a84a6c1ea1b779cbd49>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,9 +9,9 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type DataSensitivity = "CRITICAL" | "HIGH" | "LOW" | "MEDIUM" | "NONE";
+export type DataClassification = "CONFIDENTIAL" | "INTERNAL" | "PUBLIC" | "SECRET";
 export type CreateDatumInput = {
-  dataSensitivity: DataSensitivity;
+  dataClassification: DataClassification;
   name: string;
   organizationId: string;
   ownerId: string;
@@ -25,7 +25,7 @@ export type NewDatumViewCreateDatumMutation$data = {
   readonly createDatum: {
     readonly datumEdge: {
       readonly node: {
-        readonly dataSensitivity: DataSensitivity;
+        readonly dataClassification: DataClassification;
         readonly id: string;
         readonly name: string;
         readonly owner: {
@@ -103,7 +103,7 @@ v5 = {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "dataSensitivity",
+          "name": "dataClassification",
           "storageKey": null
         },
         {
@@ -232,16 +232,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "0ab550803b091f5dfa1935f810eaecdc",
+    "cacheID": "1349272a7b0c9f14ee6e257f66ad5cea",
     "id": null,
     "metadata": {},
     "name": "NewDatumViewCreateDatumMutation",
     "operationKind": "mutation",
-    "text": "mutation NewDatumViewCreateDatumMutation(\n  $input: CreateDatumInput!\n) {\n  createDatum(input: $input) {\n    datumEdge {\n      node {\n        id\n        name\n        dataSensitivity\n        owner {\n          id\n          fullName\n        }\n        vendors {\n          edges {\n            node {\n              id\n              name\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "mutation NewDatumViewCreateDatumMutation(\n  $input: CreateDatumInput!\n) {\n  createDatum(input: $input) {\n    datumEdge {\n      node {\n        id\n        name\n        dataClassification\n        owner {\n          id\n          fullName\n        }\n        vendors {\n          edges {\n            node {\n              id\n              name\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "697a260fb7d44115c617682d38b9259d";
+(node as any).hash = "9b5546ff1b7563fdb7db2bbcba53f3fe";
 
 export default node;

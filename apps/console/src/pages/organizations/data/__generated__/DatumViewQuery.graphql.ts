@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<272734160b60bf94a6f031e685751b64>>
+ * @generated SignedSource<<435da2b0f7d8b9ec259d386a752c18b7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,7 +10,7 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type DataSensitivity = "CRITICAL" | "HIGH" | "LOW" | "MEDIUM" | "NONE";
+export type DataClassification = "CONFIDENTIAL" | "INTERNAL" | "PUBLIC" | "SECRET";
 export type DatumViewQuery$variables = {
   datumId: string;
   organizationId: string;
@@ -18,7 +18,7 @@ export type DatumViewQuery$variables = {
 export type DatumViewQuery$data = {
   readonly node: {
     readonly createdAt?: string;
-    readonly dataSensitivity?: DataSensitivity;
+    readonly dataClassification?: DataClassification;
     readonly id?: string;
     readonly name?: string;
     readonly owner?: {
@@ -91,7 +91,7 @@ v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "dataSensitivity",
+  "name": "dataClassification",
   "storageKey": null
 },
 v5 = {
@@ -469,7 +469,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "c3fd8609637a69d90a532344150b4d6a",
+    "cacheID": "958954258516869d985feedba1cf9db3",
     "id": null,
     "metadata": {
       "connection": [
@@ -486,11 +486,11 @@ return {
     },
     "name": "DatumViewQuery",
     "operationKind": "query",
-    "text": "query DatumViewQuery(\n  $datumId: ID!\n  $organizationId: ID!\n) {\n  node(id: $datumId) {\n    __typename\n    ... on Datum {\n      id\n      name\n      dataSensitivity\n      vendors {\n        edges {\n          node {\n            id\n            name\n          }\n        }\n      }\n      owner {\n        id\n        fullName\n      }\n      createdAt\n      updatedAt\n    }\n    id\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      ...PeopleSelector_organization\n      vendors(first: 100, orderBy: {direction: ASC, field: NAME}) {\n        edges {\n          node {\n            id\n            name\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query DatumViewQuery(\n  $datumId: ID!\n  $organizationId: ID!\n) {\n  node(id: $datumId) {\n    __typename\n    ... on Datum {\n      id\n      name\n      dataClassification\n      vendors {\n        edges {\n          node {\n            id\n            name\n          }\n        }\n      }\n      owner {\n        id\n        fullName\n      }\n      createdAt\n      updatedAt\n    }\n    id\n  }\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      ...PeopleSelector_organization\n      vendors(first: 100, orderBy: {direction: ASC, field: NAME}) {\n        edges {\n          node {\n            id\n            name\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n\nfragment PeopleSelector_organization on Organization {\n  id\n  peoples(first: 100, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "2f759d45493db37e45b3a7166dd36c2e";
+(node as any).hash = "836074301e1d6f8c2aec59fc569bd68e";
 
 export default node;

@@ -14,38 +14,11 @@
 
 package coredata
 
-import (
-	"fmt"
-)
-
-type DatumOrderField string
+type DataClassification string
 
 const (
-	DatumOrderFieldCreatedAt          DatumOrderField = "CREATED_AT"
-	DatumOrderFieldName               DatumOrderField = "NAME"
-	DatumOrderFieldDataClassification DatumOrderField = "DATA_CLASSIFICATION"
+	DataClassificationPublic       DataClassification = "PUBLIC"
+	DataClassificationInternal     DataClassification = "INTERNAL"
+	DataClassificationConfidential DataClassification = "CONFIDENTIAL"
+	DataClassificationSecret       DataClassification = "SECRET"
 )
-
-func (p DatumOrderField) Column() string {
-	return string(p)
-}
-
-func (p DatumOrderField) String() string {
-	return string(p)
-}
-
-func (p DatumOrderField) MarshalText() ([]byte, error) {
-	return []byte(p.String()), nil
-}
-
-func (p *DatumOrderField) UnmarshalText(text []byte) error {
-	val := string(text)
-	switch val {
-	case string(DatumOrderFieldCreatedAt),
-		string(DatumOrderFieldName),
-		string(DatumOrderFieldDataClassification):
-		*p = DatumOrderField(val)
-		return nil
-	}
-	return fmt.Errorf("invalid DatumOrderField value: %q", val)
-}

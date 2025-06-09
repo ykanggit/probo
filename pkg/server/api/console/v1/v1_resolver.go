@@ -1844,11 +1844,11 @@ func (r *mutationResolver) CreateDatum(ctx context.Context, input types.CreateDa
 	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
 
 	data, err := svc.Data.Create(ctx, probo.CreateDatumRequest{
-		OrganizationID:  input.OrganizationID,
-		Name:            input.Name,
-		DataSensitivity: input.DataSensitivity,
-		OwnerID:         input.OwnerID,
-		VendorIDs:       input.VendorIds,
+		OrganizationID:     input.OrganizationID,
+		Name:               input.Name,
+		DataClassification: input.DataClassification,
+		OwnerID:            input.OwnerID,
+		VendorIDs:          input.VendorIds,
 	})
 
 	if err != nil {
@@ -1865,11 +1865,11 @@ func (r *mutationResolver) UpdateDatum(ctx context.Context, input types.UpdateDa
 	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
 
 	datum, err := svc.Data.Update(ctx, probo.UpdateDatumRequest{
-		ID:              input.ID,
-		Name:            input.Name,
-		DataSensitivity: input.DataSensitivity,
-		OwnerID:         input.OwnerID,
-		VendorIDs:       input.VendorIds,
+		ID:                 input.ID,
+		Name:               input.Name,
+		DataClassification: input.DataClassification,
+		OwnerID:            input.OwnerID,
+		VendorIDs:          input.VendorIds,
 	})
 
 	if err != nil {

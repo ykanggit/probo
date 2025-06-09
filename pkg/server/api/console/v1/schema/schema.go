@@ -221,14 +221,14 @@ type ComplexityRoot struct {
 	}
 
 	Datum struct {
-		CreatedAt       func(childComplexity int) int
-		DataSensitivity func(childComplexity int) int
-		ID              func(childComplexity int) int
-		Name            func(childComplexity int) int
-		Organization    func(childComplexity int) int
-		Owner           func(childComplexity int) int
-		UpdatedAt       func(childComplexity int) int
-		Vendors         func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) int
+		CreatedAt          func(childComplexity int) int
+		DataClassification func(childComplexity int) int
+		ID                 func(childComplexity int) int
+		Name               func(childComplexity int) int
+		Organization       func(childComplexity int) int
+		Owner              func(childComplexity int) int
+		UpdatedAt          func(childComplexity int) int
+		Vendors            func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) int
 	}
 
 	DatumConnection struct {
@@ -1518,12 +1518,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Datum.CreatedAt(childComplexity), true
 
-	case "Datum.dataSensitivity":
-		if e.complexity.Datum.DataSensitivity == nil {
+	case "Datum.dataClassification":
+		if e.complexity.Datum.DataClassification == nil {
 			break
 		}
 
-		return e.complexity.Datum.DataSensitivity(childComplexity), true
+		return e.complexity.Datum.DataClassification(childComplexity), true
 
 	case "Datum.id":
 		if e.complexity.Datum.ID == nil {
@@ -5061,7 +5061,19 @@ enum AssetOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.Ass
 enum DatumOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.DatumOrderField") {
   CREATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldCreatedAt")
   NAME @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldName")
-  DATA_SENSITIVITY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldDataSensitivity")
+  DATA_CLASSIFICATION @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldDataClassification")
+}
+
+enum DataClassification
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.DataClassification") {
+  PUBLIC
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationPublic")
+  INTERNAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationInternal")
+  CONFIDENTIAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationConfidential")
+  SECRET
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationSecret")
 }
 
 # Input Types
@@ -6723,7 +6735,7 @@ type DeleteAssetPayload {
 type Datum implements Node {
   id: ID!
   name: String!
-  dataSensitivity: DataSensitivity!
+  dataClassification: DataClassification!
   owner: People! @goField(forceResolver: true)
   vendors(
     first: Int
@@ -6745,7 +6757,7 @@ input DatumOrder {
 input CreateDatumInput {
   organizationId: ID!
   name: String!
-  dataSensitivity: DataSensitivity!
+  dataClassification: DataClassification!
   ownerId: ID!
   vendorIds: [ID!]
 }
@@ -6753,7 +6765,7 @@ input CreateDatumInput {
 input UpdateDatumInput {
   id: ID!
   name: String
-  dataSensitivity: DataSensitivity
+  dataClassification: DataClassification
   ownerId: ID
   vendorIds: [ID!]
 }
@@ -14755,8 +14767,8 @@ func (ec *executionContext) fieldContext_Datum_name(_ context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _Datum_dataSensitivity(ctx context.Context, field graphql.CollectedField, obj *types.Datum) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Datum_dataSensitivity(ctx, field)
+func (ec *executionContext) _Datum_dataClassification(ctx context.Context, field graphql.CollectedField, obj *types.Datum) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Datum_dataClassification(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -14769,7 +14781,7 @@ func (ec *executionContext) _Datum_dataSensitivity(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DataSensitivity, nil
+		return obj.DataClassification, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14781,19 +14793,19 @@ func (ec *executionContext) _Datum_dataSensitivity(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(coredata.DataSensitivity)
+	res := resTmp.(coredata.DataClassification)
 	fc.Result = res
-	return ec.marshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity(ctx, field.Selections, res)
+	return ec.marshalNDataClassification2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Datum_dataSensitivity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Datum_dataClassification(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Datum",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DataSensitivity does not have child fields")
+			return nil, errors.New("field of type DataClassification does not have child fields")
 		},
 	}
 	return fc, nil
@@ -15285,8 +15297,8 @@ func (ec *executionContext) fieldContext_DatumEdge_node(_ context.Context, field
 				return ec.fieldContext_Datum_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Datum_name(ctx, field)
-			case "dataSensitivity":
-				return ec.fieldContext_Datum_dataSensitivity(ctx, field)
+			case "dataClassification":
+				return ec.fieldContext_Datum_dataClassification(ctx, field)
 			case "owner":
 				return ec.fieldContext_Datum_owner(ctx, field)
 			case "vendors":
@@ -29608,8 +29620,8 @@ func (ec *executionContext) fieldContext_UpdateDatumPayload_datum(_ context.Cont
 				return ec.fieldContext_Datum_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Datum_name(ctx, field)
-			case "dataSensitivity":
-				return ec.fieldContext_Datum_dataSensitivity(ctx, field)
+			case "dataClassification":
+				return ec.fieldContext_Datum_dataClassification(ctx, field)
 			case "owner":
 				return ec.fieldContext_Datum_owner(ctx, field)
 			case "vendors":
@@ -36225,7 +36237,7 @@ func (ec *executionContext) unmarshalInputCreateDatumInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "dataSensitivity", "ownerId", "vendorIds"}
+	fieldsInOrder := [...]string{"organizationId", "name", "dataClassification", "ownerId", "vendorIds"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -36246,13 +36258,13 @@ func (ec *executionContext) unmarshalInputCreateDatumInput(ctx context.Context, 
 				return it, err
 			}
 			it.Name = data
-		case "dataSensitivity":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dataSensitivity"))
-			data, err := ec.unmarshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity(ctx, v)
+		case "dataClassification":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dataClassification"))
+			data, err := ec.unmarshalNDataClassification2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.DataSensitivity = data
+			it.DataClassification = data
 		case "ownerId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerId"))
 			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
@@ -38465,7 +38477,7 @@ func (ec *executionContext) unmarshalInputUpdateDatumInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "dataSensitivity", "ownerId", "vendorIds"}
+	fieldsInOrder := [...]string{"id", "name", "dataClassification", "ownerId", "vendorIds"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -38486,13 +38498,13 @@ func (ec *executionContext) unmarshalInputUpdateDatumInput(ctx context.Context, 
 				return it, err
 			}
 			it.Name = data
-		case "dataSensitivity":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dataSensitivity"))
-			data, err := ec.unmarshalODataSensitivity2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity(ctx, v)
+		case "dataClassification":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dataClassification"))
+			data, err := ec.unmarshalODataClassification2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.DataSensitivity = data
+			it.DataClassification = data
 		case "ownerId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerId"))
 			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
@@ -41109,8 +41121,8 @@ func (ec *executionContext) _Datum(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "dataSensitivity":
-			out.Values[i] = ec._Datum_dataSensitivity(ctx, field, obj)
+		case "dataClassification":
+			out.Values[i] = ec._Datum_dataClassification(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -49024,6 +49036,38 @@ func (ec *executionContext) marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋ
 	return res
 }
 
+func (ec *executionContext) unmarshalNDataClassification2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification(ctx context.Context, v any) (coredata.DataClassification, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNDataClassification2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDataClassification2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification(ctx context.Context, sel ast.SelectionSet, v coredata.DataClassification) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalString(marshalNDataClassification2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNDataClassification2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification = map[string]coredata.DataClassification{
+		"PUBLIC":       coredata.DataClassificationPublic,
+		"INTERNAL":     coredata.DataClassificationInternal,
+		"CONFIDENTIAL": coredata.DataClassificationConfidential,
+		"SECRET":       coredata.DataClassificationSecret,
+	}
+	marshalNDataClassification2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification = map[coredata.DataClassification]string{
+		coredata.DataClassificationPublic:       "PUBLIC",
+		coredata.DataClassificationInternal:     "INTERNAL",
+		coredata.DataClassificationConfidential: "CONFIDENTIAL",
+		coredata.DataClassificationSecret:       "SECRET",
+	}
+)
+
 func (ec *executionContext) unmarshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity(ctx context.Context, v any) (coredata.DataSensitivity, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := unmarshalNDataSensitivity2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity[tmp]
@@ -49171,14 +49215,14 @@ func (ec *executionContext) marshalNDatumOrderField2githubᚗcomᚋgetproboᚋpr
 
 var (
 	unmarshalNDatumOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDatumOrderField = map[string]coredata.DatumOrderField{
-		"CREATED_AT":       coredata.DatumOrderFieldCreatedAt,
-		"NAME":             coredata.DatumOrderFieldName,
-		"DATA_SENSITIVITY": coredata.DatumOrderFieldDataSensitivity,
+		"CREATED_AT":          coredata.DatumOrderFieldCreatedAt,
+		"NAME":                coredata.DatumOrderFieldName,
+		"DATA_CLASSIFICATION": coredata.DatumOrderFieldDataClassification,
 	}
 	marshalNDatumOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDatumOrderField = map[coredata.DatumOrderField]string{
-		coredata.DatumOrderFieldCreatedAt:       "CREATED_AT",
-		coredata.DatumOrderFieldName:            "NAME",
-		coredata.DatumOrderFieldDataSensitivity: "DATA_SENSITIVITY",
+		coredata.DatumOrderFieldCreatedAt:          "CREATED_AT",
+		coredata.DatumOrderFieldName:               "NAME",
+		coredata.DatumOrderFieldDataClassification: "DATA_CLASSIFICATION",
 	}
 )
 
@@ -52369,39 +52413,37 @@ func (ec *executionContext) marshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋprobo
 	return res
 }
 
-func (ec *executionContext) unmarshalODataSensitivity2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity(ctx context.Context, v any) (*coredata.DataSensitivity, error) {
+func (ec *executionContext) unmarshalODataClassification2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification(ctx context.Context, v any) (*coredata.DataClassification, error) {
 	if v == nil {
 		return nil, nil
 	}
 	tmp, err := graphql.UnmarshalString(v)
-	res := unmarshalODataSensitivity2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity[tmp]
+	res := unmarshalODataClassification2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification[tmp]
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalODataSensitivity2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity(ctx context.Context, sel ast.SelectionSet, v *coredata.DataSensitivity) graphql.Marshaler {
+func (ec *executionContext) marshalODataClassification2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification(ctx context.Context, sel ast.SelectionSet, v *coredata.DataClassification) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	_ = sel
 	_ = ctx
-	res := graphql.MarshalString(marshalODataSensitivity2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity[*v])
+	res := graphql.MarshalString(marshalODataClassification2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification[*v])
 	return res
 }
 
 var (
-	unmarshalODataSensitivity2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity = map[string]coredata.DataSensitivity{
-		"NONE":     coredata.DataSensitivityNone,
-		"LOW":      coredata.DataSensitivityLow,
-		"MEDIUM":   coredata.DataSensitivityMedium,
-		"HIGH":     coredata.DataSensitivityHigh,
-		"CRITICAL": coredata.DataSensitivityCritical,
+	unmarshalODataClassification2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification = map[string]coredata.DataClassification{
+		"PUBLIC":       coredata.DataClassificationPublic,
+		"INTERNAL":     coredata.DataClassificationInternal,
+		"CONFIDENTIAL": coredata.DataClassificationConfidential,
+		"SECRET":       coredata.DataClassificationSecret,
 	}
-	marshalODataSensitivity2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataSensitivity = map[coredata.DataSensitivity]string{
-		coredata.DataSensitivityNone:     "NONE",
-		coredata.DataSensitivityLow:      "LOW",
-		coredata.DataSensitivityMedium:   "MEDIUM",
-		coredata.DataSensitivityHigh:     "HIGH",
-		coredata.DataSensitivityCritical: "CRITICAL",
+	marshalODataClassification2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDataClassification = map[coredata.DataClassification]string{
+		coredata.DataClassificationPublic:       "PUBLIC",
+		coredata.DataClassificationInternal:     "INTERNAL",
+		coredata.DataClassificationConfidential: "CONFIDENTIAL",
+		coredata.DataClassificationSecret:       "SECRET",
 	}
 )
 

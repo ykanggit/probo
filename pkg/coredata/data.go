@@ -27,13 +27,13 @@ import (
 )
 
 type Data struct {
-	ID              gid.GID         `db:"id"`
-	Name            string          `db:"name"`
-	OrganizationID  gid.GID         `db:"organization_id"`
-	OwnerID         gid.GID         `db:"owner_id"`
-	DataSensitivity DataSensitivity `db:"data_sensitivity"`
-	CreatedAt       time.Time       `db:"created_at"`
-	UpdatedAt       time.Time       `db:"updated_at"`
+	ID                 gid.GID            `db:"id"`
+	Name               string             `db:"name"`
+	OrganizationID     gid.GID            `db:"organization_id"`
+	OwnerID            gid.GID            `db:"owner_id"`
+	DataClassification DataClassification `db:"data_classification"`
+	CreatedAt          time.Time          `db:"created_at"`
+	UpdatedAt          time.Time          `db:"updated_at"`
 }
 
 func (d *Data) CursorKey(field DatumOrderField) page.CursorKey {
@@ -42,8 +42,8 @@ func (d *Data) CursorKey(field DatumOrderField) page.CursorKey {
 		return page.NewCursorKey(d.ID, d.CreatedAt)
 	case DatumOrderFieldName:
 		return page.NewCursorKey(d.ID, d.Name)
-	case DatumOrderFieldDataSensitivity:
-		return page.NewCursorKey(d.ID, d.DataSensitivity)
+	case DatumOrderFieldDataClassification:
+		return page.NewCursorKey(d.ID, d.DataClassification)
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", field))
@@ -63,7 +63,7 @@ SELECT
 	name,
 	owner_id,
 	organization_id,
-	data_sensitivity,
+	data_classification,
 	created_at,
 	updated_at
 FROM
@@ -105,7 +105,7 @@ SELECT
 	name,
 	owner_id,
 	organization_id,
-	data_sensitivity,
+	data_classification,
 	created_at,
 	updated_at
 FROM
@@ -148,7 +148,7 @@ SELECT
 	id,
 	name,
 	owner_id,
-	data_sensitivity,
+	data_classification,
 	created_at,
 	updated_at
 FROM
@@ -193,7 +193,7 @@ SELECT
 	name,
 	organization_id,
 	owner_id,
-	data_sensitivity,
+	data_classification,
 	created_at,
 	updated_at
 FROM
@@ -237,7 +237,7 @@ INSERT INTO data (
 	name,
 	owner_id,
 	organization_id,
-	data_sensitivity,
+	data_classification,
 	created_at,
 	updated_at
 ) VALUES (
@@ -246,21 +246,21 @@ INSERT INTO data (
 	@name,
 	@owner_id,
 	@organization_id,
-	@data_sensitivity,
+	@data_classification,
 	@created_at,
 	@updated_at
 )
 `
 
 	args := pgx.StrictNamedArgs{
-		"id":               d.ID,
-		"tenant_id":        scope.GetTenantID(),
-		"name":             d.Name,
-		"owner_id":         d.OwnerID,
-		"organization_id":  d.OrganizationID,
-		"data_sensitivity": d.DataSensitivity,
-		"created_at":       d.CreatedAt,
-		"updated_at":       d.UpdatedAt,
+		"id":                  d.ID,
+		"tenant_id":           scope.GetTenantID(),
+		"name":                d.Name,
+		"owner_id":            d.OwnerID,
+		"organization_id":     d.OrganizationID,
+		"data_classification": d.DataClassification,
+		"created_at":          d.CreatedAt,
+		"updated_at":          d.UpdatedAt,
 	}
 
 	_, err := conn.Exec(ctx, q, args)
@@ -281,7 +281,7 @@ UPDATE data
 SET
 	name = @name,
 	owner_id = @owner_id,
-	data_sensitivity = @data_sensitivity,
+	data_classification = @data_classification,
 	updated_at = @updated_at
 WHERE
 	%s
@@ -291,7 +291,7 @@ RETURNING
 	name,
 	owner_id,
 	organization_id,
-	data_sensitivity,
+	data_classification,
 	created_at,
 	updated_at
 `
@@ -299,11 +299,11 @@ RETURNING
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
 	args := pgx.StrictNamedArgs{
-		"id":               d.ID,
-		"name":             d.Name,
-		"owner_id":         d.OwnerID,
-		"data_sensitivity": d.DataSensitivity,
-		"updated_at":       time.Now(),
+		"id":                  d.ID,
+		"name":                d.Name,
+		"owner_id":            d.OwnerID,
+		"data_classification": d.DataClassification,
+		"updated_at":          time.Now(),
 	}
 	maps.Copy(args, scope.SQLArguments())
 

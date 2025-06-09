@@ -176,11 +176,11 @@ type CreateControlPayload struct {
 }
 
 type CreateDatumInput struct {
-	OrganizationID  gid.GID                  `json:"organizationId"`
-	Name            string                   `json:"name"`
-	DataSensitivity coredata.DataSensitivity `json:"dataSensitivity"`
-	OwnerID         gid.GID                  `json:"ownerId"`
-	VendorIds       []gid.GID                `json:"vendorIds,omitempty"`
+	OrganizationID     gid.GID                     `json:"organizationId"`
+	Name               string                      `json:"name"`
+	DataClassification coredata.DataClassification `json:"dataClassification"`
+	OwnerID            gid.GID                     `json:"ownerId"`
+	VendorIds          []gid.GID                   `json:"vendorIds,omitempty"`
 }
 
 type CreateDatumPayload struct {
@@ -357,14 +357,14 @@ type CreateVendorRiskAssessmentPayload struct {
 }
 
 type Datum struct {
-	ID              gid.GID                  `json:"id"`
-	Name            string                   `json:"name"`
-	DataSensitivity coredata.DataSensitivity `json:"dataSensitivity"`
-	Owner           *People                  `json:"owner"`
-	Vendors         *VendorConnection        `json:"vendors"`
-	Organization    *Organization            `json:"organization"`
-	CreatedAt       time.Time                `json:"createdAt"`
-	UpdatedAt       time.Time                `json:"updatedAt"`
+	ID                 gid.GID                     `json:"id"`
+	Name               string                      `json:"name"`
+	DataClassification coredata.DataClassification `json:"dataClassification"`
+	Owner              *People                     `json:"owner"`
+	Vendors            *VendorConnection           `json:"vendors"`
+	Organization       *Organization               `json:"organization"`
+	CreatedAt          time.Time                   `json:"createdAt"`
+	UpdatedAt          time.Time                   `json:"updatedAt"`
 }
 
 func (Datum) IsNode()             {}
@@ -972,11 +972,11 @@ type UpdateControlPayload struct {
 }
 
 type UpdateDatumInput struct {
-	ID              gid.GID                   `json:"id"`
-	Name            *string                   `json:"name,omitempty"`
-	DataSensitivity *coredata.DataSensitivity `json:"dataSensitivity,omitempty"`
-	OwnerID         *gid.GID                  `json:"ownerId,omitempty"`
-	VendorIds       []gid.GID                 `json:"vendorIds,omitempty"`
+	ID                 gid.GID                      `json:"id"`
+	Name               *string                      `json:"name,omitempty"`
+	DataClassification *coredata.DataClassification `json:"dataClassification,omitempty"`
+	OwnerID            *gid.GID                     `json:"ownerId,omitempty"`
+	VendorIds          []gid.GID                    `json:"vendorIds,omitempty"`
 }
 
 type UpdateDatumPayload struct {

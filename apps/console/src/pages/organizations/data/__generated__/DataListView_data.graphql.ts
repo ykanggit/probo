@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<25f5cfd4e1e5f0724a1082db9d9b10d6>>
+ * @generated SignedSource<<63f7ca6490b6387c5950790772723ebc>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,7 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
-export type DataSensitivity = "CRITICAL" | "HIGH" | "LOW" | "MEDIUM" | "NONE";
+export type DataClassification = "CONFIDENTIAL" | "INTERNAL" | "PUBLIC" | "SECRET";
 import { FragmentRefs } from "relay-runtime";
 export type DataListView_data$data = {
   readonly data: {
@@ -17,7 +17,7 @@ export type DataListView_data$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly createdAt: string;
-        readonly dataSensitivity: DataSensitivity;
+        readonly dataClassification: DataClassification;
         readonly id: string;
         readonly name: string;
         readonly owner: {
@@ -165,7 +165,7 @@ return {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
-                  "name": "dataSensitivity",
+                  "name": "dataClassification",
                   "storageKey": null
                 },
                 {
@@ -316,6 +316,6 @@ return {
 };
 })();
 
-(node as any).hash = "d1b1652f1f59c091709bce823b6a0eaa";
+(node as any).hash = "b8465a1295d6d7351cee98f2e4f9756a";
 
 export default node;

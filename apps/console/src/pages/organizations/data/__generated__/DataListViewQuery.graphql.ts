@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<905fb20472d2c30aabb9a9afc41acf41>>
+ * @generated SignedSource<<f5c4ef95583024470ef959e39f4452a2>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -208,7 +208,7 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
-                            "name": "dataSensitivity",
+                            "name": "dataClassification",
                             "storageKey": null
                           },
                           {
@@ -368,12 +368,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "0c5725c38efb32dc65674c4bbd8dd154",
+    "cacheID": "164b5819fe6d186b9baa512c67b59e9a",
     "id": null,
     "metadata": {},
     "name": "DataListViewQuery",
     "operationKind": "query",
-    "text": "query DataListViewQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...DataListView_data_pbnwq\n    id\n  }\n}\n\nfragment DataListView_data_pbnwq on Organization {\n  id\n  data(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        dataSensitivity\n        owner {\n          id\n          fullName\n        }\n        vendors {\n          edges {\n            node {\n              id\n              name\n            }\n          }\n        }\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
+    "text": "query DataListViewQuery(\n  $organizationId: ID!\n  $first: Int\n  $after: CursorKey\n  $last: Int\n  $before: CursorKey\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ...DataListView_data_pbnwq\n    id\n  }\n}\n\nfragment DataListView_data_pbnwq on Organization {\n  id\n  data(first: $first, after: $after, last: $last, before: $before, orderBy: {direction: ASC, field: NAME}) {\n    edges {\n      node {\n        id\n        name\n        dataClassification\n        owner {\n          id\n          fullName\n        }\n        vendors {\n          edges {\n            node {\n              id\n              name\n            }\n          }\n        }\n        createdAt\n        updatedAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n  }\n}\n"
   }
 };
 })();

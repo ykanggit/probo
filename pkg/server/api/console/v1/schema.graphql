@@ -367,7 +367,19 @@ enum AssetOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.Ass
 enum DatumOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.DatumOrderField") {
   CREATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldCreatedAt")
   NAME @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldName")
-  DATA_SENSITIVITY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldDataSensitivity")
+  DATA_CLASSIFICATION @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldDataClassification")
+}
+
+enum DataClassification
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.DataClassification") {
+  PUBLIC
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationPublic")
+  INTERNAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationInternal")
+  CONFIDENTIAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationConfidential")
+  SECRET
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationSecret")
 }
 
 # Input Types
@@ -2029,7 +2041,7 @@ type DeleteAssetPayload {
 type Datum implements Node {
   id: ID!
   name: String!
-  dataSensitivity: DataSensitivity!
+  dataClassification: DataClassification!
   owner: People! @goField(forceResolver: true)
   vendors(
     first: Int
@@ -2051,7 +2063,7 @@ input DatumOrder {
 input CreateDatumInput {
   organizationId: ID!
   name: String!
-  dataSensitivity: DataSensitivity!
+  dataClassification: DataClassification!
   ownerId: ID!
   vendorIds: [ID!]
 }
@@ -2059,7 +2071,7 @@ input CreateDatumInput {
 input UpdateDatumInput {
   id: ID!
   name: String
-  dataSensitivity: DataSensitivity
+  dataClassification: DataClassification
   ownerId: ID
   vendorIds: [ID!]
 }

@@ -44,7 +44,7 @@ const createDatumMutation = graphql`
         node {
           id
           name
-          dataSensitivity
+          dataClassification
           owner {
             id
             fullName
@@ -129,7 +129,7 @@ function NewDataViewContent({
 
   const [formData, setFormData] = useState({
     name: "",
-    dataSensitivity: "NONE" as "NONE" | "LOW" | "MEDIUM" | "HIGH" | "CRITICAL",
+    dataClassification: "INTERNAL" as "PUBLIC" | "INTERNAL" | "CONFIDENTIAL" | "SECRET",
     ownerId: "",
     selectedVendorIds: [] as string[],
   });
@@ -184,7 +184,7 @@ function NewDataViewContent({
         input: {
           organizationId: organizationId!,
           name: formData.name,
-          dataSensitivity: formData.dataSensitivity,
+          dataClassification: formData.dataClassification,
           ownerId: formData.ownerId,
           vendorIds: formData.selectedVendorIds.length > 0 ? formData.selectedVendorIds : undefined,
         } satisfies CreateDatumInput,
@@ -278,19 +278,18 @@ function NewDataViewContent({
             <div className="space-y-2">
               <Label className="text-sm">Data Sensitivity</Label>
               <Select
-                value={formData.dataSensitivity}
+                value={formData.dataClassification}
                 onValueChange={(value: string) =>
-                  handleFieldChange("dataSensitivity", value as "NONE" | "LOW" | "MEDIUM" | "HIGH" | "CRITICAL")}
+                  handleFieldChange("dataClassification", value as "PUBLIC" | "INTERNAL" | "CONFIDENTIAL" | "SECRET")}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select data sensitivity" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="NONE">No sensitive data</SelectItem>
-                  <SelectItem value="LOW">Public or non-sensitive data</SelectItem>
-                  <SelectItem value="MEDIUM">Internal/restricted data</SelectItem>
-                  <SelectItem value="HIGH">Confidential data</SelectItem>
-                  <SelectItem value="CRITICAL">Regulated/PII/financial data</SelectItem>
+                  <SelectItem value="PUBLIC">Public</SelectItem>
+                  <SelectItem value="INTERNAL">Internal</SelectItem>
+                  <SelectItem value="CONFIDENTIAL">Confidential</SelectItem>
+                  <SelectItem value="SECRET">Secret</SelectItem>
                 </SelectContent>
               </Select>
             </div>

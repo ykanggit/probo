@@ -30,19 +30,19 @@ type DatumService struct {
 }
 
 type CreateDatumRequest struct {
-	OrganizationID  gid.GID
-	Name            string
-	DataSensitivity coredata.DataSensitivity
-	OwnerID         gid.GID
-	VendorIDs       []gid.GID
+	OrganizationID     gid.GID
+	Name               string
+	DataClassification coredata.DataClassification
+	OwnerID            gid.GID
+	VendorIDs          []gid.GID
 }
 
 type UpdateDatumRequest struct {
-	ID              gid.GID
-	Name            *string
-	DataSensitivity *coredata.DataSensitivity
-	OwnerID         *gid.GID
-	VendorIDs       []gid.GID
+	ID                 gid.GID
+	Name               *string
+	DataClassification *coredata.DataClassification
+	OwnerID            *gid.GID
+	VendorIDs          []gid.GID
 }
 
 func (s DatumService) Get(
@@ -126,21 +126,21 @@ func (s DatumService) Update(
 	}
 
 	datum := &coredata.Data{
-		ID:              req.ID,
-		OrganizationID:  existing.OrganizationID,
-		Name:            existing.Name,
-		DataSensitivity: existing.DataSensitivity,
-		OwnerID:         existing.OwnerID,
-		CreatedAt:       existing.CreatedAt,
-		UpdatedAt:       now,
+		ID:                 req.ID,
+		OrganizationID:     existing.OrganizationID,
+		Name:               existing.Name,
+		DataClassification: existing.DataClassification,
+		OwnerID:            existing.OwnerID,
+		CreatedAt:          existing.CreatedAt,
+		UpdatedAt:          now,
 	}
 
 	// Update fields from request
 	if req.Name != nil {
 		datum.Name = *req.Name
 	}
-	if req.DataSensitivity != nil {
-		datum.DataSensitivity = *req.DataSensitivity
+	if req.DataClassification != nil {
+		datum.DataClassification = *req.DataClassification
 	}
 	if req.OwnerID != nil {
 		datum.OwnerID = *req.OwnerID
@@ -161,13 +161,13 @@ func (s DatumService) Create(
 	datumID := gid.New(s.svc.scope.GetTenantID(), coredata.DatumEntityType)
 
 	datum := &coredata.Data{
-		ID:              datumID,
-		OrganizationID:  req.OrganizationID,
-		Name:            req.Name,
-		DataSensitivity: req.DataSensitivity,
-		OwnerID:         req.OwnerID,
-		CreatedAt:       now,
-		UpdatedAt:       now,
+		ID:                 datumID,
+		OrganizationID:     req.OrganizationID,
+		Name:               req.Name,
+		DataClassification: req.DataClassification,
+		OwnerID:            req.OwnerID,
+		CreatedAt:          now,
+		UpdatedAt:          now,
 	}
 
 	err := s.svc.pg.WithTx(
