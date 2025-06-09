@@ -17,6 +17,9 @@ All notable changes to this project will be documented in this file.
 - Add controls manual create, update, and delete
 - Add backend fulltext search on controls
 
+### Fixed
+- Use new enum for data classification
+
 ## [0.31.0] - 2025-06-04
 
 ### Added
