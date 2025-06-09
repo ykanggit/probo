@@ -102,6 +102,7 @@ func (p *Documents) LoadByOrganizationID(
 	scope Scoper,
 	organizationID gid.GID,
 	cursor *page.Cursor[DocumentOrderField],
+	filter *DocumentFilter,
 ) error {
 	q := `
 SELECT
@@ -119,12 +120,14 @@ WHERE
     %s
     AND organization_id = @organization_id
     AND %s
+    AND %s
 `
 
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	args := pgx.NamedArgs{"organization_id": organizationID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -249,6 +252,7 @@ func (p *Documents) LoadByControlID(
 	scope Scoper,
 	controlID gid.GID,
 	cursor *page.Cursor[DocumentOrderField],
+	filter *DocumentFilter,
 ) error {
 	q := `
 WITH plcs AS (
@@ -282,11 +286,13 @@ FROM
 	plcs
 WHERE %s
 	AND %s
+	AND %s
 `
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"control_id": controlID}
+	args := pgx.NamedArgs{"control_id": controlID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
@@ -310,6 +316,7 @@ func (p *Documents) LoadByRiskID(
 	scope Scoper,
 	riskID gid.GID,
 	cursor *page.Cursor[DocumentOrderField],
+	filter *DocumentFilter,
 ) error {
 	q := `
 WITH plcs AS (
@@ -343,11 +350,13 @@ FROM
 	plcs
 WHERE %s
 	AND %s
+	AND %s
 `
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"risk_id": riskID}
+	args := pgx.NamedArgs{"risk_id": riskID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)

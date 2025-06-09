@@ -19,24 +19,24 @@ import (
 )
 
 type (
-	ControlFilter struct {
+	DocumentFilter struct {
 		query *string
 	}
 )
 
-func NewControlFilter(query *string) *ControlFilter {
-	return &ControlFilter{
+func NewDocumentFilter(query *string) *DocumentFilter {
+	return &DocumentFilter{
 		query: query,
 	}
 }
 
-func (f *ControlFilter) SQLArguments() pgx.NamedArgs {
+func (f *DocumentFilter) SQLArguments() pgx.NamedArgs {
 	return pgx.NamedArgs{
 		"query": f.query,
 	}
 }
 
-func (f *ControlFilter) SQLFragment() string {
+func (f *DocumentFilter) SQLFragment() string {
 	if f.query == nil || *f.query == "" {
 		return "TRUE"
 	}

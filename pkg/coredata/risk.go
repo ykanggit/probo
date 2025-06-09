@@ -74,6 +74,7 @@ func (r *Risks) LoadByMeasureID(
 	scope Scoper,
 	measureID gid.GID,
 	cursor *page.Cursor[RiskOrderField],
+	filter *RiskFilter,
 ) error {
 	q := `
 WITH rsks AS (
@@ -123,11 +124,14 @@ FROM
 	rsks
 WHERE %s
 	AND %s
+	AND %s
 `
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.NamedArgs{"measure_id": measureID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {
@@ -150,6 +154,7 @@ func (r *Risks) LoadByOrganizationID(
 	scope Scoper,
 	organizationID gid.GID,
 	cursor *page.Cursor[RiskOrderField],
+	filter *RiskFilter,
 ) error {
 	q := `
 SELECT
@@ -173,11 +178,13 @@ FROM risks
 WHERE %s
 	AND organization_id = @organization_id
 	AND %s
+	AND %s
 `
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	args := pgx.NamedArgs{"organization_id": organizationID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
 	maps.Copy(args, cursor.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)

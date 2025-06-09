@@ -323,7 +323,7 @@ func (s FrameworkService) ExportAudit(
 					},
 				)
 
-				if err := measures.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor); err != nil {
+				if err := measures.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor, coredata.NewMeasureFilter(nil)); err != nil {
 					return fmt.Errorf("cannot load measures: %w", err)
 				}
 
@@ -339,7 +339,7 @@ func (s FrameworkService) ExportAudit(
 					},
 				)
 
-				if err := documents.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor2); err != nil {
+				if err := documents.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor2, coredata.NewDocumentFilter(nil)); err != nil {
 					return fmt.Errorf("cannot load documents: %w", err)
 				}
 

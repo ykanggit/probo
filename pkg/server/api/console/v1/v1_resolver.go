@@ -108,7 +108,7 @@ func (r *controlResolver) Framework(ctx context.Context, obj *types.Control) (*t
 }
 
 // Measures is the resolver for the measures field.
-func (r *controlResolver) Measures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error) {
+func (r *controlResolver) Measures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.MeasureOrderField]{
@@ -124,7 +124,12 @@ func (r *controlResolver) Measures(ctx context.Context, obj *types.Control, firs
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Measures.ListForControlID(ctx, obj.ID, cursor)
+	var measureFilter = coredata.NewMeasureFilter(nil)
+	if filter != nil {
+		measureFilter = coredata.NewMeasureFilter(filter.Query)
+	}
+
+	page, err := svc.Measures.ListForControlID(ctx, obj.ID, cursor, measureFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list measures: %w", err)
 	}
@@ -133,7 +138,7 @@ func (r *controlResolver) Measures(ctx context.Context, obj *types.Control, firs
 }
 
 // Documents is the resolver for the documents field.
-func (r *controlResolver) Documents(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy) (*types.DocumentConnection, error) {
+func (r *controlResolver) Documents(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DocumentOrderField]{
@@ -149,7 +154,12 @@ func (r *controlResolver) Documents(ctx context.Context, obj *types.Control, fir
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Documents.ListForControlID(ctx, obj.ID, cursor)
+	var documentFilter = coredata.NewDocumentFilter(nil)
+	if filter != nil {
+		documentFilter = coredata.NewDocumentFilter(filter.Query)
+	}
+
+	page, err := svc.Documents.ListForControlID(ctx, obj.ID, cursor, documentFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list documents: %w", err)
 	}
@@ -585,7 +595,7 @@ func (r *measureResolver) Tasks(ctx context.Context, obj *types.Measure, first *
 }
 
 // Risks is the resolver for the risks field.
-func (r *measureResolver) Risks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error) {
+func (r *measureResolver) Risks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) (*types.RiskConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.RiskOrderField]{
@@ -601,7 +611,12 @@ func (r *measureResolver) Risks(ctx context.Context, obj *types.Measure, first *
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Risks.ListForMeasureID(ctx, obj.ID, cursor)
+	var riskFilter = coredata.NewRiskFilter(nil)
+	if filter != nil {
+		riskFilter = coredata.NewRiskFilter(filter.Query)
+	}
+
+	page, err := svc.Risks.ListForMeasureID(ctx, obj.ID, cursor, riskFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list measure risks: %w", err)
 	}
@@ -2055,7 +2070,7 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 }
 
 // Documents is the resolver for the documents field.
-func (r *organizationResolver) Documents(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy) (*types.DocumentConnection, error) {
+func (r *organizationResolver) Documents(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DocumentOrderField]{
@@ -2071,7 +2086,12 @@ func (r *organizationResolver) Documents(ctx context.Context, obj *types.Organiz
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Documents.ListByOrganizationID(ctx, obj.ID, cursor)
+	var documentFilter = coredata.NewDocumentFilter(nil)
+	if filter != nil {
+		documentFilter = coredata.NewDocumentFilter(filter.Query)
+	}
+
+	page, err := svc.Documents.ListByOrganizationID(ctx, obj.ID, cursor, documentFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization documents: %w", err))
 	}
@@ -2080,7 +2100,7 @@ func (r *organizationResolver) Documents(ctx context.Context, obj *types.Organiz
 }
 
 // Measures is the resolver for the measures field.
-func (r *organizationResolver) Measures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error) {
+func (r *organizationResolver) Measures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.MeasureOrderField]{
@@ -2096,7 +2116,12 @@ func (r *organizationResolver) Measures(ctx context.Context, obj *types.Organiza
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Measures.ListForOrganizationID(ctx, obj.ID, cursor)
+	var measureFilter = coredata.NewMeasureFilter(nil)
+	if filter != nil {
+		measureFilter = coredata.NewMeasureFilter(filter.Query)
+	}
+
+	page, err := svc.Measures.ListForOrganizationID(ctx, obj.ID, cursor, measureFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization measures: %w", err))
 	}
@@ -2105,7 +2130,7 @@ func (r *organizationResolver) Measures(ctx context.Context, obj *types.Organiza
 }
 
 // Risks is the resolver for the risks field.
-func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error) {
+func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) (*types.RiskConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.RiskOrderField]{
@@ -2121,7 +2146,12 @@ func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organizatio
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Risks.ListForOrganizationID(ctx, obj.ID, cursor)
+	var riskFilter = coredata.NewRiskFilter(nil)
+	if filter != nil {
+		riskFilter = coredata.NewRiskFilter(filter.Query)
+	}
+
+	page, err := svc.Risks.ListForOrganizationID(ctx, obj.ID, cursor, riskFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization risks: %w", err))
 	}
@@ -2363,7 +2393,7 @@ func (r *riskResolver) Organization(ctx context.Context, obj *types.Risk) (*type
 }
 
 // Measures is the resolver for the measures field.
-func (r *riskResolver) Measures(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error) {
+func (r *riskResolver) Measures(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.MeasureOrderField]{
@@ -2379,7 +2409,12 @@ func (r *riskResolver) Measures(ctx context.Context, obj *types.Risk, first *int
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Measures.ListForRiskID(ctx, obj.ID, cursor)
+	var measureFilter = coredata.NewMeasureFilter(nil)
+	if filter != nil {
+		measureFilter = coredata.NewMeasureFilter(filter.Query)
+	}
+
+	page, err := svc.Measures.ListForRiskID(ctx, obj.ID, cursor, measureFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list risk measures: %w", err))
 	}
@@ -2388,7 +2423,7 @@ func (r *riskResolver) Measures(ctx context.Context, obj *types.Risk, first *int
 }
 
 // Documents is the resolver for the documents field.
-func (r *riskResolver) Documents(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy) (*types.DocumentConnection, error) {
+func (r *riskResolver) Documents(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DocumentOrderField]{
@@ -2404,7 +2439,12 @@ func (r *riskResolver) Documents(ctx context.Context, obj *types.Risk, first *in
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Documents.ListForRiskID(ctx, obj.ID, cursor)
+	var documentFilter = coredata.NewDocumentFilter(nil)
+	if filter != nil {
+		documentFilter = coredata.NewDocumentFilter(filter.Query)
+	}
+
+	page, err := svc.Documents.ListForRiskID(ctx, obj.ID, cursor, documentFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list risk documents: %w", err))
 	}

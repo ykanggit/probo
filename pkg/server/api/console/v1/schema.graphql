@@ -498,6 +498,18 @@ input ControlFilter {
   query: String
 }
 
+input DocumentFilter {
+  query: String
+}
+
+input MeasureFilter {
+  query: String
+}
+
+input RiskFilter {
+  query: String
+}
+
 # Core Types
 type Organization implements Node {
   id: ID!
@@ -559,6 +571,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: DocumentOrder
+    filter: DocumentFilter
   ): DocumentConnection! @goField(forceResolver: true)
 
   measures(
@@ -567,6 +580,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: MeasureOrder
+    filter: MeasureFilter
   ): MeasureConnection! @goField(forceResolver: true)
 
   risks(
@@ -575,6 +589,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: RiskOrder
+    filter: RiskFilter
   ): RiskConnection! @goField(forceResolver: true)
 
   tasks(
@@ -726,6 +741,7 @@ type Control implements Node {
     last: Int
     before: CursorKey
     orderBy: MeasureOrder
+    filter: MeasureFilter
   ): MeasureConnection! @goField(forceResolver: true)
 
   documents(
@@ -734,6 +750,7 @@ type Control implements Node {
     last: Int
     before: CursorKey
     orderBy: DocumentOrder
+    filter: DocumentFilter
   ): DocumentConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -769,6 +786,7 @@ type Measure implements Node {
     last: Int
     before: CursorKey
     orderBy: RiskOrder
+    filter: RiskFilter
   ): RiskConnection! @goField(forceResolver: true)
 
   controls(
@@ -880,6 +898,7 @@ type Risk implements Node {
     last: Int
     before: CursorKey
     orderBy: MeasureOrder
+    filter: MeasureFilter
   ): MeasureConnection! @goField(forceResolver: true)
 
   documents(
@@ -888,6 +907,7 @@ type Risk implements Node {
     last: Int
     before: CursorKey
     orderBy: DocumentOrder
+    filter: DocumentFilter
   ): DocumentConnection! @goField(forceResolver: true)
 
   controls(

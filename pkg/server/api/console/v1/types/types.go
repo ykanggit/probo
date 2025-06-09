@@ -548,6 +548,10 @@ type DocumentEdge struct {
 	Node   *Document      `json:"node"`
 }
 
+type DocumentFilter struct {
+	Query *string `json:"query,omitempty"`
+}
+
 type DocumentVersion struct {
 	ID          gid.GID                             `json:"id"`
 	Document    *Document                           `json:"document"`
@@ -745,6 +749,10 @@ type MeasureEdge struct {
 	Node   *Measure       `json:"node"`
 }
 
+type MeasureFilter struct {
+	Query *string `json:"query,omitempty"`
+}
+
 type Mutation struct {
 }
 
@@ -894,6 +902,10 @@ type RiskConnection struct {
 type RiskEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Risk          `json:"node"`
+}
+
+type RiskFilter struct {
+	Query *string `json:"query,omitempty"`
 }
 
 type SendSigningNotificationsInput struct {

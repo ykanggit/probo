@@ -19,24 +19,24 @@ import (
 )
 
 type (
-	ControlFilter struct {
+	RiskFilter struct {
 		query *string
 	}
 )
 
-func NewControlFilter(query *string) *ControlFilter {
-	return &ControlFilter{
+func NewRiskFilter(query *string) *RiskFilter {
+	return &RiskFilter{
 		query: query,
 	}
 }
 
-func (f *ControlFilter) SQLArguments() pgx.NamedArgs {
+func (f *RiskFilter) SQLArguments() pgx.NamedArgs {
 	return pgx.NamedArgs{
 		"query": f.query,
 	}
 }
 
-func (f *ControlFilter) SQLFragment() string {
+func (f *RiskFilter) SQLFragment() string {
 	if f.query == nil || *f.query == "" {
 		return "TRUE"
 	}

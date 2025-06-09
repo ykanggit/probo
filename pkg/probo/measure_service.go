@@ -73,6 +73,7 @@ func (s MeasureService) ListForRiskID(
 	ctx context.Context,
 	riskID gid.GID,
 	cursor *page.Cursor[coredata.MeasureOrderField],
+	filter *coredata.MeasureFilter,
 ) (*page.Page[*coredata.Measure, coredata.MeasureOrderField], error) {
 	var measures coredata.Measures
 	risk := &coredata.Risk{}
@@ -84,7 +85,7 @@ func (s MeasureService) ListForRiskID(
 				return fmt.Errorf("cannot load risk: %w", err)
 			}
 
-			err := measures.LoadByRiskID(ctx, conn, s.svc.scope, risk.ID, cursor)
+			err := measures.LoadByRiskID(ctx, conn, s.svc.scope, risk.ID, cursor, filter)
 			if err != nil {
 				return fmt.Errorf("cannot load measures: %w", err)
 			}
@@ -104,6 +105,7 @@ func (s MeasureService) ListForControlID(
 	ctx context.Context,
 	controlID gid.GID,
 	cursor *page.Cursor[coredata.MeasureOrderField],
+	filter *coredata.MeasureFilter,
 ) (*page.Page[*coredata.Measure, coredata.MeasureOrderField], error) {
 	var measures coredata.Measures
 	control := &coredata.Control{}
@@ -115,7 +117,7 @@ func (s MeasureService) ListForControlID(
 				return fmt.Errorf("cannot load control: %w", err)
 			}
 
-			err := measures.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor)
+			err := measures.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor, filter)
 			if err != nil {
 				return fmt.Errorf("cannot load measures: %w", err)
 			}
@@ -321,6 +323,7 @@ func (s MeasureService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
 	cursor *page.Cursor[coredata.MeasureOrderField],
+	filter *coredata.MeasureFilter,
 ) (*page.Page[*coredata.Measure, coredata.MeasureOrderField], error) {
 	var measures coredata.Measures
 	organization := &coredata.Organization{}
@@ -338,6 +341,7 @@ func (s MeasureService) ListForOrganizationID(
 				s.svc.scope,
 				organization.ID,
 				cursor,
+				filter,
 			)
 			if err != nil {
 				return fmt.Errorf("cannot load measures: %w", err)

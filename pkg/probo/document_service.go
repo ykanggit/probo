@@ -660,6 +660,7 @@ func (s *DocumentService) ListByOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
 	cursor *page.Cursor[coredata.DocumentOrderField],
+	filter *coredata.DocumentFilter,
 ) (*page.Page[*coredata.Document, coredata.DocumentOrderField], error) {
 	var documents coredata.Documents
 
@@ -672,6 +673,7 @@ func (s *DocumentService) ListByOrganizationID(
 				s.svc.scope,
 				organizationID,
 				cursor,
+				filter,
 			)
 		},
 	)
@@ -687,13 +689,14 @@ func (s *DocumentService) ListForControlID(
 	ctx context.Context,
 	controlID gid.GID,
 	cursor *page.Cursor[coredata.DocumentOrderField],
+	filter *coredata.DocumentFilter,
 ) (*page.Page[*coredata.Document, coredata.DocumentOrderField], error) {
 	var documents coredata.Documents
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return documents.LoadByControlID(ctx, conn, s.svc.scope, controlID, cursor)
+			return documents.LoadByControlID(ctx, conn, s.svc.scope, controlID, cursor, filter)
 		},
 	)
 
@@ -708,13 +711,14 @@ func (s *DocumentService) ListForRiskID(
 	ctx context.Context,
 	riskID gid.GID,
 	cursor *page.Cursor[coredata.DocumentOrderField],
+	filter *coredata.DocumentFilter,
 ) (*page.Page[*coredata.Document, coredata.DocumentOrderField], error) {
 	var documents coredata.Documents
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return documents.LoadByRiskID(ctx, conn, s.svc.scope, riskID, cursor)
+			return documents.LoadByRiskID(ctx, conn, s.svc.scope, riskID, cursor, filter)
 		},
 	)
 

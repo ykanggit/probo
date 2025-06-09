@@ -63,13 +63,14 @@ func (s RiskService) ListForMeasureID(
 	ctx context.Context,
 	measureID gid.GID,
 	cursor *page.Cursor[coredata.RiskOrderField],
+	filter *coredata.RiskFilter,
 ) (*page.Page[*coredata.Risk, coredata.RiskOrderField], error) {
 	var risks coredata.Risks
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return risks.LoadByMeasureID(ctx, conn, s.svc.scope, measureID, cursor)
+			return risks.LoadByMeasureID(ctx, conn, s.svc.scope, measureID, cursor, filter)
 		},
 	)
 
@@ -394,6 +395,7 @@ func (s RiskService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
 	cursor *page.Cursor[coredata.RiskOrderField],
+	filter *coredata.RiskFilter,
 ) (*page.Page[*coredata.Risk, coredata.RiskOrderField], error) {
 	var risks coredata.Risks
 
@@ -406,6 +408,7 @@ func (s RiskService) ListForOrganizationID(
 				s.svc.scope,
 				organizationID,
 				cursor,
+				filter,
 			)
 		},
 	)

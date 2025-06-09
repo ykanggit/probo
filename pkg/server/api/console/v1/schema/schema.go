@@ -124,10 +124,10 @@ type ComplexityRoot struct {
 	Control struct {
 		CreatedAt    func(childComplexity int) int
 		Description  func(childComplexity int) int
-		Documents    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy) int
+		Documents    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) int
 		Framework    func(childComplexity int) int
 		ID           func(childComplexity int) int
-		Measures     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) int
+		Measures     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) int
 		Name         func(childComplexity int) int
 		SectionTitle func(childComplexity int) int
 		UpdatedAt    func(childComplexity int) int
@@ -459,7 +459,7 @@ type ComplexityRoot struct {
 		Evidences   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) int
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
-		Risks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) int
+		Risks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) int
 		State       func(childComplexity int) int
 		Tasks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) int
 		UpdatedAt   func(childComplexity int) int
@@ -547,14 +547,14 @@ type ComplexityRoot struct {
 		Controls   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) int
 		CreatedAt  func(childComplexity int) int
 		Data       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrder) int
-		Documents  func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy) int
+		Documents  func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) int
 		Frameworks func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) int
 		ID         func(childComplexity int) int
 		LogoURL    func(childComplexity int) int
-		Measures   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) int
+		Measures   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) int
 		Name       func(childComplexity int) int
 		Peoples    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) int
-		Risks      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) int
+		Risks      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) int
 		Tasks      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) int
 		UpdatedAt  func(childComplexity int) int
 		Users      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrderBy) int
@@ -628,12 +628,12 @@ type ComplexityRoot struct {
 		Controls           func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) int
 		CreatedAt          func(childComplexity int) int
 		Description        func(childComplexity int) int
-		Documents          func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy) int
+		Documents          func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) int
 		ID                 func(childComplexity int) int
 		InherentImpact     func(childComplexity int) int
 		InherentLikelihood func(childComplexity int) int
 		InherentRiskScore  func(childComplexity int) int
-		Measures           func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) int
+		Measures           func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) int
 		Name               func(childComplexity int) int
 		Note               func(childComplexity int) int
 		Organization       func(childComplexity int) int
@@ -871,8 +871,8 @@ type AssetResolver interface {
 }
 type ControlResolver interface {
 	Framework(ctx context.Context, obj *types.Control) (*types.Framework, error)
-	Measures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error)
-	Documents(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy) (*types.DocumentConnection, error)
+	Measures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error)
+	Documents(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error)
 }
 type DatumResolver interface {
 	Owner(ctx context.Context, obj *types.Datum) (*types.People, error)
@@ -912,7 +912,7 @@ type FrameworkResolver interface {
 type MeasureResolver interface {
 	Evidences(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error)
 	Tasks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
-	Risks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error)
+	Risks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) (*types.RiskConnection, error)
 	Controls(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error)
 }
 type MutationResolver interface {
@@ -988,9 +988,9 @@ type OrganizationResolver interface {
 	Controls(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error)
 	Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error)
 	Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) (*types.PeopleConnection, error)
-	Documents(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy) (*types.DocumentConnection, error)
-	Measures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error)
-	Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy) (*types.RiskConnection, error)
+	Documents(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error)
+	Measures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error)
+	Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) (*types.RiskConnection, error)
 	Tasks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
 	Assets(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrder) (*types.AssetConnection, error)
 	Data(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrder) (*types.DatumConnection, error)
@@ -1002,8 +1002,8 @@ type QueryResolver interface {
 type RiskResolver interface {
 	Owner(ctx context.Context, obj *types.Risk) (*types.People, error)
 	Organization(ctx context.Context, obj *types.Risk) (*types.Organization, error)
-	Measures(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy) (*types.MeasureConnection, error)
-	Documents(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy) (*types.DocumentConnection, error)
+	Measures(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error)
+	Documents(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error)
 	Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error)
 }
 type TaskResolver interface {
@@ -1273,7 +1273,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Control.Documents(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.DocumentOrderBy)), true
+		return e.complexity.Control.Documents(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.DocumentOrderBy), args["filter"].(*types.DocumentFilter)), true
 
 	case "Control.framework":
 		if e.complexity.Control.Framework == nil {
@@ -1299,7 +1299,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Control.Measures(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.MeasureOrderBy)), true
+		return e.complexity.Control.Measures(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.MeasureOrderBy), args["filter"].(*types.MeasureFilter)), true
 
 	case "Control.name":
 		if e.complexity.Control.Name == nil {
@@ -2382,7 +2382,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Measure.Risks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.RiskOrderBy)), true
+		return e.complexity.Measure.Risks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.RiskOrderBy), args["filter"].(*types.RiskFilter)), true
 
 	case "Measure.state":
 		if e.complexity.Measure.State == nil {
@@ -3259,7 +3259,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Organization.Documents(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.DocumentOrderBy)), true
+		return e.complexity.Organization.Documents(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.DocumentOrderBy), args["filter"].(*types.DocumentFilter)), true
 
 	case "Organization.frameworks":
 		if e.complexity.Organization.Frameworks == nil {
@@ -3297,7 +3297,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Organization.Measures(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.MeasureOrderBy)), true
+		return e.complexity.Organization.Measures(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.MeasureOrderBy), args["filter"].(*types.MeasureFilter)), true
 
 	case "Organization.name":
 		if e.complexity.Organization.Name == nil {
@@ -3328,7 +3328,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Organization.Risks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.RiskOrderBy)), true
+		return e.complexity.Organization.Risks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.RiskOrderBy), args["filter"].(*types.RiskFilter)), true
 
 	case "Organization.tasks":
 		if e.complexity.Organization.Tasks == nil {
@@ -3624,7 +3624,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Risk.Documents(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.DocumentOrderBy)), true
+		return e.complexity.Risk.Documents(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.DocumentOrderBy), args["filter"].(*types.DocumentFilter)), true
 
 	case "Risk.id":
 		if e.complexity.Risk.ID == nil {
@@ -3664,7 +3664,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Risk.Measures(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.MeasureOrderBy)), true
+		return e.complexity.Risk.Measures(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.MeasureOrderBy), args["filter"].(*types.MeasureFilter)), true
 
 	case "Risk.name":
 		if e.complexity.Risk.Name == nil {
@@ -4553,6 +4553,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeleteTaskInput,
 		ec.unmarshalInputDeleteVendorComplianceReportInput,
 		ec.unmarshalInputDeleteVendorInput,
+		ec.unmarshalInputDocumentFilter,
 		ec.unmarshalInputDocumentOrder,
 		ec.unmarshalInputDocumentVersionFilter,
 		ec.unmarshalInputDocumentVersionOrder,
@@ -4565,6 +4566,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputImportFrameworkInput,
 		ec.unmarshalInputImportMeasureInput,
 		ec.unmarshalInputInviteUserInput,
+		ec.unmarshalInputMeasureFilter,
 		ec.unmarshalInputMeasureOrder,
 		ec.unmarshalInputOrganizationOrder,
 		ec.unmarshalInputPeopleOrder,
@@ -4572,6 +4574,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputRemoveUserInput,
 		ec.unmarshalInputRequestEvidenceInput,
 		ec.unmarshalInputRequestSignatureInput,
+		ec.unmarshalInputRiskFilter,
 		ec.unmarshalInputRiskOrder,
 		ec.unmarshalInputSendSigningNotificationsInput,
 		ec.unmarshalInputTaskOrder,
@@ -5192,6 +5195,18 @@ input ControlFilter {
   query: String
 }
 
+input DocumentFilter {
+  query: String
+}
+
+input MeasureFilter {
+  query: String
+}
+
+input RiskFilter {
+  query: String
+}
+
 # Core Types
 type Organization implements Node {
   id: ID!
@@ -5253,6 +5268,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: DocumentOrder
+    filter: DocumentFilter
   ): DocumentConnection! @goField(forceResolver: true)
 
   measures(
@@ -5261,6 +5277,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: MeasureOrder
+    filter: MeasureFilter
   ): MeasureConnection! @goField(forceResolver: true)
 
   risks(
@@ -5269,6 +5286,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: RiskOrder
+    filter: RiskFilter
   ): RiskConnection! @goField(forceResolver: true)
 
   tasks(
@@ -5420,6 +5438,7 @@ type Control implements Node {
     last: Int
     before: CursorKey
     orderBy: MeasureOrder
+    filter: MeasureFilter
   ): MeasureConnection! @goField(forceResolver: true)
 
   documents(
@@ -5428,6 +5447,7 @@ type Control implements Node {
     last: Int
     before: CursorKey
     orderBy: DocumentOrder
+    filter: DocumentFilter
   ): DocumentConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
@@ -5463,6 +5483,7 @@ type Measure implements Node {
     last: Int
     before: CursorKey
     orderBy: RiskOrder
+    filter: RiskFilter
   ): RiskConnection! @goField(forceResolver: true)
 
   controls(
@@ -5574,6 +5595,7 @@ type Risk implements Node {
     last: Int
     before: CursorKey
     orderBy: MeasureOrder
+    filter: MeasureFilter
   ): MeasureConnection! @goField(forceResolver: true)
 
   documents(
@@ -5582,6 +5604,7 @@ type Risk implements Node {
     last: Int
     before: CursorKey
     orderBy: DocumentOrder
+    filter: DocumentFilter
   ): DocumentConnection! @goField(forceResolver: true)
 
   controls(
@@ -6916,6 +6939,11 @@ func (ec *executionContext) field_Control_documents_args(ctx context.Context, ra
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Control_documents_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Control_documents_argsFirst(
@@ -6983,6 +7011,19 @@ func (ec *executionContext) field_Control_documents_argsOrderBy(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Control_documents_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.DocumentFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalODocumentFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDocumentFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.DocumentFilter
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Control_measures_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -7011,6 +7052,11 @@ func (ec *executionContext) field_Control_measures_args(ctx context.Context, raw
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Control_measures_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Control_measures_argsFirst(
@@ -7075,6 +7121,19 @@ func (ec *executionContext) field_Control_measures_argsOrderBy(
 	}
 
 	var zeroVal *types.MeasureOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_measures_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.MeasureFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOMeasureFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasureFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.MeasureFilter
 	return zeroVal, nil
 }
 
@@ -7843,6 +7902,11 @@ func (ec *executionContext) field_Measure_risks_args(ctx context.Context, rawArg
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Measure_risks_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Measure_risks_argsFirst(
@@ -7907,6 +7971,19 @@ func (ec *executionContext) field_Measure_risks_argsOrderBy(
 	}
 
 	var zeroVal *types.RiskOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Measure_risks_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.RiskFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalORiskFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRiskFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.RiskFilter
 	return zeroVal, nil
 }
 
@@ -9880,6 +9957,11 @@ func (ec *executionContext) field_Organization_documents_args(ctx context.Contex
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Organization_documents_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Organization_documents_argsFirst(
@@ -9944,6 +10026,19 @@ func (ec *executionContext) field_Organization_documents_argsOrderBy(
 	}
 
 	var zeroVal *types.DocumentOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_documents_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.DocumentFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalODocumentFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDocumentFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.DocumentFilter
 	return zeroVal, nil
 }
 
@@ -10070,6 +10165,11 @@ func (ec *executionContext) field_Organization_measures_args(ctx context.Context
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Organization_measures_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Organization_measures_argsFirst(
@@ -10134,6 +10234,19 @@ func (ec *executionContext) field_Organization_measures_argsOrderBy(
 	}
 
 	var zeroVal *types.MeasureOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_measures_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.MeasureFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOMeasureFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasureFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.MeasureFilter
 	return zeroVal, nil
 }
 
@@ -10260,6 +10373,11 @@ func (ec *executionContext) field_Organization_risks_args(ctx context.Context, r
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Organization_risks_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Organization_risks_argsFirst(
@@ -10324,6 +10442,19 @@ func (ec *executionContext) field_Organization_risks_argsOrderBy(
 	}
 
 	var zeroVal *types.RiskOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_risks_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.RiskFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalORiskFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRiskFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.RiskFilter
 	return zeroVal, nil
 }
 
@@ -10799,6 +10930,11 @@ func (ec *executionContext) field_Risk_documents_args(ctx context.Context, rawAr
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Risk_documents_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Risk_documents_argsFirst(
@@ -10866,6 +11002,19 @@ func (ec *executionContext) field_Risk_documents_argsOrderBy(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Risk_documents_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.DocumentFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalODocumentFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDocumentFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.DocumentFilter
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Risk_measures_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -10894,6 +11043,11 @@ func (ec *executionContext) field_Risk_measures_args(ctx context.Context, rawArg
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Risk_measures_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Risk_measures_argsFirst(
@@ -10958,6 +11112,19 @@ func (ec *executionContext) field_Risk_measures_argsOrderBy(
 	}
 
 	var zeroVal *types.MeasureOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Risk_measures_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.MeasureFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOMeasureFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasureFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.MeasureFilter
 	return zeroVal, nil
 }
 
@@ -13121,7 +13288,7 @@ func (ec *executionContext) _Control_measures(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Control().Measures(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.MeasureOrderBy))
+		return ec.resolvers.Control().Measures(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.MeasureOrderBy), fc.Args["filter"].(*types.MeasureFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13182,7 +13349,7 @@ func (ec *executionContext) _Control_documents(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Control().Documents(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.DocumentOrderBy))
+		return ec.resolvers.Control().Documents(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.DocumentOrderBy), fc.Args["filter"].(*types.DocumentFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -20573,7 +20740,7 @@ func (ec *executionContext) _Measure_risks(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Measure().Risks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.RiskOrderBy))
+		return ec.resolvers.Measure().Risks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.RiskOrderBy), fc.Args["filter"].(*types.RiskFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -25231,7 +25398,7 @@ func (ec *executionContext) _Organization_documents(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Documents(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.DocumentOrderBy))
+		return ec.resolvers.Organization().Documents(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.DocumentOrderBy), fc.Args["filter"].(*types.DocumentFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -25292,7 +25459,7 @@ func (ec *executionContext) _Organization_measures(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Measures(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.MeasureOrderBy))
+		return ec.resolvers.Organization().Measures(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.MeasureOrderBy), fc.Args["filter"].(*types.MeasureFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -25353,7 +25520,7 @@ func (ec *executionContext) _Organization_risks(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Risks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.RiskOrderBy))
+		return ec.resolvers.Organization().Risks(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.RiskOrderBy), fc.Args["filter"].(*types.RiskFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -27921,7 +28088,7 @@ func (ec *executionContext) _Risk_measures(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Risk().Measures(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.MeasureOrderBy))
+		return ec.resolvers.Risk().Measures(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.MeasureOrderBy), fc.Args["filter"].(*types.MeasureFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -27982,7 +28149,7 @@ func (ec *executionContext) _Risk_documents(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Risk().Documents(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.DocumentOrderBy))
+		return ec.resolvers.Risk().Documents(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.DocumentOrderBy), fc.Args["filter"].(*types.DocumentFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -37564,6 +37731,33 @@ func (ec *executionContext) unmarshalInputDeleteVendorInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDocumentFilter(ctx context.Context, obj any) (types.DocumentFilter, error) {
+	var it types.DocumentFilter
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"query"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "query":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Query = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDocumentOrder(ctx context.Context, obj any) (types.DocumentOrderBy, error) {
 	var it types.DocumentOrderBy
 	asMap := map[string]any{}
@@ -37972,6 +38166,33 @@ func (ec *executionContext) unmarshalInputInviteUserInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputMeasureFilter(ctx context.Context, obj any) (types.MeasureFilter, error) {
+	var it types.MeasureFilter
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"query"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "query":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Query = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputMeasureOrder(ctx context.Context, obj any) (types.MeasureOrderBy, error) {
 	var it types.MeasureOrderBy
 	asMap := map[string]any{}
@@ -38218,6 +38439,33 @@ func (ec *executionContext) unmarshalInputRequestSignatureInput(ctx context.Cont
 				return it, err
 			}
 			it.SignatoryID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputRiskFilter(ctx context.Context, obj any) (types.RiskFilter, error) {
+	var it types.RiskFilter
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"query"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "query":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Query = data
 		}
 	}
 
@@ -52473,6 +52721,14 @@ func (ec *executionContext) unmarshalODatumOrder2ᚖgithubᚗcomᚋgetproboᚋpr
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalODocumentFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDocumentFilter(ctx context.Context, v any) (*types.DocumentFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputDocumentFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalODocumentOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDocumentOrderBy(ctx context.Context, v any) (*types.DocumentOrderBy, error) {
 	if v == nil {
 		return nil, nil
@@ -52680,6 +52936,14 @@ func (ec *executionContext) marshalOMeasure2ᚖgithubᚗcomᚋgetproboᚋprobo�
 	return ec._Measure(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOMeasureFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasureFilter(ctx context.Context, v any) (*types.MeasureFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMeasureFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOMeasureOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐMeasureOrderBy(ctx context.Context, v any) (*types.MeasureOrderBy, error) {
 	if v == nil {
 		return nil, nil
@@ -52774,6 +53038,14 @@ func (ec *executionContext) unmarshalOPeopleOrder2ᚖgithubᚗcomᚋgetproboᚋp
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputPeopleOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalORiskFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRiskFilter(ctx context.Context, v any) (*types.RiskFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputRiskFilter(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
