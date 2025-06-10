@@ -58,6 +58,7 @@ type ResolverRoot interface {
 	MeasureConnection() MeasureConnectionResolver
 	Mutation() MutationResolver
 	Organization() OrganizationResolver
+	PeopleConnection() PeopleConnectionResolver
 	Query() QueryResolver
 	Risk() RiskResolver
 	RiskConnection() RiskConnectionResolver
@@ -605,8 +606,9 @@ type ComplexityRoot struct {
 	}
 
 	PeopleConnection struct {
-		Edges    func(childComplexity int) int
-		PageInfo func(childComplexity int) int
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	PeopleEdge struct {
@@ -1025,6 +1027,9 @@ type OrganizationResolver interface {
 	Tasks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
 	Assets(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrder) (*types.AssetConnection, error)
 	Data(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrder) (*types.DatumConnection, error)
+}
+type PeopleConnectionResolver interface {
+	TotalCount(ctx context.Context, obj *types.PeopleConnection) (int, error)
 }
 type QueryResolver interface {
 	Node(ctx context.Context, id gid.GID) (types.Node, error)
@@ -3588,6 +3593,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.PeopleConnection.PageInfo(childComplexity), true
 
+	case "PeopleConnection.totalCount":
+		if e.complexity.PeopleConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.PeopleConnection.TotalCount(childComplexity), true
+
 	case "PeopleEdge.cursor":
 		if e.complexity.PeopleEdge.Cursor == nil {
 			break
@@ -5863,7 +5875,11 @@ type UserEdge {
   node: User!
 }
 
-type PeopleConnection {
+type PeopleConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.PeopleConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [PeopleEdge!]!
   pageInfo: PageInfo!
 }
@@ -25844,6 +25860,8 @@ func (ec *executionContext) fieldContext_Organization_peoples(ctx context.Contex
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_PeopleConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_PeopleConnection_edges(ctx, field)
 			case "pageInfo":
@@ -27157,6 +27175,50 @@ func (ec *executionContext) fieldContext_People_updatedAt(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _PeopleConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *types.PeopleConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PeopleConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.PeopleConnection().TotalCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PeopleConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PeopleConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _PeopleConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.PeopleConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_PeopleConnection_edges(ctx, field)
 	if err != nil {
@@ -27233,9 +27295,9 @@ func (ec *executionContext) _PeopleConnection_pageInfo(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.PageInfo)
+	res := resTmp.(types.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PeopleConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -46166,15 +46228,51 @@ func (ec *executionContext) _PeopleConnection(ctx context.Context, sel ast.Selec
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PeopleConnection")
+		case "totalCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._PeopleConnection_totalCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "edges":
 			out.Values[i] = ec._PeopleConnection_edges(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "pageInfo":
 			out.Values[i] = ec._PeopleConnection_pageInfo(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

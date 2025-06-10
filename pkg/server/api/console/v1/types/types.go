@@ -792,11 +792,6 @@ type People struct {
 func (People) IsNode()             {}
 func (this People) GetID() gid.GID { return this.ID }
 
-type PeopleConnection struct {
-	Edges    []*PeopleEdge `json:"edges"`
-	PageInfo *PageInfo     `json:"pageInfo"`
-}
-
 type PeopleEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *People        `json:"node"`

@@ -1070,7 +1070,11 @@ type UserEdge {
   node: User!
 }
 
-type PeopleConnection {
+type PeopleConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.PeopleConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [PeopleEdge!]!
   pageInfo: PageInfo!
 }

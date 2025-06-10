@@ -16,14 +16,28 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
 
 type (
 	PeopleOrderBy OrderBy[coredata.PeopleOrderField]
+
+	PeopleConnection struct {
+		TotalCount int
+		Edges      []*PeopleEdge
+		PageInfo   PageInfo
+
+		Resolver any
+		ParentID gid.GID
+	}
 )
 
-func NewPeopleConnection(p *page.Page[*coredata.People, coredata.PeopleOrderField]) *PeopleConnection {
+func NewPeopleConnection(
+	p *page.Page[*coredata.People, coredata.PeopleOrderField],
+	parentType any,
+	parentID gid.GID,
+) *PeopleConnection {
 	var edges = make([]*PeopleEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +46,10 @@ func NewPeopleConnection(p *page.Page[*coredata.People, coredata.PeopleOrderFiel
 
 	return &PeopleConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(p),
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: parentType,
+		ParentID: parentID,
 	}
 }
 

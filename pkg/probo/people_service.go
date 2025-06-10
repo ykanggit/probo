@@ -95,6 +95,32 @@ func (s PeopleService) GetByUserID(
 	return people, nil
 }
 
+func (s PeopleService) CountForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			peoples := coredata.Peoples{}
+			count, err = peoples.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID)
+			if err != nil {
+				return fmt.Errorf("cannot count peoples: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s PeopleService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,

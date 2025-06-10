@@ -293,6 +293,38 @@ DELETE FROM peoples WHERE %s AND id = @people_id
 	return err
 }
 
+func (p *Peoples) CountByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+) (int, error) {
+	q := `
+SELECT
+    COUNT(id)
+FROM
+    peoples
+WHERE
+    %s
+    AND organization_id = @organization_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("cannot count people: %w", err)
+	}
+
+	return count, nil
+}
+
 func (p *Peoples) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,

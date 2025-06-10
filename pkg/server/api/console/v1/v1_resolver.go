@@ -2200,7 +2200,7 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 		panic(fmt.Errorf("cannot list organization peoples: %w", err))
 	}
 
-	return types.NewPeopleConnection(page), nil
+	return types.NewPeopleConnection(page, r, obj.ID), nil
 }
 
 // Documents is the resolver for the documents field.
@@ -2366,6 +2366,22 @@ func (r *organizationResolver) Data(ctx context.Context, obj *types.Organization
 	}
 
 	return types.NewDataConnection(page), nil
+}
+
+// TotalCount is the resolver for the totalCount field.
+func (r *peopleConnectionResolver) TotalCount(ctx context.Context, obj *types.PeopleConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := svc.Peoples.CountForOrganizationID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count peoples: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 }
 
 // Node is the resolver for the node field.
@@ -3027,6 +3043,11 @@ func (r *Resolver) Mutation() schema.MutationResolver { return &mutationResolver
 // Organization returns schema.OrganizationResolver implementation.
 func (r *Resolver) Organization() schema.OrganizationResolver { return &organizationResolver{r} }
 
+// PeopleConnection returns schema.PeopleConnectionResolver implementation.
+func (r *Resolver) PeopleConnection() schema.PeopleConnectionResolver {
+	return &peopleConnectionResolver{r}
+}
+
 // Query returns schema.QueryResolver implementation.
 func (r *Resolver) Query() schema.QueryResolver { return &queryResolver{r} }
 
@@ -3082,6 +3103,7 @@ type measureResolver struct{ *Resolver }
 type measureConnectionResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
+type peopleConnectionResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type riskResolver struct{ *Resolver }
 type riskConnectionResolver struct{ *Resolver }
