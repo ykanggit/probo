@@ -118,6 +118,7 @@ WITH ctrl AS (
 		c.description,
 		c.created_at,
 		c.updated_at
+		c.search_vector
 	FROM
 		controls c
 	INNER JOIN
@@ -221,7 +222,8 @@ WITH ctrl AS (
 		c.name,
 		c.description,
 		c.created_at,
-		c.updated_at
+		c.updated_at,
+		c.search_vector
 	FROM
 		controls c
 	INNER JOIN
@@ -331,7 +333,8 @@ WITH ctrl AS (
 		c.name,
 		c.description,
 		c.created_at,
-		c.updated_at
+		c.updated_at,
+		c.search_vector
 	FROM
 		controls c
 	LEFT JOIN
@@ -472,14 +475,7 @@ func (c *Controls) CountByOrganizationID(
 	q := `
 WITH ctrl AS (
 	SELECT
-		c.id,
-		c.section_title,
-		c.framework_id,
-		c.tenant_id,
-		c.name,
-		c.description,
-		c.created_at,
-		c.updated_at
+		c.id
 	FROM
 		controls c
 	INNER JOIN
@@ -527,7 +523,8 @@ WITH ctrl AS (
 		c.name,
 		c.description,
 		c.created_at,
-		c.updated_at
+		c.updated_at,
+		c.search_vector
 	FROM
 		controls c
 	INNER JOIN
