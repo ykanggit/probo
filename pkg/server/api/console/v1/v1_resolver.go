@@ -164,7 +164,7 @@ func (r *controlResolver) Documents(ctx context.Context, obj *types.Control, fir
 		return nil, fmt.Errorf("cannot list documents: %w", err)
 	}
 
-	return types.NewDocumentConnection(page), nil
+	return types.NewDocumentConnection(page, r, obj.ID, documentFilter), nil
 }
 
 // TotalCount is the resolver for the totalCount field.
@@ -349,6 +349,34 @@ func (r *documentResolver) Controls(ctx context.Context, obj *types.Document, fi
 	}
 
 	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
+}
+
+// TotalCount is the resolver for the totalCount field.
+func (r *documentConnectionResolver) TotalCount(ctx context.Context, obj *types.DocumentConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *controlResolver:
+		count, err := svc.Documents.CountForControlID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count controls: %w", err)
+		}
+		return count, nil
+	case *organizationResolver:
+		count, err := svc.Documents.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count documents: %w", err)
+		}
+		return count, nil
+	case *riskResolver:
+		count, err := svc.Documents.CountForRiskID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count risks: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 }
 
 // Document is the resolver for the document field.
@@ -2180,7 +2208,7 @@ func (r *organizationResolver) Documents(ctx context.Context, obj *types.Organiz
 		panic(fmt.Errorf("cannot list organization documents: %w", err))
 	}
 
-	return types.NewDocumentConnection(page), nil
+	return types.NewDocumentConnection(page, r, obj.ID, documentFilter), nil
 }
 
 // Measures is the resolver for the measures field.
@@ -2533,7 +2561,7 @@ func (r *riskResolver) Documents(ctx context.Context, obj *types.Risk, first *in
 		panic(fmt.Errorf("cannot list risk documents: %w", err))
 	}
 
-	return types.NewDocumentConnection(page), nil
+	return types.NewDocumentConnection(page, r, obj.ID, documentFilter), nil
 }
 
 // Controls is the resolver for the controls field.
@@ -2882,6 +2910,11 @@ func (r *Resolver) Datum() schema.DatumResolver { return &datumResolver{r} }
 // Document returns schema.DocumentResolver implementation.
 func (r *Resolver) Document() schema.DocumentResolver { return &documentResolver{r} }
 
+// DocumentConnection returns schema.DocumentConnectionResolver implementation.
+func (r *Resolver) DocumentConnection() schema.DocumentConnectionResolver {
+	return &documentConnectionResolver{r}
+}
+
 // DocumentVersion returns schema.DocumentVersionResolver implementation.
 func (r *Resolver) DocumentVersion() schema.DocumentVersionResolver {
 	return &documentVersionResolver{r}
@@ -2953,6 +2986,7 @@ type controlResolver struct{ *Resolver }
 type controlConnectionResolver struct{ *Resolver }
 type datumResolver struct{ *Resolver }
 type documentResolver struct{ *Resolver }
+type documentConnectionResolver struct{ *Resolver }
 type documentVersionResolver struct{ *Resolver }
 type documentVersionSignatureResolver struct{ *Resolver }
 type evidenceResolver struct{ *Resolver }

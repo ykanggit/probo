@@ -16,22 +16,43 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
 
 type (
 	DocumentOrderBy OrderBy[coredata.DocumentOrderField]
+
+	DocumentConnection struct {
+		TotalCount int
+		Edges      []*DocumentEdge
+		PageInfo   PageInfo
+
+		Resolver any
+		ParentID gid.GID
+		Filters  *coredata.DocumentFilter
+	}
 )
 
-func NewDocumentConnection(page *page.Page[*coredata.Document, coredata.DocumentOrderField]) *DocumentConnection {
-	edges := make([]*DocumentEdge, len(page.Data))
-	for i, document := range page.Data {
-		edges[i] = NewDocumentEdge(document, page.Cursor.OrderBy.Field)
+func NewDocumentConnection(
+	p *page.Page[*coredata.Document, coredata.DocumentOrderField],
+	parentType any,
+	parentID gid.GID,
+	filters *coredata.DocumentFilter,
+) *DocumentConnection {
+	var edges = make([]*DocumentEdge, len(p.Data))
+
+	for i := range edges {
+		edges[i] = NewDocumentEdge(p.Data[i], p.Cursor.OrderBy.Field)
 	}
 
 	return &DocumentConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(page),
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: parentType,
+		ParentID: parentID,
+		Filters:  filters,
 	}
 }
 

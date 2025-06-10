@@ -96,6 +96,39 @@ LIMIT 1;
 	return nil
 }
 
+func (p *Documents) CountByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+	filter *DocumentFilter,
+) (int, error) {
+	q := `
+SELECT
+	COUNT(id)
+FROM
+    documents
+WHERE
+    %s
+    AND organization_id = @organization_id
+    AND %s
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
+
 func (p *Documents) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -246,6 +279,47 @@ WHERE %s
 	return nil
 }
 
+func (p *Documents) CountByControlID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	controlID gid.GID,
+	filter *DocumentFilter,
+) (int, error) {
+	q := `
+WITH plcs AS (
+	SELECT
+		p.id
+	FROM
+		documents p
+	INNER JOIN
+		controls_documents cp ON p.id = cp.document_id
+	WHERE
+		cp.control_id = @control_id
+)
+SELECT
+	COUNT(id)
+FROM
+	plcs
+WHERE %s
+	AND %s
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"control_id": controlID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
+
 func (p *Documents) LoadByControlID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -308,6 +382,47 @@ WHERE %s
 	*p = documents
 
 	return nil
+}
+
+func (p *Documents) CountByRiskID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	riskID gid.GID,
+	filter *DocumentFilter,
+) (int, error) {
+	q := `
+WITH plcs AS (
+	SELECT
+		p.id
+	FROM
+		documents p
+	INNER JOIN
+		risks_documents rp ON p.id = rp.document_id
+	WHERE
+		rp.risk_id = @risk_id
+)
+SELECT
+	COUNT(id)
+FROM
+	plcs
+WHERE %s
+	AND %s
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"risk_id": riskID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
 }
 
 func (p *Documents) LoadByRiskID(

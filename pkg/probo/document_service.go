@@ -656,6 +656,33 @@ func (s *DocumentService) GetVersion(
 	return documentVersion, nil
 }
 
+func (s *DocumentService) CountForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+	filter *coredata.DocumentFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			documents := &coredata.Documents{}
+			count, err = documents.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count documents: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count documents: %w", err)
+	}
+
+	return count, nil
+}
+
 func (s *DocumentService) ListByOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
@@ -685,6 +712,33 @@ func (s *DocumentService) ListByOrganizationID(
 	return page.NewPage(documents, cursor), nil
 }
 
+func (s *DocumentService) CountForControlID(
+	ctx context.Context,
+	controlID gid.GID,
+	filter *coredata.DocumentFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			documents := &coredata.Documents{}
+			count, err = documents.CountByControlID(ctx, conn, s.svc.scope, controlID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count documents: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count documents: %w", err)
+	}
+
+	return count, nil
+}
+
 func (s *DocumentService) ListForControlID(
 	ctx context.Context,
 	controlID gid.GID,
@@ -705,6 +759,33 @@ func (s *DocumentService) ListForControlID(
 	}
 
 	return page.NewPage(documents, cursor), nil
+}
+
+func (s *DocumentService) CountForRiskID(
+	ctx context.Context,
+	riskID gid.GID,
+	filter *coredata.DocumentFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			documents := &coredata.Documents{}
+			count, err = documents.CountByRiskID(ctx, conn, s.svc.scope, riskID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count documents: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count documents: %w", err)
+	}
+
+	return count, nil
 }
 
 func (s *DocumentService) ListForRiskID(

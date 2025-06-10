@@ -1152,7 +1152,11 @@ type EvidenceEdge {
   node: Evidence!
 }
 
-type DocumentConnection {
+type DocumentConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.DocumentConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [DocumentEdge!]!
   pageInfo: PageInfo!
 }

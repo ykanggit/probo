@@ -47,6 +47,7 @@ type ResolverRoot interface {
 	ControlConnection() ControlConnectionResolver
 	Datum() DatumResolver
 	Document() DocumentResolver
+	DocumentConnection() DocumentConnectionResolver
 	DocumentVersion() DocumentVersionResolver
 	DocumentVersionSignature() DocumentVersionSignatureResolver
 	Evidence() EvidenceResolver
@@ -329,8 +330,9 @@ type ComplexityRoot struct {
 	}
 
 	DocumentConnection struct {
-		Edges    func(childComplexity int) int
-		PageInfo func(childComplexity int) int
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	DocumentEdge struct {
@@ -895,6 +897,9 @@ type DocumentResolver interface {
 	Organization(ctx context.Context, obj *types.Document) (*types.Organization, error)
 	Versions(ctx context.Context, obj *types.Document, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentVersionOrderBy, filter *types.DocumentVersionFilter) (*types.DocumentVersionConnection, error)
 	Controls(ctx context.Context, obj *types.Document, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error)
+}
+type DocumentConnectionResolver interface {
+	TotalCount(ctx context.Context, obj *types.DocumentConnection) (int, error)
 }
 type DocumentVersionResolver interface {
 	Document(ctx context.Context, obj *types.DocumentVersion) (*types.Document, error)
@@ -1867,6 +1872,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.DocumentConnection.PageInfo(childComplexity), true
+
+	case "DocumentConnection.totalCount":
+		if e.complexity.DocumentConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.DocumentConnection.TotalCount(childComplexity), true
 
 	case "DocumentEdge.cursor":
 		if e.complexity.DocumentEdge.Cursor == nil {
@@ -5897,7 +5909,11 @@ type EvidenceEdge {
   node: Evidence!
 }
 
-type DocumentConnection {
+type DocumentConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.DocumentConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [DocumentEdge!]!
   pageInfo: PageInfo!
 }
@@ -13548,6 +13564,8 @@ func (ec *executionContext) fieldContext_Control_documents(ctx context.Context, 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_DocumentConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_DocumentConnection_edges(ctx, field)
 			case "pageInfo":
@@ -17156,6 +17174,50 @@ func (ec *executionContext) fieldContext_Document_updatedAt(_ context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _DocumentConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *types.DocumentConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DocumentConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DocumentConnection().TotalCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DocumentConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DocumentConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DocumentConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.DocumentConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DocumentConnection_edges(ctx, field)
 	if err != nil {
@@ -17232,9 +17294,9 @@ func (ec *executionContext) _DocumentConnection_pageInfo(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.PageInfo)
+	res := resTmp.(types.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_DocumentConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -25741,6 +25803,8 @@ func (ec *executionContext) fieldContext_Organization_documents(ctx context.Cont
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_DocumentConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_DocumentConnection_edges(ctx, field)
 			case "pageInfo":
@@ -28498,6 +28562,8 @@ func (ec *executionContext) fieldContext_Risk_documents(ctx context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_DocumentConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_DocumentConnection_edges(ctx, field)
 			case "pageInfo":
@@ -42874,15 +42940,51 @@ func (ec *executionContext) _DocumentConnection(ctx context.Context, sel ast.Sel
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DocumentConnection")
+		case "totalCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DocumentConnection_totalCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "edges":
 			out.Values[i] = ec._DocumentConnection_edges(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "pageInfo":
 			out.Values[i] = ec._DocumentConnection_pageInfo(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

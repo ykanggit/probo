@@ -533,11 +533,6 @@ type Document struct {
 func (Document) IsNode()             {}
 func (this Document) GetID() gid.GID { return this.ID }
 
-type DocumentConnection struct {
-	Edges    []*DocumentEdge `json:"edges"`
-	PageInfo *PageInfo       `json:"pageInfo"`
-}
-
 type DocumentEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Document      `json:"node"`
