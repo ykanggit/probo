@@ -48,8 +48,8 @@ type UpdateDatumRequest struct {
 func (s DatumService) Get(
 	ctx context.Context,
 	datumID gid.GID,
-) (*coredata.Data, error) {
-	datum := &coredata.Data{}
+) (*coredata.Datum, error) {
+	datum := &coredata.Datum{}
 
 	err := s.svc.pg.WithConn(
 		ctx,
@@ -68,8 +68,8 @@ func (s DatumService) Get(
 func (s DatumService) GetByOwnerID(
 	ctx context.Context,
 	ownerID gid.GID,
-) (*coredata.Data, error) {
-	datum := &coredata.Data{OwnerID: ownerID}
+) (*coredata.Datum, error) {
+	datum := &coredata.Datum{OwnerID: ownerID}
 
 	err := s.svc.pg.WithConn(
 		ctx,
@@ -94,7 +94,7 @@ func (s DatumService) CountForOrganizationID(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) (err error) {
-			data := coredata.DataList{}
+			data := coredata.Data{}
 			count, err = data.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID)
 			if err != nil {
 				return fmt.Errorf("cannot count data: %w", err)
@@ -115,8 +115,8 @@ func (s DatumService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
 	cursor *page.Cursor[coredata.DatumOrderField],
-) (*page.Page[*coredata.Data, coredata.DatumOrderField], error) {
-	var data coredata.DataList
+) (*page.Page[*coredata.Datum, coredata.DatumOrderField], error) {
+	var data coredata.Data
 
 	err := s.svc.pg.WithConn(
 		ctx,
@@ -141,17 +141,17 @@ func (s DatumService) ListForOrganizationID(
 func (s DatumService) Update(
 	ctx context.Context,
 	req UpdateDatumRequest,
-) (*coredata.Data, error) {
+) (*coredata.Datum, error) {
 	now := time.Now()
 
-	existing := &coredata.Data{}
+	existing := &coredata.Datum{}
 	if err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
 		return existing.LoadByID(ctx, conn, s.svc.scope, req.ID)
 	}); err != nil {
 		return nil, fmt.Errorf("cannot load data: %w", err)
 	}
 
-	datum := &coredata.Data{
+	datum := &coredata.Datum{
 		ID:                 req.ID,
 		OrganizationID:     existing.OrganizationID,
 		Name:               existing.Name,
@@ -182,11 +182,11 @@ func (s DatumService) Update(
 func (s DatumService) Create(
 	ctx context.Context,
 	req CreateDatumRequest,
-) (*coredata.Data, error) {
+) (*coredata.Datum, error) {
 	now := time.Now()
 	datumID := gid.New(s.svc.scope.GetTenantID(), coredata.DatumEntityType)
 
-	datum := &coredata.Data{
+	datum := &coredata.Datum{
 		ID:                 datumID,
 		OrganizationID:     req.OrganizationID,
 		Name:               req.Name,
@@ -214,7 +214,7 @@ func (s DatumService) Delete(
 	ctx context.Context,
 	datumID gid.GID,
 ) error {
-	datum := &coredata.Data{ID: datumID}
+	datum := &coredata.Datum{ID: datumID}
 
 	return s.svc.pg.WithConn(
 		ctx,

@@ -27,7 +27,7 @@ import (
 )
 
 type (
-	Data struct {
+	Datum struct {
 		ID                 gid.GID            `db:"id"`
 		Name               string             `db:"name"`
 		OrganizationID     gid.GID            `db:"organization_id"`
@@ -37,10 +37,10 @@ type (
 		UpdatedAt          time.Time          `db:"updated_at"`
 	}
 
-	DataList []*Data
+	Data []*Datum
 )
 
-func (d *Data) CursorKey(field DatumOrderField) page.CursorKey {
+func (d *Datum) CursorKey(field DatumOrderField) page.CursorKey {
 	switch field {
 	case DatumOrderFieldCreatedAt:
 		return page.NewCursorKey(d.ID, d.CreatedAt)
@@ -53,7 +53,7 @@ func (d *Data) CursorKey(field DatumOrderField) page.CursorKey {
 	panic(fmt.Sprintf("unsupported order by: %s", field))
 }
 
-func (d *Data) LoadByID(
+func (d *Datum) LoadByID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -86,17 +86,17 @@ LIMIT 1;
 		return fmt.Errorf("cannot query data: %w", err)
 	}
 
-	data, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Data])
+	datum, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Datum])
 	if err != nil {
 		return fmt.Errorf("cannot collect data: %w", err)
 	}
 
-	*d = data
+	*d = datum
 
 	return nil
 }
 
-func (d *Data) LoadByOwnerID(
+func (d *Datum) LoadByOwnerID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -128,7 +128,7 @@ LIMIT 1;
 		return fmt.Errorf("cannot query data: %w", err)
 	}
 
-	data, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Data])
+	data, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Datum])
 	if err != nil {
 		return fmt.Errorf("cannot collect data: %w", err)
 	}
@@ -138,7 +138,7 @@ LIMIT 1;
 	return nil
 }
 
-func (dl *DataList) CountByOrganizationID(
+func (d *Data) CountByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -170,7 +170,7 @@ WHERE
 	return count, nil
 }
 
-func (dl *DataList) LoadByOrganizationID(
+func (d *Data) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -205,17 +205,17 @@ WHERE
 		return fmt.Errorf("cannot query data: %w", err)
 	}
 
-	data, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Data])
+	data, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Datum])
 	if err != nil {
 		return fmt.Errorf("cannot collect data: %w", err)
 	}
 
-	*dl = data
+	*d = data
 
 	return nil
 }
 
-func (d *Data) Insert(
+func (d *Datum) Insert(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -261,7 +261,7 @@ INSERT INTO data (
 	return nil
 }
 
-func (d *Data) Update(
+func (d *Datum) Update(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -302,17 +302,17 @@ RETURNING
 		return fmt.Errorf("cannot update data: %w", err)
 	}
 
-	data, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Data])
+	datum, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Datum])
 	if err != nil {
 		return fmt.Errorf("cannot collect updated data: %w", err)
 	}
 
-	*d = data
+	*d = datum
 
 	return nil
 }
 
-func (d *Data) Delete(
+func (d *Datum) Delete(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -338,12 +338,12 @@ WHERE
 }
 
 type DataVendor struct {
-	DataID    gid.GID   `db:"data_id"`
+	DatumID   gid.GID   `db:"datum_id"`
 	VendorID  gid.GID   `db:"vendor_id"`
 	CreatedAt time.Time `db:"created_at"`
 }
 
-func (d *Data) CreateWithVendors(
+func (d *Datum) CreateWithVendors(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
@@ -369,14 +369,14 @@ func (d *Data) CreateWithVendors(
 	return nil
 }
 
-func (d *Data) UpdateWithVendors(
+func (d *Datum) UpdateWithVendors(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
 	vendorIDs []gid.GID,
 	now time.Time,
 ) error {
-	existing := &Data{}
+	existing := &Datum{}
 	if err := existing.LoadByID(ctx, conn, scope, d.ID); err != nil {
 		return fmt.Errorf("cannot load data: %w", err)
 	}
@@ -411,8 +411,7 @@ func (d *Data) UpdateWithVendors(
 	return nil
 }
 
-// UpdateWithVendorsTx updates a data entry and its vendor relationships in a single transaction
-func (d *Data) UpdateWithVendorsTx(
+func (d *Datum) UpdateWithVendorsTx(
 	ctx context.Context,
 	db *pg.Client,
 	scope Scoper,

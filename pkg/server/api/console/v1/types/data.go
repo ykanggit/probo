@@ -34,13 +34,13 @@ type (
 )
 
 func NewDataConnection(
-	p *page.Page[*coredata.Data, coredata.DatumOrderField],
+	p *page.Page[*coredata.Datum, coredata.DatumOrderField],
 	parentType any,
 	parentID gid.GID,
 ) *DatumConnection {
 	edges := make([]*DatumEdge, len(p.Data))
-	for i, data := range p.Data {
-		edges[i] = NewDatumEdge(data, p.Cursor.OrderBy.Field)
+	for i, datum := range p.Data {
+		edges[i] = NewDatumEdge(datum, p.Cursor.OrderBy.Field)
 	}
 
 	return &DatumConnection{
@@ -52,7 +52,7 @@ func NewDataConnection(
 	}
 }
 
-func NewDatum(d *coredata.Data) *Datum {
+func NewDatum(d *coredata.Datum) *Datum {
 	return &Datum{
 		ID:                 d.ID,
 		Name:               d.Name,
@@ -63,7 +63,7 @@ func NewDatum(d *coredata.Data) *Datum {
 	}
 }
 
-func NewDatumEdge(d *coredata.Data, orderField coredata.DatumOrderField) *DatumEdge {
+func NewDatumEdge(d *coredata.Datum, orderField coredata.DatumOrderField) *DatumEdge {
 	return &DatumEdge{
 		Node:   NewDatum(d),
 		Cursor: d.CursorKey(orderField),
