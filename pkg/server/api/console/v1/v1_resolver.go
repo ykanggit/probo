@@ -565,6 +565,28 @@ func (r *evidenceResolver) Measure(ctx context.Context, obj *types.Evidence) (*t
 	return types.NewMeasure(measure), nil
 }
 
+// TotalCount is the resolver for the totalCount field.
+func (r *evidenceConnectionResolver) TotalCount(ctx context.Context, obj *types.EvidenceConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *measureResolver:
+		count, err := svc.Evidences.CountForMeasureID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count tasks: %w", err)
+		}
+		return count, nil
+	case *taskResolver:
+		count, err := svc.Evidences.CountForTaskID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count tasks: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
 // Organization is the resolver for the organization field.
 func (r *frameworkResolver) Organization(ctx context.Context, obj *types.Framework) (*types.Organization, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -650,7 +672,7 @@ func (r *measureResolver) Evidences(ctx context.Context, obj *types.Measure, fir
 		return nil, fmt.Errorf("cannot list measure evidences: %w", err)
 	}
 
-	return types.NewEvidenceConnection(page), nil
+	return types.NewEvidenceConnection(page, r, obj.ID), nil
 }
 
 // Tasks is the resolver for the tasks field.
@@ -2692,7 +2714,7 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 		panic(fmt.Errorf("failed to list task evidences: %w", err))
 	}
 
-	return types.NewEvidenceConnection(page), nil
+	return types.NewEvidenceConnection(page, r, obj.ID), nil
 }
 
 // TotalCount is the resolver for the totalCount field.
@@ -2950,6 +2972,11 @@ func (r *Resolver) DocumentVersionSignature() schema.DocumentVersionSignatureRes
 // Evidence returns schema.EvidenceResolver implementation.
 func (r *Resolver) Evidence() schema.EvidenceResolver { return &evidenceResolver{r} }
 
+// EvidenceConnection returns schema.EvidenceConnectionResolver implementation.
+func (r *Resolver) EvidenceConnection() schema.EvidenceConnectionResolver {
+	return &evidenceConnectionResolver{r}
+}
+
 // Framework returns schema.FrameworkResolver implementation.
 func (r *Resolver) Framework() schema.FrameworkResolver { return &frameworkResolver{r} }
 
@@ -3015,6 +3042,7 @@ type documentConnectionResolver struct{ *Resolver }
 type documentVersionResolver struct{ *Resolver }
 type documentVersionSignatureResolver struct{ *Resolver }
 type evidenceResolver struct{ *Resolver }
+type evidenceConnectionResolver struct{ *Resolver }
 type frameworkResolver struct{ *Resolver }
 type frameworkConnectionResolver struct{ *Resolver }
 type measureResolver struct{ *Resolver }

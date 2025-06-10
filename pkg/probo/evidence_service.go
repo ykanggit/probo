@@ -441,6 +441,32 @@ func (s EvidenceService) GenerateFileURL(
 	return &presignedReq.URL, nil
 }
 
+func (s EvidenceService) CountForMeasureID(
+	ctx context.Context,
+	measureID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			evidences := coredata.Evidences{}
+			count, err = evidences.CountByMeasureID(ctx, conn, s.svc.scope, measureID)
+			if err != nil {
+				return fmt.Errorf("cannot count evidences: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s EvidenceService) ListForMeasureID(
 	ctx context.Context,
 	measureID gid.GID,
@@ -466,6 +492,32 @@ func (s EvidenceService) ListForMeasureID(
 	}
 
 	return page.NewPage(evidences, cursor), nil
+}
+
+func (s EvidenceService) CountForTaskID(
+	ctx context.Context,
+	taskID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			evidences := coredata.Evidences{}
+			count, err = evidences.CountByTaskID(ctx, conn, s.svc.scope, taskID)
+			if err != nil {
+				return fmt.Errorf("cannot count evidences: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func (s EvidenceService) ListForTaskID(

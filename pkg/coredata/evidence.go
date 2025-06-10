@@ -239,6 +239,38 @@ LIMIT 1;
 	return nil
 }
 
+func (e *Evidences) CountByMeasureID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	measureID gid.GID,
+) (int, error) {
+	q := `
+SELECT
+	COUNT(id)
+FROM
+	evidences
+WHERE
+	%s
+	AND measure_id = @measure_id
+	`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"measure_id": measureID}
+	maps.Copy(args, scope.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("cannot collect evidence: %w", err)
+	}
+
+	return count, nil
+}
+
 func (e *Evidences) LoadByMeasureID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -247,27 +279,27 @@ func (e *Evidences) LoadByMeasureID(
 	cursor *page.Cursor[EvidenceOrderField],
 ) error {
 	q := `
-	SELECT
-		id,
-		measure_id,
-		task_id,
-		reference_id,
-		state,
-		type,
-		object_key,
-		mime_type,
-		size,
-		filename,
-		url,
-		description,
-		created_at,
-		updated_at
-	FROM
-		evidences
-	WHERE
-		%s
-		AND measure_id = @measure_id
-		AND %s
+SELECT
+	id,
+	measure_id,
+	task_id,
+	reference_id,
+	state,
+	type,
+	object_key,
+	mime_type,
+	size,
+	filename,
+	url,
+	description,
+	created_at,
+	updated_at
+FROM
+	evidences
+WHERE
+	%s
+	AND measure_id = @measure_id
+	AND %s
 	`
 
 	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
@@ -289,6 +321,38 @@ func (e *Evidences) LoadByMeasureID(
 	*e = evidences
 
 	return nil
+}
+
+func (e *Evidences) CountByTaskID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	taskID gid.GID,
+) (int, error) {
+	q := `
+SELECT
+    COUNT(id)
+FROM
+    evidences
+WHERE
+    %s
+    AND task_id = @task_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"task_id": taskID}
+	maps.Copy(args, scope.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("cannot collect evidence: %w", err)
+	}
+
+	return count, nil
 }
 
 func (e *Evidences) LoadByTaskID(

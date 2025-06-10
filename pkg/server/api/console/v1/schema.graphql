@@ -1146,7 +1146,11 @@ type TaskEdge {
   node: Task!
 }
 
-type EvidenceConnection {
+type EvidenceConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.EvidenceConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [EvidenceEdge!]!
   pageInfo: PageInfo!
 }

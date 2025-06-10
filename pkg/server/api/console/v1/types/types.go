@@ -624,11 +624,6 @@ type Evidence struct {
 func (Evidence) IsNode()             {}
 func (this Evidence) GetID() gid.GID { return this.ID }
 
-type EvidenceConnection struct {
-	Edges    []*EvidenceEdge `json:"edges"`
-	PageInfo *PageInfo       `json:"pageInfo"`
-}
-
 type EvidenceEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Evidence      `json:"node"`

@@ -16,14 +16,28 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
 
 type (
 	EvidenceOrderBy OrderBy[coredata.EvidenceOrderField]
+
+	EvidenceConnection struct {
+		TotalCount int
+		Edges      []*EvidenceEdge
+		PageInfo   PageInfo
+
+		Resolver any
+		ParentID gid.GID
+	}
 )
 
-func NewEvidenceConnection(p *page.Page[*coredata.Evidence, coredata.EvidenceOrderField]) *EvidenceConnection {
+func NewEvidenceConnection(
+	p *page.Page[*coredata.Evidence, coredata.EvidenceOrderField],
+	parentType any,
+	parentID gid.GID,
+) *EvidenceConnection {
 	var edges = make([]*EvidenceEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +46,10 @@ func NewEvidenceConnection(p *page.Page[*coredata.Evidence, coredata.EvidenceOrd
 
 	return &EvidenceConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(p),
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: parentType,
+		ParentID: parentID,
 	}
 }
 
