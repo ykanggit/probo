@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Add backend fulltext search on controls, documents, risks and measures
+- Add `totalCount` field in `Connection` object
 
 ### Fixed
 - Use new enum for data classification
