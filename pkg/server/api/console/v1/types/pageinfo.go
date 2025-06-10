@@ -15,7 +15,7 @@
 package types
 
 import (
-	"gearno.de/ref"
+	"go.gearno.de/x/ref"
 	"github.com/getprobo/probo/pkg/page"
 )
 

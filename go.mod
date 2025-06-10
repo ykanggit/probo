@@ -6,7 +6,6 @@ go 1.24
 replace github.com/olekukonko/tablewriter => github.com/olekukonko/tablewriter v0.0.5
 
 require (
-	gearno.de/ref v0.0.0-20221013162104-a522beda40f4
 	github.com/99designs/gqlgen v0.17.73
 	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.67
@@ -21,6 +20,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.27
 	go.gearno.de/crypto/uuid v0.1.0
 	go.gearno.de/kit v0.0.0-20250517034137-7943a87a6d2f
+	go.gearno.de/x/ref v0.0.0-20240502200927-d74926fcb14c
 	go.opentelemetry.io/otel v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0
 	golang.org/x/crypto v0.38.0
