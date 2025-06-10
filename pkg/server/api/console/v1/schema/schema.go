@@ -558,7 +558,7 @@ type ComplexityRoot struct {
 	}
 
 	Organization struct {
-		Assets     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrder) int
+		Assets     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrderBy) int
 		Connectors func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ConnectorOrder) int
 		Controls   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) int
 		CreatedAt  func(childComplexity int) int
@@ -1030,7 +1030,7 @@ type OrganizationResolver interface {
 	Measures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error)
 	Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) (*types.RiskConnection, error)
 	Tasks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
-	Assets(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrder) (*types.AssetConnection, error)
+	Assets(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrderBy) (*types.AssetConnection, error)
 	Data(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrderBy) (*types.DatumConnection, error)
 }
 type PeopleConnectionResolver interface {
@@ -3296,7 +3296,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Organization.Assets(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.AssetOrder)), true
+		return e.complexity.Organization.Assets(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.AssetOrderBy)), true
 
 	case "Organization.connectors":
 		if e.complexity.Organization.Connectors == nil {
@@ -6980,7 +6980,10 @@ type AssetEdge {
   node: Asset!
 }
 
-input AssetOrder {
+input AssetOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.AssetOrderBy"
+  ) {
   direction: OrderDirection!
   field: AssetOrderField!
 }
@@ -9887,13 +9890,13 @@ func (ec *executionContext) field_Organization_assets_argsBefore(
 func (ec *executionContext) field_Organization_assets_argsOrderBy(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*types.AssetOrder, error) {
+) (*types.AssetOrderBy, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
 	if tmp, ok := rawArgs["orderBy"]; ok {
-		return ec.unmarshalOAssetOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssetOrder(ctx, tmp)
+		return ec.unmarshalOAssetOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssetOrderBy(ctx, tmp)
 	}
 
-	var zeroVal *types.AssetOrder
+	var zeroVal *types.AssetOrderBy
 	return zeroVal, nil
 }
 
@@ -26213,7 +26216,7 @@ func (ec *executionContext) _Organization_assets(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Assets(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.AssetOrder))
+		return ec.resolvers.Organization().Assets(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.AssetOrderBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -36768,8 +36771,8 @@ func (ec *executionContext) unmarshalInputAssessVendorInput(ctx context.Context,
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputAssetOrder(ctx context.Context, obj any) (types.AssetOrder, error) {
-	var it types.AssetOrder
+func (ec *executionContext) unmarshalInputAssetOrder(ctx context.Context, obj any) (types.AssetOrderBy, error) {
+	var it types.AssetOrderBy
 	asMap := map[string]any{}
 	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
@@ -53640,7 +53643,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) unmarshalOAssetOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssetOrder(ctx context.Context, v any) (*types.AssetOrder, error) {
+func (ec *executionContext) unmarshalOAssetOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAssetOrderBy(ctx context.Context, v any) (*types.AssetOrderBy, error) {
 	if v == nil {
 		return nil, nil
 	}

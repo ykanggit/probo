@@ -52,11 +52,6 @@ type AssetEdge struct {
 	Node   *Asset         `json:"node"`
 }
 
-type AssetOrder struct {
-	Direction page.OrderDirection      `json:"direction"`
-	Field     coredata.AssetOrderField `json:"field"`
-}
-
 type AssignTaskInput struct {
 	TaskID       gid.GID `json:"taskId"`
 	AssignedToID gid.GID `json:"assignedToId"`

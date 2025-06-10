@@ -2335,7 +2335,7 @@ func (r *organizationResolver) Tasks(ctx context.Context, obj *types.Organizatio
 }
 
 // Assets is the resolver for the assets field.
-func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrder) (*types.AssetConnection, error) {
+func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrderBy) (*types.AssetConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.AssetOrderField]{
