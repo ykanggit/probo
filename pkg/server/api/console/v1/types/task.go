@@ -16,14 +16,28 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
 
 type (
 	TaskOrderBy OrderBy[coredata.TaskOrderField]
+
+	TaskConnection struct {
+		TotalCount int
+		Edges      []*TaskEdge
+		PageInfo   PageInfo
+
+		Resolver any
+		ParentID gid.GID
+	}
 )
 
-func NewTaskConnection(p *page.Page[*coredata.Task, coredata.TaskOrderField]) *TaskConnection {
+func NewTaskConnection(
+	p *page.Page[*coredata.Task, coredata.TaskOrderField],
+	parentType any,
+	parentID gid.GID,
+) *TaskConnection {
 	var edges = make([]*TaskEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +46,10 @@ func NewTaskConnection(p *page.Page[*coredata.Task, coredata.TaskOrderField]) *T
 
 	return &TaskConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(p),
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: parentType,
+		ParentID: parentID,
 	}
 }
 

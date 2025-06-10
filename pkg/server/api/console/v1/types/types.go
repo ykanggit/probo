@@ -914,11 +914,6 @@ type Task struct {
 func (Task) IsNode()             {}
 func (this Task) GetID() gid.GID { return this.ID }
 
-type TaskConnection struct {
-	Edges    []*TaskEdge `json:"edges"`
-	PageInfo *PageInfo   `json:"pageInfo"`
-}
-
 type TaskEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Task          `json:"node"`

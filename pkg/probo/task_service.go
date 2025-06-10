@@ -245,6 +245,31 @@ func (s TaskService) Delete(
 	return nil
 }
 
+func (s TaskService) CountForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			tasks := coredata.Tasks{}
+			count, err = tasks.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID)
+			if err != nil {
+				return fmt.Errorf("cannot count tasks: %w", err)
+			}
+
+			return nil
+		},
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s TaskService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
@@ -263,6 +288,31 @@ func (s TaskService) ListForOrganizationID(
 	}
 
 	return page.NewPage(tasks, cursor), nil
+}
+
+func (s TaskService) CountForMeasureID(
+	ctx context.Context,
+	measureID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			tasks := coredata.Tasks{}
+			count, err = tasks.CountByMeasureID(ctx, conn, s.svc.scope, measureID)
+			if err != nil {
+				return fmt.Errorf("cannot count tasks: %w", err)
+			}
+
+			return nil
+		},
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func (s TaskService) ListForMeasureID(

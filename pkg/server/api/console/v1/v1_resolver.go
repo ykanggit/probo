@@ -675,7 +675,7 @@ func (r *measureResolver) Tasks(ctx context.Context, obj *types.Measure, first *
 		return nil, fmt.Errorf("cannot list measure tasks: %w", err)
 	}
 
-	return types.NewTaskConnection(page), nil
+	return types.NewTaskConnection(page, r, obj.ID), nil
 }
 
 // Risks is the resolver for the risks field.
@@ -2293,7 +2293,7 @@ func (r *organizationResolver) Tasks(ctx context.Context, obj *types.Organizatio
 		panic(fmt.Errorf("cannot list organization tasks: %w", err))
 	}
 
-	return types.NewTaskConnection(page), nil
+	return types.NewTaskConnection(page, r, obj.ID), nil
 }
 
 // Assets is the resolver for the assets field.
@@ -2695,6 +2695,28 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 	return types.NewEvidenceConnection(page), nil
 }
 
+// TotalCount is the resolver for the totalCount field.
+func (r *taskConnectionResolver) TotalCount(ctx context.Context, obj *types.TaskConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *measureResolver:
+		count, err := svc.Tasks.CountForMeasureID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count tasks: %w", err)
+		}
+		return count, nil
+	case *organizationResolver:
+		count, err := svc.Tasks.CountForOrganizationID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count tasks: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
 // People is the resolver for the people field.
 func (r *userResolver) People(ctx context.Context, obj *types.User, organizationID gid.GID) (*types.People, error) {
 	svc := GetTenantService(ctx, r.proboSvc, organizationID.TenantID())
@@ -2962,6 +2984,9 @@ func (r *Resolver) RiskConnection() schema.RiskConnectionResolver { return &risk
 // Task returns schema.TaskResolver implementation.
 func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 
+// TaskConnection returns schema.TaskConnectionResolver implementation.
+func (r *Resolver) TaskConnection() schema.TaskConnectionResolver { return &taskConnectionResolver{r} }
+
 // User returns schema.UserResolver implementation.
 func (r *Resolver) User() schema.UserResolver { return &userResolver{r} }
 
@@ -3000,6 +3025,7 @@ type queryResolver struct{ *Resolver }
 type riskResolver struct{ *Resolver }
 type riskConnectionResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
+type taskConnectionResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
 type vendorResolver struct{ *Resolver }
 type vendorComplianceReportResolver struct{ *Resolver }

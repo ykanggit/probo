@@ -1132,7 +1132,11 @@ type MeasureEdge {
   node: Measure!
 }
 
-type TaskConnection {
+type TaskConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.TaskConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [TaskEdge!]!
   pageInfo: PageInfo!
 }
