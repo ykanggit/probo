@@ -42,11 +42,6 @@ type Asset struct {
 func (Asset) IsNode()             {}
 func (this Asset) GetID() gid.GID { return this.ID }
 
-type AssetConnection struct {
-	Edges    []*AssetEdge `json:"edges"`
-	PageInfo *PageInfo    `json:"pageInfo"`
-}
-
 type AssetEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Asset         `json:"node"`

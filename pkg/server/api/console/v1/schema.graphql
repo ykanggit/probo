@@ -2153,7 +2153,11 @@ type Asset implements Node {
   updatedAt: Datetime!
 }
 
-type AssetConnection {
+type AssetConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.AssetConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [AssetEdge!]!
   pageInfo: PageInfo!
 }

@@ -26,18 +26,22 @@ import (
 	"go.gearno.de/kit/pg"
 )
 
-type Asset struct {
-	ID              gid.GID        `db:"id"`
-	Name            string         `db:"name"`
-	Amount          int            `db:"amount"`
-	OwnerID         gid.GID        `db:"owner_id"`
-	OrganizationID  gid.GID        `db:"organization_id"`
-	Criticity       CriticityLevel `db:"criticity"`
-	AssetType       AssetType      `db:"asset_type"`
-	DataTypesStored string         `db:"data_types_stored"`
-	CreatedAt       time.Time      `db:"created_at"`
-	UpdatedAt       time.Time      `db:"updated_at"`
-}
+type (
+	Asset struct {
+		ID              gid.GID        `db:"id"`
+		Name            string         `db:"name"`
+		Amount          int            `db:"amount"`
+		OwnerID         gid.GID        `db:"owner_id"`
+		OrganizationID  gid.GID        `db:"organization_id"`
+		Criticity       CriticityLevel `db:"criticity"`
+		AssetType       AssetType      `db:"asset_type"`
+		DataTypesStored string         `db:"data_types_stored"`
+		CreatedAt       time.Time      `db:"created_at"`
+		UpdatedAt       time.Time      `db:"updated_at"`
+	}
+
+	Assets []*Asset
+)
 
 func (a *Asset) CursorKey(field AssetOrderField) page.CursorKey {
 	switch field {
@@ -51,8 +55,6 @@ func (a *Asset) CursorKey(field AssetOrderField) page.CursorKey {
 
 	panic(fmt.Sprintf("unsupported order by: %s", field))
 }
-
-type Assets []*Asset
 
 func (a *Asset) LoadByID(
 	ctx context.Context,
@@ -143,6 +145,37 @@ LIMIT 1;
 	*a = asset
 
 	return nil
+}
+
+func (a *Assets) CountByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+) (int, error) {
+	q := `
+SELECT
+	COUNT(id)
+FROM
+	assets
+WHERE
+	%s
+	AND organization_id = @organization_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
 }
 
 func (a *Assets) LoadByOrganizationID(

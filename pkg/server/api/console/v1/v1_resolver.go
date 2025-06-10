@@ -90,6 +90,22 @@ func (r *assetResolver) Organization(ctx context.Context, obj *types.Asset) (*ty
 	return types.NewOrganization(org), nil
 }
 
+// TotalCount is the resolver for the totalCount field.
+func (r *assetConnectionResolver) TotalCount(ctx context.Context, obj *types.AssetConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := svc.Assets.CountForOrganizationID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count assets: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
 // Framework is the resolver for the framework field.
 func (r *controlResolver) Framework(ctx context.Context, obj *types.Control) (*types.Framework, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -2356,7 +2372,7 @@ func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organizati
 		panic(fmt.Errorf("cannot list organization assets: %w", err))
 	}
 
-	return types.NewAssetConnection(page), nil
+	return types.NewAssetConnection(page, r, obj.ID), nil
 }
 
 // Assets is the resolver for the assets field.
@@ -3000,6 +3016,11 @@ func (r *viewerResolver) Organizations(ctx context.Context, obj *types.Viewer, f
 // Asset returns schema.AssetResolver implementation.
 func (r *Resolver) Asset() schema.AssetResolver { return &assetResolver{r} }
 
+// AssetConnection returns schema.AssetConnectionResolver implementation.
+func (r *Resolver) AssetConnection() schema.AssetConnectionResolver {
+	return &assetConnectionResolver{r}
+}
+
 // Control returns schema.ControlResolver implementation.
 func (r *Resolver) Control() schema.ControlResolver { return &controlResolver{r} }
 
@@ -3109,6 +3130,7 @@ func (r *Resolver) VendorRiskAssessment() schema.VendorRiskAssessmentResolver {
 func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
 
 type assetResolver struct{ *Resolver }
+type assetConnectionResolver struct{ *Resolver }
 type controlResolver struct{ *Resolver }
 type controlConnectionResolver struct{ *Resolver }
 type datumResolver struct{ *Resolver }

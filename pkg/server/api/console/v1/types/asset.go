@@ -2,22 +2,39 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
 
 type (
 	AssetOrderBy OrderBy[coredata.AssetOrderField]
+
+	AssetConnection struct {
+		TotalCount int
+		Edges      []*AssetEdge
+		PageInfo   PageInfo
+
+		Resolver any
+		ParentID gid.GID
+	}
 )
 
-func NewAssetConnection(page *page.Page[*coredata.Asset, coredata.AssetOrderField]) *AssetConnection {
-	edges := make([]*AssetEdge, len(page.Data))
-	for i, asset := range page.Data {
-		edges[i] = NewAssetEdge(asset, page.Cursor.OrderBy.Field)
+func NewAssetConnection(
+	p *page.Page[*coredata.Asset, coredata.AssetOrderField],
+	resolver any,
+	parentID gid.GID,
+) *AssetConnection {
+	edges := make([]*AssetEdge, len(p.Data))
+	for i, asset := range p.Data {
+		edges[i] = NewAssetEdge(asset, p.Cursor.OrderBy.Field)
 	}
 
 	return &AssetConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(page),
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: resolver,
+		ParentID: parentID,
 	}
 }
 

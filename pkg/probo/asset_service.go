@@ -77,6 +77,32 @@ func (s AssetService) GetByOwnerID(
 	return asset, nil
 }
 
+func (s AssetService) CountForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			assets := coredata.Assets{}
+			count, err = assets.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID)
+			if err != nil {
+				return fmt.Errorf("cannot count assets: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s AssetService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
