@@ -53,6 +53,7 @@ type ResolverRoot interface {
 	Framework() FrameworkResolver
 	FrameworkConnection() FrameworkConnectionResolver
 	Measure() MeasureResolver
+	MeasureConnection() MeasureConnectionResolver
 	Mutation() MutationResolver
 	Organization() OrganizationResolver
 	Query() QueryResolver
@@ -470,8 +471,9 @@ type ComplexityRoot struct {
 	}
 
 	MeasureConnection struct {
-		Edges    func(childComplexity int) int
-		PageInfo func(childComplexity int) int
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	MeasureEdge struct {
@@ -924,6 +926,9 @@ type MeasureResolver interface {
 	Tasks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error)
 	Risks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) (*types.RiskConnection, error)
 	Controls(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error)
+}
+type MeasureConnectionResolver interface {
+	TotalCount(ctx context.Context, obj *types.MeasureConnection) (int, error)
 }
 type MutationResolver interface {
 	CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error)
@@ -2447,6 +2452,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.MeasureConnection.PageInfo(childComplexity), true
+
+	case "MeasureConnection.totalCount":
+		if e.complexity.MeasureConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MeasureConnection.TotalCount(childComplexity), true
 
 	case "MeasureEdge.cursor":
 		if e.complexity.MeasureEdge.Cursor == nil {
@@ -5839,7 +5851,11 @@ type ControlEdge {
   node: Control!
 }
 
-type MeasureConnection {
+type MeasureConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.MeasureConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [MeasureEdge!]!
   pageInfo: PageInfo!
 }
@@ -13453,6 +13469,8 @@ func (ec *executionContext) fieldContext_Control_measures(ctx context.Context, f
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_MeasureConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_MeasureConnection_edges(ctx, field)
 			case "pageInfo":
@@ -21170,6 +21188,50 @@ func (ec *executionContext) fieldContext_Measure_updatedAt(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _MeasureConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *types.MeasureConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MeasureConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MeasureConnection().TotalCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MeasureConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MeasureConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MeasureConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.MeasureConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MeasureConnection_edges(ctx, field)
 	if err != nil {
@@ -21246,9 +21308,9 @@ func (ec *executionContext) _MeasureConnection_pageInfo(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.PageInfo)
+	res := resTmp.(types.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MeasureConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -25722,6 +25784,8 @@ func (ec *executionContext) fieldContext_Organization_measures(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_MeasureConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_MeasureConnection_edges(ctx, field)
 			case "pageInfo":
@@ -28351,6 +28415,8 @@ func (ec *executionContext) fieldContext_Risk_measures(ctx context.Context, fiel
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_MeasureConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_MeasureConnection_edges(ctx, field)
 			case "pageInfo":
@@ -44367,15 +44433,51 @@ func (ec *executionContext) _MeasureConnection(ctx context.Context, sel ast.Sele
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("MeasureConnection")
+		case "totalCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MeasureConnection_totalCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "edges":
 			out.Values[i] = ec._MeasureConnection_edges(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "pageInfo":
 			out.Values[i] = ec._MeasureConnection_pageInfo(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

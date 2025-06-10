@@ -16,14 +16,30 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
 
 type (
 	MeasureOrderBy OrderBy[coredata.MeasureOrderField]
+
+	MeasureConnection struct {
+		TotalCount int
+		Edges      []*MeasureEdge
+		PageInfo   PageInfo
+
+		Resolver any
+		ParentID gid.GID
+		Filters  *coredata.MeasureFilter
+	}
 )
 
-func NewMeasureConnection(p *page.Page[*coredata.Measure, coredata.MeasureOrderField]) *MeasureConnection {
+func NewMeasureConnection(
+	p *page.Page[*coredata.Measure, coredata.MeasureOrderField],
+	parentType any,
+	parentID gid.GID,
+	filters *coredata.MeasureFilter,
+) *MeasureConnection {
 	var edges = make([]*MeasureEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +48,11 @@ func NewMeasureConnection(p *page.Page[*coredata.Measure, coredata.MeasureOrderF
 
 	return &MeasureConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(p),
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: parentType,
+		ParentID: parentID,
+		Filters:  filters,
 	}
 }
 

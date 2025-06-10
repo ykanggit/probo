@@ -1118,7 +1118,11 @@ type ControlEdge {
   node: Control!
 }
 
-type MeasureConnection {
+type MeasureConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.MeasureConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [MeasureEdge!]!
   pageInfo: PageInfo!
 }

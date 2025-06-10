@@ -52,6 +52,47 @@ func (m Measure) CursorKey(orderBy MeasureOrderField) page.CursorKey {
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
+func (m *Measures) CountByRiskID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	riskID gid.GID,
+	filter *MeasureFilter,
+) (int, error) {
+	q := `
+WITH msrs AS (
+	SELECT
+		m.id
+	FROM
+		measures m
+	INNER JOIN
+		risks_measures rm ON m.id = rm.measure_id
+	WHERE
+		rm.risk_id = @risk_id
+)
+SELECT
+	COUNT(id)
+FROM
+	msrs
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"risk_id": riskID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
+
 func (m *Measures) LoadByRiskID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -118,6 +159,47 @@ WHERE %s
 	return nil
 }
 
+func (m *Measures) CountByControlID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	controlID gid.GID,
+	filter *MeasureFilter,
+) (int, error) {
+	q := `
+WITH mtgtns AS (
+		SELECT
+			m.id
+		FROM
+			measures m
+		INNER JOIN
+			controls_measures cm ON m.id = cm.measure_id
+		WHERE
+			cm.control_id = @control_id
+	)
+	SELECT
+		COUNT(id)
+	FROM
+		mtgtns
+	WHERE %s
+		AND %s
+	`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"control_id": controlID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
+
 func (m *Measures) LoadByControlID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -182,6 +264,39 @@ WHERE %s
 	*m = measures
 
 	return nil
+}
+
+func (m *Measures) CountByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+	filter *MeasureFilter,
+) (int, error) {
+	q := `
+SELECT
+    COUNT(id)
+FROM
+    measures
+WHERE
+    %s
+    AND organization_id = @organization_id
+    AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
 }
 
 func (m *Measures) LoadByOrganizationID(

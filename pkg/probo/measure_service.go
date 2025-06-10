@@ -69,6 +69,32 @@ type (
 	}
 )
 
+func (s MeasureService) CountForRiskID(
+	ctx context.Context,
+	riskID gid.GID,
+	filter *coredata.MeasureFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			measures := &coredata.Measures{}
+			count, err = measures.CountByRiskID(ctx, conn, s.svc.scope, riskID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count measures: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
 func (s MeasureService) ListForRiskID(
 	ctx context.Context,
 	riskID gid.GID,
@@ -101,6 +127,33 @@ func (s MeasureService) ListForRiskID(
 	return page.NewPage(measures, cursor), nil
 }
 
+func (s MeasureService) CountForControlID(
+	ctx context.Context,
+	controlID gid.GID,
+	filter *coredata.MeasureFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			measures := &coredata.Measures{}
+			count, err = measures.CountByControlID(ctx, conn, s.svc.scope, controlID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count measures: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s MeasureService) ListForControlID(
 	ctx context.Context,
 	controlID gid.GID,
@@ -118,6 +171,72 @@ func (s MeasureService) ListForControlID(
 			}
 
 			err := measures.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor, filter)
+			if err != nil {
+				return fmt.Errorf("cannot load measures: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(measures, cursor), nil
+}
+
+func (s MeasureService) CountForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+	filter *coredata.MeasureFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			measures := &coredata.Measures{}
+			count, err = measures.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count measures: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (s MeasureService) ListForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+	cursor *page.Cursor[coredata.MeasureOrderField],
+	filter *coredata.MeasureFilter,
+) (*page.Page[*coredata.Measure, coredata.MeasureOrderField], error) {
+	var measures coredata.Measures
+	organization := &coredata.Organization{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, organizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			err := measures.LoadByOrganizationID(
+				ctx,
+				conn,
+				s.svc.scope,
+				organization.ID,
+				cursor,
+				filter,
+			)
 			if err != nil {
 				return fmt.Errorf("cannot load measures: %w", err)
 			}
@@ -317,45 +436,6 @@ func (s MeasureService) Update(
 	}
 
 	return measure, nil
-}
-
-func (s MeasureService) ListForOrganizationID(
-	ctx context.Context,
-	organizationID gid.GID,
-	cursor *page.Cursor[coredata.MeasureOrderField],
-	filter *coredata.MeasureFilter,
-) (*page.Page[*coredata.Measure, coredata.MeasureOrderField], error) {
-	var measures coredata.Measures
-	organization := &coredata.Organization{}
-
-	err := s.svc.pg.WithConn(
-		ctx,
-		func(conn pg.Conn) error {
-			if err := organization.LoadByID(ctx, conn, s.svc.scope, organizationID); err != nil {
-				return fmt.Errorf("cannot load organization: %w", err)
-			}
-
-			err := measures.LoadByOrganizationID(
-				ctx,
-				conn,
-				s.svc.scope,
-				organization.ID,
-				cursor,
-				filter,
-			)
-			if err != nil {
-				return fmt.Errorf("cannot load measures: %w", err)
-			}
-
-			return nil
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return page.NewPage(measures, cursor), nil
 }
 
 func (s MeasureService) Create(

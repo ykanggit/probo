@@ -134,7 +134,7 @@ func (r *controlResolver) Measures(ctx context.Context, obj *types.Control, firs
 		return nil, fmt.Errorf("cannot list measures: %w", err)
 	}
 
-	return types.NewMeasureConnection(page), nil
+	return types.NewMeasureConnection(page, r, obj.ID, measureFilter), nil
 }
 
 // Documents is the resolver for the documents field.
@@ -708,6 +708,34 @@ func (r *measureResolver) Controls(ctx context.Context, obj *types.Measure, firs
 	}
 
 	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
+}
+
+// TotalCount is the resolver for the totalCount field.
+func (r *measureConnectionResolver) TotalCount(ctx context.Context, obj *types.MeasureConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := svc.Measures.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count measures: %w", err)
+		}
+		return count, nil
+	case *controlResolver:
+		count, err := svc.Measures.CountForControlID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count measures: %w", err)
+		}
+		return count, nil
+	case *riskResolver:
+		count, err := svc.Measures.CountForRiskID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count measures: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 }
 
 // CreateOrganization is the resolver for the createOrganization field.
@@ -2182,7 +2210,7 @@ func (r *organizationResolver) Measures(ctx context.Context, obj *types.Organiza
 		panic(fmt.Errorf("cannot list organization measures: %w", err))
 	}
 
-	return types.NewMeasureConnection(page), nil
+	return types.NewMeasureConnection(page, r, obj.ID, measureFilter), nil
 }
 
 // Risks is the resolver for the risks field.
@@ -2475,7 +2503,7 @@ func (r *riskResolver) Measures(ctx context.Context, obj *types.Risk, first *int
 		panic(fmt.Errorf("cannot list risk measures: %w", err))
 	}
 
-	return types.NewMeasureConnection(page), nil
+	return types.NewMeasureConnection(page, r, obj.ID, measureFilter), nil
 }
 
 // Documents is the resolver for the documents field.
@@ -2856,6 +2884,11 @@ func (r *Resolver) FrameworkConnection() schema.FrameworkConnectionResolver {
 // Measure returns schema.MeasureResolver implementation.
 func (r *Resolver) Measure() schema.MeasureResolver { return &measureResolver{r} }
 
+// MeasureConnection returns schema.MeasureConnectionResolver implementation.
+func (r *Resolver) MeasureConnection() schema.MeasureConnectionResolver {
+	return &measureConnectionResolver{r}
+}
+
 // Mutation returns schema.MutationResolver implementation.
 func (r *Resolver) Mutation() schema.MutationResolver { return &mutationResolver{r} }
 
@@ -2901,6 +2934,7 @@ type evidenceResolver struct{ *Resolver }
 type frameworkResolver struct{ *Resolver }
 type frameworkConnectionResolver struct{ *Resolver }
 type measureResolver struct{ *Resolver }
+type measureConnectionResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

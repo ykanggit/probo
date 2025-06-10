@@ -729,11 +729,6 @@ type Measure struct {
 func (Measure) IsNode()             {}
 func (this Measure) GetID() gid.GID { return this.ID }
 
-type MeasureConnection struct {
-	Edges    []*MeasureEdge `json:"edges"`
-	PageInfo *PageInfo      `json:"pageInfo"`
-}
-
 type MeasureEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Measure       `json:"node"`
