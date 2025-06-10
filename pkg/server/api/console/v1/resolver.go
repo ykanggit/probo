@@ -332,7 +332,11 @@ func WithSession(usrmgrSvc *usrmgr.Service, authCfg AuthConfig, next http.Handle
 	}
 }
 
-func GetTenantService(ctx context.Context, svc *probo.Service, tenantID gid.TenantID) *probo.TenantService {
+func (r *Resolver) ProboService(ctx context.Context, tenantID gid.TenantID) *probo.TenantService {
+	return GetTenantService(ctx, r.proboSvc, tenantID)
+}
+
+func GetTenantService(ctx context.Context, proboSvc *probo.Service, tenantID gid.TenantID) *probo.TenantService {
 	tenantIDs, _ := ctx.Value(userTenantContextKey).(*[]gid.TenantID)
 
 	if tenantIDs == nil {
@@ -341,7 +345,7 @@ func GetTenantService(ctx context.Context, svc *probo.Service, tenantID gid.Tena
 
 	for _, id := range *tenantIDs {
 		if id == tenantID {
-			return svc.WithTenant(tenantID)
+			return proboSvc.WithTenant(tenantID)
 		}
 	}
 

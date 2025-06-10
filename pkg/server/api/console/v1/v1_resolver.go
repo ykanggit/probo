@@ -22,14 +22,14 @@ import (
 
 // Owner is the resolver for the owner field.
 func (r *assetResolver) Owner(ctx context.Context, obj *types.Asset) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	asset, err := svc.Assets.Get(ctx, obj.ID)
+	asset, err := prb.Assets.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get asset: %w", err))
 	}
 
-	owner, err := svc.Peoples.Get(ctx, asset.OwnerID)
+	owner, err := prb.Peoples.Get(ctx, asset.OwnerID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get owner: %w", err))
 	}
@@ -39,7 +39,7 @@ func (r *assetResolver) Owner(ctx context.Context, obj *types.Asset) (*types.Peo
 
 // Vendors is the resolver for the vendors field.
 func (r *assetResolver) Vendors(ctx context.Context, obj *types.Asset, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.VendorOrderField]{
 		Field:     coredata.VendorOrderFieldCreatedAt,
@@ -54,7 +54,7 @@ func (r *assetResolver) Vendors(ctx context.Context, obj *types.Asset, first *in
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Vendors.ListForAssetID(ctx, obj.ID, cursor)
+	page, err := prb.Vendors.ListForAssetID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list asset vendors: %w", err))
 	}
@@ -64,9 +64,9 @@ func (r *assetResolver) Vendors(ctx context.Context, obj *types.Asset, first *in
 
 // AssetType is the resolver for the assetType field.
 func (r *assetResolver) AssetType(ctx context.Context, obj *types.Asset) (coredata.AssetType, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	asset, err := svc.Assets.Get(ctx, obj.ID)
+	asset, err := prb.Assets.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get asset: %w", err))
 	}
@@ -76,13 +76,13 @@ func (r *assetResolver) AssetType(ctx context.Context, obj *types.Asset) (coreda
 
 // Organization is the resolver for the organization field.
 func (r *assetResolver) Organization(ctx context.Context, obj *types.Asset) (*types.Organization, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	if obj.Organization == nil {
 		return nil, fmt.Errorf("cannot get organization")
 	}
 
-	org, err := svc.Organizations.Get(ctx, obj.Organization.ID)
+	org, err := prb.Organizations.Get(ctx, obj.Organization.ID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get organization: %w", err)
 	}
@@ -92,11 +92,11 @@ func (r *assetResolver) Organization(ctx context.Context, obj *types.Asset) (*ty
 
 // TotalCount is the resolver for the totalCount field.
 func (r *assetConnectionResolver) TotalCount(ctx context.Context, obj *types.AssetConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := svc.Assets.CountForOrganizationID(ctx, obj.ParentID)
+		count, err := prb.Assets.CountForOrganizationID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count assets: %w", err)
 		}
@@ -108,14 +108,14 @@ func (r *assetConnectionResolver) TotalCount(ctx context.Context, obj *types.Ass
 
 // Framework is the resolver for the framework field.
 func (r *controlResolver) Framework(ctx context.Context, obj *types.Control) (*types.Framework, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	control, err := svc.Controls.Get(ctx, obj.ID)
+	control, err := prb.Controls.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get control: %w", err))
 	}
 
-	framework, err := svc.Frameworks.Get(ctx, control.FrameworkID)
+	framework, err := prb.Frameworks.Get(ctx, control.FrameworkID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get framework: %w", err))
 	}
@@ -125,7 +125,7 @@ func (r *controlResolver) Framework(ctx context.Context, obj *types.Control) (*t
 
 // Measures is the resolver for the measures field.
 func (r *controlResolver) Measures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.MeasureOrderField]{
 		Field:     coredata.MeasureOrderFieldCreatedAt,
@@ -145,7 +145,7 @@ func (r *controlResolver) Measures(ctx context.Context, obj *types.Control, firs
 		measureFilter = coredata.NewMeasureFilter(filter.Query)
 	}
 
-	page, err := svc.Measures.ListForControlID(ctx, obj.ID, cursor, measureFilter)
+	page, err := prb.Measures.ListForControlID(ctx, obj.ID, cursor, measureFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list measures: %w", err)
 	}
@@ -155,7 +155,7 @@ func (r *controlResolver) Measures(ctx context.Context, obj *types.Control, firs
 
 // Documents is the resolver for the documents field.
 func (r *controlResolver) Documents(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DocumentOrderField]{
 		Field:     coredata.DocumentOrderFieldCreatedAt,
@@ -175,7 +175,7 @@ func (r *controlResolver) Documents(ctx context.Context, obj *types.Control, fir
 		documentFilter = coredata.NewDocumentFilter(filter.Query)
 	}
 
-	page, err := svc.Documents.ListForControlID(ctx, obj.ID, cursor, documentFilter)
+	page, err := prb.Documents.ListForControlID(ctx, obj.ID, cursor, documentFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list documents: %w", err)
 	}
@@ -185,35 +185,35 @@ func (r *controlResolver) Documents(ctx context.Context, obj *types.Control, fir
 
 // TotalCount is the resolver for the totalCount field.
 func (r *controlConnectionResolver) TotalCount(ctx context.Context, obj *types.ControlConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := svc.Controls.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Controls.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count controls: %w", err)
 		}
 		return count, nil
 	case *frameworkResolver:
-		count, err := svc.Controls.CountForFrameworkID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Controls.CountForFrameworkID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count controls: %w", err)
 		}
 		return count, nil
 	case *documentResolver:
-		count, err := svc.Controls.CountForDocumentID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Controls.CountForDocumentID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count controls: %w", err)
 		}
 		return count, nil
 	case *measureResolver:
-		count, err := svc.Controls.CountForMeasureID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Controls.CountForMeasureID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count controls: %w", err)
 		}
 		return count, nil
 	case *riskResolver:
-		count, err := svc.Controls.CountForRiskID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Controls.CountForRiskID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count controls: %w", err)
 		}
@@ -225,14 +225,14 @@ func (r *controlConnectionResolver) TotalCount(ctx context.Context, obj *types.C
 
 // Owner is the resolver for the owner field.
 func (r *datumResolver) Owner(ctx context.Context, obj *types.Datum) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	data, err := svc.Data.Get(ctx, obj.ID)
+	data, err := prb.Data.Get(ctx, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get datum: %w", err)
 	}
 
-	people, err := svc.Peoples.Get(ctx, data.OwnerID)
+	people, err := prb.Peoples.Get(ctx, data.OwnerID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get owner: %w", err)
 	}
@@ -242,7 +242,7 @@ func (r *datumResolver) Owner(ctx context.Context, obj *types.Datum) (*types.Peo
 
 // Vendors is the resolver for the vendors field.
 func (r *datumResolver) Vendors(ctx context.Context, obj *types.Datum, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.VendorOrderField]{
 		Field:     coredata.VendorOrderFieldCreatedAt,
@@ -257,7 +257,7 @@ func (r *datumResolver) Vendors(ctx context.Context, obj *types.Datum, first *in
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Data.ListVendors(ctx, obj.ID, cursor)
+	page, err := prb.Data.ListVendors(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list data vendors: %w", err))
 	}
@@ -267,9 +267,9 @@ func (r *datumResolver) Vendors(ctx context.Context, obj *types.Datum, first *in
 
 // Organization is the resolver for the organization field.
 func (r *datumResolver) Organization(ctx context.Context, obj *types.Datum) (*types.Organization, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	org, err := svc.Organizations.Get(ctx, obj.Organization.ID)
+	org, err := prb.Organizations.Get(ctx, obj.Organization.ID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get organization: %w", err)
 	}
@@ -279,11 +279,11 @@ func (r *datumResolver) Organization(ctx context.Context, obj *types.Datum) (*ty
 
 // TotalCount is the resolver for the totalCount field.
 func (r *datumConnectionResolver) TotalCount(ctx context.Context, obj *types.DatumConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := svc.Data.CountForOrganizationID(ctx, obj.ParentID)
+		count, err := prb.Data.CountForOrganizationID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count data: %w", err)
 		}
@@ -295,15 +295,15 @@ func (r *datumConnectionResolver) TotalCount(ctx context.Context, obj *types.Dat
 
 // Owner is the resolver for the owner field.
 func (r *documentResolver) Owner(ctx context.Context, obj *types.Document) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	document, err := svc.Documents.Get(ctx, obj.ID)
+	document, err := prb.Documents.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get document: %w", err))
 	}
 
 	// Get the owner
-	owner, err := svc.Peoples.Get(ctx, document.OwnerID)
+	owner, err := prb.Peoples.Get(ctx, document.OwnerID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get owner: %w", err))
 	}
@@ -313,14 +313,14 @@ func (r *documentResolver) Owner(ctx context.Context, obj *types.Document) (*typ
 
 // Organization is the resolver for the organization field.
 func (r *documentResolver) Organization(ctx context.Context, obj *types.Document) (*types.Organization, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	document, err := svc.Documents.Get(ctx, obj.ID)
+	document, err := prb.Documents.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get document: %w", err))
 	}
 
-	organization, err := svc.Organizations.Get(ctx, document.OrganizationID)
+	organization, err := prb.Organizations.Get(ctx, document.OrganizationID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get organization: %w", err))
 	}
@@ -330,7 +330,7 @@ func (r *documentResolver) Organization(ctx context.Context, obj *types.Document
 
 // Versions is the resolver for the versions field.
 func (r *documentResolver) Versions(ctx context.Context, obj *types.Document, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentVersionOrderBy, filter *types.DocumentVersionFilter) (*types.DocumentVersionConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DocumentVersionOrderField]{
 		Field:     coredata.DocumentVersionOrderFieldCreatedAt,
@@ -345,7 +345,7 @@ func (r *documentResolver) Versions(ctx context.Context, obj *types.Document, fi
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Documents.ListVersions(ctx, obj.ID, cursor)
+	page, err := prb.Documents.ListVersions(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list document versions: %w", err))
 	}
@@ -355,7 +355,7 @@ func (r *documentResolver) Versions(ctx context.Context, obj *types.Document, fi
 
 // Controls is the resolver for the controls field.
 func (r *documentResolver) Controls(ctx context.Context, obj *types.Document, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
 		Field:     coredata.ControlOrderFieldCreatedAt,
@@ -375,7 +375,7 @@ func (r *documentResolver) Controls(ctx context.Context, obj *types.Document, fi
 		controlFilter = coredata.NewControlFilter(filter.Query)
 	}
 
-	page, err := svc.Controls.ListForDocumentID(ctx, obj.ID, cursor, controlFilter)
+	page, err := prb.Controls.ListForDocumentID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list document controls: %w", err))
 	}
@@ -385,23 +385,23 @@ func (r *documentResolver) Controls(ctx context.Context, obj *types.Document, fi
 
 // TotalCount is the resolver for the totalCount field.
 func (r *documentConnectionResolver) TotalCount(ctx context.Context, obj *types.DocumentConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *controlResolver:
-		count, err := svc.Documents.CountForControlID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Documents.CountForControlID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count controls: %w", err)
 		}
 		return count, nil
 	case *organizationResolver:
-		count, err := svc.Documents.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Documents.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count documents: %w", err)
 		}
 		return count, nil
 	case *riskResolver:
-		count, err := svc.Documents.CountForRiskID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Documents.CountForRiskID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count risks: %w", err)
 		}
@@ -413,14 +413,14 @@ func (r *documentConnectionResolver) TotalCount(ctx context.Context, obj *types.
 
 // Document is the resolver for the document field.
 func (r *documentVersionResolver) Document(ctx context.Context, obj *types.DocumentVersion) (*types.Document, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	documentVersion, err := svc.Documents.GetVersion(ctx, obj.ID)
+	documentVersion, err := prb.Documents.GetVersion(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get document version: %w", err))
 	}
 
-	document, err := svc.Documents.Get(ctx, documentVersion.DocumentID)
+	document, err := prb.Documents.Get(ctx, documentVersion.DocumentID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get document: %w", err))
 	}
@@ -430,14 +430,14 @@ func (r *documentVersionResolver) Document(ctx context.Context, obj *types.Docum
 
 // Owner is the resolver for the owner field.
 func (r *documentVersionResolver) Owner(ctx context.Context, obj *types.DocumentVersion) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	documentVersion, err := svc.Documents.GetVersion(ctx, obj.ID)
+	documentVersion, err := prb.Documents.GetVersion(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get document version: %w", err))
 	}
 
-	owner, err := svc.Peoples.Get(ctx, documentVersion.OwnerID)
+	owner, err := prb.Peoples.Get(ctx, documentVersion.OwnerID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get owner: %w", err))
 	}
@@ -447,7 +447,7 @@ func (r *documentVersionResolver) Owner(ctx context.Context, obj *types.Document
 
 // Signatures is the resolver for the signatures field.
 func (r *documentVersionResolver) Signatures(ctx context.Context, obj *types.DocumentVersion, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentVersionSignatureOrder) (*types.DocumentVersionSignatureConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DocumentVersionSignatureOrderField]{
 		Field:     coredata.DocumentVersionSignatureOrderFieldCreatedAt,
@@ -462,7 +462,7 @@ func (r *documentVersionResolver) Signatures(ctx context.Context, obj *types.Doc
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Documents.ListSignatures(ctx, obj.ID, cursor)
+	page, err := prb.Documents.ListSignatures(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list document version signatures: %w", err))
 	}
@@ -472,9 +472,9 @@ func (r *documentVersionResolver) Signatures(ctx context.Context, obj *types.Doc
 
 // PublishedBy is the resolver for the publishedBy field.
 func (r *documentVersionResolver) PublishedBy(ctx context.Context, obj *types.DocumentVersion) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	documentVersion, err := svc.Documents.GetVersion(ctx, obj.ID)
+	documentVersion, err := prb.Documents.GetVersion(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get document version: %w", err))
 	}
@@ -483,7 +483,7 @@ func (r *documentVersionResolver) PublishedBy(ctx context.Context, obj *types.Do
 		return nil, nil
 	}
 
-	people, err := svc.Peoples.Get(ctx, *documentVersion.PublishedBy)
+	people, err := prb.Peoples.Get(ctx, *documentVersion.PublishedBy)
 	if err != nil {
 		panic(fmt.Errorf("cannot get people: %w", err))
 	}
@@ -493,14 +493,14 @@ func (r *documentVersionResolver) PublishedBy(ctx context.Context, obj *types.Do
 
 // DocumentVersion is the resolver for the documentVersion field.
 func (r *documentVersionSignatureResolver) DocumentVersion(ctx context.Context, obj *types.DocumentVersionSignature) (*types.DocumentVersion, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	documentVersionSignature, err := svc.Documents.GetVersionSignature(ctx, obj.ID)
+	documentVersionSignature, err := prb.Documents.GetVersionSignature(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get document version signature: %w", err))
 	}
 
-	documentVersion, err := svc.Documents.GetVersion(ctx, documentVersionSignature.DocumentVersionID)
+	documentVersion, err := prb.Documents.GetVersion(ctx, documentVersionSignature.DocumentVersionID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get document version: %w", err))
 	}
@@ -510,14 +510,14 @@ func (r *documentVersionSignatureResolver) DocumentVersion(ctx context.Context, 
 
 // SignedBy is the resolver for the signedBy field.
 func (r *documentVersionSignatureResolver) SignedBy(ctx context.Context, obj *types.DocumentVersionSignature) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	documentVersionSignature, err := svc.Documents.GetVersionSignature(ctx, obj.ID)
+	documentVersionSignature, err := prb.Documents.GetVersionSignature(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get document version signature: %w", err))
 	}
 
-	people, err := svc.Peoples.Get(ctx, documentVersionSignature.SignedBy)
+	people, err := prb.Peoples.Get(ctx, documentVersionSignature.SignedBy)
 	if err != nil {
 		panic(fmt.Errorf("cannot get people: %w", err))
 	}
@@ -527,14 +527,14 @@ func (r *documentVersionSignatureResolver) SignedBy(ctx context.Context, obj *ty
 
 // RequestedBy is the resolver for the requestedBy field.
 func (r *documentVersionSignatureResolver) RequestedBy(ctx context.Context, obj *types.DocumentVersionSignature) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	documentVersionSignature, err := svc.Documents.GetVersionSignature(ctx, obj.ID)
+	documentVersionSignature, err := prb.Documents.GetVersionSignature(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get document version signature: %w", err))
 	}
 
-	people, err := svc.Peoples.Get(ctx, documentVersionSignature.RequestedBy)
+	people, err := prb.Peoples.Get(ctx, documentVersionSignature.RequestedBy)
 	if err != nil {
 		panic(fmt.Errorf("cannot get people: %w", err))
 	}
@@ -544,13 +544,13 @@ func (r *documentVersionSignatureResolver) RequestedBy(ctx context.Context, obj 
 
 // FileURL is the resolver for the fileUrl field.
 func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*string, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	if obj.Type == coredata.EvidenceTypeLink {
 		return obj.URL, nil
 	}
 
-	fileURL, err := svc.Evidences.GenerateFileURL(ctx, obj.ID, 15*time.Minute)
+	fileURL, err := prb.Evidences.GenerateFileURL(ctx, obj.ID, 15*time.Minute)
 	if err != nil {
 		return nil, fmt.Errorf("cannot generate file URL: %w", err)
 	}
@@ -561,9 +561,9 @@ func (r *evidenceResolver) FileURL(ctx context.Context, obj *types.Evidence) (*s
 
 // Task is the resolver for the task field.
 func (r *evidenceResolver) Task(ctx context.Context, obj *types.Evidence) (*types.Task, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	evidence, err := svc.Evidences.Get(ctx, obj.ID)
+	evidence, err := prb.Evidences.Get(ctx, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load evidence: %w", err)
 	}
@@ -572,7 +572,7 @@ func (r *evidenceResolver) Task(ctx context.Context, obj *types.Evidence) (*type
 		return nil, fmt.Errorf("evidence is not associated with a task")
 	}
 
-	task, err := svc.Tasks.Get(ctx, *evidence.TaskID)
+	task, err := prb.Tasks.Get(ctx, *evidence.TaskID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load task: %w", err)
 	}
@@ -582,14 +582,14 @@ func (r *evidenceResolver) Task(ctx context.Context, obj *types.Evidence) (*type
 
 // Measure is the resolver for the measure field.
 func (r *evidenceResolver) Measure(ctx context.Context, obj *types.Evidence) (*types.Measure, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	evidence, err := svc.Evidences.Get(ctx, obj.ID)
+	evidence, err := prb.Evidences.Get(ctx, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load evidence: %w", err)
 	}
 
-	measure, err := svc.Measures.Get(ctx, evidence.MeasureID)
+	measure, err := prb.Measures.Get(ctx, evidence.MeasureID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load measure: %w", err)
 	}
@@ -599,17 +599,17 @@ func (r *evidenceResolver) Measure(ctx context.Context, obj *types.Evidence) (*t
 
 // TotalCount is the resolver for the totalCount field.
 func (r *evidenceConnectionResolver) TotalCount(ctx context.Context, obj *types.EvidenceConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *measureResolver:
-		count, err := svc.Evidences.CountForMeasureID(ctx, obj.ParentID)
+		count, err := prb.Evidences.CountForMeasureID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count tasks: %w", err)
 		}
 		return count, nil
 	case *taskResolver:
-		count, err := svc.Evidences.CountForTaskID(ctx, obj.ParentID)
+		count, err := prb.Evidences.CountForTaskID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count tasks: %w", err)
 		}
@@ -621,14 +621,14 @@ func (r *evidenceConnectionResolver) TotalCount(ctx context.Context, obj *types.
 
 // Organization is the resolver for the organization field.
 func (r *frameworkResolver) Organization(ctx context.Context, obj *types.Framework) (*types.Organization, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	framework, err := svc.Frameworks.Get(ctx, obj.ID)
+	framework, err := prb.Frameworks.Get(ctx, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load framework: %w", err)
 	}
 
-	organization, err := svc.Organizations.Get(ctx, framework.OrganizationID)
+	organization, err := prb.Organizations.Get(ctx, framework.OrganizationID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load organization: %w", err)
 	}
@@ -638,7 +638,7 @@ func (r *frameworkResolver) Organization(ctx context.Context, obj *types.Framewo
 
 // Controls is the resolver for the controls field.
 func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
 		Field:     coredata.ControlOrderFieldCreatedAt,
@@ -658,7 +658,7 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 		controlFilter = coredata.NewControlFilter(filter.Query)
 	}
 
-	page, err := svc.Controls.ListForFrameworkID(ctx, obj.ID, cursor, controlFilter)
+	page, err := prb.Controls.ListForFrameworkID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list controls: %w", err)
 	}
@@ -668,11 +668,11 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 
 // TotalCount is the resolver for the totalCount field.
 func (r *frameworkConnectionResolver) TotalCount(ctx context.Context, obj *types.FrameworkConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := svc.Frameworks.CountForOrganizationID(ctx, obj.ParentID)
+		count, err := prb.Frameworks.CountForOrganizationID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count frameworks: %w", err)
 		}
@@ -684,7 +684,7 @@ func (r *frameworkConnectionResolver) TotalCount(ctx context.Context, obj *types
 
 // Evidences is the resolver for the evidences field.
 func (r *measureResolver) Evidences(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.EvidenceOrderField]{
 		Field:     coredata.EvidenceOrderFieldCreatedAt,
@@ -699,7 +699,7 @@ func (r *measureResolver) Evidences(ctx context.Context, obj *types.Measure, fir
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Evidences.ListForMeasureID(ctx, obj.ID, cursor)
+	page, err := prb.Evidences.ListForMeasureID(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list measure evidences: %w", err)
 	}
@@ -709,7 +709,7 @@ func (r *measureResolver) Evidences(ctx context.Context, obj *types.Measure, fir
 
 // Tasks is the resolver for the tasks field.
 func (r *measureResolver) Tasks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.TaskOrderField]{
 		Field:     coredata.TaskOrderFieldCreatedAt,
@@ -724,7 +724,7 @@ func (r *measureResolver) Tasks(ctx context.Context, obj *types.Measure, first *
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Tasks.ListForMeasureID(ctx, obj.ID, cursor)
+	page, err := prb.Tasks.ListForMeasureID(ctx, obj.ID, cursor)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list measure tasks: %w", err)
 	}
@@ -734,7 +734,7 @@ func (r *measureResolver) Tasks(ctx context.Context, obj *types.Measure, first *
 
 // Risks is the resolver for the risks field.
 func (r *measureResolver) Risks(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) (*types.RiskConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.RiskOrderField]{
 		Field:     coredata.RiskOrderFieldCreatedAt,
@@ -754,7 +754,7 @@ func (r *measureResolver) Risks(ctx context.Context, obj *types.Measure, first *
 		riskFilter = coredata.NewRiskFilter(filter.Query)
 	}
 
-	page, err := svc.Risks.ListForMeasureID(ctx, obj.ID, cursor, riskFilter)
+	page, err := prb.Risks.ListForMeasureID(ctx, obj.ID, cursor, riskFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list measure risks: %w", err)
 	}
@@ -764,7 +764,7 @@ func (r *measureResolver) Risks(ctx context.Context, obj *types.Measure, first *
 
 // Controls is the resolver for the controls field.
 func (r *measureResolver) Controls(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
 		Field:     coredata.ControlOrderFieldCreatedAt,
@@ -784,7 +784,7 @@ func (r *measureResolver) Controls(ctx context.Context, obj *types.Measure, firs
 		controlFilter = coredata.NewControlFilter(filter.Query)
 	}
 
-	page, err := svc.Controls.ListForMeasureID(ctx, obj.ID, cursor, controlFilter)
+	page, err := prb.Controls.ListForMeasureID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list measure controls: %w", err)
 	}
@@ -794,23 +794,23 @@ func (r *measureResolver) Controls(ctx context.Context, obj *types.Measure, firs
 
 // TotalCount is the resolver for the totalCount field.
 func (r *measureConnectionResolver) TotalCount(ctx context.Context, obj *types.MeasureConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := svc.Measures.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Measures.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count measures: %w", err)
 		}
 		return count, nil
 	case *controlResolver:
-		count, err := svc.Measures.CountForControlID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Measures.CountForControlID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count measures: %w", err)
 		}
 		return count, nil
 	case *riskResolver:
-		count, err := svc.Measures.CountForRiskID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Measures.CountForRiskID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count measures: %w", err)
 		}
@@ -822,9 +822,9 @@ func (r *measureConnectionResolver) TotalCount(ctx context.Context, obj *types.M
 
 // CreateOrganization is the resolver for the createOrganization field.
 func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error) {
-	svc := r.proboSvc.WithTenant(gid.NewTenantID())
+	prb := r.ProboService(ctx, gid.NewTenantID())
 
-	organization, err := svc.Organizations.Create(ctx, probo.CreateOrganizationRequest{
+	organization, err := prb.Organizations.Create(ctx, probo.CreateOrganizationRequest{
 		Name: input.Name,
 	})
 	if err != nil {
@@ -839,7 +839,7 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.C
 	tenantIDs, _ := ctx.Value(userTenantContextKey).(*[]gid.TenantID)
 	*tenantIDs = append(*tenantIDs, organization.ID.TenantID())
 
-	_, err = svc.Peoples.Create(
+	_, err = prb.Peoples.Create(
 		ctx,
 		probo.CreatePeopleRequest{
 			OrganizationID:           organization.ID,
@@ -862,7 +862,7 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.C
 
 // UpdateOrganization is the resolver for the updateOrganization field.
 func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.UpdateOrganizationInput) (*types.UpdateOrganizationPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
 	req := probo.UpdateOrganizationRequest{
 		ID:   input.OrganizationID,
@@ -878,7 +878,7 @@ func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.U
 		}
 	}
 
-	organization, err := svc.Organizations.Update(ctx, req)
+	organization, err := prb.Organizations.Update(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot update organization: %w", err)
 	}
@@ -947,9 +947,9 @@ func (r *mutationResolver) RemoveUser(ctx context.Context, input types.RemoveUse
 
 // CreatePeople is the resolver for the createPeople field.
 func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreatePeopleInput) (*types.CreatePeoplePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
-	people, err := svc.Peoples.Create(ctx, probo.CreatePeopleRequest{
+	people, err := prb.Peoples.Create(ctx, probo.CreatePeopleRequest{
 		OrganizationID:           input.OrganizationID,
 		FullName:                 input.FullName,
 		PrimaryEmailAddress:      input.PrimaryEmailAddress,
@@ -971,9 +971,9 @@ func (r *mutationResolver) CreatePeople(ctx context.Context, input types.CreateP
 
 // UpdatePeople is the resolver for the updatePeople field.
 func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdatePeopleInput) (*types.UpdatePeoplePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
-	people, err := svc.Peoples.Update(ctx, probo.UpdatePeopleRequest{
+	people, err := prb.Peoples.Update(ctx, probo.UpdatePeopleRequest{
 		ID:                       input.ID,
 		FullName:                 input.FullName,
 		PrimaryEmailAddress:      input.PrimaryEmailAddress,
@@ -994,9 +994,9 @@ func (r *mutationResolver) UpdatePeople(ctx context.Context, input types.UpdateP
 
 // DeletePeople is the resolver for the deletePeople field.
 func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeletePeopleInput) (*types.DeletePeoplePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.PeopleID.TenantID())
+	prb := r.ProboService(ctx, input.PeopleID.TenantID())
 
-	err := svc.Peoples.Delete(ctx, input.PeopleID)
+	err := prb.Peoples.Delete(ctx, input.PeopleID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete people: %w", err)
 	}
@@ -1008,9 +1008,9 @@ func (r *mutationResolver) DeletePeople(ctx context.Context, input types.DeleteP
 
 // CreateVendor is the resolver for the createVendor field.
 func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
-	vendor, err := svc.Vendors.Create(
+	vendor, err := prb.Vendors.Create(
 		ctx,
 		probo.CreateVendorRequest{
 			OrganizationID:                input.OrganizationID,
@@ -1044,9 +1044,9 @@ func (r *mutationResolver) CreateVendor(ctx context.Context, input types.CreateV
 
 // UpdateVendor is the resolver for the updateVendor field.
 func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.UpdateVendorPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
-	vendor, err := svc.Vendors.Update(ctx, probo.UpdateVendorRequest{
+	vendor, err := prb.Vendors.Update(ctx, probo.UpdateVendorRequest{
 		ID:                            input.ID,
 		Name:                          input.Name,
 		Description:                   input.Description,
@@ -1078,9 +1078,9 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 
 // DeleteVendor is the resolver for the deleteVendor field.
 func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.VendorID.TenantID())
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
 
-	err := svc.Vendors.Delete(ctx, input.VendorID)
+	err := prb.Vendors.Delete(ctx, input.VendorID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete vendor: %w", err)
 	}
@@ -1092,9 +1092,9 @@ func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteV
 
 // CreateFramework is the resolver for the createFramework field.
 func (r *mutationResolver) CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
-	framework, err := svc.Frameworks.Create(ctx, probo.CreateFrameworkRequest{
+	framework, err := prb.Frameworks.Create(ctx, probo.CreateFrameworkRequest{
 		OrganizationID: input.OrganizationID,
 		Name:           input.Name,
 	})
@@ -1109,9 +1109,9 @@ func (r *mutationResolver) CreateFramework(ctx context.Context, input types.Crea
 
 // UpdateFramework is the resolver for the updateFramework field.
 func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
-	framework, err := svc.Frameworks.Update(ctx, probo.UpdateFrameworkRequest{
+	framework, err := prb.Frameworks.Update(ctx, probo.UpdateFrameworkRequest{
 		ID:          input.ID,
 		Name:        input.Name,
 		Description: input.Description,
@@ -1127,14 +1127,14 @@ func (r *mutationResolver) UpdateFramework(ctx context.Context, input types.Upda
 
 // ImportFramework is the resolver for the importFramework field.
 func (r *mutationResolver) ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
 	req := probo.ImportFrameworkRequest{}
 	if err := json.NewDecoder(input.File.File).Decode(&req.Framework); err != nil {
 		return nil, fmt.Errorf("cannot decode framework: %w", err)
 	}
 
-	framework, err := svc.Frameworks.Import(ctx, input.OrganizationID, req)
+	framework, err := prb.Frameworks.Import(ctx, input.OrganizationID, req)
 	if err != nil {
 		var errFrameworkReferenceIDAlreadyExists *coredata.ErrFrameworkReferenceIDAlreadyExists
 		if errors.As(err, &errFrameworkReferenceIDAlreadyExists) {
@@ -1157,9 +1157,9 @@ func (r *mutationResolver) ImportFramework(ctx context.Context, input types.Impo
 
 // DeleteFramework is the resolver for the deleteFramework field.
 func (r *mutationResolver) DeleteFramework(ctx context.Context, input types.DeleteFrameworkInput) (*types.DeleteFrameworkPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.FrameworkID.TenantID())
+	prb := r.ProboService(ctx, input.FrameworkID.TenantID())
 
-	err := svc.Frameworks.Delete(ctx, input.FrameworkID)
+	err := prb.Frameworks.Delete(ctx, input.FrameworkID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete framework: %w", err)
 	}
@@ -1171,9 +1171,9 @@ func (r *mutationResolver) DeleteFramework(ctx context.Context, input types.Dele
 
 // CreateControl is the resolver for the createControl field.
 func (r *mutationResolver) CreateControl(ctx context.Context, input types.CreateControlInput) (*types.CreateControlPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.FrameworkID.TenantID())
+	prb := r.ProboService(ctx, input.FrameworkID.TenantID())
 
-	control, err := svc.Controls.Create(ctx, probo.CreateControlRequest{
+	control, err := prb.Controls.Create(ctx, probo.CreateControlRequest{
 		FrameworkID:  input.FrameworkID,
 		Name:         input.Name,
 		Description:  input.Description,
@@ -1190,9 +1190,9 @@ func (r *mutationResolver) CreateControl(ctx context.Context, input types.Create
 
 // UpdateControl is the resolver for the updateControl field.
 func (r *mutationResolver) UpdateControl(ctx context.Context, input types.UpdateControlInput) (*types.UpdateControlPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
-	control, err := svc.Controls.Update(ctx, probo.UpdateControlRequest{
+	control, err := prb.Controls.Update(ctx, probo.UpdateControlRequest{
 		ID:           input.ID,
 		Name:         input.Name,
 		Description:  input.Description,
@@ -1210,9 +1210,9 @@ func (r *mutationResolver) UpdateControl(ctx context.Context, input types.Update
 
 // DeleteControl is the resolver for the deleteControl field.
 func (r *mutationResolver) DeleteControl(ctx context.Context, input types.DeleteControlInput) (*types.DeleteControlPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ControlID.TenantID())
+	prb := r.ProboService(ctx, input.ControlID.TenantID())
 
-	err := svc.Controls.Delete(ctx, input.ControlID)
+	err := prb.Controls.Delete(ctx, input.ControlID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete control: %w", err)
 	}
@@ -1224,9 +1224,9 @@ func (r *mutationResolver) DeleteControl(ctx context.Context, input types.Delete
 
 // // CreateMeasure is the resolver for the createMeasure field.
 func (r *mutationResolver) CreateMeasure(ctx context.Context, input types.CreateMeasureInput) (*types.CreateMeasurePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
-	measure, err := svc.Measures.Create(ctx, probo.CreateMeasureRequest{
+	measure, err := prb.Measures.Create(ctx, probo.CreateMeasureRequest{
 		OrganizationID: input.OrganizationID,
 		Name:           input.Name,
 		Description:    input.Description,
@@ -1243,9 +1243,9 @@ func (r *mutationResolver) CreateMeasure(ctx context.Context, input types.Create
 
 // UpdateMeasure is the resolver for the updateMeasure field.
 func (r *mutationResolver) UpdateMeasure(ctx context.Context, input types.UpdateMeasureInput) (*types.UpdateMeasurePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
-	measure, err := svc.Measures.Update(ctx, probo.UpdateMeasureRequest{
+	measure, err := prb.Measures.Update(ctx, probo.UpdateMeasureRequest{
 		ID:          input.ID,
 		Name:        input.Name,
 		Description: input.Description,
@@ -1263,14 +1263,14 @@ func (r *mutationResolver) UpdateMeasure(ctx context.Context, input types.Update
 
 // ImportMeasure is the resolver for the importMeasure field.
 func (r *mutationResolver) ImportMeasure(ctx context.Context, input types.ImportMeasureInput) (*types.ImportMeasurePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
 	var req probo.ImportMeasureRequest
 	if err := json.NewDecoder(input.File.File).Decode(&req.Measures); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal measure: %w", err)
 	}
 
-	measures, err := svc.Measures.Import(ctx, input.OrganizationID, req)
+	measures, err := prb.Measures.Import(ctx, input.OrganizationID, req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot import measure: %w", err)
 	}
@@ -1287,9 +1287,9 @@ func (r *mutationResolver) ImportMeasure(ctx context.Context, input types.Import
 
 // DeleteMeasure is the resolver for the deleteMeasure field.
 func (r *mutationResolver) DeleteMeasure(ctx context.Context, input types.DeleteMeasureInput) (*types.DeleteMeasurePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.MeasureID.TenantID())
+	prb := r.ProboService(ctx, input.MeasureID.TenantID())
 
-	err := svc.Measures.Delete(ctx, input.MeasureID)
+	err := prb.Measures.Delete(ctx, input.MeasureID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete measure: %w", err))
 	}
@@ -1301,9 +1301,9 @@ func (r *mutationResolver) DeleteMeasure(ctx context.Context, input types.Delete
 
 // CreateControlMeasureMapping is the resolver for the createControlMeasureMapping field.
 func (r *mutationResolver) CreateControlMeasureMapping(ctx context.Context, input types.CreateControlMeasureMappingInput) (*types.CreateControlMeasureMappingPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.MeasureID.TenantID())
+	prb := r.ProboService(ctx, input.MeasureID.TenantID())
 
-	control, measure, err := svc.Controls.CreateMeasureMapping(ctx, input.ControlID, input.MeasureID)
+	control, measure, err := prb.Controls.CreateMeasureMapping(ctx, input.ControlID, input.MeasureID)
 	if err != nil {
 		panic(fmt.Errorf("cannot create control measure mapping: %w", err))
 	}
@@ -1316,9 +1316,9 @@ func (r *mutationResolver) CreateControlMeasureMapping(ctx context.Context, inpu
 
 // CreateControlDocumentMapping is the resolver for the createControlDocumentMapping field.
 func (r *mutationResolver) CreateControlDocumentMapping(ctx context.Context, input types.CreateControlDocumentMappingInput) (*types.CreateControlDocumentMappingPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.DocumentID.TenantID())
+	prb := r.ProboService(ctx, input.DocumentID.TenantID())
 
-	control, document, err := svc.Controls.CreateDocumentMapping(ctx, input.ControlID, input.DocumentID)
+	control, document, err := prb.Controls.CreateDocumentMapping(ctx, input.ControlID, input.DocumentID)
 	if err != nil {
 		panic(fmt.Errorf("cannot create control document mapping: %w", err))
 	}
@@ -1331,9 +1331,9 @@ func (r *mutationResolver) CreateControlDocumentMapping(ctx context.Context, inp
 
 // DeleteControlMeasureMapping is the resolver for the deleteControlMeasureMapping field.
 func (r *mutationResolver) DeleteControlMeasureMapping(ctx context.Context, input types.DeleteControlMeasureMappingInput) (*types.DeleteControlMeasureMappingPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.MeasureID.TenantID())
+	prb := r.ProboService(ctx, input.MeasureID.TenantID())
 
-	control, measure, err := svc.Controls.DeleteMeasureMapping(ctx, input.ControlID, input.MeasureID)
+	control, measure, err := prb.Controls.DeleteMeasureMapping(ctx, input.ControlID, input.MeasureID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete control measure mapping: %w", err))
 	}
@@ -1346,9 +1346,9 @@ func (r *mutationResolver) DeleteControlMeasureMapping(ctx context.Context, inpu
 
 // DeleteControlDocumentMapping is the resolver for the deleteControlDocumentMapping field.
 func (r *mutationResolver) DeleteControlDocumentMapping(ctx context.Context, input types.DeleteControlDocumentMappingInput) (*types.DeleteControlDocumentMappingPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.DocumentID.TenantID())
+	prb := r.ProboService(ctx, input.DocumentID.TenantID())
 
-	control, document, err := svc.Controls.DeleteDocumentMapping(ctx, input.ControlID, input.DocumentID)
+	control, document, err := prb.Controls.DeleteDocumentMapping(ctx, input.ControlID, input.DocumentID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete control document mapping: %w", err))
 	}
@@ -1361,9 +1361,9 @@ func (r *mutationResolver) DeleteControlDocumentMapping(ctx context.Context, inp
 
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.MeasureID.TenantID())
+	prb := r.ProboService(ctx, input.MeasureID.TenantID())
 
-	task, err := svc.Tasks.Create(ctx, probo.CreateTaskRequest{
+	task, err := prb.Tasks.Create(ctx, probo.CreateTaskRequest{
 		MeasureID:      input.MeasureID,
 		OrganizationID: input.OrganizationID,
 		Name:           input.Name,
@@ -1382,9 +1382,9 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input types.CreateTas
 
 // UpdateTask is the resolver for the updateTask field.
 func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
+	prb := r.ProboService(ctx, input.TaskID.TenantID())
 
-	task, err := svc.Tasks.Update(ctx, probo.UpdateTaskRequest{
+	task, err := prb.Tasks.Update(ctx, probo.UpdateTaskRequest{
 		TaskID:       input.TaskID,
 		Name:         input.Name,
 		Description:  input.Description,
@@ -1403,9 +1403,9 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, input types.UpdateTas
 
 // DeleteTask is the resolver for the deleteTask field.
 func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
+	prb := r.ProboService(ctx, input.TaskID.TenantID())
 
-	err := svc.Tasks.Delete(ctx, input.TaskID)
+	err := prb.Tasks.Delete(ctx, input.TaskID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete task: %w", err))
 	}
@@ -1417,9 +1417,9 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, input types.DeleteTas
 
 // AssignTask is the resolver for the assignTask field.
 func (r *mutationResolver) AssignTask(ctx context.Context, input types.AssignTaskInput) (*types.AssignTaskPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
+	prb := r.ProboService(ctx, input.TaskID.TenantID())
 
-	task, err := svc.Tasks.Assign(ctx, input.TaskID, input.AssignedToID)
+	task, err := prb.Tasks.Assign(ctx, input.TaskID, input.AssignedToID)
 	if err != nil {
 		panic(fmt.Errorf("cannot assign task: %w", err))
 	}
@@ -1431,9 +1431,9 @@ func (r *mutationResolver) AssignTask(ctx context.Context, input types.AssignTas
 
 // UnassignTask is the resolver for the unassignTask field.
 func (r *mutationResolver) UnassignTask(ctx context.Context, input types.UnassignTaskInput) (*types.UnassignTaskPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
+	prb := r.ProboService(ctx, input.TaskID.TenantID())
 
-	task, err := svc.Tasks.Unassign(ctx, input.TaskID)
+	task, err := prb.Tasks.Unassign(ctx, input.TaskID)
 	if err != nil {
 		panic(fmt.Errorf("cannot unassign task: %w", err))
 	}
@@ -1445,9 +1445,9 @@ func (r *mutationResolver) UnassignTask(ctx context.Context, input types.Unassig
 
 // CreateRisk is the resolver for the createRisk field.
 func (r *mutationResolver) CreateRisk(ctx context.Context, input types.CreateRiskInput) (*types.CreateRiskPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
-	risk, err := svc.Risks.Create(
+	risk, err := prb.Risks.Create(
 		ctx,
 		probo.CreateRiskRequest{
 			OrganizationID:     input.OrganizationID,
@@ -1474,9 +1474,9 @@ func (r *mutationResolver) CreateRisk(ctx context.Context, input types.CreateRis
 
 // UpdateRisk is the resolver for the updateRisk field.
 func (r *mutationResolver) UpdateRisk(ctx context.Context, input types.UpdateRiskInput) (*types.UpdateRiskPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
-	risk, err := svc.Risks.Update(
+	risk, err := prb.Risks.Update(
 		ctx,
 		probo.UpdateRiskRequest{
 			ID:                 input.ID,
@@ -1503,9 +1503,9 @@ func (r *mutationResolver) UpdateRisk(ctx context.Context, input types.UpdateRis
 
 // DeleteRisk is the resolver for the deleteRisk field.
 func (r *mutationResolver) DeleteRisk(ctx context.Context, input types.DeleteRiskInput) (*types.DeleteRiskPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
+	prb := r.ProboService(ctx, input.RiskID.TenantID())
 
-	err := svc.Risks.Delete(ctx, input.RiskID)
+	err := prb.Risks.Delete(ctx, input.RiskID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete risk: %w", err))
 	}
@@ -1517,9 +1517,9 @@ func (r *mutationResolver) DeleteRisk(ctx context.Context, input types.DeleteRis
 
 // CreateRiskMeasureMapping is the resolver for the createRiskMeasureMapping field.
 func (r *mutationResolver) CreateRiskMeasureMapping(ctx context.Context, input types.CreateRiskMeasureMappingInput) (*types.CreateRiskMeasureMappingPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
+	prb := r.ProboService(ctx, input.RiskID.TenantID())
 
-	risk, measure, err := svc.Risks.CreateMeasureMapping(ctx, input.RiskID, input.MeasureID)
+	risk, measure, err := prb.Risks.CreateMeasureMapping(ctx, input.RiskID, input.MeasureID)
 	if err != nil {
 		panic(fmt.Errorf("cannot create risk measure mapping: %w", err))
 	}
@@ -1532,9 +1532,9 @@ func (r *mutationResolver) CreateRiskMeasureMapping(ctx context.Context, input t
 
 // DeleteRiskMeasureMapping is the resolver for the deleteRiskMeasureMapping field.
 func (r *mutationResolver) DeleteRiskMeasureMapping(ctx context.Context, input types.DeleteRiskMeasureMappingInput) (*types.DeleteRiskMeasureMappingPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
+	prb := r.ProboService(ctx, input.RiskID.TenantID())
 
-	risk, measure, err := svc.Risks.DeleteMeasureMapping(ctx, input.RiskID, input.MeasureID)
+	risk, measure, err := prb.Risks.DeleteMeasureMapping(ctx, input.RiskID, input.MeasureID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete risk measure mapping: %w", err))
 	}
@@ -1547,9 +1547,9 @@ func (r *mutationResolver) DeleteRiskMeasureMapping(ctx context.Context, input t
 
 // CreateRiskDocumentMapping is the resolver for the createRiskDocumentMapping field.
 func (r *mutationResolver) CreateRiskDocumentMapping(ctx context.Context, input types.CreateRiskDocumentMappingInput) (*types.CreateRiskDocumentMappingPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
+	prb := r.ProboService(ctx, input.RiskID.TenantID())
 
-	risk, document, err := svc.Risks.CreateDocumentMapping(ctx, input.RiskID, input.DocumentID)
+	risk, document, err := prb.Risks.CreateDocumentMapping(ctx, input.RiskID, input.DocumentID)
 	if err != nil {
 		panic(fmt.Errorf("cannot create risk document mapping: %w", err))
 	}
@@ -1562,9 +1562,9 @@ func (r *mutationResolver) CreateRiskDocumentMapping(ctx context.Context, input 
 
 // DeleteRiskDocumentMapping is the resolver for the deleteRiskDocumentMapping field.
 func (r *mutationResolver) DeleteRiskDocumentMapping(ctx context.Context, input types.DeleteRiskDocumentMappingInput) (*types.DeleteRiskDocumentMappingPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.RiskID.TenantID())
+	prb := r.ProboService(ctx, input.RiskID.TenantID())
 
-	risk, document, err := svc.Risks.DeleteDocumentMapping(ctx, input.RiskID, input.DocumentID)
+	risk, document, err := prb.Risks.DeleteDocumentMapping(ctx, input.RiskID, input.DocumentID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete risk document mapping: %w", err))
 	}
@@ -1577,9 +1577,9 @@ func (r *mutationResolver) DeleteRiskDocumentMapping(ctx context.Context, input 
 
 // RequestEvidence is the resolver for the requestEvidence field.
 func (r *mutationResolver) RequestEvidence(ctx context.Context, input types.RequestEvidenceInput) (*types.RequestEvidencePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
+	prb := r.ProboService(ctx, input.TaskID.TenantID())
 
-	evidence, err := svc.Evidences.Request(
+	evidence, err := prb.Evidences.Request(
 		ctx,
 		probo.RequestEvidenceRequest{
 			TaskID:      &input.TaskID,
@@ -1599,7 +1599,7 @@ func (r *mutationResolver) RequestEvidence(ctx context.Context, input types.Requ
 
 // FulfillEvidence is the resolver for the fulfillEvidence field.
 func (r *mutationResolver) FulfillEvidence(ctx context.Context, input types.FulfillEvidenceInput) (*types.FulfillEvidencePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.EvidenceID.TenantID())
+	prb := r.ProboService(ctx, input.EvidenceID.TenantID())
 
 	req := probo.FulfilledEvidenceRequest{
 		EvidenceID: input.EvidenceID,
@@ -1614,7 +1614,7 @@ func (r *mutationResolver) FulfillEvidence(ctx context.Context, input types.Fulf
 		req.URL = input.URL
 	}
 
-	evidence, err := svc.Evidences.Fulfill(ctx, req)
+	evidence, err := prb.Evidences.Fulfill(ctx, req)
 	if err != nil {
 		panic(fmt.Errorf("cannot fulfill evidence: %w", err))
 	}
@@ -1626,9 +1626,9 @@ func (r *mutationResolver) FulfillEvidence(ctx context.Context, input types.Fulf
 
 // DeleteEvidence is the resolver for the deleteEvidence field.
 func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.DeleteEvidenceInput) (*types.DeleteEvidencePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.EvidenceID.TenantID())
+	prb := r.ProboService(ctx, input.EvidenceID.TenantID())
 
-	err := svc.Evidences.Delete(ctx, input.EvidenceID)
+	err := prb.Evidences.Delete(ctx, input.EvidenceID)
 	if err != nil {
 		panic(fmt.Errorf("failed to delete evidence: %w", err))
 	}
@@ -1640,9 +1640,9 @@ func (r *mutationResolver) DeleteEvidence(ctx context.Context, input types.Delet
 
 // UploadTaskEvidence is the resolver for the uploadTaskEvidence field.
 func (r *mutationResolver) UploadTaskEvidence(ctx context.Context, input types.UploadTaskEvidenceInput) (*types.UploadTaskEvidencePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.TaskID.TenantID())
+	prb := r.ProboService(ctx, input.TaskID.TenantID())
 
-	evidence, err := svc.Evidences.UploadTaskEvidence(
+	evidence, err := prb.Evidences.UploadTaskEvidence(
 		ctx,
 		probo.UploadTaskEvidenceRequest{
 			TaskID: input.TaskID,
@@ -1665,9 +1665,9 @@ func (r *mutationResolver) UploadTaskEvidence(ctx context.Context, input types.U
 
 // UploadMeasureEvidence is the resolver for the uploadMeasureEvidence field.
 func (r *mutationResolver) UploadMeasureEvidence(ctx context.Context, input types.UploadMeasureEvidenceInput) (*types.UploadMeasureEvidencePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.MeasureID.TenantID())
+	prb := r.ProboService(ctx, input.MeasureID.TenantID())
 
-	evidence, err := svc.Evidences.UploadMeasureEvidence(
+	evidence, err := prb.Evidences.UploadMeasureEvidence(
 		ctx,
 		probo.UploadMeasureEvidenceRequest{
 			MeasureID: input.MeasureID,
@@ -1690,9 +1690,9 @@ func (r *mutationResolver) UploadMeasureEvidence(ctx context.Context, input type
 
 // UploadVendorComplianceReport is the resolver for the uploadVendorComplianceReport field.
 func (r *mutationResolver) UploadVendorComplianceReport(ctx context.Context, input types.UploadVendorComplianceReportInput) (*types.UploadVendorComplianceReportPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.VendorID.TenantID())
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
 
-	vendorComplianceReport, err := svc.VendorComplianceReports.Upload(
+	vendorComplianceReport, err := prb.VendorComplianceReports.Upload(
 		ctx,
 		input.VendorID,
 		&probo.VendorComplianceReportCreateRequest{
@@ -1713,9 +1713,9 @@ func (r *mutationResolver) UploadVendorComplianceReport(ctx context.Context, inp
 
 // DeleteVendorComplianceReport is the resolver for the deleteVendorComplianceReport field.
 func (r *mutationResolver) DeleteVendorComplianceReport(ctx context.Context, input types.DeleteVendorComplianceReportInput) (*types.DeleteVendorComplianceReportPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ReportID.TenantID())
+	prb := r.ProboService(ctx, input.ReportID.TenantID())
 
-	err := svc.VendorComplianceReports.Delete(ctx, input.ReportID)
+	err := prb.VendorComplianceReports.Delete(ctx, input.ReportID)
 	if err != nil {
 		panic(fmt.Errorf("failed to delete vendor compliance report: %w", err))
 	}
@@ -1727,15 +1727,15 @@ func (r *mutationResolver) DeleteVendorComplianceReport(ctx context.Context, inp
 
 // CreateDocument is the resolver for the createDocument field.
 func (r *mutationResolver) CreateDocument(ctx context.Context, input types.CreateDocumentInput) (*types.CreateDocumentPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
 	user := UserFromContext(ctx)
-	people, err := svc.Peoples.GetByUserID(ctx, user.ID)
+	people, err := prb.Peoples.GetByUserID(ctx, user.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get people: %w", err))
 	}
 
-	document, documentVersion, err := svc.Documents.Create(
+	document, documentVersion, err := prb.Documents.Create(
 		ctx,
 		probo.CreateDocumentRequest{
 			OrganizationID: input.OrganizationID,
@@ -1758,9 +1758,9 @@ func (r *mutationResolver) CreateDocument(ctx context.Context, input types.Creat
 
 // UpdateDocument is the resolver for the updateDocument field.
 func (r *mutationResolver) UpdateDocument(ctx context.Context, input types.UpdateDocumentInput) (*types.UpdateDocumentPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
-	document, err := svc.Documents.Update(
+	document, err := prb.Documents.Update(
 		ctx,
 		input.ID,
 		input.OwnerID,
@@ -1779,9 +1779,9 @@ func (r *mutationResolver) UpdateDocument(ctx context.Context, input types.Updat
 
 // DeleteDocument is the resolver for the deleteDocument field.
 func (r *mutationResolver) DeleteDocument(ctx context.Context, input types.DeleteDocumentInput) (*types.DeleteDocumentPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.DocumentID.TenantID())
+	prb := r.ProboService(ctx, input.DocumentID.TenantID())
 
-	err := svc.Documents.Delete(ctx, input.DocumentID)
+	err := prb.Documents.Delete(ctx, input.DocumentID)
 	if err != nil {
 		panic(fmt.Errorf("cannot delete document: %w", err))
 	}
@@ -1793,15 +1793,15 @@ func (r *mutationResolver) DeleteDocument(ctx context.Context, input types.Delet
 
 // PublishDocumentVersion is the resolver for the publishDocumentVersion field.
 func (r *mutationResolver) PublishDocumentVersion(ctx context.Context, input types.PublishDocumentVersionInput) (*types.PublishDocumentVersionPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.DocumentID.TenantID())
+	prb := r.ProboService(ctx, input.DocumentID.TenantID())
 	user := UserFromContext(ctx)
 
-	people, err := svc.Peoples.GetByUserID(ctx, user.ID)
+	people, err := prb.Peoples.GetByUserID(ctx, user.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get people: %w", err))
 	}
 
-	document, documentVersion, err := svc.Documents.PublishVersion(ctx, input.DocumentID, people.ID, input.Changelog)
+	document, documentVersion, err := prb.Documents.PublishVersion(ctx, input.DocumentID, people.ID, input.Changelog)
 	if err != nil {
 		panic(fmt.Errorf("cannot publish document version: %w", err))
 	}
@@ -1814,9 +1814,9 @@ func (r *mutationResolver) PublishDocumentVersion(ctx context.Context, input typ
 
 // GenerateDocumentChangelog is the resolver for the generateDocumentChangelog field.
 func (r *mutationResolver) GenerateDocumentChangelog(ctx context.Context, input types.GenerateDocumentChangelogInput) (*types.GenerateDocumentChangelogPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.DocumentID.TenantID())
+	prb := r.ProboService(ctx, input.DocumentID.TenantID())
 
-	changelog, err := svc.Documents.GenerateChangelog(ctx, input.DocumentID)
+	changelog, err := prb.Documents.GenerateChangelog(ctx, input.DocumentID)
 	if err != nil {
 		panic(fmt.Errorf("cannot generate document changelog: %w", err))
 	}
@@ -1828,15 +1828,15 @@ func (r *mutationResolver) GenerateDocumentChangelog(ctx context.Context, input 
 
 // CreateDraftDocumentVersion is the resolver for the createDraftDocumentVersion field.
 func (r *mutationResolver) CreateDraftDocumentVersion(ctx context.Context, input types.CreateDraftDocumentVersionInput) (*types.CreateDraftDocumentVersionPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.DocumentID.TenantID())
+	prb := r.ProboService(ctx, input.DocumentID.TenantID())
 
 	user := UserFromContext(ctx)
-	people, err := svc.Peoples.GetByUserID(ctx, user.ID)
+	people, err := prb.Peoples.GetByUserID(ctx, user.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get people: %w", err))
 	}
 
-	documentVersion, err := svc.Documents.CreateDraft(ctx, input.DocumentID, people.ID)
+	documentVersion, err := prb.Documents.CreateDraft(ctx, input.DocumentID, people.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot create draft document version: %w", err))
 	}
@@ -1848,9 +1848,9 @@ func (r *mutationResolver) CreateDraftDocumentVersion(ctx context.Context, input
 
 // UpdateDocumentVersion is the resolver for the updateDocumentVersion field.
 func (r *mutationResolver) UpdateDocumentVersion(ctx context.Context, input types.UpdateDocumentVersionInput) (*types.UpdateDocumentVersionPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.DocumentVersionID.TenantID())
+	prb := r.ProboService(ctx, input.DocumentVersionID.TenantID())
 
-	documentVersion, err := svc.Documents.UpdateVersion(ctx, probo.UpdateDocumentVersionRequest{
+	documentVersion, err := prb.Documents.UpdateVersion(ctx, probo.UpdateDocumentVersionRequest{
 		ID:      input.DocumentVersionID,
 		Content: input.Content,
 	})
@@ -1865,16 +1865,16 @@ func (r *mutationResolver) UpdateDocumentVersion(ctx context.Context, input type
 
 // RequestSignature is the resolver for the requestSignature field.
 func (r *mutationResolver) RequestSignature(ctx context.Context, input types.RequestSignatureInput) (*types.RequestSignaturePayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.DocumentVersionID.TenantID())
+	prb := r.ProboService(ctx, input.DocumentVersionID.TenantID())
 
 	user := UserFromContext(ctx)
 
-	people, err := svc.Peoples.GetByUserID(ctx, user.ID)
+	people, err := prb.Peoples.GetByUserID(ctx, user.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get people: %w", err))
 	}
 
-	documentVersionSignature, err := svc.Documents.RequestSignature(
+	documentVersionSignature, err := prb.Documents.RequestSignature(
 		ctx,
 		probo.RequestSignatureRequest{
 			DocumentVersionID: input.DocumentVersionID,
@@ -1893,9 +1893,9 @@ func (r *mutationResolver) RequestSignature(ctx context.Context, input types.Req
 
 // SendSigningNotifications is the resolver for the sendSigningNotifications field.
 func (r *mutationResolver) SendSigningNotifications(ctx context.Context, input types.SendSigningNotificationsInput) (*types.SendSigningNotificationsPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
-	err := svc.Documents.SendSigningNotifications(ctx, input.OrganizationID)
+	err := prb.Documents.SendSigningNotifications(ctx, input.OrganizationID)
 	if err != nil {
 		panic(fmt.Errorf("cannot send signing notifications: %w", err))
 	}
@@ -1907,9 +1907,9 @@ func (r *mutationResolver) SendSigningNotifications(ctx context.Context, input t
 
 // CreateVendorRiskAssessment is the resolver for the createVendorRiskAssessment field.
 func (r *mutationResolver) CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.VendorID.TenantID())
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
 
-	vendorRiskAssessment, err := svc.Vendors.CreateRiskAssessment(
+	vendorRiskAssessment, err := prb.Vendors.CreateRiskAssessment(
 		ctx,
 		probo.CreateVendorRiskAssessmentRequest{
 			VendorID:        input.VendorID,
@@ -1931,8 +1931,8 @@ func (r *mutationResolver) CreateVendorRiskAssessment(ctx context.Context, input
 
 // ExportAudit is the resolver for the exportAudit field.
 func (r *mutationResolver) ExportAudit(ctx context.Context, input types.ExportAuditInput) (*types.ExportAuditPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.FrameworkID.TenantID())
-	fileUrl, err := svc.Frameworks.ExportAudit(ctx, input.FrameworkID)
+	prb := r.ProboService(ctx, input.FrameworkID.TenantID())
+	fileUrl, err := prb.Frameworks.ExportAudit(ctx, input.FrameworkID)
 	if err != nil {
 		panic(fmt.Errorf("cannot export audit: %w", err))
 	}
@@ -1944,9 +1944,9 @@ func (r *mutationResolver) ExportAudit(ctx context.Context, input types.ExportAu
 
 // AssessVendor is the resolver for the assessVendor field.
 func (r *mutationResolver) AssessVendor(ctx context.Context, input types.AssessVendorInput) (*types.AssessVendorPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
-	vendor, err := svc.Vendors.Assess(ctx, probo.AssessVendorRequest{
+	vendor, err := prb.Vendors.Assess(ctx, probo.AssessVendorRequest{
 		ID:         input.ID,
 		WebsiteURL: input.WebsiteURL,
 	})
@@ -1961,9 +1961,9 @@ func (r *mutationResolver) AssessVendor(ctx context.Context, input types.AssessV
 
 // CreateAsset is the resolver for the createAsset field.
 func (r *mutationResolver) CreateAsset(ctx context.Context, input types.CreateAssetInput) (*types.CreateAssetPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
-	asset, err := svc.Assets.Create(ctx, probo.CreateAssetRequest{
+	asset, err := prb.Assets.Create(ctx, probo.CreateAssetRequest{
 		OrganizationID:  input.OrganizationID,
 		Name:            input.Name,
 		Amount:          input.Amount,
@@ -1985,9 +1985,9 @@ func (r *mutationResolver) CreateAsset(ctx context.Context, input types.CreateAs
 
 // UpdateAsset is the resolver for the updateAsset field.
 func (r *mutationResolver) UpdateAsset(ctx context.Context, input types.UpdateAssetInput) (*types.UpdateAssetPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
-	asset, err := svc.Assets.Update(ctx, probo.UpdateAssetRequest{
+	asset, err := prb.Assets.Update(ctx, probo.UpdateAssetRequest{
 		ID:              input.ID,
 		Name:            input.Name,
 		Amount:          input.Amount,
@@ -2008,9 +2008,9 @@ func (r *mutationResolver) UpdateAsset(ctx context.Context, input types.UpdateAs
 
 // DeleteAsset is the resolver for the deleteAsset field.
 func (r *mutationResolver) DeleteAsset(ctx context.Context, input types.DeleteAssetInput) (*types.DeleteAssetPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.AssetID.TenantID())
+	prb := r.ProboService(ctx, input.AssetID.TenantID())
 
-	err := svc.Assets.Delete(ctx, input.AssetID)
+	err := prb.Assets.Delete(ctx, input.AssetID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete asset: %w", err)
 	}
@@ -2022,9 +2022,9 @@ func (r *mutationResolver) DeleteAsset(ctx context.Context, input types.DeleteAs
 
 // CreateDatum is the resolver for the createDatum field.
 func (r *mutationResolver) CreateDatum(ctx context.Context, input types.CreateDatumInput) (*types.CreateDatumPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.OrganizationID.TenantID())
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
-	data, err := svc.Data.Create(ctx, probo.CreateDatumRequest{
+	data, err := prb.Data.Create(ctx, probo.CreateDatumRequest{
 		OrganizationID:     input.OrganizationID,
 		Name:               input.Name,
 		DataClassification: input.DataClassification,
@@ -2043,9 +2043,9 @@ func (r *mutationResolver) CreateDatum(ctx context.Context, input types.CreateDa
 
 // UpdateDatum is the resolver for the updateDatum field.
 func (r *mutationResolver) UpdateDatum(ctx context.Context, input types.UpdateDatumInput) (*types.UpdateDatumPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.ID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
-	datum, err := svc.Data.Update(ctx, probo.UpdateDatumRequest{
+	datum, err := prb.Data.Update(ctx, probo.UpdateDatumRequest{
 		ID:                 input.ID,
 		Name:               input.Name,
 		DataClassification: input.DataClassification,
@@ -2064,9 +2064,9 @@ func (r *mutationResolver) UpdateDatum(ctx context.Context, input types.UpdateDa
 
 // DeleteDatum is the resolver for the deleteDatum field.
 func (r *mutationResolver) DeleteDatum(ctx context.Context, input types.DeleteDatumInput) (*types.DeleteDatumPayload, error) {
-	svc := GetTenantService(ctx, r.proboSvc, input.DatumID.TenantID())
+	prb := r.ProboService(ctx, input.DatumID.TenantID())
 
-	if err := svc.Data.Delete(ctx, input.DatumID); err != nil {
+	if err := prb.Data.Delete(ctx, input.DatumID); err != nil {
 		return nil, fmt.Errorf("cannot delete datum: %w", err)
 	}
 
@@ -2077,9 +2077,9 @@ func (r *mutationResolver) DeleteDatum(ctx context.Context, input types.DeleteDa
 
 // LogoURL is the resolver for the logoUrl field.
 func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organization) (*string, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	return svc.Organizations.GenerateLogoURL(ctx, obj.ID, 1*time.Hour)
+	return prb.Organizations.GenerateLogoURL(ctx, obj.ID, 1*time.Hour)
 }
 
 // Users is the resolver for the users field.
@@ -2107,7 +2107,7 @@ func (r *organizationResolver) Users(ctx context.Context, obj *types.Organizatio
 
 // Connectors is the resolver for the connectors field.
 func (r *organizationResolver) Connectors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ConnectorOrder) (*types.ConnectorConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ConnectorOrderField]{
 		Field:     coredata.ConnectorOrderFieldCreatedAt,
@@ -2122,7 +2122,7 @@ func (r *organizationResolver) Connectors(ctx context.Context, obj *types.Organi
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Connectors.ListForOrganizationID(ctx, obj.ID, cursor)
+	page, err := prb.Connectors.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization connectors: %w", err))
 	}
@@ -2132,7 +2132,7 @@ func (r *organizationResolver) Connectors(ctx context.Context, obj *types.Organi
 
 // Frameworks is the resolver for the frameworks field.
 func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) (*types.FrameworkConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.FrameworkOrderField]{
 		Field:     coredata.FrameworkOrderFieldCreatedAt,
@@ -2147,7 +2147,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Frameworks.ListForOrganizationID(ctx, obj.ID, cursor)
+	page, err := prb.Frameworks.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization frameworks: %w", err))
 	}
@@ -2157,7 +2157,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 
 // Controls is the resolver for the controls field.
 func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
 		Field:     coredata.ControlOrderFieldCreatedAt,
@@ -2177,7 +2177,7 @@ func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organiza
 		controlFilter = coredata.NewControlFilter(filter.Query)
 	}
 
-	page, err := svc.Controls.ListForOrganizationID(ctx, obj.ID, cursor, controlFilter)
+	page, err := prb.Controls.ListForOrganizationID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list controls: %w", err)
 	}
@@ -2187,7 +2187,7 @@ func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organiza
 
 // Vendors is the resolver for the vendors field.
 func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.VendorOrderField]{
 		Field:     coredata.VendorOrderFieldCreatedAt,
@@ -2202,7 +2202,7 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Vendors.ListForOrganizationID(ctx, obj.ID, cursor)
+	page, err := prb.Vendors.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization vendors: %w", err))
 	}
@@ -2212,7 +2212,7 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 
 // Peoples is the resolver for the peoples field.
 func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) (*types.PeopleConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.PeopleOrderField]{
 		Field:     coredata.PeopleOrderFieldCreatedAt,
@@ -2227,7 +2227,7 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Peoples.ListForOrganizationID(ctx, obj.ID, cursor)
+	page, err := prb.Peoples.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization peoples: %w", err))
 	}
@@ -2237,7 +2237,7 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 
 // Documents is the resolver for the documents field.
 func (r *organizationResolver) Documents(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DocumentOrderField]{
 		Field:     coredata.DocumentOrderFieldTitle,
@@ -2257,7 +2257,7 @@ func (r *organizationResolver) Documents(ctx context.Context, obj *types.Organiz
 		documentFilter = coredata.NewDocumentFilter(filter.Query)
 	}
 
-	page, err := svc.Documents.ListByOrganizationID(ctx, obj.ID, cursor, documentFilter)
+	page, err := prb.Documents.ListByOrganizationID(ctx, obj.ID, cursor, documentFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization documents: %w", err))
 	}
@@ -2267,7 +2267,7 @@ func (r *organizationResolver) Documents(ctx context.Context, obj *types.Organiz
 
 // Measures is the resolver for the measures field.
 func (r *organizationResolver) Measures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.MeasureOrderField]{
 		Field:     coredata.MeasureOrderFieldCreatedAt,
@@ -2287,7 +2287,7 @@ func (r *organizationResolver) Measures(ctx context.Context, obj *types.Organiza
 		measureFilter = coredata.NewMeasureFilter(filter.Query)
 	}
 
-	page, err := svc.Measures.ListForOrganizationID(ctx, obj.ID, cursor, measureFilter)
+	page, err := prb.Measures.ListForOrganizationID(ctx, obj.ID, cursor, measureFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization measures: %w", err))
 	}
@@ -2297,7 +2297,7 @@ func (r *organizationResolver) Measures(ctx context.Context, obj *types.Organiza
 
 // Risks is the resolver for the risks field.
 func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) (*types.RiskConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.RiskOrderField]{
 		Field:     coredata.RiskOrderFieldCreatedAt,
@@ -2317,7 +2317,7 @@ func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organizatio
 		riskFilter = coredata.NewRiskFilter(filter.Query)
 	}
 
-	page, err := svc.Risks.ListForOrganizationID(ctx, obj.ID, cursor, riskFilter)
+	page, err := prb.Risks.ListForOrganizationID(ctx, obj.ID, cursor, riskFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization risks: %w", err))
 	}
@@ -2327,7 +2327,7 @@ func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organizatio
 
 // Tasks is the resolver for the tasks field.
 func (r *organizationResolver) Tasks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) (*types.TaskConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.TaskOrderField]{
 		Field:     coredata.TaskOrderFieldCreatedAt,
@@ -2342,7 +2342,7 @@ func (r *organizationResolver) Tasks(ctx context.Context, obj *types.Organizatio
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Tasks.ListForOrganizationID(ctx, obj.ID, cursor)
+	page, err := prb.Tasks.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization tasks: %w", err))
 	}
@@ -2352,7 +2352,7 @@ func (r *organizationResolver) Tasks(ctx context.Context, obj *types.Organizatio
 
 // Assets is the resolver for the assets field.
 func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrderBy) (*types.AssetConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.AssetOrderField]{
 		Field:     coredata.AssetOrderFieldCreatedAt,
@@ -2367,7 +2367,7 @@ func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organizati
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Assets.ListForOrganizationID(ctx, obj.ID, cursor)
+	page, err := prb.Assets.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization assets: %w", err))
 	}
@@ -2377,7 +2377,7 @@ func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organizati
 
 // Assets is the resolver for the assets field.
 func (r *organizationResolver) Data(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrderBy) (*types.DatumConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DatumOrderField]{
 		Field:     coredata.DatumOrderFieldCreatedAt,
@@ -2392,7 +2392,7 @@ func (r *organizationResolver) Data(ctx context.Context, obj *types.Organization
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Data.ListForOrganizationID(ctx, obj.ID, cursor)
+	page, err := prb.Data.ListForOrganizationID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization data: %w", err))
 	}
@@ -2402,11 +2402,11 @@ func (r *organizationResolver) Data(ctx context.Context, obj *types.Organization
 
 // TotalCount is the resolver for the totalCount field.
 func (r *peopleConnectionResolver) TotalCount(ctx context.Context, obj *types.PeopleConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := svc.Peoples.CountForOrganizationID(ctx, obj.ParentID)
+		count, err := prb.Peoples.CountForOrganizationID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count peoples: %w", err)
 		}
@@ -2418,103 +2418,103 @@ func (r *peopleConnectionResolver) TotalCount(ctx context.Context, obj *types.Pe
 
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error) {
-	svc := GetTenantService(ctx, r.proboSvc, id.TenantID())
+	prb := r.ProboService(ctx, id.TenantID())
 
 	switch id.EntityType() {
 	case coredata.OrganizationEntityType:
-		organization, err := svc.Organizations.Get(ctx, id)
+		organization, err := prb.Organizations.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get organization: %w", err))
 		}
 
 		return types.NewOrganization(organization), nil
 	case coredata.PeopleEntityType:
-		people, err := svc.Peoples.Get(ctx, id)
+		people, err := prb.Peoples.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get people: %w", err))
 		}
 
 		return types.NewPeople(people), nil
 	case coredata.VendorEntityType:
-		vendor, err := svc.Vendors.Get(ctx, id)
+		vendor, err := prb.Vendors.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get vendor: %w", err))
 		}
 
 		return types.NewVendor(vendor), nil
 	case coredata.FrameworkEntityType:
-		framework, err := svc.Frameworks.Get(ctx, id)
+		framework, err := prb.Frameworks.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get framework: %w", err))
 		}
 
 		return types.NewFramework(framework), nil
 	case coredata.MeasureEntityType:
-		measure, err := svc.Measures.Get(ctx, id)
+		measure, err := prb.Measures.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get measure: %w", err))
 		}
 
 		return types.NewMeasure(measure), nil
 	case coredata.TaskEntityType:
-		task, err := svc.Tasks.Get(ctx, id)
+		task, err := prb.Tasks.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get task: %w", err))
 		}
 
 		return types.NewTask(task), nil
 	case coredata.EvidenceEntityType:
-		evidence, err := svc.Evidences.Get(ctx, id)
+		evidence, err := prb.Evidences.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get evidence: %w", err))
 		}
 
 		return types.NewEvidence(evidence), nil
 	case coredata.DocumentEntityType:
-		document, err := svc.Documents.Get(ctx, id)
+		document, err := prb.Documents.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get document: %w", err))
 		}
 		return types.NewDocument(document), nil
 	case coredata.ControlEntityType:
-		control, err := svc.Controls.Get(ctx, id)
+		control, err := prb.Controls.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get control: %w", err))
 		}
 
 		return types.NewControl(control), nil
 	case coredata.RiskEntityType:
-		risk, err := svc.Risks.Get(ctx, id)
+		risk, err := prb.Risks.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get risk: %w", err))
 		}
 		return types.NewRisk(risk), nil
 	case coredata.VendorComplianceReportEntityType:
-		vendorComplianceReport, err := svc.VendorComplianceReports.Get(ctx, id)
+		vendorComplianceReport, err := prb.VendorComplianceReports.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get vendor compliance report: %w", err))
 		}
 		return types.NewVendorComplianceReport(vendorComplianceReport), nil
 	case coredata.DocumentVersionEntityType:
-		documentVersion, err := svc.Documents.GetVersion(ctx, id)
+		documentVersion, err := prb.Documents.GetVersion(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get document version: %w", err))
 		}
 		return types.NewDocumentVersion(documentVersion), nil
 	case coredata.DocumentVersionSignatureEntityType:
-		documentVersionSignature, err := svc.Documents.GetVersionSignature(ctx, id)
+		documentVersionSignature, err := prb.Documents.GetVersionSignature(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get document version signature: %w", err))
 		}
 		return types.NewDocumentVersionSignature(documentVersionSignature), nil
 	case coredata.AssetEntityType:
-		asset, err := svc.Assets.Get(ctx, id)
+		asset, err := prb.Assets.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get asset: %w", err))
 		}
 		return types.NewAsset(asset), nil
 	case coredata.DatumEntityType:
-		datum, err := svc.Data.Get(ctx, id)
+		datum, err := prb.Data.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get data: %w", err))
 		}
@@ -2538,9 +2538,9 @@ func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
 
 // Owner is the resolver for the owner field.
 func (r *riskResolver) Owner(ctx context.Context, obj *types.Risk) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	risk, err := svc.Risks.Get(ctx, obj.ID)
+	risk, err := prb.Risks.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get risk: %w", err))
 	}
@@ -2549,7 +2549,7 @@ func (r *riskResolver) Owner(ctx context.Context, obj *types.Risk) (*types.Peopl
 		return nil, nil
 	}
 
-	owner, err := svc.Peoples.Get(ctx, *risk.OwnerID)
+	owner, err := prb.Peoples.Get(ctx, *risk.OwnerID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get owner: %w", err))
 	}
@@ -2559,14 +2559,14 @@ func (r *riskResolver) Owner(ctx context.Context, obj *types.Risk) (*types.Peopl
 
 // Organization is the resolver for the organization field.
 func (r *riskResolver) Organization(ctx context.Context, obj *types.Risk) (*types.Organization, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	risk, err := svc.Risks.Get(ctx, obj.ID)
+	risk, err := prb.Risks.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get risk: %w", err))
 	}
 
-	organization, err := svc.Organizations.Get(ctx, risk.OrganizationID)
+	organization, err := prb.Organizations.Get(ctx, risk.OrganizationID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get organization: %w", err))
 	}
@@ -2576,7 +2576,7 @@ func (r *riskResolver) Organization(ctx context.Context, obj *types.Risk) (*type
 
 // Measures is the resolver for the measures field.
 func (r *riskResolver) Measures(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.MeasureOrderField]{
 		Field:     coredata.MeasureOrderFieldCreatedAt,
@@ -2596,7 +2596,7 @@ func (r *riskResolver) Measures(ctx context.Context, obj *types.Risk, first *int
 		measureFilter = coredata.NewMeasureFilter(filter.Query)
 	}
 
-	page, err := svc.Measures.ListForRiskID(ctx, obj.ID, cursor, measureFilter)
+	page, err := prb.Measures.ListForRiskID(ctx, obj.ID, cursor, measureFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list risk measures: %w", err))
 	}
@@ -2606,7 +2606,7 @@ func (r *riskResolver) Measures(ctx context.Context, obj *types.Risk, first *int
 
 // Documents is the resolver for the documents field.
 func (r *riskResolver) Documents(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DocumentOrderField]{
 		Field:     coredata.DocumentOrderFieldCreatedAt,
@@ -2626,7 +2626,7 @@ func (r *riskResolver) Documents(ctx context.Context, obj *types.Risk, first *in
 		documentFilter = coredata.NewDocumentFilter(filter.Query)
 	}
 
-	page, err := svc.Documents.ListForRiskID(ctx, obj.ID, cursor, documentFilter)
+	page, err := prb.Documents.ListForRiskID(ctx, obj.ID, cursor, documentFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list risk documents: %w", err))
 	}
@@ -2636,7 +2636,7 @@ func (r *riskResolver) Documents(ctx context.Context, obj *types.Risk, first *in
 
 // Controls is the resolver for the controls field.
 func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
 		Field:     coredata.ControlOrderFieldCreatedAt,
@@ -2656,7 +2656,7 @@ func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int
 		controlFilter = coredata.NewControlFilter(filter.Query)
 	}
 
-	page, err := svc.Controls.ListForRiskID(ctx, obj.ID, cursor, controlFilter)
+	page, err := prb.Controls.ListForRiskID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list risk controls: %w", err))
 	}
@@ -2666,17 +2666,17 @@ func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int
 
 // TotalCount is the resolver for the totalCount field.
 func (r *riskConnectionResolver) TotalCount(ctx context.Context, obj *types.RiskConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *measureResolver:
-		count, err := svc.Risks.CountForMeasureID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Risks.CountForMeasureID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count risks: %w", err)
 		}
 		return count, nil
 	case *organizationResolver:
-		count, err := svc.Risks.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
+		count, err := prb.Risks.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count risks: %w", err)
 		}
@@ -2688,9 +2688,9 @@ func (r *riskConnectionResolver) TotalCount(ctx context.Context, obj *types.Risk
 
 // AssignedTo is the resolver for the assignedTo field.
 func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	task, err := svc.Tasks.Get(ctx, obj.ID)
+	task, err := prb.Tasks.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get task: %w", err))
 	}
@@ -2699,7 +2699,7 @@ func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.
 		return nil, nil
 	}
 
-	people, err := svc.Peoples.Get(ctx, *task.AssignedToID)
+	people, err := prb.Peoples.Get(ctx, *task.AssignedToID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get assigned to: %w", err))
 	}
@@ -2709,14 +2709,14 @@ func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.
 
 // Organization is the resolver for the organization field.
 func (r *taskResolver) Organization(ctx context.Context, obj *types.Task) (*types.Organization, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	task, err := svc.Tasks.Get(ctx, obj.ID)
+	task, err := prb.Tasks.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get task: %w", err))
 	}
 
-	organization, err := svc.Organizations.Get(ctx, task.OrganizationID)
+	organization, err := prb.Organizations.Get(ctx, task.OrganizationID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get organization: %w", err))
 	}
@@ -2726,14 +2726,14 @@ func (r *taskResolver) Organization(ctx context.Context, obj *types.Task) (*type
 
 // Measure is the resolver for the measure field.
 func (r *taskResolver) Measure(ctx context.Context, obj *types.Task) (*types.Measure, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	task, err := svc.Tasks.Get(ctx, obj.ID)
+	task, err := prb.Tasks.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get task: %w", err))
 	}
 
-	measure, err := svc.Measures.Get(ctx, *task.MeasureID)
+	measure, err := prb.Measures.Get(ctx, *task.MeasureID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get measure: %w", err))
 	}
@@ -2743,7 +2743,7 @@ func (r *taskResolver) Measure(ctx context.Context, obj *types.Task) (*types.Mea
 
 // Evidences is the resolver for the evidences field.
 func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.EvidenceOrderField]{
 		Field:     coredata.EvidenceOrderFieldCreatedAt,
@@ -2757,7 +2757,7 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 	}
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
-	page, err := svc.Evidences.ListForTaskID(ctx, obj.ID, cursor)
+	page, err := prb.Evidences.ListForTaskID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("failed to list task evidences: %w", err))
 	}
@@ -2767,17 +2767,17 @@ func (r *taskResolver) Evidences(ctx context.Context, obj *types.Task, first *in
 
 // TotalCount is the resolver for the totalCount field.
 func (r *taskConnectionResolver) TotalCount(ctx context.Context, obj *types.TaskConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *measureResolver:
-		count, err := svc.Tasks.CountForMeasureID(ctx, obj.ParentID)
+		count, err := prb.Tasks.CountForMeasureID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count tasks: %w", err)
 		}
 		return count, nil
 	case *organizationResolver:
-		count, err := svc.Tasks.CountForOrganizationID(ctx, obj.ParentID)
+		count, err := prb.Tasks.CountForOrganizationID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count tasks: %w", err)
 		}
@@ -2789,9 +2789,9 @@ func (r *taskConnectionResolver) TotalCount(ctx context.Context, obj *types.Task
 
 // People is the resolver for the people field.
 func (r *userResolver) People(ctx context.Context, obj *types.User, organizationID gid.GID) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, organizationID.TenantID())
+	prb := r.ProboService(ctx, organizationID.TenantID())
 
-	people, err := svc.Peoples.GetByUserID(ctx, obj.ID)
+	people, err := prb.Peoples.GetByUserID(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("failed to get people: %w", err))
 	}
@@ -2801,14 +2801,14 @@ func (r *userResolver) People(ctx context.Context, obj *types.User, organization
 
 // Organization is the resolver for the organization field.
 func (r *vendorResolver) Organization(ctx context.Context, obj *types.Vendor) (*types.Organization, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	vendor, err := svc.Vendors.Get(ctx, obj.ID)
+	vendor, err := prb.Vendors.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get vendor: %w", err))
 	}
 
-	organization, err := svc.Organizations.Get(ctx, vendor.OrganizationID)
+	organization, err := prb.Organizations.Get(ctx, vendor.OrganizationID)
 	if err != nil {
 		panic(fmt.Errorf("cannot get organization: %w", err))
 	}
@@ -2818,7 +2818,7 @@ func (r *vendorResolver) Organization(ctx context.Context, obj *types.Vendor) (*
 
 // ComplianceReports is the resolver for the complianceReports field.
 func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) (*types.VendorComplianceReportConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.VendorComplianceReportOrderField]{
 		Field:     coredata.VendorComplianceReportOrderFieldReportDate,
@@ -2833,7 +2833,7 @@ func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendo
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.VendorComplianceReports.ListForVendorID(ctx, obj.ID, cursor)
+	page, err := prb.VendorComplianceReports.ListForVendorID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("failed to list vendor compliance reports: %w", err))
 	}
@@ -2843,7 +2843,7 @@ func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendo
 
 // RiskAssessments is the resolver for the riskAssessments field.
 func (r *vendorResolver) RiskAssessments(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorRiskAssessmentOrder) (*types.VendorRiskAssessmentConnection, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.VendorRiskAssessmentOrderField]{
 		Field:     coredata.VendorRiskAssessmentOrderFieldCreatedAt,
@@ -2858,7 +2858,7 @@ func (r *vendorResolver) RiskAssessments(ctx context.Context, obj *types.Vendor,
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Vendors.ListRiskAssessments(ctx, obj.ID, cursor)
+	page, err := prb.Vendors.ListRiskAssessments(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("failed to list vendor risk assessments: %w", err))
 	}
@@ -2868,9 +2868,9 @@ func (r *vendorResolver) RiskAssessments(ctx context.Context, obj *types.Vendor,
 
 // BusinessOwner is the resolver for the businessOwner field.
 func (r *vendorResolver) BusinessOwner(ctx context.Context, obj *types.Vendor) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	vendor, err := svc.Vendors.Get(ctx, obj.ID)
+	vendor, err := prb.Vendors.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("failed to get vendor: %w", err))
 	}
@@ -2879,7 +2879,7 @@ func (r *vendorResolver) BusinessOwner(ctx context.Context, obj *types.Vendor) (
 		return nil, nil
 	}
 
-	people, err := svc.Peoples.Get(ctx, *vendor.BusinessOwnerID)
+	people, err := prb.Peoples.Get(ctx, *vendor.BusinessOwnerID)
 	if err != nil {
 		panic(fmt.Errorf("failed to get business owner: %w", err))
 	}
@@ -2889,8 +2889,8 @@ func (r *vendorResolver) BusinessOwner(ctx context.Context, obj *types.Vendor) (
 
 // SecurityOwner is the resolver for the securityOwner field.
 func (r *vendorResolver) SecurityOwner(ctx context.Context, obj *types.Vendor) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
-	vendor, err := svc.Vendors.Get(ctx, obj.ID)
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+	vendor, err := prb.Vendors.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("failed to get vendor: %w", err))
 	}
@@ -2899,7 +2899,7 @@ func (r *vendorResolver) SecurityOwner(ctx context.Context, obj *types.Vendor) (
 		return nil, nil
 	}
 
-	people, err := svc.Peoples.Get(ctx, *vendor.SecurityOwnerID)
+	people, err := prb.Peoples.Get(ctx, *vendor.SecurityOwnerID)
 	if err != nil {
 		panic(fmt.Errorf("failed to get security owner: %w", err))
 	}
@@ -2909,9 +2909,9 @@ func (r *vendorResolver) SecurityOwner(ctx context.Context, obj *types.Vendor) (
 
 // Vendor is the resolver for the vendor field.
 func (r *vendorComplianceReportResolver) Vendor(ctx context.Context, obj *types.VendorComplianceReport) (*types.Vendor, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	vendor, err := svc.Vendors.Get(ctx, obj.ID)
+	vendor, err := prb.Vendors.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("failed to get vendor: %w", err))
 	}
@@ -2921,9 +2921,9 @@ func (r *vendorComplianceReportResolver) Vendor(ctx context.Context, obj *types.
 
 // FileURL is the resolver for the fileUrl field.
 func (r *vendorComplianceReportResolver) FileURL(ctx context.Context, obj *types.VendorComplianceReport) (string, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	fileURL, err := svc.VendorComplianceReports.GenerateFileURL(ctx, obj.ID, 1*time.Hour)
+	fileURL, err := prb.VendorComplianceReports.GenerateFileURL(ctx, obj.ID, 1*time.Hour)
 	if err != nil {
 		panic(fmt.Errorf("failed to generate file URL: %w", err))
 	}
@@ -2933,23 +2933,23 @@ func (r *vendorComplianceReportResolver) FileURL(ctx context.Context, obj *types
 
 // TotalCount is the resolver for the totalCount field.
 func (r *vendorConnectionResolver) TotalCount(ctx context.Context, obj *types.VendorConnection) (int, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := svc.Vendors.CountForOrganizationID(ctx, obj.ParentID)
+		count, err := prb.Vendors.CountForOrganizationID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count vendors: %w", err)
 		}
 		return count, nil
 	case *assetResolver:
-		count, err := svc.Vendors.CountForAssetID(ctx, obj.ParentID)
+		count, err := prb.Vendors.CountForAssetID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count vendors: %w", err)
 		}
 		return count, nil
 	case *datumResolver:
-		count, err := svc.Vendors.CountForDatumID(ctx, obj.ParentID)
+		count, err := prb.Vendors.CountForDatumID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count vendors: %w", err)
 		}
@@ -2961,9 +2961,9 @@ func (r *vendorConnectionResolver) TotalCount(ctx context.Context, obj *types.Ve
 
 // Vendor is the resolver for the vendor field.
 func (r *vendorRiskAssessmentResolver) Vendor(ctx context.Context, obj *types.VendorRiskAssessment) (*types.Vendor, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	vendor, err := svc.Vendors.Get(ctx, obj.ID)
+	vendor, err := prb.Vendors.Get(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("failed to get vendor: %w", err))
 	}
@@ -2973,14 +2973,14 @@ func (r *vendorRiskAssessmentResolver) Vendor(ctx context.Context, obj *types.Ve
 
 // AssessedBy is the resolver for the assessedBy field.
 func (r *vendorRiskAssessmentResolver) AssessedBy(ctx context.Context, obj *types.VendorRiskAssessment) (*types.People, error) {
-	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
+	prb := r.ProboService(ctx, obj.ID.TenantID())
 
-	vendorRiskAssessment, err := svc.Vendors.GetRiskAssessment(ctx, obj.ID)
+	vendorRiskAssessment, err := prb.Vendors.GetRiskAssessment(ctx, obj.ID)
 	if err != nil {
 		panic(fmt.Errorf("failed to get vendor risk assessment: %w", err))
 	}
 
-	people, err := svc.Peoples.Get(ctx, vendorRiskAssessment.AssessedBy)
+	people, err := prb.Peoples.Get(ctx, vendorRiskAssessment.AssessedBy)
 	if err != nil {
 		panic(fmt.Errorf("failed to get assessed by: %w", err))
 	}
