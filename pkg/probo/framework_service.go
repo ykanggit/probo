@@ -104,6 +104,32 @@ func (s FrameworkService) Create(
 	return framework, nil
 }
 
+func (s FrameworkService) CountForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			frameworks := &coredata.Frameworks{}
+			count, err = frameworks.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID)
+			if err != nil {
+				return fmt.Errorf("cannot count frameworks: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count frameworks: %w", err)
+	}
+
+	return count, nil
+}
+
 func (s FrameworkService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,

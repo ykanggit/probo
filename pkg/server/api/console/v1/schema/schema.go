@@ -51,6 +51,7 @@ type ResolverRoot interface {
 	DocumentVersionSignature() DocumentVersionSignatureResolver
 	Evidence() EvidenceResolver
 	Framework() FrameworkResolver
+	FrameworkConnection() FrameworkConnectionResolver
 	Measure() MeasureResolver
 	Mutation() MutationResolver
 	Organization() OrganizationResolver
@@ -424,8 +425,9 @@ type ComplexityRoot struct {
 	}
 
 	FrameworkConnection struct {
-		Edges    func(childComplexity int) int
-		PageInfo func(childComplexity int) int
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	FrameworkEdge struct {
@@ -913,6 +915,9 @@ type EvidenceResolver interface {
 type FrameworkResolver interface {
 	Organization(ctx context.Context, obj *types.Framework) (*types.Organization, error)
 	Controls(ctx context.Context, obj *types.Framework, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error)
+}
+type FrameworkConnectionResolver interface {
+	TotalCount(ctx context.Context, obj *types.FrameworkConnection) (int, error)
 }
 type MeasureResolver interface {
 	Evidences(ctx context.Context, obj *types.Measure, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) (*types.EvidenceConnection, error)
@@ -2275,6 +2280,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.FrameworkConnection.PageInfo(childComplexity), true
+
+	case "FrameworkConnection.totalCount":
+		if e.complexity.FrameworkConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.FrameworkConnection.TotalCount(childComplexity), true
 
 	case "FrameworkEdge.cursor":
 		if e.complexity.FrameworkEdge.Cursor == nil {
@@ -5799,7 +5811,11 @@ type VendorEdge {
   node: Vendor!
 }
 
-type FrameworkConnection {
+type FrameworkConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.FrameworkConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [FrameworkEdge!]!
   pageInfo: PageInfo!
 }
@@ -20110,6 +20126,50 @@ func (ec *executionContext) fieldContext_Framework_updatedAt(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _FrameworkConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *types.FrameworkConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FrameworkConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.FrameworkConnection().TotalCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FrameworkConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FrameworkConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _FrameworkConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.FrameworkConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_FrameworkConnection_edges(ctx, field)
 	if err != nil {
@@ -20186,9 +20246,9 @@ func (ec *executionContext) _FrameworkConnection_pageInfo(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.PageInfo)
+	res := resTmp.(types.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_FrameworkConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -25353,6 +25413,8 @@ func (ec *executionContext) fieldContext_Organization_frameworks(ctx context.Con
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_FrameworkConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_FrameworkConnection_edges(ctx, field)
 			case "pageInfo":
@@ -43773,15 +43835,51 @@ func (ec *executionContext) _FrameworkConnection(ctx context.Context, sel ast.Se
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FrameworkConnection")
+		case "totalCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._FrameworkConnection_totalCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "edges":
 			out.Values[i] = ec._FrameworkConnection_edges(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "pageInfo":
 			out.Values[i] = ec._FrameworkConnection_pageInfo(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

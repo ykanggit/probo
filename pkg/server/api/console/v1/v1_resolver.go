@@ -202,9 +202,9 @@ func (r *controlConnectionResolver) TotalCount(ctx context.Context, obj *types.C
 			return 0, fmt.Errorf("cannot count controls: %w", err)
 		}
 		return count, nil
-	default:
-		panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 }
 
 // Owner is the resolver for the owner field.
@@ -582,6 +582,22 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 	}
 
 	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
+}
+
+// TotalCount is the resolver for the totalCount field.
+func (r *frameworkConnectionResolver) TotalCount(ctx context.Context, obj *types.FrameworkConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := svc.Frameworks.CountForOrganizationID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count frameworks: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 }
 
 // Evidences is the resolver for the evidences field.
@@ -2026,7 +2042,7 @@ func (r *organizationResolver) Frameworks(ctx context.Context, obj *types.Organi
 		panic(fmt.Errorf("cannot list organization frameworks: %w", err))
 	}
 
-	return types.NewFrameworkConnection(page), nil
+	return types.NewFrameworkConnection(page, r, obj.ID), nil
 }
 
 // Controls is the resolver for the controls field.
@@ -2832,6 +2848,11 @@ func (r *Resolver) Evidence() schema.EvidenceResolver { return &evidenceResolver
 // Framework returns schema.FrameworkResolver implementation.
 func (r *Resolver) Framework() schema.FrameworkResolver { return &frameworkResolver{r} }
 
+// FrameworkConnection returns schema.FrameworkConnectionResolver implementation.
+func (r *Resolver) FrameworkConnection() schema.FrameworkConnectionResolver {
+	return &frameworkConnectionResolver{r}
+}
+
 // Measure returns schema.MeasureResolver implementation.
 func (r *Resolver) Measure() schema.MeasureResolver { return &measureResolver{r} }
 
@@ -2878,6 +2899,7 @@ type documentVersionResolver struct{ *Resolver }
 type documentVersionSignatureResolver struct{ *Resolver }
 type evidenceResolver struct{ *Resolver }
 type frameworkResolver struct{ *Resolver }
+type frameworkConnectionResolver struct{ *Resolver }
 type measureResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }

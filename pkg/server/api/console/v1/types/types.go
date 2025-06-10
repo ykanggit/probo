@@ -660,11 +660,6 @@ type Framework struct {
 func (Framework) IsNode()             {}
 func (this Framework) GetID() gid.GID { return this.ID }
 
-type FrameworkConnection struct {
-	Edges    []*FrameworkEdge `json:"edges"`
-	PageInfo *PageInfo        `json:"pageInfo"`
-}
-
 type FrameworkEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Framework     `json:"node"`

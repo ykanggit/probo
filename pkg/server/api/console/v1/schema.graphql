@@ -1090,7 +1090,11 @@ type VendorEdge {
   node: Vendor!
 }
 
-type FrameworkConnection {
+type FrameworkConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.FrameworkConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [FrameworkEdge!]!
   pageInfo: PageInfo!
 }

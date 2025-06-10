@@ -16,14 +16,28 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
 
 type (
 	FrameworkOrderBy OrderBy[coredata.FrameworkOrderField]
+
+	FrameworkConnection struct {
+		TotalCount int
+		Edges      []*FrameworkEdge
+		PageInfo   PageInfo
+
+		Resolver any
+		ParentID gid.GID
+	}
 )
 
-func NewFrameworkConnection(p *page.Page[*coredata.Framework, coredata.FrameworkOrderField]) *FrameworkConnection {
+func NewFrameworkConnection(
+	p *page.Page[*coredata.Framework, coredata.FrameworkOrderField],
+	parentType any,
+	parentID gid.GID,
+) *FrameworkConnection {
 	var edges = make([]*FrameworkEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +46,10 @@ func NewFrameworkConnection(p *page.Page[*coredata.Framework, coredata.Framework
 
 	return &FrameworkConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(p),
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: parentType,
+		ParentID: parentID,
 	}
 }
 
