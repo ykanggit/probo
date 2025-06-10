@@ -677,7 +677,7 @@ func (r *measureResolver) Risks(ctx context.Context, obj *types.Measure, first *
 		return nil, fmt.Errorf("cannot list measure risks: %w", err)
 	}
 
-	return types.NewRiskConnection(page), nil
+	return types.NewRiskConnection(page, r, obj.ID, riskFilter), nil
 }
 
 // Controls is the resolver for the controls field.
@@ -2240,7 +2240,7 @@ func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organizatio
 		panic(fmt.Errorf("cannot list organization risks: %w", err))
 	}
 
-	return types.NewRiskConnection(page), nil
+	return types.NewRiskConnection(page, r, obj.ID, riskFilter), nil
 }
 
 // Tasks is the resolver for the tasks field.
@@ -2564,6 +2564,28 @@ func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int
 	}
 
 	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
+}
+
+// TotalCount is the resolver for the totalCount field.
+func (r *riskConnectionResolver) TotalCount(ctx context.Context, obj *types.RiskConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *measureResolver:
+		count, err := svc.Risks.CountForMeasureID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count risks: %w", err)
+		}
+		return count, nil
+	case *organizationResolver:
+		count, err := svc.Risks.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count risks: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 }
 
 // AssignedTo is the resolver for the assignedTo field.
@@ -2901,6 +2923,9 @@ func (r *Resolver) Query() schema.QueryResolver { return &queryResolver{r} }
 // Risk returns schema.RiskResolver implementation.
 func (r *Resolver) Risk() schema.RiskResolver { return &riskResolver{r} }
 
+// RiskConnection returns schema.RiskConnectionResolver implementation.
+func (r *Resolver) RiskConnection() schema.RiskConnectionResolver { return &riskConnectionResolver{r} }
+
 // Task returns schema.TaskResolver implementation.
 func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 
@@ -2939,6 +2964,7 @@ type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type riskResolver struct{ *Resolver }
+type riskConnectionResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
 type vendorResolver struct{ *Resolver }

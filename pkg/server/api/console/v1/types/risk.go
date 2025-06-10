@@ -16,14 +16,30 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
 
 type (
 	RiskOrderBy OrderBy[coredata.RiskOrderField]
+
+	RiskConnection struct {
+		TotalCount int
+		Edges      []*RiskEdge
+		PageInfo   PageInfo
+
+		Resolver any
+		ParentID gid.GID
+		Filters  *coredata.RiskFilter
+	}
 )
 
-func NewRiskConnection(p *page.Page[*coredata.Risk, coredata.RiskOrderField]) *RiskConnection {
+func NewRiskConnection(
+	p *page.Page[*coredata.Risk, coredata.RiskOrderField],
+	parentType any,
+	parentID gid.GID,
+	filters *coredata.RiskFilter,
+) *RiskConnection {
 	var edges = make([]*RiskEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +48,11 @@ func NewRiskConnection(p *page.Page[*coredata.Risk, coredata.RiskOrderField]) *R
 
 	return &RiskConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(p),
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: parentType,
+		ParentID: parentID,
+		Filters:  filters,
 	}
 }
 

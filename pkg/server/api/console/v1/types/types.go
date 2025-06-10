@@ -879,11 +879,6 @@ type Risk struct {
 func (Risk) IsNode()             {}
 func (this Risk) GetID() gid.GID { return this.ID }
 
-type RiskConnection struct {
-	Edges    []*RiskEdge `json:"edges"`
-	PageInfo *PageInfo   `json:"pageInfo"`
-}
-
 type RiskEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Risk          `json:"node"`

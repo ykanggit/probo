@@ -59,6 +59,33 @@ type (
 	}
 )
 
+func (s RiskService) CountForMeasureID(
+	ctx context.Context,
+	measureID gid.GID,
+	filter *coredata.RiskFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			risks := &coredata.Risks{}
+			count, err = risks.CountByMeasureID(ctx, conn, s.svc.scope, measureID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count risks: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count risks: %w", err)
+	}
+
+	return count, nil
+}
+
 func (s RiskService) ListForMeasureID(
 	ctx context.Context,
 	measureID gid.GID,
@@ -71,6 +98,62 @@ func (s RiskService) ListForMeasureID(
 		ctx,
 		func(conn pg.Conn) error {
 			return risks.LoadByMeasureID(ctx, conn, s.svc.scope, measureID, cursor, filter)
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot list risks: %w", err)
+	}
+
+	return page.NewPage(risks, cursor), nil
+}
+
+func (s RiskService) CountForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+	filter *coredata.RiskFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			risks := &coredata.Risks{}
+			count, err = risks.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count risks: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count risks: %w", err)
+	}
+
+	return count, nil
+}
+
+func (s RiskService) ListForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+	cursor *page.Cursor[coredata.RiskOrderField],
+	filter *coredata.RiskFilter,
+) (*page.Page[*coredata.Risk, coredata.RiskOrderField], error) {
+	var risks coredata.Risks
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return risks.LoadByOrganizationID(
+				ctx,
+				conn,
+				s.svc.scope,
+				organizationID,
+				cursor,
+				filter,
+			)
 		},
 	)
 
@@ -389,33 +472,4 @@ func (s RiskService) Delete(
 			return risk.Delete(ctx, conn, s.svc.scope, riskID)
 		},
 	)
-}
-
-func (s RiskService) ListForOrganizationID(
-	ctx context.Context,
-	organizationID gid.GID,
-	cursor *page.Cursor[coredata.RiskOrderField],
-	filter *coredata.RiskFilter,
-) (*page.Page[*coredata.Risk, coredata.RiskOrderField], error) {
-	var risks coredata.Risks
-
-	err := s.svc.pg.WithConn(
-		ctx,
-		func(conn pg.Conn) error {
-			return risks.LoadByOrganizationID(
-				ctx,
-				conn,
-				s.svc.scope,
-				organizationID,
-				cursor,
-				filter,
-			)
-		},
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("cannot list risks: %w", err)
-	}
-
-	return page.NewPage(risks, cursor), nil
 }

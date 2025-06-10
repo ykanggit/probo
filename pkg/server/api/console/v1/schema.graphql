@@ -1162,7 +1162,11 @@ type DocumentEdge {
   node: Document!
 }
 
-type RiskConnection {
+type RiskConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.RiskConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [RiskEdge!]!
   pageInfo: PageInfo!
 }
