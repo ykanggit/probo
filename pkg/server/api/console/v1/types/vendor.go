@@ -16,14 +16,28 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
 
 type (
 	VendorOrderBy OrderBy[coredata.VendorOrderField]
+
+	VendorConnection struct {
+		TotalCount int
+		Edges      []*VendorEdge
+		PageInfo   PageInfo
+
+		Resolver any
+		ParentID gid.GID
+	}
 )
 
-func NewVendorConnection(p *page.Page[*coredata.Vendor, coredata.VendorOrderField]) *VendorConnection {
+func NewVendorConnection(
+	p *page.Page[*coredata.Vendor, coredata.VendorOrderField],
+	parentType any,
+	parentID gid.GID,
+) *VendorConnection {
 	var edges = make([]*VendorEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +46,10 @@ func NewVendorConnection(p *page.Page[*coredata.Vendor, coredata.VendorOrderFiel
 
 	return &VendorConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(p),
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: parentType,
+		ParentID: parentID,
 	}
 }
 

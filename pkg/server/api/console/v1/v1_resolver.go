@@ -54,12 +54,12 @@ func (r *assetResolver) Vendors(ctx context.Context, obj *types.Asset, first *in
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := svc.Assets.ListVendors(ctx, obj.ID, cursor)
+	page, err := svc.Vendors.ListForAssetID(ctx, obj.ID, cursor)
 	if err != nil {
 		panic(fmt.Errorf("cannot list asset vendors: %w", err))
 	}
 
-	return types.NewVendorConnection(page), nil
+	return types.NewVendorConnection(page, r, obj.ID), nil
 }
 
 // AssetType is the resolver for the assetType field.
@@ -246,7 +246,7 @@ func (r *datumResolver) Vendors(ctx context.Context, obj *types.Datum, first *in
 		panic(fmt.Errorf("cannot list data vendors: %w", err))
 	}
 
-	return types.NewVendorConnection(page), nil
+	return types.NewVendorConnection(page, r, obj.ID), nil
 }
 
 // Organization is the resolver for the organization field.
@@ -2175,7 +2175,7 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 		panic(fmt.Errorf("cannot list organization vendors: %w", err))
 	}
 
-	return types.NewVendorConnection(page), nil
+	return types.NewVendorConnection(page, r, obj.ID), nil
 }
 
 // Peoples is the resolver for the peoples field.
@@ -2883,6 +2883,34 @@ func (r *vendorComplianceReportResolver) FileURL(ctx context.Context, obj *types
 	return fileURL, nil
 }
 
+// TotalCount is the resolver for the totalCount field.
+func (r *vendorConnectionResolver) TotalCount(ctx context.Context, obj *types.VendorConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := svc.Vendors.CountForOrganizationID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count vendors: %w", err)
+		}
+		return count, nil
+	case *assetResolver:
+		count, err := svc.Vendors.CountForAssetID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count vendors: %w", err)
+		}
+		return count, nil
+	case *datumResolver:
+		count, err := svc.Vendors.CountForDatumID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count vendors: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
 // Vendor is the resolver for the vendor field.
 func (r *vendorRiskAssessmentResolver) Vendor(ctx context.Context, obj *types.VendorRiskAssessment) (*types.Vendor, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -3025,6 +3053,11 @@ func (r *Resolver) VendorComplianceReport() schema.VendorComplianceReportResolve
 	return &vendorComplianceReportResolver{r}
 }
 
+// VendorConnection returns schema.VendorConnectionResolver implementation.
+func (r *Resolver) VendorConnection() schema.VendorConnectionResolver {
+	return &vendorConnectionResolver{r}
+}
+
 // VendorRiskAssessment returns schema.VendorRiskAssessmentResolver implementation.
 func (r *Resolver) VendorRiskAssessment() schema.VendorRiskAssessmentResolver {
 	return &vendorRiskAssessmentResolver{r}
@@ -3057,5 +3090,6 @@ type taskConnectionResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
 type vendorResolver struct{ *Resolver }
 type vendorComplianceReportResolver struct{ *Resolver }
+type vendorConnectionResolver struct{ *Resolver }
 type vendorRiskAssessmentResolver struct{ *Resolver }
 type viewerResolver struct{ *Resolver }

@@ -1080,7 +1080,11 @@ type PeopleEdge {
   node: People!
 }
 
-type VendorConnection {
+type VendorConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.VendorConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [VendorEdge!]!
   pageInfo: PageInfo!
 }

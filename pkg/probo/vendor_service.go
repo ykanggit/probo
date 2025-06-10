@@ -89,6 +89,32 @@ type (
 	}
 )
 
+func (s VendorService) CountForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			vendors := coredata.Vendors{}
+			count, err = vendors.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID)
+			if err != nil {
+				return fmt.Errorf("cannot count vendors: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s VendorService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
@@ -109,6 +135,59 @@ func (s VendorService) ListForOrganizationID(
 				conn,
 				s.svc.scope,
 				organization.ID,
+				cursor,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(vendors, cursor), nil
+}
+
+func (s VendorService) CountForDatumID(
+	ctx context.Context,
+	datumID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			vendors := coredata.Vendors{}
+			count, err = vendors.CountByDatumID(ctx, conn, s.svc.scope, datumID)
+			if err != nil {
+				return fmt.Errorf("cannot count vendors: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (s VendorService) ListForDatumID(
+	ctx context.Context,
+	datumID gid.GID,
+	cursor *page.Cursor[coredata.VendorOrderField],
+) (*page.Page[*coredata.Vendor, coredata.VendorOrderField], error) {
+	var vendors coredata.Vendors
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return vendors.LoadByDatumID(
+				ctx,
+				conn,
+				s.svc.scope,
+				datumID,
 				cursor,
 			)
 		},
@@ -353,6 +432,53 @@ func (s VendorService) Create(
 	}
 
 	return vendor, nil
+}
+
+func (s VendorService) CountForAssetID(
+	ctx context.Context,
+	assetID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			vendors := coredata.Vendors{}
+			count, err = vendors.CountByAssetID(ctx, conn, s.svc.scope, assetID)
+			if err != nil {
+				return fmt.Errorf("cannot count vendors: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (s VendorService) ListForAssetID(
+	ctx context.Context,
+	assetID gid.GID,
+	cursor *page.Cursor[coredata.VendorOrderField],
+) (*page.Page[*coredata.Vendor, coredata.VendorOrderField], error) {
+	var vendors coredata.Vendors
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			return vendors.LoadByAssetID(ctx, conn, s.svc.scope, assetID, cursor)
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(vendors, cursor), nil
 }
 
 func (s VendorService) ListRiskAssessments(

@@ -218,30 +218,3 @@ func (s DatumService) ListVendors(
 
 	return page.NewPage(vendors, cursor), nil
 }
-
-func (s VendorService) ListForDatumID(
-	ctx context.Context,
-	datumID gid.GID,
-	cursor *page.Cursor[coredata.VendorOrderField],
-) (*page.Page[*coredata.Vendor, coredata.VendorOrderField], error) {
-	var vendors coredata.Vendors
-
-	err := s.svc.pg.WithConn(
-		ctx,
-		func(conn pg.Conn) error {
-			return vendors.LoadByDatumID(
-				ctx,
-				conn,
-				s.svc.scope,
-				datumID,
-				cursor,
-			)
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return page.NewPage(vendors, cursor), nil
-}

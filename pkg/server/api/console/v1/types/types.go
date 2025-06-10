@@ -1193,11 +1193,6 @@ type VendorComplianceReportEdge struct {
 	Node   *VendorComplianceReport `json:"node"`
 }
 
-type VendorConnection struct {
-	Edges    []*VendorEdge `json:"edges"`
-	PageInfo *PageInfo     `json:"pageInfo"`
-}
-
 type VendorEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Vendor        `json:"node"`

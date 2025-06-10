@@ -205,24 +205,3 @@ func (s AssetService) Delete(
 		},
 	)
 }
-
-func (s AssetService) ListVendors(
-	ctx context.Context,
-	assetID gid.GID,
-	cursor *page.Cursor[coredata.VendorOrderField],
-) (*page.Page[*coredata.Vendor, coredata.VendorOrderField], error) {
-	var vendors coredata.Vendors
-
-	err := s.svc.pg.WithConn(
-		ctx,
-		func(conn pg.Conn) error {
-			return vendors.LoadByAssetID(ctx, conn, s.svc.scope, assetID, cursor)
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return page.NewPage(vendors, cursor), nil
-}

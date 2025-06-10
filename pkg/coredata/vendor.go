@@ -235,6 +235,38 @@ DELETE FROM vendors WHERE %s AND id = @vendor_id
 	return err
 }
 
+func (v *Vendors) CountByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+) (int, error) {
+	q := `
+SELECT
+    COUNT(id)
+FROM
+    vendors
+WHERE
+    %s
+    AND organization_id = @organization_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("cannot count vendors: %w", err)
+	}
+
+	return count, nil
+}
+
 func (v *Vendors) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -390,6 +422,45 @@ func (v Vendor) ExpireNonExpiredRiskAssessments(
 	return nil
 }
 
+func (v *Vendors) CountByAssetID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	assetID gid.GID,
+) (int, error) {
+	q := `
+WITH vend AS (
+	SELECT
+		v.id
+	FROM
+		vendors v
+	INNER JOIN
+		asset_vendors av ON v.id = av.vendor_id
+	WHERE
+		av.asset_id = @asset_id
+)
+SELECT
+	COUNT(id)
+FROM
+	vend
+WHERE %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"asset_id": assetID}
+	maps.Copy(args, scope.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("cannot count vendors: %w", err)
+	}
+
+	return count, nil
+}
+
 func (v *Vendors) LoadByAssetID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -478,6 +549,45 @@ WHERE %s
 	*v = vendors
 
 	return nil
+}
+
+func (v *Vendors) CountByDatumID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	datumID gid.GID,
+) (int, error) {
+	q := `
+WITH vend AS (
+	SELECT
+		v.id
+	FROM
+		vendors v
+	INNER JOIN
+		data_vendors dv ON v.id = dv.vendor_id
+	WHERE
+		dv.datum_id = @datum_id
+)
+SELECT
+	COUNT(id)
+FROM
+	vend
+WHERE %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"datum_id": datumID}
+	maps.Copy(args, scope.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("cannot count vendors: %w", err)
+	}
+
+	return count, nil
 }
 
 func (vs *Vendors) LoadByDatumID(
