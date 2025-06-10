@@ -58,6 +58,47 @@ func (c Control) CursorKey(orderBy ControlOrderField) page.CursorKey {
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
 
+func (c *Controls) CountByDocumentID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	documentID gid.GID,
+	filter *ControlFilter,
+) (int, error) {
+	q := `
+WITH ctrl AS (
+	SELECT
+		c.id
+	FROM
+		controls c
+	INNER JOIN
+		controls_documents cp ON c.id = cp.control_id
+	WHERE
+		cp.document_id = @document_id
+)
+SELECT
+	COUNT(id)
+FROM
+	ctrl
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"document_id": documentID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
+
 func (c *Controls) LoadByDocumentID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -121,6 +162,47 @@ WHERE %s
 	return nil
 }
 
+func (c *Controls) CountByMeasureID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	measureID gid.GID,
+	filter *ControlFilter,
+) (int, error) {
+	q := `
+WITH ctrl AS (
+	SELECT
+		c.id
+	FROM
+		controls c
+	INNER JOIN
+		controls_measures cm ON c.id = cm.control_id
+	WHERE
+		cm.measure_id = @measure_id
+)
+SELECT
+	COUNT(id)
+FROM
+	ctrl
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"measure_id": measureID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
+
 func (c *Controls) LoadByMeasureID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -182,6 +264,53 @@ WHERE %s
 	*c = controls
 
 	return nil
+}
+
+func (c *Controls) CountByRiskID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	riskID gid.GID,
+	filter *ControlFilter,
+) (int, error) {
+	q := `
+WITH ctrl AS (
+	SELECT DISTINCT
+		c.id
+	FROM
+		controls c
+	LEFT JOIN
+		controls_documents cp ON c.id = cp.control_id
+	LEFT JOIN
+		risks_documents rp ON cp.document_id = rp.document_id
+	LEFT JOIN
+		controls_measures cm ON c.id = cm.control_id
+	LEFT JOIN
+		risks_measures rm ON (rm.measure_id = cm.measure_id)
+	WHERE
+		rp.risk_id = @risk_id OR rm.risk_id = @risk_id
+)
+SELECT
+	COUNT(id)
+FROM
+	ctrl
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"risk_id": riskID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
 }
 
 func (c *Controls) LoadByRiskID(
@@ -253,6 +382,38 @@ WHERE %s
 	return nil
 }
 
+func (c *Controls) CountByFrameworkID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	frameworkID gid.GID,
+	filter *ControlFilter,
+) (int, error) {
+	q := `
+SELECT
+	COUNT(id)
+FROM
+	controls
+WHERE %s 
+	AND framework_id = @framework_id 
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"framework_id": frameworkID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
+
 func (c *Controls) LoadByFrameworkID(
 	ctx context.Context,
 	conn pg.Conn,
@@ -299,6 +460,53 @@ WHERE
 	*c = controls
 
 	return nil
+}
+
+func (c *Controls) CountByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+	filter *ControlFilter,
+) (int, error) {
+	q := `
+WITH ctrl AS (
+	SELECT
+		c.id,
+		c.section_title,
+		c.framework_id,
+		c.tenant_id,
+		c.name,
+		c.description,
+		c.created_at,
+		c.updated_at
+	FROM
+		controls c
+	INNER JOIN
+		frameworks f ON c.framework_id = f.id
+	WHERE
+		f.organization_id = @organization_id
+)
+SELECT
+	COUNT(id)
+FROM
+	ctrl
+WHERE %s
+    AND %s
+`
+
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
 }
 
 func (c *Controls) LoadByOrganizationID(

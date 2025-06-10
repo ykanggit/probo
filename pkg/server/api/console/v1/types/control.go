@@ -16,6 +16,7 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
 
@@ -23,7 +24,12 @@ type (
 	ControlOrderBy OrderBy[coredata.ControlOrderField]
 )
 
-func NewControlConnection(p *page.Page[*coredata.Control, coredata.ControlOrderField]) *ControlConnection {
+func NewControlConnection(
+	p *page.Page[*coredata.Control, coredata.ControlOrderField],
+	parentType any,
+	parentID gid.GID,
+	filters *coredata.ControlFilter,
+) *ControlConnection {
 	var edges = make([]*ControlEdge, len(p.Data))
 
 	for i := range edges {
@@ -32,7 +38,11 @@ func NewControlConnection(p *page.Page[*coredata.Control, coredata.ControlOrderF
 
 	return &ControlConnection{
 		Edges:    edges,
-		PageInfo: NewPageInfo(p),
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: parentType,
+		ParentID: parentID,
+		Filters:  filters,
 	}
 }
 

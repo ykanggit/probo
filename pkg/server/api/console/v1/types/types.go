@@ -115,11 +115,6 @@ type Control struct {
 func (Control) IsNode()             {}
 func (this Control) GetID() gid.GID { return this.ID }
 
-type ControlConnection struct {
-	Edges    []*ControlEdge `json:"edges"`
-	PageInfo *PageInfo      `json:"pageInfo"`
-}
-
 type ControlEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Control       `json:"node"`

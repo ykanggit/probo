@@ -249,10 +249,22 @@ enum VendorComplianceReportOrderField
     )
 }
 
-enum OrganizationOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderField") {
-  NAME @goEnum(value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldName")
-  CREATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldCreatedAt")
-  UPDATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldUpdatedAt")
+enum OrganizationOrderField
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderField"
+  ) {
+  NAME
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldName"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldCreatedAt"
+    )
+  UPDATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldUpdatedAt"
+    )
 }
 
 enum ConnectorOrderField
@@ -316,72 +328,168 @@ enum DocumentVersionOrderField
     )
 }
 
-enum VendorCategory @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorCategory") {
-  ANALYTICS @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryAnalytics")
-  CLOUD_MONITORING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudMonitoring")
-  CLOUD_PROVIDER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudProvider")
-  COLLABORATION @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCollaboration")
-  CUSTOMER_SUPPORT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCustomerSupport")
-  DATA_STORAGE_AND_PROCESSING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDataStorageAndProcessing")
-  DOCUMENT_MANAGEMENT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDocumentManagement")
-  EMPLOYEE_MANAGEMENT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEmployeeManagement")
-  ENGINEERING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEngineering")
-  FINANCE @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryFinance")
-  IDENTITY_PROVIDER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryIdentityProvider")
+enum VendorCategory
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorCategory") {
+  ANALYTICS
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryAnalytics"
+    )
+  CLOUD_MONITORING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudMonitoring"
+    )
+  CLOUD_PROVIDER
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudProvider"
+    )
+  COLLABORATION
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCollaboration"
+    )
+  CUSTOMER_SUPPORT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCustomerSupport"
+    )
+  DATA_STORAGE_AND_PROCESSING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDataStorageAndProcessing"
+    )
+  DOCUMENT_MANAGEMENT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDocumentManagement"
+    )
+  EMPLOYEE_MANAGEMENT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEmployeeManagement"
+    )
+  ENGINEERING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEngineering"
+    )
+  FINANCE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryFinance"
+    )
+  IDENTITY_PROVIDER
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryIdentityProvider"
+    )
   IT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryIT")
-  MARKETING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryMarketing")
-  OFFICE_OPERATIONS @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOfficeOperations")
-  OTHER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOther")
-  PASSWORD_MANAGEMENT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryPasswordManagement")
-  PRODUCT_AND_DESIGN @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProductAndDesign")
-  PROFESSIONAL_SERVICES @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProfessionalServices")
-  RECRUITING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryRecruiting")
-  SALES @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySales")
-  SECURITY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySecurity")
-  VERSION_CONTROL @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryVersionControl")
+  MARKETING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryMarketing"
+    )
+  OFFICE_OPERATIONS
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOfficeOperations"
+    )
+  OTHER
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOther")
+  PASSWORD_MANAGEMENT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryPasswordManagement"
+    )
+  PRODUCT_AND_DESIGN
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProductAndDesign"
+    )
+  PROFESSIONAL_SERVICES
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProfessionalServices"
+    )
+  RECRUITING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryRecruiting"
+    )
+  SALES
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySales")
+  SECURITY
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySecurity"
+    )
+  VERSION_CONTROL
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryVersionControl"
+    )
 }
 
-enum DocumentType @goModel(model: "github.com/getprobo/probo/pkg/coredata.DocumentType") {
-  OTHER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypeOther")
+enum DocumentType
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.DocumentType") {
+  OTHER
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypeOther")
   ISMS @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypeISMS")
-  POLICY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypePolicy")
+  POLICY
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypePolicy")
 }
 
-enum AssetType @goModel(model: "github.com/getprobo/probo/pkg/coredata.AssetType") {
-  PHYSICAL @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetTypePhysical")
-  VIRTUAL @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetTypeVirtual")
+enum AssetType
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.AssetType") {
+  PHYSICAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetTypePhysical")
+  VIRTUAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetTypeVirtual")
 }
 
-enum CriticityLevel @goModel(model: "github.com/getprobo/probo/pkg/coredata.CriticityLevel") {
+enum CriticityLevel
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.CriticityLevel") {
   LOW @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelLow")
-  MEDIUM @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelMedium")
-  HIGH @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelHigh")
+  MEDIUM
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelMedium"
+    )
+  HIGH
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelHigh")
 }
 
-enum AssetOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.AssetOrderField") {
-  CREATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldCreatedAt")
-  AMOUNT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldAmount")
-  CRITICITY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldCriticity")
+enum AssetOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.AssetOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldCreatedAt"
+    )
+  AMOUNT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldAmount"
+    )
+  CRITICITY
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldCriticity"
+    )
 }
 
-enum DatumOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.DatumOrderField") {
-  CREATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldCreatedAt")
-  NAME @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldName")
-  DATA_CLASSIFICATION @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldDataClassification")
+enum DatumOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.DatumOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldCreatedAt"
+    )
+  NAME
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldName")
+  DATA_CLASSIFICATION
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldDataClassification"
+    )
 }
 
 enum DataClassification
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.DataClassification") {
   PUBLIC
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationPublic")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataClassificationPublic"
+    )
   INTERNAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationInternal")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataClassificationInternal"
+    )
   CONFIDENTIAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationConfidential")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataClassificationConfidential"
+    )
   SECRET
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationSecret")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataClassificationSecret"
+    )
 }
-
 # Input Types
 input UserOrder
   @goModel(
@@ -992,7 +1100,11 @@ type FrameworkEdge {
   node: Framework!
 }
 
-type ControlConnection {
+type ControlConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.ControlConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [ControlEdge!]!
   pageInfo: PageInfo!
 }

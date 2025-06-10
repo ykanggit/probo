@@ -44,6 +44,7 @@ type Config struct {
 type ResolverRoot interface {
 	Asset() AssetResolver
 	Control() ControlResolver
+	ControlConnection() ControlConnectionResolver
 	Datum() DatumResolver
 	Document() DocumentResolver
 	DocumentVersion() DocumentVersionResolver
@@ -134,8 +135,9 @@ type ComplexityRoot struct {
 	}
 
 	ControlConnection struct {
-		Edges    func(childComplexity int) int
-		PageInfo func(childComplexity int) int
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	ControlEdge struct {
@@ -874,6 +876,9 @@ type ControlResolver interface {
 	Measures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error)
 	Documents(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error)
 }
+type ControlConnectionResolver interface {
+	TotalCount(ctx context.Context, obj *types.ControlConnection) (int, error)
+}
 type DatumResolver interface {
 	Owner(ctx context.Context, obj *types.Datum) (*types.People, error)
 	Vendors(ctx context.Context, obj *types.Datum, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error)
@@ -1335,6 +1340,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.ControlConnection.PageInfo(childComplexity), true
+
+	case "ControlConnection.totalCount":
+		if e.complexity.ControlConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.ControlConnection.TotalCount(childComplexity), true
 
 	case "ControlEdge.cursor":
 		if e.complexity.ControlEdge.Cursor == nil {
@@ -4946,10 +4958,22 @@ enum VendorComplianceReportOrderField
     )
 }
 
-enum OrganizationOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderField") {
-  NAME @goEnum(value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldName")
-  CREATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldCreatedAt")
-  UPDATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldUpdatedAt")
+enum OrganizationOrderField
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderField"
+  ) {
+  NAME
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldName"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldCreatedAt"
+    )
+  UPDATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderFieldUpdatedAt"
+    )
 }
 
 enum ConnectorOrderField
@@ -5013,72 +5037,168 @@ enum DocumentVersionOrderField
     )
 }
 
-enum VendorCategory @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorCategory") {
-  ANALYTICS @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryAnalytics")
-  CLOUD_MONITORING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudMonitoring")
-  CLOUD_PROVIDER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudProvider")
-  COLLABORATION @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCollaboration")
-  CUSTOMER_SUPPORT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCustomerSupport")
-  DATA_STORAGE_AND_PROCESSING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDataStorageAndProcessing")
-  DOCUMENT_MANAGEMENT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDocumentManagement")
-  EMPLOYEE_MANAGEMENT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEmployeeManagement")
-  ENGINEERING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEngineering")
-  FINANCE @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryFinance")
-  IDENTITY_PROVIDER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryIdentityProvider")
+enum VendorCategory
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorCategory") {
+  ANALYTICS
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryAnalytics"
+    )
+  CLOUD_MONITORING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudMonitoring"
+    )
+  CLOUD_PROVIDER
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudProvider"
+    )
+  COLLABORATION
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCollaboration"
+    )
+  CUSTOMER_SUPPORT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCustomerSupport"
+    )
+  DATA_STORAGE_AND_PROCESSING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDataStorageAndProcessing"
+    )
+  DOCUMENT_MANAGEMENT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDocumentManagement"
+    )
+  EMPLOYEE_MANAGEMENT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEmployeeManagement"
+    )
+  ENGINEERING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEngineering"
+    )
+  FINANCE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryFinance"
+    )
+  IDENTITY_PROVIDER
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryIdentityProvider"
+    )
   IT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryIT")
-  MARKETING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryMarketing")
-  OFFICE_OPERATIONS @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOfficeOperations")
-  OTHER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOther")
-  PASSWORD_MANAGEMENT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryPasswordManagement")
-  PRODUCT_AND_DESIGN @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProductAndDesign")
-  PROFESSIONAL_SERVICES @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProfessionalServices")
-  RECRUITING @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryRecruiting")
-  SALES @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySales")
-  SECURITY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySecurity")
-  VERSION_CONTROL @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryVersionControl")
+  MARKETING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryMarketing"
+    )
+  OFFICE_OPERATIONS
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOfficeOperations"
+    )
+  OTHER
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOther")
+  PASSWORD_MANAGEMENT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryPasswordManagement"
+    )
+  PRODUCT_AND_DESIGN
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProductAndDesign"
+    )
+  PROFESSIONAL_SERVICES
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProfessionalServices"
+    )
+  RECRUITING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryRecruiting"
+    )
+  SALES
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySales")
+  SECURITY
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySecurity"
+    )
+  VERSION_CONTROL
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryVersionControl"
+    )
 }
 
-enum DocumentType @goModel(model: "github.com/getprobo/probo/pkg/coredata.DocumentType") {
-  OTHER @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypeOther")
+enum DocumentType
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.DocumentType") {
+  OTHER
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypeOther")
   ISMS @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypeISMS")
-  POLICY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypePolicy")
+  POLICY
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypePolicy")
 }
 
-enum AssetType @goModel(model: "github.com/getprobo/probo/pkg/coredata.AssetType") {
-  PHYSICAL @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetTypePhysical")
-  VIRTUAL @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetTypeVirtual")
+enum AssetType
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.AssetType") {
+  PHYSICAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetTypePhysical")
+  VIRTUAL
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetTypeVirtual")
 }
 
-enum CriticityLevel @goModel(model: "github.com/getprobo/probo/pkg/coredata.CriticityLevel") {
+enum CriticityLevel
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.CriticityLevel") {
   LOW @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelLow")
-  MEDIUM @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelMedium")
-  HIGH @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelHigh")
+  MEDIUM
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelMedium"
+    )
+  HIGH
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.CriticityLevelHigh")
 }
 
-enum AssetOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.AssetOrderField") {
-  CREATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldCreatedAt")
-  AMOUNT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldAmount")
-  CRITICITY @goEnum(value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldCriticity")
+enum AssetOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.AssetOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldCreatedAt"
+    )
+  AMOUNT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldAmount"
+    )
+  CRITICITY
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AssetOrderFieldCriticity"
+    )
 }
 
-enum DatumOrderField @goModel(model: "github.com/getprobo/probo/pkg/coredata.DatumOrderField") {
-  CREATED_AT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldCreatedAt")
-  NAME @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldName")
-  DATA_CLASSIFICATION @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldDataClassification")
+enum DatumOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.DatumOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldCreatedAt"
+    )
+  NAME
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldName")
+  DATA_CLASSIFICATION
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DatumOrderFieldDataClassification"
+    )
 }
 
 enum DataClassification
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.DataClassification") {
   PUBLIC
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationPublic")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataClassificationPublic"
+    )
   INTERNAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationInternal")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataClassificationInternal"
+    )
   CONFIDENTIAL
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationConfidential")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataClassificationConfidential"
+    )
   SECRET
-    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DataClassificationSecret")
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DataClassificationSecret"
+    )
 }
-
 # Input Types
 input UserOrder
   @goModel(
@@ -5689,7 +5809,11 @@ type FrameworkEdge {
   node: Framework!
 }
 
-type ControlConnection {
+type ControlConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.ControlConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [ControlEdge!]!
   pageInfo: PageInfo!
 }
@@ -13484,6 +13608,50 @@ func (ec *executionContext) fieldContext_Control_updatedAt(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _ControlConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *types.ControlConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ControlConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ControlConnection().TotalCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ControlConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ControlConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ControlConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.ControlConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ControlConnection_edges(ctx, field)
 	if err != nil {
@@ -13560,9 +13728,9 @@ func (ec *executionContext) _ControlConnection_pageInfo(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.PageInfo)
+	res := resTmp.(types.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ControlConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16826,6 +16994,8 @@ func (ec *executionContext) fieldContext_Document_controls(ctx context.Context, 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ControlConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_ControlConnection_edges(ctx, field)
 			case "pageInfo":
@@ -19828,6 +19998,8 @@ func (ec *executionContext) fieldContext_Framework_controls(ctx context.Context,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ControlConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_ControlConnection_edges(ctx, field)
 			case "pageInfo":
@@ -20826,6 +20998,8 @@ func (ec *executionContext) fieldContext_Measure_controls(ctx context.Context, f
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ControlConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_ControlConnection_edges(ctx, field)
 			case "pageInfo":
@@ -25240,6 +25414,8 @@ func (ec *executionContext) fieldContext_Organization_controls(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ControlConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_ControlConnection_edges(ctx, field)
 			case "pageInfo":
@@ -28235,6 +28411,8 @@ func (ec *executionContext) fieldContext_Risk_controls(ctx context.Context, fiel
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ControlConnection_totalCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_ControlConnection_edges(ctx, field)
 			case "pageInfo":
@@ -40544,15 +40722,51 @@ func (ec *executionContext) _ControlConnection(ctx context.Context, sel ast.Sele
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ControlConnection")
+		case "totalCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ControlConnection_totalCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "edges":
 			out.Values[i] = ec._ControlConnection_edges(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "pageInfo":
 			out.Values[i] = ec._ControlConnection_pageInfo(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -50884,6 +51098,10 @@ var (
 		coredata.OrganizationOrderFieldUpdatedAt: "UPDATED_AT",
 	}
 )
+
+func (ec *executionContext) marshalNPageInfo2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v types.PageInfo) graphql.Marshaler {
+	return ec._PageInfo(ctx, sel, &v)
+}
 
 func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *types.PageInfo) graphql.Marshaler {
 	if v == nil {

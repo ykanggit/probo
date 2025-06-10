@@ -56,6 +56,33 @@ type (
 	}
 )
 
+func (s ControlService) CountForDocumentID(
+	ctx context.Context,
+	documentID gid.GID,
+	filter *coredata.ControlFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			controls := &coredata.Controls{}
+			count, err = controls.CountByDocumentID(ctx, conn, s.svc.scope, documentID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count controls: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count controls: %w", err)
+	}
+
+	return count, nil
+}
+
 func (s ControlService) ListForDocumentID(
 	ctx context.Context,
 	documentID gid.GID,
@@ -83,6 +110,33 @@ func (s ControlService) ListForDocumentID(
 	return page.NewPage(controls, cursor), nil
 }
 
+func (s ControlService) CountForMeasureID(
+	ctx context.Context,
+	measureID gid.GID,
+	filter *coredata.ControlFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			controls := &coredata.Controls{}
+			count, err = controls.CountByMeasureID(ctx, conn, s.svc.scope, measureID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count controls: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count controls: %w", err)
+	}
+
+	return count, nil
+}
+
 func (s ControlService) ListForMeasureID(
 	ctx context.Context,
 	measureID gid.GID,
@@ -100,6 +154,182 @@ func (s ControlService) ListForMeasureID(
 			}
 
 			return controls.LoadByMeasureID(ctx, conn, s.svc.scope, measureID, cursor, filter)
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot list controls: %w", err)
+	}
+
+	return page.NewPage(controls, cursor), nil
+}
+
+func (s ControlService) CountForFrameworkID(
+	ctx context.Context,
+	frameworkID gid.GID,
+	filter *coredata.ControlFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			controls := &coredata.Controls{}
+			count, err = controls.CountByFrameworkID(ctx, conn, s.svc.scope, frameworkID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count controls: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count controls: %w", err)
+	}
+
+	return count, nil
+}
+
+func (s ControlService) ListForFrameworkID(
+	ctx context.Context,
+	frameworkID gid.GID,
+	cursor *page.Cursor[coredata.ControlOrderField],
+	filter *coredata.ControlFilter,
+) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
+	var controls coredata.Controls
+	framework := &coredata.Framework{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := framework.LoadByID(ctx, conn, s.svc.scope, frameworkID); err != nil {
+				return fmt.Errorf("cannot load framework: %w", err)
+			}
+
+			return controls.LoadByFrameworkID(
+				ctx,
+				conn,
+				s.svc.scope,
+				framework.ID,
+				cursor,
+				filter,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot list controls: %w", err)
+	}
+
+	return page.NewPage(controls, cursor), nil
+}
+
+func (s ControlService) CountForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+	filter *coredata.ControlFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			controls := &coredata.Controls{}
+			count, err = controls.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count controls: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count controls: %w", err)
+	}
+
+	return count, nil
+}
+
+func (s ControlService) ListForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+	cursor *page.Cursor[coredata.ControlOrderField],
+	filter *coredata.ControlFilter,
+) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
+	var controls coredata.Controls
+	organization := &coredata.Organization{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, organizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			return controls.LoadByOrganizationID(
+				ctx,
+				conn,
+				s.svc.scope,
+				organization.ID,
+				cursor,
+				filter,
+			)
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot list controls: %w", err)
+	}
+
+	return page.NewPage(controls, cursor), nil
+}
+
+func (s ControlService) CountForRiskID(
+	ctx context.Context,
+	riskID gid.GID,
+	filter *coredata.ControlFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			controls := &coredata.Controls{}
+			count, err = controls.CountByRiskID(ctx, conn, s.svc.scope, riskID, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count controls: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("cannot count controls: %w", err)
+	}
+
+	return count, nil
+}
+
+func (s ControlService) ListForRiskID(
+	ctx context.Context,
+	riskID gid.GID,
+	cursor *page.Cursor[coredata.ControlOrderField],
+	filter *coredata.ControlFilter,
+) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
+	var controls coredata.Controls
+	risk := &coredata.Risk{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := risk.LoadByID(ctx, conn, s.svc.scope, riskID); err != nil {
+				return fmt.Errorf("cannot load risk: %w", err)
+			}
+
+			return controls.LoadByRiskID(ctx, conn, s.svc.scope, risk.ID, cursor, filter)
 		},
 	)
 
@@ -352,99 +582,4 @@ func (s ControlService) Delete(
 			return control.Delete(ctx, conn, s.svc.scope)
 		},
 	)
-}
-
-func (s ControlService) ListForFrameworkID(
-	ctx context.Context,
-	frameworkID gid.GID,
-	cursor *page.Cursor[coredata.ControlOrderField],
-	filter *coredata.ControlFilter,
-) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
-	var controls coredata.Controls
-	framework := &coredata.Framework{}
-
-	err := s.svc.pg.WithConn(
-		ctx,
-		func(conn pg.Conn) error {
-			if err := framework.LoadByID(ctx, conn, s.svc.scope, frameworkID); err != nil {
-				return fmt.Errorf("cannot load framework: %w", err)
-			}
-
-			return controls.LoadByFrameworkID(
-				ctx,
-				conn,
-				s.svc.scope,
-				framework.ID,
-				cursor,
-				filter,
-			)
-		},
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("cannot list controls: %w", err)
-	}
-
-	return page.NewPage(controls, cursor), nil
-}
-
-func (s ControlService) ListForOrganizationID(
-	ctx context.Context,
-	organizationID gid.GID,
-	cursor *page.Cursor[coredata.ControlOrderField],
-	filter *coredata.ControlFilter,
-) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
-	var controls coredata.Controls
-	organization := &coredata.Organization{}
-
-	err := s.svc.pg.WithConn(
-		ctx,
-		func(conn pg.Conn) error {
-			if err := organization.LoadByID(ctx, conn, s.svc.scope, organizationID); err != nil {
-				return fmt.Errorf("cannot load organization: %w", err)
-			}
-
-			return controls.LoadByOrganizationID(
-				ctx,
-				conn,
-				s.svc.scope,
-				organization.ID,
-				cursor,
-				filter,
-			)
-		},
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("cannot list controls: %w", err)
-	}
-
-	return page.NewPage(controls, cursor), nil
-}
-
-func (s ControlService) ListForRiskID(
-	ctx context.Context,
-	riskID gid.GID,
-	cursor *page.Cursor[coredata.ControlOrderField],
-	filter *coredata.ControlFilter,
-) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
-	var controls coredata.Controls
-	risk := &coredata.Risk{}
-
-	err := s.svc.pg.WithConn(
-		ctx,
-		func(conn pg.Conn) error {
-			if err := risk.LoadByID(ctx, conn, s.svc.scope, riskID); err != nil {
-				return fmt.Errorf("cannot load risk: %w", err)
-			}
-
-			return controls.LoadByRiskID(ctx, conn, s.svc.scope, risk.ID, cursor, filter)
-		},
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("cannot list controls: %w", err)
-	}
-
-	return page.NewPage(controls, cursor), nil
 }

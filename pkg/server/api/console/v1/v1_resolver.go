@@ -167,6 +167,46 @@ func (r *controlResolver) Documents(ctx context.Context, obj *types.Control, fir
 	return types.NewDocumentConnection(page), nil
 }
 
+// TotalCount is the resolver for the totalCount field.
+func (r *controlConnectionResolver) TotalCount(ctx context.Context, obj *types.ControlConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := svc.Controls.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count controls: %w", err)
+		}
+		return count, nil
+	case *frameworkResolver:
+		count, err := svc.Controls.CountForFrameworkID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count controls: %w", err)
+		}
+		return count, nil
+	case *documentResolver:
+		count, err := svc.Controls.CountForDocumentID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count controls: %w", err)
+		}
+		return count, nil
+	case *measureResolver:
+		count, err := svc.Controls.CountForMeasureID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count controls: %w", err)
+		}
+		return count, nil
+	case *riskResolver:
+		count, err := svc.Controls.CountForRiskID(ctx, obj.ParentID, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count controls: %w", err)
+		}
+		return count, nil
+	default:
+		panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+	}
+}
+
 // Owner is the resolver for the owner field.
 func (r *datumResolver) Owner(ctx context.Context, obj *types.Datum) (*types.People, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -308,7 +348,7 @@ func (r *documentResolver) Controls(ctx context.Context, obj *types.Document, fi
 		panic(fmt.Errorf("cannot list document controls: %w", err))
 	}
 
-	return types.NewControlConnection(page), nil
+	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
 }
 
 // Document is the resolver for the document field.
@@ -541,7 +581,7 @@ func (r *frameworkResolver) Controls(ctx context.Context, obj *types.Framework, 
 		return nil, fmt.Errorf("cannot list controls: %w", err)
 	}
 
-	return types.NewControlConnection(page), nil
+	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
 }
 
 // Evidences is the resolver for the evidences field.
@@ -651,7 +691,7 @@ func (r *measureResolver) Controls(ctx context.Context, obj *types.Measure, firs
 		return nil, fmt.Errorf("cannot list measure controls: %w", err)
 	}
 
-	return types.NewControlConnection(page), nil
+	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
 }
 
 // CreateOrganization is the resolver for the createOrganization field.
@@ -2016,7 +2056,7 @@ func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organiza
 		return nil, fmt.Errorf("cannot list controls: %w", err)
 	}
 
-	return types.NewControlConnection(page), nil
+	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
 }
 
 // Vendors is the resolver for the vendors field.
@@ -2479,7 +2519,7 @@ func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int
 		panic(fmt.Errorf("cannot list risk controls: %w", err))
 	}
 
-	return types.NewControlConnection(page), nil
+	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
 }
 
 // AssignedTo is the resolver for the assignedTo field.
@@ -2765,6 +2805,11 @@ func (r *Resolver) Asset() schema.AssetResolver { return &assetResolver{r} }
 // Control returns schema.ControlResolver implementation.
 func (r *Resolver) Control() schema.ControlResolver { return &controlResolver{r} }
 
+// ControlConnection returns schema.ControlConnectionResolver implementation.
+func (r *Resolver) ControlConnection() schema.ControlConnectionResolver {
+	return &controlConnectionResolver{r}
+}
+
 // Datum returns schema.DatumResolver implementation.
 func (r *Resolver) Datum() schema.DatumResolver { return &datumResolver{r} }
 
@@ -2826,6 +2871,7 @@ func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
 
 type assetResolver struct{ *Resolver }
 type controlResolver struct{ *Resolver }
+type controlConnectionResolver struct{ *Resolver }
 type datumResolver struct{ *Resolver }
 type documentResolver struct{ *Resolver }
 type documentVersionResolver struct{ *Resolver }
