@@ -41,5 +41,10 @@ func (f *RiskFilter) SQLFragment() string {
 		return "TRUE"
 	}
 
-	return "search_vector @@ websearch_to_tsquery('simple', @query)"
+	return `
+		search_vector @@ (
+			SELECT to_tsquery('simple', string_agg(lexeme || ':*', ' & '))
+			FROM unnest(regexp_split_to_array(trim(@query), '\s+')) AS lexeme
+		)
+	`
 }

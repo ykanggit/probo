@@ -333,6 +333,7 @@ WITH plcs AS (
 	SELECT
 		p.id,
 		p.tenant_id,
+		p.search_vector,
 		p.organization_id,
 		p.owner_id,
 		p.title,

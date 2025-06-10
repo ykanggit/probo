@@ -219,6 +219,7 @@ WITH mtgtns AS (
 		m.description,
 		m.state,
 		m.reference_id,
+		m.search_vector,
 		m.created_at,
 		m.updated_at
 	FROM
