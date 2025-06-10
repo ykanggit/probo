@@ -135,48 +135,48 @@ func (s AssetService) Update(
 	req UpdateAssetRequest,
 ) (*coredata.Asset, error) {
 	now := time.Now()
+	asset := &coredata.Asset{ID: req.ID}
+	assetVendors := &coredata.AssetVendors{}
 
-	existing := &coredata.Asset{}
-	if err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
-		return existing.LoadByID(ctx, conn, s.svc.scope, req.ID)
-	}); err != nil {
-		return nil, fmt.Errorf("cannot load asset: %w", err)
-	}
+	err := s.svc.pg.WithTx(ctx, func(conn pg.Conn) error {
+		if err := asset.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
+			return fmt.Errorf("cannot load asset: %w", err)
+		}
 
-	asset := &coredata.Asset{
-		ID:              req.ID,
-		OrganizationID:  existing.OrganizationID,
-		Name:            existing.Name,
-		Amount:          existing.Amount,
-		OwnerID:         existing.OwnerID,
-		Criticity:       existing.Criticity,
-		AssetType:       existing.AssetType,
-		DataTypesStored: existing.DataTypesStored,
-		CreatedAt:       existing.CreatedAt,
-		UpdatedAt:       now,
-	}
+		asset.UpdatedAt = now
+		if req.Name != nil {
+			asset.Name = *req.Name
+		}
+		if req.Amount != nil {
+			asset.Amount = *req.Amount
+		}
+		if req.OwnerID != nil {
+			asset.OwnerID = *req.OwnerID
+		}
+		if req.Criticity != nil {
+			asset.Criticity = *req.Criticity
+		}
+		if req.AssetType != nil {
+			asset.AssetType = *req.AssetType
+		}
+		if req.DataTypesStored != nil {
+			asset.DataTypesStored = *req.DataTypesStored
+		}
 
-	// Update fields from request
-	if req.Name != nil {
-		asset.Name = *req.Name
-	}
-	if req.Amount != nil {
-		asset.Amount = *req.Amount
-	}
-	if req.OwnerID != nil {
-		asset.OwnerID = *req.OwnerID
-	}
-	if req.Criticity != nil {
-		asset.Criticity = *req.Criticity
-	}
-	if req.AssetType != nil {
-		asset.AssetType = *req.AssetType
-	}
-	if req.DataTypesStored != nil {
-		asset.DataTypesStored = *req.DataTypesStored
-	}
+		if err := asset.Update(ctx, conn, s.svc.scope); err != nil {
+			return fmt.Errorf("cannot update asset: %w", err)
+		}
 
-	if err := asset.UpdateWithVendorsTx(ctx, s.svc.pg, s.svc.scope, req.VendorIDs, now); err != nil {
+		if req.VendorIDs != nil {
+			if err := assetVendors.Merge(ctx, conn, s.svc.scope, asset.ID, req.VendorIDs); err != nil {
+				return fmt.Errorf("cannot update asset vendors: %w", err)
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -189,8 +189,8 @@ func (s AssetService) Create(
 ) (*coredata.Asset, error) {
 	now := time.Now()
 	assetID := gid.New(s.svc.scope.GetTenantID(), coredata.AssetEntityType)
+	assetVendors := &coredata.AssetVendors{}
 
-	organization := &coredata.Organization{}
 	asset := &coredata.Asset{
 		ID:              assetID,
 		OrganizationID:  req.OrganizationID,
@@ -204,12 +204,19 @@ func (s AssetService) Create(
 		UpdatedAt:       now,
 	}
 
-	err := s.svc.pg.WithTx(
-		ctx,
-		func(conn pg.Conn) error {
-			return asset.CreateWithVendors(ctx, conn, s.svc.scope, organization, req.VendorIDs, now)
-		},
-	)
+	err := s.svc.pg.WithTx(ctx, func(conn pg.Conn) error {
+		if err := asset.Insert(ctx, conn, s.svc.scope); err != nil {
+			return fmt.Errorf("cannot insert asset: %w", err)
+		}
+
+		if len(req.VendorIDs) > 0 {
+			if err := assetVendors.Insert(ctx, conn, s.svc.scope, asset.ID, req.VendorIDs); err != nil {
+				return fmt.Errorf("cannot create asset vendors: %w", err)
+			}
+		}
+
+		return nil
+	})
 
 	if err != nil {
 		return nil, err

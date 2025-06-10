@@ -143,36 +143,39 @@ func (s DatumService) Update(
 	req UpdateDatumRequest,
 ) (*coredata.Datum, error) {
 	now := time.Now()
+	datum := &coredata.Datum{}
+	datumVendors := &coredata.DatumVendors{}
 
-	existing := &coredata.Datum{}
-	if err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
-		return existing.LoadByID(ctx, conn, s.svc.scope, req.ID)
-	}); err != nil {
-		return nil, fmt.Errorf("cannot load data: %w", err)
-	}
+	err := s.svc.pg.WithTx(ctx, func(conn pg.Conn) error {
+		if err := datum.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
+			return fmt.Errorf("cannot load data: %w", err)
+		}
 
-	datum := &coredata.Datum{
-		ID:                 req.ID,
-		OrganizationID:     existing.OrganizationID,
-		Name:               existing.Name,
-		DataClassification: existing.DataClassification,
-		OwnerID:            existing.OwnerID,
-		CreatedAt:          existing.CreatedAt,
-		UpdatedAt:          now,
-	}
+		if req.Name != nil {
+			datum.Name = *req.Name
+		}
+		if req.DataClassification != nil {
+			datum.DataClassification = *req.DataClassification
+		}
+		if req.OwnerID != nil {
+			datum.OwnerID = *req.OwnerID
+		}
+		datum.UpdatedAt = now
 
-	// Update fields from request
-	if req.Name != nil {
-		datum.Name = *req.Name
-	}
-	if req.DataClassification != nil {
-		datum.DataClassification = *req.DataClassification
-	}
-	if req.OwnerID != nil {
-		datum.OwnerID = *req.OwnerID
-	}
+		if err := datum.Update(ctx, conn, s.svc.scope); err != nil {
+			return fmt.Errorf("cannot update data: %w", err)
+		}
 
-	if err := datum.UpdateWithVendorsTx(ctx, s.svc.pg, s.svc.scope, req.VendorIDs, now); err != nil {
+		if req.VendorIDs != nil {
+			if err := datumVendors.Merge(ctx, conn, s.svc.scope, datum.ID, req.VendorIDs); err != nil {
+				return fmt.Errorf("cannot update data vendors: %w", err)
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -185,6 +188,7 @@ func (s DatumService) Create(
 ) (*coredata.Datum, error) {
 	now := time.Now()
 	datumID := gid.New(s.svc.scope.GetTenantID(), coredata.DatumEntityType)
+	datumVendors := &coredata.DatumVendors{}
 
 	datum := &coredata.Datum{
 		ID:                 datumID,
@@ -199,7 +203,17 @@ func (s DatumService) Create(
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			return datum.CreateWithVendors(ctx, conn, s.svc.scope, req.VendorIDs, now)
+			if err := datum.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert datum: %w", err)
+			}
+
+			if len(req.VendorIDs) > 0 {
+				if err := datumVendors.Insert(ctx, conn, s.svc.scope, datum.ID, req.VendorIDs); err != nil {
+					return fmt.Errorf("cannot create data vendors: %w", err)
+				}
+			}
+
+			return nil
 		},
 	)
 

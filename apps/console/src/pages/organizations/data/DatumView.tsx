@@ -190,7 +190,7 @@ function DatumViewContent({
           name: formData.name,
           dataClassification: formData.dataClassification,
           ownerId: formData.ownerId,
-          vendorIds: formData.selectedVendorIds.length > 0 ? formData.selectedVendorIds : undefined,
+          vendorIds: formData.selectedVendorIds,
         },
       },
       onCompleted: () => {

@@ -293,7 +293,7 @@ RETURNING
 		"name":                d.Name,
 		"owner_id":            d.OwnerID,
 		"data_classification": d.DataClassification,
-		"updated_at":          time.Now(),
+		"updated_at":          d.UpdatedAt,
 	}
 	maps.Copy(args, scope.SQLArguments())
 
@@ -335,90 +335,4 @@ WHERE
 	}
 
 	return nil
-}
-
-type DataVendor struct {
-	DatumID   gid.GID   `db:"datum_id"`
-	VendorID  gid.GID   `db:"vendor_id"`
-	CreatedAt time.Time `db:"created_at"`
-}
-
-func (d *Datum) CreateWithVendors(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-	vendorIDs []gid.GID,
-	now time.Time,
-) error {
-	if err := d.Insert(ctx, conn, scope); err != nil {
-		return fmt.Errorf("cannot insert data: %w", err)
-	}
-
-	if len(vendorIDs) > 0 {
-		for _, vendorID := range vendorIDs {
-			_, err := conn.Exec(ctx, `
-				INSERT INTO data_vendors (tenant_id, datum_id, vendor_id, created_at)
-				VALUES ($1, $2, $3, $4)
-			`, scope.GetTenantID(), d.ID, vendorID, now)
-			if err != nil {
-				return fmt.Errorf("cannot insert data vendor: %w", err)
-			}
-		}
-	}
-
-	return nil
-}
-
-func (d *Datum) UpdateWithVendors(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-	vendorIDs []gid.GID,
-	now time.Time,
-) error {
-	existing := &Datum{}
-	if err := existing.LoadByID(ctx, conn, scope, d.ID); err != nil {
-		return fmt.Errorf("cannot load data: %w", err)
-	}
-
-	d.CreatedAt = existing.CreatedAt
-	d.UpdatedAt = now
-
-	if err := d.Update(ctx, conn, scope); err != nil {
-		return fmt.Errorf("cannot update data: %w", err)
-	}
-
-	_, err := conn.Exec(ctx, `
-		DELETE FROM data_vendors
-		WHERE tenant_id = $1 AND datum_id = $2
-	`, scope.GetTenantID(), d.ID)
-	if err != nil {
-		return fmt.Errorf("cannot delete data vendors: %w", err)
-	}
-
-	if len(vendorIDs) > 0 {
-		for _, vendorID := range vendorIDs {
-			_, err := conn.Exec(ctx, `
-				INSERT INTO data_vendors (tenant_id, datum_id, vendor_id, created_at)
-				VALUES ($1, $2, $3, $4)
-			`, scope.GetTenantID(), d.ID, vendorID, now)
-			if err != nil {
-				return fmt.Errorf("cannot insert data vendor: %w", err)
-			}
-		}
-	}
-
-	return nil
-}
-
-func (d *Datum) UpdateWithVendorsTx(
-	ctx context.Context,
-	db *pg.Client,
-	scope Scoper,
-	vendorIDs []gid.GID,
-	now time.Time,
-) error {
-	return db.WithTx(ctx, func(conn pg.Conn) error {
-		return d.UpdateWithVendors(ctx, conn, scope, vendorIDs, now)
-	})
 }
