@@ -1236,7 +1236,11 @@ type DocumentVersionEdge {
   node: DocumentVersion!
 }
 
-type DatumConnection {
+type DatumConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.DatumConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
   edges: [DatumEdge!]!
   pageInfo: PageInfo!
 }
@@ -2219,7 +2223,10 @@ type Datum implements Node {
   updatedAt: Datetime!
 }
 
-input DatumOrder {
+input DatumOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.DatumOrderBy"
+  ) {
   direction: OrderDirection!
   field: DatumOrderField!
 }

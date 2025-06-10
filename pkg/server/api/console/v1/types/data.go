@@ -16,8 +16,41 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 )
+
+type (
+	DatumOrderBy OrderBy[coredata.DatumOrderField]
+
+	DatumConnection struct {
+		TotalCount int
+		Edges      []*DatumEdge
+		PageInfo   PageInfo
+
+		Resolver any
+		ParentID gid.GID
+	}
+)
+
+func NewDataConnection(
+	p *page.Page[*coredata.Data, coredata.DatumOrderField],
+	parentType any,
+	parentID gid.GID,
+) *DatumConnection {
+	edges := make([]*DatumEdge, len(p.Data))
+	for i, data := range p.Data {
+		edges[i] = NewDatumEdge(data, p.Cursor.OrderBy.Field)
+	}
+
+	return &DatumConnection{
+		Edges:    edges,
+		PageInfo: *NewPageInfo(p),
+
+		Resolver: parentType,
+		ParentID: parentID,
+	}
+}
 
 func NewDatum(d *coredata.Data) *Datum {
 	return &Datum{
@@ -34,17 +67,5 @@ func NewDatumEdge(d *coredata.Data, orderField coredata.DatumOrderField) *DatumE
 	return &DatumEdge{
 		Node:   NewDatum(d),
 		Cursor: d.CursorKey(orderField),
-	}
-}
-
-func NewDataConnection(page *page.Page[*coredata.Data, coredata.DatumOrderField]) *DatumConnection {
-	edges := make([]*DatumEdge, len(page.Data))
-	for i, data := range page.Data {
-		edges[i] = NewDatumEdge(data, page.Cursor.OrderBy.Field)
-	}
-
-	return &DatumConnection{
-		Edges:    edges,
-		PageInfo: NewPageInfo(page),
 	}
 }

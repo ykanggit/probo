@@ -26,15 +26,19 @@ import (
 	"go.gearno.de/kit/pg"
 )
 
-type Data struct {
-	ID                 gid.GID            `db:"id"`
-	Name               string             `db:"name"`
-	OrganizationID     gid.GID            `db:"organization_id"`
-	OwnerID            gid.GID            `db:"owner_id"`
-	DataClassification DataClassification `db:"data_classification"`
-	CreatedAt          time.Time          `db:"created_at"`
-	UpdatedAt          time.Time          `db:"updated_at"`
-}
+type (
+	Data struct {
+		ID                 gid.GID            `db:"id"`
+		Name               string             `db:"name"`
+		OrganizationID     gid.GID            `db:"organization_id"`
+		OwnerID            gid.GID            `db:"owner_id"`
+		DataClassification DataClassification `db:"data_classification"`
+		CreatedAt          time.Time          `db:"created_at"`
+		UpdatedAt          time.Time          `db:"updated_at"`
+	}
+
+	DataList []*Data
+)
 
 func (d *Data) CursorKey(field DatumOrderField) page.CursorKey {
 	switch field {
@@ -48,8 +52,6 @@ func (d *Data) CursorKey(field DatumOrderField) page.CursorKey {
 
 	panic(fmt.Sprintf("unsupported order by: %s", field))
 }
-
-type DataList []*Data
 
 func (d *Data) LoadByID(
 	ctx context.Context,
@@ -136,48 +138,36 @@ LIMIT 1;
 	return nil
 }
 
-func (dl *DataList) LoadByOwnerID(
+func (dl *DataList) CountByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,
 	scope Scoper,
-	ownerID gid.GID,
-	cursor *page.Cursor[DatumOrderField],
-) error {
+	organizationID gid.GID,
+) (int, error) {
 	q := `
 SELECT
-	id,
-	name,
-	owner_id,
-	data_classification,
-	created_at,
-	updated_at
+	COUNT(id)
 FROM
 	data
 WHERE
 	%s
-	AND owner_id = @owner_id
-	AND %s
+	AND organization_id = @organization_id
 `
 
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{"owner_id": ownerID}
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
 	maps.Copy(args, scope.SQLArguments())
-	maps.Copy(args, cursor.SQLArguments())
 
-	rows, err := conn.Query(ctx, q, args)
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	err := row.Scan(&count)
 	if err != nil {
-		return fmt.Errorf("cannot query data: %w", err)
+		return 0, fmt.Errorf("cannot count data: %w", err)
 	}
 
-	data, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Data])
-	if err != nil {
-		return fmt.Errorf("cannot collect data: %w", err)
-	}
-
-	*dl = data
-
-	return nil
+	return count, nil
 }
 
 func (dl *DataList) LoadByOrganizationID(

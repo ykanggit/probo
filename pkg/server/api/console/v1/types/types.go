@@ -365,19 +365,9 @@ type Datum struct {
 func (Datum) IsNode()             {}
 func (this Datum) GetID() gid.GID { return this.ID }
 
-type DatumConnection struct {
-	Edges    []*DatumEdge `json:"edges"`
-	PageInfo *PageInfo    `json:"pageInfo"`
-}
-
 type DatumEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *Datum         `json:"node"`
-}
-
-type DatumOrder struct {
-	Direction page.OrderDirection      `json:"direction"`
-	Field     coredata.DatumOrderField `json:"field"`
 }
 
 type DeleteAssetInput struct {

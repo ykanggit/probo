@@ -85,6 +85,32 @@ func (s DatumService) GetByOwnerID(
 	return datum, nil
 }
 
+func (s DatumService) CountForOrganizationID(
+	ctx context.Context,
+	organizationID gid.GID,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			data := coredata.DataList{}
+			count, err = data.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID)
+			if err != nil {
+				return fmt.Errorf("cannot count data: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s DatumService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,

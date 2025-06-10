@@ -261,6 +261,22 @@ func (r *datumResolver) Organization(ctx context.Context, obj *types.Datum) (*ty
 	return types.NewOrganization(org), nil
 }
 
+// TotalCount is the resolver for the totalCount field.
+func (r *datumConnectionResolver) TotalCount(ctx context.Context, obj *types.DatumConnection) (int, error) {
+	svc := GetTenantService(ctx, r.proboSvc, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := svc.Data.CountForOrganizationID(ctx, obj.ParentID)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count data: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
 // Owner is the resolver for the owner field.
 func (r *documentResolver) Owner(ctx context.Context, obj *types.Document) (*types.People, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
@@ -2344,7 +2360,7 @@ func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organizati
 }
 
 // Assets is the resolver for the assets field.
-func (r *organizationResolver) Data(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrder) (*types.DatumConnection, error) {
+func (r *organizationResolver) Data(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrderBy) (*types.DatumConnection, error) {
 	svc := GetTenantService(ctx, r.proboSvc, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DatumOrderField]{
@@ -2365,7 +2381,7 @@ func (r *organizationResolver) Data(ctx context.Context, obj *types.Organization
 		panic(fmt.Errorf("cannot list organization data: %w", err))
 	}
 
-	return types.NewDataConnection(page), nil
+	return types.NewDataConnection(page, r, obj.ID), nil
 }
 
 // TotalCount is the resolver for the totalCount field.
@@ -2995,6 +3011,11 @@ func (r *Resolver) ControlConnection() schema.ControlConnectionResolver {
 // Datum returns schema.DatumResolver implementation.
 func (r *Resolver) Datum() schema.DatumResolver { return &datumResolver{r} }
 
+// DatumConnection returns schema.DatumConnectionResolver implementation.
+func (r *Resolver) DatumConnection() schema.DatumConnectionResolver {
+	return &datumConnectionResolver{r}
+}
+
 // Document returns schema.DocumentResolver implementation.
 func (r *Resolver) Document() schema.DocumentResolver { return &documentResolver{r} }
 
@@ -3091,6 +3112,7 @@ type assetResolver struct{ *Resolver }
 type controlResolver struct{ *Resolver }
 type controlConnectionResolver struct{ *Resolver }
 type datumResolver struct{ *Resolver }
+type datumConnectionResolver struct{ *Resolver }
 type documentResolver struct{ *Resolver }
 type documentConnectionResolver struct{ *Resolver }
 type documentVersionResolver struct{ *Resolver }
