@@ -2651,7 +2651,7 @@ func (r *riskResolver) Controls(ctx context.Context, obj *types.Risk, first *int
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	var controlFilter *coredata.ControlFilter
+	var controlFilter = coredata.NewControlFilter(nil)
 	if filter != nil {
 		controlFilter = coredata.NewControlFilter(filter.Query)
 	}
