@@ -23,6 +23,27 @@ export class InternalServerError extends Error {
   }
 }
 
+export function buildEndpoint(path: string): string {
+  const host = import.meta.env.VITE_API_URL;
+
+  if (!host) {
+    return path;
+  }
+
+  const formattedHost =
+    host.startsWith("http://") || host.startsWith("https://")
+      ? host
+      : `https://${host}`;
+
+  const url = new URL(formattedHost);
+
+  if (path) {
+    url.pathname = path.startsWith("/") ? path : `/${path}`;
+  }
+
+  return url.toString();
+}
+
 const hasUnauthenticatedError = (error: GraphQLError) =>
   error.extensions?.code == "UNAUTHENTICATED";
 
@@ -79,7 +100,7 @@ const fetchRelay: FetchFunction = async (
   }
 
   const response = await fetch(
-    import.meta.env.VITE_API_URL + "/api/console/v1/query",
+    buildEndpoint("/api/console/v1/query"),
     requestInit
   );
 

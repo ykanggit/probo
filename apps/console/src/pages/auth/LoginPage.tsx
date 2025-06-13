@@ -2,7 +2,7 @@ import { useTranslate } from "@probo/i18n";
 import { Button, Field, useToast } from "@probo/ui";
 import type { FormEventHandler } from "react";
 import { Link, useNavigate } from "react-router";
-import { clearRelayStore } from "/providers/RelayProviders";
+import { buildEndpoint, clearRelayStore } from "/providers/RelayProviders";
 
 export default function LoginPage() {
   const { __ } = useTranslate();
@@ -15,7 +15,7 @@ export default function LoginPage() {
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
 
-    fetch(import.meta.env.VITE_API_URL + "/api/console/v1/auth/login", {
+    fetch(buildEndpoint("/api/console/v1/auth/login"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

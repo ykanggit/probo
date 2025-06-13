@@ -6,9 +6,10 @@ import {
   Card,
   Markdown,
   IconCheckmark1,
-  IconCircleProgress
+  IconCircleProgress,
 } from "@probo/ui";
 import { ProgressBar } from "../components/documentSigning/ProgressBar";
+import { buildEndpoint } from "/providers/RelayProviders";
 
 type Document = {
   document_version_id: string;
@@ -30,12 +31,15 @@ export default function DocumentSigningRequestsPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [signingData, setSigningData] = useState<DocumentSigningResponse | null>(null);
+  const [signingData, setSigningData] =
+    useState<DocumentSigningResponse | null>(null);
   const [currentDocIndex, setCurrentDocIndex] = useState(0);
 
   useEffect(() => {
     if (!token) {
-      setError(__("Missing signing token. Please check your URL and try again."));
+      setError(
+        __("Missing signing token. Please check your URL and try again.")
+      );
       setLoading(false);
       return;
     }
@@ -43,14 +47,14 @@ export default function DocumentSigningRequestsPage() {
     async function fetchDocuments() {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/console/v1/documents/signing-requests`,
+          buildEndpoint("/api/console/v1/documents/signing-requests"),
           {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
-          },
+          }
         );
 
         if (!response.ok) {
@@ -71,7 +75,7 @@ export default function DocumentSigningRequestsPage() {
         });
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : __("An unknown error occurred"),
+          err instanceof Error ? err.message : __("An unknown error occurred")
         );
       } finally {
         setLoading(false);
@@ -88,14 +92,16 @@ export default function DocumentSigningRequestsPage() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/console/v1/documents/signing-requests/${docToSign.document_version_id}/sign`,
+        buildEndpoint(
+          `/api/console/v1/documents/signing-requests/${docToSign.document_version_id}/sign`
+        ),
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        },
+        }
       );
 
       if (!response.ok) {
@@ -117,7 +123,9 @@ export default function DocumentSigningRequestsPage() {
         setCurrentDocIndex(currentDocIndex + 1);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : __("Failed to sign document"));
+      setError(
+        err instanceof Error ? err.message : __("Failed to sign document")
+      );
     }
   };
 
@@ -146,7 +154,9 @@ export default function DocumentSigningRequestsPage() {
             <div className="flex items-center gap-4">
               <IconCircleProgress size={24} className="text-txt-accent" />
               <div>
-                <h1 className="text-xl font-semibold">{__("Loading Signing Requests")}</h1>
+                <h1 className="text-xl font-semibold">
+                  {__("Loading Signing Requests")}
+                </h1>
                 <p className="text-txt-tertiary">
                   {__("Please wait while we fetch your documents...")}
                 </p>
@@ -164,7 +174,9 @@ export default function DocumentSigningRequestsPage() {
         <title>{__("Error")}</title>
         <div className="flex justify-center items-center min-h-screen">
           <Card padded className="w-full max-w-3xl">
-            <h1 className="text-xl font-semibold text-red-600 mb-2">{__("Error")}</h1>
+            <h1 className="text-xl font-semibold text-red-600 mb-2">
+              {__("Error")}
+            </h1>
             <p className="text-txt-tertiary mb-4">{error}</p>
             <Button onClick={() => window.location.reload()}>
               {__("Try Again")}
@@ -181,9 +193,13 @@ export default function DocumentSigningRequestsPage() {
         <title>{__("No Documents to Sign")}</title>
         <div className="flex justify-center items-center min-h-screen">
           <Card padded className="w-full max-w-3xl">
-            <h1 className="text-xl font-semibold mb-2">{__("No Documents to Sign")}</h1>
+            <h1 className="text-xl font-semibold mb-2">
+              {__("No Documents to Sign")}
+            </h1>
             <p className="text-txt-tertiary">
-              {__("There are no documents requiring your signature at this time.")}
+              {__(
+                "There are no documents requiring your signature at this time."
+              )}
             </p>
           </Card>
         </div>
@@ -200,15 +216,19 @@ export default function DocumentSigningRequestsPage() {
       <title>{__("Document Signing")}</title>
       <div className="container mx-auto py-10 space-y-6">
         <div className="space-y-4">
-          <h1 className="text-3xl font-bold">{__("Document Signing Request")}</h1>
+          <h1 className="text-3xl font-bold">
+            {__("Document Signing Request")}
+          </h1>
           <p className="text-txt-tertiary">
-            {__("From")} {signingData.requesterName} {__("at")} {signingData.requesterOrganization}
+            {__("From")} {signingData.requesterName} {__("at")}{" "}
+            {signingData.requesterOrganization}
           </p>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm text-txt-tertiary">
-                {getSignedCount()} {__("of")} {signingData.documents.length} {__("documents signed")}
+                {getSignedCount()} {__("of")} {signingData.documents.length}{" "}
+                {__("documents signed")}
               </span>
               <span className="text-sm font-medium">
                 {Math.round(getProgressPercentage())}%
@@ -223,7 +243,8 @@ export default function DocumentSigningRequestsPage() {
             <div>
               <h2 className="text-xl font-semibold">{currentDoc.title}</h2>
               <p className="text-txt-tertiary">
-                {__("Document")} {currentDocIndex + 1} {__("of")} {signingData.documents.length}
+                {__("Document")} {currentDocIndex + 1} {__("of")}{" "}
+                {signingData.documents.length}
               </p>
             </div>
 

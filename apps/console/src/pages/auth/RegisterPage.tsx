@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { Button, Field, useToast } from "@probo/ui";
 import { useTranslate } from "@probo/i18n";
 import { useMutation } from "@tanstack/react-query";
+import { buildEndpoint } from "/providers/RelayProviders";
 
 interface RegisterData {
   email: string;
@@ -20,7 +21,7 @@ export default function RegisterPage() {
 
   const registerUser = async (data: RegisterData) => {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/console/v1/auth/register`,
+      buildEndpoint("/api/console/v1/auth/register"),
       {
         method: "POST",
         headers: {
@@ -33,7 +34,10 @@ export default function RegisterPage() {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      return { success: false, error: errorData.message || __("Registration failed") };
+      return {
+        success: false,
+        error: errorData.message || __("Registration failed"),
+      };
     }
 
     return { success: true, data: await response.json() };
@@ -103,7 +107,9 @@ export default function RegisterPage() {
             type="text"
             placeholder={__("John Doe")}
             value={fullName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFullName(e.target.value)
+            }
             required
           />
 
@@ -112,7 +118,9 @@ export default function RegisterPage() {
             type="email"
             placeholder={__("name@example.com")}
             value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setEmail(e.target.value)
+            }
             required
           />
 
@@ -121,19 +129,30 @@ export default function RegisterPage() {
             type="password"
             placeholder="••••••••"
             value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setPassword(e.target.value)
+            }
             required
           />
 
-          <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
-            {registerMutation.isPending ? __("Creating account...") : __("Sign up with email")}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={registerMutation.isPending}
+          >
+            {registerMutation.isPending
+              ? __("Creating account...")
+              : __("Sign up with email")}
           </Button>
         </form>
 
         <div className="text-center">
           <p className="text-sm text-txt-tertiary">
             {__("Already have an account?")}{" "}
-            <Link to="/login" className="underline text-txt-primary hover:text-txt-secondary">
+            <Link
+              to="/login"
+              className="underline text-txt-primary hover:text-txt-secondary"
+            >
               {__("Log in here")}
             </Link>
           </p>

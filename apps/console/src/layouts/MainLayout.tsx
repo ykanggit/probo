@@ -33,6 +33,7 @@ import { Suspense } from "react";
 import { useToast } from "@probo/ui";
 import { ErrorBoundary } from "react-error-boundary";
 import { PageError } from "/components/PageError";
+import { buildEndpoint } from "/providers/RelayProviders";
 
 const MainLayoutQuery = graphql`
   query MainLayoutQuery {
@@ -156,7 +157,7 @@ function UserDropdown() {
   ) => {
     e.preventDefault();
 
-    fetch(import.meta.env.VITE_API_URL + "/api/console/v1/auth/logout", {
+    fetch(buildEndpoint("/api/console/v1/auth/logout"), {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
