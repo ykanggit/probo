@@ -20,7 +20,7 @@ export function PeopleSelectField({
   return (
     <Field {...props}>
       <Suspense
-        fallback={<Select variant="editor" disabled placeholder="Loading..." />}
+        fallback={<Select variant="editor" loading placeholder="Loading..." />}
       >
         <PeopleSelectWithQuery
           organizationId={organizationId}

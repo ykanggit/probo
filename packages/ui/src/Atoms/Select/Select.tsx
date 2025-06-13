@@ -15,6 +15,7 @@ import { IconChevronGrabberVertical } from "../Icons/IconChevronGrabberVertical.
 import { tv } from "tailwind-variants";
 import { Children, type ComponentProps, type PropsWithChildren } from "react";
 import { IconMagnifyingGlass } from "../Icons/IconMagnifyingGlass.tsx";
+import { Spinner } from "../Spinner/Spinner.tsx";
 
 type Props<T> = PropsWithChildren<
     {
@@ -29,6 +30,7 @@ type Props<T> = PropsWithChildren<
         searchValue?: string;
         onSearch?: (s: string) => void;
         searchPlaceholder?: string;
+        loading?: boolean;
     } & Omit<ComponentProps<typeof Root>, "onChange" | "value">
 >;
 
@@ -47,6 +49,11 @@ const select = tv({
             },
         },
         disabled: {
+            true: {
+                trigger: "opacity-60",
+            },
+        },
+        loading: {
             true: {
                 trigger: "opacity-60",
             },
@@ -88,6 +95,7 @@ export function Select<T>({
     searchValue,
     onSearch,
     searchPlaceholder,
+    loading,
     ...props
 }: Props<T>) {
     const { trigger, content, icon } = select({
@@ -105,7 +113,11 @@ export function Select<T>({
             >
                 <Value placeholder={placeholder} />
                 <Icon className={icon()}>
-                    <IconChevronGrabberVertical size={16} />
+                    {loading ? (
+                        <Spinner size={16} />
+                    ) : (
+                        <IconChevronGrabberVertical size={16} />
+                    )}
                 </Icon>
             </Trigger>
             <Portal>

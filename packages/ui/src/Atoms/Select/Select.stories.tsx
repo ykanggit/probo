@@ -37,3 +37,17 @@ export const Invalid: Story = {
         invalid: true,
     },
 };
+
+export const Loading: Story = {
+    args: {
+        ...Default.args,
+        loading: true,
+    },
+};
+
+export const Disabled: Story = {
+    args: {
+        ...Default.args,
+        disabled: true,
+    },
+};
