@@ -6,9 +6,9 @@ import {
   DropdownItem,
   FileButton,
   FrameworkSelector,
+  IconFolderUpload,
   IconPencil,
   IconTrashCan,
-  IconUpload,
   PageHeader,
   useDialogRef,
 } from "@probo/ui";
@@ -131,7 +131,7 @@ export default function FrameworksPage(props: Props) {
       >
         <FileButton
           variant="secondary"
-          icon={IconUpload}
+          icon={IconFolderUpload}
           onChange={handleUpload}
           disabled={isLoading}
         >
