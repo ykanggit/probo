@@ -4,10 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.33.0] - 2025-06-13
+
 ### Added
 
 - Add backend fulltext search on controls, documents, risks and measures
 - Add `totalCount` field in `Connection` object
+- New console design
 
 ### Fixed
 - Use new enum for data classification
