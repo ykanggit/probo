@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.33.2] - 2025-06-13
+
+### Fixed
+
+- Fix API path contain undefined
+
 ## [0.33.1] - 2025-06-13
 
 ### Fixed
