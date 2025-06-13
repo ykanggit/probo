@@ -54,6 +54,10 @@ const routes = [
         path: "login",
         Component: lazy(() => import("./pages/auth/LoginPage")),
       },
+      {
+        path: "register",
+        Component: lazy(() => import("./pages/auth/RegisterPage")),
+      },
     ],
   },
   {
