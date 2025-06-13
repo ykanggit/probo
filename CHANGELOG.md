@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.33.1] - 2025-06-13
+
+### Fixed
+
+- Fix localhost enforce at build time
+
 ## [0.33.0] - 2025-06-13
 
 ### Added
