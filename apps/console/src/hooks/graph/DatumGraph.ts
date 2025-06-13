@@ -230,12 +230,10 @@ export const useData = (queryRef: PreloadedQuery<DatumGraphListQuery>) => {
   return useMemo(() => {
     const dataEntries = data.node?.data?.edges.map((edge) => edge.node) ?? [];
     const connectionId = data.node?.data?.__id ?? "";
-    const peoples = data.node?.peoples?.edges.map((edge) => edge.node) ?? [];
 
     return {
       dataEntries,
       connectionId,
-      peoples,
       rawData: data,
     };
   }, [data]);
