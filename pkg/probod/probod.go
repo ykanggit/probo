@@ -277,6 +277,8 @@ func (impl *Implm) Run(
 
 	wg.Wait()
 
+	pgClient.Close()
+
 	return context.Cause(ctx)
 }
 
