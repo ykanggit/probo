@@ -29,13 +29,17 @@ import { dataRoutes } from "./routes/dataRoutes.ts";
 import { assetRoutes } from "./routes/assetRoutes.ts";
 import { lazy } from "@probo/react-lazy";
 
-function ErrorBoundary() {
-  const error = useRouteError();
+/**
+ * Top level error boundary
+ */
+function ErrorBoundary({ error: propsError }: { error?: string }) {
+  const error = useRouteError() ?? propsError;
 
   if (error instanceof UnAuthenticatedError) {
     return <Navigate to="/auth/login" />;
   }
-  return <div>error</div>;
+
+  return <PageError error={error?.toString()} />;
 }
 
 export type AppRoute = {
@@ -78,7 +82,9 @@ const routes = [
       },
       {
         path: "documents/signing-requests",
-        Component: lazy(() => import("./pages/DocumentSigningRequestsPage.tsx")),
+        Component: lazy(
+          () => import("./pages/DocumentSigningRequestsPage.tsx")
+        ),
       },
     ],
   },
@@ -117,6 +123,11 @@ const routes = [
         Component: PageError,
       },
     ],
+  },
+  // Fallback URL to the NotFound Page
+  {
+    path: "*",
+    Component: PageError,
   },
 ] satisfies AppRoute[];
 
