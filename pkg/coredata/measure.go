@@ -62,7 +62,8 @@ func (m *Measures) CountByRiskID(
 	q := `
 WITH msrs AS (
 	SELECT
-		m.id
+		m.id,
+		m.tenant_id
 	FROM
 		measures m
 	INNER JOIN
@@ -169,7 +170,8 @@ func (m *Measures) CountByControlID(
 	q := `
 WITH mtgtns AS (
 		SELECT
-			m.id
+			m.id,
+			m.tenant_id
 		FROM
 			measures m
 		INNER JOIN
