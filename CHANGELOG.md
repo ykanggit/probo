@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.33.3] - 2025-06-13
+
+### Fixed
+
+- Fix 5xx on document count for risk
+- Fix leaking pg connections
+
 ## [0.33.2] - 2025-06-13
 
 ### Fixed
