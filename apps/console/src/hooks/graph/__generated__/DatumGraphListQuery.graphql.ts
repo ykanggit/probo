@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9e4a2879379ca7f3999937db340c18f3>>
+ * @generated SignedSource<<cb9d58af641e9b44e2b6632843e1ba68>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -35,14 +35,6 @@ export type DatumGraphListQuery$data = {
               };
             }>;
           };
-        };
-      }>;
-    };
-    readonly peoples?: {
-      readonly edges: ReadonlyArray<{
-        readonly node: {
-          readonly fullName: string;
-          readonly id: string;
         };
       }>;
     };
@@ -208,42 +200,7 @@ v12 = [
     "name": "first",
     "value": 100
   }
-],
-v13 = {
-  "alias": null,
-  "args": (v12/*: any*/),
-  "concreteType": "PeopleConnection",
-  "kind": "LinkedField",
-  "name": "peoples",
-  "plural": false,
-  "selections": [
-    {
-      "alias": null,
-      "args": null,
-      "concreteType": "PeopleEdge",
-      "kind": "LinkedField",
-      "name": "edges",
-      "plural": true,
-      "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "People",
-          "kind": "LinkedField",
-          "name": "node",
-          "plural": false,
-          "selections": [
-            (v2/*: any*/),
-            (v5/*: any*/)
-          ],
-          "storageKey": null
-        }
-      ],
-      "storageKey": null
-    }
-  ],
-  "storageKey": "peoples(first:100)"
-};
+];
 return {
   "fragment": {
     "argumentDefinitions": (v0/*: any*/),
@@ -315,8 +272,7 @@ return {
                   (v11/*: any*/)
                 ],
                 "storageKey": null
-              },
-              (v13/*: any*/)
+              }
             ],
             "type": "Organization",
             "abstractKey": null
@@ -409,8 +365,7 @@ return {
                 "key": "DataPage_data",
                 "kind": "LinkedHandle",
                 "name": "data"
-              },
-              (v13/*: any*/)
+              }
             ],
             "type": "Organization",
             "abstractKey": null
@@ -422,7 +377,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d4e47a72e0f7585fe7d74ffac75a0f06",
+    "cacheID": "a9d2d911138e13ea75c85f64f310c41d",
     "id": null,
     "metadata": {
       "connection": [
@@ -439,11 +394,11 @@ return {
     },
     "name": "DatumGraphListQuery",
     "operationKind": "query",
-    "text": "query DatumGraphListQuery(\n  $organizationId: ID!\n) {\n  node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      data(first: 100) {\n        edges {\n          node {\n            id\n            name\n            dataClassification\n            owner {\n              fullName\n              id\n            }\n            vendors(first: 50) {\n              edges {\n                node {\n                  id\n                  name\n                  websiteUrl\n                }\n              }\n            }\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      peoples(first: 100) {\n        edges {\n          node {\n            id\n            fullName\n          }\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query DatumGraphListQuery(\n  $organizationId: ID!\n) {\n  node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      data(first: 100) {\n        edges {\n          node {\n            id\n            name\n            dataClassification\n            owner {\n              fullName\n              id\n            }\n            vendors(first: 50) {\n              edges {\n                node {\n                  id\n                  name\n                  websiteUrl\n                }\n              }\n            }\n            createdAt\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "2104705ef9537afe6c45469cf35f4f2c";
+(node as any).hash = "525bc7b05c73f821c23f8694d1ba2981";
 
 export default node;
