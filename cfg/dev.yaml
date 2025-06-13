@@ -1,7 +1,7 @@
 probod:
   api:
     cors:
-      allowed-origins: ["http://localhost:5173"]
+      allowed-origins: ["http://localhost:8080"]
   aws:
     access-key-id: "probod"
     secret-access-key: "thisisnotasecret"

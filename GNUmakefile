@@ -46,7 +46,7 @@ bin/probod: pkg/server/api/console/v1/schema/schema.go pkg/server/api/console/v1
 .PHONY: @probo/console
 @probo/console: NODE_ENV=production
 @probo/console:
-	$(NPM) --workspace $@ run typecheck
+	$(NPM) --workspace $@ run check
 	$(NPM) --workspace $@ run build
 
 pkg/server/api/console/v1/schema/schema.go \
@@ -60,7 +60,7 @@ help: ## Show this help
 
 .PHONY:dev
 dev: ## Start the development server
-	parallel -j 2 --line-buffer ::: "gow -r=false run cmd/probod/main.go" "cd apps/console2 && npm run dev"
+	parallel -j 2 --line-buffer ::: "gow -r=false run cmd/probod/main.go" "cd apps/console && npm run dev"
 
 .PHONY: fmt
 fmt: fmt-go ## Format Go code
@@ -90,4 +90,3 @@ stack-ps: ## List the docker stack containers
 .PHONY: psql
 psql: ## Open a psql shell to the postgres container
 	$(DOCKER_COMPOSE) exec postgres psql -U probod -d probod
-

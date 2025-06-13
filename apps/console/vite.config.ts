@@ -1,23 +1,22 @@
-import {defineConfig} from 'vite'
-import react from '@vitejs/plugin-react'
-import {resolve} from 'node:path';
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import { fileURLToPath, URL } from "node:url";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react({babel: {plugins: ["relay"]}}),
-    tailwindcss(),
-  ],
-  server: {
-    cors: {
-      // the origin you will be accessing via browser
-      origin: 'http://localhost:8080',
-    },
-  },
+  plugins: [react({ babel: { plugins: ["relay"] } }), tailwindcss()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      "/type": fileURLToPath(new URL("./src/type.ts", import.meta.url)),
+      "/components": fileURLToPath(
+        new URL("./src/components", import.meta.url)
+      ),
+      "/hooks": fileURLToPath(new URL("./src/hooks", import.meta.url)),
+      "/layouts": fileURLToPath(new URL("./src/layouts", import.meta.url)),
+      "/pages": fileURLToPath(new URL("./src/pages", import.meta.url)),
+      "/routes": fileURLToPath(new URL("./src/routes", import.meta.url)),
+      "/providers": fileURLToPath(new URL("./src/providers", import.meta.url)),
     },
   },
-})
+});
