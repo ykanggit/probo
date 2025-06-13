@@ -30,6 +30,7 @@ import { graphql } from "relay-runtime";
 import { useLazyLoadQuery } from "react-relay";
 import type { MainLayoutQuery as MainLayoutQueryType } from "./__generated__/MainLayoutQuery.graphql";
 import { Suspense } from "react";
+import { useToast } from "@probo/ui";
 import { ErrorBoundary } from "react-error-boundary";
 import { PageError } from "/components/PageError";
 
@@ -146,8 +147,39 @@ export function MainLayout() {
 
 function UserDropdown() {
   const { __ } = useTranslate();
+  const { toast } = useToast();
   const user = useLazyLoadQuery<MainLayoutQueryType>(MainLayoutQuery, {}).viewer
     .user;
+
+  const handleLogout: React.MouseEventHandler<HTMLAnchorElement> = async (
+    e
+  ) => {
+    e.preventDefault();
+
+    fetch(import.meta.env.VITE_API_URL + "/api/console/v1/auth/logout", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.message || __("Failed to login"));
+        }
+
+        window.location.reload();
+      })
+      .catch((e) => {
+        toast({
+          title: __("Error"),
+          description: e.message as string,
+          variant: "error",
+        });
+      });
+  };
+
   return (
     <UserDropdownRoot fullName={user.fullName} email={user.email}>
       <UserDropdownItem
@@ -166,6 +198,7 @@ function UserDropdown() {
         to="/logout"
         icon={IconArrowBoxLeft}
         label="Logout"
+        onClick={handleLogout}
       />
     </UserDropdownRoot>
   );

@@ -44,15 +44,17 @@ export function UserDropdownItem({
     icon: IconComponent,
     label,
     variant = "tertiary",
+    onClick,
 }: {
     to: string;
     icon: FC<IconProps>;
     label: string;
     variant?: "tertiary" | "danger";
+    onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }) {
     return (
         <DropdownItem asChild variant={variant}>
-            <Link to={to}>
+            <Link to={to} onClick={onClick}>
                 {IconComponent && <IconComponent size={16} />}
                 {label}
             </Link>
