@@ -183,11 +183,6 @@ function UserDropdown() {
   return (
     <UserDropdownRoot fullName={user.fullName} email={user.email}>
       <UserDropdownItem
-        to="/settings"
-        icon={IconSettingsGear2}
-        label={__("Settings")}
-      />
-      <UserDropdownItem
         to="mailto:support@getprobo.com"
         icon={IconCircleQuestionmark}
         label={__("Help")}
