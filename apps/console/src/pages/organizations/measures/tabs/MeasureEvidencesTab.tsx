@@ -122,11 +122,23 @@ export default function MeasureEvidencesTab() {
   return (
     <div className="space-y-6">
       <Dropzone
-        description={__("Only PDF files up to 10MB are allowed")}
+        description={__(
+          "Only PDF, DOCX, XLSX, PPTX, JPG, PNG, WEBP files up to 10MB are allowed"
+        )}
         isUploading={isUpdating}
         onDrop={handleDrop}
         accept={{
           "application/pdf": [".pdf"],
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            [".docx"],
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+            ".xlsx",
+          ],
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+            [".pptx"],
+          "image/jpeg": [".jpg", ".jpeg"],
+          "image/png": [".png"],
+          "image/webp": [".webp"],
         }}
         maxSize={10}
       />
