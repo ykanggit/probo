@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.33.4] - 2025-06-13
+
+- Fix measure count
+
+
 ## [0.33.3] - 2025-06-13
 
 ### Fixed
