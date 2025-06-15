@@ -55,7 +55,7 @@ export const dropzone = tv({
     },
 });
 
-const MB = 1024;
+const MB = 1024 * 1024;
 
 export function Dropzone(props: Props) {
     const { __ } = useTranslate();
