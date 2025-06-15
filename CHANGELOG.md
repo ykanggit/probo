@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.33.6] - 2025-06-15
+
+### Fixed
+
+- Fix filedrop upload too small file size
+
 ## [0.33.5] - 2025-06-14
 
 ### Fixed
