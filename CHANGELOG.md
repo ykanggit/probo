@@ -4,10 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.33.5] - 2025-06-14
+
+### Fixed
+
+- Fix framework view too many queries
+- Fix image upload failed
+
 ## [0.33.4] - 2025-06-13
 
 - Fix measure count
-
 
 ## [0.33.3] - 2025-06-13
 
@@ -37,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - New console design
 
 ### Fixed
+
 - Use new enum for data classification
 
 ## [0.32.0] - 2025-06-07
