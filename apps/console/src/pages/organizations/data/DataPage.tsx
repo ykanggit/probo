@@ -2,7 +2,6 @@ import {
   Button,
   IconPlusLarge,
   PageHeader,
-  Table,
   Thead,
   Tbody,
   Tr,
@@ -16,15 +15,66 @@ import {
 } from "@probo/ui";
 import { useTranslate } from "@probo/i18n";
 import { usePageTitle } from "@probo/hooks";
-import { type PreloadedQuery } from "react-relay";
+import {
+  usePaginationFragment,
+  usePreloadedQuery,
+  type PreloadedQuery,
+} from "react-relay";
 import { useOrganizationId } from "/hooks/useOrganizationId";
 import { CreateDatumDialog } from "./dialogs/CreateDatumDialog";
-import { useDeleteDatum, useData } from "../../../hooks/graph/DatumGraph";
+import { useDeleteDatum, dataQuery } from "../../../hooks/graph/DatumGraph";
 import type { DatumGraphListQuery } from "/hooks/graph/__generated__/DatumGraphListQuery.graphql";
 import { faviconUrl } from "@probo/helpers";
 import type { NodeOf } from "/types";
+import type {
+  DataPageFragment$data,
+  DataPageFragment$key,
+} from "./__generated__/DataPageFragment.graphql";
+import { SortableTable } from "/components/SortableTable";
 
-type DataEntry = NodeOf<NonNullable<NonNullable<DatumGraphListQuery["response"]["node"]>["data"]>>;
+const paginatedDataFragment = graphql`
+  fragment DataPageFragment on Organization
+  @refetchable(queryName: "DataListQuery")
+  @argumentDefinitions(
+    first: { type: "Int", defaultValue: 10 }
+    orderBy: { type: "DatumOrder", defaultValue: null }
+    after: { type: "CursorKey", defaultValue: null }
+    before: { type: "CursorKey", defaultValue: null }
+    last: { type: "Int", defaultValue: null }
+  ) {
+    data(
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+      orderBy: $orderBy
+    ) @connection(key: "DataPage_data") {
+      __id
+      edges {
+        node {
+          id
+          name
+          dataClassification
+          owner {
+            fullName
+          }
+          vendors(first: 50) {
+            edges {
+              node {
+                id
+                name
+                websiteUrl
+              }
+            }
+          }
+          createdAt
+        }
+      }
+    }
+  }
+`;
+
+type DataEntry = NodeOf<DataPageFragment$data["data"]>;
 
 type Props = {
   queryRef: PreloadedQuery<DatumGraphListQuery>;
@@ -34,7 +84,14 @@ export default function DataPage(props: Props) {
   const { __ } = useTranslate();
   const organizationId = useOrganizationId();
 
-  const { dataEntries, connectionId } = useData(props.queryRef);
+  const data = usePreloadedQuery(dataQuery, props.queryRef);
+  const pagination = usePaginationFragment(
+    paginatedDataFragment,
+    data.node as DataPageFragment$key
+  );
+
+  const dataEntries = pagination.data.data.edges.map((edge) => edge.node);
+  const connectionId = pagination.data.data.__id;
 
   usePageTitle(__("Data"));
 
@@ -46,11 +103,14 @@ export default function DataPage(props: Props) {
           "Manage your organization's data assets and their classifications."
         )}
       >
-        <CreateDatumDialog connection={connectionId} organizationId={organizationId}>
+        <CreateDatumDialog
+          connection={connectionId}
+          organizationId={organizationId}
+        >
           <Button icon={IconPlusLarge}>{__("Add data")}</Button>
         </CreateDatumDialog>
       </PageHeader>
-      <Table>
+      <SortableTable {...pagination}>
         <Thead>
           <Tr>
             <Th>{__("Name")}</Th>
@@ -62,14 +122,10 @@ export default function DataPage(props: Props) {
         </Thead>
         <Tbody>
           {dataEntries.map((entry) => (
-            <DataRow
-              key={entry.id}
-              entry={entry}
-              connectionId={connectionId}
-            />
+            <DataRow key={entry.id} entry={entry} connectionId={connectionId} />
           ))}
         </Tbody>
-      </Table>
+      </SortableTable>
     </div>
   );
 }
@@ -84,7 +140,7 @@ function DataRow({
   const organizationId = useOrganizationId();
   const { __ } = useTranslate();
   const deleteDatum = useDeleteDatum(entry, connectionId);
-  const vendors = entry.vendors?.edges.map(edge => edge.node) ?? [];
+  const vendors = entry.vendors?.edges.map((edge) => edge.node) ?? [];
 
   return (
     <Tr to={`/organizations/${organizationId}/data/${entry.id}`}>
@@ -97,7 +153,11 @@ function DataRow({
         {vendors.length > 0 ? (
           <div className="flex flex-wrap gap-1">
             {vendors.slice(0, 3).map((vendor) => (
-              <Badge key={vendor.id} variant="neutral" className="flex items-center gap-1">
+              <Badge
+                key={vendor.id}
+                variant="neutral"
+                className="flex items-center gap-1"
+              >
                 <Avatar
                   name={vendor.name}
                   src={faviconUrl(vendor.websiteUrl)}

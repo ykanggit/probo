@@ -1,38 +1,14 @@
 import { graphql } from "relay-runtime";
-import { useMutation, usePreloadedQuery, type PreloadedQuery } from "react-relay";
+import { useMutation } from "react-relay";
 import { useConfirm } from "@probo/ui";
 import { useTranslate } from "@probo/i18n";
 import { promisifyMutation, sprintf } from "@probo/helpers";
-import { useMemo } from "react";
-import type { DatumGraphListQuery } from "./__generated__/DatumGraphListQuery.graphql";
 
 export const dataQuery = graphql`
   query DatumGraphListQuery($organizationId: ID!) {
     node(id: $organizationId) {
       ... on Organization {
-        data(first: 100) @connection(key: "DataPage_data") {
-          __id
-          edges {
-            node {
-              id
-              name
-              dataClassification
-              owner {
-                fullName
-              }
-              vendors(first: 50) {
-                edges {
-                  node {
-                    id
-                    name
-                    websiteUrl
-                  }
-                }
-              }
-              createdAt
-            }
-          }
-        }
+        ...DataPageFragment
       }
     }
   }
@@ -222,19 +198,4 @@ export const useUpdateDatum = () => {
       },
     });
   };
-};
-
-export const useData = (queryRef: PreloadedQuery<DatumGraphListQuery>) => {
-  const data = usePreloadedQuery(dataQuery, queryRef);
-
-  return useMemo(() => {
-    const dataEntries = data.node?.data?.edges.map((edge) => edge.node) ?? [];
-    const connectionId = data.node?.data?.__id ?? "";
-
-    return {
-      dataEntries,
-      connectionId,
-      rawData: data,
-    };
-  }, [data]);
 };

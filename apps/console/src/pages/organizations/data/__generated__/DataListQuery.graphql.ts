@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<157213d294566208969ddbfd7e79fd91>>
+ * @generated SignedSource<<4894c4387072fb7ac2f379ab04b4168a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,56 +10,110 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type DatumGraphListQuery$variables = {
-  organizationId: string;
+export type DatumOrderField = "CREATED_AT" | "DATA_CLASSIFICATION" | "NAME";
+export type OrderDirection = "ASC" | "DESC";
+export type DatumOrder = {
+  direction: OrderDirection;
+  field: DatumOrderField;
 };
-export type DatumGraphListQuery$data = {
+export type DataListQuery$variables = {
+  after?: any | null | undefined;
+  before?: any | null | undefined;
+  first?: number | null | undefined;
+  id: string;
+  last?: number | null | undefined;
+  orderBy?: DatumOrder | null | undefined;
+};
+export type DataListQuery$data = {
   readonly node: {
     readonly " $fragmentSpreads": FragmentRefs<"DataPageFragment">;
   };
 };
-export type DatumGraphListQuery = {
-  response: DatumGraphListQuery$data;
-  variables: DatumGraphListQuery$variables;
+export type DataListQuery = {
+  response: DataListQuery$data;
+  variables: DataListQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "defaultValue": null,
-    "kind": "LocalArgument",
-    "name": "organizationId"
-  }
-],
-v1 = [
+var v0 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "after"
+},
+v1 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "before"
+},
+v2 = {
+  "defaultValue": 10,
+  "kind": "LocalArgument",
+  "name": "first"
+},
+v3 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "id"
+},
+v4 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "last"
+},
+v5 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "orderBy"
+},
+v6 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "organizationId"
+    "variableName": "id"
   }
 ],
-v2 = {
+v7 = [
+  {
+    "kind": "Variable",
+    "name": "after",
+    "variableName": "after"
+  },
+  {
+    "kind": "Variable",
+    "name": "before",
+    "variableName": "before"
+  },
+  {
+    "kind": "Variable",
+    "name": "first",
+    "variableName": "first"
+  },
+  {
+    "kind": "Variable",
+    "name": "last",
+    "variableName": "last"
+  },
+  {
+    "kind": "Variable",
+    "name": "orderBy",
+    "variableName": "orderBy"
+  }
+],
+v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v3 = {
+v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v4 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 10
-  }
-],
-v5 = {
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
@@ -68,30 +122,30 @@ v5 = {
 };
 return {
   "fragment": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/),
+      (v2/*: any*/),
+      (v3/*: any*/),
+      (v4/*: any*/),
+      (v5/*: any*/)
+    ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "DatumGraphListQuery",
+    "name": "DataListQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v1/*: any*/),
+        "args": (v6/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
           {
-            "kind": "InlineFragment",
-            "selections": [
-              {
-                "args": null,
-                "kind": "FragmentSpread",
-                "name": "DataPageFragment"
-              }
-            ],
-            "type": "Organization",
-            "abstractKey": null
+            "args": (v7/*: any*/),
+            "kind": "FragmentSpread",
+            "name": "DataPageFragment"
           }
         ],
         "storageKey": null
@@ -102,26 +156,33 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/),
+      (v2/*: any*/),
+      (v4/*: any*/),
+      (v5/*: any*/),
+      (v3/*: any*/)
+    ],
     "kind": "Operation",
-    "name": "DatumGraphListQuery",
+    "name": "DataListQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v1/*: any*/),
+        "args": (v6/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/),
-          (v3/*: any*/),
+          (v8/*: any*/),
+          (v9/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v4/*: any*/),
+                "args": (v7/*: any*/),
                 "concreteType": "DatumConnection",
                 "kind": "LinkedField",
                 "name": "data",
@@ -143,8 +204,8 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v3/*: any*/),
-                          (v5/*: any*/),
+                          (v9/*: any*/),
+                          (v10/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -167,7 +228,7 @@ return {
                                 "name": "fullName",
                                 "storageKey": null
                               },
-                              (v3/*: any*/)
+                              (v9/*: any*/)
                             ],
                             "storageKey": null
                           },
@@ -201,8 +262,8 @@ return {
                                     "name": "node",
                                     "plural": false,
                                     "selections": [
-                                      (v3/*: any*/),
-                                      (v5/*: any*/),
+                                      (v9/*: any*/),
+                                      (v10/*: any*/),
                                       {
                                         "alias": null,
                                         "args": null,
@@ -226,7 +287,7 @@ return {
                             "name": "createdAt",
                             "storageKey": null
                           },
-                          (v2/*: any*/)
+                          (v8/*: any*/)
                         ],
                         "storageKey": null
                       },
@@ -292,11 +353,11 @@ return {
                     ]
                   }
                 ],
-                "storageKey": "data(first:10)"
+                "storageKey": null
               },
               {
                 "alias": null,
-                "args": (v4/*: any*/),
+                "args": (v7/*: any*/),
                 "filters": [
                   "orderBy"
                 ],
@@ -315,16 +376,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "93f16f8bcd6ae56a947a18b90146fac4",
+    "cacheID": "d6742fb1de534407018aeb39ca1438d5",
     "id": null,
     "metadata": {},
-    "name": "DatumGraphListQuery",
+    "name": "DataListQuery",
     "operationKind": "query",
-    "text": "query DatumGraphListQuery(\n  $organizationId: ID!\n) {\n  node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      ...DataPageFragment\n    }\n    id\n  }\n}\n\nfragment DataPageFragment on Organization {\n  data(first: 10) {\n    edges {\n      node {\n        id\n        name\n        dataClassification\n        owner {\n          fullName\n          id\n        }\n        vendors(first: 50) {\n          edges {\n            node {\n              id\n              name\n              websiteUrl\n            }\n          }\n        }\n        createdAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query DataListQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 10\n  $last: Int = null\n  $orderBy: DatumOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...DataPageFragment_sdb03\n    id\n  }\n}\n\nfragment DataPageFragment_sdb03 on Organization {\n  data(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        name\n        dataClassification\n        owner {\n          fullName\n          id\n        }\n        vendors(first: 50) {\n          edges {\n            node {\n              id\n              name\n              websiteUrl\n            }\n          }\n        }\n        createdAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ebacc146f9ff0dc7fac8dcfcb8e6f74a";
+(node as any).hash = "a797d00b7f2cac2876322b23aa781efa";
 
 export default node;
