@@ -66,6 +66,10 @@ const routes = [
         path: "confirm-email",
         Component: lazy(() => import("./pages/auth/ConfirmEmailPage")),
       },
+      {
+        path: "confirm-invitation",
+        Component: lazy(() => import("./pages/auth/ConfirmInvitationPage")),
+      },
     ],
   },
   {

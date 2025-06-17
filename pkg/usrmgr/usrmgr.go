@@ -713,7 +713,7 @@ func (s Service) InviteUser(
 	confirmationInvitationUrl := url.URL{
 		Scheme: "https",
 		Host:   s.hostname,
-		Path:   "/confirm-invitation",
+		Path:   "/auth/confirm-invitation",
 		RawQuery: url.Values{
 			"token": []string{confirmationToken},
 		}.Encode(),
