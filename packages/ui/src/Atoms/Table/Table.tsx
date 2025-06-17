@@ -106,7 +106,9 @@ export function Td({
             width={width}
             className={clsx("first:*:pl-6 *:pr-6 *:block *:py-3", className)}
         >
-            <Link to={to}>{children}</Link>
+            <Link to={to} className="select-text" draggable={false}>
+                {children}
+            </Link>
         </td>
     );
 }
