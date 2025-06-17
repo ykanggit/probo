@@ -42,9 +42,9 @@ export function SortableTable({
   ...props
 }: ComponentProps<typeof Table> & {
   refetch: (o: { order: Order }) => void;
-  hasNext: boolean;
-  loadNext: (...args: any[]) => void;
-  isLoadingNext: boolean;
+  hasNext?: boolean;
+  loadNext?: (...args: any[]) => void;
+  isLoadingNext?: boolean;
 }) {
   const { __ } = useTranslate();
   const [order, setOrder] = useState(defaultOrder);
@@ -58,7 +58,7 @@ export function SortableTable({
     <SortableContext value={{ order, onOrderChange }}>
       <div className="space-y-4">
         <Table {...props} />
-        {hasNext && (
+        {hasNext && loadNext && (
           <Button
             variant="tertiary"
             onClick={() => loadNext()}

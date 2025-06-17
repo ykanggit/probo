@@ -5,7 +5,6 @@ import {
   useMutation,
   usePaginationFragment,
   usePreloadedQuery,
-  useRefetchableFragment,
   type PreloadedQuery,
 } from "react-relay";
 import { useMemo } from "react";

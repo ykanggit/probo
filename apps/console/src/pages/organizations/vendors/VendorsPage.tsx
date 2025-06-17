@@ -2,7 +2,6 @@ import {
   Button,
   IconPlusLarge,
   PageHeader,
-  Table,
   Thead,
   Tbody,
   Tr,
@@ -31,14 +30,14 @@ import {
   useDeleteVendor,
   vendorsQuery,
 } from "/hooks/graph/VendorGraph";
+import type { VendorGraphListQuery } from "/hooks/graph/__generated__/VendorGraphListQuery.graphql";
 import type {
-  VendorGraphListQuery,
-  VendorGraphListQuery$data,
-} from "/hooks/graph/__generated__/VendorGraphListQuery.graphql";
-import type { VendorGraphPaginatedFragment$key } from "/hooks/graph/__generated__/VendorGraphPaginatedFragment.graphql";
+  VendorGraphPaginatedFragment$data,
+  VendorGraphPaginatedFragment$key,
+} from "/hooks/graph/__generated__/VendorGraphPaginatedFragment.graphql";
 import { SortableTable } from "/components/SortableTable";
 
-type Vendor = NodeOf<VendorGraphListQuery$data["node"]["vendors"]>;
+type Vendor = NodeOf<VendorGraphPaginatedFragment$data["vendors"]>;
 
 type Props = {
   queryRef: PreloadedQuery<VendorGraphListQuery>;

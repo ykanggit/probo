@@ -1,7 +1,6 @@
 import { useTranslate } from "@probo/i18n";
 import {
   PageHeader,
-  Table,
   Tbody,
   Thead,
   Tr,

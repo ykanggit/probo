@@ -16,6 +16,7 @@ import {
 import { useTranslate } from "@probo/i18n";
 import { usePageTitle } from "@probo/hooks";
 import {
+  graphql,
   usePaginationFragment,
   usePreloadedQuery,
   type PreloadedQuery,
