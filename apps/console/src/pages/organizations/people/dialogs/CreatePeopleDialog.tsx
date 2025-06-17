@@ -30,7 +30,7 @@ const schema = z.object({
   additionalEmailAddresses: z.preprocess(
     // Empty additional emails are skipped
     (v) => (v as string[]).filter((v) => !!v),
-    z.array(z.string().email())
+    z.array(z.string().email()),
   ),
   kind: z.enum(peopleRoles),
 });
@@ -57,7 +57,7 @@ export const createPeopleMutation = graphql`
 export function CreatePeopleDialog({ children, connectionId }: Props) {
   const { __ } = useTranslate();
   const organizationId = useOrganizationId();
-  const { control, handleSubmit, register } = useFormWithSchema(schema, {
+  const { control, handleSubmit, register, reset } = useFormWithSchema(schema, {
     defaultValues: {
       additionalEmailAddresses: [],
     },
@@ -79,6 +79,7 @@ export function CreatePeopleDialog({ children, connectionId }: Props) {
         connections: [connectionId],
       },
       onSuccess: () => {
+        reset();
         ref.current?.close();
       },
     });
