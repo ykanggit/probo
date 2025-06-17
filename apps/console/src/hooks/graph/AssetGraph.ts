@@ -1,5 +1,9 @@
 import { graphql } from "relay-runtime";
-import { useMutation, usePreloadedQuery, type PreloadedQuery } from "react-relay";
+import {
+  useMutation,
+  usePreloadedQuery,
+  type PreloadedQuery,
+} from "react-relay";
 import { useConfirm } from "@probo/ui";
 import { useTranslate } from "@probo/i18n";
 import { promisifyMutation, sprintf } from "@probo/helpers";
@@ -10,32 +14,7 @@ export const assetsQuery = graphql`
   query AssetGraphListQuery($organizationId: ID!) {
     node(id: $organizationId) {
       ... on Organization {
-        assets(first: 100) @connection(key: "AssetsPage_assets") {
-          __id
-          edges {
-            node {
-              id
-              name
-              amount
-              criticity
-              assetType
-              dataTypesStored
-              owner {
-                fullName
-              }
-              vendors(first: 50) {
-                edges {
-                  node {
-                    id
-                    name
-                    websiteUrl
-                  }
-                }
-              }
-              createdAt
-            }
-          }
-        }
+        ...AssetsPageFragment
       }
     }
   }
@@ -249,20 +228,4 @@ export const useUpdateAsset = () => {
       },
     });
   };
-};
-
-export const useAssets = (queryRef: PreloadedQuery<AssetGraphListQuery>) => {
-  const data = usePreloadedQuery(assetsQuery, queryRef);
-
-  return useMemo(() => {
-    const organization = data.node;
-    if (!organization || !organization.assets) {
-      return { assets: [], connectionId: "" };
-    }
-
-    return {
-      assets: organization.assets.edges.map((edge) => edge.node),
-      connectionId: organization.assets.__id,
-    };
-  }, [data]);
 };

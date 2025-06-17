@@ -2,7 +2,6 @@ import {
   Button,
   IconPlusLarge,
   PageHeader,
-  Table,
   Thead,
   Tbody,
   Tr,
@@ -16,16 +15,72 @@ import {
 } from "@probo/ui";
 import { useTranslate } from "@probo/i18n";
 import { usePageTitle } from "@probo/hooks";
-import { type PreloadedQuery } from "react-relay";
+import {
+  graphql,
+  usePaginationFragment,
+  usePreloadedQuery,
+  type PreloadedQuery,
+} from "react-relay";
 import { useOrganizationId } from "/hooks/useOrganizationId";
 import { CreateAssetDialog } from "./dialogs/CreateAssetDialog";
-import { useDeleteAsset, useAssets } from "../../../hooks/graph/AssetGraph";
+import { useDeleteAsset, assetsQuery } from "../../../hooks/graph/AssetGraph";
 import type { AssetGraphListQuery } from "/hooks/graph/__generated__/AssetGraphListQuery.graphql";
 import { faviconUrl } from "@probo/helpers";
 import type { NodeOf } from "/types";
 import { getAssetTypeVariant, getCriticityVariant } from "@probo/helpers";
+import type {
+  AssetsPageFragment$data,
+  AssetsPageFragment$key,
+} from "./__generated__/AssetsPageFragment.graphql";
+import { SortableTable } from "/components/SortableTable";
 
-type AssetEntry = NodeOf<NonNullable<NonNullable<AssetGraphListQuery["response"]["node"]>["assets"]>>;
+const paginatedAssetsFragment = graphql`
+  fragment AssetsPageFragment on Organization
+  @refetchable(queryName: "AssetsListQuery")
+  @argumentDefinitions(
+    first: { type: "Int", defaultValue: 10 }
+    orderBy: { type: "AssetOrder", defaultValue: null }
+    after: { type: "CursorKey", defaultValue: null }
+    before: { type: "CursorKey", defaultValue: null }
+    last: { type: "Int", defaultValue: null }
+  ) {
+    assets(
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+      orderBy: $orderBy
+    ) @connection(key: "AssetsPage_assets") {
+      __id
+      edges {
+        node {
+          id
+          name
+          amount
+          criticity
+          assetType
+          dataTypesStored
+          owner {
+            id
+            fullName
+          }
+          vendors(first: 50) {
+            edges {
+              node {
+                id
+                name
+                websiteUrl
+              }
+            }
+          }
+          createdAt
+        }
+      }
+    }
+  }
+`;
+
+type AssetEntry = NodeOf<AssetsPageFragment$data["assets"]>;
 
 type Props = {
   queryRef: PreloadedQuery<AssetGraphListQuery>;
@@ -35,7 +90,13 @@ export default function AssetsPage(props: Props) {
   const { __ } = useTranslate();
   const organizationId = useOrganizationId();
 
-  const { assets, connectionId } = useAssets(props.queryRef);
+  const data = usePreloadedQuery(assetsQuery, props.queryRef);
+  const pagination = usePaginationFragment(
+    paginatedAssetsFragment,
+    data.node as AssetsPageFragment$key
+  );
+  const assets = pagination.data.assets?.edges.map((edge) => edge.node);
+  const connectionId = pagination.data.assets.__id;
 
   usePageTitle(__("Assets"));
 
@@ -47,11 +108,14 @@ export default function AssetsPage(props: Props) {
           "Manage your organization's assets and their classifications."
         )}
       >
-        <CreateAssetDialog connection={connectionId} organizationId={organizationId}>
+        <CreateAssetDialog
+          connection={connectionId}
+          organizationId={organizationId}
+        >
           <Button icon={IconPlusLarge}>{__("Add asset")}</Button>
         </CreateAssetDialog>
       </PageHeader>
-      <Table>
+      <SortableTable {...pagination}>
         <Thead>
           <Tr>
             <Th>{__("Name")}</Th>
@@ -72,7 +136,7 @@ export default function AssetsPage(props: Props) {
             />
           ))}
         </Tbody>
-      </Table>
+      </SortableTable>
     </div>
   );
 }
@@ -87,7 +151,7 @@ function AssetRow({
   const organizationId = useOrganizationId();
   const { __ } = useTranslate();
   const deleteAsset = useDeleteAsset(entry, connectionId);
-  const vendors = entry.vendors?.edges.map(edge => edge.node) ?? [];
+  const vendors = entry.vendors?.edges.map((edge) => edge.node) ?? [];
 
   return (
     <Tr to={`/organizations/${organizationId}/assets/${entry.id}`}>
@@ -108,7 +172,11 @@ function AssetRow({
         {vendors.length > 0 ? (
           <div className="flex flex-wrap gap-1">
             {vendors.slice(0, 3).map((vendor) => (
-              <Badge key={vendor.id} variant="neutral" className="flex items-center gap-1">
+              <Badge
+                key={vendor.id}
+                variant="neutral"
+                className="flex items-center gap-1"
+              >
                 <Avatar
                   name={vendor.name}
                   src={faviconUrl(vendor.websiteUrl)}

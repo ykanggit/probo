@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8758668524dc47bc04757126d7f423b3>>
+ * @generated SignedSource<<305c2e15c19e7ead66752260c29d8794>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,56 +10,110 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type AssetGraphListQuery$variables = {
-  organizationId: string;
+export type AssetOrderField = "AMOUNT" | "CREATED_AT" | "CRITICITY";
+export type OrderDirection = "ASC" | "DESC";
+export type AssetOrder = {
+  direction: OrderDirection;
+  field: AssetOrderField;
 };
-export type AssetGraphListQuery$data = {
+export type AssetsListQuery$variables = {
+  after?: any | null | undefined;
+  before?: any | null | undefined;
+  first?: number | null | undefined;
+  id: string;
+  last?: number | null | undefined;
+  orderBy?: AssetOrder | null | undefined;
+};
+export type AssetsListQuery$data = {
   readonly node: {
     readonly " $fragmentSpreads": FragmentRefs<"AssetsPageFragment">;
   };
 };
-export type AssetGraphListQuery = {
-  response: AssetGraphListQuery$data;
-  variables: AssetGraphListQuery$variables;
+export type AssetsListQuery = {
+  response: AssetsListQuery$data;
+  variables: AssetsListQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "defaultValue": null,
-    "kind": "LocalArgument",
-    "name": "organizationId"
-  }
-],
-v1 = [
+var v0 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "after"
+},
+v1 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "before"
+},
+v2 = {
+  "defaultValue": 10,
+  "kind": "LocalArgument",
+  "name": "first"
+},
+v3 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "id"
+},
+v4 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "last"
+},
+v5 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "orderBy"
+},
+v6 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "organizationId"
+    "variableName": "id"
   }
 ],
-v2 = {
+v7 = [
+  {
+    "kind": "Variable",
+    "name": "after",
+    "variableName": "after"
+  },
+  {
+    "kind": "Variable",
+    "name": "before",
+    "variableName": "before"
+  },
+  {
+    "kind": "Variable",
+    "name": "first",
+    "variableName": "first"
+  },
+  {
+    "kind": "Variable",
+    "name": "last",
+    "variableName": "last"
+  },
+  {
+    "kind": "Variable",
+    "name": "orderBy",
+    "variableName": "orderBy"
+  }
+],
+v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v3 = {
+v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v4 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 10
-  }
-],
-v5 = {
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
@@ -68,30 +122,30 @@ v5 = {
 };
 return {
   "fragment": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/),
+      (v2/*: any*/),
+      (v3/*: any*/),
+      (v4/*: any*/),
+      (v5/*: any*/)
+    ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "AssetGraphListQuery",
+    "name": "AssetsListQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v1/*: any*/),
+        "args": (v6/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
           {
-            "kind": "InlineFragment",
-            "selections": [
-              {
-                "args": null,
-                "kind": "FragmentSpread",
-                "name": "AssetsPageFragment"
-              }
-            ],
-            "type": "Organization",
-            "abstractKey": null
+            "args": (v7/*: any*/),
+            "kind": "FragmentSpread",
+            "name": "AssetsPageFragment"
           }
         ],
         "storageKey": null
@@ -102,26 +156,33 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/),
+      (v2/*: any*/),
+      (v4/*: any*/),
+      (v5/*: any*/),
+      (v3/*: any*/)
+    ],
     "kind": "Operation",
-    "name": "AssetGraphListQuery",
+    "name": "AssetsListQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v1/*: any*/),
+        "args": (v6/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/),
-          (v3/*: any*/),
+          (v8/*: any*/),
+          (v9/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v4/*: any*/),
+                "args": (v7/*: any*/),
                 "concreteType": "AssetConnection",
                 "kind": "LinkedField",
                 "name": "assets",
@@ -143,8 +204,8 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v3/*: any*/),
-                          (v5/*: any*/),
+                          (v9/*: any*/),
+                          (v10/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -181,7 +242,7 @@ return {
                             "name": "owner",
                             "plural": false,
                             "selections": [
-                              (v3/*: any*/),
+                              (v9/*: any*/),
                               {
                                 "alias": null,
                                 "args": null,
@@ -222,8 +283,8 @@ return {
                                     "name": "node",
                                     "plural": false,
                                     "selections": [
-                                      (v3/*: any*/),
-                                      (v5/*: any*/),
+                                      (v9/*: any*/),
+                                      (v10/*: any*/),
                                       {
                                         "alias": null,
                                         "args": null,
@@ -247,7 +308,7 @@ return {
                             "name": "createdAt",
                             "storageKey": null
                           },
-                          (v2/*: any*/)
+                          (v8/*: any*/)
                         ],
                         "storageKey": null
                       },
@@ -313,11 +374,11 @@ return {
                     ]
                   }
                 ],
-                "storageKey": "assets(first:10)"
+                "storageKey": null
               },
               {
                 "alias": null,
-                "args": (v4/*: any*/),
+                "args": (v7/*: any*/),
                 "filters": [
                   "orderBy"
                 ],
@@ -336,16 +397,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "7e293e732d5ff8246a1ed772e1c33984",
+    "cacheID": "d712227ae7c1c1a4151005092f7eeaf9",
     "id": null,
     "metadata": {},
-    "name": "AssetGraphListQuery",
+    "name": "AssetsListQuery",
     "operationKind": "query",
-    "text": "query AssetGraphListQuery(\n  $organizationId: ID!\n) {\n  node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      ...AssetsPageFragment\n    }\n    id\n  }\n}\n\nfragment AssetsPageFragment on Organization {\n  assets(first: 10) {\n    edges {\n      node {\n        id\n        name\n        amount\n        criticity\n        assetType\n        dataTypesStored\n        owner {\n          id\n          fullName\n        }\n        vendors(first: 50) {\n          edges {\n            node {\n              id\n              name\n              websiteUrl\n            }\n          }\n        }\n        createdAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query AssetsListQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 10\n  $last: Int = null\n  $orderBy: AssetOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...AssetsPageFragment_sdb03\n    id\n  }\n}\n\nfragment AssetsPageFragment_sdb03 on Organization {\n  assets(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        name\n        amount\n        criticity\n        assetType\n        dataTypesStored\n        owner {\n          id\n          fullName\n        }\n        vendors(first: 50) {\n          edges {\n            node {\n              id\n              name\n              websiteUrl\n            }\n          }\n        }\n        createdAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "88644d5fcb5f2e017df4b5d6373ce27f";
+(node as any).hash = "e25e58aa9cf789614d280313c6059d5e";
 
 export default node;
