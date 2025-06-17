@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<43878b22fe8a689f41bcd506711ddb5f>>
+ * @generated SignedSource<<56d7fa0e53727e6a52fc6ab7bc805ceb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -57,7 +57,7 @@ v4 = [
   {
     "kind": "Literal",
     "name": "first",
-    "value": 50
+    "value": 1
   }
 ];
 return {
@@ -233,7 +233,7 @@ return {
                     ]
                   }
                 ],
-                "storageKey": "peoples(first:50)"
+                "storageKey": "peoples(first:1)"
               },
               {
                 "alias": null,
@@ -256,12 +256,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b154e94ac7e783a492bc5aed7d44229d",
+    "cacheID": "838b4fd1617a05fcb681c1e533cc0a9f",
     "id": null,
     "metadata": {},
     "name": "PeopleGraphPaginatedQuery",
     "operationKind": "query",
-    "text": "query PeopleGraphPaginatedQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      ...PeopleGraphPaginatedFragment\n    }\n    id\n  }\n}\n\nfragment PeopleGraphPaginatedFragment on Organization {\n  peoples(first: 50) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        additionalEmailAddresses\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query PeopleGraphPaginatedQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      ...PeopleGraphPaginatedFragment\n    }\n    id\n  }\n}\n\nfragment PeopleGraphPaginatedFragment on Organization {\n  peoples(first: 1) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        additionalEmailAddresses\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();

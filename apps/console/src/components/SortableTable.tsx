@@ -1,4 +1,12 @@
-import { IconChevronTriangleDownSmall, Table, Th } from "@probo/ui";
+import { useTranslate } from "@probo/i18n";
+import {
+  Button,
+  IconChevronDown,
+  IconChevronTriangleDownSmall,
+  Spinner,
+  Table,
+  Th,
+} from "@probo/ui";
 import clsx from "clsx";
 import {
   createContext,
@@ -28,10 +36,17 @@ const defaultOrder = {
 
 export function SortableTable({
   refetch,
+  hasNext,
+  loadNext,
+  isLoading,
   ...props
 }: ComponentProps<typeof Table> & {
   refetch: (o: { order: Order }) => void;
+  hasNext: boolean;
+  loadNext: () => void;
+  isLoading: boolean;
 }) {
+  const { __ } = useTranslate();
   const [order, setOrder] = useState(defaultOrder);
   const onOrderChange = (o: Order) => {
     startTransition(() => {
@@ -41,7 +56,20 @@ export function SortableTable({
   };
   return (
     <SortableContext value={{ order, onOrderChange }}>
-      <Table {...props} />
+      <div className="space-y-4">
+        <Table {...props} />
+        {hasNext && (
+          <Button
+            variant="tertiary"
+            onClick={() => loadNext()}
+            className="mt-3 mx-auto"
+            disabled={isLoading}
+            icon={isLoading ? Spinner : IconChevronDown}
+          >
+            {__("Show more")}
+          </Button>
+        )}
+      </div>
     </SortableContext>
   );
 }

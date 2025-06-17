@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<bc0fdc02fb8b596386e290ae0cf0b8b8>>
+ * @generated SignedSource<<b6d154d843de3da0a803639f428f7152>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -46,7 +46,7 @@ v1 = {
   "name": "before"
 },
 v2 = {
-  "defaultValue": 50,
+  "defaultValue": 1,
   "kind": "LocalArgument",
   "name": "first"
 },
@@ -329,16 +329,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a17ff68897dbcf3daa33b073bc83f1bb",
+    "cacheID": "e26cb4d1b42b5500dd12ee294ccce2e5",
     "id": null,
     "metadata": {},
     "name": "PeopleListQuery",
     "operationKind": "query",
-    "text": "query PeopleListQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: PeopleOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...PeopleGraphPaginatedFragment_16fISc\n    id\n  }\n}\n\nfragment PeopleGraphPaginatedFragment_16fISc on Organization {\n  peoples(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        additionalEmailAddresses\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query PeopleListQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 1\n  $last: Int = null\n  $order: PeopleOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...PeopleGraphPaginatedFragment_16fISc\n    id\n  }\n}\n\nfragment PeopleGraphPaginatedFragment_16fISc on Organization {\n  peoples(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        additionalEmailAddresses\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c163b7909a337efd22088852b9908045";
+(node as any).hash = "e1720a7dc0b7914edb8a07f63d5cf95a";
 
 export default node;

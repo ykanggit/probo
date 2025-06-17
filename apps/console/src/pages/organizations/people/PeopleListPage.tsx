@@ -32,7 +32,8 @@ export default function PeopleListPage({
   queryRef: PreloadedQuery<PeopleGraphPaginatedQuery>;
 }) {
   const { __ } = useTranslate();
-  const { people, refetch, connectionId } = usePeopleQuery(queryRef);
+  const { people, refetch, connectionId, hasNext, loadNext, isLoadingNext } =
+    usePeopleQuery(queryRef);
 
   usePageTitle(__("Members"));
 
@@ -48,7 +49,12 @@ export default function PeopleListPage({
           <Button icon={IconPlusLarge}>{__("Add member")}</Button>
         </CreatePeopleDialog>
       </PageHeader>
-      <SortableTable refetch={refetch}>
+      <SortableTable
+        refetch={refetch}
+        hasNext={hasNext}
+        loadNext={loadNext}
+        isLoading={isLoadingNext}
+      >
         <Thead>
           <Tr>
             <SortableTh field="FULL_NAME">{__("Name")}</SortableTh>

@@ -3,6 +3,7 @@ import type { PeopleGraphQuery } from "./__generated__/PeopleGraphQuery.graphql"
 import {
   useLazyLoadQuery,
   useMutation,
+  usePaginationFragment,
   usePreloadedQuery,
   useRefetchableFragment,
   type PreloadedQuery,
@@ -91,15 +92,15 @@ export function usePeopleQuery(
   queryRef: PreloadedQuery<PeopleGraphPaginatedQuery>
 ) {
   const data = usePreloadedQuery(paginatedPeopleQuery, queryRef);
-  const [dataFragment, refetch] = useRefetchableFragment(
+  const pagination = usePaginationFragment(
     paginatedPeopleFragment,
     data.organization as PeopleGraphPaginatedFragment$key
   );
-  const people = dataFragment?.peoples?.edges.map((edge) => edge.node);
+  const people = pagination.data.peoples?.edges.map((edge) => edge.node);
   return {
+    ...pagination,
     people,
-    refetch,
-    connectionId: dataFragment.peoples.__id,
+    connectionId: pagination.data.peoples.__id,
   };
 }
 
