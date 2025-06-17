@@ -5,6 +5,7 @@ import type { OrganizationsPageQuery as OrganizationsPageQueryType } from "./__g
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { Avatar, Button, Card, IconPlusLarge } from "@probo/ui";
+import { usePageTitle } from "@probo/hooks";
 
 const OrganizationsPageQuery = graphql`
   query OrganizationsPageQuery {
@@ -34,6 +35,8 @@ export default function OrganizationsPage() {
     (edge) => edge.node
   );
 
+  usePageTitle(__("Select an organization"));
+
   // Redirect to the first organization if only one exists
   useEffect(() => {
     if (organizations.length === 1) {
@@ -43,8 +46,7 @@ export default function OrganizationsPage() {
 
   return (
     <>
-      <title>{__("Select an organization")}</title>
-      <div className="space-y-6 w-full">
+      <div className="space-y-6 w-full py-6">
         <h1 className="text-3xl font-bold text-center">
           {__("Select an organization")}
         </h1>
