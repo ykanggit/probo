@@ -92,27 +92,48 @@ export const vendorsQuery = graphql`
   query VendorGraphListQuery($organizationId: ID!) {
     node(id: $organizationId) {
       ... on Organization {
-        vendors(first: 25) @connection(key: "VendorsPage_vendors") {
-          __id
-          edges {
-            node {
-              id
-              name
-              websiteUrl
-              updatedAt
-              riskAssessments(
-                first: 1
-                orderBy: { direction: DESC, field: ASSESSED_AT }
-              ) {
-                edges {
-                  node {
-                    id
-                    assessedAt
-                    expiresAt
-                    dataSensitivity
-                    businessImpact
-                  }
-                }
+        id
+        ...VendorGraphPaginatedFragment
+      }
+    }
+  }
+`;
+
+export const paginatedVendorsFragment = graphql`
+  fragment VendorGraphPaginatedFragment on Organization
+  @refetchable(queryName: "VendorsListQuery")
+  @argumentDefinitions(
+    first: { type: "Int", defaultValue: 50 }
+    order: { type: "VendorOrder", defaultValue: null }
+    after: { type: "CursorKey", defaultValue: null }
+    before: { type: "CursorKey", defaultValue: null }
+    last: { type: "Int", defaultValue: null }
+  ) {
+    vendors(
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+      orderBy: $order
+    ) @connection(key: "VendorsListQuery_vendors") {
+      __id
+      edges {
+        node {
+          id
+          name
+          websiteUrl
+          updatedAt
+          riskAssessments(
+            first: 1
+            orderBy: { direction: DESC, field: ASSESSED_AT }
+          ) {
+            edges {
+              node {
+                id
+                assessedAt
+                expiresAt
+                dataSensitivity
+                businessImpact
               }
             }
           }

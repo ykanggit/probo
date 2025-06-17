@@ -17,16 +17,26 @@ import {
 } from "@probo/ui";
 import { useTranslate } from "@probo/i18n";
 import { usePageTitle } from "@probo/hooks";
-import { usePreloadedQuery, type PreloadedQuery } from "react-relay";
+import {
+  usePaginationFragment,
+  usePreloadedQuery,
+  type PreloadedQuery,
+} from "react-relay";
 import { useOrganizationId } from "/hooks/useOrganizationId";
 import { faviconUrl } from "@probo/helpers";
 import type { NodeOf } from "/types";
 import { CreateVendorDialog } from "./dialogs/CreateVendorDialog";
-import { useDeleteVendor, vendorsQuery } from "/hooks/graph/VendorGraph";
+import {
+  paginatedVendorsFragment,
+  useDeleteVendor,
+  vendorsQuery,
+} from "/hooks/graph/VendorGraph";
 import type {
   VendorGraphListQuery,
   VendorGraphListQuery$data,
 } from "/hooks/graph/__generated__/VendorGraphListQuery.graphql";
+import type { VendorGraphPaginatedFragment$key } from "/hooks/graph/__generated__/VendorGraphPaginatedFragment.graphql";
+import { SortableTable } from "/components/SortableTable";
 
 type Vendor = NodeOf<VendorGraphListQuery$data["node"]["vendors"]>;
 
@@ -39,9 +49,13 @@ export default function VendorsPage(props: Props) {
   const organizationId = useOrganizationId();
 
   const data = usePreloadedQuery(vendorsQuery, props.queryRef);
+  const pagination = usePaginationFragment(
+    paginatedVendorsFragment,
+    data.node as VendorGraphPaginatedFragment$key
+  );
 
-  const vendors = data.node?.vendors?.edges.map((edge) => edge.node);
-  const connectionId = data.node!.vendors!.__id;
+  const vendors = pagination.data.vendors?.edges.map((edge) => edge.node);
+  const connectionId = pagination.data.vendors.__id;
 
   usePageTitle(__("Vendors"));
 
@@ -54,13 +68,13 @@ export default function VendorsPage(props: Props) {
         )}
       >
         <CreateVendorDialog
-          connection={data.node!.vendors!.__id}
+          connection={connectionId}
           organizationId={organizationId}
         >
           <Button icon={IconPlusLarge}>{__("Add vendor")}</Button>
         </CreateVendorDialog>
       </PageHeader>
-      <Table>
+      <SortableTable {...pagination}>
         <Thead>
           <Tr>
             <Th>{__("Vendor")}</Th>
@@ -81,7 +95,7 @@ export default function VendorsPage(props: Props) {
             />
           ))}
         </Tbody>
-      </Table>
+      </SortableTable>
     </div>
   );
 }

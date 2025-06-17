@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e4fcd65491a7570cf56382a3f977e06d>>
+ * @generated SignedSource<<93638f7eeb1634fc19aaaa95cae0c7b8>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,34 +9,45 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
-export type PeopleKind = "CONTRACTOR" | "EMPLOYEE" | "SERVICE_ACCOUNT";
+export type BusinessImpact = "CRITICAL" | "HIGH" | "LOW" | "MEDIUM";
+export type DataSensitivity = "CRITICAL" | "HIGH" | "LOW" | "MEDIUM" | "NONE";
 import { FragmentRefs } from "relay-runtime";
-export type PeopleGraphPaginatedFragment$data = {
+export type VendorGraphPaginatedFragment$data = {
   readonly id: string;
-  readonly peoples: {
+  readonly vendors: {
     readonly __id: string;
     readonly edges: ReadonlyArray<{
       readonly node: {
-        readonly additionalEmailAddresses: ReadonlyArray<string>;
-        readonly fullName: string;
         readonly id: string;
-        readonly kind: PeopleKind;
-        readonly primaryEmailAddress: string;
+        readonly name: string;
+        readonly riskAssessments: {
+          readonly edges: ReadonlyArray<{
+            readonly node: {
+              readonly assessedAt: any;
+              readonly businessImpact: BusinessImpact;
+              readonly dataSensitivity: DataSensitivity;
+              readonly expiresAt: any;
+              readonly id: string;
+            };
+          }>;
+        };
+        readonly updatedAt: any;
+        readonly websiteUrl: string | null | undefined;
       };
     }>;
   };
-  readonly " $fragmentType": "PeopleGraphPaginatedFragment";
+  readonly " $fragmentType": "VendorGraphPaginatedFragment";
 };
-export type PeopleGraphPaginatedFragment$key = {
-  readonly " $data"?: PeopleGraphPaginatedFragment$data;
-  readonly " $fragmentSpreads": FragmentRefs<"PeopleGraphPaginatedFragment">;
+export type VendorGraphPaginatedFragment$key = {
+  readonly " $data"?: VendorGraphPaginatedFragment$data;
+  readonly " $fragmentSpreads": FragmentRefs<"VendorGraphPaginatedFragment">;
 };
 
-import PeopleListQuery_graphql from './PeopleListQuery.graphql';
+import VendorsListQuery_graphql from './VendorsListQuery.graphql';
 
 const node: ReaderFragment = (function(){
 var v0 = [
-  "peoples"
+  "vendors"
 ],
 v1 = {
   "alias": null,
@@ -98,17 +109,17 @@ return {
       "fragmentPathInResult": [
         "node"
       ],
-      "operation": PeopleListQuery_graphql,
+      "operation": VendorsListQuery_graphql,
       "identifierInfo": {
         "identifierField": "id",
         "identifierQueryVariableName": "id"
       }
     }
   },
-  "name": "PeopleGraphPaginatedFragment",
+  "name": "VendorGraphPaginatedFragment",
   "selections": [
     {
-      "alias": "peoples",
+      "alias": "vendors",
       "args": [
         {
           "kind": "Variable",
@@ -116,15 +127,15 @@ return {
           "variableName": "order"
         }
       ],
-      "concreteType": "PeopleConnection",
+      "concreteType": "VendorConnection",
       "kind": "LinkedField",
-      "name": "__PeopleGraphPaginatedQuery_peoples_connection",
+      "name": "__VendorsListQuery_vendors_connection",
       "plural": false,
       "selections": [
         {
           "alias": null,
           "args": null,
-          "concreteType": "PeopleEdge",
+          "concreteType": "VendorEdge",
           "kind": "LinkedField",
           "name": "edges",
           "plural": true,
@@ -132,7 +143,7 @@ return {
             {
               "alias": null,
               "args": null,
-              "concreteType": "People",
+              "concreteType": "Vendor",
               "kind": "LinkedField",
               "name": "node",
               "plural": false,
@@ -142,29 +153,98 @@ return {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
-                  "name": "fullName",
+                  "name": "name",
                   "storageKey": null
                 },
                 {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
-                  "name": "primaryEmailAddress",
+                  "name": "websiteUrl",
                   "storageKey": null
                 },
                 {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
-                  "name": "kind",
+                  "name": "updatedAt",
                   "storageKey": null
                 },
                 {
                   "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "additionalEmailAddresses",
-                  "storageKey": null
+                  "args": [
+                    {
+                      "kind": "Literal",
+                      "name": "first",
+                      "value": 1
+                    },
+                    {
+                      "kind": "Literal",
+                      "name": "orderBy",
+                      "value": {
+                        "direction": "DESC",
+                        "field": "ASSESSED_AT"
+                      }
+                    }
+                  ],
+                  "concreteType": "VendorRiskAssessmentConnection",
+                  "kind": "LinkedField",
+                  "name": "riskAssessments",
+                  "plural": false,
+                  "selections": [
+                    {
+                      "alias": null,
+                      "args": null,
+                      "concreteType": "VendorRiskAssessmentEdge",
+                      "kind": "LinkedField",
+                      "name": "edges",
+                      "plural": true,
+                      "selections": [
+                        {
+                          "alias": null,
+                          "args": null,
+                          "concreteType": "VendorRiskAssessment",
+                          "kind": "LinkedField",
+                          "name": "node",
+                          "plural": false,
+                          "selections": [
+                            (v1/*: any*/),
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "assessedAt",
+                              "storageKey": null
+                            },
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "expiresAt",
+                              "storageKey": null
+                            },
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "dataSensitivity",
+                              "storageKey": null
+                            },
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "businessImpact",
+                              "storageKey": null
+                            }
+                          ],
+                          "storageKey": null
+                        }
+                      ],
+                      "storageKey": null
+                    }
+                  ],
+                  "storageKey": "riskAssessments(first:1,orderBy:{\"direction\":\"DESC\",\"field\":\"ASSESSED_AT\"})"
                 },
                 {
                   "alias": null,
@@ -247,6 +327,6 @@ return {
 };
 })();
 
-(node as any).hash = "c163b7909a337efd22088852b9908045";
+(node as any).hash = "1d2bf7c29e77d60d0a955a62b98c85ab";
 
 export default node;

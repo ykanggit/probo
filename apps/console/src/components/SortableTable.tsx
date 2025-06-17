@@ -38,13 +38,13 @@ export function SortableTable({
   refetch,
   hasNext,
   loadNext,
-  isLoading,
+  isLoadingNext,
   ...props
 }: ComponentProps<typeof Table> & {
   refetch: (o: { order: Order }) => void;
   hasNext: boolean;
-  loadNext: () => void;
-  isLoading: boolean;
+  loadNext: (...args: any[]) => void;
+  isLoadingNext: boolean;
 }) {
   const { __ } = useTranslate();
   const [order, setOrder] = useState(defaultOrder);
@@ -63,8 +63,8 @@ export function SortableTable({
             variant="tertiary"
             onClick={() => loadNext()}
             className="mt-3 mx-auto"
-            disabled={isLoading}
-            icon={isLoading ? Spinner : IconChevronDown}
+            disabled={isLoadingNext}
+            icon={isLoadingNext ? Spinner : IconChevronDown}
           >
             {__("Show more")}
           </Button>

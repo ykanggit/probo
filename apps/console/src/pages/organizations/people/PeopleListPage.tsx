@@ -53,7 +53,7 @@ export default function PeopleListPage({
         refetch={refetch}
         hasNext={hasNext}
         loadNext={loadNext}
-        isLoading={isLoadingNext}
+        isLoadingNext={isLoadingNext}
       >
         <Thead>
           <Tr>
