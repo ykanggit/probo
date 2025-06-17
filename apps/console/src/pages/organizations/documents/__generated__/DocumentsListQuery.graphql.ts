@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d9bda0dcda5063209bf188927b57d117>>
+ * @generated SignedSource<<7ebb9cf96131d4b0b2670e63ab60e0d6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,74 +10,147 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type DocumentGraphListQuery$variables = {
-  organizationId: string;
+export type DocumentOrderField = "CREATED_AT" | "TITLE";
+export type OrderDirection = "ASC" | "DESC";
+export type DocumentOrder = {
+  direction: OrderDirection;
+  field: DocumentOrderField;
 };
-export type DocumentGraphListQuery$data = {
-  readonly organization: {
-    readonly id: string;
+export type DocumentsListQuery$variables = {
+  after?: any | null | undefined;
+  before?: any | null | undefined;
+  first?: number | null | undefined;
+  id: string;
+  last?: number | null | undefined;
+  order?: DocumentOrder | null | undefined;
+};
+export type DocumentsListQuery$data = {
+  readonly node: {
     readonly " $fragmentSpreads": FragmentRefs<"DocumentsPageListFragment">;
   };
 };
-export type DocumentGraphListQuery = {
-  response: DocumentGraphListQuery$data;
-  variables: DocumentGraphListQuery$variables;
+export type DocumentsListQuery = {
+  response: DocumentsListQuery$data;
+  variables: DocumentsListQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "defaultValue": null,
-    "kind": "LocalArgument",
-    "name": "organizationId"
-  }
-],
-v1 = [
+var v0 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "after"
+},
+v1 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "before"
+},
+v2 = {
+  "defaultValue": 50,
+  "kind": "LocalArgument",
+  "name": "first"
+},
+v3 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "id"
+},
+v4 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "last"
+},
+v5 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "order"
+},
+v6 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "organizationId"
+    "variableName": "id"
   }
 ],
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
+v7 = {
+  "kind": "Variable",
+  "name": "after",
+  "variableName": "after"
 },
-v3 = {
+v8 = {
+  "kind": "Variable",
+  "name": "before",
+  "variableName": "before"
+},
+v9 = {
+  "kind": "Variable",
+  "name": "first",
+  "variableName": "first"
+},
+v10 = {
+  "kind": "Variable",
+  "name": "last",
+  "variableName": "last"
+},
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v4 = [
+v12 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v13 = [
+  (v7/*: any*/),
+  (v8/*: any*/),
+  (v9/*: any*/),
+  (v10/*: any*/),
   {
-    "kind": "Literal",
-    "name": "first",
-    "value": 50
+    "kind": "Variable",
+    "name": "orderBy",
+    "variableName": "order"
   }
 ];
 return {
   "fragment": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/),
+      (v2/*: any*/),
+      (v3/*: any*/),
+      (v4/*: any*/),
+      (v5/*: any*/)
+    ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "DocumentGraphListQuery",
+    "name": "DocumentsListQuery",
     "selections": [
       {
-        "alias": "organization",
-        "args": (v1/*: any*/),
+        "alias": null,
+        "args": (v6/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/),
           {
-            "args": null,
+            "args": [
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/),
+              (v10/*: any*/),
+              {
+                "kind": "Variable",
+                "name": "order",
+                "variableName": "order"
+              }
+            ],
             "kind": "FragmentSpread",
             "name": "DocumentsPageListFragment"
           }
@@ -90,26 +163,33 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/),
+      (v2/*: any*/),
+      (v4/*: any*/),
+      (v5/*: any*/),
+      (v3/*: any*/)
+    ],
     "kind": "Operation",
-    "name": "DocumentGraphListQuery",
+    "name": "DocumentsListQuery",
     "selections": [
       {
-        "alias": "organization",
-        "args": (v1/*: any*/),
+        "alias": null,
+        "args": (v6/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v3/*: any*/),
-          (v2/*: any*/),
+          (v11/*: any*/),
+          (v12/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v4/*: any*/),
+                "args": (v13/*: any*/),
                 "concreteType": "DocumentConnection",
                 "kind": "LinkedField",
                 "name": "documents",
@@ -131,7 +211,7 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v2/*: any*/),
+                          (v12/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -168,7 +248,7 @@ return {
                             "name": "owner",
                             "plural": false,
                             "selections": [
-                              (v2/*: any*/),
+                              (v12/*: any*/),
                               {
                                 "alias": null,
                                 "args": null,
@@ -209,7 +289,7 @@ return {
                                     "name": "node",
                                     "plural": false,
                                     "selections": [
-                                      (v2/*: any*/),
+                                      (v12/*: any*/),
                                       {
                                         "alias": null,
                                         "args": null,
@@ -247,7 +327,7 @@ return {
                                                 "name": "node",
                                                 "plural": false,
                                                 "selections": [
-                                                  (v2/*: any*/),
+                                                  (v12/*: any*/),
                                                   {
                                                     "alias": null,
                                                     "args": null,
@@ -273,7 +353,7 @@ return {
                             ],
                             "storageKey": "versions(first:1)"
                           },
-                          (v3/*: any*/)
+                          (v11/*: any*/)
                         ],
                         "storageKey": null
                       },
@@ -339,11 +419,11 @@ return {
                     ]
                   }
                 ],
-                "storageKey": "documents(first:50)"
+                "storageKey": null
               },
               {
                 "alias": null,
-                "args": (v4/*: any*/),
+                "args": (v13/*: any*/),
                 "filters": [
                   "orderBy"
                 ],
@@ -362,16 +442,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "cefd94e1cb5245f2d9852b098653ce53",
+    "cacheID": "3da7d3804fefec2e77c96b6c33c2cefc",
     "id": null,
     "metadata": {},
-    "name": "DocumentGraphListQuery",
+    "name": "DocumentsListQuery",
     "operationKind": "query",
-    "text": "query DocumentGraphListQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...DocumentsPageListFragment\n  }\n}\n\nfragment DocumentsPageListFragment on Organization {\n  documents(first: 50) {\n    edges {\n      node {\n        id\n        ...DocumentsPageRowFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n\nfragment DocumentsPageRowFragment on Document {\n  id\n  title\n  description\n  documentType\n  updatedAt\n  owner {\n    id\n    fullName\n  }\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query DocumentsListQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: DocumentOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...DocumentsPageListFragment_16fISc\n    id\n  }\n}\n\nfragment DocumentsPageListFragment_16fISc on Organization {\n  documents(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    edges {\n      node {\n        id\n        ...DocumentsPageRowFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n\nfragment DocumentsPageRowFragment on Document {\n  id\n  title\n  description\n  documentType\n  updatedAt\n  owner {\n    id\n    fullName\n  }\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "63de39eb2c87fc45b83eeee047ddd36c";
+(node as any).hash = "dc234a4cafbe4da1c1ff4943ff75c32a";
 
 export default node;

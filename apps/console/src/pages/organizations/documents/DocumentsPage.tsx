@@ -19,6 +19,7 @@ import {
 } from "@probo/ui";
 import {
   useFragment,
+  usePaginationFragment,
   usePreloadedQuery,
   type PreloadedQuery,
 } from "react-relay";
@@ -34,10 +35,25 @@ import { usePageTitle } from "@probo/hooks";
 import { sprintf, getDocumentTypeLabel } from "@probo/helpers";
 import { CreateDocumentDialog } from "./dialogs/CreateDocumentDialog";
 import type { DocumentsPageRowFragment$key } from "./__generated__/DocumentsPageRowFragment.graphql";
+import { SortableTable } from "/components/SortableTable";
 
 const documentsFragment = graphql`
-  fragment DocumentsPageListFragment on Organization {
-    documents(first: 100) @connection(key: "DocumentsPageFragment_documents") {
+  fragment DocumentsPageListFragment on Organization
+  @refetchable(queryName: "DocumentsListQuery")
+  @argumentDefinitions(
+    first: { type: "Int", defaultValue: 50 }
+    order: { type: "DocumentOrder", defaultValue: null }
+    after: { type: "CursorKey", defaultValue: null }
+    before: { type: "CursorKey", defaultValue: null }
+    last: { type: "Int", defaultValue: null }
+  ) {
+    documents(
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+      orderBy: $order
+    ) @connection(key: "DocumentsListQuery_documents") {
       __id
       edges {
         node {
@@ -60,13 +76,13 @@ export default function DocumentsPage(props: Props) {
     documentsQuery,
     props.queryRef
   ).organization;
-  const data = useFragment<DocumentsPageListFragment$key>(
+  const pagination = usePaginationFragment(
     documentsFragment,
-    organization
+    organization as DocumentsPageListFragment$key
   );
 
-  const documents = data.documents.edges.map((edge) => edge.node);
-  const connectionId = data.documents.__id;
+  const documents = pagination.data.documents.edges.map((edge) => edge.node);
+  const connectionId = pagination.data.documents.__id;
   const [sendSigningNotifications] = useSendSigningNotificationsMutation();
 
   usePageTitle(__("Documents"));
@@ -86,7 +102,7 @@ export default function DocumentsPage(props: Props) {
         description={__("Manage your organization's documents")}
       >
         <div className="flex gap-2">
-                    <Button
+          <Button
             icon={IconBell2}
             variant="secondary"
             onClick={handleSendSigningNotifications}
@@ -99,7 +115,7 @@ export default function DocumentsPage(props: Props) {
           />
         </div>
       </PageHeader>
-      <Table>
+      <SortableTable {...pagination}>
         <Thead>
           <Tr>
             <Th>{__("Name")}</Th>
@@ -121,7 +137,7 @@ export default function DocumentsPage(props: Props) {
             />
           ))}
         </Tbody>
-      </Table>
+      </SortableTable>
     </div>
   );
 }
@@ -218,9 +234,7 @@ function DocumentRow({
           {isDraft ? __("Draft") : __("Published")}
         </Badge>
       </Td>
-      <Td>
-        {getDocumentTypeLabel(__, document.documentType)}
-      </Td>
+      <Td>{getDocumentTypeLabel(__, document.documentType)}</Td>
       <Td>
         <div className="flex gap-2 items-center">
           <Avatar name={document.owner.fullName} />

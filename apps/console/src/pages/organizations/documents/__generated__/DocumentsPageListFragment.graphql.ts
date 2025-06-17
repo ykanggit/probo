@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5d1d855cd444dbaa6fc92493bc333dd4>>
+ * @generated SignedSource<<1082bf950eb1233b6c85c02d89dcd260>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -20,6 +20,7 @@ export type DocumentsPageListFragment$data = {
       };
     }>;
   };
+  readonly id: string;
   readonly " $fragmentType": "DocumentsPageListFragment";
 };
 export type DocumentsPageListFragment$key = {
@@ -27,29 +28,93 @@ export type DocumentsPageListFragment$key = {
   readonly " $fragmentSpreads": FragmentRefs<"DocumentsPageListFragment">;
 };
 
-const node: ReaderFragment = {
-  "argumentDefinitions": [],
+import DocumentsListQuery_graphql from './DocumentsListQuery.graphql';
+
+const node: ReaderFragment = (function(){
+var v0 = [
+  "documents"
+],
+v1 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+};
+return {
+  "argumentDefinitions": [
+    {
+      "defaultValue": null,
+      "kind": "LocalArgument",
+      "name": "after"
+    },
+    {
+      "defaultValue": null,
+      "kind": "LocalArgument",
+      "name": "before"
+    },
+    {
+      "defaultValue": 50,
+      "kind": "LocalArgument",
+      "name": "first"
+    },
+    {
+      "defaultValue": null,
+      "kind": "LocalArgument",
+      "name": "last"
+    },
+    {
+      "defaultValue": null,
+      "kind": "LocalArgument",
+      "name": "order"
+    }
+  ],
   "kind": "Fragment",
   "metadata": {
     "connection": [
       {
         "count": null,
         "cursor": null,
-        "direction": "forward",
-        "path": [
-          "documents"
-        ]
+        "direction": "bidirectional",
+        "path": (v0/*: any*/)
       }
-    ]
+    ],
+    "refetch": {
+      "connection": {
+        "forward": {
+          "count": "first",
+          "cursor": "after"
+        },
+        "backward": {
+          "count": "last",
+          "cursor": "before"
+        },
+        "path": (v0/*: any*/)
+      },
+      "fragmentPathInResult": [
+        "node"
+      ],
+      "operation": DocumentsListQuery_graphql,
+      "identifierInfo": {
+        "identifierField": "id",
+        "identifierQueryVariableName": "id"
+      }
+    }
   },
   "name": "DocumentsPageListFragment",
   "selections": [
     {
       "alias": "documents",
-      "args": null,
+      "args": [
+        {
+          "kind": "Variable",
+          "name": "orderBy",
+          "variableName": "order"
+        }
+      ],
       "concreteType": "DocumentConnection",
       "kind": "LinkedField",
-      "name": "__DocumentsPageFragment_documents_connection",
+      "name": "__DocumentsListQuery_documents_connection",
       "plural": false,
       "selections": [
         {
@@ -68,13 +133,7 @@ const node: ReaderFragment = {
               "name": "node",
               "plural": false,
               "selections": [
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "id",
-                  "storageKey": null
-                },
+                (v1/*: any*/),
                 {
                   "args": null,
                   "kind": "FragmentSpread",
@@ -121,6 +180,20 @@ const node: ReaderFragment = {
               "kind": "ScalarField",
               "name": "hasNextPage",
               "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "hasPreviousPage",
+              "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "startCursor",
+              "storageKey": null
             }
           ],
           "storageKey": null
@@ -139,12 +212,14 @@ const node: ReaderFragment = {
         }
       ],
       "storageKey": null
-    }
+    },
+    (v1/*: any*/)
   ],
   "type": "Organization",
   "abstractKey": null
 };
+})();
 
-(node as any).hash = "f6098fe2da00c369d0386e3854cd894b";
+(node as any).hash = "dc234a4cafbe4da1c1ff4943ff75c32a";
 
 export default node;
