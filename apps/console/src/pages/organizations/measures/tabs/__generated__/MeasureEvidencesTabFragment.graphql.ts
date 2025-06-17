@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<70954edefec64fedbc4f8c1ec1c1efab>>
+ * @generated SignedSource<<f1947ff2accbc325c11c88fb343d82b2>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,7 +15,10 @@ export type MeasureEvidencesTabFragment$data = {
     readonly __id: string;
     readonly edges: ReadonlyArray<{
       readonly node: {
+        readonly fileUrl: string | null | undefined;
+        readonly filename: string;
         readonly id: string;
+        readonly mimeType: string;
         readonly " $fragmentSpreads": FragmentRefs<"MeasureEvidencesTabFragment_evidence">;
       };
     }>;
@@ -136,6 +139,27 @@ return {
               "selections": [
                 (v1/*: any*/),
                 {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "filename",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "fileUrl",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "mimeType",
+                  "storageKey": null
+                },
+                {
                   "args": null,
                   "kind": "FragmentSpread",
                   "name": "MeasureEvidencesTabFragment_evidence"
@@ -220,6 +244,6 @@ return {
 };
 })();
 
-(node as any).hash = "619655a768981a51a00a71887dbcb227";
+(node as any).hash = "abae73e44e966689cd837465f93abcb3";
 
 export default node;

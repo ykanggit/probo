@@ -49,6 +49,7 @@ type Props = {
     defaultOpen?: boolean;
     className?: string;
     ref?: DialogRef;
+    onClose?: () => void;
 };
 
 export const useDialogRef = (): DialogRef => {
@@ -62,6 +63,7 @@ export function Dialog({
     className,
     ref,
     defaultOpen,
+    onClose,
 }: Props) {
     const { overlay, content, header, title: titleClassname } = dialog();
     const [open, setOpen] = useState(!!defaultOpen);
@@ -76,8 +78,16 @@ export function Dialog({
             },
         };
     }
+
+    const onOpenChange = (open: boolean) => {
+        setOpen(open);
+        if (!open) {
+            onClose?.();
+        }
+    };
+
     return (
-        <Root open={open} onOpenChange={setOpen}>
+        <Root open={open} onOpenChange={onOpenChange}>
             {trigger && <Trigger asChild>{trigger}</Trigger>}
             <Portal>
                 <Overlay className={overlay()} />

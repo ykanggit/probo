@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7e91345490d4b70ef6668bb6504be1e3>>
+ * @generated SignedSource<<286a7d808d7a9c793cd9e9b6830cb40b>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -602,6 +602,20 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
+                            "name": "fileUrl",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "mimeType",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
                             "name": "size",
                             "storageKey": null
                           },
@@ -617,20 +631,6 @@ return {
                             "args": null,
                             "kind": "ScalarField",
                             "name": "createdAt",
-                            "storageKey": null
-                          },
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "fileUrl",
-                            "storageKey": null
-                          },
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "mimeType",
                             "storageKey": null
                           },
                           (v13/*: any*/)
@@ -667,12 +667,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "4a923b265801da22c605af53e744d543",
+    "cacheID": "c36bf27c7f4d6b3ef4a3e063e4bfccea",
     "id": null,
     "metadata": {},
     "name": "MeasureGraphNodeQuery",
     "operationKind": "query",
-    "text": "query MeasureGraphNodeQuery(\n  $measureId: ID!\n) {\n  node(id: $measureId) {\n    __typename\n    ... on Measure {\n      id\n      name\n      description\n      state\n      category\n      evidencesInfos: evidences(first: 0) {\n        totalCount\n      }\n      risksInfos: risks(first: 0) {\n        totalCount\n      }\n      tasksInfos: tasks(first: 0) {\n        totalCount\n      }\n      controlsInfos: controls(first: 0) {\n        totalCount\n      }\n      ...MeasureRisksTabFragment\n      ...MeasureTasksTabFragment\n      ...MeasureControlsTabFragment\n      ...MeasureFormDialogMeasureFragment\n      ...MeasureEvidencesTabFragment\n    }\n    id\n  }\n}\n\nfragment LinkedControlsCardFragment on Control {\n  id\n  name\n  sectionTitle\n  framework {\n    id\n    name\n  }\n}\n\nfragment LinkedRisksCardFragment on Risk {\n  id\n  name\n  inherentRiskScore\n  residualRiskScore\n}\n\nfragment MeasureControlsTabFragment on Measure {\n  id\n  controls(first: 20) {\n    edges {\n      node {\n        id\n        ...LinkedControlsCardFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment MeasureEvidencesTabFragment on Measure {\n  id\n  evidences(first: 50) {\n    edges {\n      node {\n        id\n        ...MeasureEvidencesTabFragment_evidence\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment MeasureEvidencesTabFragment_evidence on Evidence {\n  id\n  filename\n  size\n  type\n  createdAt\n  fileUrl\n  mimeType\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasureRisksTabFragment on Measure {\n  id\n  risks(first: 100) {\n    edges {\n      node {\n        id\n        ...LinkedRisksCardFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment MeasureTasksTabFragment on Measure {\n  tasks(first: 100) {\n    edges {\n      node {\n        id\n        name\n        state\n        description\n        ...TaskFormDialogFragment\n        assignedTo {\n          id\n          fullName\n        }\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment TaskFormDialogFragment on Task {\n  id\n  description\n  name\n  state\n  timeEstimate\n  deadline\n  assignedTo {\n    id\n  }\n  measure {\n    id\n  }\n}\n"
+    "text": "query MeasureGraphNodeQuery(\n  $measureId: ID!\n) {\n  node(id: $measureId) {\n    __typename\n    ... on Measure {\n      id\n      name\n      description\n      state\n      category\n      evidencesInfos: evidences(first: 0) {\n        totalCount\n      }\n      risksInfos: risks(first: 0) {\n        totalCount\n      }\n      tasksInfos: tasks(first: 0) {\n        totalCount\n      }\n      controlsInfos: controls(first: 0) {\n        totalCount\n      }\n      ...MeasureRisksTabFragment\n      ...MeasureTasksTabFragment\n      ...MeasureControlsTabFragment\n      ...MeasureFormDialogMeasureFragment\n      ...MeasureEvidencesTabFragment\n    }\n    id\n  }\n}\n\nfragment LinkedControlsCardFragment on Control {\n  id\n  name\n  sectionTitle\n  framework {\n    id\n    name\n  }\n}\n\nfragment LinkedRisksCardFragment on Risk {\n  id\n  name\n  inherentRiskScore\n  residualRiskScore\n}\n\nfragment MeasureControlsTabFragment on Measure {\n  id\n  controls(first: 20) {\n    edges {\n      node {\n        id\n        ...LinkedControlsCardFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment MeasureEvidencesTabFragment on Measure {\n  id\n  evidences(first: 50) {\n    edges {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        ...MeasureEvidencesTabFragment_evidence\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment MeasureEvidencesTabFragment_evidence on Evidence {\n  id\n  filename\n  size\n  type\n  createdAt\n  fileUrl\n  mimeType\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasureRisksTabFragment on Measure {\n  id\n  risks(first: 100) {\n    edges {\n      node {\n        id\n        ...LinkedRisksCardFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment MeasureTasksTabFragment on Measure {\n  tasks(first: 100) {\n    edges {\n      node {\n        id\n        name\n        state\n        description\n        ...TaskFormDialogFragment\n        assignedTo {\n          id\n          fullName\n        }\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment TaskFormDialogFragment on Task {\n  id\n  description\n  name\n  state\n  timeEstimate\n  deadline\n  assignedTo {\n    id\n  }\n  measure {\n    id\n  }\n}\n"
   }
 };
 })();

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<65fd5218c9365e00e3127dfca328ad10>>
+ * @generated SignedSource<<e2a2d3c5470f8878acedd5e4ecc05300>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -223,6 +223,20 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
+                            "name": "fileUrl",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "mimeType",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
                             "name": "size",
                             "storageKey": null
                           },
@@ -238,20 +252,6 @@ return {
                             "args": null,
                             "kind": "ScalarField",
                             "name": "createdAt",
-                            "storageKey": null
-                          },
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "fileUrl",
-                            "storageKey": null
-                          },
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "mimeType",
                             "storageKey": null
                           },
                           (v11/*: any*/)
@@ -343,16 +343,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "28755a6b97ad50d18c25dea1b383d062",
+    "cacheID": "61b9596f07d5d2516f50e2f646eb21a2",
     "id": null,
     "metadata": {},
     "name": "MeasureEvidencesTabQuery",
     "operationKind": "query",
-    "text": "query MeasureEvidencesTabQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: EvidenceOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...MeasureEvidencesTabFragment_16fISc\n    id\n  }\n}\n\nfragment MeasureEvidencesTabFragment_16fISc on Measure {\n  id\n  evidences(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    edges {\n      node {\n        id\n        ...MeasureEvidencesTabFragment_evidence\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment MeasureEvidencesTabFragment_evidence on Evidence {\n  id\n  filename\n  size\n  type\n  createdAt\n  fileUrl\n  mimeType\n}\n"
+    "text": "query MeasureEvidencesTabQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: EvidenceOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...MeasureEvidencesTabFragment_16fISc\n    id\n  }\n}\n\nfragment MeasureEvidencesTabFragment_16fISc on Measure {\n  id\n  evidences(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    edges {\n      node {\n        id\n        filename\n        fileUrl\n        mimeType\n        ...MeasureEvidencesTabFragment_evidence\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment MeasureEvidencesTabFragment_evidence on Evidence {\n  id\n  filename\n  size\n  type\n  createdAt\n  fileUrl\n  mimeType\n}\n"
   }
 };
 })();
 
-(node as any).hash = "619655a768981a51a00a71887dbcb227";
+(node as any).hash = "abae73e44e966689cd837465f93abcb3";
 
 export default node;

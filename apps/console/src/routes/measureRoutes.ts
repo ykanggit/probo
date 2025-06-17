@@ -61,7 +61,7 @@ export const measureRoutes = [
         ),
       },
       {
-        path: "evidences",
+        path: "evidences/:evidenceId?",
         fallback: LinkCardSkeleton,
         Component: lazy(
           () =>

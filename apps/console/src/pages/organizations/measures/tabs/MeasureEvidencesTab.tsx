@@ -1,9 +1,10 @@
-import { useOutletContext } from "react-router";
+import { useNavigate, useOutletContext, useParams } from "react-router";
 import type { MeasureEvidencesTabFragment$key } from "./__generated__/MeasureEvidencesTabFragment.graphql";
 import { useTranslate } from "@probo/i18n";
 import { usePageTitle } from "@probo/hooks";
 import {
-  Button,
+  ActionDropdown,
+  DropdownItem,
   Dropzone,
   IconArrowInbox,
   IconTrashCan,
@@ -18,8 +19,9 @@ import { graphql } from "relay-runtime";
 import { useFragment, useMutation, useRefetchableFragment } from "react-relay";
 import { SortableTable } from "/components/SortableTable";
 import type { MeasureEvidencesTabFragment_evidence$key } from "./__generated__/MeasureEvidencesTabFragment_evidence.graphql";
-import { fileSize, fileType } from "@probo/helpers";
-import { promisifyMutation, sprintf } from "@probo/helpers";
+import { fileSize, fileType, promisifyMutation, sprintf } from "@probo/helpers";
+import { EvidencePreviewDialog } from "../dialog/EvidencePreviewDialog";
+import { useOrganizationId } from "/hooks/useOrganizationId";
 
 export const evidencesFragment = graphql`
   fragment MeasureEvidencesTabFragment on Measure
@@ -43,6 +45,9 @@ export const evidencesFragment = graphql`
       edges {
         node {
           id
+          filename
+          fileUrl
+          mimeType
           ...MeasureEvidencesTabFragment_evidence
         }
       }
@@ -50,7 +55,7 @@ export const evidencesFragment = graphql`
   }
 `;
 
-const evidenceFragment = graphql`
+export const evidenceFragment = graphql`
   fragment MeasureEvidencesTabFragment_evidence on Evidence {
     id
     filename
@@ -93,12 +98,15 @@ export default function MeasureEvidencesTab() {
   const { measure } = useOutletContext<{
     measure: MeasureEvidencesTabFragment$key & { id: string; name: string };
   }>();
+  const { evidenceId } = useParams<{ evidenceId: string }>();
   const [data, refetch] = useRefetchableFragment(evidencesFragment, measure);
   const connectionId = data.evidences.__id;
   const evidences = data.evidences?.edges?.map((edge) => edge.node) ?? [];
-
+  const navigate = useNavigate();
   const { __ } = useTranslate();
   const [mutate, isUpdating] = useMutation(uploadEvidenceMutation);
+  const evidence = evidences.find((e) => e.id === evidenceId);
+  const organizationId = useOrganizationId();
 
   usePageTitle(measure.name + " - " + __("Evidences"));
 
@@ -123,7 +131,7 @@ export default function MeasureEvidencesTab() {
     <div className="space-y-6">
       <Dropzone
         description={__(
-          "Only PDF, DOCX, XLSX, PPTX, JPG, PNG, WEBP files up to 10MB are allowed"
+          "Only PDF, DOCX, XLSX, PPTX, JPG, PNG, WEBP files up to 10MB are allowed",
         )}
         isUploading={isUpdating}
         onDrop={handleDrop}
@@ -157,17 +165,32 @@ export default function MeasureEvidencesTab() {
             <EvidenceRow
               key={evidence.id}
               evidenceKey={evidence}
+              measureId={measure.id}
+              organizationId={organizationId}
               connectionId={connectionId}
             />
           ))}
         </Tbody>
       </SortableTable>
+      {evidence && (
+        <EvidencePreviewDialog
+          key={evidence?.id}
+          onClose={() =>
+            navigate(
+              `/organizations/${organizationId}/measures/${measure.id}/evidences`,
+            )
+          }
+          evidence={evidence}
+        />
+      )}
     </div>
   );
 }
 
 function EvidenceRow(props: {
   evidenceKey: MeasureEvidencesTabFragment_evidence$key;
+  measureId: string;
+  organizationId: string;
   connectionId: string;
 }) {
   const evidence = useFragment(evidenceFragment, props.evidenceKey);
@@ -191,34 +214,40 @@ function EvidenceRow(props: {
       {
         message: sprintf(
           __(
-            'This will permanently delete the evidence "%s". This action cannot be undone.'
+            'This will permanently delete the evidence "%s". This action cannot be undone.',
           ),
-          evidence.filename
+          evidence.filename,
         ),
-      }
+      },
     );
   };
 
   return (
-    <Tr>
+    <Tr
+      to={`/organizations/${props.organizationId}/measures/${props.measureId}/evidences/${evidence.id}`}
+    >
       <Td>{evidence.filename}</Td>
       <Td>{fileType(__, evidence)}</Td>
       <Td>{fileSize(__, evidence.size)}</Td>
       <Td>{dateFormat(evidence.createdAt)}</Td>
-      <Td>
+      <Td noLink>
         <div className="flex gap-2">
-          <Button asChild variant="secondary">
-            <a href={evidence.fileUrl ?? ""} target="_blank">
-              <IconArrowInbox size={16} />
-              {__("Download")}
-            </a>
-          </Button>
-          <Button
-            variant="danger"
-            icon={IconTrashCan}
-            onClick={handleDelete}
-            disabled={isDeleting}
-          />
+          <ActionDropdown>
+            <DropdownItem asChild>
+              <a href={evidence.fileUrl ?? ""} target="_blank">
+                <IconArrowInbox size={16} />
+                {__("Download")}
+              </a>
+            </DropdownItem>
+            <DropdownItem
+              variant="danger"
+              icon={IconTrashCan}
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {__("Delete")}
+            </DropdownItem>
+          </ActionDropdown>
         </div>
       </Td>
     </Tr>
