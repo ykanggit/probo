@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.34.0] - 2025-06-17
+
+### Added
+
+- Pagination for people, vendors, documents, data and assets
+
+### Fixed
+
+- Fix 404 on email confirmation page
+- Fix 404 on invitation confirmation page
+- Fix login redirection
+- Fix form not reset after submit
+
 ## [0.33.6] - 2025-06-15
 
 ### Fixed
