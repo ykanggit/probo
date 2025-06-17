@@ -124,6 +124,7 @@ function SignatureList(props: { version: Version }) {
   const signatureMap = new Map(signatures.map((s) => [s.signedBy.id, s]));
   const organizationId = useOrganizationId();
   const people = usePeople(organizationId);
+  const signable = props.version.status === "PUBLISHED";
 
   if (people.length === 0) {
     return (
@@ -142,6 +143,7 @@ function SignatureList(props: { version: Version }) {
           signature={signatureMap.get(p.id)}
           people={p}
           connectionId={props.version.signatures.__id}
+          signable={signable}
         />
       ))}
     </div>
@@ -192,6 +194,7 @@ function SignatureItem(props: {
   signature?: DocumentSignaturesDialog_signature$key;
   people: ItemOf<ReturnType<typeof usePeople>>;
   connectionId: string;
+  signable: boolean;
 }) {
   const signature = useFragment(signatureFragment, props.signature);
   const { __, dateTimeFormat } = useTranslate();
@@ -216,24 +219,26 @@ function SignatureItem(props: {
             {props.people.primaryEmailAddress}
           </div>
         </div>
-        <Button
-          variant="secondary"
-          className="ml-auto"
-          disabled={isSendingRequest}
-          onClick={() => {
-            requestSignature({
-              variables: {
-                input: {
-                  documentVersionId: props.versionId,
-                  signatoryId: props.people.id,
+        {props.signable && (
+          <Button
+            variant="secondary"
+            className="ml-auto"
+            disabled={isSendingRequest}
+            onClick={() => {
+              requestSignature({
+                variables: {
+                  input: {
+                    documentVersionId: props.versionId,
+                    signatoryId: props.people.id,
+                  },
+                  connections: [props.connectionId],
                 },
-                connections: [props.connectionId],
-              },
-            });
-          }}
-        >
-          {__("Request signature")}
-        </Button>
+              });
+            }}
+          >
+            {__("Request signature")}
+          </Button>
+        )}
       </div>
     );
   }
