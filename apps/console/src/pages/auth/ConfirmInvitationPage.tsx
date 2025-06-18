@@ -72,9 +72,9 @@ export default function ConfirmInvitationPage() {
   return (
     <div className="space-y-6 w-full max-w-md mx-auto">
       <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold">{__("Sign up")}</h1>
+        <h1 className="text-3xl font-bold">{__("Confirm invitation")}</h1>
         <p className="text-txt-tertiary">
-          {__("Enter your information to create an account")}
+          {__("Enter your information to confirm your invitation")}
         </p>
       </div>
 
@@ -82,6 +82,7 @@ export default function ConfirmInvitationPage() {
         <Field
           label={__("Token")}
           type="text"
+          hidden
           placeholder={__("Enter your token")}
           {...register("token")}
           required
