@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.35.0] - 2025-06-20
+
+### Added
+
+- Add forgot password pages
+
 ## [0.34.0] - 2025-06-17
 
 ### Added
