@@ -70,6 +70,14 @@ const routes = [
         path: "confirm-invitation",
         Component: lazy(() => import("./pages/auth/ConfirmInvitationPage")),
       },
+      {
+        path: "forgot-password",
+        Component: lazy(() => import("./pages/auth/ForgotPasswordPage")),
+      },
+      {
+        path: "reset-password",
+        Component: lazy(() => import("./pages/auth/ResetPasswordPage")),
+      },
     ],
   },
   {

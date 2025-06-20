@@ -196,7 +196,7 @@ func (s Service) ForgetPassword(
 	resetPasswordUrl := url.URL{
 		Scheme: "https",
 		Host:   s.hostname,
-		Path:   "/reset-password",
+		Path:   "/auth/reset-password",
 		RawQuery: url.Values{
 			"token": []string{passwordResetToken},
 		}.Encode(),

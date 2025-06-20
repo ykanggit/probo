@@ -7,12 +7,18 @@ import { usePageTitle } from "@probo/hooks";
 import { buildEndpoint } from "/providers/RelayProviders";
 import { useEffect } from "react";
 
-const schema = z.object({
-  token: z.string(),
-  password: z.string().min(8),
-});
+const schema = z
+  .object({
+    token: z.string(),
+    password: z.string().min(8),
+    confirmPassword: z.string().min(8),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
-export default function ConfirmInvitationPage() {
+export default function ResetPasswordPage() {
   const { __ } = useTranslate();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -22,29 +28,33 @@ export default function ConfirmInvitationPage() {
       defaultValues: {
         token: "",
         password: "",
+        confirmPassword: "",
       },
     }
   );
 
   const onSubmit = handleSubmit(async (data) => {
     const response = await fetch(
-      buildEndpoint("/api/console/v1/auth/invitation"),
+      buildEndpoint("/api/console/v1/auth/reset-password"),
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          token: data.token,
+          password: data.password,
+        }),
       }
     );
 
-    // Registration failed
+    // Reset failed
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       toast({
-        title: __("Confirmation failed"),
-        description: errorData.message || __("Confirmation failed"),
+        title: __("Reset failed"),
+        description: errorData.message || __("Password reset failed"),
         variant: "error",
       });
       return;
@@ -52,13 +62,13 @@ export default function ConfirmInvitationPage() {
 
     toast({
       title: __("Success"),
-      description: __("Invitation confirmed successfully"),
+      description: __("Password reset successfully"),
       variant: "success",
     });
-    navigate("/", { replace: true });
+    navigate("/auth/login", { replace: true });
   });
 
-  usePageTitle(__("Confirm invitation"));
+  usePageTitle(__("Reset password"));
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -72,9 +82,9 @@ export default function ConfirmInvitationPage() {
   return (
     <div className="space-y-6 w-full max-w-md mx-auto">
       <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold">{__("Confirm invitation")}</h1>
+        <h1 className="text-3xl font-bold">{__("Reset password")}</h1>
         <p className="text-txt-tertiary">
-          {__("Enter your information to confirm your invitation")}
+          {__("Enter your new password to reset your account")}
         </p>
       </div>
 
@@ -90,7 +100,7 @@ export default function ConfirmInvitationPage() {
         />
 
         <Field
-          label={__("Password")}
+          label={__("New Password")}
           type="password"
           placeholder="••••••••"
           {...register("password")}
@@ -98,16 +108,25 @@ export default function ConfirmInvitationPage() {
           error={formState.errors.password?.message}
         />
 
+        <Field
+          label={__("Confirm Password")}
+          type="password"
+          placeholder="••••••••"
+          {...register("confirmPassword")}
+          required
+          error={formState.errors.confirmPassword?.message}
+        />
+
         <Button type="submit" className="w-full" disabled={formState.isLoading}>
           {formState.isLoading
-            ? __("Confirming invitation...")
-            : __("Confirm invitation")}
+            ? __("Resetting password...")
+            : __("Reset password")}
         </Button>
       </form>
 
       <div className="text-center">
         <p className="text-sm text-txt-tertiary">
-          {__("Already have an account?")}{" "}
+          {__("Remember your password?")}{" "}
           <Link
             to="/auth/login"
             className="underline text-txt-primary hover:text-txt-secondary"

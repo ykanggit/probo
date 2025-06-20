@@ -67,6 +67,15 @@ export default function LoginPage() {
           {__("Register")}
         </Link>
       </div>
+      <div className="text-center mt-6 text-sm text-txt-secondary">
+        {__("Forgot password?")}{" "}
+        <Link
+          to="/auth/forgot-password"
+          className="underline hover:text-txt-primary"
+        >
+          {__("Reset password")}
+        </Link>
+      </div>
     </form>
   );
 }
