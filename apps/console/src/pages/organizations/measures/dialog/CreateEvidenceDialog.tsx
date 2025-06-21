@@ -12,7 +12,7 @@ import {
   type DialogRef,
 } from "@probo/ui";
 import { useTranslate } from "@probo/i18n";
-import { graphql, useMutation } from "react-relay";
+import { graphql } from "react-relay";
 import { useState } from "react";
 import { z } from "zod";
 import { useFormWithSchema } from "/hooks/useFormWithSchema";
@@ -42,7 +42,7 @@ type Props = {
 
 export function CreateEvidenceDialog(props: Props) {
   const { __ } = useTranslate();
-  const [tab, setTab] = useState("link");
+  const [tab, setTab] = useState("upload");
   return (
     <Dialog
       title={
@@ -73,7 +73,10 @@ export function CreateEvidenceDialog(props: Props) {
 function EvidenceUpload({ measureId, connectionId }: Omit<Props, "ref">) {
   const { __ } = useTranslate();
 
-  const [mutate, isUpdating] = useMutation(uploadEvidenceMutation);
+  const [mutate, isUpdating] = useMutationWithToasts(uploadEvidenceMutation, {
+    successMessage: __("Evidence uploaded successfully"),
+    errorMessage: __("Failed to create evidence"),
+  });
   const handleDrop = (files: File[]) => {
     for (const file of files) {
       mutate({
@@ -95,11 +98,12 @@ function EvidenceUpload({ measureId, connectionId }: Omit<Props, "ref">) {
       <DialogContent padded>
         <Dropzone
           description={__(
-            "Only PDF, DOCX, XLSX, PPTX, JPG, PNG, WEBP files up to 10MB are allowed"
+            "Only PDF, DOCX, XLSX, PPTX, JPG, PNG, WEBP, URI files up to 10MB are allowed",
           )}
           isUploading={isUpdating}
           onDrop={handleDrop}
           accept={{
+            "text/plain": [".uri"],
             "application/pdf": [".pdf"],
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
               [".docx"],
