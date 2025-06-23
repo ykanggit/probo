@@ -65,7 +65,6 @@ var (
 	sessionContextKey    = &ctxKey{name: "session"}
 	userContextKey       = &ctxKey{name: "user"}
 	userTenantContextKey = &ctxKey{name: "user_tenants"}
-	panicValueContextKey = &ctxKey{name: "panic_value"}
 )
 
 func SessionFromContext(ctx context.Context) *coredata.Session {
