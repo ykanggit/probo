@@ -352,6 +352,8 @@ func (s Service) SignIn(
 		ctx,
 		func(tx pg.Conn) error {
 			if err := user.LoadByEmail(ctx, tx, email); err != nil {
+				_, _ = s.hp.ComparePasswordAndHash([]byte("this-compare-should-never-succeed"), []byte("it-just-to-prevent-timing-attack"))
+
 				var errUserNotFound *coredata.ErrUserNotFound
 
 				if errors.As(err, &errUserNotFound) {
