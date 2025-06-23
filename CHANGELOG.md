@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add URI evidence type
+
 ## [0.35.0] - 2025-06-20
 
 ### Added
