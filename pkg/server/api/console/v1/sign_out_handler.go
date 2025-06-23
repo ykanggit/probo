@@ -52,6 +52,8 @@ func SignOutHandler(usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.HandlerF
 			authCfg.CookieSecret,
 		))
 
+		w.Header().Set("Clear-Site-Data", "*")
+
 		httpserver.RenderJSON(w, http.StatusOK, map[string]bool{"success": true})
 	}
 }
