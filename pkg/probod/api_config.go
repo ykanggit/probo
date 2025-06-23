@@ -20,7 +20,8 @@ type (
 	}
 
 	apiConfig struct {
-		Addr string     `json:"addr"`
-		Cors corsConfig `json:"cors"`
+		Addr              string            `json:"addr"`
+		Cors              corsConfig        `json:"cors"`
+		ExtraHeaderFields map[string]string `json:"extra-header-fields"`
 	}
 )

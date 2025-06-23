@@ -34,6 +34,7 @@ import (
 // Config holds the configuration for the server
 type Config struct {
 	AllowedOrigins    []string
+	ExtraHeaderFields map[string]string
 	Probo             *probo.Service
 	Usrmgr            *usrmgr.Service
 	Auth              console_v1.AuthConfig
@@ -45,9 +46,10 @@ type Config struct {
 
 // Server represents the main server that handles both API and frontend requests
 type Server struct {
-	apiServer *api.Server
-	webServer *web.Server
-	router    *chi.Mux
+	apiServer         *api.Server
+	webServer         *web.Server
+	router            *chi.Mux
+	extraHeaderFields map[string]string
 }
 
 // NewServer creates a new server instance
@@ -77,9 +79,10 @@ func NewServer(cfg Config) (*Server, error) {
 	router := chi.NewRouter()
 
 	server := &Server{
-		apiServer: apiServer,
-		webServer: webServer,
-		router:    router,
+		apiServer:         apiServer,
+		webServer:         webServer,
+		router:            router,
+		extraHeaderFields: cfg.ExtraHeaderFields,
 	}
 
 	// Set up routes
@@ -106,5 +109,9 @@ func (s *Server) setupRoutes() {
 
 // ServeHTTP implements the http.Handler interface
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	for key, value := range s.extraHeaderFields {
+		w.Header().Set(key, value)
+	}
+
 	s.router.ServeHTTP(w, r)
 }

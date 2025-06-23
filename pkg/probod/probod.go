@@ -224,6 +224,7 @@ func (impl *Implm) Run(
 	serverHandler, err := server.NewServer(
 		server.Config{
 			AllowedOrigins:    impl.cfg.Api.Cors.AllowedOrigins,
+			ExtraHeaderFields: impl.cfg.Api.ExtraHeaderFields,
 			Probo:             proboService,
 			Usrmgr:            usrmgrService,
 			ConnectorRegistry: defaultConnectorRegistry,
