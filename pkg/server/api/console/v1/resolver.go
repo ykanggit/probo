@@ -41,6 +41,7 @@ import (
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
 	"github.com/vektah/gqlparser/v2/gqlerror"
+	"go.gearno.de/kit/httpserver"
 	"go.gearno.de/kit/log"
 )
 
@@ -232,6 +233,7 @@ func graphqlHandler(logger *log.Logger, proboSvc *probo.Service, usrmgrSvc *usrm
 	srv.Use(extension.Introspection{})
 	srv.Use(tracingExtension{})
 	srv.SetRecoverFunc(func(ctx context.Context, err any) error {
+		logger := httpserver.LoggerFromContext(ctx)
 		logger.Error("resolver panic", log.Any("error", err))
 
 		return errors.New("internal server error")
