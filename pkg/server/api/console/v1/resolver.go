@@ -235,7 +235,7 @@ func graphqlHandler(logger *log.Logger, proboSvc *probo.Service, usrmgrSvc *usrm
 	srv.SetRecoverFunc(func(ctx context.Context, err any) error {
 		logger.Error("resolver panic", log.Any("error", err))
 
-		return fmt.Errorf("resolver panic: %v", err)
+		return errors.New("internal server error")
 	})
 
 	srv.AroundOperations(
