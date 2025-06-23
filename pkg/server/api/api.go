@@ -100,6 +100,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Debug:              false,
 	}
 
+	// Default API security headers
+	w.Header().Set("X-Frame-Options", "DENY")
+	w.Header().Set("X-XSS-Protection", "0")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.Header().Set("Referrer-Policy", "no-referrer")
+	w.Header().Set("Content-Security-Policy", "default-src 'self'")
+
 	router := chi.NewRouter()
 	router.MethodNotAllowed(methodNotAllowed)
 	router.NotFound(notFound)
