@@ -48,7 +48,8 @@ type (
 	}
 
 	ErrInvalidPassword struct {
-		length int
+		minLength int
+		maxLength int
 	}
 
 	ErrInvalidFullName struct {
@@ -145,7 +146,7 @@ func (e ErrInvalidEmail) Error() string {
 }
 
 func (e ErrInvalidPassword) Error() string {
-	return fmt.Sprintf("invalid password: the length must be at least %d characters", e.length)
+	return fmt.Sprintf("invalid password: the length must be between %d and %d characters", e.minLength, e.maxLength)
 }
 
 func (e ErrInvalidFullName) Error() string {
@@ -251,8 +252,8 @@ func (s Service) SignUp(
 		return nil, nil, &ErrInvalidEmail{email}
 	}
 
-	if len(password) < 8 {
-		return nil, nil, &ErrInvalidPassword{len(password)}
+	if len(password) < 8 || len(password) > 128 {
+		return nil, nil, &ErrInvalidPassword{minLength: 8, maxLength: 128}
 	}
 
 	if fullName == "" {
@@ -346,6 +347,10 @@ func (s Service) SignIn(
 		ExpiredAt: now.Add(24 * time.Hour),
 		CreatedAt: now,
 		UpdatedAt: now,
+	}
+
+	if len(password) < 8 || len(password) > 128 {
+		return nil, nil, &ErrInvalidPassword{minLength: 8, maxLength: 128}
 	}
 
 	err := s.pg.WithTx(
@@ -750,8 +755,8 @@ func (s Service) ConfirmInvitation(ctx context.Context, tokenString string, pass
 		return nil, fmt.Errorf("cannot validate organization invitation token: %w", err)
 	}
 
-	if len(password) < 8 {
-		return nil, &ErrInvalidPassword{len(password)}
+	if len(password) < 8 || len(password) > 128 {
+		return nil, &ErrInvalidPassword{minLength: 8, maxLength: 128}
 	}
 
 	now := time.Now()
@@ -855,8 +860,8 @@ func (s Service) ResetPassword(ctx context.Context, tokenString string, newPassw
 		return fmt.Errorf("cannot validate password reset token: %w", err)
 	}
 
-	if len(newPassword) < 8 {
-		return &ErrInvalidPassword{length: 8}
+	if len(newPassword) < 8 || len(newPassword) > 128 {
+		return &ErrInvalidPassword{minLength: 8, maxLength: 128}
 	}
 
 	hashedPassword, err := s.hp.HashPassword([]byte(newPassword))
