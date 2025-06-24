@@ -21,7 +21,7 @@ type (
 const (
 	PeopleOrderFieldCreatedAt PeopleOrderField = "CREATED_AT"
 	PeopleOrderFieldFullName  PeopleOrderField = "FULL_NAME"
-	PeopleOrderFieldRole      PeopleOrderField = "ROLE"
+	PeopleOrderFieldKind      PeopleOrderField = "KIND"
 )
 
 func (p PeopleOrderField) Column() string {

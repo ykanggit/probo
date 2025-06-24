@@ -60,6 +60,8 @@ func (p People) CursorKey(orderBy PeopleOrderField) page.CursorKey {
 		return page.NewCursorKey(p.ID, p.CreatedAt)
 	case PeopleOrderFieldFullName:
 		return page.NewCursorKey(p.ID, p.FullName)
+	case PeopleOrderFieldKind:
+		return page.NewCursorKey(p.ID, p.Kind)
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))

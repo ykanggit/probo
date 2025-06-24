@@ -146,9 +146,9 @@ enum PeopleOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldCreatedAt"
     )
-  ROLE
+  KIND
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldRole"
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldKind"
     )
 }
 

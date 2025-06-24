@@ -4975,9 +4975,9 @@ enum PeopleOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldCreatedAt"
     )
-  ROLE
+  KIND
     @goEnum(
-      value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldRole"
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldKind"
     )
 }
 
@@ -52254,12 +52254,12 @@ var (
 	unmarshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField = map[string]coredata.PeopleOrderField{
 		"FULL_NAME":  coredata.PeopleOrderFieldFullName,
 		"CREATED_AT": coredata.PeopleOrderFieldCreatedAt,
-		"ROLE":       coredata.PeopleOrderFieldRole,
+		"KIND":       coredata.PeopleOrderFieldKind,
 	}
 	marshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField = map[coredata.PeopleOrderField]string{
 		coredata.PeopleOrderFieldFullName:  "FULL_NAME",
 		coredata.PeopleOrderFieldCreatedAt: "CREATED_AT",
-		coredata.PeopleOrderFieldRole:      "ROLE",
+		coredata.PeopleOrderFieldKind:      "KIND",
 	}
 )
 
