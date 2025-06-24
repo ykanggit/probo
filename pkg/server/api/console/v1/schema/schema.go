@@ -4975,6 +4975,10 @@ enum PeopleOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldCreatedAt"
     )
+  ROLE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.PeopleOrderFieldRole"
+    )
 }
 
 enum VendorOrderField
@@ -52250,10 +52254,12 @@ var (
 	unmarshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField = map[string]coredata.PeopleOrderField{
 		"FULL_NAME":  coredata.PeopleOrderFieldFullName,
 		"CREATED_AT": coredata.PeopleOrderFieldCreatedAt,
+		"ROLE":       coredata.PeopleOrderFieldRole,
 	}
 	marshalNPeopleOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleOrderField = map[coredata.PeopleOrderField]string{
 		coredata.PeopleOrderFieldFullName:  "FULL_NAME",
 		coredata.PeopleOrderFieldCreatedAt: "CREATED_AT",
+		coredata.PeopleOrderFieldRole:      "ROLE",
 	}
 )
 
