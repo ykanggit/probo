@@ -73,9 +73,11 @@ const schema = z.object({
   timeEstimate: z.string().nullable(),
   assignedToId: z.string(),
   measureId: z.string(),
-  deadline: z.date({
-    coerce: true,
-  }),
+  deadline: z
+    .date({
+      coerce: true,
+    })
+    .nullable(),
 });
 
 type Props = {
@@ -110,7 +112,7 @@ export default function TaskFormDialog(props: Props) {
         timeEstimate: task?.timeEstimate ?? "",
         assignedToId: task?.assignedTo?.id ?? "",
         measureId: task?.measure?.id ?? props.measureId ?? "",
-        deadline: task?.deadline.split("T")[0] ?? new Date(),
+        deadline: task?.deadline?.split("T")[0] ?? null,
       },
     }
   );
@@ -136,7 +138,7 @@ export default function TaskFormDialog(props: Props) {
             name: data.name,
             description: data.description,
             timeEstimate: data.timeEstimate || null,
-            deadline: data.deadline,
+            deadline: data.deadline || null,
             assignedToId: data.assignedToId,
             measureId: data.measureId,
           },
