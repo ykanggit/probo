@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.37.0] - 2025-06-30
+
+### Added
+
+- Add SOA generator
+- Show last assessment date
+
 ## [0.36.0] - 2025-06-29
 
 ### Added
