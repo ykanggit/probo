@@ -4,9 +4,31 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.36.0] - 2025-06-29
+
 ### Added
 
 - Add URI evidence type
+- Add link dialog for measure evidences
+- Add default security header to API
+- Add support for extra header
+
+### Fixed
+
+- Fix tasks deadline
+- Fix order people by kind
+- Fix missing people role order
+
+### Security
+
+- Remove all data after logout
+- Enforce maximum password limit
+- Mitigate timing attack on signin
+
+### Changed
+
+- Use httplogger on GraphQL error
+- Returns internal error when error is known
 
 ## [0.35.0] - 2025-06-20
 
