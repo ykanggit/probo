@@ -80,7 +80,7 @@ export default function VendorsPage(props: Props) {
             <Th>{__("Accessed At")}</Th>
             <Th>{__("Data Risk")}</Th>
             <Th>{__("Business Risk")}</Th>
-            <Th>{__("Compliance status")}</Th>
+            <Th>{__("Assessment Date")}</Th>
             <Th></Th>
           </Tr>
         </Thead>
@@ -110,9 +110,7 @@ function VendorRow({
 }) {
   const { __, dateFormat } = useTranslate();
   const latestAssessment = vendor.riskAssessments?.edges[0]?.node;
-  const isExpired = latestAssessment
-    ? new Date(latestAssessment.expiresAt) < new Date()
-    : false;
+  const assessmentDate = latestAssessment?.assessedAt || null;
 
   const deleteVendor = useDeleteVendor(vendor, connectionId);
 
@@ -141,8 +139,13 @@ function VendorRow({
           <RiskBadge level={latestAssessment?.businessImpact ?? "NONE"} />
         </Td>
         <Td>
-          <Badge variant={isExpired ? "danger" : "warning"}>
-            {isExpired ? __("Late") : __("In progress")}
+          <Badge variant={assessmentDate ? "success" : "warning"}>
+            {assessmentDate
+              ? dateFormat(assessmentDate, {
+                  day: "2-digit",
+                  month: "short",
+                })
+              : __("Not assessed")}
           </Badge>
         </Td>
         <Td noLink width={50} className="text-end">
