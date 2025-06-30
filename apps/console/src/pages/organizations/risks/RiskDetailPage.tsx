@@ -163,6 +163,16 @@ export default function RiskDetailPage(props: Props) {
             {getTreatment(__, risk.treatment)}
           </Badge>
         </PropertyRow>
+        <PropertyRow label={__("Initial Risk Score")}>
+          <div className="text-sm text-txt-secondary">
+            {risk.inherentRiskScore}
+          </div>
+        </PropertyRow>
+        <PropertyRow label={__("Residual Risk Score")}>
+          <div className="text-sm text-txt-secondary">
+            {risk.residualRiskScore}
+          </div>
+        </PropertyRow>
         <PropertyRow label={__("Note")}>
           <div className="text-sm text-txt-secondary">{risk.note}</div>
         </PropertyRow>

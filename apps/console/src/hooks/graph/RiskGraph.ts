@@ -106,6 +106,8 @@ export const riskNodeQuery = graphql`
           fullName
         }
         note
+        inherentRiskScore
+        residualRiskScore
         measuresInfo: measures(first: 0) {
           totalCount
         }
