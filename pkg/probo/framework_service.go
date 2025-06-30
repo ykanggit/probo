@@ -722,11 +722,9 @@ func (s FrameworkService) buildSOARowData(ctx context.Context, conn pg.Conn, con
 
 func (s FrameworkService) createSOAExcelFile(framework *coredata.Framework, soaData []soaRowData) (io.Reader, error) {
 	f := excelize.NewFile()
-	defer func() {
-		if err := f.Close(); err != nil {
-			fmt.Printf("Error closing Excel file: %v\n", err)
-		}
-	}()
+	if err := f.Close(); err != nil {
+		return nil, fmt.Errorf("cannot close Excel file: %w", err)
+	}
 
 	sheetName := "State of Applicability"
 	f.SetSheetName("Sheet1", sheetName)
