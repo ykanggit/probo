@@ -588,7 +588,7 @@ func (s FrameworkService) StateOfApplicability(ctx context.Context, frameworkID 
 			return err
 		}
 
-		excelReader, err := s.createSOAExcelFile(framework, soaData)
+		excelReader, err := s.createSOAExcelFile(soaData)
 		if err != nil {
 			return err
 		}
@@ -720,7 +720,7 @@ func (s FrameworkService) buildSOARowData(ctx context.Context, conn pg.Conn, con
 	return rowData, nil
 }
 
-func (s FrameworkService) createSOAExcelFile(framework *coredata.Framework, soaData []soaRowData) (io.Reader, error) {
+func (s FrameworkService) createSOAExcelFile(soaData []soaRowData) (io.Reader, error) {
 	f := excelize.NewFile()
 	if err := f.Close(); err != nil {
 		return nil, fmt.Errorf("cannot close Excel file: %w", err)
