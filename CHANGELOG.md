@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.37.1] - 2025-06-30
+
+### Added
+
+- Add updated at and created at order for vendor
+
+### Fixed
+
+- Fix SOA filename
+
 ## [0.37.0] - 2025-06-30
 
 ### Added
