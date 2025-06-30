@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.37.2] - 2025-06-30
+
+### Changed
+
+- Generate excel in memory instead of using fs
+
 ## [0.37.1] - 2025-06-30
 
 ### Added
