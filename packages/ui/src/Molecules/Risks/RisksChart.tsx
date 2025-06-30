@@ -191,7 +191,7 @@ function RisksChartCell({
             <DropdownSeparator className="my-3" />
             <div className="flex items-center justify-between gap-4">
                 <div className="text-txt-secondary">Risk Score</div>
-                <div>{impact * likelihood}</div>
+                <div className="text-txt-primary">{impact * likelihood}</div>
             </div>
             <DropdownSeparator className="my-3" />
             <div className="text-txt-secondary mb-1">{__("Linked Risks")}</div>
