@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9f3bb5320763a3026c5efad2a0fd88d2>>
+ * @generated SignedSource<<bfe74e681960002105d6995d91548400>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,7 +11,7 @@
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type OrderDirection = "ASC" | "DESC";
-export type VendorOrderField = "NAME";
+export type VendorOrderField = "CREATED_AT" | "NAME" | "UPDATED_AT";
 export type VendorOrder = {
   direction: OrderDirection;
   field: VendorOrderField;

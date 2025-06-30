@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5627e402cef1ec879c133d54980b26ab>>
+ * @generated SignedSource<<f1a5a3800adf762d96c4e257075a0f48>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -129,7 +129,15 @@ return {
                   {
                     "kind": "Literal",
                     "name": "first",
-                    "value": 100
+                    "value": 250
+                  },
+                  {
+                    "kind": "Literal",
+                    "name": "orderBy",
+                    "value": {
+                      "direction": "ASC",
+                      "field": "SECTION_TITLE"
+                    }
                   }
                 ],
                 "concreteType": "ControlConnection",
@@ -181,7 +189,7 @@ return {
                     ]
                   }
                 ],
-                "storageKey": "controls(first:100)"
+                "storageKey": "controls(first:250,orderBy:{\"direction\":\"ASC\",\"field\":\"SECTION_TITLE\"})"
               }
             ],
             "type": "Framework",
@@ -193,12 +201,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "28ea34e7b455cffd5283428ef567963a",
+    "cacheID": "cf02a37946ff1ec0d7bb2b9a24f26c2a",
     "id": null,
     "metadata": {},
     "name": "FrameworkGraphNodeQuery",
     "operationKind": "query",
-    "text": "query FrameworkGraphNodeQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    ... on Framework {\n      id\n      name\n      ...FrameworkDetailPageFragment\n    }\n    id\n  }\n}\n\nfragment FrameworkDetailPageFragment on Framework {\n  id\n  name\n  description\n  controls(first: 100) {\n    edges {\n      node {\n        id\n        sectionTitle\n        name\n      }\n    }\n  }\n}\n"
+    "text": "query FrameworkGraphNodeQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    ... on Framework {\n      id\n      name\n      ...FrameworkDetailPageFragment\n    }\n    id\n  }\n}\n\nfragment FrameworkDetailPageFragment on Framework {\n  id\n  name\n  description\n  controls(first: 250, orderBy: {field: SECTION_TITLE, direction: ASC}) {\n    edges {\n      node {\n        id\n        sectionTitle\n        name\n      }\n    }\n  }\n}\n"
   }
 };
 })();

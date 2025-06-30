@@ -39,7 +39,7 @@ const frameworkDetailFragment = graphql`
     id
     name
     description
-    controls(first: 100) {
+    controls(first: 250, orderBy: { field: SECTION_TITLE, direction: ASC }) {
       __id
       edges {
         node {

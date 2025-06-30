@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6b38711542a158ba9424c744d217bed5>>
+ * @generated SignedSource<<d3c93020e1d7d125fc2055a650dd62e3>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -67,7 +67,15 @@ return {
         {
           "kind": "Literal",
           "name": "first",
-          "value": 100
+          "value": 250
+        },
+        {
+          "kind": "Literal",
+          "name": "orderBy",
+          "value": {
+            "direction": "ASC",
+            "field": "SECTION_TITLE"
+          }
         }
       ],
       "concreteType": "ControlConnection",
@@ -119,7 +127,7 @@ return {
           ]
         }
       ],
-      "storageKey": "controls(first:100)"
+      "storageKey": "controls(first:250,orderBy:{\"direction\":\"ASC\",\"field\":\"SECTION_TITLE\"})"
     }
   ],
   "type": "Framework",
@@ -127,6 +135,6 @@ return {
 };
 })();
 
-(node as any).hash = "e95f82575c72a8b95c87ecd3ffc676ed";
+(node as any).hash = "ad59b1c61a01fdcb5afbf0ee920a46bb";
 
 export default node;
