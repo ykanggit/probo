@@ -985,8 +985,16 @@ func (s FrameworkService) applyExcelFormatting(f *excelize.File, sheetName strin
 
 func (s FrameworkService) generateSOAFileName(framework *coredata.Framework) string {
 	now := time.Now()
+
+	// Sanitize framework name by replacing invalid file name characters
+	sanitizedName := framework.Name
+	invalidChars := []string{"/", "\\", ":", "*", "?", "\"", "<", ">", "|", " "}
+	for _, char := range invalidChars {
+		sanitizedName = strings.ReplaceAll(sanitizedName, char, "_")
+	}
+
 	return fmt.Sprintf("SOA_%s_%s.xlsx",
-		strings.ReplaceAll(framework.Name, " ", "_"),
+		sanitizedName,
 		now.Format("20060102_150405"))
 }
 
