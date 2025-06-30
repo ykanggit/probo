@@ -35,7 +35,7 @@ import type {
   VendorGraphPaginatedFragment$data,
   VendorGraphPaginatedFragment$key,
 } from "/hooks/graph/__generated__/VendorGraphPaginatedFragment.graphql";
-import { SortableTable } from "/components/SortableTable";
+import { SortableTable, SortableTh } from "/components/SortableTable";
 
 type Vendor = NodeOf<VendorGraphPaginatedFragment$data["vendors"]>;
 
@@ -76,11 +76,10 @@ export default function VendorsPage(props: Props) {
       <SortableTable {...pagination}>
         <Thead>
           <Tr>
-            <Th>{__("Vendor")}</Th>
+            <SortableTh field="NAME">{__("Vendor")}</SortableTh>
             <Th>{__("Accessed At")}</Th>
             <Th>{__("Data Risk")}</Th>
             <Th>{__("Business Risk")}</Th>
-            <Th>{__("Assessment Date")}</Th>
             <Th></Th>
           </Tr>
         </Thead>
@@ -110,7 +109,6 @@ function VendorRow({
 }) {
   const { __, dateFormat } = useTranslate();
   const latestAssessment = vendor.riskAssessments?.edges[0]?.node;
-  const assessmentDate = latestAssessment?.assessedAt || null;
 
   const deleteVendor = useDeleteVendor(vendor, connectionId);
 
@@ -137,16 +135,6 @@ function VendorRow({
         </Td>
         <Td>
           <RiskBadge level={latestAssessment?.businessImpact ?? "NONE"} />
-        </Td>
-        <Td>
-          <Badge variant={assessmentDate ? "success" : "warning"}>
-            {assessmentDate
-              ? dateFormat(assessmentDate, {
-                  day: "2-digit",
-                  month: "short",
-                })
-              : __("Not assessed")}
-          </Badge>
         </Td>
         <Td noLink width={50} className="text-end">
           <ActionDropdown>

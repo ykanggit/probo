@@ -5010,6 +5010,17 @@ enum PeopleOrderField
 enum VendorOrderField
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorOrderField") {
   NAME
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorOrderFieldName"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorOrderFieldCreatedAt"
+    )
+  UPDATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorOrderFieldUpdatedAt"
+    )
 }
 
 enum FrameworkOrderField
@@ -53612,13 +53623,13 @@ func (ec *executionContext) marshalNVendorEdge2ᚖgithubᚗcomᚋgetproboᚋprob
 
 func (ec *executionContext) unmarshalNVendorOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorOrderField(ctx context.Context, v any) (coredata.VendorOrderField, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := coredata.VendorOrderField(tmp)
+	res := unmarshalNVendorOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorOrderField[tmp]
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNVendorOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.VendorOrderField) graphql.Marshaler {
 	_ = sel
-	res := graphql.MarshalString(string(v))
+	res := graphql.MarshalString(marshalNVendorOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorOrderField[v])
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -53626,6 +53637,19 @@ func (ec *executionContext) marshalNVendorOrderField2githubᚗcomᚋgetproboᚋp
 	}
 	return res
 }
+
+var (
+	unmarshalNVendorOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorOrderField = map[string]coredata.VendorOrderField{
+		"NAME":       coredata.VendorOrderFieldName,
+		"CREATED_AT": coredata.VendorOrderFieldCreatedAt,
+		"UPDATED_AT": coredata.VendorOrderFieldUpdatedAt,
+	}
+	marshalNVendorOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorOrderField = map[coredata.VendorOrderField]string{
+		coredata.VendorOrderFieldName:      "NAME",
+		coredata.VendorOrderFieldCreatedAt: "CREATED_AT",
+		coredata.VendorOrderFieldUpdatedAt: "UPDATED_AT",
+	}
+)
 
 func (ec *executionContext) marshalNVendorRiskAssessment2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorRiskAssessment(ctx context.Context, sel ast.SelectionSet, v *types.VendorRiskAssessment) graphql.Marshaler {
 	if v == nil {

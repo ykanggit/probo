@@ -155,6 +155,17 @@ enum PeopleOrderField
 enum VendorOrderField
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorOrderField") {
   NAME
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorOrderFieldName"
+    )
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorOrderFieldCreatedAt"
+    )
+  UPDATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorOrderFieldUpdatedAt"
+    )
 }
 
 enum FrameworkOrderField
