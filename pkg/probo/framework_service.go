@@ -15,6 +15,7 @@
 package probo
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -587,14 +588,13 @@ func (s FrameworkService) StateOfApplicability(ctx context.Context, frameworkID 
 			return err
 		}
 
-		excelFilePath, err := s.createSOAExcelFile(framework, soaData)
+		excelReader, err := s.createSOAExcelFile(framework, soaData)
 		if err != nil {
 			return err
 		}
-		defer os.Remove(excelFilePath) // Clean up local file after upload
 
 		// Upload to S3 and get presigned URL
-		presignedURL, err = s.uploadSOAToS3(ctx, framework, excelFilePath)
+		presignedURL, err = s.uploadSOAToS3(ctx, framework, excelReader)
 		if err != nil {
 			return fmt.Errorf("cannot upload SOA to S3: %w", err)
 		}
@@ -720,7 +720,7 @@ func (s FrameworkService) buildSOARowData(ctx context.Context, conn pg.Conn, con
 	return rowData, nil
 }
 
-func (s FrameworkService) createSOAExcelFile(framework *coredata.Framework, soaData []soaRowData) (string, error) {
+func (s FrameworkService) createSOAExcelFile(framework *coredata.Framework, soaData []soaRowData) (io.Reader, error) {
 	f := excelize.NewFile()
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -733,29 +733,29 @@ func (s FrameworkService) createSOAExcelFile(framework *coredata.Framework, soaD
 
 	styles, err := s.createExcelStyles(f)
 	if err != nil {
-		return "", fmt.Errorf("cannot create Excel styles: %w", err)
+		return nil, fmt.Errorf("cannot create Excel styles: %w", err)
 	}
 
 	if err := s.setupExcelHeader(f, sheetName, styles); err != nil {
-		return "", fmt.Errorf("cannot setup Excel header: %w", err)
+		return nil, fmt.Errorf("cannot setup Excel header: %w", err)
 	}
 
 	if err := s.populateExcelData(f, sheetName, soaData, styles); err != nil {
-		return "", fmt.Errorf("cannot populate Excel data: %w", err)
+		return nil, fmt.Errorf("cannot populate Excel data: %w", err)
 	}
 
 	if err := s.applyExcelFormatting(f, sheetName, len(soaData)); err != nil {
-		return "", fmt.Errorf("cannot apply Excel formatting: %w", err)
+		return nil, fmt.Errorf("cannot apply Excel formatting: %w", err)
 	}
 
-	fileName := s.generateSOAFileName(framework)
-	excelFilePath := filepath.Join("./", fileName)
-
-	if err := f.SaveAs(excelFilePath); err != nil {
-		return "", fmt.Errorf("cannot save Excel file: %w", err)
+	// Write to buffer
+	buffer, err := f.WriteToBuffer()
+	if err != nil {
+		return nil, fmt.Errorf("cannot write Excel file to buffer: %w", err)
 	}
 
-	return excelFilePath, nil
+	// Convert to bytes.Reader for seekability (required by S3 SDK)
+	return bytes.NewReader(buffer.Bytes()), nil
 }
 
 func (s FrameworkService) createExcelStyles(f *excelize.File) (map[string]int, error) {
@@ -998,20 +998,14 @@ func (s FrameworkService) generateSOAFileName(framework *coredata.Framework) str
 		now.Format("20060102_150405"))
 }
 
-func (s FrameworkService) uploadSOAToS3(ctx context.Context, framework *coredata.Framework, excelFilePath string) (string, error) {
-	file, err := os.Open(excelFilePath)
-	if err != nil {
-		return "", fmt.Errorf("cannot open Excel file: %w", err)
-	}
-	defer file.Close()
-
+func (s FrameworkService) uploadSOAToS3(ctx context.Context, framework *coredata.Framework, excelReader io.Reader) (string, error) {
 	objectKey := fmt.Sprintf("soa/%s/%s", framework.ID, s.generateSOAFileName(framework))
 
-	// Upload file to S3
-	_, err = s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
+	// Upload file to S3 using bytes reader
+	_, err := s.svc.s3.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(s.svc.bucket),
 		Key:    aws.String(objectKey),
-		Body:   file,
+		Body:   excelReader,
 	})
 	if err != nil {
 		return "", fmt.Errorf("cannot upload SOA file to S3: %w", err)
