@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.37.4] - 2025-06-30
+
+### Fixed
+
+- Fix SOA with risk
+
 ## [0.37.3] - 2025-06-30
 
 ### Fixed
