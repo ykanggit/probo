@@ -658,7 +658,7 @@ func (s FrameworkService) buildSOARowData(ctx context.Context, conn pg.Conn, con
 		return soaRowData{}, fmt.Errorf("cannot load policies: %w", err)
 	}
 
-	hasEvidence := false
+	hasRisks := false
 	for _, measure := range measures {
 		if measure == nil {
 			continue
@@ -679,10 +679,22 @@ func (s FrameworkService) buildSOARowData(ctx context.Context, conn pg.Conn, con
 			continue
 		}
 
-		if len(evidences) > 0 {
-			hasEvidence = true
-			break
+		risks := coredata.Risks{}
+		risksCursor := page.NewCursor(
+			maxItemsLimit,
+			nil,
+			page.Head,
+			page.OrderBy[coredata.RiskOrderField]{
+				Field:     coredata.RiskOrderFieldCreatedAt,
+				Direction: page.OrderDirectionAsc,
+			},
+		)
+
+		if err := risks.LoadByMeasureID(ctx, conn, s.svc.scope, measure.ID, risksCursor, coredata.NewRiskFilter(nil)); err != nil {
+			continue
 		}
+
+		hasRisks = len(risks) > 0
 	}
 
 	rowData := soaRowData{
@@ -695,7 +707,7 @@ func (s FrameworkService) buildSOARowData(ctx context.Context, conn pg.Conn, con
 		rowData.regulatory = "YES"
 		rowData.bestPractice = "YES"
 
-		if hasEvidence {
+		if hasRisks {
 			rowData.riskAssessment = "YES"
 		}
 
