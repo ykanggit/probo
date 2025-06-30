@@ -9,7 +9,6 @@ import {
   Td,
   Avatar,
   RiskBadge,
-  Badge,
   ActionDropdown,
   DropdownItem,
   IconTrashCan,
