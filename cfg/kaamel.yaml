@@ -1,0 +1,25 @@
+# Probo Configuration Template
+# contains configuration options with some default values.
+probod:
+  hostname: "8vlq3we8mbakad4k.app.eng.kaamel.com"
+  api:
+    cors:
+      allowed-origins: [ "http://localhost:8080", "http://localhost:5173" ]
+  aws:
+    region: "us-east-1"
+    bucket: "probod"
+    access-key-id: ""
+    secret-access-key: ""
+    endpoint: ""
+  mailer:
+    sender-name: "Probo"
+    sender-email: "no-reply@notification.localhost"
+    smtp:
+      addr: "localhost:1011"
+      user: ""
+      password: ""
+      tls-required: false
+  openai:
+    api-key: ""
+    temperature: 0
+    model-name: "" 
