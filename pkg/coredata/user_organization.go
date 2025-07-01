@@ -78,3 +78,27 @@ SELECT user_id, organization_id, created_at FROM users_organizations WHERE user_
 
 	return nil
 }
+
+func (uo *UserOrganizations) ForOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	organizationID gid.GID,
+) error {
+	q := `
+SELECT user_id, organization_id, created_at FROM users_organizations WHERE organization_id = @organization_id
+`
+
+	rows, err := conn.Query(ctx, q, pgx.StrictNamedArgs{"organization_id": organizationID})
+	if err != nil {
+		return err
+	}
+
+	userOrganizations, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[UserOrganization])
+	if err != nil {
+		return err
+	}
+
+	*uo = userOrganizations
+
+	return nil
+}

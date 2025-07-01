@@ -48,6 +48,10 @@ type (
 		Name *string
 		File *File
 	}
+
+	DeleteOrganizationRequest struct {
+		ID gid.GID
+	}
 )
 
 func (s OrganizationService) Create(
@@ -203,6 +207,46 @@ func (s OrganizationService) Update(
 	}
 
 	return organization, nil
+}
+
+func (s OrganizationService) Delete(
+	ctx context.Context,
+	req DeleteOrganizationRequest,
+) error {
+	organization := &coredata.Organization{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.ID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			// Delete all user-organization relationships for this organization
+			userOrgs := coredata.UserOrganizations{}
+			if err := userOrgs.ForOrganizationID(ctx, conn, req.ID); err != nil {
+				return fmt.Errorf("cannot load user organizations: %w", err)
+			}
+
+			for _, userOrg := range userOrgs {
+				if err := userOrg.Delete(ctx, conn); err != nil {
+					return fmt.Errorf("cannot delete user organization relationship: %w", err)
+				}
+			}
+
+			if err := organization.Delete(ctx, s.svc.scope, conn); err != nil {
+				return fmt.Errorf("cannot delete organization: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s OrganizationService) GenerateLogoURL(

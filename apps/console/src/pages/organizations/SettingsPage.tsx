@@ -77,6 +77,14 @@ const updateOrganizationMutation = graphql`
   }
 `;
 
+const deleteOrganizationMutation = graphql`
+  mutation SettingsPage_DeleteMutation($input: DeleteOrganizationInput!) {
+    deleteOrganization(input: $input) {
+      success
+    }
+  }
+`;
+
 export default function SettingsPage({ queryRef }: Props) {
   const { __ } = useTranslate();
   const organizationKey = usePreloadedQuery(
@@ -84,12 +92,20 @@ export default function SettingsPage({ queryRef }: Props) {
     queryRef
   ).node;
   const { toast } = useToast();
+  const confirm = useConfirm();
   const organization = useFragment<SettingsPageFragment$key>(
     organizationFragment,
     organizationKey
   );
   const [updateOrganization, isUpdating] = useMutation(
     updateOrganizationMutation
+  );
+  const [deleteOrganization, isDeleting] = useMutationWithToasts(
+    deleteOrganizationMutation,
+    {
+      successMessage: __("Organization deleted successfully"),
+      errorMessage: __("Failed to delete organization"),
+    }
   );
   const users = organization.users.edges.map((edge) => edge.node);
 
@@ -130,6 +146,29 @@ export default function SettingsPage({ queryRef }: Props) {
         });
       },
     });
+  };
+
+  const handleDeleteOrganization = () => {
+    confirm(
+      () => {
+        return deleteOrganization({
+          variables: {
+            input: {
+              organizationId: organization.id,
+            },
+          },
+          onSuccess: () => {
+            // Redirect to organizations page after successful deletion
+            window.location.href = "/";
+          },
+        });
+      },
+      {
+        message: __(
+          "Are you sure you want to delete this organization? This action cannot be undone and will permanently delete all data associated with this organization."
+        ),
+      }
+    );
   };
 
   return (
@@ -198,6 +237,39 @@ export default function SettingsPage({ queryRef }: Props) {
             organizationId={organization.id}
             connectors={organization.connectors.edges.map((edge) => edge.node)}
           />
+        </Card>
+      </div>
+
+      {/* Dangerous Actions */}
+      <div className="space-y-4">
+        <h2 className="text-base font-medium text-red-600">{__("Dangerous Actions")}</h2>
+        <Card padded className="border-red-200 bg-red-50">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-medium text-red-800">{__("Delete Organization")}</h3>
+              <p className="text-sm text-red-600 mt-1">
+                {__("Once you delete an organization, there is no going back. Please be certain.")}
+              </p>
+            </div>
+            <Button
+              variant="danger"
+              onClick={handleDeleteOrganization}
+              disabled={isDeleting}
+              className="w-full sm:w-auto"
+            >
+              {isDeleting ? (
+                <>
+                  <Spinner size={16} className="mr-2" />
+                  {__("Deleting...")}
+                </>
+              ) : (
+                <>
+                  <IconTrashCan className="mr-2" />
+                  {__("Delete Organization")}
+                </>
+              )}
+            </Button>
+          </div>
         </Card>
       </div>
     </div>

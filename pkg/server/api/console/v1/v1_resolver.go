@@ -897,6 +897,42 @@ func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.U
 	}, nil
 }
 
+// DeleteOrganization is the resolver for the deleteOrganization field.
+func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error) {
+	user := UserFromContext(ctx)
+
+	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to list organizations for user: %w", err))
+	}
+
+	// Check if user has access to the organization
+	hasAccess := false
+	for _, organization := range organizations {
+		if organization.ID == input.OrganizationID {
+			hasAccess = true
+			break
+		}
+	}
+
+	if !hasAccess {
+		return nil, fmt.Errorf("organization not found or access denied")
+	}
+
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
+
+	err = prb.Organizations.Delete(ctx, probo.DeleteOrganizationRequest{
+		ID: input.OrganizationID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete organization: %w", err)
+	}
+
+	return &types.DeleteOrganizationPayload{
+		Success: true,
+	}, nil
+}
+
 // ConfirmEmail is the resolver for the confirmEmail field.
 func (r *mutationResolver) ConfirmEmail(ctx context.Context, input types.ConfirmEmailInput) (*types.ConfirmEmailPayload, error) {
 	err := r.usrmgrSvc.ConfirmEmail(ctx, input.Token)

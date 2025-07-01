@@ -1279,6 +1279,9 @@ type Mutation {
   updateOrganization(
     input: UpdateOrganizationInput!
   ): UpdateOrganizationPayload!
+  deleteOrganization(
+    input: DeleteOrganizationInput!
+  ): DeleteOrganizationPayload!
 
   # User mutations
   confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
@@ -1428,6 +1431,10 @@ input UpdateOrganizationInput {
   organizationId: ID!
   name: String
   logo: Upload
+}
+
+input DeleteOrganizationInput {
+  organizationId: ID!
 }
 
 input CreateVendorInput {
@@ -1749,6 +1756,10 @@ type CreateOrganizationPayload {
 
 type UpdateOrganizationPayload {
   organization: Organization!
+}
+
+type DeleteOrganizationPayload {
+  success: Boolean!
 }
 
 type CreateControlPayload {
