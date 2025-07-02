@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6f19d3ea0d16b3f4418e85261e3e4915>>
+ * @generated SignedSource<<0ea2e589c7538113066b55292521e8d6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -139,6 +139,48 @@ return {
               },
               {
                 "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "mailingAddress",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "telephoneNumber",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "websiteUrl",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "securityComplianceEmail",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "companyDescription",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "companyLegalName",
+                "storageKey": null
+              },
+              {
+                "alias": null,
                 "args": (v4/*: any*/),
                 "concreteType": "UserConnection",
                 "kind": "LinkedField",
@@ -239,12 +281,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "3062be33ff59b816b10d098c083db370",
+    "cacheID": "123055ab519d0492e8d600e4296cb3ca",
     "id": null,
     "metadata": {},
     "name": "OrganizationGraph_ViewQuery",
     "operationKind": "query",
-    "text": "query OrganizationGraph_ViewQuery(\n  $organizationId: ID!\n) {\n  node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      name\n      ...SettingsPageFragment\n    }\n    id\n  }\n}\n\nfragment SettingsPageFragment on Organization {\n  id\n  name\n  logoUrl\n  users(first: 100) {\n    edges {\n      node {\n        id\n        fullName\n        email\n        createdAt\n      }\n    }\n  }\n  connectors(first: 100) {\n    edges {\n      node {\n        id\n        name\n        type\n        createdAt\n      }\n    }\n  }\n}\n"
+    "text": "query OrganizationGraph_ViewQuery(\n  $organizationId: ID!\n) {\n  node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      name\n      ...SettingsPageFragment\n    }\n    id\n  }\n}\n\nfragment SettingsPageFragment on Organization {\n  id\n  name\n  logoUrl\n  mailingAddress\n  telephoneNumber\n  websiteUrl\n  securityComplianceEmail\n  companyDescription\n  companyLegalName\n  users(first: 100) {\n    edges {\n      node {\n        id\n        fullName\n        email\n        createdAt\n      }\n    }\n  }\n  connectors(first: 100) {\n    edges {\n      node {\n        id\n        name\n        type\n        createdAt\n      }\n    }\n  }\n}\n"
   }
 };
 })();

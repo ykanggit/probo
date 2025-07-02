@@ -42,6 +42,12 @@ const organizationFragment = graphql`
     id
     name
     logoUrl
+    mailingAddress
+    telephoneNumber
+    websiteUrl
+    securityComplianceEmail
+    companyDescription
+    companyLegalName
     users(first: 100) {
       edges {
         node {
@@ -72,6 +78,12 @@ const updateOrganizationMutation = graphql`
         id
         name
         logoUrl
+        mailingAddress
+        telephoneNumber
+        websiteUrl
+        securityComplianceEmail
+        companyDescription
+        companyLegalName
       }
     }
   }
@@ -119,6 +131,21 @@ export default function SettingsPage({ queryRef }: Props) {
           organizationId: organization.id,
           name,
         },
+      },
+    });
+  }, 500);
+
+  const updateOrganizationField = useDebounceCallback((field: string, value: string) => {
+    if (!value) {
+      return "";
+    }
+    const input: any = {
+      organizationId: organization.id,
+    };
+    input[field] = value;
+    updateOrganization({
+      variables: {
+        input,
       },
     });
   }, 500);
@@ -210,6 +237,60 @@ export default function SettingsPage({ queryRef }: Props) {
             label={__("Organization name")}
             placeholder={__("Organization name")}
             onChange={(e) => updateOrganizationName(e.currentTarget.value)}
+          />
+          <Field
+            readOnly={isUpdating}
+            name="companyLegalName"
+            type="text"
+            defaultValue={organization.companyLegalName || ""}
+            label={__("Company legal name")}
+            placeholder={__("Enter company legal name")}
+            onChange={(e) => updateOrganizationField("companyLegalName", e.currentTarget.value)}
+          />
+          <Field
+            readOnly={isUpdating}
+            name="mailingAddress"
+            type="textarea"
+            defaultValue={organization.mailingAddress || ""}
+            label={__("Mailing address")}
+            placeholder={__("Enter mailing address")}
+            onChange={(e) => updateOrganizationField("mailingAddress", e.currentTarget.value)}
+          />
+          <Field
+            readOnly={isUpdating}
+            name="telephoneNumber"
+            type="text"
+            defaultValue={organization.telephoneNumber || ""}
+            label={__("Telephone number")}
+            placeholder={__("Enter telephone number")}
+            onChange={(e) => updateOrganizationField("telephoneNumber", e.currentTarget.value)}
+          />
+          <Field
+            readOnly={isUpdating}
+            name="websiteUrl"
+            type="text"
+            defaultValue={organization.websiteUrl || ""}
+            label={__("Website URL")}
+            placeholder={__("Enter website URL")}
+            onChange={(e) => updateOrganizationField("websiteUrl", e.currentTarget.value)}
+          />
+          <Field
+            readOnly={isUpdating}
+            name="securityComplianceEmail"
+            type="email"
+            defaultValue={organization.securityComplianceEmail || ""}
+            label={__("Security/Compliance email")}
+            placeholder={__("Enter security/compliance email")}
+            onChange={(e) => updateOrganizationField("securityComplianceEmail", e.currentTarget.value)}
+          />
+          <Field
+            readOnly={isUpdating}
+            name="companyDescription"
+            type="textarea"
+            defaultValue={organization.companyDescription || ""}
+            label={__("Company/Product description")}
+            placeholder={__("Enter company or product description")}
+            onChange={(e) => updateOrganizationField("companyDescription", e.currentTarget.value)}
           />
         </Card>
       </div>

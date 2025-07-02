@@ -638,6 +638,12 @@ type Organization implements Node {
   id: ID!
   name: String!
   logoUrl: String @goField(forceResolver: true)
+  mailingAddress: String
+  telephoneNumber: String
+  websiteUrl: String
+  securityComplianceEmail: String
+  companyDescription: String
+  companyLegalName: String
 
   users(
     first: Int
@@ -1431,6 +1437,12 @@ input UpdateOrganizationInput {
   organizationId: ID!
   name: String
   logo: Upload
+  mailingAddress: String
+  telephoneNumber: String
+  websiteUrl: String
+  securityComplianceEmail: String
+  companyDescription: String
+  companyLegalName: String
 }
 
 input DeleteOrganizationInput {

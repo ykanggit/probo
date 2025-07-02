@@ -531,7 +531,7 @@ type ComplexityRoot struct {
 		DeleteEvidence                        func(childComplexity int, input types.DeleteEvidenceInput) int
 		DeleteFramework                       func(childComplexity int, input types.DeleteFrameworkInput) int
 		DeleteMeasure                         func(childComplexity int, input types.DeleteMeasureInput) int
-		DeleteOrganization           func(childComplexity int, input types.DeleteOrganizationInput) int
+		DeleteOrganization                    func(childComplexity int, input types.DeleteOrganizationInput) int
 		DeletePeople                          func(childComplexity int, input types.DeletePeopleInput) int
 		DeleteRisk                            func(childComplexity int, input types.DeleteRiskInput) int
 		DeleteRiskDocumentMapping             func(childComplexity int, input types.DeleteRiskDocumentMappingInput) int
@@ -570,23 +570,29 @@ type ComplexityRoot struct {
 	}
 
 	Organization struct {
-		Assets     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrderBy) int
-		Connectors func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ConnectorOrder) int
-		Controls   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) int
-		CreatedAt  func(childComplexity int) int
-		Data       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrderBy) int
-		Documents  func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) int
-		Frameworks func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) int
-		ID         func(childComplexity int) int
-		LogoURL    func(childComplexity int) int
-		Measures   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) int
-		Name       func(childComplexity int) int
-		Peoples    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) int
-		Risks      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) int
-		Tasks      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) int
-		UpdatedAt  func(childComplexity int) int
-		Users      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrderBy) int
-		Vendors    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) int
+		Assets                  func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrderBy) int
+		CompanyDescription      func(childComplexity int) int
+		CompanyLegalName        func(childComplexity int) int
+		Connectors              func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ConnectorOrder) int
+		Controls                func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) int
+		CreatedAt               func(childComplexity int) int
+		Data                    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrderBy) int
+		Documents               func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) int
+		Frameworks              func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) int
+		ID                      func(childComplexity int) int
+		LogoURL                 func(childComplexity int) int
+		MailingAddress          func(childComplexity int) int
+		Measures                func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) int
+		Name                    func(childComplexity int) int
+		Peoples                 func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) int
+		Risks                   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) int
+		SecurityComplianceEmail func(childComplexity int) int
+		Tasks                   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) int
+		TelephoneNumber         func(childComplexity int) int
+		UpdatedAt               func(childComplexity int) int
+		Users                   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrderBy) int
+		Vendors                 func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) int
+		WebsiteURL              func(childComplexity int) int
 	}
 
 	OrganizationConnection struct {
@@ -1037,6 +1043,7 @@ type MutationResolver interface {
 }
 type OrganizationResolver interface {
 	LogoURL(ctx context.Context, obj *types.Organization) (*string, error)
+
 	Users(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.UserOrderBy) (*types.UserConnection, error)
 	Connectors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ConnectorOrder) (*types.ConnectorConnection, error)
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) (*types.FrameworkConnection, error)
@@ -3360,6 +3367,20 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Organization.Assets(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.AssetOrderBy)), true
 
+	case "Organization.companyDescription":
+		if e.complexity.Organization.CompanyDescription == nil {
+			break
+		}
+
+		return e.complexity.Organization.CompanyDescription(childComplexity), true
+
+	case "Organization.companyLegalName":
+		if e.complexity.Organization.CompanyLegalName == nil {
+			break
+		}
+
+		return e.complexity.Organization.CompanyLegalName(childComplexity), true
+
 	case "Organization.connectors":
 		if e.complexity.Organization.Connectors == nil {
 			break
@@ -3441,6 +3462,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Organization.LogoURL(childComplexity), true
 
+	case "Organization.mailingAddress":
+		if e.complexity.Organization.MailingAddress == nil {
+			break
+		}
+
+		return e.complexity.Organization.MailingAddress(childComplexity), true
+
 	case "Organization.measures":
 		if e.complexity.Organization.Measures == nil {
 			break
@@ -3484,6 +3512,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Organization.Risks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.RiskOrderBy), args["filter"].(*types.RiskFilter)), true
 
+	case "Organization.securityComplianceEmail":
+		if e.complexity.Organization.SecurityComplianceEmail == nil {
+			break
+		}
+
+		return e.complexity.Organization.SecurityComplianceEmail(childComplexity), true
+
 	case "Organization.tasks":
 		if e.complexity.Organization.Tasks == nil {
 			break
@@ -3495,6 +3530,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Organization.Tasks(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.TaskOrderBy)), true
+
+	case "Organization.telephoneNumber":
+		if e.complexity.Organization.TelephoneNumber == nil {
+			break
+		}
+
+		return e.complexity.Organization.TelephoneNumber(childComplexity), true
 
 	case "Organization.updatedAt":
 		if e.complexity.Organization.UpdatedAt == nil {
@@ -3526,6 +3568,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Organization.Vendors(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.VendorOrderBy)), true
+
+	case "Organization.websiteUrl":
+		if e.complexity.Organization.WebsiteURL == nil {
+			break
+		}
+
+		return e.complexity.Organization.WebsiteURL(childComplexity), true
 
 	case "OrganizationConnection.edges":
 		if e.complexity.OrganizationConnection.Edges == nil {
@@ -5519,6 +5568,12 @@ type Organization implements Node {
   id: ID!
   name: String!
   logoUrl: String @goField(forceResolver: true)
+  mailingAddress: String
+  telephoneNumber: String
+  websiteUrl: String
+  securityComplianceEmail: String
+  companyDescription: String
+  companyLegalName: String
 
   users(
     first: Int
@@ -6312,6 +6367,12 @@ input UpdateOrganizationInput {
   organizationId: ID!
   name: String
   logo: Upload
+  mailingAddress: String
+  telephoneNumber: String
+  websiteUrl: String
+  securityComplianceEmail: String
+  companyDescription: String
+  companyLegalName: String
 }
 
 input DeleteOrganizationInput {
@@ -12588,6 +12649,18 @@ func (ec *executionContext) fieldContext_Asset_organization(_ context.Context, f
 				return ec.fieldContext_Organization_name(ctx, field)
 			case "logoUrl":
 				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "mailingAddress":
+				return ec.fieldContext_Organization_mailingAddress(ctx, field)
+			case "telephoneNumber":
+				return ec.fieldContext_Organization_telephoneNumber(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Organization_websiteUrl(ctx, field)
+			case "securityComplianceEmail":
+				return ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+			case "companyDescription":
+				return ec.fieldContext_Organization_companyDescription(ctx, field)
+			case "companyLegalName":
+				return ec.fieldContext_Organization_companyLegalName(ctx, field)
 			case "users":
 				return ec.fieldContext_Organization_users(ctx, field)
 			case "connectors":
@@ -15671,6 +15744,18 @@ func (ec *executionContext) fieldContext_Datum_organization(_ context.Context, f
 				return ec.fieldContext_Organization_name(ctx, field)
 			case "logoUrl":
 				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "mailingAddress":
+				return ec.fieldContext_Organization_mailingAddress(ctx, field)
+			case "telephoneNumber":
+				return ec.fieldContext_Organization_telephoneNumber(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Organization_websiteUrl(ctx, field)
+			case "securityComplianceEmail":
+				return ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+			case "companyDescription":
+				return ec.fieldContext_Organization_companyDescription(ctx, field)
+			case "companyLegalName":
+				return ec.fieldContext_Organization_companyLegalName(ctx, field)
 			case "users":
 				return ec.fieldContext_Organization_users(ctx, field)
 			case "connectors":
@@ -17300,6 +17385,18 @@ func (ec *executionContext) fieldContext_Document_organization(_ context.Context
 				return ec.fieldContext_Organization_name(ctx, field)
 			case "logoUrl":
 				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "mailingAddress":
+				return ec.fieldContext_Organization_mailingAddress(ctx, field)
+			case "telephoneNumber":
+				return ec.fieldContext_Organization_telephoneNumber(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Organization_websiteUrl(ctx, field)
+			case "securityComplianceEmail":
+				return ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+			case "companyDescription":
+				return ec.fieldContext_Organization_companyDescription(ctx, field)
+			case "companyLegalName":
+				return ec.fieldContext_Organization_companyLegalName(ctx, field)
 			case "users":
 				return ec.fieldContext_Organization_users(ctx, field)
 			case "connectors":
@@ -20453,6 +20550,18 @@ func (ec *executionContext) fieldContext_Framework_organization(_ context.Contex
 				return ec.fieldContext_Organization_name(ctx, field)
 			case "logoUrl":
 				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "mailingAddress":
+				return ec.fieldContext_Organization_mailingAddress(ctx, field)
+			case "telephoneNumber":
+				return ec.fieldContext_Organization_telephoneNumber(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Organization_websiteUrl(ctx, field)
+			case "securityComplianceEmail":
+				return ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+			case "companyDescription":
+				return ec.fieldContext_Organization_companyDescription(ctx, field)
+			case "companyLegalName":
+				return ec.fieldContext_Organization_companyLegalName(ctx, field)
 			case "users":
 				return ec.fieldContext_Organization_users(ctx, field)
 			case "connectors":
@@ -25977,6 +26086,252 @@ func (ec *executionContext) fieldContext_Organization_logoUrl(_ context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Organization_mailingAddress(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_mailingAddress(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MailingAddress, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_mailingAddress(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_telephoneNumber(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_telephoneNumber(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TelephoneNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_telephoneNumber(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_websiteUrl(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_websiteUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WebsiteURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_websiteUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_securityComplianceEmail(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SecurityComplianceEmail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_securityComplianceEmail(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_companyDescription(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_companyDescription(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CompanyDescription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_companyDescription(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_companyLegalName(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_companyLegalName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CompanyLegalName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_companyLegalName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Organization_users(ctx context.Context, field graphql.CollectedField, obj *types.Organization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Organization_users(ctx, field)
 	if err != nil {
@@ -27010,6 +27365,18 @@ func (ec *executionContext) fieldContext_OrganizationEdge_node(_ context.Context
 				return ec.fieldContext_Organization_name(ctx, field)
 			case "logoUrl":
 				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "mailingAddress":
+				return ec.fieldContext_Organization_mailingAddress(ctx, field)
+			case "telephoneNumber":
+				return ec.fieldContext_Organization_telephoneNumber(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Organization_websiteUrl(ctx, field)
+			case "securityComplianceEmail":
+				return ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+			case "companyDescription":
+				return ec.fieldContext_Organization_companyDescription(ctx, field)
+			case "companyLegalName":
+				return ec.fieldContext_Organization_companyLegalName(ctx, field)
 			case "users":
 				return ec.fieldContext_Organization_users(ctx, field)
 			case "connectors":
@@ -29062,6 +29429,18 @@ func (ec *executionContext) fieldContext_Risk_organization(_ context.Context, fi
 				return ec.fieldContext_Organization_name(ctx, field)
 			case "logoUrl":
 				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "mailingAddress":
+				return ec.fieldContext_Organization_mailingAddress(ctx, field)
+			case "telephoneNumber":
+				return ec.fieldContext_Organization_telephoneNumber(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Organization_websiteUrl(ctx, field)
+			case "securityComplianceEmail":
+				return ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+			case "companyDescription":
+				return ec.fieldContext_Organization_companyDescription(ctx, field)
+			case "companyLegalName":
+				return ec.fieldContext_Organization_companyLegalName(ctx, field)
 			case "users":
 				return ec.fieldContext_Organization_users(ctx, field)
 			case "connectors":
@@ -30148,6 +30527,18 @@ func (ec *executionContext) fieldContext_Task_organization(_ context.Context, fi
 				return ec.fieldContext_Organization_name(ctx, field)
 			case "logoUrl":
 				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "mailingAddress":
+				return ec.fieldContext_Organization_mailingAddress(ctx, field)
+			case "telephoneNumber":
+				return ec.fieldContext_Organization_telephoneNumber(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Organization_websiteUrl(ctx, field)
+			case "securityComplianceEmail":
+				return ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+			case "companyDescription":
+				return ec.fieldContext_Organization_companyDescription(ctx, field)
+			case "companyLegalName":
+				return ec.fieldContext_Organization_companyLegalName(ctx, field)
 			case "users":
 				return ec.fieldContext_Organization_users(ctx, field)
 			case "connectors":
@@ -31238,6 +31629,18 @@ func (ec *executionContext) fieldContext_UpdateOrganizationPayload_organization(
 				return ec.fieldContext_Organization_name(ctx, field)
 			case "logoUrl":
 				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "mailingAddress":
+				return ec.fieldContext_Organization_mailingAddress(ctx, field)
+			case "telephoneNumber":
+				return ec.fieldContext_Organization_telephoneNumber(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Organization_websiteUrl(ctx, field)
+			case "securityComplianceEmail":
+				return ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+			case "companyDescription":
+				return ec.fieldContext_Organization_companyDescription(ctx, field)
+			case "companyLegalName":
+				return ec.fieldContext_Organization_companyLegalName(ctx, field)
 			case "users":
 				return ec.fieldContext_Organization_users(ctx, field)
 			case "connectors":
@@ -32455,6 +32858,18 @@ func (ec *executionContext) fieldContext_Vendor_organization(_ context.Context, 
 				return ec.fieldContext_Organization_name(ctx, field)
 			case "logoUrl":
 				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "mailingAddress":
+				return ec.fieldContext_Organization_mailingAddress(ctx, field)
+			case "telephoneNumber":
+				return ec.fieldContext_Organization_telephoneNumber(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Organization_websiteUrl(ctx, field)
+			case "securityComplianceEmail":
+				return ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+			case "companyDescription":
+				return ec.fieldContext_Organization_companyDescription(ctx, field)
+			case "companyLegalName":
+				return ec.fieldContext_Organization_companyLegalName(ctx, field)
 			case "users":
 				return ec.fieldContext_Organization_users(ctx, field)
 			case "connectors":
@@ -40189,7 +40604,7 @@ func (ec *executionContext) unmarshalInputUpdateOrganizationInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "name", "logo"}
+	fieldsInOrder := [...]string{"organizationId", "name", "logo", "mailingAddress", "telephoneNumber", "websiteUrl", "securityComplianceEmail", "companyDescription", "companyLegalName"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -40217,6 +40632,48 @@ func (ec *executionContext) unmarshalInputUpdateOrganizationInput(ctx context.Co
 				return it, err
 			}
 			it.Logo = data
+		case "mailingAddress":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mailingAddress"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MailingAddress = data
+		case "telephoneNumber":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("telephoneNumber"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TelephoneNumber = data
+		case "websiteUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("websiteUrl"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.WebsiteURL = data
+		case "securityComplianceEmail":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("securityComplianceEmail"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SecurityComplianceEmail = data
+		case "companyDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("companyDescription"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CompanyDescription = data
+		case "companyLegalName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("companyLegalName"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CompanyLegalName = data
 		}
 	}
 
@@ -46230,6 +46687,18 @@ func (ec *executionContext) _Organization(ctx context.Context, sel ast.Selection
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "mailingAddress":
+			out.Values[i] = ec._Organization_mailingAddress(ctx, field, obj)
+		case "telephoneNumber":
+			out.Values[i] = ec._Organization_telephoneNumber(ctx, field, obj)
+		case "websiteUrl":
+			out.Values[i] = ec._Organization_websiteUrl(ctx, field, obj)
+		case "securityComplianceEmail":
+			out.Values[i] = ec._Organization_securityComplianceEmail(ctx, field, obj)
+		case "companyDescription":
+			out.Values[i] = ec._Organization_companyDescription(ctx, field, obj)
+		case "companyLegalName":
+			out.Values[i] = ec._Organization_companyLegalName(ctx, field, obj)
 		case "users":
 			field := field
 

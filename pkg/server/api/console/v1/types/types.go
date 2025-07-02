@@ -728,23 +728,29 @@ type Mutation struct {
 }
 
 type Organization struct {
-	ID         gid.GID              `json:"id"`
-	Name       string               `json:"name"`
-	LogoURL    *string              `json:"logoUrl,omitempty"`
-	Users      *UserConnection      `json:"users"`
-	Connectors *ConnectorConnection `json:"connectors"`
-	Frameworks *FrameworkConnection `json:"frameworks"`
-	Controls   *ControlConnection   `json:"controls"`
-	Vendors    *VendorConnection    `json:"vendors"`
-	Peoples    *PeopleConnection    `json:"peoples"`
-	Documents  *DocumentConnection  `json:"documents"`
-	Measures   *MeasureConnection   `json:"measures"`
-	Risks      *RiskConnection      `json:"risks"`
-	Tasks      *TaskConnection      `json:"tasks"`
-	Assets     *AssetConnection     `json:"assets"`
-	Data       *DatumConnection     `json:"data"`
-	CreatedAt  time.Time            `json:"createdAt"`
-	UpdatedAt  time.Time            `json:"updatedAt"`
+	ID                      gid.GID              `json:"id"`
+	Name                    string               `json:"name"`
+	LogoURL                 *string              `json:"logoUrl,omitempty"`
+	MailingAddress          *string              `json:"mailingAddress,omitempty"`
+	TelephoneNumber         *string              `json:"telephoneNumber,omitempty"`
+	WebsiteURL              *string              `json:"websiteUrl,omitempty"`
+	SecurityComplianceEmail *string              `json:"securityComplianceEmail,omitempty"`
+	CompanyDescription      *string              `json:"companyDescription,omitempty"`
+	CompanyLegalName        *string              `json:"companyLegalName,omitempty"`
+	Users                   *UserConnection      `json:"users"`
+	Connectors              *ConnectorConnection `json:"connectors"`
+	Frameworks              *FrameworkConnection `json:"frameworks"`
+	Controls                *ControlConnection   `json:"controls"`
+	Vendors                 *VendorConnection    `json:"vendors"`
+	Peoples                 *PeopleConnection    `json:"peoples"`
+	Documents               *DocumentConnection  `json:"documents"`
+	Measures                *MeasureConnection   `json:"measures"`
+	Risks                   *RiskConnection      `json:"risks"`
+	Tasks                   *TaskConnection      `json:"tasks"`
+	Assets                  *AssetConnection     `json:"assets"`
+	Data                    *DatumConnection     `json:"data"`
+	CreatedAt               time.Time            `json:"createdAt"`
+	UpdatedAt               time.Time            `json:"updatedAt"`
 }
 
 func (Organization) IsNode()             {}
@@ -996,9 +1002,15 @@ type UpdateMeasurePayload struct {
 }
 
 type UpdateOrganizationInput struct {
-	OrganizationID gid.GID         `json:"organizationId"`
-	Name           *string         `json:"name,omitempty"`
-	Logo           *graphql.Upload `json:"logo,omitempty"`
+	OrganizationID          gid.GID         `json:"organizationId"`
+	Name                    *string         `json:"name,omitempty"`
+	Logo                    *graphql.Upload `json:"logo,omitempty"`
+	MailingAddress          *string         `json:"mailingAddress,omitempty"`
+	TelephoneNumber         *string         `json:"telephoneNumber,omitempty"`
+	WebsiteURL              *string         `json:"websiteUrl,omitempty"`
+	SecurityComplianceEmail *string         `json:"securityComplianceEmail,omitempty"`
+	CompanyDescription      *string         `json:"companyDescription,omitempty"`
+	CompanyLegalName        *string         `json:"companyLegalName,omitempty"`
 }
 
 type UpdateOrganizationPayload struct {

@@ -44,9 +44,15 @@ type (
 	}
 
 	UpdateOrganizationRequest struct {
-		ID   gid.GID
-		Name *string
-		File *File
+		ID                      gid.GID
+		Name                    *string
+		File                    *File
+		MailingAddress          *string
+		TelephoneNumber         *string
+		WebsiteURL              *string
+		SecurityComplianceEmail *string
+		CompanyDescription      *string
+		CompanyLegalName        *string
 	}
 
 	DeleteOrganizationRequest struct {
@@ -129,6 +135,30 @@ func (s OrganizationService) Update(
 
 			if req.Name != nil {
 				organization.Name = *req.Name
+			}
+
+			if req.MailingAddress != nil {
+				organization.MailingAddress = req.MailingAddress
+			}
+
+			if req.TelephoneNumber != nil {
+				organization.TelephoneNumber = req.TelephoneNumber
+			}
+
+			if req.WebsiteURL != nil {
+				organization.WebsiteURL = req.WebsiteURL
+			}
+
+			if req.SecurityComplianceEmail != nil {
+				organization.SecurityComplianceEmail = req.SecurityComplianceEmail
+			}
+
+			if req.CompanyDescription != nil {
+				organization.CompanyDescription = req.CompanyDescription
+			}
+
+			if req.CompanyLegalName != nil {
+				organization.CompanyLegalName = req.CompanyLegalName
 			}
 
 			if req.File != nil {
