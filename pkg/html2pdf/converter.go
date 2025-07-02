@@ -75,7 +75,7 @@ func WithTracerProvider(tp trace.TracerProvider) Option {
 
 func NewConverter(addr string, opts ...Option) *Converter {
 	c := &Converter{
-		addr:           addr,
+		addr:           "ws://" + addr,
 		l:              log.NewLogger(log.WithOutput(io.Discard)),
 		tracerProvider: otel.GetTracerProvider(),
 	}
