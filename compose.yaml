@@ -92,6 +92,13 @@ services:
       - "--headless"
       - "--disable-gpu"
       - "--disable-dev-shm-usage"
+      - "--hide-scrollbars"
+      - "--mute-audio"
+      - "--no-default-browser-check"
+      - "--no-first-run"
+      - "--disable-background-networking"
+      - "--disable-background-timer-throttling"
+      - "--disable-extensions"
 
 volumes:
   postgres-data:
