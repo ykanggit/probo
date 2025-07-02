@@ -25,6 +25,9 @@ import (
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 	"go.gearno.de/kit/log"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -32,6 +35,8 @@ var (
 		var ready bool
 		return chromedp.Evaluate(`document.readyState === 'complete'`, &ready).Do(ctx)
 	}
+
+	tracerName = "github.com/getprobo/probo/pkg/html2pdf"
 )
 
 type (
@@ -49,8 +54,10 @@ type (
 	Option func(*Converter)
 
 	Converter struct {
-		l    *log.Logger
-		addr string
+		l              *log.Logger
+		tracerProvider trace.TracerProvider
+		tracer         trace.Tracer
+		addr           string
 	}
 )
 
@@ -60,16 +67,24 @@ func WithLogger(l *log.Logger) Option {
 	}
 }
 
+func WithTracerProvider(tp trace.TracerProvider) Option {
+	return func(c *Converter) {
+		c.tracerProvider = tp
+	}
+}
+
 func NewConverter(addr string, opts ...Option) *Converter {
 	c := &Converter{
-		addr: addr,
-		l:    log.NewLogger(log.WithOutput(io.Discard)),
+		addr:           addr,
+		l:              log.NewLogger(log.WithOutput(io.Discard)),
+		tracerProvider: otel.GetTracerProvider(),
 	}
 	for _, opt := range opts {
 		opt(c)
 	}
 
-	c.l = c.l.Named("mdpdf").With(log.String("addr", addr))
+	c.l = c.l.Named("html2pdf").With(log.String("addr", addr))
+	c.tracer = c.tracerProvider.Tracer(tracerName)
 
 	return c
 }
@@ -93,6 +108,20 @@ func getPageDimensions(format PageFormat, orientation Orientation) (width, heigh
 }
 
 func (c *Converter) GeneratePDF(ctx context.Context, htmlDocument []byte, cfg RenderConfig) (io.Reader, error) {
+	var (
+		rootSpan = trace.SpanFromContext(ctx)
+		span     trace.Span
+	)
+
+	if rootSpan.IsRecording() {
+		ctx, span = c.tracer.Start(
+			ctx,
+			"GeneratePDF",
+			trace.WithSpanKind(trace.SpanKindInternal),
+		)
+		defer span.End()
+	}
+
 	allocCtx, cancel := chromedp.NewRemoteAllocator(ctx, c.addr)
 	defer cancel()
 
@@ -156,7 +185,14 @@ func (c *Converter) GeneratePDF(ctx context.Context, htmlDocument []byte, cfg Re
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("cannot run chromedp: %w", err)
+		err2 := fmt.Errorf("cannot run chromedp: %w", err)
+
+		if rootSpan.IsRecording() {
+			span.RecordError(err2)
+			span.SetStatus(codes.Error, err2.Error())
+		}
+
+		return nil, err2
 	}
 
 	return bytes.NewReader(pdfBytes), nil
