@@ -87,24 +87,24 @@ export function MainLayout() {
       sidebar={
         <ul className="space-y-[2px]">
           <SidebarItem
+            label={__("Frameworks")}
+            icon={IconBank}
+            to={`${prefix}/frameworks`}
+          />
+          <SidebarItem
+            label={__("Controls")}
+            icon={IconTodo}
+            to={`${prefix}/measures`}
+          />
+          <SidebarItem
             label={__("Tasks")}
             icon={IconInboxEmpty}
             to={`${prefix}/tasks`}
           />
           <SidebarItem
-            label={__("Measures")}
-            icon={IconTodo}
-            to={`${prefix}/measures`}
-          />
-          <SidebarItem
             label={__("Risks")}
             icon={IconFire3}
             to={`${prefix}/risks`}
-          />
-          <SidebarItem
-            label={__("Frameworks")}
-            icon={IconBank}
-            to={`${prefix}/frameworks`}
           />
           <SidebarItem
             label={__("People")}

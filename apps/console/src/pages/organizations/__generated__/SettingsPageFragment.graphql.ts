@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e5b6c1db04175ebddb21379dfd331fc6>>
+ * @generated SignedSource<<91966774e33d2d399df5c48ad91ca24d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,6 +11,8 @@
 import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type SettingsPageFragment$data = {
+  readonly companyDescription: string | null | undefined;
+  readonly companyLegalName: string | null | undefined;
   readonly connectors: {
     readonly edges: ReadonlyArray<{
       readonly node: {
@@ -23,7 +25,10 @@ export type SettingsPageFragment$data = {
   };
   readonly id: string;
   readonly logoUrl: string | null | undefined;
+  readonly mailingAddress: string | null | undefined;
   readonly name: string;
+  readonly securityComplianceEmail: string | null | undefined;
+  readonly telephoneNumber: string | null | undefined;
   readonly users: {
     readonly edges: ReadonlyArray<{
       readonly node: {
@@ -34,6 +39,7 @@ export type SettingsPageFragment$data = {
       };
     }>;
   };
+  readonly websiteUrl: string | null | undefined;
   readonly " $fragmentType": "SettingsPageFragment";
 };
 export type SettingsPageFragment$key = {
@@ -83,6 +89,48 @@ return {
       "args": null,
       "kind": "ScalarField",
       "name": "logoUrl",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "mailingAddress",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "telephoneNumber",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "websiteUrl",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "securityComplianceEmail",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "companyDescription",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "companyLegalName",
       "storageKey": null
     },
     {
@@ -183,6 +231,6 @@ return {
 };
 })();
 
-(node as any).hash = "b7ee53afcaaa0406dceeda0427afdfef";
+(node as any).hash = "425b927d2b07b5b6f81090ef93d96a2b";
 
 export default node;

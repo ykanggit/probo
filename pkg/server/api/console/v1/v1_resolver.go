@@ -874,8 +874,14 @@ func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.U
 	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
 	req := probo.UpdateOrganizationRequest{
-		ID:   input.OrganizationID,
-		Name: input.Name,
+		ID:                      input.OrganizationID,
+		Name:                    input.Name,
+		MailingAddress:          input.MailingAddress,
+		TelephoneNumber:         input.TelephoneNumber,
+		WebsiteURL:              input.WebsiteURL,
+		SecurityComplianceEmail: input.SecurityComplianceEmail,
+		CompanyDescription:      input.CompanyDescription,
+		CompanyLegalName:        input.CompanyLegalName,
 	}
 
 	if input.Logo != nil {

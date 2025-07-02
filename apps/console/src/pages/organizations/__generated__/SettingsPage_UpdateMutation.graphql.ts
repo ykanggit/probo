@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6dc30c35c9ce7367967d235b1a259179>>
+ * @generated SignedSource<<e52ff21c6805e96937d86b9132e82bd6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,9 +10,15 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type UpdateOrganizationInput = {
+  companyDescription?: string | null | undefined;
+  companyLegalName?: string | null | undefined;
   logo?: any | null | undefined;
+  mailingAddress?: string | null | undefined;
   name?: string | null | undefined;
   organizationId: string;
+  securityComplianceEmail?: string | null | undefined;
+  telephoneNumber?: string | null | undefined;
+  websiteUrl?: string | null | undefined;
 };
 export type SettingsPage_UpdateMutation$variables = {
   input: UpdateOrganizationInput;
@@ -20,9 +26,15 @@ export type SettingsPage_UpdateMutation$variables = {
 export type SettingsPage_UpdateMutation$data = {
   readonly updateOrganization: {
     readonly organization: {
+      readonly companyDescription: string | null | undefined;
+      readonly companyLegalName: string | null | undefined;
       readonly id: string;
       readonly logoUrl: string | null | undefined;
+      readonly mailingAddress: string | null | undefined;
       readonly name: string;
+      readonly securityComplianceEmail: string | null | undefined;
+      readonly telephoneNumber: string | null | undefined;
+      readonly websiteUrl: string | null | undefined;
     };
   };
 };
@@ -82,6 +94,48 @@ v1 = [
             "kind": "ScalarField",
             "name": "logoUrl",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "mailingAddress",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "telephoneNumber",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "websiteUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "securityComplianceEmail",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "companyDescription",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "companyLegalName",
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -108,16 +162,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "ac8d86332fabe20dd7ea8fef4207b75e",
+    "cacheID": "772ca4c2fc43f18362d828d132c065bd",
     "id": null,
     "metadata": {},
     "name": "SettingsPage_UpdateMutation",
     "operationKind": "mutation",
-    "text": "mutation SettingsPage_UpdateMutation(\n  $input: UpdateOrganizationInput!\n) {\n  updateOrganization(input: $input) {\n    organization {\n      id\n      name\n      logoUrl\n    }\n  }\n}\n"
+    "text": "mutation SettingsPage_UpdateMutation(\n  $input: UpdateOrganizationInput!\n) {\n  updateOrganization(input: $input) {\n    organization {\n      id\n      name\n      logoUrl\n      mailingAddress\n      telephoneNumber\n      websiteUrl\n      securityComplianceEmail\n      companyDescription\n      companyLegalName\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "85f76939223253c1d102d05cd74f7538";
+(node as any).hash = "28d9dbbbb7d88b90f304c04a8673a334";
 
 export default node;
