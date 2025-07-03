@@ -52,8 +52,6 @@ var (
 )
 
 type (
-	Generator struct{}
-
 	Classification string
 
 	DocumentData struct {
@@ -84,11 +82,7 @@ const (
 	ClassificationSecret       Classification = "SECRET"
 )
 
-func NewGenerator() *Generator {
-	return &Generator{}
-}
-
-func (g *Generator) GenerateHTML(data DocumentData) ([]byte, error) {
+func RenderHTML(data DocumentData) ([]byte, error) {
 	data.Title = html.EscapeString(data.Title)
 	data.Approver = html.EscapeString(data.Approver)
 	data.Description = html.EscapeString(data.Description)

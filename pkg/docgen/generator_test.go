@@ -25,14 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewGenerator(t *testing.T) {
-	generator := NewGenerator()
-	assert.NotNil(t, generator)
-	assert.IsType(t, &Generator{}, generator)
-}
-
-func TestGenerateHTML(t *testing.T) {
-	generator := NewGenerator()
+func TestRenderHTML(t *testing.T) {
 	now := time.Now()
 
 	tests := []struct {
@@ -166,7 +159,7 @@ func TestGenerateHTML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := generator.GenerateHTML(tt.data)
+			result, err := RenderHTML(tt.data)
 			require.NoError(t, err)
 			require.NotEmpty(t, result)
 
@@ -194,16 +187,14 @@ func TestGenerateHTML(t *testing.T) {
 	}
 }
 
-func TestGenerateHTML_ErrorHandling(t *testing.T) {
-	generator := NewGenerator()
-
+func TestRenderHTML_ErrorHandling(t *testing.T) {
 	// Test with data that should not cause errors
 	data := DocumentData{
 		Title:   "Valid Document",
 		Content: "Valid content",
 	}
 
-	result, err := generator.GenerateHTML(data)
+	result, err := RenderHTML(data)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, result)
 }
@@ -271,8 +262,6 @@ func TestClassificationConstants(t *testing.T) {
 }
 
 func TestHTMLEscaping(t *testing.T) {
-	generator := NewGenerator()
-
 	dangerousData := DocumentData{
 		Title:       "<script>alert('xss')</script>",
 		Approver:    "User & <Company>",
@@ -286,7 +275,7 @@ func TestHTMLEscaping(t *testing.T) {
 		},
 	}
 
-	result, err := generator.GenerateHTML(dangerousData)
+	result, err := RenderHTML(dangerousData)
 	require.NoError(t, err)
 
 	resultStr := string(result)
@@ -300,8 +289,6 @@ func TestHTMLEscaping(t *testing.T) {
 }
 
 func TestMarkdownRendering(t *testing.T) {
-	generator := NewGenerator()
-
 	tests := []struct {
 		name     string
 		markdown string
@@ -341,7 +328,7 @@ func TestMarkdownRendering(t *testing.T) {
 				Content: tt.markdown,
 			}
 
-			result, err := generator.GenerateHTML(data)
+			result, err := RenderHTML(data)
 			require.NoError(t, err)
 
 			resultStr := string(result)
@@ -353,7 +340,6 @@ func TestMarkdownRendering(t *testing.T) {
 }
 
 func TestDocumentVersionSignatureStates(t *testing.T) {
-	generator := NewGenerator()
 	now := time.Now()
 
 	states := []coredata.DocumentVersionSignatureState{
@@ -376,7 +362,7 @@ func TestDocumentVersionSignatureStates(t *testing.T) {
 				},
 			}
 
-			result, err := generator.GenerateHTML(data)
+			result, err := RenderHTML(data)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, result)
 		})
@@ -384,8 +370,6 @@ func TestDocumentVersionSignatureStates(t *testing.T) {
 }
 
 func TestLargeContent(t *testing.T) {
-	generator := NewGenerator()
-
 	// Create a large markdown content
 	var largeContent strings.Builder
 	for i := 0; i < 1000; i++ {
@@ -400,14 +384,13 @@ func TestLargeContent(t *testing.T) {
 		Content: largeContent.String(),
 	}
 
-	result, err := generator.GenerateHTML(data)
+	result, err := RenderHTML(data)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, result)
 	assert.True(t, len(result) > 10000) // Should be reasonably large
 }
 
 func BenchmarkGenerateHTML(b *testing.B) {
-	generator := NewGenerator()
 	now := time.Now()
 
 	data := DocumentData{
@@ -431,7 +414,7 @@ func BenchmarkGenerateHTML(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := generator.GenerateHTML(data)
+		_, err := RenderHTML(data)
 		if err != nil {
 			b.Fatal(err)
 		}
