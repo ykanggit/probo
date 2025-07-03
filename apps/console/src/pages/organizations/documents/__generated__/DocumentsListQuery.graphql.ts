@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b61f74ae791f86da55afd868c68c85e4>>
+ * @generated SignedSource<<9ea096db73885458f35ae718a00ded47>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,7 +10,7 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type DocumentOrderField = "CREATED_AT" | "TITLE";
+export type DocumentOrderField = "CREATED_AT" | "DOCUMENT_TYPE" | "TITLE";
 export type OrderDirection = "ASC" | "DESC";
 export type DocumentOrder = {
   direction: OrderDirection;

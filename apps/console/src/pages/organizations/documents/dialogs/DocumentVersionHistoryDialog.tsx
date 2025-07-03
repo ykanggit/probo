@@ -1,9 +1,11 @@
 import {
   Avatar,
+  Button,
   Dialog,
   DialogContent,
   DialogFooter,
   DialogTitle,
+  IconArrowInbox,
   Markdown,
 } from "@probo/ui";
 import { graphql } from "relay-runtime";
@@ -11,9 +13,11 @@ import { useTranslate } from "@probo/i18n";
 import { useState, type ReactNode } from "react";
 import { useFragment } from "react-relay";
 import type { DocumentVersionHistoryDialogFragment$key } from "./__generated__/DocumentVersionHistoryDialogFragment.graphql";
+import type { DocumentVersionHistoryDialogExportPDFMutation } from "./__generated__/DocumentVersionHistoryDialogExportPDFMutation.graphql";
 import clsx from "clsx";
 import type { NodeOf } from "/types";
 import type { DocumentDetailPageDocumentFragment$data } from "../__generated__/DocumentDetailPageDocumentFragment.graphql";
+import { useMutationWithToasts } from "/hooks/useMutationWithToasts";
 
 const historyFragment = graphql`
   fragment DocumentVersionHistoryDialogFragment on DocumentVersion {
@@ -30,6 +34,16 @@ const historyFragment = graphql`
   }
 `;
 
+const exportPDFMutation = graphql`
+  mutation DocumentVersionHistoryDialogExportPDFMutation(
+    $documentVersionId: ID!
+  ) {
+    exportDocumentVersionPDF(input: { documentVersionId: $documentVersionId }) {
+      data
+    }
+  }
+`;
+
 type Props = {
   document: DocumentDetailPageDocumentFragment$data;
   children?: ReactNode;
@@ -41,6 +55,46 @@ export function DocumentVersionHistoryDialog(props: Props) {
   const { __ } = useTranslate();
   const versions = props.document.versions.edges.map((edge) => edge.node);
   const [selectedVersion, setSelectedVersion] = useState<Version>(versions[0]);
+  const [exportPDF, isExporting] =
+    useMutationWithToasts<DocumentVersionHistoryDialogExportPDFMutation>(
+      exportPDFMutation,
+      {
+        errorMessage: __("Failed to export PDF"),
+        successMessage: __("PDF exported successfully"),
+      }
+    );
+
+  const handleDownloadPDF = () => {
+    exportPDF({
+      variables: { documentVersionId: selectedVersion.id },
+      onCompleted: (data) => {
+        if (data.exportDocumentVersionPDF.data) {
+          // Handle data URI format (data:application/pdf;base64,...)
+          const dataUri = data.exportDocumentVersionPDF.data;
+
+          // Extract base64 part from data URI
+          const base64Data = dataUri.split(",")[1];
+
+          // Convert base64 to blob and download
+          const binaryString = atob(base64Data);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          const blob = new Blob([bytes], { type: "application/pdf" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `${props.document.title}-v${selectedVersion.version}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
+      },
+    });
+  };
+
   return (
     <Dialog trigger={props.children}>
       <DialogContent className="flex" scrollableChildren>
@@ -59,6 +113,16 @@ export function DocumentVersionHistoryDialog(props: Props) {
           ))}
         </aside>
         <main className="flex-1 px-12 py-8">
+          <div className="mb-4">
+            <Button
+              onClick={handleDownloadPDF}
+              icon={IconArrowInbox}
+              variant="secondary"
+              disabled={isExporting}
+            >
+              {isExporting ? __("Exporting...") : __("Download PDF")}
+            </Button>
+          </div>
           <Markdown content={selectedVersion.content} />
         </main>
       </DialogContent>
