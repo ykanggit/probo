@@ -34,14 +34,17 @@ import { usePageTitle } from "@probo/hooks";
 import { sprintf, getDocumentTypeLabel } from "@probo/helpers";
 import { CreateDocumentDialog } from "./dialogs/CreateDocumentDialog";
 import type { DocumentsPageRowFragment$key } from "./__generated__/DocumentsPageRowFragment.graphql";
-import { SortableTable } from "/components/SortableTable";
+import { SortableTable, SortableTh } from "/components/SortableTable";
 
 const documentsFragment = graphql`
   fragment DocumentsPageListFragment on Organization
   @refetchable(queryName: "DocumentsListQuery")
   @argumentDefinitions(
     first: { type: "Int", defaultValue: 50 }
-    order: { type: "DocumentOrder", defaultValue: null }
+    order: {
+      type: "DocumentOrder"
+      defaultValue: { field: TITLE, direction: ASC }
+    }
     after: { type: "CursorKey", defaultValue: null }
     before: { type: "CursorKey", defaultValue: null }
     last: { type: "Int", defaultValue: null }
@@ -117,9 +120,9 @@ export default function DocumentsPage(props: Props) {
       <SortableTable {...pagination}>
         <Thead>
           <Tr>
-            <Th>{__("Name")}</Th>
+            <SortableTh field="TITLE">{__("Name")}</SortableTh>
             <Th>{__("Status")}</Th>
-            <Th>{__("Type")}</Th>
+            <SortableTh field="DOCUMENT_TYPE">{__("Type")}</SortableTh>
             <Th>{__("Owner")}</Th>
             <Th>{__("Last update")}</Th>
             <Th>{__("Signatures")}</Th>

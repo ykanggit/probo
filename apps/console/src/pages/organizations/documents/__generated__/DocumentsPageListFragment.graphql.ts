@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1082bf950eb1233b6c85c02d89dcd260>>
+ * @generated SignedSource<<0abee66a5b3a949907293acd4981f05e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -64,7 +64,10 @@ return {
       "name": "last"
     },
     {
-      "defaultValue": null,
+      "defaultValue": {
+        "direction": "ASC",
+        "field": "TITLE"
+      },
       "kind": "LocalArgument",
       "name": "order"
     }
@@ -220,6 +223,6 @@ return {
 };
 })();
 
-(node as any).hash = "dc234a4cafbe4da1c1ff4943ff75c32a";
+(node as any).hash = "8cda24b1d10caa3f4b83dbb82035365b";
 
 export default node;
