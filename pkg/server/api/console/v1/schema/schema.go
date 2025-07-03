@@ -5068,6 +5068,10 @@ enum DocumentOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.DocumentOrderFieldCreatedAt"
     )
+  DOCUMENT_TYPE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DocumentOrderFieldDocumentType"
+    )
 }
 
 enum RiskOrderField
@@ -51348,12 +51352,14 @@ func (ec *executionContext) marshalNDocumentOrderField2githubᚗcomᚋgetprobo�
 
 var (
 	unmarshalNDocumentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDocumentOrderField = map[string]coredata.DocumentOrderField{
-		"TITLE":      coredata.DocumentOrderFieldTitle,
-		"CREATED_AT": coredata.DocumentOrderFieldCreatedAt,
+		"TITLE":         coredata.DocumentOrderFieldTitle,
+		"CREATED_AT":    coredata.DocumentOrderFieldCreatedAt,
+		"DOCUMENT_TYPE": coredata.DocumentOrderFieldDocumentType,
 	}
 	marshalNDocumentOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDocumentOrderField = map[coredata.DocumentOrderField]string{
-		coredata.DocumentOrderFieldTitle:     "TITLE",
-		coredata.DocumentOrderFieldCreatedAt: "CREATED_AT",
+		coredata.DocumentOrderFieldTitle:        "TITLE",
+		coredata.DocumentOrderFieldCreatedAt:    "CREATED_AT",
+		coredata.DocumentOrderFieldDocumentType: "DOCUMENT_TYPE",
 	}
 )
 

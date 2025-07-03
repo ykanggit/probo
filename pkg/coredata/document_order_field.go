@@ -19,8 +19,9 @@ type (
 )
 
 const (
-	DocumentOrderFieldCreatedAt DocumentOrderField = "CREATED_AT"
-	DocumentOrderFieldTitle     DocumentOrderField = "TITLE"
+	DocumentOrderFieldCreatedAt    DocumentOrderField = "CREATED_AT"
+	DocumentOrderFieldTitle        DocumentOrderField = "TITLE"
+	DocumentOrderFieldDocumentType DocumentOrderField = "DOCUMENT_TYPE"
 )
 
 func (p DocumentOrderField) Column() string {

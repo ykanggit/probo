@@ -213,6 +213,10 @@ enum DocumentOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.DocumentOrderFieldCreatedAt"
     )
+  DOCUMENT_TYPE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DocumentOrderFieldDocumentType"
+    )
 }
 
 enum RiskOrderField

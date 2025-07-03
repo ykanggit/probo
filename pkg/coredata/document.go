@@ -47,6 +47,8 @@ func (p Document) CursorKey(orderBy DocumentOrderField) page.CursorKey {
 		return page.NewCursorKey(p.ID, p.CreatedAt)
 	case DocumentOrderFieldTitle:
 		return page.NewCursorKey(p.ID, p.Title)
+	case DocumentOrderFieldDocumentType:
+		return page.NewCursorKey(p.ID, p.DocumentType)
 	}
 
 	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
