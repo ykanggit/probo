@@ -62,7 +62,7 @@ type (
 		Approver       string
 		Description    string
 		PublishedAt    *time.Time
-		PublishedBy    *time.Time
+		PublishedBy    string
 		Signatures     []SignatureData
 	}
 
