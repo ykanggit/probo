@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.39.0] - 2025-06-03
+
+### Added
+
+- Add policy PDF export
+
+### Security
+
+- Update go dependencies
+- Update node dependencies
+
 ## [0.38.1] - 2025-06-03
 
 ### Fixed
