@@ -359,7 +359,7 @@ func BenchmarkMarginString(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, margin := range margins {
-			margin.String()
+			_ = margin.String()
 		}
 	}
 }
