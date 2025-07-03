@@ -617,6 +617,14 @@ type ExportAuditPayload struct {
 	URL string `json:"url"`
 }
 
+type ExportDocumentVersionPDFInput struct {
+	DocumentVersionID gid.GID `json:"documentVersionId"`
+}
+
+type ExportDocumentVersionPDFPayload struct {
+	Data string `json:"data"`
+}
+
 type Framework struct {
 	ID           gid.GID            `json:"id"`
 	Name         string             `json:"name"`

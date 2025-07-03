@@ -6,6 +6,7 @@ package console_v1
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -1925,6 +1926,20 @@ func (r *mutationResolver) SendSigningNotifications(ctx context.Context, input t
 
 	return &types.SendSigningNotificationsPayload{
 		Success: true,
+	}, nil
+}
+
+// ExportDocumentVersionPDF is the resolver for the exportDocumentVersionPDF field.
+func (r *mutationResolver) ExportDocumentVersionPDF(ctx context.Context, input types.ExportDocumentVersionPDFInput) (*types.ExportDocumentVersionPDFPayload, error) {
+	prb := r.ProboService(ctx, input.DocumentVersionID.TenantID())
+
+	pdf, err := prb.Documents.ExportPDF(ctx, input.DocumentVersionID)
+	if err != nil {
+		panic(fmt.Errorf("cannot export document version PDF: %w", err))
+	}
+
+	return &types.ExportDocumentVersionPDFPayload{
+		Data: fmt.Sprintf("data:application/pdf;base64,%s", base64.StdEncoding.EncodeToString(pdf)),
 	}, nil
 }
 

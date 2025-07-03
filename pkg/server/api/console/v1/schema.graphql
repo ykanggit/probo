@@ -1397,6 +1397,9 @@ type Mutation {
   sendSigningNotifications(
     input: SendSigningNotificationsInput!
   ): SendSigningNotificationsPayload!
+  exportDocumentVersionPDF(
+    input: ExportDocumentVersionPDFInput!
+  ): ExportDocumentVersionPDFPayload!
 
   createVendorRiskAssessment(
     input: CreateVendorRiskAssessmentInput!
@@ -1709,6 +1712,10 @@ input UpdateDocumentInput {
   documentType: DocumentType
 }
 
+input ExportDocumentVersionPDFInput {
+  documentVersionId: ID!
+}
+
 input DeleteDocumentInput {
   documentId: ID!
 }
@@ -1918,6 +1925,10 @@ type DeleteVendorComplianceReportPayload {
 type CreateDocumentPayload {
   documentEdge: DocumentEdge!
   documentVersionEdge: DocumentVersionEdge!
+}
+
+type ExportDocumentVersionPDFPayload {
+  data: String!
 }
 
 type UpdateDocumentPayload {

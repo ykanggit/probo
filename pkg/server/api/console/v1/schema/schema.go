@@ -427,6 +427,10 @@ type ComplexityRoot struct {
 		URL func(childComplexity int) int
 	}
 
+	ExportDocumentVersionPDFPayload struct {
+		Data func(childComplexity int) int
+	}
+
 	Framework struct {
 		Controls     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) int
 		CreatedAt    func(childComplexity int) int
@@ -535,6 +539,7 @@ type ComplexityRoot struct {
 		DeleteVendor                          func(childComplexity int, input types.DeleteVendorInput) int
 		DeleteVendorComplianceReport          func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
 		ExportAudit                           func(childComplexity int, input types.ExportAuditInput) int
+		ExportDocumentVersionPDF              func(childComplexity int, input types.ExportDocumentVersionPDFInput) int
 		FulfillEvidence                       func(childComplexity int, input types.FulfillEvidenceInput) int
 		GenerateDocumentChangelog             func(childComplexity int, input types.GenerateDocumentChangelogInput) int
 		GenerateFrameworkStateOfApplicability func(childComplexity int, input types.GenerateFrameworkStateOfApplicabilityInput) int
@@ -1019,6 +1024,7 @@ type MutationResolver interface {
 	UpdateDocumentVersion(ctx context.Context, input types.UpdateDocumentVersionInput) (*types.UpdateDocumentVersionPayload, error)
 	RequestSignature(ctx context.Context, input types.RequestSignatureInput) (*types.RequestSignaturePayload, error)
 	SendSigningNotifications(ctx context.Context, input types.SendSigningNotificationsInput) (*types.SendSigningNotificationsPayload, error)
+	ExportDocumentVersionPDF(ctx context.Context, input types.ExportDocumentVersionPDFInput) (*types.ExportDocumentVersionPDFPayload, error)
 	CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error)
 	ExportAudit(ctx context.Context, input types.ExportAuditInput) (*types.ExportAuditPayload, error)
 	AssessVendor(ctx context.Context, input types.AssessVendorInput) (*types.AssessVendorPayload, error)
@@ -2292,6 +2298,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.ExportAuditPayload.URL(childComplexity), true
 
+	case "ExportDocumentVersionPDFPayload.data":
+		if e.complexity.ExportDocumentVersionPDFPayload.Data == nil {
+			break
+		}
+
+		return e.complexity.ExportDocumentVersionPDFPayload.Data(childComplexity), true
+
 	case "Framework.controls":
 		if e.complexity.Framework.Controls == nil {
 			break
@@ -2998,6 +3011,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.ExportAudit(childComplexity, args["input"].(types.ExportAuditInput)), true
+
+	case "Mutation.exportDocumentVersionPDF":
+		if e.complexity.Mutation.ExportDocumentVersionPDF == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_exportDocumentVersionPDF_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ExportDocumentVersionPDF(childComplexity, args["input"].(types.ExportDocumentVersionPDFInput)), true
 
 	case "Mutation.fulfillEvidence":
 		if e.complexity.Mutation.FulfillEvidence == nil {
@@ -4717,6 +4742,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDocumentVersionSignatureOrder,
 		ec.unmarshalInputEvidenceOrder,
 		ec.unmarshalInputExportAuditInput,
+		ec.unmarshalInputExportDocumentVersionPDFInput,
 		ec.unmarshalInputFrameworkOrder,
 		ec.unmarshalInputFulfillEvidenceInput,
 		ec.unmarshalInputGenerateDocumentChangelogInput,
@@ -6252,6 +6278,9 @@ type Mutation {
   sendSigningNotifications(
     input: SendSigningNotificationsInput!
   ): SendSigningNotificationsPayload!
+  exportDocumentVersionPDF(
+    input: ExportDocumentVersionPDFInput!
+  ): ExportDocumentVersionPDFPayload!
 
   createVendorRiskAssessment(
     input: CreateVendorRiskAssessmentInput!
@@ -6564,6 +6593,10 @@ input UpdateDocumentInput {
   documentType: DocumentType
 }
 
+input ExportDocumentVersionPDFInput {
+  documentVersionId: ID!
+}
+
 input DeleteDocumentInput {
   documentId: ID!
 }
@@ -6773,6 +6806,10 @@ type DeleteVendorComplianceReportPayload {
 type CreateDocumentPayload {
   documentEdge: DocumentEdge!
   documentVersionEdge: DocumentVersionEdge!
+}
+
+type ExportDocumentVersionPDFPayload {
+  data: String!
 }
 
 type UpdateDocumentPayload {
@@ -9276,6 +9313,29 @@ func (ec *executionContext) field_Mutation_exportAudit_argsInput(
 	}
 
 	var zeroVal types.ExportAuditInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_exportDocumentVersionPDF_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_exportDocumentVersionPDF_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_exportDocumentVersionPDF_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.ExportDocumentVersionPDFInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNExportDocumentVersionPDFInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportDocumentVersionPDFInput(ctx, tmp)
+	}
+
+	var zeroVal types.ExportDocumentVersionPDFInput
 	return zeroVal, nil
 }
 
@@ -20176,6 +20236,50 @@ func (ec *executionContext) fieldContext_ExportAuditPayload_url(_ context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _ExportDocumentVersionPDFPayload_data(ctx context.Context, field graphql.CollectedField, obj *types.ExportDocumentVersionPDFPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExportDocumentVersionPDFPayload_data(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExportDocumentVersionPDFPayload_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExportDocumentVersionPDFPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Framework_id(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Framework_id(ctx, field)
 	if err != nil {
@@ -25152,6 +25256,65 @@ func (ec *executionContext) fieldContext_Mutation_sendSigningNotifications(ctx c
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_sendSigningNotifications_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_exportDocumentVersionPDF(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_exportDocumentVersionPDF(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ExportDocumentVersionPDF(rctx, fc.Args["input"].(types.ExportDocumentVersionPDFInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ExportDocumentVersionPDFPayload)
+	fc.Result = res
+	return ec.marshalNExportDocumentVersionPDFPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportDocumentVersionPDFPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_exportDocumentVersionPDF(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "data":
+				return ec.fieldContext_ExportDocumentVersionPDFPayload_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ExportDocumentVersionPDFPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_exportDocumentVersionPDF_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -38952,6 +39115,33 @@ func (ec *executionContext) unmarshalInputExportAuditInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputExportDocumentVersionPDFInput(ctx context.Context, obj any) (types.ExportDocumentVersionPDFInput, error) {
+	var it types.ExportDocumentVersionPDFInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"documentVersionId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "documentVersionId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentVersionId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DocumentVersionID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputFrameworkOrder(ctx context.Context, obj any) (types.FrameworkOrderBy, error) {
 	var it types.FrameworkOrderBy
 	asMap := map[string]any{}
@@ -44628,6 +44818,45 @@ func (ec *executionContext) _ExportAuditPayload(ctx context.Context, sel ast.Sel
 	return out
 }
 
+var exportDocumentVersionPDFPayloadImplementors = []string{"ExportDocumentVersionPDFPayload"}
+
+func (ec *executionContext) _ExportDocumentVersionPDFPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ExportDocumentVersionPDFPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, exportDocumentVersionPDFPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ExportDocumentVersionPDFPayload")
+		case "data":
+			out.Values[i] = ec._ExportDocumentVersionPDFPayload_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var frameworkImplementors = []string{"Framework", "Node"}
 
 func (ec *executionContext) _Framework(ctx context.Context, sel ast.SelectionSet, obj *types.Framework) graphql.Marshaler {
@@ -45854,6 +46083,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "sendSigningNotifications":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_sendSigningNotifications(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "exportDocumentVersionPDF":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_exportDocumentVersionPDF(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -51833,6 +52069,25 @@ func (ec *executionContext) marshalNExportAuditPayload2ᚖgithubᚗcomᚋgetprob
 		return graphql.Null
 	}
 	return ec._ExportAuditPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNExportDocumentVersionPDFInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportDocumentVersionPDFInput(ctx context.Context, v any) (types.ExportDocumentVersionPDFInput, error) {
+	res, err := ec.unmarshalInputExportDocumentVersionPDFInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNExportDocumentVersionPDFPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportDocumentVersionPDFPayload(ctx context.Context, sel ast.SelectionSet, v types.ExportDocumentVersionPDFPayload) graphql.Marshaler {
+	return ec._ExportDocumentVersionPDFPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNExportDocumentVersionPDFPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportDocumentVersionPDFPayload(ctx context.Context, sel ast.SelectionSet, v *types.ExportDocumentVersionPDFPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ExportDocumentVersionPDFPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNFramework2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v types.Framework) graphql.Marshaler {
