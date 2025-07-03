@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.38.1] - 2025-06-03
+
+### Fixed
+
+- Fix 5xx on document type order
+
 ## [0.38.0] - 2025-06-03
 
 ### Added
