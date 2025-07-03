@@ -150,7 +150,6 @@ func (c *Converter) GeneratePDF(ctx context.Context, htmlDocument []byte, cfg Re
 	c.l.InfoCtx(
 		ctx,
 		"running chromedp",
-		log.String("dataURL", dataURL),
 		log.Float64("width", width),
 		log.Float64("height", height),
 		log.Float64("marginTop", marginTop),
