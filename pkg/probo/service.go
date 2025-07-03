@@ -24,18 +24,20 @@ import (
 	"github.com/getprobo/probo/pkg/crypto/cipher"
 	"github.com/getprobo/probo/pkg/filevalidation"
 	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/html2pdf"
 	"go.gearno.de/kit/pg"
 )
 
 type (
 	Service struct {
-		pg            *pg.Client
-		s3            *s3.Client
-		bucket        string
-		encryptionKey cipher.EncryptionKey
-		hostname      string
-		tokenSecret   string
-		agentConfig   agents.Config
+		pg                *pg.Client
+		s3                *s3.Client
+		bucket            string
+		encryptionKey     cipher.EncryptionKey
+		hostname          string
+		tokenSecret       string
+		agentConfig       agents.Config
+		html2pdfConverter *html2pdf.Converter
 	}
 
 	TenantService struct {
@@ -73,19 +75,21 @@ func NewService(
 	hostname string,
 	tokenSecret string,
 	agentConfig agents.Config,
+	html2pdfConverter *html2pdf.Converter,
 ) (*Service, error) {
 	if bucket == "" {
 		return nil, fmt.Errorf("bucket is required")
 	}
 
 	svc := &Service{
-		pg:            pgClient,
-		s3:            s3Client,
-		bucket:        bucket,
-		encryptionKey: encryptionKey,
-		hostname:      hostname,
-		tokenSecret:   tokenSecret,
-		agentConfig:   agentConfig,
+		pg:                pgClient,
+		s3:                s3Client,
+		bucket:            bucket,
+		encryptionKey:     encryptionKey,
+		hostname:          hostname,
+		tokenSecret:       tokenSecret,
+		agentConfig:       agentConfig,
+		html2pdfConverter: html2pdfConverter,
 	}
 
 	return svc, nil
@@ -120,7 +124,10 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	}
 	tenantService.Peoples = &PeopleService{svc: tenantService}
 	tenantService.Vendors = &VendorService{svc: tenantService}
-	tenantService.Documents = &DocumentService{svc: tenantService}
+	tenantService.Documents = &DocumentService{
+		svc:               tenantService,
+		html2pdfConverter: s.html2pdfConverter,
+	}
 	tenantService.Organizations = &OrganizationService{
 		svc: tenantService,
 		fileValidator: filevalidation.NewValidator(

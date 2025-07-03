@@ -3,11 +3,14 @@ package probo
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/url"
 	"time"
 
 	"github.com/getprobo/probo/pkg/coredata"
+	"github.com/getprobo/probo/pkg/docgen"
 	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/html2pdf"
 	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/statelesstoken"
 	"github.com/jackc/pgx/v5"
@@ -16,7 +19,8 @@ import (
 
 type (
 	DocumentService struct {
-		svc *TenantService
+		svc               *TenantService
+		html2pdfConverter *html2pdf.Converter
 	}
 
 	CreateDocumentRequest struct {
@@ -858,4 +862,135 @@ func (s *DocumentService) Update(
 	}
 
 	return document, nil
+}
+
+func (s *DocumentService) ExportPDF(
+	ctx context.Context,
+	documentVersionID gid.GID,
+) ([]byte, error) {
+	document := &coredata.Document{}
+	version := &coredata.DocumentVersion{}
+	owner := &coredata.People{}
+	publishedBy := &coredata.People{}
+	signatures := coredata.DocumentVersionSignatures{}
+	peopleMap := make(map[gid.GID]*coredata.People)
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := version.LoadByID(ctx, conn, s.svc.scope, documentVersionID); err != nil {
+				return fmt.Errorf("cannot load document version: %w", err)
+			}
+
+			if err := document.LoadByID(ctx, conn, s.svc.scope, version.DocumentID); err != nil {
+				return fmt.Errorf("cannot load document: %w", err)
+			}
+
+			if version.PublishedBy != nil {
+				if err := publishedBy.LoadByID(ctx, conn, s.svc.scope, *version.PublishedBy); err != nil {
+					return fmt.Errorf("cannot load published by person: %w", err)
+				}
+			}
+
+			cursor := page.NewCursor(
+				100,
+				nil,
+				page.Head,
+				page.OrderBy[coredata.DocumentVersionSignatureOrderField]{
+					Field:     coredata.DocumentVersionSignatureOrderFieldCreatedAt,
+					Direction: page.OrderDirectionAsc,
+				},
+			)
+
+			if err := signatures.LoadByDocumentVersionID(ctx, conn, s.svc.scope, documentVersionID, cursor); err != nil {
+				return fmt.Errorf("cannot load document version signatures: %w", err)
+			}
+
+			if err := owner.LoadByID(ctx, conn, s.svc.scope, document.OwnerID); err != nil {
+				return fmt.Errorf("cannot load document owner: %w", err)
+			}
+
+			// TODO: refactor this to use a single query
+			for _, sig := range signatures {
+				if _, ok := peopleMap[sig.SignedBy]; !ok {
+					people := &coredata.People{}
+					if err := people.LoadByID(ctx, conn, s.svc.scope, sig.SignedBy); err != nil {
+						return fmt.Errorf("cannot load people %q: %w", sig.SignedBy, err)
+					}
+					peopleMap[sig.SignedBy] = people
+				}
+
+				if _, ok := peopleMap[sig.RequestedBy]; !ok {
+					people := &coredata.People{}
+					if err := people.LoadByID(ctx, conn, s.svc.scope, sig.RequestedBy); err != nil {
+						return fmt.Errorf("cannot load people %q: %w", sig.RequestedBy, err)
+					}
+					peopleMap[sig.RequestedBy] = people
+				}
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	classification := docgen.ClassificationInternal
+	switch document.DocumentType {
+	case coredata.DocumentTypePolicy:
+		classification = docgen.ClassificationConfidential
+	case coredata.DocumentTypeISMS:
+		classification = docgen.ClassificationSecret
+	}
+
+	docData := docgen.DocumentData{
+		Title:          version.Title,
+		Content:        version.Content,
+		Version:        version.VersionNumber,
+		Classification: classification,
+		Approver:       owner.FullName,
+		Description:    version.Changelog,
+		PublishedAt:    version.PublishedAt,
+		PublishedBy:    publishedBy.FullName,
+		Signatures:     make([]docgen.SignatureData, len(signatures)),
+	}
+
+	for i, sig := range signatures {
+		docData.Signatures[i] = docgen.SignatureData{
+			SignedBy:    peopleMap[sig.SignedBy].FullName,
+			SignedAt:    sig.SignedAt,
+			State:       sig.State,
+			RequestedAt: sig.RequestedAt,
+			RequestedBy: peopleMap[sig.RequestedBy].FullName,
+		}
+	}
+
+	htmlContent, err := docgen.RenderHTML(docData)
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate HTML: %w", err)
+	}
+
+	cfg := html2pdf.RenderConfig{
+		PageFormat:      html2pdf.PageFormatA4,
+		Orientation:     html2pdf.OrientationPortrait,
+		MarginTop:       html2pdf.NewMarginInches(1.0),
+		MarginBottom:    html2pdf.NewMarginInches(1.0),
+		MarginLeft:      html2pdf.NewMarginInches(1.0),
+		MarginRight:     html2pdf.NewMarginInches(1.0),
+		PrintBackground: true,
+		Scale:           1.0,
+	}
+
+	pdfReader, err := s.html2pdfConverter.GeneratePDF(ctx, htmlContent, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate PDF: %w", err)
+	}
+
+	pdfData, err := io.ReadAll(pdfReader)
+	if err != nil {
+		return nil, fmt.Errorf("cannot read PDF data: %w", err)
+	}
+	return pdfData, nil
 }
