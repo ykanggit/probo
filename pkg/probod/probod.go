@@ -30,6 +30,7 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/crypto/cipher"
 	"github.com/getprobo/probo/pkg/crypto/passwdhash"
+	"github.com/getprobo/probo/pkg/html2pdf"
 	"github.com/getprobo/probo/pkg/mailer"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/saferedirect"
@@ -61,6 +62,7 @@ type (
 		Mailer        mailerConfig         `json:"mailer"`
 		Connectors    []connectorConfig    `json:"connectors"`
 		OpenAI        openaiConfig         `json:"openai"`
+		ChromeDPAddr  string               `json:"chrome-dp-addr"`
 	}
 )
 
@@ -83,6 +85,7 @@ func New() *Implm {
 				Database: "probod",
 				PoolSize: 100,
 			},
+			ChromeDPAddr: "localhost:9222",
 			Auth: authConfig{
 				Password: passwordConfig{
 					Pepper:     "this-is-a-secure-pepper-for-password-hashing-at-least-32-bytes",
@@ -168,6 +171,12 @@ func (impl *Implm) Run(
 		},
 	)
 
+	html2pdfConverter := html2pdf.NewConverter(
+		impl.cfg.ChromeDPAddr,
+		html2pdf.WithLogger(l),
+		html2pdf.WithTracerProvider(tp),
+	)
+
 	s3Client := s3.NewFromConfig(awsConfig)
 
 	err = migrator.NewMigrator(pgClient, coredata.Migrations, l.Named("migrations")).Run(ctx, "migrations")
@@ -216,6 +225,7 @@ func (impl *Implm) Run(
 		impl.cfg.Hostname,
 		impl.cfg.Auth.Cookie.Secret,
 		agentConfig,
+		html2pdfConverter,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot create probo service: %w", err)

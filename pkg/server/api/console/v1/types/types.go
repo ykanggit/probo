@@ -56,6 +56,14 @@ type AssignTaskPayload struct {
 	Task *Task `json:"task"`
 }
 
+type CancelSignatureRequestInput struct {
+	DocumentVersionSignatureID gid.GID `json:"documentVersionSignatureId"`
+}
+
+type CancelSignatureRequestPayload struct {
+	DeletedDocumentVersionSignatureID gid.GID `json:"deletedDocumentVersionSignatureId"`
+}
+
 type ConfirmEmailInput struct {
 	Token string `json:"token"`
 }
@@ -623,6 +631,14 @@ type ExportAuditInput struct {
 
 type ExportAuditPayload struct {
 	URL string `json:"url"`
+}
+
+type ExportDocumentVersionPDFInput struct {
+	DocumentVersionID gid.GID `json:"documentVersionId"`
+}
+
+type ExportDocumentVersionPDFPayload struct {
+	Data string `json:"data"`
 }
 
 type Framework struct {
