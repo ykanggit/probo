@@ -92,7 +92,7 @@ export function MainLayout() {
             to={`${prefix}/frameworks`}
           />
           <SidebarItem
-            label={__("Controls")}
+            label={__("Measures")}
             icon={IconTodo}
             to={`${prefix}/measures`}
           />
