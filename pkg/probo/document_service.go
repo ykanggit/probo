@@ -873,6 +873,14 @@ func (s *DocumentService) CancelSignatureRequest(
 	return s.svc.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
+			if err := documentVersionSignature.LoadByID(ctx, tx, s.svc.scope, documentVersionSignatureID); err != nil {
+				return fmt.Errorf("cannot load document version signature: %w", err)
+			}
+
+			if documentVersionSignature.State != coredata.DocumentVersionSignatureStateRequested {
+				return fmt.Errorf("cannot cancel signature request: %w", err)
+			}
+
 			if err := documentVersionSignature.Delete(ctx, tx, s.svc.scope, documentVersionSignatureID); err != nil {
 				return fmt.Errorf("cannot delete document version signature: %w", err)
 			}
