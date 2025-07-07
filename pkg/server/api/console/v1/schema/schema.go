@@ -436,10 +436,6 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
-	ExportAuditPayload struct {
-		URL func(childComplexity int) int
-	}
-
 	ExportDocumentVersionPDFPayload struct {
 		Data func(childComplexity int) int
 	}
@@ -474,7 +470,7 @@ type ComplexityRoot struct {
 	}
 
 	GenerateFrameworkStateOfApplicabilityPayload struct {
-		DownloadURL func(childComplexity int) int
+		Data func(childComplexity int) int
 	}
 
 	ImportFrameworkPayload struct {
@@ -554,7 +550,6 @@ type ComplexityRoot struct {
 		DeleteTask                            func(childComplexity int, input types.DeleteTaskInput) int
 		DeleteVendor                          func(childComplexity int, input types.DeleteVendorInput) int
 		DeleteVendorComplianceReport          func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
-		ExportAudit                           func(childComplexity int, input types.ExportAuditInput) int
 		ExportDocumentVersionPDF              func(childComplexity int, input types.ExportDocumentVersionPDFInput) int
 		FulfillEvidence                       func(childComplexity int, input types.FulfillEvidenceInput) int
 		GenerateDocumentChangelog             func(childComplexity int, input types.GenerateDocumentChangelogInput) int
@@ -1045,7 +1040,6 @@ type MutationResolver interface {
 	CancelSignatureRequest(ctx context.Context, input types.CancelSignatureRequestInput) (*types.CancelSignatureRequestPayload, error)
 	ExportDocumentVersionPDF(ctx context.Context, input types.ExportDocumentVersionPDFInput) (*types.ExportDocumentVersionPDFPayload, error)
 	CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error)
-	ExportAudit(ctx context.Context, input types.ExportAuditInput) (*types.ExportAuditPayload, error)
 	AssessVendor(ctx context.Context, input types.AssessVendorInput) (*types.AssessVendorPayload, error)
 	CreateAsset(ctx context.Context, input types.CreateAssetInput) (*types.CreateAssetPayload, error)
 	UpdateAsset(ctx context.Context, input types.UpdateAssetInput) (*types.UpdateAssetPayload, error)
@@ -2338,13 +2332,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.EvidenceEdge.Node(childComplexity), true
 
-	case "ExportAuditPayload.url":
-		if e.complexity.ExportAuditPayload.URL == nil {
-			break
-		}
-
-		return e.complexity.ExportAuditPayload.URL(childComplexity), true
-
 	case "ExportDocumentVersionPDFPayload.data":
 		if e.complexity.ExportDocumentVersionPDFPayload.Data == nil {
 			break
@@ -2455,12 +2442,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.GenerateDocumentChangelogPayload.Changelog(childComplexity), true
 
-	case "GenerateFrameworkStateOfApplicabilityPayload.downloadUrl":
-		if e.complexity.GenerateFrameworkStateOfApplicabilityPayload.DownloadURL == nil {
+	case "GenerateFrameworkStateOfApplicabilityPayload.data":
+		if e.complexity.GenerateFrameworkStateOfApplicabilityPayload.Data == nil {
 			break
 		}
 
-		return e.complexity.GenerateFrameworkStateOfApplicabilityPayload.DownloadURL(childComplexity), true
+		return e.complexity.GenerateFrameworkStateOfApplicabilityPayload.Data(childComplexity), true
 
 	case "ImportFrameworkPayload.frameworkEdge":
 		if e.complexity.ImportFrameworkPayload.FrameworkEdge == nil {
@@ -3082,18 +3069,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteVendorComplianceReport(childComplexity, args["input"].(types.DeleteVendorComplianceReportInput)), true
-
-	case "Mutation.exportAudit":
-		if e.complexity.Mutation.ExportAudit == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_exportAudit_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ExportAudit(childComplexity, args["input"].(types.ExportAuditInput)), true
 
 	case "Mutation.exportDocumentVersionPDF":
 		if e.complexity.Mutation.ExportDocumentVersionPDF == nil {
@@ -4827,7 +4802,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDocumentVersionOrder,
 		ec.unmarshalInputDocumentVersionSignatureOrder,
 		ec.unmarshalInputEvidenceOrder,
-		ec.unmarshalInputExportAuditInput,
 		ec.unmarshalInputExportDocumentVersionPDFInput,
 		ec.unmarshalInputFrameworkOrder,
 		ec.unmarshalInputFulfillEvidenceInput,
@@ -6381,8 +6355,6 @@ type Mutation {
     input: CreateVendorRiskAssessmentInput!
   ): CreateVendorRiskAssessmentPayload!
 
-  exportAudit(input: ExportAuditInput!): ExportAuditPayload!
-
   assessVendor(input: AssessVendorInput!): AssessVendorPayload!
 
   createAsset(input: CreateAssetInput!): CreateAssetPayload!
@@ -6400,7 +6372,7 @@ input GenerateFrameworkStateOfApplicabilityInput {
 }
 
 type GenerateFrameworkStateOfApplicabilityPayload {
-  downloadUrl: String!
+  data: String!
 }
 
 input CreateOrganizationInput {
@@ -7150,14 +7122,6 @@ input UploadTaskEvidenceInput {
 input UploadMeasureEvidenceInput {
   measureId: ID!
   file: Upload!
-}
-
-input ExportAuditInput {
-  frameworkId: ID!
-}
-
-type ExportAuditPayload {
-  url: String!
 }
 
 input GenerateDocumentChangelogInput {
@@ -9481,29 +9445,6 @@ func (ec *executionContext) field_Mutation_deleteVendor_argsInput(
 	}
 
 	var zeroVal types.DeleteVendorInput
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_exportAudit_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_exportAudit_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_exportAudit_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (types.ExportAuditInput, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNExportAuditInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportAuditInput(ctx, tmp)
-	}
-
-	var zeroVal types.ExportAuditInput
 	return zeroVal, nil
 }
 
@@ -20577,50 +20518,6 @@ func (ec *executionContext) fieldContext_EvidenceEdge_node(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _ExportAuditPayload_url(ctx context.Context, field graphql.CollectedField, obj *types.ExportAuditPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ExportAuditPayload_url(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.URL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ExportAuditPayload_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ExportAuditPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _ExportDocumentVersionPDFPayload_data(ctx context.Context, field graphql.CollectedField, obj *types.ExportDocumentVersionPDFPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ExportDocumentVersionPDFPayload_data(ctx, field)
 	if err != nil {
@@ -21374,8 +21271,8 @@ func (ec *executionContext) fieldContext_GenerateDocumentChangelogPayload_change
 	return fc, nil
 }
 
-func (ec *executionContext) _GenerateFrameworkStateOfApplicabilityPayload_downloadUrl(ctx context.Context, field graphql.CollectedField, obj *types.GenerateFrameworkStateOfApplicabilityPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_GenerateFrameworkStateOfApplicabilityPayload_downloadUrl(ctx, field)
+func (ec *executionContext) _GenerateFrameworkStateOfApplicabilityPayload_data(ctx context.Context, field graphql.CollectedField, obj *types.GenerateFrameworkStateOfApplicabilityPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GenerateFrameworkStateOfApplicabilityPayload_data(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -21388,7 +21285,7 @@ func (ec *executionContext) _GenerateFrameworkStateOfApplicabilityPayload_downlo
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DownloadURL, nil
+		return obj.Data, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -21405,7 +21302,7 @@ func (ec *executionContext) _GenerateFrameworkStateOfApplicabilityPayload_downlo
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_GenerateFrameworkStateOfApplicabilityPayload_downloadUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_GenerateFrameworkStateOfApplicabilityPayload_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "GenerateFrameworkStateOfApplicabilityPayload",
 		Field:      field,
@@ -23306,8 +23203,8 @@ func (ec *executionContext) fieldContext_Mutation_generateFrameworkStateOfApplic
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "downloadUrl":
-				return ec.fieldContext_GenerateFrameworkStateOfApplicabilityPayload_downloadUrl(ctx, field)
+			case "data":
+				return ec.fieldContext_GenerateFrameworkStateOfApplicabilityPayload_data(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type GenerateFrameworkStateOfApplicabilityPayload", field.Name)
 		},
@@ -25938,65 +25835,6 @@ func (ec *executionContext) fieldContext_Mutation_createVendorRiskAssessment(ctx
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createVendorRiskAssessment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_exportAudit(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_exportAudit(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ExportAudit(rctx, fc.Args["input"].(types.ExportAuditInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.ExportAuditPayload)
-	fc.Result = res
-	return ec.marshalNExportAuditPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportAuditPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_exportAudit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "url":
-				return ec.fieldContext_ExportAuditPayload_url(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ExportAuditPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_exportAudit_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -39747,33 +39585,6 @@ func (ec *executionContext) unmarshalInputEvidenceOrder(ctx context.Context, obj
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputExportAuditInput(ctx context.Context, obj any) (types.ExportAuditInput, error) {
-	var it types.ExportAuditInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"frameworkId"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "frameworkId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("frameworkId"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.FrameworkID = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputExportDocumentVersionPDFInput(ctx context.Context, obj any) (types.ExportDocumentVersionPDFInput, error) {
 	var it types.ExportDocumentVersionPDFInput
 	asMap := map[string]any{}
@@ -45560,45 +45371,6 @@ func (ec *executionContext) _EvidenceEdge(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var exportAuditPayloadImplementors = []string{"ExportAuditPayload"}
-
-func (ec *executionContext) _ExportAuditPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ExportAuditPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, exportAuditPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ExportAuditPayload")
-		case "url":
-			out.Values[i] = ec._ExportAuditPayload_url(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var exportDocumentVersionPDFPayloadImplementors = []string{"ExportDocumentVersionPDFPayload"}
 
 func (ec *executionContext) _ExportDocumentVersionPDFPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ExportDocumentVersionPDFPayload) graphql.Marshaler {
@@ -45982,8 +45754,8 @@ func (ec *executionContext) _GenerateFrameworkStateOfApplicabilityPayload(ctx co
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("GenerateFrameworkStateOfApplicabilityPayload")
-		case "downloadUrl":
-			out.Values[i] = ec._GenerateFrameworkStateOfApplicabilityPayload_downloadUrl(ctx, field, obj)
+		case "data":
+			out.Values[i] = ec._GenerateFrameworkStateOfApplicabilityPayload_data(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -46899,13 +46671,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createVendorRiskAssessment":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createVendorRiskAssessment(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "exportAudit":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_exportAudit(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -52910,25 +52675,6 @@ var (
 		coredata.EvidenceTypeLink: "LINK",
 	}
 )
-
-func (ec *executionContext) unmarshalNExportAuditInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportAuditInput(ctx context.Context, v any) (types.ExportAuditInput, error) {
-	res, err := ec.unmarshalInputExportAuditInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNExportAuditPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportAuditPayload(ctx context.Context, sel ast.SelectionSet, v types.ExportAuditPayload) graphql.Marshaler {
-	return ec._ExportAuditPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNExportAuditPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportAuditPayload(ctx context.Context, sel ast.SelectionSet, v *types.ExportAuditPayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ExportAuditPayload(ctx, sel, v)
-}
 
 func (ec *executionContext) unmarshalNExportDocumentVersionPDFInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportDocumentVersionPDFInput(ctx context.Context, v any) (types.ExportDocumentVersionPDFInput, error) {
 	res, err := ec.unmarshalInputExportDocumentVersionPDFInput(ctx, v)

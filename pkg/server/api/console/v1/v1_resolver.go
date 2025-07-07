@@ -1189,7 +1189,10 @@ func (r *mutationResolver) GenerateFrameworkStateOfApplicability(ctx context.Con
 	}
 
 	return &types.GenerateFrameworkStateOfApplicabilityPayload{
-		DownloadURL: soa,
+		Data: fmt.Sprintf(
+			"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,%s",
+			base64.StdEncoding.EncodeToString(soa),
+		),
 	}, nil
 }
 
@@ -2048,19 +2051,6 @@ func (r *mutationResolver) CreateVendorRiskAssessment(ctx context.Context, input
 
 	return &types.CreateVendorRiskAssessmentPayload{
 		VendorRiskAssessmentEdge: types.NewVendorRiskAssessmentEdge(vendorRiskAssessment, coredata.VendorRiskAssessmentOrderFieldCreatedAt),
-	}, nil
-}
-
-// ExportAudit is the resolver for the exportAudit field.
-func (r *mutationResolver) ExportAudit(ctx context.Context, input types.ExportAuditInput) (*types.ExportAuditPayload, error) {
-	prb := r.ProboService(ctx, input.FrameworkID.TenantID())
-	fileUrl, err := prb.Frameworks.ExportAudit(ctx, input.FrameworkID)
-	if err != nil {
-		panic(fmt.Errorf("cannot export audit: %w", err))
-	}
-
-	return &types.ExportAuditPayload{
-		URL: fileUrl,
 	}, nil
 }
 

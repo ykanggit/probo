@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<bcdaed0c84805f387ee7d1de8ece0068>>
+ * @generated SignedSource<<b7c54e98eb3ba12bf4619530b45fdbab>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,7 +14,7 @@ export type FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation$var
 };
 export type FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation$data = {
   readonly generateFrameworkStateOfApplicability: {
-    readonly downloadUrl: string;
+    readonly data: string;
   };
 };
 export type FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation = {
@@ -55,7 +55,7 @@ v1 = [
         "alias": null,
         "args": null,
         "kind": "ScalarField",
-        "name": "downloadUrl",
+        "name": "data",
         "storageKey": null
       }
     ],
@@ -80,16 +80,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "338cbffe84fb19cdf46c97b739216342",
+    "cacheID": "80185d474f3a9c5d20f97a387b219511",
     "id": null,
     "metadata": {},
     "name": "FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation",
     "operationKind": "mutation",
-    "text": "mutation FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation(\n  $frameworkId: ID!\n) {\n  generateFrameworkStateOfApplicability(input: {frameworkId: $frameworkId}) {\n    downloadUrl\n  }\n}\n"
+    "text": "mutation FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation(\n  $frameworkId: ID!\n) {\n  generateFrameworkStateOfApplicability(input: {frameworkId: $frameworkId}) {\n    data\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "f5c0a7d2bebedecc3de7d55d52f06cd8";
+(node as any).hash = "eac70164d676cb8e19d7fe7f06b2b817";
 
 export default node;

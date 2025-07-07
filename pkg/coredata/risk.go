@@ -418,3 +418,45 @@ DELETE FROM risks WHERE %s AND id = @id
 	_, err := conn.Exec(ctx, q, args)
 	return err
 }
+
+func (r *Risks) CountByDocumentID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	documentID gid.GID,
+	filter *RiskFilter,
+) (int, error) {
+	q := `
+WITH rsks AS (
+	SELECT
+		r.id,
+		r.tenant_id
+	FROM
+		risks r
+	INNER JOIN
+		risks_documents rd ON r.id = rd.risk_id
+	WHERE
+		rd.document_id = @document_id
+)
+SELECT
+	COUNT(id)
+FROM
+	rsks
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"document_id": documentID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
