@@ -23,6 +23,11 @@ type (
 		html2pdfConverter *html2pdf.Converter
 	}
 
+	ErrSignatureNotCancellable struct {
+		currentState  coredata.DocumentVersionSignatureState
+		expectedState coredata.DocumentVersionSignatureState
+	}
+
 	CreateDocumentRequest struct {
 		OrganizationID gid.GID
 		Title          string
@@ -52,6 +57,11 @@ type (
 const (
 	TokenTypeSigningRequest = "signing_request"
 )
+
+func (e ErrSignatureNotCancellable) Error() string {
+	return fmt.Sprintf("cannot cancel signature request: signature is in state %v, expected %v",
+		e.currentState, e.expectedState)
+}
 
 func (s *DocumentService) Get(
 	ctx context.Context,
@@ -878,7 +888,10 @@ func (s *DocumentService) CancelSignatureRequest(
 			}
 
 			if documentVersionSignature.State != coredata.DocumentVersionSignatureStateRequested {
-				return fmt.Errorf("cannot cancel signature request: %w", err)
+				return ErrSignatureNotCancellable{
+					currentState:  documentVersionSignature.State,
+					expectedState: coredata.DocumentVersionSignatureStateRequested,
+				}
 			}
 
 			if err := documentVersionSignature.Delete(ctx, tx, s.svc.scope, documentVersionSignatureID); err != nil {
