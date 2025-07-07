@@ -26,10 +26,7 @@ import { Navigate, Outlet, useNavigate, useParams } from "react-router";
 import { useOrganizationId } from "/hooks/useOrganizationId";
 import type { FrameworkGraphNodeQuery } from "/hooks/graph/__generated__/FrameworkGraphNodeQuery.graphql";
 import type { FrameworkDetailPageFragment$key } from "./__generated__/FrameworkDetailPageFragment.graphql";
-import type {
-  FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation,
-  FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation$data,
-} from "./__generated__/FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation.graphql";
+import type { FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation } from "./__generated__/FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation.graphql";
 import { FrameworkFormDialog } from "./dialogs/FrameworkFormDialog";
 import { FrameworkControlDialog } from "./dialogs/FrameworkControlDialog";
 import { useMutationWithToasts } from "/hooks/useMutationWithToasts";
@@ -59,7 +56,7 @@ const generateFrameworkStateOfApplicabilityMutation = graphql`
     generateFrameworkStateOfApplicability(
       input: { frameworkId: $frameworkId }
     ) {
-      downloadUrl
+      data
     }
   }
 `;
@@ -139,17 +136,14 @@ export default function FrameworkDetailPage(props: Props) {
             onClick={() => {
               generateFrameworkStateOfApplicability({
                 variables: { frameworkId: framework.id },
-                onCompleted: (
-                  data: FrameworkDetailPageGenerateFrameworkStateOfApplicabilityMutation$data
-                ) => {
-                  if (data.generateFrameworkStateOfApplicability.downloadUrl) {
-                    const link = document.createElement("a");
-                    link.href =
-                      data.generateFrameworkStateOfApplicability.downloadUrl;
-                    link.download = `${framework.name}-SOA.pdf`; // You can adjust the filename as needed
-                    document.body.appendChild(link);
+                onCompleted: (data) => {
+                  if (data.generateFrameworkStateOfApplicability?.data) {
+                    const link = window.document.createElement("a");
+                    link.href = data.generateFrameworkStateOfApplicability.data;
+                    link.download = `${framework.name}-SOA.xlsx`;
+                    window.document.body.appendChild(link);
                     link.click();
-                    document.body.removeChild(link);
+                    window.document.body.removeChild(link);
                   }
                 },
               });

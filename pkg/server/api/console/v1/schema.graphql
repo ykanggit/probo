@@ -1432,8 +1432,6 @@ type Mutation {
     input: CreateVendorRiskAssessmentInput!
   ): CreateVendorRiskAssessmentPayload!
 
-  exportAudit(input: ExportAuditInput!): ExportAuditPayload!
-
   assessVendor(input: AssessVendorInput!): AssessVendorPayload!
 
   createAsset(input: CreateAssetInput!): CreateAssetPayload!
@@ -1451,7 +1449,7 @@ input GenerateFrameworkStateOfApplicabilityInput {
 }
 
 type GenerateFrameworkStateOfApplicabilityPayload {
-  downloadUrl: String!
+  data: String!
 }
 
 input CreateOrganizationInput {
@@ -2237,14 +2235,6 @@ input UploadTaskEvidenceInput {
 input UploadMeasureEvidenceInput {
   measureId: ID!
   file: Upload!
-}
-
-input ExportAuditInput {
-  frameworkId: ID!
-}
-
-type ExportAuditPayload {
-  url: String!
 }
 
 input GenerateDocumentChangelogInput {

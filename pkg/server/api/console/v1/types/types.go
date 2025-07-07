@@ -649,14 +649,6 @@ type EvidenceEdge struct {
 	Node   *Evidence      `json:"node"`
 }
 
-type ExportAuditInput struct {
-	FrameworkID gid.GID `json:"frameworkId"`
-}
-
-type ExportAuditPayload struct {
-	URL string `json:"url"`
-}
-
 type ExportDocumentVersionPDFInput struct {
 	DocumentVersionID gid.GID `json:"documentVersionId"`
 }
@@ -717,7 +709,7 @@ type GenerateFrameworkStateOfApplicabilityInput struct {
 }
 
 type GenerateFrameworkStateOfApplicabilityPayload struct {
-	DownloadURL string `json:"downloadUrl"`
+	Data string `json:"data"`
 }
 
 type ImportFrameworkInput struct {
