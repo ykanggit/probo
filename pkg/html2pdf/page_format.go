@@ -12,31 +12,11 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package coredata
+package html2pdf
 
-type (
-	DocumentOrderField string
-)
+type PageFormat string
 
 const (
-	DocumentOrderFieldCreatedAt    DocumentOrderField = "CREATED_AT"
-	DocumentOrderFieldTitle        DocumentOrderField = "TITLE"
-	DocumentOrderFieldDocumentType DocumentOrderField = "DOCUMENT_TYPE"
+	PageFormatA4     PageFormat = "A4"
+	PageFormatLetter PageFormat = "Letter"
 )
-
-func (p DocumentOrderField) Column() string {
-	return string(p)
-}
-
-func (p DocumentOrderField) String() string {
-	return string(p)
-}
-
-func (p DocumentOrderField) MarshalText() ([]byte, error) {
-	return []byte(p.String()), nil
-}
-
-func (p *DocumentOrderField) UnmarshalText(text []byte) error {
-	*p = DocumentOrderField(text)
-	return nil
-}

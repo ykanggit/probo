@@ -74,6 +74,7 @@ services:
     volumes:
       - "./compose/tempo/tempo.yaml:/etc/tempo.yaml:ro"
       - "tempo-data:/var/tempo:rw"
+
   mailhog:
     image: "mailhog/mailhog:latest"
     platform: linux/amd64 
@@ -82,6 +83,22 @@ services:
       - "8025:8025" # Web UI
     environment:
       - MH_STORAGE=memory
+
+  chrome:
+    image: "chromedp/headless-shell:140.0.7259.2"
+    ports:
+      - "9222:9222"
+    command:
+      - "--headless"
+      - "--disable-gpu"
+      - "--disable-dev-shm-usage"
+      - "--hide-scrollbars"
+      - "--mute-audio"
+      - "--no-default-browser-check"
+      - "--no-first-run"
+      - "--disable-background-networking"
+      - "--disable-background-timer-throttling"
+      - "--disable-extensions"
 
 volumes:
   postgres-data:

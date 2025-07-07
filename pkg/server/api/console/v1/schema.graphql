@@ -213,6 +213,10 @@ enum DocumentOrderField
     @goEnum(
       value: "github.com/getprobo/probo/pkg/coredata.DocumentOrderFieldCreatedAt"
     )
+  DOCUMENT_TYPE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.DocumentOrderFieldDocumentType"
+    )
 }
 
 enum RiskOrderField
@@ -1402,6 +1406,12 @@ type Mutation {
   sendSigningNotifications(
     input: SendSigningNotificationsInput!
   ): SendSigningNotificationsPayload!
+  cancelSignatureRequest(
+    input: CancelSignatureRequestInput!
+  ): CancelSignatureRequestPayload!
+  exportDocumentVersionPDF(
+    input: ExportDocumentVersionPDFInput!
+  ): ExportDocumentVersionPDFPayload!
 
   createVendorRiskAssessment(
     input: CreateVendorRiskAssessmentInput!
@@ -1724,6 +1734,10 @@ input UpdateDocumentInput {
   documentType: DocumentType
 }
 
+input ExportDocumentVersionPDFInput {
+  documentVersionId: ID!
+}
+
 input DeleteDocumentInput {
   documentId: ID!
 }
@@ -1939,6 +1953,10 @@ type CreateDocumentPayload {
   documentVersionEdge: DocumentVersionEdge!
 }
 
+type ExportDocumentVersionPDFPayload {
+  data: String!
+}
+
 type UpdateDocumentPayload {
   document: Document!
 }
@@ -2127,6 +2145,10 @@ input UpdateDocumentVersionInput {
   content: String!
 }
 
+input CancelSignatureRequestInput {
+  documentVersionSignatureId: ID!
+}
+
 type UpdateDocumentVersionPayload {
   documentVersion: DocumentVersion!
 }
@@ -2137,6 +2159,10 @@ input SendSigningNotificationsInput {
 
 type SendSigningNotificationsPayload {
   success: Boolean!
+}
+
+type CancelSignatureRequestPayload {
+  deletedDocumentVersionSignatureId: ID!
 }
 
 type UploadTaskEvidencePayload {
