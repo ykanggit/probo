@@ -864,6 +864,24 @@ func (s *DocumentService) Update(
 	return document, nil
 }
 
+func (s *DocumentService) CancelSignatureRequest(
+	ctx context.Context,
+	documentVersionSignatureID gid.GID,
+) error {
+	documentVersionSignature := &coredata.DocumentVersionSignature{}
+
+	return s.svc.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			if err := documentVersionSignature.Delete(ctx, tx, s.svc.scope, documentVersionSignatureID); err != nil {
+				return fmt.Errorf("cannot delete document version signature: %w", err)
+			}
+
+			return nil
+		},
+	)
+}
+
 func (s *DocumentService) ExportPDF(
 	ctx context.Context,
 	documentVersionID gid.GID,

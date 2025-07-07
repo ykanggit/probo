@@ -56,6 +56,14 @@ type AssignTaskPayload struct {
 	Task *Task `json:"task"`
 }
 
+type CancelSignatureRequestInput struct {
+	DocumentVersionSignatureID gid.GID `json:"documentVersionSignatureId"`
+}
+
+type CancelSignatureRequestPayload struct {
+	DeletedDocumentVersionSignatureID gid.GID `json:"deletedDocumentVersionSignatureId"`
+}
+
 type ConfirmEmailInput struct {
 	Token string `json:"token"`
 }

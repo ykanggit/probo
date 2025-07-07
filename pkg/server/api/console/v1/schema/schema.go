@@ -111,6 +111,10 @@ type ComplexityRoot struct {
 		Task func(childComplexity int) int
 	}
 
+	CancelSignatureRequestPayload struct {
+		DeletedDocumentVersionSignatureID func(childComplexity int) int
+	}
+
 	ConfirmEmailPayload struct {
 		Success func(childComplexity int) int
 	}
@@ -504,6 +508,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AssessVendor                          func(childComplexity int, input types.AssessVendorInput) int
 		AssignTask                            func(childComplexity int, input types.AssignTaskInput) int
+		CancelSignatureRequest                func(childComplexity int, input types.CancelSignatureRequestInput) int
 		ConfirmEmail                          func(childComplexity int, input types.ConfirmEmailInput) int
 		CreateAsset                           func(childComplexity int, input types.CreateAssetInput) int
 		CreateControl                         func(childComplexity int, input types.CreateControlInput) int
@@ -1024,6 +1029,7 @@ type MutationResolver interface {
 	UpdateDocumentVersion(ctx context.Context, input types.UpdateDocumentVersionInput) (*types.UpdateDocumentVersionPayload, error)
 	RequestSignature(ctx context.Context, input types.RequestSignatureInput) (*types.RequestSignaturePayload, error)
 	SendSigningNotifications(ctx context.Context, input types.SendSigningNotificationsInput) (*types.SendSigningNotificationsPayload, error)
+	CancelSignatureRequest(ctx context.Context, input types.CancelSignatureRequestInput) (*types.CancelSignatureRequestPayload, error)
 	ExportDocumentVersionPDF(ctx context.Context, input types.ExportDocumentVersionPDFInput) (*types.ExportDocumentVersionPDFPayload, error)
 	CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error)
 	ExportAudit(ctx context.Context, input types.ExportAuditInput) (*types.ExportAuditPayload, error)
@@ -1252,6 +1258,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.AssignTaskPayload.Task(childComplexity), true
+
+	case "CancelSignatureRequestPayload.deletedDocumentVersionSignatureId":
+		if e.complexity.CancelSignatureRequestPayload.DeletedDocumentVersionSignatureID == nil {
+			break
+		}
+
+		return e.complexity.CancelSignatureRequestPayload.DeletedDocumentVersionSignatureID(childComplexity), true
 
 	case "ConfirmEmailPayload.success":
 		if e.complexity.ConfirmEmailPayload.Success == nil {
@@ -2591,6 +2604,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.AssignTask(childComplexity, args["input"].(types.AssignTaskInput)), true
+
+	case "Mutation.cancelSignatureRequest":
+		if e.complexity.Mutation.CancelSignatureRequest == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_cancelSignatureRequest_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CancelSignatureRequest(childComplexity, args["input"].(types.CancelSignatureRequestInput)), true
 
 	case "Mutation.confirmEmail":
 		if e.complexity.Mutation.ConfirmEmail == nil {
@@ -4696,6 +4721,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAssessVendorInput,
 		ec.unmarshalInputAssetOrder,
 		ec.unmarshalInputAssignTaskInput,
+		ec.unmarshalInputCancelSignatureRequestInput,
 		ec.unmarshalInputConfirmEmailInput,
 		ec.unmarshalInputConnectorOrder,
 		ec.unmarshalInputControlFilter,
@@ -6278,6 +6304,9 @@ type Mutation {
   sendSigningNotifications(
     input: SendSigningNotificationsInput!
   ): SendSigningNotificationsPayload!
+  cancelSignatureRequest(
+    input: CancelSignatureRequestInput!
+  ): CancelSignatureRequestPayload!
   exportDocumentVersionPDF(
     input: ExportDocumentVersionPDFInput!
   ): ExportDocumentVersionPDFPayload!
@@ -7000,6 +7029,10 @@ input UpdateDocumentVersionInput {
   content: String!
 }
 
+input CancelSignatureRequestInput {
+  documentVersionSignatureId: ID!
+}
+
 type UpdateDocumentVersionPayload {
   documentVersion: DocumentVersion!
 }
@@ -7010,6 +7043,10 @@ input SendSigningNotificationsInput {
 
 type SendSigningNotificationsPayload {
   success: Boolean!
+}
+
+type CancelSignatureRequestPayload {
+  deletedDocumentVersionSignatureId: ID!
 }
 
 type UploadTaskEvidencePayload {
@@ -8508,6 +8545,29 @@ func (ec *executionContext) field_Mutation_assignTask_argsInput(
 	}
 
 	var zeroVal types.AssignTaskInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_cancelSignatureRequest_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_cancelSignatureRequest_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_cancelSignatureRequest_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CancelSignatureRequestInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCancelSignatureRequestInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCancelSignatureRequestInput(ctx, tmp)
+	}
+
+	var zeroVal types.CancelSignatureRequestInput
 	return zeroVal, nil
 }
 
@@ -13040,6 +13100,50 @@ func (ec *executionContext) fieldContext_AssignTaskPayload_task(_ context.Contex
 				return ec.fieldContext_Task_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CancelSignatureRequestPayload_deletedDocumentVersionSignatureId(ctx context.Context, field graphql.CollectedField, obj *types.CancelSignatureRequestPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CancelSignatureRequestPayload_deletedDocumentVersionSignatureId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedDocumentVersionSignatureID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CancelSignatureRequestPayload_deletedDocumentVersionSignatureId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CancelSignatureRequestPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -25262,6 +25366,65 @@ func (ec *executionContext) fieldContext_Mutation_sendSigningNotifications(ctx c
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_cancelSignatureRequest(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_cancelSignatureRequest(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CancelSignatureRequest(rctx, fc.Args["input"].(types.CancelSignatureRequestInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CancelSignatureRequestPayload)
+	fc.Result = res
+	return ec.marshalNCancelSignatureRequestPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCancelSignatureRequestPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_cancelSignatureRequest(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedDocumentVersionSignatureId":
+				return ec.fieldContext_CancelSignatureRequestPayload_deletedDocumentVersionSignatureId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CancelSignatureRequestPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_cancelSignatureRequest_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_exportDocumentVersionPDF(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_exportDocumentVersionPDF(ctx, field)
 	if err != nil {
@@ -37246,6 +37409,33 @@ func (ec *executionContext) unmarshalInputAssignTaskInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCancelSignatureRequestInput(ctx context.Context, obj any) (types.CancelSignatureRequestInput, error) {
+	var it types.CancelSignatureRequestInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"documentVersionSignatureId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "documentVersionSignatureId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentVersionSignatureId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DocumentVersionSignatureID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputConfirmEmailInput(ctx context.Context, obj any) (types.ConfirmEmailInput, error) {
 	var it types.ConfirmEmailInput
 	asMap := map[string]any{}
@@ -41406,6 +41596,45 @@ func (ec *executionContext) _AssignTaskPayload(ctx context.Context, sel ast.Sele
 			out.Values[i] = graphql.MarshalString("AssignTaskPayload")
 		case "task":
 			out.Values[i] = ec._AssignTaskPayload_task(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var cancelSignatureRequestPayloadImplementors = []string{"CancelSignatureRequestPayload"}
+
+func (ec *executionContext) _CancelSignatureRequestPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CancelSignatureRequestPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cancelSignatureRequestPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CancelSignatureRequestPayload")
+		case "deletedDocumentVersionSignatureId":
+			out.Values[i] = ec._CancelSignatureRequestPayload_deletedDocumentVersionSignatureId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -46087,6 +46316,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "cancelSignatureRequest":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_cancelSignatureRequest(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "exportDocumentVersionPDF":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_exportDocumentVersionPDF(ctx, field)
@@ -50392,6 +50628,25 @@ var (
 		coredata.BusinessImpactCritical: "CRITICAL",
 	}
 )
+
+func (ec *executionContext) unmarshalNCancelSignatureRequestInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCancelSignatureRequestInput(ctx context.Context, v any) (types.CancelSignatureRequestInput, error) {
+	res, err := ec.unmarshalInputCancelSignatureRequestInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCancelSignatureRequestPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCancelSignatureRequestPayload(ctx context.Context, sel ast.SelectionSet, v types.CancelSignatureRequestPayload) graphql.Marshaler {
+	return ec._CancelSignatureRequestPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCancelSignatureRequestPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCancelSignatureRequestPayload(ctx context.Context, sel ast.SelectionSet, v *types.CancelSignatureRequestPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CancelSignatureRequestPayload(ctx, sel, v)
+}
 
 func (ec *executionContext) unmarshalNConfirmEmailInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐConfirmEmailInput(ctx context.Context, v any) (types.ConfirmEmailInput, error) {
 	res, err := ec.unmarshalInputConfirmEmailInput(ctx, v)
