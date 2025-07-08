@@ -115,6 +115,9 @@ export default function MeasuresPage(props: Props) {
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   
+  // Multi-select state for table view
+  const [selectedMeasures, setSelectedMeasures] = useState<Set<string>>(new Set());
+  
   const [importMeasures] = useMutationWithToasts<MeasuresPageImportMutation>(
     importMeasuresMutation,
     {
@@ -122,6 +125,8 @@ export default function MeasuresPage(props: Props) {
       errorMessage: __("Failed to import measures. Please try again."),
     }
   );
+  const [deleteMeasure] = useDeleteMeasureMutation();
+  const confirm = useConfirm();
   const importFileRef = useRef<HTMLInputElement>(null);
   usePageTitle(__("Measures"));
 
@@ -192,6 +197,72 @@ export default function MeasuresPage(props: Props) {
     return sortDirection === 'asc' ? '↑' : '↓';
   };
 
+  // Multi-select handlers
+  const handleSelectAll = () => {
+    if (selectedMeasures.size === sortedMeasures.length) {
+      setSelectedMeasures(new Set());
+    } else {
+      setSelectedMeasures(new Set(sortedMeasures.map(m => m.id)));
+    }
+  };
+
+  const handleSelectMeasure = (measureId: string) => {
+    const newSelected = new Set(selectedMeasures);
+    if (newSelected.has(measureId)) {
+      newSelected.delete(measureId);
+    } else {
+      newSelected.add(measureId);
+    }
+    setSelectedMeasures(newSelected);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedMeasures.size === 0) return;
+    
+    confirm(
+      () =>
+        new Promise<void>((resolve) => {
+          // Delete each selected measure
+          const deletePromises = Array.from(selectedMeasures).map(measureId => {
+            return new Promise<void>((resolveDelete) => {
+              deleteMeasure({
+                variables: {
+                  input: { measureId },
+                  connections: [connectionId],
+                },
+                onCompleted: () => resolveDelete(),
+                onError: () => resolveDelete(), // Continue even if one fails
+              });
+            });
+          });
+          
+          Promise.all(deletePromises).then(() => {
+            setSelectedMeasures(new Set());
+            resolve();
+          });
+        }),
+      {
+        message: sprintf(
+          __('This will permanently delete %s selected measures. This action cannot be undone.'),
+          selectedMeasures.size
+        ),
+      }
+    );
+  };
+
+  const handleDeleteMeasure = (measureId: string) => {
+    return new Promise<void>((resolve) => {
+      deleteMeasure({
+        variables: {
+          input: { measureId },
+          connections: [connectionId],
+        },
+        onCompleted: () => resolve(),
+        onError: () => resolve(),
+      });
+    });
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -201,30 +272,20 @@ export default function MeasuresPage(props: Props) {
         )}
       >
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-secondary rounded-full p-1">
-            <button
-              className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all ${
-                viewMode === 'categories'
-                  ? 'bg-primary text-invert shadow-sm'
-                  : 'text-txt-secondary hover:text-txt-primary'
-              }`}
-              onClick={() => setViewMode('categories')}
-            >
-              <IconDotGrid1x3Horizontal size={16} />
-              {__("Categories")}
-            </button>
-            <button
-              className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all ${
-                viewMode === 'table'
-                  ? 'bg-primary text-invert shadow-sm'
-                  : 'text-txt-secondary hover:text-txt-primary'
-              }`}
-              onClick={() => setViewMode('table')}
-            >
-              <IconListStack size={16} />
-              {__("Table")}
-            </button>
-          </div>
+          <Button
+            variant={viewMode === 'categories' ? 'primary' : 'secondary'}
+            icon={IconDotGrid1x3Horizontal}
+            onClick={() => setViewMode('categories')}
+          >
+            {__("Categories")}
+          </Button>
+          <Button
+            variant={viewMode === 'table' ? 'primary' : 'secondary'}
+            icon={IconListStack}
+            onClick={() => setViewMode('table')}
+          >
+            {__("Table")}
+          </Button>
         </div>
         <FileButton
           ref={importFileRef}
@@ -258,9 +319,35 @@ export default function MeasuresPage(props: Props) {
       ) : (
         // Table view
         <Card className="p-0">
+          {selectedMeasures.size > 0 && (
+            <div className="flex items-center justify-between p-4 bg-highlight border-b border-border-low">
+              <span className="text-sm text-txt-primary">
+                {sprintf(__("%s measures selected"), selectedMeasures.size)}
+              </span>
+              <Button
+                variant="danger"
+                icon={IconTrashCan}
+                onClick={handleBulkDelete}
+              >
+                {sprintf(__("Delete %s measures"), selectedMeasures.size)}
+              </Button>
+            </div>
+          )}
           <Table>
             <Thead>
               <Tr>
+                <Th width={50}>
+                  <input
+                    type="checkbox"
+                    checked={selectedMeasures.size === sortedMeasures.length && sortedMeasures.length > 0}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleSelectAll();
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="rounded border-border-low"
+                  />
+                </Th>
                 <Th>
                   <button
                     className="flex items-center gap-1 hover:text-txt-primary transition-colors"
@@ -298,6 +385,9 @@ export default function MeasuresPage(props: Props) {
                   measure={measure}
                   connectionId={connectionId}
                   showCategory={true}
+                  isSelected={selectedMeasures.has(measure.id)}
+                  onSelect={() => handleSelectMeasure(measure.id)}
+                  onDelete={handleDeleteMeasure}
                 />
               ))}
             </Tbody>
@@ -388,25 +478,24 @@ type MeasureRowProps = {
   measure: NodeOf<MeasuresPageFragment$data["measures"]>;
   connectionId: string;
   showCategory?: boolean;
+  isSelected?: boolean;
+  onSelect?: (measureId: string) => void;
+  onDelete?: (measureId: string) => void;
 };
 
 function MeasureRow(props: MeasureRowProps) {
   const { __ } = useTranslate();
-  const [deleteMeasure, isDeleting] = useDeleteMeasureMutation();
   const confirm = useConfirm();
   const organizationId = useOrganizationId();
 
   const onDelete = () => {
+    if (!props.onDelete) return;
+    
     confirm(
       () =>
         new Promise<void>((resolve) => {
-          deleteMeasure({
-            variables: {
-              input: { measureId: props.measure.id },
-              connections: [props.connectionId],
-            },
-            onCompleted: () => resolve(),
-          });
+          props.onDelete!(props.measure.id);
+          resolve();
         }),
       {
         message: sprintf(
@@ -425,6 +514,20 @@ function MeasureRow(props: MeasureRowProps) {
     <>
       <MeasureFormDialog measure={props.measure} ref={dialogRef} />
       <Tr to={`/organizations/${organizationId}/measures/${props.measure.id}`}>
+        {props.showCategory && (
+          <Td>
+            <input
+              type="checkbox"
+              checked={props.isSelected}
+              onChange={(e) => {
+                e.stopPropagation();
+                props.onSelect?.(props.measure.id);
+              }}
+              onClick={(e) => e.stopPropagation()}
+              className="rounded border-border-low"
+            />
+          </Td>
+        )}
         <Td>{props.measure.name}</Td>
         {props.showCategory && (
           <Td>{props.measure.category}</Td>
@@ -442,7 +545,7 @@ function MeasureRow(props: MeasureRowProps) {
             </DropdownItem>
             <DropdownItem
               onClick={onDelete}
-              disabled={isDeleting}
+              disabled={false}
               variant="danger"
               icon={IconTrashCan}
             >
