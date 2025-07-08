@@ -3,6 +3,8 @@ NPX?=	npx
 PRETTIER?=	$(NPX) prettier
 GO?=	go
 DOCKER?=	docker
+SYFT ?= syft
+GRYPE ?= grype
 
 DOCKER_BUILD_FLAGS?=
 DOCKER_BUILD=	DOCKER_BUILDKIT=1 $(DOCKER) build $(DOCKER_BUILD_FLAGS)
@@ -34,6 +36,35 @@ vet:
 
 .PHONY: build
 build: @probo/console bin/probod
+
+.PHONY: sbom-docker
+sbom-docker: docker-build
+	$(SYFT) docker:$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME) -o cyclonedx-json \
+		--source-name "$(DOCKER_IMAGE_NAME)" \
+		--source-version "$(DOCKER_TAG_NAME)" \
+		> sbom-docker.json
+
+.PHONY: sbom
+sbom:
+	$(SYFT) dir:. -o cyclonedx-json \
+		--source-name "probo" \
+		--source-version "$(VERSION)" \
+		> sbom.json
+
+.PHONY: scan-sbom
+scan-sbom: sbom
+	$(GRYPE) sbom:sbom.json --fail-on high
+
+.PHONY: scan-sbom-docker
+scan-sbom-docker: sbom-docker
+	$(GRYPE) sbom:sbom-docker.json --fail-on high
+
+.PHONY: scan-docker
+scan-docker: docker-build
+	$(GRYPE) docker:$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME) --fail-on high
+
+.PHONY: scan
+scan: scan-sbom scan-sbom-docker scan-docker
 
 .PHONY: docker-build
 docker-build:
@@ -74,6 +105,7 @@ clean: ## Clean the project (node_modules and build artifacts)
 	$(RM) -rf bin/*
 	$(RM) -rf node_modules
 	$(RM) -rf apps/console/{dist,node_modules}
+	$(RM) -rf sbom-docker.json sbom.json
 
 .PHONY: stack-up
 stack-up: ## Start the docker stack as a deamon
