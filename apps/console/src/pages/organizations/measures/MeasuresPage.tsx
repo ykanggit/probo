@@ -17,6 +17,8 @@ import {
   IconPencil,
   IconPlusLarge,
   IconTrashCan,
+  IconListStack,
+  IconDotGrid1x3Horizontal,
   MeasureBadge,
   MeasureImplementation,
   PageHeader,
@@ -51,6 +53,9 @@ import { usePageTitle } from "@probo/hooks";
 type Props = {
   queryRef: PreloadedQuery<MeasureGraphListQuery>;
 };
+
+type SortField = 'name' | 'category' | 'state';
+type SortDirection = 'asc' | 'desc';
 
 const measuresFragment = graphql`
   fragment MeasuresPageFragment on Organization {
@@ -102,6 +107,14 @@ export default function MeasuresPage(props: Props) {
   const measuresPerCategory = useMemo(() => {
     return groupBy(measures, (measure) => measure.category);
   }, [measures]);
+  
+  // View state
+  const [viewMode, setViewMode] = useState<'categories' | 'table'>('categories');
+  
+  // Sorting state for table view
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  
   const [importMeasures] = useMutationWithToasts<MeasuresPageImportMutation>(
     importMeasuresMutation,
     {
@@ -134,6 +147,51 @@ export default function MeasuresPage(props: Props) {
     });
   };
 
+  // Sort measures for table view
+  const sortedMeasures = useMemo(() => {
+    return [...measures].sort((a, b) => {
+      let aValue: string;
+      let bValue: string;
+      
+      switch (sortField) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'category':
+          aValue = a.category.toLowerCase();
+          bValue = b.category.toLowerCase();
+          break;
+        case 'state':
+          aValue = a.state.toLowerCase();
+          bValue = b.state.toLowerCase();
+          break;
+        default:
+          return 0;
+      }
+      
+      if (sortDirection === 'asc') {
+        return aValue.localeCompare(bValue);
+      } else {
+        return bValue.localeCompare(aValue);
+      }
+    });
+  }, [measures, sortField, sortDirection]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return null;
+    return sortDirection === 'asc' ? '↑' : '↓';
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -142,6 +200,32 @@ export default function MeasuresPage(props: Props) {
           "Measures are actions taken to reduce the risk. Add them to track their implementation status."
         )}
       >
+        <div className="flex items-center gap-2">
+          <div className="flex items-center bg-secondary rounded-full p-1">
+            <button
+              className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                viewMode === 'categories'
+                  ? 'bg-primary text-invert shadow-sm'
+                  : 'text-txt-secondary hover:text-txt-primary'
+              }`}
+              onClick={() => setViewMode('categories')}
+            >
+              <IconDotGrid1x3Horizontal size={16} />
+              {__("Categories")}
+            </button>
+            <button
+              className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                viewMode === 'table'
+                  ? 'bg-primary text-invert shadow-sm'
+                  : 'text-txt-secondary hover:text-txt-primary'
+              }`}
+              onClick={() => setViewMode('table')}
+            >
+              <IconListStack size={16} />
+              {__("Table")}
+            </button>
+          </div>
+        </div>
         <FileButton
           ref={importFileRef}
           variant="secondary"
@@ -156,17 +240,70 @@ export default function MeasuresPage(props: Props) {
           </Button>
         </MeasureFormDialog>
       </PageHeader>
+      
       <MeasureImplementation measures={measures} className="my-10" />
-      {objectKeys(measuresPerCategory)
-        .sort((a, b) => a.localeCompare(b))
-        .map((category) => (
-          <Category
-            key={category}
-            category={category}
-            measures={measuresPerCategory[category]}
-            connectionId={connectionId}
-          />
-        ))}
+      
+      {viewMode === 'categories' ? (
+        // Category tiles view (existing implementation)
+        objectKeys(measuresPerCategory)
+          .sort((a, b) => a.localeCompare(b))
+          .map((category) => (
+            <Category
+              key={category}
+              category={category}
+              measures={measuresPerCategory[category]}
+              connectionId={connectionId}
+            />
+          ))
+      ) : (
+        // Table view
+        <Card className="p-0">
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>
+                  <button
+                    className="flex items-center gap-1 hover:text-txt-primary transition-colors"
+                    onClick={() => handleSort('name')}
+                  >
+                    {__("Measure")}
+                    {getSortIcon('name')}
+                  </button>
+                </Th>
+                <Th>
+                  <button
+                    className="flex items-center gap-1 hover:text-txt-primary transition-colors"
+                    onClick={() => handleSort('category')}
+                  >
+                    {__("Category")}
+                    {getSortIcon('category')}
+                  </button>
+                </Th>
+                <Th>
+                  <button
+                    className="flex items-center gap-1 hover:text-txt-primary transition-colors"
+                    onClick={() => handleSort('state')}
+                  >
+                    {__("State")}
+                    {getSortIcon('state')}
+                  </button>
+                </Th>
+                <Th width={50}></Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {sortedMeasures.map((measure) => (
+                <MeasureRow
+                  key={measure.id}
+                  measure={measure}
+                  connectionId={connectionId}
+                  showCategory={true}
+                />
+              ))}
+            </Tbody>
+          </Table>
+        </Card>
+      )}
     </div>
   );
 }
@@ -250,6 +387,7 @@ function Category(props: CategoryProps) {
 type MeasureRowProps = {
   measure: NodeOf<MeasuresPageFragment$data["measures"]>;
   connectionId: string;
+  showCategory?: boolean;
 };
 
 function MeasureRow(props: MeasureRowProps) {
@@ -288,6 +426,9 @@ function MeasureRow(props: MeasureRowProps) {
       <MeasureFormDialog measure={props.measure} ref={dialogRef} />
       <Tr to={`/organizations/${organizationId}/measures/${props.measure.id}`}>
         <Td>{props.measure.name}</Td>
+        {props.showCategory && (
+          <Td>{props.measure.category}</Td>
+        )}
         <Td width={120}>
           <MeasureBadge state={props.measure.state} />
         </Td>
