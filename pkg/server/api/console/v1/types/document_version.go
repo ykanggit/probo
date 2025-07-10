@@ -35,6 +35,16 @@ func NewDocumentVersionConnection(page *page.Page[*coredata.DocumentVersion, cor
 	}
 }
 
+func NewDocumentVersionEdges(documentVersions []*coredata.DocumentVersion, orderBy coredata.DocumentVersionOrderField) []*DocumentVersionEdge {
+	edges := make([]*DocumentVersionEdge, len(documentVersions))
+
+	for i := range edges {
+		edges[i] = NewDocumentVersionEdge(documentVersions[i], orderBy)
+	}
+
+	return edges
+}
+
 func NewDocumentVersionEdge(documentVersion *coredata.DocumentVersion, orderBy coredata.DocumentVersionOrderField) *DocumentVersionEdge {
 	return &DocumentVersionEdge{
 		Cursor: documentVersion.CursorKey(orderBy),

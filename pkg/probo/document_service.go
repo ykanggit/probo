@@ -139,61 +139,26 @@ func (s DocumentService) GenerateChangelog(
 	return changelog, nil
 }
 
-func (s *DocumentService) PublishVersion(
+func (s *DocumentService) BulkPublishVersions(
 	ctx context.Context,
-	documentID gid.GID,
+	documentIds []gid.GID,
 	publishedBy gid.GID,
-	changelog *string,
-) (*coredata.Document, *coredata.DocumentVersion, error) {
-	document := &coredata.Document{}
-	documentVersion := &coredata.DocumentVersion{}
-	publishedVersion := &coredata.DocumentVersion{}
-	now := time.Now()
+	changelog string,
+) ([]*coredata.DocumentVersion, []*coredata.Document, error) {
+	var publishedVersions []*coredata.DocumentVersion
+	var updatedDocuments []*coredata.Document
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
-			if err := document.LoadByID(ctx, tx, s.svc.scope, documentID); err != nil {
-				return fmt.Errorf("cannot load document %q: %w", documentID, err)
-			}
-
-			if err := documentVersion.LoadLatestVersion(ctx, tx, s.svc.scope, documentID); err != nil {
-				return fmt.Errorf("cannot load current draft: %w", err)
-			}
-
-			if documentVersion.Status != coredata.DocumentStatusDraft {
-				return fmt.Errorf("cannot publish version")
-			}
-
-			if document.CurrentPublishedVersion != nil {
-				if err := publishedVersion.LoadByDocumentIDAndVersionNumber(ctx, tx, s.svc.scope, documentID, *document.CurrentPublishedVersion); err != nil {
-					return fmt.Errorf("cannot load published version: %w", err)
+			for _, documentID := range documentIds {
+				document, version, err := s.publishVersionInTx(ctx, tx, documentID, publishedBy, &changelog)
+				if err != nil {
+					return fmt.Errorf("cannot publish document %q: %w", documentID, err)
 				}
-				if publishedVersion.Content == documentVersion.Content &&
-					publishedVersion.Title == documentVersion.Title &&
-					publishedVersion.OwnerID == documentVersion.OwnerID {
-					return fmt.Errorf("cannot publish version: no changes detected")
-				}
-			}
 
-			if changelog != nil {
-				documentVersion.Changelog = *changelog
-			}
-
-			document.CurrentPublishedVersion = &documentVersion.VersionNumber
-			document.UpdatedAt = now
-
-			documentVersion.Status = coredata.DocumentStatusPublished
-			documentVersion.PublishedAt = &now
-			documentVersion.PublishedBy = &publishedBy
-			documentVersion.UpdatedAt = now
-
-			if err := document.Update(ctx, tx, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot update document: %w", err)
-			}
-
-			if err := documentVersion.Update(ctx, tx, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot update document version: %w", err)
+				publishedVersions = append(publishedVersions, version)
+				updatedDocuments = append(updatedDocuments, document)
 			}
 
 			return nil
@@ -202,6 +167,96 @@ func (s *DocumentService) PublishVersion(
 
 	if err != nil {
 		return nil, nil, err
+	}
+
+	return publishedVersions, updatedDocuments, nil
+}
+
+func (s *DocumentService) PublishVersion(
+	ctx context.Context,
+	documentID gid.GID,
+	publishedBy gid.GID,
+	changelog *string,
+) (*coredata.Document, *coredata.DocumentVersion, error) {
+	var document *coredata.Document
+	var documentVersion *coredata.DocumentVersion
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			var err error
+			document, documentVersion, err = s.publishVersionInTx(ctx, tx, documentID, publishedBy, changelog)
+			return err
+		},
+	)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return document, documentVersion, nil
+}
+
+func (s *DocumentService) publishVersionInTx(
+	ctx context.Context,
+	tx pg.Conn,
+	documentID gid.GID,
+	publishedBy gid.GID,
+	changelog *string,
+) (*coredata.Document, *coredata.DocumentVersion, error) {
+	document := &coredata.Document{}
+	documentVersion := &coredata.DocumentVersion{}
+	publishedVersion := &coredata.DocumentVersion{}
+	people := &coredata.People{}
+	now := time.Now()
+
+	if err := people.LoadByID(ctx, tx, s.svc.scope, publishedBy); err != nil {
+		return nil, nil, fmt.Errorf("cannot load people: %w", err)
+	}
+
+	if err := document.LoadByID(ctx, tx, s.svc.scope, documentID); err != nil {
+		return nil, nil, fmt.Errorf("cannot load document %q: %w", documentID, err)
+	}
+
+	if err := documentVersion.LoadLatestVersion(ctx, tx, s.svc.scope, documentID); err != nil {
+		return nil, nil, fmt.Errorf("cannot load current draft: %w", err)
+	}
+
+	if documentVersion.Status != coredata.DocumentStatusDraft {
+		return nil, nil, fmt.Errorf("cannot publish version")
+	}
+
+	if document.CurrentPublishedVersion != nil {
+		if err := publishedVersion.LoadByDocumentIDAndVersionNumber(ctx, tx, s.svc.scope, documentID, *document.CurrentPublishedVersion); err != nil {
+			return nil, nil, fmt.Errorf("cannot load published version: %w", err)
+		}
+		if publishedVersion.Content == documentVersion.Content &&
+			publishedVersion.Title == documentVersion.Title &&
+			publishedVersion.OwnerID == documentVersion.OwnerID {
+			return nil, nil, fmt.Errorf("cannot publish version: no changes detected")
+		}
+	}
+
+	if changelog != nil {
+		documentVersion.Changelog = *changelog
+	}
+
+	document.CurrentPublishedVersion = &documentVersion.VersionNumber
+	document.UpdatedAt = now
+
+	documentVersion.Status = coredata.DocumentStatusPublished
+	documentVersion.PublishedAt = &now
+	if publishedBy != gid.Nil {
+		documentVersion.PublishedBy = &people.ID
+	}
+	documentVersion.UpdatedAt = now
+
+	if err := document.Update(ctx, tx, s.svc.scope); err != nil {
+		return nil, nil, fmt.Errorf("cannot update document: %w", err)
+	}
+
+	if err := documentVersion.Update(ctx, tx, s.svc.scope); err != nil {
+		return nil, nil, fmt.Errorf("cannot update document version: %w", err)
 	}
 
 	return document, documentVersion, nil

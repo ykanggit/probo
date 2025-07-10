@@ -56,6 +56,16 @@ func NewDocumentConnection(
 	}
 }
 
+func NewDocumentEdges(documents []*coredata.Document, orderBy coredata.DocumentOrderField) []*DocumentEdge {
+	edges := make([]*DocumentEdge, len(documents))
+
+	for i := range edges {
+		edges[i] = NewDocumentEdge(documents[i], orderBy)
+	}
+
+	return edges
+}
+
 func NewDocumentEdge(document *coredata.Document, orderBy coredata.DocumentOrderField) *DocumentEdge {
 	return &DocumentEdge{
 		Cursor: document.CursorKey(orderBy),

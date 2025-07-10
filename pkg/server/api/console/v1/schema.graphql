@@ -1402,6 +1402,9 @@ type Mutation {
   publishDocumentVersion(
     input: PublishDocumentVersionInput!
   ): PublishDocumentVersionPayload!
+  bulkPublishDocumentVersions(
+    input: BulkPublishDocumentVersionsInput!
+  ): BulkPublishDocumentVersionsPayload!
   generateDocumentChangelog(
     input: GenerateDocumentChangelogInput!
   ): GenerateDocumentChangelogPayload!
@@ -2151,6 +2154,16 @@ input RequestSignatureInput {
 
 type RequestSignaturePayload {
   documentVersionSignatureEdge: DocumentVersionSignatureEdge!
+}
+
+input BulkPublishDocumentVersionsInput {
+  documentIds: [ID!]!
+  changelog: String!
+}
+
+type BulkPublishDocumentVersionsPayload {
+  documentVersionEdges: [DocumentVersionEdge!]!
+  documentEdges: [DocumentEdge!]!
 }
 
 input PublishDocumentVersionInput {
