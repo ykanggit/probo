@@ -1415,6 +1415,9 @@ type Mutation {
     input: UpdateDocumentVersionInput!
   ): UpdateDocumentVersionPayload!
   requestSignature(input: RequestSignatureInput!): RequestSignaturePayload!
+  bulkRequestSignatures(
+    input: BulkRequestSignaturesInput!
+  ): BulkRequestSignaturesPayload!
   sendSigningNotifications(
     input: SendSigningNotificationsInput!
   ): SendSigningNotificationsPayload!
@@ -2152,8 +2155,17 @@ input RequestSignatureInput {
   signatoryId: ID!
 }
 
+input BulkRequestSignaturesInput {
+  documentIds: [ID!]!
+  signatoryIds: [ID!]!
+}
+
 type RequestSignaturePayload {
   documentVersionSignatureEdge: DocumentVersionSignatureEdge!
+}
+
+type BulkRequestSignaturesPayload {
+  documentVersionSignatureEdges: [DocumentVersionSignatureEdge!]!
 }
 
 input BulkPublishDocumentVersionsInput {

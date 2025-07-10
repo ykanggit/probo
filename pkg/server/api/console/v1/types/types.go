@@ -70,6 +70,15 @@ type BulkPublishDocumentVersionsPayload struct {
 	DocumentEdges        []*DocumentEdge        `json:"documentEdges"`
 }
 
+type BulkRequestSignaturesInput struct {
+	DocumentIds  []gid.GID `json:"documentIds"`
+	SignatoryIds []gid.GID `json:"signatoryIds"`
+}
+
+type BulkRequestSignaturesPayload struct {
+	DocumentVersionSignatureEdges []*DocumentVersionSignatureEdge `json:"documentVersionSignatureEdges"`
+}
+
 type CancelSignatureRequestInput struct {
 	DocumentVersionSignatureID gid.GID `json:"documentVersionSignatureId"`
 }

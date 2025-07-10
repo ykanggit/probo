@@ -35,6 +35,15 @@ func NewDocumentVersionSignatureConnection(page *page.Page[*coredata.DocumentVer
 	}
 }
 
+func NewDocumentVersionSignatureEdges(documentVersionSignatures []*coredata.DocumentVersionSignature, orderBy coredata.DocumentVersionSignatureOrderField) []*DocumentVersionSignatureEdge {
+	edges := make([]*DocumentVersionSignatureEdge, len(documentVersionSignatures))
+	for i := range edges {
+		edges[i] = NewDocumentVersionSignatureEdge(documentVersionSignatures[i], orderBy)
+	}
+
+	return edges
+}
+
 func NewDocumentVersionSignatureEdge(documentVersionSignature *coredata.DocumentVersionSignature, orderBy coredata.DocumentVersionSignatureOrderField) *DocumentVersionSignatureEdge {
 	return &DocumentVersionSignatureEdge{
 		Cursor: documentVersionSignature.CursorKey(orderBy),

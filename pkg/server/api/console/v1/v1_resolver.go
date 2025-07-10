@@ -1962,6 +1962,35 @@ func (r *mutationResolver) PublishDocumentVersion(ctx context.Context, input typ
 	}, nil
 }
 
+// BulkPublishDocumentVersions is the resolver for the bulkPublishDocumentVersions field.
+func (r *mutationResolver) BulkPublishDocumentVersions(ctx context.Context, input types.BulkPublishDocumentVersionsInput) (*types.BulkPublishDocumentVersionsPayload, error) {
+	if len(input.DocumentIds) == 0 {
+		return &types.BulkPublishDocumentVersionsPayload{
+			DocumentVersionEdges: []*types.DocumentVersionEdge{},
+			DocumentEdges:        []*types.DocumentEdge{},
+		}, nil
+	}
+
+	prb := r.ProboService(ctx, input.DocumentIds[0].TenantID())
+
+	user := UserFromContext(ctx)
+
+	people, err := prb.Peoples.GetByUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	documentVersions, documents, err := prb.Documents.BulkPublishVersions(ctx, input.DocumentIds, people.ID, input.Changelog)
+	if err != nil {
+		panic(fmt.Errorf("cannot bulk publish document versions: %w", err))
+	}
+
+	return &types.BulkPublishDocumentVersionsPayload{
+		DocumentVersionEdges: types.NewDocumentVersionEdges(documentVersions, coredata.DocumentVersionOrderFieldCreatedAt),
+		DocumentEdges:        types.NewDocumentEdges(documents, coredata.DocumentOrderFieldTitle),
+	}, nil
+}
+
 // GenerateDocumentChangelog is the resolver for the generateDocumentChangelog field.
 func (r *mutationResolver) GenerateDocumentChangelog(ctx context.Context, input types.GenerateDocumentChangelogInput) (*types.GenerateDocumentChangelogPayload, error) {
 	prb := r.ProboService(ctx, input.DocumentID.TenantID())
@@ -2041,6 +2070,40 @@ func (r *mutationResolver) RequestSignature(ctx context.Context, input types.Req
 	}, nil
 }
 
+// BulkRequestSignatures is the resolver for the bulkRequestSignatures field.
+func (r *mutationResolver) BulkRequestSignatures(ctx context.Context, input types.BulkRequestSignaturesInput) (*types.BulkRequestSignaturesPayload, error) {
+	if len(input.DocumentIds) == 0 {
+		return &types.BulkRequestSignaturesPayload{
+			DocumentVersionSignatureEdges: []*types.DocumentVersionSignatureEdge{},
+		}, nil
+	}
+
+	prb := r.ProboService(ctx, input.DocumentIds[0].TenantID())
+
+	user := UserFromContext(ctx)
+
+	people, err := prb.Peoples.GetByUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	documentVersionSignatures, err := prb.Documents.BulkRequestSignatures(
+		ctx,
+		probo.BulkRequestSignaturesRequest{
+			DocumentIDs:  input.DocumentIds,
+			SignatoryIDs: input.SignatoryIds,
+			RequestedBy:  people.ID,
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("cannot bulk request signatures: %w", err))
+	}
+
+	return &types.BulkRequestSignaturesPayload{
+		DocumentVersionSignatureEdges: types.NewDocumentVersionSignatureEdges(documentVersionSignatures, coredata.DocumentVersionSignatureOrderFieldCreatedAt),
+	}, nil
+}
+
 // SendSigningNotifications is the resolver for the sendSigningNotifications field.
 func (r *mutationResolver) SendSigningNotifications(ctx context.Context, input types.SendSigningNotificationsInput) (*types.SendSigningNotificationsPayload, error) {
 	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
@@ -2080,34 +2143,6 @@ func (r *mutationResolver) ExportDocumentVersionPDF(ctx context.Context, input t
 
 	return &types.ExportDocumentVersionPDFPayload{
 		Data: fmt.Sprintf("data:application/pdf;base64,%s", base64.StdEncoding.EncodeToString(pdf)),
-	}, nil
-}
-
-func (r *mutationResolver) BulkPublishDocumentVersions(ctx context.Context, input types.BulkPublishDocumentVersionsInput) (*types.BulkPublishDocumentVersionsPayload, error) {
-	if len(input.DocumentIds) == 0 {
-		return &types.BulkPublishDocumentVersionsPayload{
-			DocumentVersionEdges: []*types.DocumentVersionEdge{},
-			DocumentEdges:        []*types.DocumentEdge{},
-		}, nil
-	}
-
-	prb := r.ProboService(ctx, input.DocumentIds[0].TenantID())
-
-	user := UserFromContext(ctx)
-
-	people, err := prb.Peoples.GetByUserID(ctx, user.ID)
-	if err != nil {
-		panic(fmt.Errorf("cannot get people: %w", err))
-	}
-
-	documentVersions, documents, err := prb.Documents.BulkPublishVersions(ctx, input.DocumentIds, people.ID, input.Changelog)
-	if err != nil {
-		panic(fmt.Errorf("cannot bulk publish document versions: %w", err))
-	}
-
-	return &types.BulkPublishDocumentVersionsPayload{
-		DocumentVersionEdges: types.NewDocumentVersionEdges(documentVersions, coredata.DocumentVersionOrderFieldCreatedAt),
-		DocumentEdges:        types.NewDocumentEdges(documents, coredata.DocumentOrderFieldTitle),
 	}, nil
 }
 
