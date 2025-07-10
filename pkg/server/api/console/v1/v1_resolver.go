@@ -1854,7 +1854,14 @@ func (r *mutationResolver) BulkPublishDocumentVersions(ctx context.Context, inpu
 		panic(fmt.Errorf("cannot get people: %w", err))
 	}
 
-	documentVersions, documents, err := prb.Documents.BulkPublishVersions(ctx, input.DocumentIds, people.ID, input.Changelog)
+	documentVersions, documents, err := prb.Documents.BulkPublishVersions(
+		ctx,
+		probo.BulkPublishVersionsRequest{
+			DocumentIDs: input.DocumentIds,
+			PublishedBy: people.ID,
+			Changelog:   input.Changelog,
+		},
+	)
 	if err != nil {
 		panic(fmt.Errorf("cannot bulk publish document versions: %w", err))
 	}

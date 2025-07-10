@@ -58,6 +58,12 @@ type (
 		OrganizationID gid.GID `json:"organization_id"`
 		PeopleID       gid.GID `json:"people_id"`
 	}
+
+	BulkPublishVersionsRequest struct {
+		DocumentIDs []gid.GID
+		PublishedBy gid.GID
+		Changelog   string
+	}
 )
 
 const (
@@ -147,9 +153,7 @@ func (s DocumentService) GenerateChangelog(
 
 func (s *DocumentService) BulkPublishVersions(
 	ctx context.Context,
-	documentIds []gid.GID,
-	publishedBy gid.GID,
-	changelog string,
+	req BulkPublishVersionsRequest,
 ) ([]*coredata.DocumentVersion, []*coredata.Document, error) {
 	var publishedVersions []*coredata.DocumentVersion
 	var updatedDocuments []*coredata.Document
@@ -157,8 +161,13 @@ func (s *DocumentService) BulkPublishVersions(
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
-			for _, documentID := range documentIds {
-				document, version, err := s.publishVersionInTx(ctx, tx, documentID, publishedBy, &changelog)
+			people := &coredata.People{}
+			if err := people.LoadByID(ctx, tx, s.svc.scope, req.PublishedBy); err != nil {
+				return fmt.Errorf("cannot load people: %w", err)
+			}
+
+			for _, documentID := range req.DocumentIDs {
+				document, version, err := s.publishVersionInTx(ctx, tx, documentID, people, &req.Changelog)
 				if err != nil {
 					return fmt.Errorf("cannot publish document %q: %w", documentID, err)
 				}
@@ -191,8 +200,18 @@ func (s *DocumentService) PublishVersion(
 		ctx,
 		func(tx pg.Conn) error {
 			var err error
-			document, documentVersion, err = s.publishVersionInTx(ctx, tx, documentID, publishedBy, changelog)
-			return err
+
+			people := &coredata.People{}
+			if err := people.LoadByID(ctx, tx, s.svc.scope, publishedBy); err != nil {
+				return fmt.Errorf("cannot load people: %w", err)
+			}
+
+			document, documentVersion, err = s.publishVersionInTx(ctx, tx, documentID, people, changelog)
+			if err != nil {
+				return fmt.Errorf("cannot publish version: %w", err)
+			}
+
+			return nil
 		},
 	)
 
@@ -207,18 +226,13 @@ func (s *DocumentService) publishVersionInTx(
 	ctx context.Context,
 	tx pg.Conn,
 	documentID gid.GID,
-	publishedBy gid.GID,
+	publishedBy *coredata.People,
 	changelog *string,
 ) (*coredata.Document, *coredata.DocumentVersion, error) {
 	document := &coredata.Document{}
 	documentVersion := &coredata.DocumentVersion{}
 	publishedVersion := &coredata.DocumentVersion{}
-	people := &coredata.People{}
 	now := time.Now()
-
-	if err := people.LoadByID(ctx, tx, s.svc.scope, publishedBy); err != nil {
-		return nil, nil, fmt.Errorf("cannot load people: %w", err)
-	}
 
 	if err := document.LoadByID(ctx, tx, s.svc.scope, documentID); err != nil {
 		return nil, nil, fmt.Errorf("cannot load document %q: %w", documentID, err)
@@ -252,9 +266,7 @@ func (s *DocumentService) publishVersionInTx(
 
 	documentVersion.Status = coredata.DocumentStatusPublished
 	documentVersion.PublishedAt = &now
-	if publishedBy != gid.Nil {
-		documentVersion.PublishedBy = &people.ID
-	}
+	documentVersion.PublishedBy = &publishedBy.ID
 	documentVersion.UpdatedAt = now
 
 	if err := document.Update(ctx, tx, s.svc.scope); err != nil {
