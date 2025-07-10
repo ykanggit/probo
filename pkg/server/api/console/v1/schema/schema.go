@@ -116,6 +116,10 @@ type ComplexityRoot struct {
 		DocumentVersionEdges func(childComplexity int) int
 	}
 
+	BulkRequestSignaturesPayload struct {
+		DocumentVersionSignatureEdges func(childComplexity int) int
+	}
+
 	CancelSignatureRequestPayload struct {
 		DeletedDocumentVersionSignatureID func(childComplexity int) int
 	}
@@ -514,6 +518,7 @@ type ComplexityRoot struct {
 		AssessVendor                          func(childComplexity int, input types.AssessVendorInput) int
 		AssignTask                            func(childComplexity int, input types.AssignTaskInput) int
 		BulkPublishDocumentVersions           func(childComplexity int, input types.BulkPublishDocumentVersionsInput) int
+		BulkRequestSignatures                 func(childComplexity int, input types.BulkRequestSignaturesInput) int
 		CancelSignatureRequest                func(childComplexity int, input types.CancelSignatureRequestInput) int
 		ConfirmEmail                          func(childComplexity int, input types.ConfirmEmailInput) int
 		CreateAsset                           func(childComplexity int, input types.CreateAssetInput) int
@@ -1035,6 +1040,7 @@ type MutationResolver interface {
 	CreateDraftDocumentVersion(ctx context.Context, input types.CreateDraftDocumentVersionInput) (*types.CreateDraftDocumentVersionPayload, error)
 	UpdateDocumentVersion(ctx context.Context, input types.UpdateDocumentVersionInput) (*types.UpdateDocumentVersionPayload, error)
 	RequestSignature(ctx context.Context, input types.RequestSignatureInput) (*types.RequestSignaturePayload, error)
+	BulkRequestSignatures(ctx context.Context, input types.BulkRequestSignaturesInput) (*types.BulkRequestSignaturesPayload, error)
 	SendSigningNotifications(ctx context.Context, input types.SendSigningNotificationsInput) (*types.SendSigningNotificationsPayload, error)
 	CancelSignatureRequest(ctx context.Context, input types.CancelSignatureRequestInput) (*types.CancelSignatureRequestPayload, error)
 	ExportDocumentVersionPDF(ctx context.Context, input types.ExportDocumentVersionPDFInput) (*types.ExportDocumentVersionPDFPayload, error)
@@ -1279,6 +1285,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.BulkPublishDocumentVersionsPayload.DocumentVersionEdges(childComplexity), true
+
+	case "BulkRequestSignaturesPayload.documentVersionSignatureEdges":
+		if e.complexity.BulkRequestSignaturesPayload.DocumentVersionSignatureEdges == nil {
+			break
+		}
+
+		return e.complexity.BulkRequestSignaturesPayload.DocumentVersionSignatureEdges(childComplexity), true
 
 	case "CancelSignatureRequestPayload.deletedDocumentVersionSignatureId":
 		if e.complexity.CancelSignatureRequestPayload.DeletedDocumentVersionSignatureID == nil {
@@ -2637,6 +2650,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.BulkPublishDocumentVersions(childComplexity, args["input"].(types.BulkPublishDocumentVersionsInput)), true
+
+	case "Mutation.bulkRequestSignatures":
+		if e.complexity.Mutation.BulkRequestSignatures == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_bulkRequestSignatures_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.BulkRequestSignatures(childComplexity, args["input"].(types.BulkRequestSignaturesInput)), true
 
 	case "Mutation.cancelSignatureRequest":
 		if e.complexity.Mutation.CancelSignatureRequest == nil {
@@ -4755,6 +4780,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAssetOrder,
 		ec.unmarshalInputAssignTaskInput,
 		ec.unmarshalInputBulkPublishDocumentVersionsInput,
+		ec.unmarshalInputBulkRequestSignaturesInput,
 		ec.unmarshalInputCancelSignatureRequestInput,
 		ec.unmarshalInputConfirmEmailInput,
 		ec.unmarshalInputConnectorOrder,
@@ -6338,6 +6364,9 @@ type Mutation {
     input: UpdateDocumentVersionInput!
   ): UpdateDocumentVersionPayload!
   requestSignature(input: RequestSignatureInput!): RequestSignaturePayload!
+  bulkRequestSignatures(
+    input: BulkRequestSignaturesInput!
+  ): BulkRequestSignaturesPayload!
   sendSigningNotifications(
     input: SendSigningNotificationsInput!
   ): SendSigningNotificationsPayload!
@@ -7039,8 +7068,17 @@ input RequestSignatureInput {
   signatoryId: ID!
 }
 
+input BulkRequestSignaturesInput {
+  documentIds: [ID!]!
+  signatoryIds: [ID!]!
+}
+
 type RequestSignaturePayload {
   documentVersionSignatureEdge: DocumentVersionSignatureEdge!
+}
+
+type BulkRequestSignaturesPayload {
+  documentVersionSignatureEdges: [DocumentVersionSignatureEdge!]!
 }
 
 input BulkPublishDocumentVersionsInput {
@@ -8615,6 +8653,29 @@ func (ec *executionContext) field_Mutation_bulkPublishDocumentVersions_argsInput
 	}
 
 	var zeroVal types.BulkPublishDocumentVersionsInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_bulkRequestSignatures_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_bulkRequestSignatures_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_bulkRequestSignatures_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.BulkRequestSignaturesInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNBulkRequestSignaturesInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐBulkRequestSignaturesInput(ctx, tmp)
+	}
+
+	var zeroVal types.BulkRequestSignaturesInput
 	return zeroVal, nil
 }
 
@@ -13270,6 +13331,56 @@ func (ec *executionContext) fieldContext_BulkPublishDocumentVersionsPayload_docu
 				return ec.fieldContext_DocumentEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type DocumentEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BulkRequestSignaturesPayload_documentVersionSignatureEdges(ctx context.Context, field graphql.CollectedField, obj *types.BulkRequestSignaturesPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BulkRequestSignaturesPayload_documentVersionSignatureEdges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DocumentVersionSignatureEdges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.DocumentVersionSignatureEdge)
+	fc.Result = res
+	return ec.marshalNDocumentVersionSignatureEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDocumentVersionSignatureEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BulkRequestSignaturesPayload_documentVersionSignatureEdges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BulkRequestSignaturesPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_DocumentVersionSignatureEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_DocumentVersionSignatureEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DocumentVersionSignatureEdge", field.Name)
 		},
 	}
 	return fc, nil
@@ -25538,6 +25649,65 @@ func (ec *executionContext) fieldContext_Mutation_requestSignature(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_bulkRequestSignatures(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_bulkRequestSignatures(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().BulkRequestSignatures(rctx, fc.Args["input"].(types.BulkRequestSignaturesInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.BulkRequestSignaturesPayload)
+	fc.Result = res
+	return ec.marshalNBulkRequestSignaturesPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐBulkRequestSignaturesPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_bulkRequestSignatures(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "documentVersionSignatureEdges":
+				return ec.fieldContext_BulkRequestSignaturesPayload_documentVersionSignatureEdges(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BulkRequestSignaturesPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_bulkRequestSignatures_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_sendSigningNotifications(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_sendSigningNotifications(ctx, field)
 	if err != nil {
@@ -37674,6 +37844,40 @@ func (ec *executionContext) unmarshalInputBulkPublishDocumentVersionsInput(ctx c
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputBulkRequestSignaturesInput(ctx context.Context, obj any) (types.BulkRequestSignaturesInput, error) {
+	var it types.BulkRequestSignaturesInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"documentIds", "signatoryIds"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "documentIds":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentIds"))
+			data, err := ec.unmarshalNID2ᚕgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DocumentIds = data
+		case "signatoryIds":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("signatoryIds"))
+			data, err := ec.unmarshalNID2ᚕgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SignatoryIds = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCancelSignatureRequestInput(ctx context.Context, obj any) (types.CancelSignatureRequestInput, error) {
 	var it types.CancelSignatureRequestInput
 	asMap := map[string]any{}
@@ -41905,6 +42109,45 @@ func (ec *executionContext) _BulkPublishDocumentVersionsPayload(ctx context.Cont
 			}
 		case "documentEdges":
 			out.Values[i] = ec._BulkPublishDocumentVersionsPayload_documentEdges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var bulkRequestSignaturesPayloadImplementors = []string{"BulkRequestSignaturesPayload"}
+
+func (ec *executionContext) _BulkRequestSignaturesPayload(ctx context.Context, sel ast.SelectionSet, obj *types.BulkRequestSignaturesPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, bulkRequestSignaturesPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("BulkRequestSignaturesPayload")
+		case "documentVersionSignatureEdges":
+			out.Values[i] = ec._BulkRequestSignaturesPayload_documentVersionSignatureEdges(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -46625,6 +46868,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "bulkRequestSignatures":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_bulkRequestSignatures(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "sendSigningNotifications":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_sendSigningNotifications(ctx, field)
@@ -50930,6 +51180,25 @@ func (ec *executionContext) marshalNBulkPublishDocumentVersionsPayload2ᚖgithub
 		return graphql.Null
 	}
 	return ec._BulkPublishDocumentVersionsPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNBulkRequestSignaturesInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐBulkRequestSignaturesInput(ctx context.Context, v any) (types.BulkRequestSignaturesInput, error) {
+	res, err := ec.unmarshalInputBulkRequestSignaturesInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNBulkRequestSignaturesPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐBulkRequestSignaturesPayload(ctx context.Context, sel ast.SelectionSet, v types.BulkRequestSignaturesPayload) graphql.Marshaler {
+	return ec._BulkRequestSignaturesPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNBulkRequestSignaturesPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐBulkRequestSignaturesPayload(ctx context.Context, sel ast.SelectionSet, v *types.BulkRequestSignaturesPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._BulkRequestSignaturesPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact(ctx context.Context, v any) (coredata.BusinessImpact, error) {

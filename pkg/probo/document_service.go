@@ -48,6 +48,12 @@ type (
 		Signatory         gid.GID
 	}
 
+	BulkRequestSignaturesRequest struct {
+		DocumentIDs  []gid.GID
+		SignatoryIDs []gid.GID
+		RequestedBy  gid.GID
+	}
+
 	SigningRequestData struct {
 		OrganizationID gid.GID `json:"organization_id"`
 		PeopleID       gid.GID `json:"people_id"`
@@ -550,12 +556,87 @@ func (s *DocumentService) GetVersionSignature(
 	return documentVersionSignature, nil
 }
 
+func (s *DocumentService) BulkRequestSignatures(
+	ctx context.Context,
+	req BulkRequestSignaturesRequest,
+) ([]*coredata.DocumentVersionSignature, error) {
+	var signatures []*coredata.DocumentVersionSignature
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			for _, documentID := range req.DocumentIDs {
+				documentVersion := &coredata.DocumentVersion{}
+				if err := documentVersion.LoadLatestVersion(ctx, tx, s.svc.scope, documentID); err != nil {
+					return fmt.Errorf("cannot load latest version for document %q: %w", documentID, err)
+				}
+
+				if documentVersion.Status != coredata.DocumentStatusPublished {
+					return fmt.Errorf("cannot request signature for unpublished document %q", documentID)
+				}
+
+				requestedBy := &coredata.People{}
+				if err := requestedBy.LoadByID(ctx, tx, s.svc.scope, req.RequestedBy); err != nil {
+					return fmt.Errorf("cannot load requested by: %w", err)
+				}
+
+				for _, signatoryID := range req.SignatoryIDs {
+					signature, err := s.createSignatureRequestInTx(ctx, tx, documentVersion.ID, requestedBy, signatoryID)
+					if err != nil {
+						return fmt.Errorf("cannot create signature request for document %q and signatory %q: %w", documentID, signatoryID, err)
+					}
+					signatures = append(signatures, signature)
+				}
+			}
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return signatures, nil
+}
+
+func (s *DocumentService) createSignatureRequestInTx(
+	ctx context.Context,
+	tx pg.Conn,
+	documentVersionID gid.GID,
+	requestedBy *coredata.People,
+	signatoryID gid.GID,
+) (*coredata.DocumentVersionSignature, error) {
+	documentVersionSignatureID := gid.New(s.svc.scope.GetTenantID(), coredata.DocumentVersionSignatureEntityType)
+	signatory := &coredata.People{}
+
+	if err := signatory.LoadByID(ctx, tx, s.svc.scope, signatoryID); err != nil {
+		return nil, fmt.Errorf("cannot load signatory: %w", err)
+	}
+
+	now := time.Now()
+	documentVersionSignature := &coredata.DocumentVersionSignature{
+		ID:                documentVersionSignatureID,
+		DocumentVersionID: documentVersionID,
+		State:             coredata.DocumentVersionSignatureStateRequested,
+		RequestedBy:       requestedBy.ID,
+		RequestedAt:       now,
+		SignedBy:          signatory.ID,
+		SignedAt:          nil,
+		CreatedAt:         now,
+		UpdatedAt:         now,
+	}
+
+	if err := documentVersionSignature.Insert(ctx, tx, s.svc.scope); err != nil {
+		return nil, fmt.Errorf("cannot insert document version signature: %w", err)
+	}
+
+	return documentVersionSignature, nil
+}
+
 func (s *DocumentService) RequestSignature(
 	ctx context.Context,
 	req RequestSignatureRequest,
 ) (*coredata.DocumentVersionSignature, error) {
-	documentVersionSignatureID := gid.New(s.svc.scope.GetTenantID(), coredata.DocumentVersionSignatureEntityType)
-
 	documentVersion, err := s.GetVersion(ctx, req.DocumentVersionID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get document version: %w", err)
@@ -565,24 +646,18 @@ func (s *DocumentService) RequestSignature(
 		return nil, fmt.Errorf("cannot request signature for unpublished version")
 	}
 
-	now := time.Now()
-	documentVersionSignature := &coredata.DocumentVersionSignature{
-		ID:                documentVersionSignatureID,
-		DocumentVersionID: req.DocumentVersionID,
-		State:             coredata.DocumentVersionSignatureStateRequested,
-		RequestedBy:       req.RequestedBy,
-		RequestedAt:       now,
-		SignedBy:          req.Signatory,
-		SignedAt:          nil,
-		CreatedAt:         now,
-		UpdatedAt:         now,
-	}
-
+	var signature *coredata.DocumentVersionSignature
 	err = s.svc.pg.WithTx(
 		ctx,
-		func(conn pg.Conn) error {
-			if err := documentVersionSignature.Insert(ctx, conn, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot insert document version signature: %w", err)
+		func(tx pg.Conn) error {
+			requestedBy := &coredata.People{}
+			if err := requestedBy.LoadByID(ctx, tx, s.svc.scope, req.RequestedBy); err != nil {
+				return fmt.Errorf("cannot load requested by %q: %w", req.RequestedBy, err)
+			}
+
+			signature, err = s.createSignatureRequestInTx(ctx, tx, req.DocumentVersionID, requestedBy, req.Signatory)
+			if err != nil {
+				return fmt.Errorf("cannot create signature request: %w", err)
 			}
 
 			return nil
@@ -593,7 +668,7 @@ func (s *DocumentService) RequestSignature(
 		return nil, err
 	}
 
-	return documentVersionSignature, nil
+	return signature, nil
 }
 
 func (s *DocumentService) ListSignatures(
