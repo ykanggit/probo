@@ -111,6 +111,11 @@ type ComplexityRoot struct {
 		Task func(childComplexity int) int
 	}
 
+	BulkPublishDocumentVersionsPayload struct {
+		DocumentEdges        func(childComplexity int) int
+		DocumentVersionEdges func(childComplexity int) int
+	}
+
 	CancelSignatureRequestPayload struct {
 		DeletedDocumentVersionSignatureID func(childComplexity int) int
 	}
@@ -508,6 +513,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AssessVendor                          func(childComplexity int, input types.AssessVendorInput) int
 		AssignTask                            func(childComplexity int, input types.AssignTaskInput) int
+		BulkPublishDocumentVersions           func(childComplexity int, input types.BulkPublishDocumentVersionsInput) int
 		CancelSignatureRequest                func(childComplexity int, input types.CancelSignatureRequestInput) int
 		ConfirmEmail                          func(childComplexity int, input types.ConfirmEmailInput) int
 		CreateAsset                           func(childComplexity int, input types.CreateAssetInput) int
@@ -1024,6 +1030,7 @@ type MutationResolver interface {
 	UpdateDocument(ctx context.Context, input types.UpdateDocumentInput) (*types.UpdateDocumentPayload, error)
 	DeleteDocument(ctx context.Context, input types.DeleteDocumentInput) (*types.DeleteDocumentPayload, error)
 	PublishDocumentVersion(ctx context.Context, input types.PublishDocumentVersionInput) (*types.PublishDocumentVersionPayload, error)
+	BulkPublishDocumentVersions(ctx context.Context, input types.BulkPublishDocumentVersionsInput) (*types.BulkPublishDocumentVersionsPayload, error)
 	GenerateDocumentChangelog(ctx context.Context, input types.GenerateDocumentChangelogInput) (*types.GenerateDocumentChangelogPayload, error)
 	CreateDraftDocumentVersion(ctx context.Context, input types.CreateDraftDocumentVersionInput) (*types.CreateDraftDocumentVersionPayload, error)
 	UpdateDocumentVersion(ctx context.Context, input types.UpdateDocumentVersionInput) (*types.UpdateDocumentVersionPayload, error)
@@ -1258,6 +1265,20 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.AssignTaskPayload.Task(childComplexity), true
+
+	case "BulkPublishDocumentVersionsPayload.documentEdges":
+		if e.complexity.BulkPublishDocumentVersionsPayload.DocumentEdges == nil {
+			break
+		}
+
+		return e.complexity.BulkPublishDocumentVersionsPayload.DocumentEdges(childComplexity), true
+
+	case "BulkPublishDocumentVersionsPayload.documentVersionEdges":
+		if e.complexity.BulkPublishDocumentVersionsPayload.DocumentVersionEdges == nil {
+			break
+		}
+
+		return e.complexity.BulkPublishDocumentVersionsPayload.DocumentVersionEdges(childComplexity), true
 
 	case "CancelSignatureRequestPayload.deletedDocumentVersionSignatureId":
 		if e.complexity.CancelSignatureRequestPayload.DeletedDocumentVersionSignatureID == nil {
@@ -2604,6 +2625,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.AssignTask(childComplexity, args["input"].(types.AssignTaskInput)), true
+
+	case "Mutation.bulkPublishDocumentVersions":
+		if e.complexity.Mutation.BulkPublishDocumentVersions == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_bulkPublishDocumentVersions_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.BulkPublishDocumentVersions(childComplexity, args["input"].(types.BulkPublishDocumentVersionsInput)), true
 
 	case "Mutation.cancelSignatureRequest":
 		if e.complexity.Mutation.CancelSignatureRequest == nil {
@@ -4721,6 +4754,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAssessVendorInput,
 		ec.unmarshalInputAssetOrder,
 		ec.unmarshalInputAssignTaskInput,
+		ec.unmarshalInputBulkPublishDocumentVersionsInput,
 		ec.unmarshalInputCancelSignatureRequestInput,
 		ec.unmarshalInputConfirmEmailInput,
 		ec.unmarshalInputConnectorOrder,
@@ -6291,6 +6325,9 @@ type Mutation {
   publishDocumentVersion(
     input: PublishDocumentVersionInput!
   ): PublishDocumentVersionPayload!
+  bulkPublishDocumentVersions(
+    input: BulkPublishDocumentVersionsInput!
+  ): BulkPublishDocumentVersionsPayload!
   generateDocumentChangelog(
     input: GenerateDocumentChangelogInput!
   ): GenerateDocumentChangelogPayload!
@@ -7004,6 +7041,16 @@ input RequestSignatureInput {
 
 type RequestSignaturePayload {
   documentVersionSignatureEdge: DocumentVersionSignatureEdge!
+}
+
+input BulkPublishDocumentVersionsInput {
+  documentIds: [ID!]!
+  changelog: String!
+}
+
+type BulkPublishDocumentVersionsPayload {
+  documentVersionEdges: [DocumentVersionEdge!]!
+  documentEdges: [DocumentEdge!]!
 }
 
 input PublishDocumentVersionInput {
@@ -8545,6 +8592,29 @@ func (ec *executionContext) field_Mutation_assignTask_argsInput(
 	}
 
 	var zeroVal types.AssignTaskInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_bulkPublishDocumentVersions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_bulkPublishDocumentVersions_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_bulkPublishDocumentVersions_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.BulkPublishDocumentVersionsInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNBulkPublishDocumentVersionsInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐBulkPublishDocumentVersionsInput(ctx, tmp)
+	}
+
+	var zeroVal types.BulkPublishDocumentVersionsInput
 	return zeroVal, nil
 }
 
@@ -13100,6 +13170,106 @@ func (ec *executionContext) fieldContext_AssignTaskPayload_task(_ context.Contex
 				return ec.fieldContext_Task_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BulkPublishDocumentVersionsPayload_documentVersionEdges(ctx context.Context, field graphql.CollectedField, obj *types.BulkPublishDocumentVersionsPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BulkPublishDocumentVersionsPayload_documentVersionEdges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DocumentVersionEdges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.DocumentVersionEdge)
+	fc.Result = res
+	return ec.marshalNDocumentVersionEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDocumentVersionEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BulkPublishDocumentVersionsPayload_documentVersionEdges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BulkPublishDocumentVersionsPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_DocumentVersionEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_DocumentVersionEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DocumentVersionEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BulkPublishDocumentVersionsPayload_documentEdges(ctx context.Context, field graphql.CollectedField, obj *types.BulkPublishDocumentVersionsPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BulkPublishDocumentVersionsPayload_documentEdges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DocumentEdges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.DocumentEdge)
+	fc.Result = res
+	return ec.marshalNDocumentEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDocumentEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BulkPublishDocumentVersionsPayload_documentEdges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BulkPublishDocumentVersionsPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_DocumentEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_DocumentEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DocumentEdge", field.Name)
 		},
 	}
 	return fc, nil
@@ -25065,6 +25235,67 @@ func (ec *executionContext) fieldContext_Mutation_publishDocumentVersion(ctx con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_publishDocumentVersion_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_bulkPublishDocumentVersions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_bulkPublishDocumentVersions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().BulkPublishDocumentVersions(rctx, fc.Args["input"].(types.BulkPublishDocumentVersionsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.BulkPublishDocumentVersionsPayload)
+	fc.Result = res
+	return ec.marshalNBulkPublishDocumentVersionsPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐBulkPublishDocumentVersionsPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_bulkPublishDocumentVersions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "documentVersionEdges":
+				return ec.fieldContext_BulkPublishDocumentVersionsPayload_documentVersionEdges(ctx, field)
+			case "documentEdges":
+				return ec.fieldContext_BulkPublishDocumentVersionsPayload_documentEdges(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BulkPublishDocumentVersionsPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_bulkPublishDocumentVersions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -37409,6 +37640,40 @@ func (ec *executionContext) unmarshalInputAssignTaskInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputBulkPublishDocumentVersionsInput(ctx context.Context, obj any) (types.BulkPublishDocumentVersionsInput, error) {
+	var it types.BulkPublishDocumentVersionsInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"documentIds", "changelog"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "documentIds":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentIds"))
+			data, err := ec.unmarshalNID2ᚕgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DocumentIds = data
+		case "changelog":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("changelog"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Changelog = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCancelSignatureRequestInput(ctx context.Context, obj any) (types.CancelSignatureRequestInput, error) {
 	var it types.CancelSignatureRequestInput
 	asMap := map[string]any{}
@@ -41596,6 +41861,50 @@ func (ec *executionContext) _AssignTaskPayload(ctx context.Context, sel ast.Sele
 			out.Values[i] = graphql.MarshalString("AssignTaskPayload")
 		case "task":
 			out.Values[i] = ec._AssignTaskPayload_task(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var bulkPublishDocumentVersionsPayloadImplementors = []string{"BulkPublishDocumentVersionsPayload"}
+
+func (ec *executionContext) _BulkPublishDocumentVersionsPayload(ctx context.Context, sel ast.SelectionSet, obj *types.BulkPublishDocumentVersionsPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, bulkPublishDocumentVersionsPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("BulkPublishDocumentVersionsPayload")
+		case "documentVersionEdges":
+			out.Values[i] = ec._BulkPublishDocumentVersionsPayload_documentVersionEdges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "documentEdges":
+			out.Values[i] = ec._BulkPublishDocumentVersionsPayload_documentEdges(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -46281,6 +46590,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "bulkPublishDocumentVersions":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_bulkPublishDocumentVersions(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "generateDocumentChangelog":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_generateDocumentChangelog(ctx, field)
@@ -50597,6 +50913,25 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNBulkPublishDocumentVersionsInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐBulkPublishDocumentVersionsInput(ctx context.Context, v any) (types.BulkPublishDocumentVersionsInput, error) {
+	res, err := ec.unmarshalInputBulkPublishDocumentVersionsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNBulkPublishDocumentVersionsPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐBulkPublishDocumentVersionsPayload(ctx context.Context, sel ast.SelectionSet, v types.BulkPublishDocumentVersionsPayload) graphql.Marshaler {
+	return ec._BulkPublishDocumentVersionsPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNBulkPublishDocumentVersionsPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐBulkPublishDocumentVersionsPayload(ctx context.Context, sel ast.SelectionSet, v *types.BulkPublishDocumentVersionsPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._BulkPublishDocumentVersionsPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact(ctx context.Context, v any) (coredata.BusinessImpact, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := unmarshalNBusinessImpact2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐBusinessImpact[tmp]
@@ -52524,6 +52859,36 @@ func (ec *executionContext) marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋg
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNID2ᚕgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGIDᚄ(ctx context.Context, v any) ([]gid.GID, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]gid.GID, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNID2ᚕgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGIDᚄ(ctx context.Context, sel ast.SelectionSet, v []gid.GID) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNImportFrameworkInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐImportFrameworkInput(ctx context.Context, v any) (types.ImportFrameworkInput, error) {

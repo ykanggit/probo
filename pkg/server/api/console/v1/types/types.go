@@ -56,6 +56,16 @@ type AssignTaskPayload struct {
 	Task *Task `json:"task"`
 }
 
+type BulkPublishDocumentVersionsInput struct {
+	DocumentIds []gid.GID `json:"documentIds"`
+	Changelog   string    `json:"changelog"`
+}
+
+type BulkPublishDocumentVersionsPayload struct {
+	DocumentVersionEdges []*DocumentVersionEdge `json:"documentVersionEdges"`
+	DocumentEdges        []*DocumentEdge        `json:"documentEdges"`
+}
+
 type CancelSignatureRequestInput struct {
 	DocumentVersionSignatureID gid.GID `json:"documentVersionSignatureId"`
 }

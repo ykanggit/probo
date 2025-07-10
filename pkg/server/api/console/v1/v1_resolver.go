@@ -1957,6 +1957,34 @@ func (r *mutationResolver) ExportDocumentVersionPDF(ctx context.Context, input t
 	}, nil
 }
 
+func (r *mutationResolver) BulkPublishDocumentVersions(ctx context.Context, input types.BulkPublishDocumentVersionsInput) (*types.BulkPublishDocumentVersionsPayload, error) {
+	if len(input.DocumentIds) == 0 {
+		return &types.BulkPublishDocumentVersionsPayload{
+			DocumentVersionEdges: []*types.DocumentVersionEdge{},
+			DocumentEdges:        []*types.DocumentEdge{},
+		}, nil
+	}
+
+	prb := r.ProboService(ctx, input.DocumentIds[0].TenantID())
+
+	user := UserFromContext(ctx)
+
+	people, err := prb.Peoples.GetByUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	documentVersions, documents, err := prb.Documents.BulkPublishVersions(ctx, input.DocumentIds, people.ID, input.Changelog)
+	if err != nil {
+		panic(fmt.Errorf("cannot bulk publish document versions: %w", err))
+	}
+
+	return &types.BulkPublishDocumentVersionsPayload{
+		DocumentVersionEdges: types.NewDocumentVersionEdges(documentVersions, coredata.DocumentVersionOrderFieldCreatedAt),
+		DocumentEdges:        types.NewDocumentEdges(documents, coredata.DocumentOrderFieldTitle),
+	}, nil
+}
+
 // CreateVendorRiskAssessment is the resolver for the createVendorRiskAssessment field.
 func (r *mutationResolver) CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error) {
 	prb := r.ProboService(ctx, input.VendorID.TenantID())
