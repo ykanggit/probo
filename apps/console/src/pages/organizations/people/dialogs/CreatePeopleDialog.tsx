@@ -26,11 +26,12 @@ type Props = {
 
 const schema = z.object({
   fullName: z.string().min(1),
+  position: z.string().min(1),
   primaryEmailAddress: z.string().email(),
   additionalEmailAddresses: z.preprocess(
     // Empty additional emails are skipped
     (v) => (v as string[]).filter((v) => !!v),
-    z.array(z.string().email()),
+    z.array(z.string().email())
   ),
   kind: z.enum(peopleRoles),
 });
@@ -46,6 +47,7 @@ export const createPeopleMutation = graphql`
           id
           fullName
           primaryEmailAddress
+          position
           kind
           additionalEmailAddresses
         }
@@ -102,6 +104,12 @@ export function CreatePeopleDialog({ children, connectionId }: Props) {
             label={__("Primary email")}
             {...register("primaryEmailAddress")}
             type="email"
+          />
+          <Field
+            label={__("Position")}
+            {...register("position")}
+            type="text"
+            placeholder={__("e.g. CEO, CFO, etc.")}
           />
           <ControlledField
             control={control}

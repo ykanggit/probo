@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e4fcd65491a7570cf56382a3f977e06d>>
+ * @generated SignedSource<<5eba326084bfab4966727af60e2aa85c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -21,6 +21,7 @@ export type PeopleGraphPaginatedFragment$data = {
         readonly fullName: string;
         readonly id: string;
         readonly kind: PeopleKind;
+        readonly position: string | null | undefined;
         readonly primaryEmailAddress: string;
       };
     }>;
@@ -163,6 +164,13 @@ return {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
+                  "name": "position",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
                   "name": "additionalEmailAddresses",
                   "storageKey": null
                 },
@@ -247,6 +255,6 @@ return {
 };
 })();
 
-(node as any).hash = "c163b7909a337efd22088852b9908045";
+(node as any).hash = "5e095baf6a65e7cdbaa804d4658cbb6b";
 
 export default node;
