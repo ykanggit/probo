@@ -88,10 +88,10 @@ signs:
     output: true
 
 docker_manifests:
-  - name_template: "ghcr.io/getprobo/probo:{{ .Version }}"
+  - name_template: "ghcr.io/getprobo/probo:{{ .Tag }}"
     image_templates:
-      - "ghcr.io/getprobo/probo:{{ .Version }}-amd64"
-      - "ghcr.io/getprobo/probo:{{ .Version }}-arm64"
+      - "ghcr.io/getprobo/probo:{{ .Tag }}-amd64"
+      - "ghcr.io/getprobo/probo:{{ .Tag }}-arm64"
     skip_push: "{{ .IsSnapshot }}"
   - name_template: "ghcr.io/getprobo/probo:latest"
     image_templates:
@@ -123,7 +123,7 @@ docker_signs:
 
 dockers:
   - image_templates:
-      - "ghcr.io/getprobo/probo:{{ .Version }}-amd64"
+      - "ghcr.io/getprobo/probo:{{ .Tag }}-amd64"
       - "ghcr.io/getprobo/probo:latest-amd64"
     dockerfile: Dockerfile
     use: buildx
@@ -144,7 +144,7 @@ dockers:
     goarch: amd64
     skip_push: "{{ .IsSnapshot }}"
   - image_templates:
-      - "ghcr.io/getprobo/probo:{{ .Version }}-arm64"
+      - "ghcr.io/getprobo/probo:{{ .Tag }}-arm64"
       - "ghcr.io/getprobo/probo:latest-arm64"
     dockerfile: Dockerfile
     use: buildx
@@ -188,9 +188,9 @@ release:
     ## Changes in {{ .Tag }}
   footer: |
     ## Docker Images
-    - `ghcr.io/getprobo/probo:{{ .Version }}` (multi-arch: linux/amd64, linux/arm64)
+    - `ghcr.io/getprobo/probo:{{ .Tag }}` (multi-arch: linux/amd64, linux/arm64)
     - `ghcr.io/getprobo/probo:latest` (multi-arch: linux/amd64, linux/arm64)
 
     ### Architecture-specific images
-    - `ghcr.io/getprobo/probo:{{ .Version }}-amd64`
-    - `ghcr.io/getprobo/probo:{{ .Version }}-arm64`
+    - `ghcr.io/getprobo/probo:{{ .Tag }}-amd64`
+    - `ghcr.io/getprobo/probo:{{ .Tag }}-arm64`

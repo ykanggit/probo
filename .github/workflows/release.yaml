@@ -98,51 +98,10 @@ jobs:
       - name: Get image digest
         id: image
         run: |
-          # Wait for the multi-platform manifest to be available
-          echo "Waiting for multi-platform manifest to be available..."
-          for i in {1..30}; do
-            echo "Attempt $i/30: Checking if image is available..."
-            
-            # Try to get the digest from the registry
-            DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:${{ github.ref_name }} --format '{{.Descriptor.Digest}}' 2>/dev/null || echo "")
-            
-            if [ -n "$DIGEST" ]; then
-              echo "Successfully retrieved digest: $DIGEST"
-              echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            
-            echo "Image not available yet, waiting 10 seconds..."
-            sleep 10
-          done
-
-          # If we get here, the primary method failed, try alternative approaches
-          echo "Primary method failed, trying alternative methods..."
-
-          # Try inspecting the latest tag
-          echo "Trying latest tag..."
-          DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:latest --format '{{.Descriptor.Digest}}' 2>/dev/null || echo "")
-
-          if [ -n "$DIGEST" ]; then
-            echo "Successfully retrieved digest from latest tag: $DIGEST"
-            echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # Try getting digest from individual architecture images
-          echo "Trying to get digest from amd64 image..."
-          DIGEST_AMD64=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:${{ github.ref_name }}-amd64 --format '{{.Descriptor.Digest}}' 2>/dev/null || echo "")
-
-          if [ -n "$DIGEST_AMD64" ]; then
-            echo "Using amd64 image digest: $DIGEST_AMD64"
-            echo "digest=$DIGEST_AMD64" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "Error: Could not retrieve image digest from registry after all attempts"
-          echo "Available tags for debugging:"
-          docker buildx imagetools inspect ghcr.io/getprobo/probo --format '{{json .}}' 2>/dev/null || echo "Failed to inspect repository"
-          exit 1
+          echo "Getting image digest..."
+          DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:${{ github.ref_name }} --format '{{.Manifest.Digest}}')
+          echo "Successfully retrieved digest: $DIGEST"
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Attest Docker image SBOM
         uses: actions/attest-sbom@v1
