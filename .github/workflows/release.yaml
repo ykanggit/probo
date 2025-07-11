@@ -99,7 +99,7 @@ jobs:
         id: image
         run: |
           echo "Getting image digest..."
-          DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:${{ github.ref_name }} --format '{{.Manifest.Digest}}')
+          DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:${{ github.ref_name }} --format '{{json .Manifest.Digest}}' | jq -r)
           echo "Successfully retrieved digest: $DIGEST"
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
