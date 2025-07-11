@@ -99,12 +99,13 @@ jobs:
         id: image
         run: |
           # Get the digest from the registry using docker buildx imagetools
-          DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:${{ github.ref_name }} --format '{{.Manifest.Digest}}' 2>/dev/null || echo "")
+          # Use Descriptor.Digest for manifest lists (multi-platform images)
+          DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:${{ github.ref_name }} --format '{{.Descriptor.Digest}}' 2>/dev/null || echo "")
 
           if [ -z "$DIGEST" ]; then
             echo "Failed to get digest from registry, trying alternative method..."
             # Alternative: use the latest tag if version-specific tag fails
-            DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:latest --format '{{.Manifest.Digest}}' 2>/dev/null || echo "")
+            DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:latest --format '{{.Descriptor.Digest}}' 2>/dev/null || echo "")
           fi
 
           if [ -z "$DIGEST" ]; then
