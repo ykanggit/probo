@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.40.0] - 2025-07-11
+
+### Added
+
+- Add cancel request mutation
+- Add bulk publish document version mutation
+- Add bulk request signature mutation
+
 ## [0.39.0] - 2025-06-03
 
 ### Added
@@ -15,13 +23,13 @@ All notable changes to this project will be documented in this file.
 - Update go dependencies
 - Update node dependencies
 
-## [0.38.1] - 2025-06-03
+## [0.38.1] - 2025-07-03
 
 ### Fixed
 
 - Fix 5xx on document type order
 
-## [0.38.0] - 2025-06-03
+## [0.38.0] - 2025-07-03
 
 ### Added
 
