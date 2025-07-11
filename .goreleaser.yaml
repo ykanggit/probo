@@ -108,7 +108,7 @@ docker_signs:
     output: true
     args:
       - "sign"
-      - "${artifact}"
+      - "${digest}"
       - "--yes"
   - id: manifests
     cmd: cosign
@@ -118,7 +118,7 @@ docker_signs:
     output: true
     args:
       - "sign"
-      - "${artifact}"
+      - "${digest}"
       - "--yes"
 
 dockers:
