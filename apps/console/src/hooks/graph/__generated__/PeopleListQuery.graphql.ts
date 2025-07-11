@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e7dfc0de7524eaa22ca235ac0b6e3011>>
+ * @generated SignedSource<<4cfc7218bc48a818eedc2ea87ac521e6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -237,6 +237,13 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
+                            "name": "position",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
                             "name": "additionalEmailAddresses",
                             "storageKey": null
                           },
@@ -329,16 +336,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a17ff68897dbcf3daa33b073bc83f1bb",
+    "cacheID": "8134caa0eab10c19236a49728f1f77b6",
     "id": null,
     "metadata": {},
     "name": "PeopleListQuery",
     "operationKind": "query",
-    "text": "query PeopleListQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: PeopleOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...PeopleGraphPaginatedFragment_16fISc\n    id\n  }\n}\n\nfragment PeopleGraphPaginatedFragment_16fISc on Organization {\n  peoples(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        additionalEmailAddresses\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query PeopleListQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: PeopleOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...PeopleGraphPaginatedFragment_16fISc\n    id\n  }\n}\n\nfragment PeopleGraphPaginatedFragment_16fISc on Organization {\n  peoples(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        position\n        additionalEmailAddresses\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c163b7909a337efd22088852b9908045";
+(node as any).hash = "5e095baf6a65e7cdbaa804d4658cbb6b";
 
 export default node;

@@ -13,6 +13,7 @@ import { EmailsField } from "/components/form/EmailsField";
 const schema = z.object({
   fullName: z.string().min(1),
   primaryEmailAddress: z.string().email(),
+  position: z.string().min(1).nullable(),
   additionalEmailAddresses: z.preprocess(
     // Empty additional emails are skipped
     (v) => (v as string[]).filter((v) => !!v),
@@ -32,6 +33,7 @@ export default function PeopleProfileTab() {
         kind: people.kind,
         fullName: people.fullName,
         primaryEmailAddress: people.primaryEmailAddress,
+        position: people.position,
         additionalEmailAddresses: [...(people.additionalEmailAddresses ?? [])],
       },
     });
@@ -50,6 +52,7 @@ export default function PeopleProfileTab() {
           id: people.id!,
           fullName: data.fullName,
           primaryEmailAddress: data.primaryEmailAddress,
+          position: data.position,
           additionalEmailAddresses: data.additionalEmailAddresses,
           // TODO : make these field optional in the query (server side)
           kind: people.kind,
@@ -65,6 +68,12 @@ export default function PeopleProfileTab() {
     <form onSubmit={onSubmit} className="space-y-4">
       <Card padded className="space-y-4">
         <Field label={__("Full name")} {...register("fullName")} type="text" />
+        <Field
+          label={__("Position")}
+          {...register("position")}
+          type="text"
+          placeholder={__("e.g. CEO, CFO, etc.")}
+        />
         <Field
           label={__("Primary email")}
           {...register("primaryEmailAddress")}

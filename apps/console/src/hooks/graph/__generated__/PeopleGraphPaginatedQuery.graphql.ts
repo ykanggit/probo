@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<43878b22fe8a689f41bcd506711ddb5f>>
+ * @generated SignedSource<<1ec11120f71d4bc3040bcdd2665904c0>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -164,6 +164,13 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
+                            "name": "position",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
                             "name": "additionalEmailAddresses",
                             "storageKey": null
                           },
@@ -256,12 +263,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b154e94ac7e783a492bc5aed7d44229d",
+    "cacheID": "1139d090f54b12e62e08f0a1970c9af0",
     "id": null,
     "metadata": {},
     "name": "PeopleGraphPaginatedQuery",
     "operationKind": "query",
-    "text": "query PeopleGraphPaginatedQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      ...PeopleGraphPaginatedFragment\n    }\n    id\n  }\n}\n\nfragment PeopleGraphPaginatedFragment on Organization {\n  peoples(first: 50) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        additionalEmailAddresses\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query PeopleGraphPaginatedQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      ...PeopleGraphPaginatedFragment\n    }\n    id\n  }\n}\n\nfragment PeopleGraphPaginatedFragment on Organization {\n  peoples(first: 50) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        position\n        additionalEmailAddresses\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();

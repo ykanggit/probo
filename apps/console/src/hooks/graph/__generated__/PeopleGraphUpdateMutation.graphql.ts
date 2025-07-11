@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b798b75c1d930af818109fd819d5cef3>>
+ * @generated SignedSource<<18d62863109c347d5fcf7b5701a9c57b>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -30,6 +30,7 @@ export type PeopleGraphUpdateMutation$data = {
       readonly fullName: string;
       readonly id: string;
       readonly kind: PeopleKind;
+      readonly position: string | null | undefined;
       readonly primaryEmailAddress: string;
     };
   };
@@ -95,6 +96,13 @@ v1 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
+            "name": "position",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
             "name": "kind",
             "storageKey": null
           },
@@ -130,16 +138,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "c61ca0a6b20067ce5e0c708fc55509d8",
+    "cacheID": "814551d1fb24548c41d417342625071f",
     "id": null,
     "metadata": {},
     "name": "PeopleGraphUpdateMutation",
     "operationKind": "mutation",
-    "text": "mutation PeopleGraphUpdateMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      kind\n      additionalEmailAddresses\n    }\n  }\n}\n"
+    "text": "mutation PeopleGraphUpdateMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      position\n      kind\n      additionalEmailAddresses\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "48c2618963704a8cd3b1f0a68817cdad";
+(node as any).hash = "ecc5666046434d5c8e80eaab0e508c11";
 
 export default node;

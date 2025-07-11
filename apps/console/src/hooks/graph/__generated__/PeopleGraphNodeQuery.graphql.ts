@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<006f8f3dc3c4d41a23cc71a870aa571c>>
+ * @generated SignedSource<<71df408810680ded020fb0e1cc93ff79>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -19,6 +19,7 @@ export type PeopleGraphNodeQuery$data = {
     readonly fullName?: string;
     readonly id?: string;
     readonly kind?: PeopleKind;
+    readonly position?: string | null | undefined;
     readonly primaryEmailAddress?: string;
   };
 };
@@ -67,10 +68,17 @@ v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "kind",
+  "name": "position",
   "storageKey": null
 },
 v6 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "kind",
+  "storageKey": null
+},
+v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
@@ -99,7 +107,8 @@ return {
               (v3/*: any*/),
               (v4/*: any*/),
               (v5/*: any*/),
-              (v6/*: any*/)
+              (v6/*: any*/),
+              (v7/*: any*/)
             ],
             "type": "People",
             "abstractKey": null
@@ -139,7 +148,8 @@ return {
               (v3/*: any*/),
               (v4/*: any*/),
               (v5/*: any*/),
-              (v6/*: any*/)
+              (v6/*: any*/),
+              (v7/*: any*/)
             ],
             "type": "People",
             "abstractKey": null
@@ -150,16 +160,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "319f5f4ff11db061920a25bbfda43244",
+    "cacheID": "850de97d42fdda9d2335c0e5219fd067",
     "id": null,
     "metadata": {},
     "name": "PeopleGraphNodeQuery",
     "operationKind": "query",
-    "text": "query PeopleGraphNodeQuery(\n  $peopleId: ID!\n) {\n  node(id: $peopleId) {\n    __typename\n    ... on People {\n      id\n      fullName\n      primaryEmailAddress\n      kind\n      additionalEmailAddresses\n    }\n    id\n  }\n}\n"
+    "text": "query PeopleGraphNodeQuery(\n  $peopleId: ID!\n) {\n  node(id: $peopleId) {\n    __typename\n    ... on People {\n      id\n      fullName\n      primaryEmailAddress\n      position\n      kind\n      additionalEmailAddresses\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "b4e6fe403e30fbc27ae638d464ad7543";
+(node as any).hash = "f39d45664dba2b3bcdad07ef8baebfe9";
 
 export default node;

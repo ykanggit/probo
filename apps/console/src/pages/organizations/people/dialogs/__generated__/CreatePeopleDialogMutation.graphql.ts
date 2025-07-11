@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<fce211be2cfe7f4b313cf2db7f4f127c>>
+ * @generated SignedSource<<cf446d4f8991b5ff332b3d81174c3247>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -32,6 +32,7 @@ export type CreatePeopleDialogMutation$data = {
         readonly fullName: string;
         readonly id: string;
         readonly kind: PeopleKind;
+        readonly position: string | null | undefined;
         readonly primaryEmailAddress: string;
       };
     };
@@ -95,6 +96,13 @@ v3 = {
           "args": null,
           "kind": "ScalarField",
           "name": "primaryEmailAddress",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "position",
           "storageKey": null
         },
         {
@@ -183,16 +191,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "634c2845825a02a0343c3211b41c90a0",
+    "cacheID": "4065779551f13f5555fa8a0f1b1ae54c",
     "id": null,
     "metadata": {},
     "name": "CreatePeopleDialogMutation",
     "operationKind": "mutation",
-    "text": "mutation CreatePeopleDialogMutation(\n  $input: CreatePeopleInput!\n) {\n  createPeople(input: $input) {\n    peopleEdge {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        additionalEmailAddresses\n      }\n    }\n  }\n}\n"
+    "text": "mutation CreatePeopleDialogMutation(\n  $input: CreatePeopleInput!\n) {\n  createPeople(input: $input) {\n    peopleEdge {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        position\n        kind\n        additionalEmailAddresses\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "867aad1276c26bd787ddf80c6f166abe";
+(node as any).hash = "1fbca12cb827104dc700c70a677f92aa";
 
 export default node;

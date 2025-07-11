@@ -80,6 +80,7 @@ const paginatedPeopleFragment = graphql`
           fullName
           primaryEmailAddress
           kind
+          position
           additionalEmailAddresses
         }
       }
@@ -157,6 +158,7 @@ export const peopleNodeQuery = graphql`
         id
         fullName
         primaryEmailAddress
+        position
         kind
         additionalEmailAddresses
       }
@@ -171,6 +173,7 @@ export const updatePeopleMutation = graphql`
         id
         fullName
         primaryEmailAddress
+        position
         kind
         additionalEmailAddresses
       }

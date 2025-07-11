@@ -59,6 +59,7 @@ export default function PeopleListPage({
           <Tr>
             <SortableTh field="FULL_NAME">{__("Name")}</SortableTh>
             <SortableTh field="KIND">{__("Role")}</SortableTh>
+            <Th>{__("Position")}</Th>
             <Th>{__("Actions")}</Th>
           </Tr>
         </Thead>
@@ -101,6 +102,7 @@ function PeopleRow({
         </div>
       </Td>
       <Td className="text-sm">{getRole(__, people.kind)}</Td>
+      <Td className="text-sm">{people.position}</Td>
       <Td noLink width={50} className="text-end">
         <ActionDropdown>
           <DropdownItem
