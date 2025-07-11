@@ -98,8 +98,21 @@ jobs:
       - name: Get image digest
         id: image
         run: |
-          # Extract image digest from goreleaser output
-          echo "digest=$(docker inspect ghcr.io/getprobo/probo:${{ github.ref_name }} --format='{{index .RepoDigests 0}}' | cut -d'@' -f2)" >> "$GITHUB_OUTPUT"
+          # Get the digest from the registry using docker buildx imagetools
+          DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:${{ github.ref_name }} --format '{{.Manifest.Digest}}' 2>/dev/null || echo "")
+
+          if [ -z "$DIGEST" ]; then
+            echo "Failed to get digest from registry, trying alternative method..."
+            # Alternative: use the latest tag if version-specific tag fails
+            DIGEST=$(docker buildx imagetools inspect ghcr.io/getprobo/probo:latest --format '{{.Manifest.Digest}}' 2>/dev/null || echo "")
+          fi
+
+          if [ -z "$DIGEST" ]; then
+            echo "Error: Could not retrieve image digest from registry"
+            exit 1
+          fi
+
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Attest Docker image SBOM
         uses: actions/attest-sbom@v1
