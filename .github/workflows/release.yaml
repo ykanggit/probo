@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+      image-digest: ${{ steps.image.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Syft
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate SBOM for attestation
+        run: |
+          syft dir:. --output cyclonedx-json --source-name probod --source-version ${{ github.ref_name }} > sbom.json
+
+      - name: Generate subject for attestation
+        id: hash
+        run: |
+          set -euo pipefail
+          (
+            cd dist
+            find . -type f -name '*.tar.gz' -o -name '*.zip' | while read file; do
+              echo "$(sha256sum "$file" | head -c 64)  $file"
+            done
+          ) > checksums.txt
+          echo "hashes=$(cat checksums.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+      - name: Attest SBOM
+        uses: actions/attest-sbom@v1
+        with:
+          subject-path: "dist/*.tar.gz, dist/*.zip"
+          sbom-path: "sbom.json"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: "dist/*.tar.gz, dist/*.zip"
+
+      - name: Get image digest
+        id: image
+        run: |
+          # Extract image digest from goreleaser output
+          echo "digest=$(docker inspect ghcr.io/getprobo/probo:${{ github.ref_name }} --format='{{index .RepoDigests 0}}' | cut -d'@' -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: Attest Docker image SBOM
+        uses: actions/attest-sbom@v1
+        with:
+          subject-name: "ghcr.io/getprobo/probo"
+          subject-digest: ${{ steps.image.outputs.digest }}
+          sbom-path: "sbom.json"
+
+      - name: Upload SBOM as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: |
+            sbom.json
+            checksums.txt
+          retention-days: 30
