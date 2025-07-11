@@ -122,3 +122,11 @@ stack-ps: ## List the docker stack containers
 .PHONY: psql
 psql: ## Open a psql shell to the postgres container
 	$(DOCKER_COMPOSE) exec postgres psql -U probod -d probod
+
+.PHONY: goreleaser-snapshot
+goreleaser-snapshot: ## Build a snapshot release with goreleaser
+	goreleaser release --snapshot --clean --config .goreleaser.yaml
+
+.PHONY: goreleaser-check
+goreleaser-check: ## Check goreleaser configuration
+	goreleaser check
