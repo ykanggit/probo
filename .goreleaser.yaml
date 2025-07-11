@@ -194,7 +194,3 @@ release:
     ### Architecture-specific images
     - `ghcr.io/getprobo/probo:{{ .Version }}-amd64`
     - `ghcr.io/getprobo/probo:{{ .Version }}-arm64`
-
-  extra_files:
-    - glob: "*.json"
-      name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}_sbom.json"
