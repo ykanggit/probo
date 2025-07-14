@@ -2,4 +2,7 @@ bin/
 node_modules/
 .turbo
 .vscode
-probo.log
+dist/
+sbom.json
+sbom-docker.json
+*_sbom.json
