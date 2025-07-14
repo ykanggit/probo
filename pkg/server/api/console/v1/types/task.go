@@ -65,6 +65,7 @@ func NewTaskEdge(t *coredata.Task, orderBy coredata.TaskOrderField) *TaskEdge {
 func NewTask(t *coredata.Task) *Task {
 	return &Task{
 		ID:           t.ID,
+		ReferenceID:  t.ReferenceID,
 		Name:         t.Name,
 		Description:  t.Description,
 		State:        t.State,

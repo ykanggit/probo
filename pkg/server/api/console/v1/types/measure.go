@@ -70,6 +70,7 @@ func NewMeasureEdge(c *coredata.Measure, orderBy coredata.MeasureOrderField) *Me
 func NewMeasure(c *coredata.Measure) *Measure {
 	return &Measure{
 		ID:          c.ID,
+		ReferenceID: c.ReferenceID,
 		Category:    c.Category,
 		Name:        c.Name,
 		Description: c.Description,

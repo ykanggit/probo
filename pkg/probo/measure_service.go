@@ -20,6 +20,11 @@ import (
 	"maps"
 	"time"
 
+	"bytes"
+	"encoding/csv"
+	"encoding/json"
+	"strings"
+
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
@@ -634,4 +639,313 @@ func (s MeasureService) Delete(
 	})
 
 	return deletedTaskIDs, err
+}
+
+func (s MeasureService) Export(
+	ctx context.Context,
+	organizationID gid.GID,
+	scope string,
+	format string,
+) (string, error) {
+	var buf bytes.Buffer
+	measures := coredata.Measures{}
+
+	err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
+		// Fetch all measures for the organization
+		cursor := page.NewCursor(10000, nil, page.Head, page.OrderBy[coredata.MeasureOrderField]{
+			Field:     coredata.MeasureOrderFieldCreatedAt,
+			Direction: page.OrderDirectionAsc,
+		})
+		if err := measures.LoadByOrganizationID(ctx, conn, s.svc.scope, organizationID, cursor, coredata.NewMeasureFilter(nil)); err != nil {
+			return err
+		}
+
+		if strings.ToLower(format) == "csv" {
+			w := csv.NewWriter(&buf)
+			w.Write([]string{"CONTROL", "TITLE", "DESCRIPTION", "STATE", "IMPLEMENTATION DETAILS"})
+			for _, m := range measures {
+				controls := coredata.Controls{}
+				if err := controls.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, page.NewCursor(10, nil, page.Head, page.OrderBy[coredata.ControlOrderField]{Field: coredata.ControlOrderFieldCreatedAt, Direction: page.OrderDirectionAsc}), coredata.NewControlFilter(nil)); err != nil {
+					return err
+				}
+				controlRef := ""
+				if len(controls) > 0 {
+					controlRef = controls[0].SectionTitle
+				}
+				tasks := coredata.Tasks{}
+				if err := tasks.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, page.NewCursor(10, nil, page.Head, page.OrderBy[coredata.TaskOrderField]{Field: coredata.TaskOrderFieldCreatedAt, Direction: page.OrderDirectionAsc})); err != nil {
+					return err
+				}
+				implDetails := ""
+				if len(tasks) > 0 {
+					implDetails = tasks[0].Description
+				}
+				w.Write([]string{controlRef, m.Name, m.Description, string(m.State), implDetails})
+			}
+			w.Flush()
+			return w.Error()
+		} else if strings.ToLower(format) == "json" {
+
+			type ExportedMeasure struct {
+				Name        string `json:"name"`
+				Description string `json:"description"`
+				Category    string `json:"category"`
+				ReferenceID string `json:"reference-id"`
+				State       string `json:"state"`
+				Standards   []struct {
+					Framework string `json:"framework"`
+					Control   string `json:"control"`
+				} `json:"standards"`
+				Tasks []struct {
+					Name        string `json:"name"`
+					Description string `json:"description"`
+					ReferenceID string `json:"reference-id"`
+					State       string `json:"state"`
+				} `json:"tasks"`
+			}
+			var exported []ExportedMeasure
+			for _, m := range measures {
+				controls := coredata.Controls{}
+				if err := controls.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, page.NewCursor(10, nil, page.Head, page.OrderBy[coredata.ControlOrderField]{Field: coredata.ControlOrderFieldCreatedAt, Direction: page.OrderDirectionAsc}), coredata.NewControlFilter(nil)); err != nil {
+					return err
+				}
+				standards := make([]struct {
+					Framework string `json:"framework"`
+					Control   string `json:"control"`
+				}, len(controls))
+				for i, c := range controls {
+					standards[i].Framework = ""
+					standards[i].Control = c.SectionTitle
+				}
+				tasks := coredata.Tasks{}
+				if err := tasks.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, page.NewCursor(100, nil, page.Head, page.OrderBy[coredata.TaskOrderField]{Field: coredata.TaskOrderFieldCreatedAt, Direction: page.OrderDirectionAsc})); err != nil {
+					return err
+				}
+				exportedTasks := make([]struct {
+					Name        string `json:"name"`
+					Description string `json:"description"`
+					ReferenceID string `json:"reference-id"`
+					State       string `json:"state"`
+				}, len(tasks))
+				for i, t := range tasks {
+					exportedTasks[i].Name = t.Name
+					exportedTasks[i].Description = t.Description
+					exportedTasks[i].ReferenceID = t.ReferenceID
+					exportedTasks[i].State = string(t.State)
+				}
+				exported = append(exported, ExportedMeasure{
+					Name:        m.Name,
+					Description: m.Description,
+					Category:    m.Category,
+					ReferenceID: m.ReferenceID,
+					State:       string(m.State),
+					Standards:   standards,
+					Tasks:       exportedTasks,
+				})
+			}
+			enc := json.NewEncoder(&buf)
+			enc.SetIndent("", "  ")
+			return enc.Encode(map[string]any{"measures": exported})
+		}
+		return fmt.Errorf("unsupported format: %s", format)
+	})
+	if err != nil {
+		return "", err
+	}
+
+	// Upload to S3/MinIO
+	// s3Client := s.svc.s3Client
+	// bucket := s.svc.cfg.AWS.Bucket
+	// key := fmt.Sprintf("exports/measures-%s-%d.%s", organizationID.String(), time.Now().Unix(), strings.ToLower(format))
+	// uploader := s3manager.NewUploader(s3Client)
+	// _, err = uploader.Upload(ctx, &s3.PutObjectInput{
+	// 	Bucket:      aws.String(bucket),
+	// 	Key:         aws.String(key),
+	// 	Body:        bytes.NewReader(buf.Bytes()),
+	// 	ContentType: aws.String(map[string]string{"csv": "text/csv", "json": "application/json"}[strings.ToLower(format)]),
+	// })
+	// if err != nil {
+	// 	return "", fmt.Errorf("failed to upload export: %w", err)
+	// }
+
+	// Generate a presigned URL
+	// presignClient := s3.NewPresignClient(s3Client)
+	// presigned, err := presignClient.PresignGetObject(ctx, &s3.GetObjectInput{
+	// 	Bucket: aws.String(bucket),
+	// 	Key:    aws.String(key),
+	// }, s3.WithPresignExpires(10*time.Minute))
+	// if err != nil {
+	// 	return "", fmt.Errorf("failed to presign export: %w", err)
+	// }
+
+	// return presigned.URL, nil
+	return "", fmt.Errorf("S3/MinIO export is not implemented")
+}
+
+// ExportAll exports all measures for an organization as CSV or JSON for direct download
+func (s MeasureService) ExportAll(
+	ctx context.Context,
+	organizationID gid.GID,
+	format string,
+) ([]byte, string, error) {
+	var measures coredata.Measures
+	err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
+		// Create an empty filter and a cursor that loads all records
+		filter := &coredata.MeasureFilter{}
+		cursor := page.NewCursor(10000, nil, page.Head, page.OrderBy[coredata.MeasureOrderField]{
+			Field:     coredata.MeasureOrderFieldCreatedAt,
+			Direction: page.OrderDirectionAsc,
+		})
+		return measures.LoadByOrganizationID(ctx, conn, s.svc.scope, organizationID, cursor, filter)
+	})
+	if err != nil {
+		return nil, "", err
+	}
+
+	switch format {
+	case "csv":
+		var buf bytes.Buffer
+		w := csv.NewWriter(&buf)
+		w.Write([]string{"CONTROL", "TITLE", "DESCRIPTION", "STATE", "IMPLEMENTATION DETAILS"})
+		for _, m := range measures {
+			var controls coredata.Controls
+			err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
+				// Create proper cursor and filter for controls
+				cursor := page.NewCursor(100, nil, page.Head, page.OrderBy[coredata.ControlOrderField]{
+					Field:     coredata.ControlOrderFieldCreatedAt,
+					Direction: page.OrderDirectionAsc,
+				})
+				filter := &coredata.ControlFilter{}
+				return controls.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, cursor, filter)
+			})
+			if err != nil {
+				return nil, "", err
+			}
+			controlRef := ""
+			if len(controls) > 0 {
+				controlRef = controls[0].SectionTitle
+			}
+			var tasks coredata.Tasks
+			err = s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
+				// Create proper cursor for tasks
+				cursor := page.NewCursor(100, nil, page.Head, page.OrderBy[coredata.TaskOrderField]{
+					Field:     coredata.TaskOrderFieldCreatedAt,
+					Direction: page.OrderDirectionAsc,
+				})
+				return tasks.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, cursor)
+			})
+			if err != nil {
+				return nil, "", err
+			}
+			implDetails := ""
+			if len(tasks) > 0 {
+				implDetails = tasks[0].Description
+			}
+			w.Write([]string{
+				controlRef,
+				m.Name,
+				m.Description,
+				string(m.State),
+				implDetails,
+			})
+		}
+		w.Flush()
+		filename := "measures-export-" + time.Now().Format("2006-01-02") + ".csv"
+		return buf.Bytes(), filename, nil
+	case "json":
+		type ExportedMeasure struct {
+			Name        string `json:"name"`
+			Description string `json:"description"`
+			Category    string `json:"category"`
+			ReferenceID string `json:"reference-id"`
+			State       string `json:"state"`
+			Standards   []struct {
+				Framework string `json:"framework"`
+				Control   string `json:"control"`
+			} `json:"standards"`
+			Tasks []struct {
+				Name        string `json:"name"`
+				Description string `json:"description"`
+				ReferenceID string `json:"reference-id"`
+				State       string `json:"state"`
+			} `json:"tasks"`
+		}
+		exportData := struct {
+			Measures []ExportedMeasure `json:"measures"`
+		}{Measures: []ExportedMeasure{}}
+		for _, m := range measures {
+			var controls coredata.Controls
+			err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
+				// Create proper cursor and filter for controls
+				cursor := page.NewCursor(100, nil, page.Head, page.OrderBy[coredata.ControlOrderField]{
+					Field:     coredata.ControlOrderFieldCreatedAt,
+					Direction: page.OrderDirectionAsc,
+				})
+				filter := &coredata.ControlFilter{}
+				return controls.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, cursor, filter)
+			})
+			if err != nil {
+				return nil, "", err
+			}
+			var tasks coredata.Tasks
+			err = s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
+				// Create proper cursor for tasks
+				cursor := page.NewCursor(100, nil, page.Head, page.OrderBy[coredata.TaskOrderField]{
+					Field:     coredata.TaskOrderFieldCreatedAt,
+					Direction: page.OrderDirectionAsc,
+				})
+				return tasks.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, cursor)
+			})
+			if err != nil {
+				return nil, "", err
+			}
+			em := ExportedMeasure{
+				Name:        m.Name,
+				Description: m.Description,
+				Category:    m.Category,
+				ReferenceID: m.ReferenceID,
+				State:       m.State.String(),
+			}
+			for _, c := range controls {
+				// Load the framework to get the actual framework name
+				var framework coredata.Framework
+				err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
+					return framework.LoadByID(ctx, conn, s.svc.scope, c.FrameworkID)
+				})
+				if err != nil {
+					return nil, "", err
+				}
+
+				em.Standards = append(em.Standards, struct {
+					Framework string `json:"framework"`
+					Control   string `json:"control"`
+				}{
+					Framework: framework.Name,
+					Control:   c.SectionTitle,
+				})
+			}
+			for _, t := range tasks {
+				em.Tasks = append(em.Tasks, struct {
+					Name        string `json:"name"`
+					Description string `json:"description"`
+					ReferenceID string `json:"reference-id"`
+					State       string `json:"state"`
+				}{
+					Name:        t.Name,
+					Description: t.Description,
+					ReferenceID: t.ReferenceID,
+					State:       t.State.String(),
+				})
+			}
+			exportData.Measures = append(exportData.Measures, em)
+		}
+		jsonBytes, err := json.MarshalIndent(exportData, "", "  ")
+		if err != nil {
+			return nil, "", err
+		}
+		filename := "measures-export-" + time.Now().Format("2006-01-02") + ".json"
+		return jsonBytes, filename, nil
+	default:
+		return nil, "", fmt.Errorf("unsupported format: %s", format)
+	}
 }

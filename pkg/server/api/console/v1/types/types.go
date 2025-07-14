@@ -3,6 +3,10 @@
 package types
 
 import (
+	"bytes"
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -642,6 +646,16 @@ type ExportDocumentVersionPDFPayload struct {
 	Data string `json:"data"`
 }
 
+type ExportMeasuresInput struct {
+	OrganizationID gid.GID      `json:"organizationId"`
+	Scope          ExportScope  `json:"scope"`
+	Format         ExportFormat `json:"format"`
+}
+
+type ExportMeasuresPayload struct {
+	URL string `json:"url"`
+}
+
 type Framework struct {
 	ID           gid.GID            `json:"id"`
 	Name         string             `json:"name"`
@@ -718,6 +732,7 @@ type InviteUserPayload struct {
 
 type Measure struct {
 	ID          gid.GID               `json:"id"`
+	ReferenceID string                `json:"referenceId"`
 	Category    string                `json:"category"`
 	Name        string                `json:"name"`
 	Description string                `json:"description"`
@@ -908,6 +923,7 @@ type Session struct {
 
 type Task struct {
 	ID           gid.GID             `json:"id"`
+	ReferenceID  string              `json:"referenceId"`
 	Name         string              `json:"name"`
 	Description  string              `json:"description"`
 	State        coredata.TaskState  `json:"state"`
@@ -1254,4 +1270,114 @@ type Viewer struct {
 	ID            gid.GID                 `json:"id"`
 	User          *User                   `json:"user"`
 	Organizations *OrganizationConnection `json:"organizations"`
+}
+
+type ExportFormat string
+
+const (
+	ExportFormatCSV  ExportFormat = "CSV"
+	ExportFormatJSON ExportFormat = "JSON"
+)
+
+var AllExportFormat = []ExportFormat{
+	ExportFormatCSV,
+	ExportFormatJSON,
+}
+
+func (e ExportFormat) IsValid() bool {
+	switch e {
+	case ExportFormatCSV, ExportFormatJSON:
+		return true
+	}
+	return false
+}
+
+func (e ExportFormat) String() string {
+	return string(e)
+}
+
+func (e *ExportFormat) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ExportFormat(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ExportFormat", str)
+	}
+	return nil
+}
+
+func (e ExportFormat) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *ExportFormat) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e ExportFormat) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type ExportScope string
+
+const (
+	ExportScopeCurrent ExportScope = "CURRENT"
+	ExportScopeAll     ExportScope = "ALL"
+)
+
+var AllExportScope = []ExportScope{
+	ExportScopeCurrent,
+	ExportScopeAll,
+}
+
+func (e ExportScope) IsValid() bool {
+	switch e {
+	case ExportScopeCurrent, ExportScopeAll:
+		return true
+	}
+	return false
+}
+
+func (e ExportScope) String() string {
+	return string(e)
+}
+
+func (e *ExportScope) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ExportScope(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ExportScope", str)
+	}
+	return nil
+}
+
+func (e ExportScope) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *ExportScope) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e ExportScope) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
 }
