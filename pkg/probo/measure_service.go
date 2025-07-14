@@ -680,7 +680,7 @@ func (s MeasureService) Export(
 				if len(tasks) > 0 {
 					implDetails = tasks[0].Description
 				}
-				w.Write([]string{controlRef, m.Name, m.Description, string(m.State), implDetails})
+				w.Write([]string{controlRef, m.Name, m.Description, m.State.String(), implDetails})
 			}
 			w.Flush()
 			return w.Error()
@@ -731,14 +731,14 @@ func (s MeasureService) Export(
 					exportedTasks[i].Name = t.Name
 					exportedTasks[i].Description = t.Description
 					exportedTasks[i].ReferenceID = t.ReferenceID
-					exportedTasks[i].State = string(t.State)
+					exportedTasks[i].State = t.State.String()
 				}
 				exported = append(exported, ExportedMeasure{
 					Name:        m.Name,
 					Description: m.Description,
 					Category:    m.Category,
 					ReferenceID: m.ReferenceID,
-					State:       string(m.State),
+					State:       m.State.String(),
 					Standards:   standards,
 					Tasks:       exportedTasks,
 				})
@@ -845,7 +845,7 @@ func (s MeasureService) ExportAll(
 				controlRef,
 				m.Name,
 				m.Description,
-				string(m.State),
+				m.State.String(),
 				implDetails,
 			})
 		}
