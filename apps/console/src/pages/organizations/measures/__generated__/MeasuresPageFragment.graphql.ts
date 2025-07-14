@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<78c502076a70be347404f14270aa58c6>>
+ * @generated SignedSource<<3ff52f114dc1be7d56e0aed14e1b1fbb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,6 +10,7 @@
 
 import { ReaderFragment } from 'relay-runtime';
 export type MeasureState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
+export type TaskState = "DONE" | "TODO";
 import { FragmentRefs } from "relay-runtime";
 export type MeasuresPageFragment$data = {
   readonly id: string;
@@ -19,9 +20,32 @@ export type MeasuresPageFragment$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly category: string;
+        readonly controls: {
+          readonly edges: ReadonlyArray<{
+            readonly node: {
+              readonly framework: {
+                readonly name: string;
+              };
+              readonly sectionTitle: string;
+            };
+          }>;
+        };
+        readonly description: string;
         readonly id: string;
         readonly name: string;
+        readonly referenceId: string;
         readonly state: MeasureState;
+        readonly tasks: {
+          readonly edges: ReadonlyArray<{
+            readonly node: {
+              readonly description: string;
+              readonly id: string;
+              readonly name: string;
+              readonly referenceId: string;
+              readonly state: TaskState;
+            };
+          }>;
+        };
         readonly " $fragmentSpreads": FragmentRefs<"MeasureFormDialogMeasureFragment">;
       };
     }>;
@@ -49,7 +73,42 @@ v1 = {
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
-};
+},
+v2 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "referenceId",
+  "storageKey": null
+},
+v3 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+},
+v4 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "state",
+  "storageKey": null
+},
+v5 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "description",
+  "storageKey": null
+},
+v6 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 1
+  }
+];
 return {
   "argumentDefinitions": [
     {
@@ -178,13 +237,8 @@ return {
               "plural": false,
               "selections": [
                 (v1/*: any*/),
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "name",
-                  "storageKey": null
-                },
+                (v2/*: any*/),
+                (v3/*: any*/),
                 {
                   "alias": null,
                   "args": null,
@@ -192,12 +246,97 @@ return {
                   "name": "category",
                   "storageKey": null
                 },
+                (v4/*: any*/),
+                (v5/*: any*/),
                 {
                   "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "state",
-                  "storageKey": null
+                  "args": (v6/*: any*/),
+                  "concreteType": "ControlConnection",
+                  "kind": "LinkedField",
+                  "name": "controls",
+                  "plural": false,
+                  "selections": [
+                    {
+                      "alias": null,
+                      "args": null,
+                      "concreteType": "ControlEdge",
+                      "kind": "LinkedField",
+                      "name": "edges",
+                      "plural": true,
+                      "selections": [
+                        {
+                          "alias": null,
+                          "args": null,
+                          "concreteType": "Control",
+                          "kind": "LinkedField",
+                          "name": "node",
+                          "plural": false,
+                          "selections": [
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "sectionTitle",
+                              "storageKey": null
+                            },
+                            {
+                              "alias": null,
+                              "args": null,
+                              "concreteType": "Framework",
+                              "kind": "LinkedField",
+                              "name": "framework",
+                              "plural": false,
+                              "selections": [
+                                (v3/*: any*/)
+                              ],
+                              "storageKey": null
+                            }
+                          ],
+                          "storageKey": null
+                        }
+                      ],
+                      "storageKey": null
+                    }
+                  ],
+                  "storageKey": "controls(first:1)"
+                },
+                {
+                  "alias": null,
+                  "args": (v6/*: any*/),
+                  "concreteType": "TaskConnection",
+                  "kind": "LinkedField",
+                  "name": "tasks",
+                  "plural": false,
+                  "selections": [
+                    {
+                      "alias": null,
+                      "args": null,
+                      "concreteType": "TaskEdge",
+                      "kind": "LinkedField",
+                      "name": "edges",
+                      "plural": true,
+                      "selections": [
+                        {
+                          "alias": null,
+                          "args": null,
+                          "concreteType": "Task",
+                          "kind": "LinkedField",
+                          "name": "node",
+                          "plural": false,
+                          "selections": [
+                            (v1/*: any*/),
+                            (v2/*: any*/),
+                            (v3/*: any*/),
+                            (v5/*: any*/),
+                            (v4/*: any*/)
+                          ],
+                          "storageKey": null
+                        }
+                      ],
+                      "storageKey": null
+                    }
+                  ],
+                  "storageKey": "tasks(first:1)"
                 },
                 {
                   "args": null,
@@ -285,6 +424,6 @@ return {
 };
 })();
 
-(node as any).hash = "4d982147f48e75619d93150fb1ea01c0";
+(node as any).hash = "a581f449f589ca2835b944bea250bcf0";
 
 export default node;

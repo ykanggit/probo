@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ed5a316f535ca95dde4b12e2cec72754>>
+ * @generated SignedSource<<29c5c69f18349dce1decfa0cfc363ab6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -115,6 +115,41 @@ v13 = [
     "kind": "Variable",
     "name": "orderBy",
     "variableName": "order"
+  }
+],
+v14 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "referenceId",
+  "storageKey": null
+},
+v15 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+},
+v16 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "state",
+  "storageKey": null
+},
+v17 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "description",
+  "storageKey": null
+},
+v18 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 1
   }
 ];
 return {
@@ -247,13 +282,8 @@ return {
                         "plural": false,
                         "selections": [
                           (v12/*: any*/),
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "name",
-                            "storageKey": null
-                          },
+                          (v14/*: any*/),
+                          (v15/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -261,19 +291,99 @@ return {
                             "name": "category",
                             "storageKey": null
                           },
+                          (v16/*: any*/),
+                          (v17/*: any*/),
                           {
                             "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "state",
-                            "storageKey": null
+                            "args": (v18/*: any*/),
+                            "concreteType": "ControlConnection",
+                            "kind": "LinkedField",
+                            "name": "controls",
+                            "plural": false,
+                            "selections": [
+                              {
+                                "alias": null,
+                                "args": null,
+                                "concreteType": "ControlEdge",
+                                "kind": "LinkedField",
+                                "name": "edges",
+                                "plural": true,
+                                "selections": [
+                                  {
+                                    "alias": null,
+                                    "args": null,
+                                    "concreteType": "Control",
+                                    "kind": "LinkedField",
+                                    "name": "node",
+                                    "plural": false,
+                                    "selections": [
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "sectionTitle",
+                                        "storageKey": null
+                                      },
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "concreteType": "Framework",
+                                        "kind": "LinkedField",
+                                        "name": "framework",
+                                        "plural": false,
+                                        "selections": [
+                                          (v15/*: any*/),
+                                          (v12/*: any*/)
+                                        ],
+                                        "storageKey": null
+                                      },
+                                      (v12/*: any*/)
+                                    ],
+                                    "storageKey": null
+                                  }
+                                ],
+                                "storageKey": null
+                              }
+                            ],
+                            "storageKey": "controls(first:1)"
                           },
                           {
                             "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "description",
-                            "storageKey": null
+                            "args": (v18/*: any*/),
+                            "concreteType": "TaskConnection",
+                            "kind": "LinkedField",
+                            "name": "tasks",
+                            "plural": false,
+                            "selections": [
+                              {
+                                "alias": null,
+                                "args": null,
+                                "concreteType": "TaskEdge",
+                                "kind": "LinkedField",
+                                "name": "edges",
+                                "plural": true,
+                                "selections": [
+                                  {
+                                    "alias": null,
+                                    "args": null,
+                                    "concreteType": "Task",
+                                    "kind": "LinkedField",
+                                    "name": "node",
+                                    "plural": false,
+                                    "selections": [
+                                      (v12/*: any*/),
+                                      (v14/*: any*/),
+                                      (v15/*: any*/),
+                                      (v17/*: any*/),
+                                      (v16/*: any*/)
+                                    ],
+                                    "storageKey": null
+                                  }
+                                ],
+                                "storageKey": null
+                              }
+                            ],
+                            "storageKey": "tasks(first:1)"
                           },
                           (v11/*: any*/)
                         ],
@@ -364,16 +474,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "cc8775b3e41942b2901fd380691f5499",
+    "cacheID": "de921748c6000f97623083a0e6d8d29d",
     "id": null,
     "metadata": {},
     "name": "MeasuresPageFragment_query",
     "operationKind": "query",
-    "text": "query MeasuresPageFragment_query(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: MeasureOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...MeasuresPageFragment_16fISc\n    id\n  }\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasuresPageFragment_16fISc on Organization {\n  measures(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    totalCount\n    notStartedCount\n    inProgressCount\n    notApplicableCount\n    completedCount\n    edges {\n      node {\n        id\n        name\n        category\n        state\n        ...MeasureFormDialogMeasureFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query MeasuresPageFragment_query(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: MeasureOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...MeasuresPageFragment_16fISc\n    id\n  }\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasuresPageFragment_16fISc on Organization {\n  measures(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    totalCount\n    notStartedCount\n    inProgressCount\n    notApplicableCount\n    completedCount\n    edges {\n      node {\n        id\n        referenceId\n        name\n        category\n        state\n        description\n        controls(first: 1) {\n          edges {\n            node {\n              sectionTitle\n              framework {\n                name\n                id\n              }\n              id\n            }\n          }\n        }\n        tasks(first: 1) {\n          edges {\n            node {\n              id\n              referenceId\n              name\n              description\n              state\n            }\n          }\n        }\n        ...MeasureFormDialogMeasureFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "4d982147f48e75619d93150fb1ea01c0";
+(node as any).hash = "a581f449f589ca2835b944bea250bcf0";
 
 export default node;

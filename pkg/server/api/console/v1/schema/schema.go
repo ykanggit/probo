@@ -440,6 +440,10 @@ type ComplexityRoot struct {
 		Data func(childComplexity int) int
 	}
 
+	ExportMeasuresPayload struct {
+		URL func(childComplexity int) int
+	}
+
 	Framework struct {
 		Controls     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) int
 		CreatedAt    func(childComplexity int) int
@@ -494,6 +498,7 @@ type ComplexityRoot struct {
 		Evidences   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.EvidenceOrderBy) int
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
+		ReferenceID func(childComplexity int) int
 		Risks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) int
 		State       func(childComplexity int) int
 		Tasks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) int
@@ -556,6 +561,7 @@ type ComplexityRoot struct {
 		DeleteVendorComplianceReport          func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
 		ExportAudit                           func(childComplexity int, input types.ExportAuditInput) int
 		ExportDocumentVersionPDF              func(childComplexity int, input types.ExportDocumentVersionPDFInput) int
+		ExportMeasures                        func(childComplexity int, input types.ExportMeasuresInput) int
 		FulfillEvidence                       func(childComplexity int, input types.FulfillEvidenceInput) int
 		GenerateDocumentChangelog             func(childComplexity int, input types.GenerateDocumentChangelogInput) int
 		GenerateFrameworkStateOfApplicability func(childComplexity int, input types.GenerateFrameworkStateOfApplicabilityInput) int
@@ -726,6 +732,7 @@ type ComplexityRoot struct {
 		Measure      func(childComplexity int) int
 		Name         func(childComplexity int) int
 		Organization func(childComplexity int) int
+		ReferenceID  func(childComplexity int) int
 		State        func(childComplexity int) int
 		TimeEstimate func(childComplexity int) int
 		UpdatedAt    func(childComplexity int) int
@@ -1021,6 +1028,7 @@ type MutationResolver interface {
 	UpdateMeasure(ctx context.Context, input types.UpdateMeasureInput) (*types.UpdateMeasurePayload, error)
 	ImportMeasure(ctx context.Context, input types.ImportMeasureInput) (*types.ImportMeasurePayload, error)
 	DeleteMeasure(ctx context.Context, input types.DeleteMeasureInput) (*types.DeleteMeasurePayload, error)
+	ExportMeasures(ctx context.Context, input types.ExportMeasuresInput) (*types.ExportMeasuresPayload, error)
 	CreateControlMeasureMapping(ctx context.Context, input types.CreateControlMeasureMappingInput) (*types.CreateControlMeasureMappingPayload, error)
 	CreateControlDocumentMapping(ctx context.Context, input types.CreateControlDocumentMappingInput) (*types.CreateControlDocumentMappingPayload, error)
 	DeleteControlMeasureMapping(ctx context.Context, input types.DeleteControlMeasureMappingInput) (*types.DeleteControlMeasureMappingPayload, error)
@@ -2359,6 +2367,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.ExportDocumentVersionPDFPayload.Data(childComplexity), true
 
+	case "ExportMeasuresPayload.url":
+		if e.complexity.ExportMeasuresPayload.URL == nil {
+			break
+		}
+
+		return e.complexity.ExportMeasuresPayload.URL(childComplexity), true
+
 	case "Framework.controls":
 		if e.complexity.Framework.Controls == nil {
 			break
@@ -2555,6 +2570,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Measure.Name(childComplexity), true
+
+	case "Measure.referenceId":
+		if e.complexity.Measure.ReferenceID == nil {
+			break
+		}
+
+		return e.complexity.Measure.ReferenceID(childComplexity), true
 
 	case "Measure.risks":
 		if e.complexity.Measure.Risks == nil {
@@ -3136,6 +3158,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.ExportDocumentVersionPDF(childComplexity, args["input"].(types.ExportDocumentVersionPDFInput)), true
+
+	case "Mutation.exportMeasures":
+		if e.complexity.Mutation.ExportMeasures == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_exportMeasures_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ExportMeasures(childComplexity, args["input"].(types.ExportMeasuresInput)), true
 
 	case "Mutation.fulfillEvidence":
 		if e.complexity.Mutation.FulfillEvidence == nil {
@@ -4169,6 +4203,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Task.Organization(childComplexity), true
 
+	case "Task.referenceId":
+		if e.complexity.Task.ReferenceID == nil {
+			break
+		}
+
+		return e.complexity.Task.ReferenceID(childComplexity), true
+
 	case "Task.state":
 		if e.complexity.Task.State == nil {
 			break
@@ -4914,6 +4955,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputEvidenceOrder,
 		ec.unmarshalInputExportAuditInput,
 		ec.unmarshalInputExportDocumentVersionPDFInput,
+		ec.unmarshalInputExportMeasuresInput,
 		ec.unmarshalInputFrameworkOrder,
 		ec.unmarshalInputFulfillEvidenceInput,
 		ec.unmarshalInputGenerateDocumentChangelogInput,
@@ -5944,6 +5986,7 @@ type Control implements Node {
 
 type Measure implements Node {
   id: ID!
+  referenceId: String!
   category: String!
   name: String!
   description: String!
@@ -5989,6 +6032,7 @@ type Measure implements Node {
 
 type Task implements Node {
   id: ID!
+  referenceId: String!
   name: String!
   description: String!
   state: TaskState!
@@ -6385,6 +6429,7 @@ type Mutation {
   updateMeasure(input: UpdateMeasureInput!): UpdateMeasurePayload!
   importMeasure(input: ImportMeasureInput!): ImportMeasurePayload!
   deleteMeasure(input: DeleteMeasureInput!): DeleteMeasurePayload!
+  exportMeasures(input: ExportMeasuresInput!): ExportMeasuresPayload!
 
   # Control mutations
   createControlMeasureMapping(
@@ -7089,9 +7134,29 @@ input DeleteMeasureInput {
   measureId: ID!
 }
 
+input ExportMeasuresInput {
+  organizationId: ID!
+  scope: ExportScope!
+  format: ExportFormat!
+}
+
+enum ExportScope {
+  CURRENT
+  ALL
+}
+
+enum ExportFormat {
+  CSV
+  JSON
+}
+
 type DeleteMeasurePayload {
   deletedMeasureId: ID!
   deletedTaskIds: [ID!]!
+}
+
+type ExportMeasuresPayload {
+  url: String!
 }
 
 type DocumentVersion implements Node {
@@ -9595,6 +9660,29 @@ func (ec *executionContext) field_Mutation_exportDocumentVersionPDF_argsInput(
 	}
 
 	var zeroVal types.ExportDocumentVersionPDFInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_exportMeasures_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_exportMeasures_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_exportMeasures_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.ExportMeasuresInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNExportMeasuresInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportMeasuresInput(ctx, tmp)
+	}
+
+	var zeroVal types.ExportMeasuresInput
 	return zeroVal, nil
 }
 
@@ -13287,6 +13375,8 @@ func (ec *executionContext) fieldContext_AssignTaskPayload_task(_ context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Task_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Task_referenceId(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
@@ -20178,6 +20268,8 @@ func (ec *executionContext) fieldContext_Evidence_task(_ context.Context, field 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Task_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Task_referenceId(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
@@ -20248,6 +20340,8 @@ func (ec *executionContext) fieldContext_Evidence_measure(_ context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Measure_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Measure_referenceId(ctx, field)
 			case "category":
 				return ec.fieldContext_Measure_category(ctx, field)
 			case "name":
@@ -20705,6 +20799,50 @@ func (ec *executionContext) _ExportDocumentVersionPDFPayload_data(ctx context.Co
 func (ec *executionContext) fieldContext_ExportDocumentVersionPDFPayload_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ExportDocumentVersionPDFPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExportMeasuresPayload_url(ctx context.Context, field graphql.CollectedField, obj *types.ExportMeasuresPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExportMeasuresPayload_url(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExportMeasuresPayload_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExportMeasuresPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -21718,6 +21856,50 @@ func (ec *executionContext) fieldContext_Measure_id(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Measure_referenceId(ctx context.Context, field graphql.CollectedField, obj *types.Measure) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Measure_referenceId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReferenceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Measure_referenceId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Measure",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Measure_category(ctx context.Context, field graphql.CollectedField, obj *types.Measure) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Measure_category(ctx, field)
 	if err != nil {
@@ -22647,6 +22829,8 @@ func (ec *executionContext) fieldContext_MeasureEdge_node(_ context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Measure_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Measure_referenceId(ctx, field)
 			case "category":
 				return ec.fieldContext_Measure_category(ctx, field)
 			case "name":
@@ -24088,6 +24272,65 @@ func (ec *executionContext) fieldContext_Mutation_deleteMeasure(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteMeasure_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_exportMeasures(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_exportMeasures(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ExportMeasures(rctx, fc.Args["input"].(types.ExportMeasuresInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ExportMeasuresPayload)
+	fc.Result = res
+	return ec.marshalNExportMeasuresPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportMeasuresPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_exportMeasures(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "url":
+				return ec.fieldContext_ExportMeasuresPayload_url(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ExportMeasuresPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_exportMeasures_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -30919,6 +31162,50 @@ func (ec *executionContext) fieldContext_Task_id(_ context.Context, field graphq
 	return fc, nil
 }
 
+func (ec *executionContext) _Task_referenceId(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_referenceId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReferenceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_referenceId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Task_name(ctx context.Context, field graphql.CollectedField, obj *types.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_name(ctx, field)
 	if err != nil {
@@ -31326,6 +31613,8 @@ func (ec *executionContext) fieldContext_Task_measure(_ context.Context, field g
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Measure_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Measure_referenceId(ctx, field)
 			case "category":
 				return ec.fieldContext_Measure_category(ctx, field)
 			case "name":
@@ -31825,6 +32114,8 @@ func (ec *executionContext) fieldContext_TaskEdge_node(_ context.Context, field 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Task_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Task_referenceId(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
@@ -31895,6 +32186,8 @@ func (ec *executionContext) fieldContext_UnassignTaskPayload_task(_ context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Task_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Task_referenceId(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
@@ -32359,6 +32652,8 @@ func (ec *executionContext) fieldContext_UpdateMeasurePayload_measure(_ context.
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Measure_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Measure_referenceId(ctx, field)
 			case "category":
 				return ec.fieldContext_Measure_category(ctx, field)
 			case "name":
@@ -32669,6 +32964,8 @@ func (ec *executionContext) fieldContext_UpdateTaskPayload_task(_ context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Task_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Task_referenceId(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
 			case "description":
@@ -40409,6 +40706,47 @@ func (ec *executionContext) unmarshalInputExportDocumentVersionPDFInput(ctx cont
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputExportMeasuresInput(ctx context.Context, obj any) (types.ExportMeasuresInput, error) {
+	var it types.ExportMeasuresInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"organizationId", "scope", "format"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
+		case "scope":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scope"))
+			data, err := ec.unmarshalNExportScope2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportScope(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Scope = data
+		case "format":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("format"))
+			data, err := ec.unmarshalNExportFormat2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportFormat(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Format = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputFrameworkOrder(ctx context.Context, obj any) (types.FrameworkOrderBy, error) {
 	var it types.FrameworkOrderBy
 	asMap := map[string]any{}
@@ -46249,6 +46587,45 @@ func (ec *executionContext) _ExportDocumentVersionPDFPayload(ctx context.Context
 	return out
 }
 
+var exportMeasuresPayloadImplementors = []string{"ExportMeasuresPayload"}
+
+func (ec *executionContext) _ExportMeasuresPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ExportMeasuresPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, exportMeasuresPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ExportMeasuresPayload")
+		case "url":
+			out.Values[i] = ec._ExportMeasuresPayload_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var frameworkImplementors = []string{"Framework", "Node"}
 
 func (ec *executionContext) _Framework(ctx context.Context, sel ast.SelectionSet, obj *types.Framework) graphql.Marshaler {
@@ -46756,6 +47133,11 @@ func (ec *executionContext) _Measure(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = graphql.MarshalString("Measure")
 		case "id":
 			out.Values[i] = ec._Measure_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "referenceId":
+			out.Values[i] = ec._Measure_referenceId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -47407,6 +47789,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteMeasure":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteMeasure(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "exportMeasures":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_exportMeasures(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -49357,6 +49746,11 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = graphql.MarshalString("Task")
 		case "id":
 			out.Values[i] = ec._Task_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "referenceId":
+			out.Values[i] = ec._Task_referenceId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -53765,6 +54159,45 @@ func (ec *executionContext) marshalNExportDocumentVersionPDFPayload2ᚖgithubᚗ
 		return graphql.Null
 	}
 	return ec._ExportDocumentVersionPDFPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNExportFormat2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportFormat(ctx context.Context, v any) (types.ExportFormat, error) {
+	var res types.ExportFormat
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNExportFormat2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportFormat(ctx context.Context, sel ast.SelectionSet, v types.ExportFormat) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNExportMeasuresInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportMeasuresInput(ctx context.Context, v any) (types.ExportMeasuresInput, error) {
+	res, err := ec.unmarshalInputExportMeasuresInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNExportMeasuresPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportMeasuresPayload(ctx context.Context, sel ast.SelectionSet, v types.ExportMeasuresPayload) graphql.Marshaler {
+	return ec._ExportMeasuresPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNExportMeasuresPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportMeasuresPayload(ctx context.Context, sel ast.SelectionSet, v *types.ExportMeasuresPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ExportMeasuresPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNExportScope2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportScope(ctx context.Context, v any) (types.ExportScope, error) {
+	var res types.ExportScope
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNExportScope2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐExportScope(ctx context.Context, sel ast.SelectionSet, v types.ExportScope) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNFramework2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v types.Framework) graphql.Marshaler {

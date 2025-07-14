@@ -892,6 +892,7 @@ type Control implements Node {
 
 type Measure implements Node {
   id: ID!
+  referenceId: String!
   category: String!
   name: String!
   description: String!
@@ -937,6 +938,7 @@ type Measure implements Node {
 
 type Task implements Node {
   id: ID!
+  referenceId: String!
   name: String!
   description: String!
   state: TaskState!
@@ -1333,6 +1335,7 @@ type Mutation {
   updateMeasure(input: UpdateMeasureInput!): UpdateMeasurePayload!
   importMeasure(input: ImportMeasureInput!): ImportMeasurePayload!
   deleteMeasure(input: DeleteMeasureInput!): DeleteMeasurePayload!
+  exportMeasures(input: ExportMeasuresInput!): ExportMeasuresPayload!
 
   # Control mutations
   createControlMeasureMapping(
@@ -2037,9 +2040,29 @@ input DeleteMeasureInput {
   measureId: ID!
 }
 
+input ExportMeasuresInput {
+  organizationId: ID!
+  scope: ExportScope!
+  format: ExportFormat!
+}
+
+enum ExportScope {
+  CURRENT
+  ALL
+}
+
+enum ExportFormat {
+  CSV
+  JSON
+}
+
 type DeleteMeasurePayload {
   deletedMeasureId: ID!
   deletedTaskIds: [ID!]!
+}
+
+type ExportMeasuresPayload {
+  url: String!
 }
 
 type DocumentVersion implements Node {

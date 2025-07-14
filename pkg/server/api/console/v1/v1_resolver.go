@@ -1430,6 +1430,25 @@ func (r *mutationResolver) DeleteMeasure(ctx context.Context, input types.Delete
 	}, nil
 }
 
+// ExportMeasures is the resolver for the exportMeasures field.
+func (r *mutationResolver) ExportMeasures(ctx context.Context, input types.ExportMeasuresInput) (*types.ExportMeasuresPayload, error) {
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
+
+	// Convert enum values to strings
+	format := string(input.Format)
+
+	_, _, err := prb.Measures.ExportAll(ctx, input.OrganizationID, format)
+	if err != nil {
+		return nil, fmt.Errorf("cannot export measures: %w", err)
+	}
+
+	// For now, return a placeholder URL since we're using direct download
+	// In the future, this could upload to S3 and return a signed URL
+	return &types.ExportMeasuresPayload{
+		URL: fmt.Sprintf("/api/console/v1/export/measures?organization_id=%s&format=%s", input.OrganizationID, format),
+	}, nil
+}
+
 // CreateControlMeasureMapping is the resolver for the createControlMeasureMapping field.
 func (r *mutationResolver) CreateControlMeasureMapping(ctx context.Context, input types.CreateControlMeasureMappingInput) (*types.CreateControlMeasureMappingPayload, error) {
 	prb := r.ProboService(ctx, input.MeasureID.TenantID())

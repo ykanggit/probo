@@ -205,6 +205,38 @@ func NewMux(
 		safeRedirect.RedirectFromQuery(w, r, "continue", "/", http.StatusSeeOther)
 	}))
 
+	// Export measures endpoint
+	r.Get("/export/measures", WithSession(usrmgrSvc, authCfg, func(w http.ResponseWriter, r *http.Request) {
+		organizationID, err := gid.ParseGID(r.URL.Query().Get("organization_id"))
+		if err != nil {
+			http.Error(w, "invalid organization id", http.StatusBadRequest)
+			return
+		}
+
+		format := r.URL.Query().Get("format")
+		if format != "csv" && format != "json" {
+			http.Error(w, "format must be 'csv' or 'json'", http.StatusBadRequest)
+			return
+		}
+
+		svc := GetTenantService(r.Context(), proboSvc, organizationID.TenantID())
+
+		// Generate the export file
+		content, filename, err := svc.Measures.ExportAll(r.Context(), organizationID, format)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to export measures: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		// Set headers for file download
+		w.Header().Set("Content-Type", getContentType(format))
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(content)))
+
+		// Write the file content
+		w.Write(content)
+	}))
+
 	r.Get("/", playground.Handler("GraphQL", "/api/console/v1/query"))
 	r.Post("/query", graphqlHandler(logger, proboSvc, usrmgrSvc, authCfg))
 
@@ -352,4 +384,15 @@ func GetTenantService(ctx context.Context, proboSvc *probo.Service, tenantID gid
 	}
 
 	panic(fmt.Errorf("tenant not found"))
+}
+
+func getContentType(format string) string {
+	switch format {
+	case "csv":
+		return "text/csv; charset=utf-8"
+	case "json":
+		return "application/json; charset=utf-8"
+	default:
+		return "application/octet-stream"
+	}
 }

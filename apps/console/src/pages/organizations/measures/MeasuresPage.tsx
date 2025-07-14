@@ -19,6 +19,7 @@ import {
   IconTrashCan,
   IconListStack,
   IconDotGrid1x3Horizontal,
+  IconUpload,
   MeasureBadge,
   MeasureImplementation,
   PageHeader,
@@ -49,6 +50,7 @@ import { useMutationWithToasts } from "/hooks/useMutationWithToasts";
 import { useOrganizationId } from "/hooks/useOrganizationId";
 import { Link, useParams } from "react-router";
 import MeasureFormDialog from "./dialog/MeasureFormDialog";
+import ExportMeasuresDialog from "./dialog/ExportMeasuresDialog";
 import { usePageTitle } from "@probo/hooks";
 
 type Props = {
@@ -84,9 +86,32 @@ const measuresFragment = graphql`
       edges {
         node {
           id
+          referenceId
           name
           category
           state
+          description
+          controls(first: 1) {
+            edges {
+              node {
+                sectionTitle
+                framework {
+                  name
+                }
+              }
+            }
+          }
+          tasks(first: 1) {
+            edges {
+              node {
+                id
+                referenceId
+                name
+                description
+                state
+              }
+            }
+          }
           ...MeasureFormDialogMeasureFragment
         }
       }
@@ -165,6 +190,7 @@ export default function MeasuresPage(props: Props) {
   const [deleteMeasure] = useDeleteMeasureMutation();
   const confirm = useConfirm();
   const importFileRef = useRef<HTMLInputElement>(null);
+  const [exporting, setExporting] = useState(false);
   usePageTitle(__("Measures"));
 
   const handleImport: ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -188,6 +214,108 @@ export default function MeasuresPage(props: Props) {
         importFileRef.current!.value = "";
       },
     });
+  };
+
+  const handleExport = async (options: { scope: 'current' | 'all'; format: 'csv' | 'json' }) => {
+    if (options.scope === 'current' && options.format === 'csv') {
+      // Export current view as CSV
+      const csvHeaders = ['CONTROL', 'TITLE', 'DESCRIPTION', 'STATE', 'IMPLEMENTATION DETAILS'];
+      const csvRows = measures.map(measure => {
+        // Get the first linked control's section title as the control reference
+        const controlReference = measure.controls?.edges?.[0]?.node?.sectionTitle || '';
+        // Get the first linked task's description as implementation details
+        const implementationDetails = measure.tasks?.edges?.[0]?.node?.description || '';
+        
+        return [
+          controlReference,
+          measure.name,
+          measure.description,
+          measure.state,
+          implementationDetails
+        ];
+      });
+      
+      const csvContent = [csvHeaders, ...csvRows]
+        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+      
+      // Create and download the file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `measures-export-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (options.scope === 'current' && options.format === 'json') {
+      // Export current view as JSON
+      const exportData = {
+        measures: measures.map(measure => ({
+          name: measure.name,
+          description: measure.description,
+          category: measure.category,
+          'reference-id': measure.referenceId,
+          state: measure.state,
+          standards: measure.controls?.edges?.map(edge => ({
+            framework: edge.node.framework?.name || 'Unknown',
+            control: edge.node.sectionTitle
+          })) || [],
+          tasks: measure.tasks?.edges?.map(edge => ({
+            name: edge.node.name,
+            description: edge.node.description,
+            'reference-id': edge.node.referenceId,
+            state: edge.node.state
+          })) || []
+        }))
+      };
+      
+      const jsonContent = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `measures-export-${new Date().toISOString().split('T')[0]}.json`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (options.scope === 'all') {
+      setExporting(true);
+      try {
+        const orgId = organization.id;
+        const url = `/api/console/v1/export/measures?organization_id=${encodeURIComponent(orgId)}&format=${options.format}`;
+        const res = await fetch(url, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
+        const blob = await res.blob();
+        // Try to get filename from Content-Disposition header
+        let filename = `measures-export.${options.format}`;
+        const disposition = res.headers.get('Content-Disposition');
+        if (disposition) {
+          const match = disposition.match(/filename="([^"]+)"/);
+          if (match) filename = match[1];
+        }
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err: any) {
+        alert(__('Failed to export all records: ') + (err?.message || err));
+      } finally {
+        setExporting(false);
+      }
+    } else {
+      alert(__('Unknown export option.'));
+    }
   };
 
   // Sort measures for table view
@@ -317,6 +445,15 @@ export default function MeasuresPage(props: Props) {
                           {__("Table view")}
           </Button>
         </div>
+        <ExportMeasuresDialog onExport={handleExport}>
+          <Button
+            variant="secondary"
+            icon={IconUpload}
+            disabled={exporting}
+          >
+            {exporting ? __("Exporting...") : __("Export")}
+          </Button>
+        </ExportMeasuresDialog>
         <FileButton
           ref={importFileRef}
           variant="secondary"
