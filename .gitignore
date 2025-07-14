@@ -6,3 +6,4 @@ dist/
 sbom.json
 sbom-docker.json
 *_sbom.json
+*.out

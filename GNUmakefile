@@ -15,8 +15,15 @@ VERSION=	0.40.0
 LDFLAGS=	-ldflags "-X 'main.version=$(VERSION)' -X 'main.env=prod'"
 GCFLAGS=	-gcflags="-e"
 
-GO_BUILD=	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) $(GO) build $(LDFLAGS) $(GCFLAGS)
-GO_GENERATE=	$(GO) generate
+CGO_ENABLED?=	0
+GOOS?=
+
+GO_BASE=	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go
+GO_BUILD=	$(GO_BASE) build $(LDFLAGS) $(GCFLAGS)
+GO_GENERATE=	$(GO_BASE) generate
+GO_TEST=	$(GO_BASE) test $(TEST_FLAGS)
+
+TEST_FLAGS?=	-race -cover -coverprofile=coverage.out
 
 DOCKER_IMAGE_NAME=	ghcr.io/getprobo/probo
 DOCKER_TAG_NAME?=	latest
@@ -33,6 +40,27 @@ lint: fmt-check vet
 .PHONY: vet
 vet:
 	$(GO) vet ./...
+
+.PHONY: test
+test: ## Run tests with race detection and coverage (usage: make test [MODULE=./pkg/some/module])
+	$(GO_TEST) $(if $(MODULE),$(MODULE),./...)
+
+.PHONY: test-verbose
+test-verbose: TEST_FLAGS+=-v
+test-verbose: test ## Run tests with verbose output
+
+.PHONY: test-short
+test-short: TEST_FLAGS+=-short
+test-short: test ## Run short tests only
+
+.PHONY: coverage-report
+coverage-report: test ## Generate HTML coverage report
+	$(GO) tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: coverage.html"
+
+.PHONY: test-bench
+test-bench: TEST_FLAGS+=-bench=.
+test-bench: test ## Run benchmark tests
 
 .PHONY: build
 build: @probo/console bin/probod
@@ -106,6 +134,7 @@ clean: ## Clean the project (node_modules and build artifacts)
 	$(RM) -rf node_modules
 	$(RM) -rf apps/console/{dist,node_modules}
 	$(RM) -rf sbom-docker.json sbom.json
+	$(RM) -rf coverage.out coverage.html
 
 .PHONY: stack-up
 stack-up: ## Start the docker stack as a deamon
