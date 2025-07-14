@@ -821,6 +821,70 @@ func (r *measureConnectionResolver) TotalCount(ctx context.Context, obj *types.M
 	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 }
 
+// NotStartedCount is the resolver for the notStartedCount field.
+func (r *measureConnectionResolver) NotStartedCount(ctx context.Context, obj *types.MeasureConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := prb.Measures.CountForOrganizationIDByState(ctx, obj.ParentID, coredata.MeasureStateNotStarted, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count not started measures: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
+// InProgressCount is the resolver for the inProgressCount field.
+func (r *measureConnectionResolver) InProgressCount(ctx context.Context, obj *types.MeasureConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := prb.Measures.CountForOrganizationIDByState(ctx, obj.ParentID, coredata.MeasureStateInProgress, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count in progress measures: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
+// NotApplicableCount is the resolver for the notApplicableCount field.
+func (r *measureConnectionResolver) NotApplicableCount(ctx context.Context, obj *types.MeasureConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := prb.Measures.CountForOrganizationIDByState(ctx, obj.ParentID, coredata.MeasureStateNotApplicable, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count not applicable measures: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
+// CompletedCount is the resolver for the completedCount field.
+func (r *measureConnectionResolver) CompletedCount(ctx context.Context, obj *types.MeasureConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := prb.Measures.CountForOrganizationIDByState(ctx, obj.ParentID, coredata.MeasureStateImplemented, obj.Filters)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count completed measures: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
 // CreateOrganization is the resolver for the createOrganization field.
 func (r *mutationResolver) CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error) {
 	prb := r.proboSvc.WithTenant(gid.NewTenantID())
@@ -1341,8 +1405,8 @@ func (r *mutationResolver) ImportMeasure(ctx context.Context, input types.Import
 		return nil, fmt.Errorf("cannot import measure: %w", err)
 	}
 
-	measureEdges := make([]*types.MeasureEdge, len(measures.Data))
-	for i, measure := range measures.Data {
+	measureEdges := make([]*types.MeasureEdge, len(measures.Measures.Data))
+	for i, measure := range measures.Measures.Data {
 		measureEdges[i] = types.NewMeasureEdge(measure, coredata.MeasureOrderFieldCreatedAt)
 	}
 
@@ -1355,13 +1419,14 @@ func (r *mutationResolver) ImportMeasure(ctx context.Context, input types.Import
 func (r *mutationResolver) DeleteMeasure(ctx context.Context, input types.DeleteMeasureInput) (*types.DeleteMeasurePayload, error) {
 	prb := r.ProboService(ctx, input.MeasureID.TenantID())
 
-	err := prb.Measures.Delete(ctx, input.MeasureID)
+	deletedTaskIDs, err := prb.Measures.Delete(ctx, input.MeasureID)
 	if err != nil {
-		panic(fmt.Errorf("cannot delete measure: %w", err))
+		return nil, fmt.Errorf("cannot delete measure: %w", err)
 	}
 
 	return &types.DeleteMeasurePayload{
 		DeletedMeasureID: input.MeasureID,
+		DeletedTaskIds:   deletedTaskIDs,
 	}, nil
 }
 
@@ -2873,6 +2938,38 @@ func (r *taskConnectionResolver) TotalCount(ctx context.Context, obj *types.Task
 		count, err := prb.Tasks.CountForOrganizationID(ctx, obj.ParentID)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count tasks: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
+// TodoCount is the resolver for the todoCount field.
+func (r *taskConnectionResolver) TodoCount(ctx context.Context, obj *types.TaskConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := prb.Tasks.CountForOrganizationIDByState(ctx, obj.ParentID, coredata.TaskStateTodo)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count todo tasks: %w", err)
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
+// DoneCount is the resolver for the doneCount field.
+func (r *taskConnectionResolver) DoneCount(ctx context.Context, obj *types.TaskConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := prb.Tasks.CountForOrganizationIDByState(ctx, obj.ParentID, coredata.TaskStateDone)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count done tasks: %w", err)
 		}
 		return count, nil
 	}

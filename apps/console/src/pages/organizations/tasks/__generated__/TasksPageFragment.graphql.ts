@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<24b80331a26f03ece71f38e531454fe2>>
+ * @generated SignedSource<<d9c6f58a56bc47865a75ba18579f9b69>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,6 +15,7 @@ export type TasksPageFragment$data = {
   readonly id: string;
   readonly tasks: {
     readonly __id: string;
+    readonly doneCount: number;
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly assignedTo: {
@@ -32,6 +33,8 @@ export type TasksPageFragment$data = {
         readonly " $fragmentSpreads": FragmentRefs<"TaskFormDialogFragment">;
       };
     }>;
+    readonly todoCount: number;
+    readonly totalCount: number;
   };
   readonly " $fragmentType": "TasksPageFragment";
 };
@@ -73,7 +76,7 @@ return {
       "name": "before"
     },
     {
-      "defaultValue": 20,
+      "defaultValue": 50,
       "kind": "LocalArgument",
       "name": "first"
     },
@@ -136,6 +139,27 @@ return {
       "name": "__TasksPageFragment_tasks_connection",
       "plural": false,
       "selections": [
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "totalCount",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "todoCount",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "doneCount",
+          "storageKey": null
+        },
         {
           "alias": null,
           "args": null,
@@ -286,6 +310,6 @@ return {
 };
 })();
 
-(node as any).hash = "a555e698539fe819dd4713ac507ea440";
+(node as any).hash = "1eb22d6b3a051a4c0069a61b6709f665";
 
 export default node;

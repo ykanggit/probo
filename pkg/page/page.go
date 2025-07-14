@@ -64,48 +64,67 @@ func NewPage[T Paginable[U], U OrderField](data []T, c *Cursor[U]) *Page[T, U] {
 
 	switch c.Position {
 	case Head:
+		// Handle cursor-based pagination
 		if c.Key != nil {
-			if len(edges) == c.Size+2 {
-				edges = edges[1 : len(edges)-1]
+			// If we fetched more than requested size, there are more pages
+			if len(data) > c.Size {
+				// Remove the extra row used to determine if there are more pages
+				edges = data[:c.Size]
+				pi.HasNext = true
 			} else {
-				edges = edges[1:]
+				// We got exactly what we requested, no more pages
+				edges = data
+				pi.HasNext = false
 			}
-		} else if c.Key == nil && len(edges) == c.Size+1 {
-			edges = edges[0 : len(edges)-1]
-		}
 
-		if c.Key != nil && c.Key.String() == firstFromData.CursorKey(c.OrderBy.Field).String() {
-			pi.HasPrev = true
-		}
-
-		if c.Key != nil && c.Size+2 == len(data) {
-			pi.HasNext = true
-		} else if c.Key == nil && c.Size+1 == len(data) {
-			pi.HasNext = true
+			// Check if there are previous pages
+			if c.Key.String() == firstFromData.CursorKey(c.OrderBy.Field).String() {
+				pi.HasPrev = true
+			}
+		} else {
+			// First page (no cursor)
+			if len(data) > c.Size {
+				// Remove the extra row used to determine if there are more pages
+				edges = data[:c.Size]
+				pi.HasNext = true
+			} else {
+				// We got exactly what we requested, no more pages
+				edges = data
+				pi.HasNext = false
+			}
 		}
 	case Tail:
+		// Reverse the data for tail-based pagination
 		for i, j := 0, len(edges)-1; i < j; i, j = i+1, j-1 {
 			edges[i], edges[j] = edges[j], edges[i]
 		}
 
+		// Handle cursor-based pagination
 		if c.Key != nil {
-			if len(edges) == c.Size+2 {
-				edges = edges[1 : len(edges)-1]
+			// If we fetched more than requested size, there are more pages
+			if len(data) > c.Size {
+				// Remove the extra row used to determine if there are more pages
+				edges = edges[:c.Size]
+				pi.HasPrev = true
 			} else {
-				edges = edges[0 : len(edges)-1]
+				// We got exactly what we requested, no more pages
+				pi.HasPrev = false
 			}
-		} else if c.Key == nil && len(edges) == c.Size+1 {
-			edges = edges[1:]
-		}
 
-		if c.Key != nil && c.Key.String() == firstFromData.CursorKey(c.OrderBy.Field).String() {
-			pi.HasNext = true
-		}
-
-		if c.Key != nil && c.Size+2 == len(data) {
-			pi.HasPrev = true
-		} else if c.Key == nil && c.Size+1 == len(data) {
-			pi.HasPrev = true
+			// Check if there are next pages
+			if c.Key.String() == firstFromData.CursorKey(c.OrderBy.Field).String() {
+				pi.HasNext = true
+			}
+		} else {
+			// Last page (no cursor)
+			if len(data) > c.Size {
+				// Remove the extra row used to determine if there are more pages
+				edges = edges[:c.Size]
+				pi.HasPrev = true
+			} else {
+				// We got exactly what we requested, no more pages
+				pi.HasPrev = false
+			}
 		}
 	}
 

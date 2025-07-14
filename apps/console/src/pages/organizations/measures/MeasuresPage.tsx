@@ -1,8 +1,8 @@
 import type { MeasureGraphListQuery } from "/hooks/graph/__generated__/MeasureGraphListQuery.graphql";
 import {
-  useFragment,
   usePreloadedQuery,
   type PreloadedQuery,
+  usePaginationFragment,
 } from "react-relay";
 import { useTranslate } from "@probo/i18n";
 import {
@@ -30,6 +30,7 @@ import {
   Tr,
   useConfirm,
   useDialogRef,
+  InfiniteScrollTrigger,
 } from "@probo/ui";
 import {
   measuresQuery,
@@ -58,9 +59,28 @@ type SortField = 'name' | 'category' | 'state';
 type SortDirection = 'asc' | 'desc';
 
 const measuresFragment = graphql`
-  fragment MeasuresPageFragment on Organization {
-    measures(first: 100) @connection(key: "MeasuresGraphListQuery__measures") {
+  fragment MeasuresPageFragment on Organization
+  @refetchable(queryName: "MeasuresPageFragment_query")
+  @argumentDefinitions(
+    first: { type: "Int", defaultValue: 50 }
+    order: { type: "MeasureOrder", defaultValue: null }
+    after: { type: "CursorKey", defaultValue: null }
+    before: { type: "CursorKey", defaultValue: null }
+    last: { type: "Int", defaultValue: null }
+  ) {
+    measures(
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+      orderBy: $order
+    ) @connection(key: "MeasuresPageFragment_measures") {
       __id
+      totalCount
+      notStartedCount
+      inProgressCount
+      notApplicableCount
+      completedCount
       edges {
         node {
           id
@@ -78,6 +98,7 @@ const importMeasuresMutation = graphql`
   mutation MeasuresPageImportMutation(
     $input: ImportMeasureInput!
     $connections: [ID!]!
+    $taskConnections: [ID!]!
   ) {
     importMeasure(input: $input) {
       measureEdges @appendEdge(connections: $connections) {
@@ -86,6 +107,17 @@ const importMeasuresMutation = graphql`
           name
           category
           state
+        }
+      }
+      taskEdges @appendEdge(connections: $taskConnections) {
+        node {
+          id
+          name
+          description
+          state
+          measure {
+            id
+          }
         }
       }
     }
@@ -98,18 +130,23 @@ export default function MeasuresPage(props: Props) {
     measuresQuery,
     props.queryRef
   ).organization;
-  const data = useFragment<MeasuresPageFragment$key>(
+  const pagination = usePaginationFragment(
     measuresFragment,
-    organization
+    organization as MeasuresPageFragment$key
   );
-  const connectionId = data.measures.__id;
-  const measures = data.measures.edges.map((edge) => edge.node);
+  const connectionId = pagination.data.measures.__id;
+  const measures = pagination.data.measures.edges.map((edge) => edge.node);
+  const totalCount = pagination.data.measures?.totalCount ?? 0;
+  const notStartedCount = pagination.data.measures?.notStartedCount ?? 0;
+  const inProgressCount = pagination.data.measures?.inProgressCount ?? 0;
+  const notApplicableCount = pagination.data.measures?.notApplicableCount ?? 0;
+  const completedCount = pagination.data.measures?.completedCount ?? 0;
   const measuresPerCategory = useMemo(() => {
     return groupBy(measures, (measure) => measure.category);
   }, [measures]);
   
   // View state
-  const [viewMode, setViewMode] = useState<'categories' | 'table'>('categories');
+  const [viewMode, setViewMode] = useState<'categories' | 'table'>('table');
   
   // Sorting state for table view
   const [sortField, setSortField] = useState<SortField>('name');
@@ -142,6 +179,7 @@ export default function MeasuresPage(props: Props) {
           file: null,
         },
         connections: [connectionId],
+        taskConnections: [`client:${organization.id}:__TasksPageFragment_tasks_connection`],
       },
       uploadables: {
         "input.file": file,
@@ -197,7 +235,6 @@ export default function MeasuresPage(props: Props) {
     return sortDirection === 'asc' ? '↑' : '↓';
   };
 
-  // Multi-select handlers
   const handleSelectAll = () => {
     if (selectedMeasures.size === sortedMeasures.length) {
       setSelectedMeasures(new Set());
@@ -217,50 +254,43 @@ export default function MeasuresPage(props: Props) {
   };
 
   const handleBulkDelete = () => {
-    if (selectedMeasures.size === 0) return;
-    
     confirm(
-      () =>
-        new Promise<void>((resolve) => {
-          // Delete each selected measure
-          const deletePromises = Array.from(selectedMeasures).map(measureId => {
-            return new Promise<void>((resolveDelete) => {
-              deleteMeasure({
-                variables: {
-                  input: { measureId },
-                  connections: [connectionId],
-                },
-                onCompleted: () => resolveDelete(),
-                onError: () => resolveDelete(), // Continue even if one fails
-              });
-            });
-          });
-          
-          Promise.all(deletePromises).then(() => {
-            setSelectedMeasures(new Set());
-            resolve();
-          });
-        }),
+      () => {
+        const promises = Array.from(selectedMeasures).map(measureId => 
+          deleteMeasure({
+            variables: { 
+              input: { measureId },
+              connections: [connectionId],
+              taskConnections: [`client:${organization.id}:__TasksPageFragment_tasks_connection`]
+            }
+          })
+        );
+        
+        return Promise.all(promises).then(() => {
+          setSelectedMeasures(new Set());
+        });
+      },
       {
-        message: sprintf(
-          __('This will permanently delete %s selected measures. This action cannot be undone.'),
-          selectedMeasures.size
-        ),
+        message: sprintf(__("This will permanently delete %s selected measures. This action cannot be undone."), selectedMeasures.size),
       }
     );
   };
 
   const handleDeleteMeasure = (measureId: string) => {
-    return new Promise<void>((resolve) => {
-      deleteMeasure({
-        variables: {
-          input: { measureId },
-          connections: [connectionId],
-        },
-        onCompleted: () => resolve(),
-        onError: () => resolve(),
-      });
-    });
+    confirm(
+      () => {
+        return deleteMeasure({
+          variables: { 
+            input: { measureId },
+            connections: [connectionId],
+            taskConnections: [`client:${organization.id}:__TasksPageFragment_tasks_connection`]
+          }
+        });
+      },
+      {
+        message: __("This will permanently delete this measure. This action cannot be undone."),
+      }
+    );
   };
 
   return (
@@ -277,14 +307,14 @@ export default function MeasuresPage(props: Props) {
             icon={IconDotGrid1x3Horizontal}
             onClick={() => setViewMode('categories')}
           >
-            {__("Categories")}
+                          {__("Category view")}
           </Button>
           <Button
             variant={viewMode === 'table' ? 'primary' : 'secondary'}
             icon={IconListStack}
             onClick={() => setViewMode('table')}
           >
-            {__("Table")}
+                          {__("Table view")}
           </Button>
         </div>
         <FileButton
@@ -302,7 +332,7 @@ export default function MeasuresPage(props: Props) {
         </MeasureFormDialog>
       </PageHeader>
       
-      <MeasureImplementation measures={measures} className="my-10" />
+      <MeasureImplementation measures={measures} totalCount={totalCount} className="my-10" />
       
       {viewMode === 'categories' ? (
         // Category tiles view (existing implementation)
@@ -319,6 +349,40 @@ export default function MeasuresPage(props: Props) {
       ) : (
         // Table view
         <Card className="p-0">
+          <div className="flex items-center justify-between p-4 border-b border-border-low">
+            <div className="flex items-center gap-4 text-sm text-txt-secondary">
+              <span>
+                {__("Total measures")}:{" "}
+                <span className="text-txt-primary font-medium">
+                  {totalCount}
+                </span>
+              </span>
+              <span>
+                {__("Not Started")}:{" "}
+                <span className="text-txt-primary font-medium">
+                  {notStartedCount}
+                </span>
+              </span>
+              <span>
+                {__("In Progress")}:{" "}
+                <span className="text-txt-primary font-medium">
+                  {inProgressCount}
+                </span>
+              </span>
+              <span>
+                {__("Not Applicable")}:{" "}
+                <span className="text-txt-primary font-medium">
+                  {notApplicableCount}
+                </span>
+              </span>
+              <span>
+                {__("Completed")}:{" "}
+                <span className="text-txt-primary font-medium">
+                  {completedCount}
+                </span>
+              </span>
+            </div>
+          </div>
           {selectedMeasures.size > 0 && (
             <div className="flex items-center justify-between p-4 bg-highlight border-b border-border-low">
               <span className="text-sm text-txt-primary">
@@ -392,6 +456,12 @@ export default function MeasuresPage(props: Props) {
               ))}
             </Tbody>
           </Table>
+          {pagination.hasNext && (
+            <InfiniteScrollTrigger
+              onView={() => pagination.loadNext(50)}
+              loading={pagination.isLoadingNext}
+            />
+          )}
         </Card>
       )}
     </div>
@@ -432,6 +502,13 @@ function Category(props: CategoryProps) {
             {__("Completion")}:{" "}
             <span className="text-txt-primary font-medium">
               {completedMeasures.length}/{props.measures.length}
+            </span>
+          </span>
+          <span className="text-border-low">|</span>
+          <span>
+            {__("Total")}:{" "}
+            <span className="text-txt-primary font-medium">
+              {props.measures.length}
             </span>
           </span>
           <span className="text-border-low">|</span>

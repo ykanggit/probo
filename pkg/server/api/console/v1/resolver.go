@@ -211,7 +211,7 @@ func NewMux(
 	return r
 }
 
-func graphqlHandler(logger *log.Logger, proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.HandlerFunc {
+func graphqlHandler(_ *log.Logger, proboSvc *probo.Service, usrmgrSvc *usrmgr.Service, authCfg AuthConfig) http.HandlerFunc {
 	var mb int64 = 1 << 20
 
 	es := schema.NewExecutableSchema(

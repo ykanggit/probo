@@ -8,6 +8,7 @@ type MeasureState = ComponentProps<typeof MeasureBadge>["state"];
 
 type Props = {
     measures: { state: MeasureState }[];
+    totalCount?: number;
     className?: string;
 };
 
@@ -18,7 +19,7 @@ const stateToColor: Record<MeasureState, string> = {
     NOT_STARTED: "bg-highlight",
 };
 
-export function MeasureImplementation({ measures, className }: Props) {
+export function MeasureImplementation({ measures, totalCount, className }: Props) {
     const { __ } = useTranslate();
     const counts = measures.reduce(
         (acc, measure) => {
@@ -32,6 +33,9 @@ export function MeasureImplementation({ measures, className }: Props) {
             ((counts["IMPLEMENTED"] ?? 0) + (counts["NOT_APPLICABLE"] ?? 0))) /
             measures.length,
     );
+    // Use totalCount if provided, otherwise fall back to measures.length
+    const displayCount = totalCount ?? measures.length;
+    
     return (
         <div className={clsx("space-y-3", className)}>
             <h2 className="text-base font-medium">
@@ -51,7 +55,7 @@ export function MeasureImplementation({ measures, className }: Props) {
             <div className="flex gap-4 text-sm">
                 {!isNaN(percent) && (
                     <div className="mr-auto">
-                        {percent}% {__("Complete")}
+                        {percent}% {__("Complete")} ({displayCount} {__("measures")})
                     </div>
                 )}
                 {measureStates.map((state) => (

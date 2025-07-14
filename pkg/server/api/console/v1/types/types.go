@@ -441,7 +441,8 @@ type DeleteMeasureInput struct {
 }
 
 type DeleteMeasurePayload struct {
-	DeletedMeasureID gid.GID `json:"deletedMeasureId"`
+	DeletedMeasureID gid.GID   `json:"deletedMeasureId"`
+	DeletedTaskIds   []gid.GID `json:"deletedTaskIds"`
 }
 
 type DeleteOrganizationInput struct {
@@ -702,6 +703,7 @@ type ImportMeasureInput struct {
 
 type ImportMeasurePayload struct {
 	MeasureEdges []*MeasureEdge `json:"measureEdges"`
+	TaskEdges    []*TaskEdge    `json:"taskEdges"`
 }
 
 type InviteUserInput struct {

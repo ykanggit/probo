@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c0e424b8b0ec7becf9ac2930c6e81b56>>
+ * @generated SignedSource<<0e8ac685aa34bee03c7055b1c5d8cec3>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,6 +10,7 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type MeasureState = "IMPLEMENTED" | "IN_PROGRESS" | "NOT_APPLICABLE" | "NOT_STARTED";
+export type TaskState = "DONE" | "TODO";
 export type ImportMeasureInput = {
   file: any;
   organizationId: string;
@@ -17,6 +18,7 @@ export type ImportMeasureInput = {
 export type MeasuresPageImportMutation$variables = {
   connections: ReadonlyArray<string>;
   input: ImportMeasureInput;
+  taskConnections: ReadonlyArray<string>;
 };
 export type MeasuresPageImportMutation$data = {
   readonly importMeasure: {
@@ -26,6 +28,17 @@ export type MeasuresPageImportMutation$data = {
         readonly id: string;
         readonly name: string;
         readonly state: MeasureState;
+      };
+    }>;
+    readonly taskEdges: ReadonlyArray<{
+      readonly node: {
+        readonly description: string;
+        readonly id: string;
+        readonly measure: {
+          readonly id: string;
+        } | null | undefined;
+        readonly name: string;
+        readonly state: TaskState;
       };
     }>;
   };
@@ -46,14 +59,40 @@ v1 = {
   "kind": "LocalArgument",
   "name": "input"
 },
-v2 = [
+v2 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "taskConnections"
+},
+v3 = [
   {
     "kind": "Variable",
     "name": "input",
     "variableName": "input"
   }
 ],
-v3 = {
+v4 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v5 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+},
+v6 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "state",
+  "storageKey": null
+},
+v7 = {
   "alias": null,
   "args": null,
   "concreteType": "MeasureEdge",
@@ -69,20 +108,8 @@ v3 = {
       "name": "node",
       "plural": false,
       "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "id",
-          "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "name",
-          "storageKey": null
-        },
+        (v4/*: any*/),
+        (v5/*: any*/),
         {
           "alias": null,
           "args": null,
@@ -90,11 +117,49 @@ v3 = {
           "name": "category",
           "storageKey": null
         },
+        (v6/*: any*/)
+      ],
+      "storageKey": null
+    }
+  ],
+  "storageKey": null
+},
+v8 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "TaskEdge",
+  "kind": "LinkedField",
+  "name": "taskEdges",
+  "plural": true,
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "concreteType": "Task",
+      "kind": "LinkedField",
+      "name": "node",
+      "plural": false,
+      "selections": [
+        (v4/*: any*/),
+        (v5/*: any*/),
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "state",
+          "name": "description",
+          "storageKey": null
+        },
+        (v6/*: any*/),
+        {
+          "alias": null,
+          "args": null,
+          "concreteType": "Measure",
+          "kind": "LinkedField",
+          "name": "measure",
+          "plural": false,
+          "selections": [
+            (v4/*: any*/)
+          ],
           "storageKey": null
         }
       ],
@@ -107,7 +172,8 @@ return {
   "fragment": {
     "argumentDefinitions": [
       (v0/*: any*/),
-      (v1/*: any*/)
+      (v1/*: any*/),
+      (v2/*: any*/)
     ],
     "kind": "Fragment",
     "metadata": null,
@@ -115,13 +181,14 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v2/*: any*/),
+        "args": (v3/*: any*/),
         "concreteType": "ImportMeasurePayload",
         "kind": "LinkedField",
         "name": "importMeasure",
         "plural": false,
         "selections": [
-          (v3/*: any*/)
+          (v7/*: any*/),
+          (v8/*: any*/)
         ],
         "storageKey": null
       }
@@ -133,20 +200,21 @@ return {
   "operation": {
     "argumentDefinitions": [
       (v1/*: any*/),
-      (v0/*: any*/)
+      (v0/*: any*/),
+      (v2/*: any*/)
     ],
     "kind": "Operation",
     "name": "MeasuresPageImportMutation",
     "selections": [
       {
         "alias": null,
-        "args": (v2/*: any*/),
+        "args": (v3/*: any*/),
         "concreteType": "ImportMeasurePayload",
         "kind": "LinkedField",
         "name": "importMeasure",
         "plural": false,
         "selections": [
-          (v3/*: any*/),
+          (v7/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -162,6 +230,23 @@ return {
                 "variableName": "connections"
               }
             ]
+          },
+          (v8/*: any*/),
+          {
+            "alias": null,
+            "args": null,
+            "filters": null,
+            "handle": "appendEdge",
+            "key": "",
+            "kind": "LinkedHandle",
+            "name": "taskEdges",
+            "handleArgs": [
+              {
+                "kind": "Variable",
+                "name": "connections",
+                "variableName": "taskConnections"
+              }
+            ]
           }
         ],
         "storageKey": null
@@ -169,16 +254,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "13a5799ca6febcfb85294f75456deffb",
+    "cacheID": "35630778ab0e75d326d98667dfdcdef0",
     "id": null,
     "metadata": {},
     "name": "MeasuresPageImportMutation",
     "operationKind": "mutation",
-    "text": "mutation MeasuresPageImportMutation(\n  $input: ImportMeasureInput!\n) {\n  importMeasure(input: $input) {\n    measureEdges {\n      node {\n        id\n        name\n        category\n        state\n      }\n    }\n  }\n}\n"
+    "text": "mutation MeasuresPageImportMutation(\n  $input: ImportMeasureInput!\n) {\n  importMeasure(input: $input) {\n    measureEdges {\n      node {\n        id\n        name\n        category\n        state\n      }\n    }\n    taskEdges {\n      node {\n        id\n        name\n        description\n        state\n        measure {\n          id\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "6419f51d00f273c824038e7f2d4c65ba";
+(node as any).hash = "6dfae22584951c4380072f6fc5baf265";
 
 export default node;

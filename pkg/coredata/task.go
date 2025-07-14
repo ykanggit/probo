@@ -280,6 +280,43 @@ func (c *Tasks) CountByOrganizationID(
 	return count, nil
 }
 
+func (c *Tasks) CountByOrganizationIDAndState(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+	state TaskState,
+) (int, error) {
+	q := `
+	SELECT
+		COUNT(id)
+	FROM
+		tasks
+	WHERE
+		%s
+		AND organization_id = @organization_id
+		AND state = @state
+	`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{
+		"organization_id": organizationID,
+		"state":           state,
+	}
+	maps.Copy(args, scope.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("cannot collect tasks: %w", err)
+	}
+
+	return count, nil
+}
+
 func (c *Tasks) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,

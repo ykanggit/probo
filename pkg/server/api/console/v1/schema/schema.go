@@ -295,6 +295,7 @@ type ComplexityRoot struct {
 
 	DeleteMeasurePayload struct {
 		DeletedMeasureID func(childComplexity int) int
+		DeletedTaskIds   func(childComplexity int) int
 	}
 
 	DeleteOrganizationPayload struct {
@@ -478,6 +479,7 @@ type ComplexityRoot struct {
 
 	ImportMeasurePayload struct {
 		MeasureEdges func(childComplexity int) int
+		TaskEdges    func(childComplexity int) int
 	}
 
 	InviteUserPayload struct {
@@ -499,9 +501,13 @@ type ComplexityRoot struct {
 	}
 
 	MeasureConnection struct {
-		Edges      func(childComplexity int) int
-		PageInfo   func(childComplexity int) int
-		TotalCount func(childComplexity int) int
+		CompletedCount     func(childComplexity int) int
+		Edges              func(childComplexity int) int
+		InProgressCount    func(childComplexity int) int
+		NotApplicableCount func(childComplexity int) int
+		NotStartedCount    func(childComplexity int) int
+		PageInfo           func(childComplexity int) int
+		TotalCount         func(childComplexity int) int
 	}
 
 	MeasureEdge struct {
@@ -726,8 +732,10 @@ type ComplexityRoot struct {
 	}
 
 	TaskConnection struct {
+		DoneCount  func(childComplexity int) int
 		Edges      func(childComplexity int) int
 		PageInfo   func(childComplexity int) int
+		TodoCount  func(childComplexity int) int
 		TotalCount func(childComplexity int) int
 	}
 
@@ -983,6 +991,10 @@ type MeasureResolver interface {
 }
 type MeasureConnectionResolver interface {
 	TotalCount(ctx context.Context, obj *types.MeasureConnection) (int, error)
+	NotStartedCount(ctx context.Context, obj *types.MeasureConnection) (int, error)
+	InProgressCount(ctx context.Context, obj *types.MeasureConnection) (int, error)
+	NotApplicableCount(ctx context.Context, obj *types.MeasureConnection) (int, error)
+	CompletedCount(ctx context.Context, obj *types.MeasureConnection) (int, error)
 }
 type MutationResolver interface {
 	CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error)
@@ -1094,6 +1106,8 @@ type TaskResolver interface {
 }
 type TaskConnectionResolver interface {
 	TotalCount(ctx context.Context, obj *types.TaskConnection) (int, error)
+	TodoCount(ctx context.Context, obj *types.TaskConnection) (int, error)
+	DoneCount(ctx context.Context, obj *types.TaskConnection) (int, error)
 }
 type UserResolver interface {
 	People(ctx context.Context, obj *types.User, organizationID gid.GID) (*types.People, error)
@@ -1791,6 +1805,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.DeleteMeasurePayload.DeletedMeasureID(childComplexity), true
 
+	case "DeleteMeasurePayload.deletedTaskIds":
+		if e.complexity.DeleteMeasurePayload.DeletedTaskIds == nil {
+			break
+		}
+
+		return e.complexity.DeleteMeasurePayload.DeletedTaskIds(childComplexity), true
+
 	case "DeleteOrganizationPayload.success":
 		if e.complexity.DeleteOrganizationPayload.Success == nil {
 			break
@@ -2462,6 +2483,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.ImportMeasurePayload.MeasureEdges(childComplexity), true
 
+	case "ImportMeasurePayload.taskEdges":
+		if e.complexity.ImportMeasurePayload.TaskEdges == nil {
+			break
+		}
+
+		return e.complexity.ImportMeasurePayload.TaskEdges(childComplexity), true
+
 	case "InviteUserPayload.success":
 		if e.complexity.InviteUserPayload.Success == nil {
 			break
@@ -2566,12 +2594,40 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Measure.UpdatedAt(childComplexity), true
 
+	case "MeasureConnection.completedCount":
+		if e.complexity.MeasureConnection.CompletedCount == nil {
+			break
+		}
+
+		return e.complexity.MeasureConnection.CompletedCount(childComplexity), true
+
 	case "MeasureConnection.edges":
 		if e.complexity.MeasureConnection.Edges == nil {
 			break
 		}
 
 		return e.complexity.MeasureConnection.Edges(childComplexity), true
+
+	case "MeasureConnection.inProgressCount":
+		if e.complexity.MeasureConnection.InProgressCount == nil {
+			break
+		}
+
+		return e.complexity.MeasureConnection.InProgressCount(childComplexity), true
+
+	case "MeasureConnection.notApplicableCount":
+		if e.complexity.MeasureConnection.NotApplicableCount == nil {
+			break
+		}
+
+		return e.complexity.MeasureConnection.NotApplicableCount(childComplexity), true
+
+	case "MeasureConnection.notStartedCount":
+		if e.complexity.MeasureConnection.NotStartedCount == nil {
+			break
+		}
+
+		return e.complexity.MeasureConnection.NotStartedCount(childComplexity), true
 
 	case "MeasureConnection.pageInfo":
 		if e.complexity.MeasureConnection.PageInfo == nil {
@@ -4134,6 +4190,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Task.UpdatedAt(childComplexity), true
 
+	case "TaskConnection.doneCount":
+		if e.complexity.TaskConnection.DoneCount == nil {
+			break
+		}
+
+		return e.complexity.TaskConnection.DoneCount(childComplexity), true
+
 	case "TaskConnection.edges":
 		if e.complexity.TaskConnection.Edges == nil {
 			break
@@ -4147,6 +4210,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.TaskConnection.PageInfo(childComplexity), true
+
+	case "TaskConnection.todoCount":
+		if e.complexity.TaskConnection.TodoCount == nil {
+			break
+		}
+
+		return e.complexity.TaskConnection.TodoCount(childComplexity), true
 
 	case "TaskConnection.totalCount":
 		if e.complexity.TaskConnection.TotalCount == nil {
@@ -6138,6 +6208,10 @@ type MeasureConnection
     model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.MeasureConnection"
   ) {
   totalCount: Int! @goField(forceResolver: true)
+  notStartedCount: Int! @goField(forceResolver: true)
+  inProgressCount: Int! @goField(forceResolver: true)
+  notApplicableCount: Int! @goField(forceResolver: true)
+  completedCount: Int! @goField(forceResolver: true)
   edges: [MeasureEdge!]!
   pageInfo: PageInfo!
 }
@@ -6152,6 +6226,8 @@ type TaskConnection
     model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.TaskConnection"
   ) {
   totalCount: Int! @goField(forceResolver: true)
+  todoCount: Int! @goField(forceResolver: true)
+  doneCount: Int! @goField(forceResolver: true)
   edges: [TaskEdge!]!
   pageInfo: PageInfo!
 }
@@ -6832,6 +6908,7 @@ type UpdateMeasurePayload {
 
 type ImportMeasurePayload {
   measureEdges: [MeasureEdge!]!
+  taskEdges: [TaskEdge!]!
 }
 
 type CreateTaskPayload {
@@ -7014,6 +7091,7 @@ input DeleteMeasureInput {
 
 type DeleteMeasurePayload {
   deletedMeasureId: ID!
+  deletedTaskIds: [ID!]!
 }
 
 type DocumentVersion implements Node {
@@ -14027,6 +14105,14 @@ func (ec *executionContext) fieldContext_Control_measures(ctx context.Context, f
 			switch field.Name {
 			case "totalCount":
 				return ec.fieldContext_MeasureConnection_totalCount(ctx, field)
+			case "notStartedCount":
+				return ec.fieldContext_MeasureConnection_notStartedCount(ctx, field)
+			case "inProgressCount":
+				return ec.fieldContext_MeasureConnection_inProgressCount(ctx, field)
+			case "notApplicableCount":
+				return ec.fieldContext_MeasureConnection_notApplicableCount(ctx, field)
+			case "completedCount":
+				return ec.fieldContext_MeasureConnection_completedCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_MeasureConnection_edges(ctx, field)
 			case "pageInfo":
@@ -16773,6 +16859,50 @@ func (ec *executionContext) _DeleteMeasurePayload_deletedMeasureId(ctx context.C
 }
 
 func (ec *executionContext) fieldContext_DeleteMeasurePayload_deletedMeasureId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteMeasurePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteMeasurePayload_deletedTaskIds(ctx context.Context, field graphql.CollectedField, obj *types.DeleteMeasurePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteMeasurePayload_deletedTaskIds(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedTaskIds, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]gid.GID)
+	fc.Result = res
+	return ec.marshalNID2ᚕgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGIDᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteMeasurePayload_deletedTaskIds(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteMeasurePayload",
 		Field:      field,
@@ -21450,6 +21580,56 @@ func (ec *executionContext) fieldContext_ImportMeasurePayload_measureEdges(_ con
 	return fc, nil
 }
 
+func (ec *executionContext) _ImportMeasurePayload_taskEdges(ctx context.Context, field graphql.CollectedField, obj *types.ImportMeasurePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImportMeasurePayload_taskEdges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TaskEdges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.TaskEdge)
+	fc.Result = res
+	return ec.marshalNTaskEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTaskEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImportMeasurePayload_taskEdges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImportMeasurePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_TaskEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_TaskEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TaskEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _InviteUserPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.InviteUserPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_InviteUserPayload_success(ctx, field)
 	if err != nil {
@@ -21818,6 +21998,10 @@ func (ec *executionContext) fieldContext_Measure_tasks(ctx context.Context, fiel
 			switch field.Name {
 			case "totalCount":
 				return ec.fieldContext_TaskConnection_totalCount(ctx, field)
+			case "todoCount":
+				return ec.fieldContext_TaskConnection_todoCount(ctx, field)
+			case "doneCount":
+				return ec.fieldContext_TaskConnection_doneCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_TaskConnection_edges(ctx, field)
 			case "pageInfo":
@@ -22086,6 +22270,182 @@ func (ec *executionContext) _MeasureConnection_totalCount(ctx context.Context, f
 }
 
 func (ec *executionContext) fieldContext_MeasureConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MeasureConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MeasureConnection_notStartedCount(ctx context.Context, field graphql.CollectedField, obj *types.MeasureConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MeasureConnection_notStartedCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MeasureConnection().NotStartedCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MeasureConnection_notStartedCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MeasureConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MeasureConnection_inProgressCount(ctx context.Context, field graphql.CollectedField, obj *types.MeasureConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MeasureConnection_inProgressCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MeasureConnection().InProgressCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MeasureConnection_inProgressCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MeasureConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MeasureConnection_notApplicableCount(ctx context.Context, field graphql.CollectedField, obj *types.MeasureConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MeasureConnection_notApplicableCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MeasureConnection().NotApplicableCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MeasureConnection_notApplicableCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MeasureConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MeasureConnection_completedCount(ctx context.Context, field graphql.CollectedField, obj *types.MeasureConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MeasureConnection_completedCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MeasureConnection().CompletedCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MeasureConnection_completedCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MeasureConnection",
 		Field:      field,
@@ -23653,6 +24013,8 @@ func (ec *executionContext) fieldContext_Mutation_importMeasure(ctx context.Cont
 			switch field.Name {
 			case "measureEdges":
 				return ec.fieldContext_ImportMeasurePayload_measureEdges(ctx, field)
+			case "taskEdges":
+				return ec.fieldContext_ImportMeasurePayload_taskEdges(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ImportMeasurePayload", field.Name)
 		},
@@ -23712,6 +24074,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteMeasure(ctx context.Cont
 			switch field.Name {
 			case "deletedMeasureId":
 				return ec.fieldContext_DeleteMeasurePayload_deletedMeasureId(ctx, field)
+			case "deletedTaskIds":
+				return ec.fieldContext_DeleteMeasurePayload_deletedTaskIds(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type DeleteMeasurePayload", field.Name)
 		},
@@ -27140,6 +27504,14 @@ func (ec *executionContext) fieldContext_Organization_measures(ctx context.Conte
 			switch field.Name {
 			case "totalCount":
 				return ec.fieldContext_MeasureConnection_totalCount(ctx, field)
+			case "notStartedCount":
+				return ec.fieldContext_MeasureConnection_notStartedCount(ctx, field)
+			case "inProgressCount":
+				return ec.fieldContext_MeasureConnection_inProgressCount(ctx, field)
+			case "notApplicableCount":
+				return ec.fieldContext_MeasureConnection_notApplicableCount(ctx, field)
+			case "completedCount":
+				return ec.fieldContext_MeasureConnection_completedCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_MeasureConnection_edges(ctx, field)
 			case "pageInfo":
@@ -27266,6 +27638,10 @@ func (ec *executionContext) fieldContext_Organization_tasks(ctx context.Context,
 			switch field.Name {
 			case "totalCount":
 				return ec.fieldContext_TaskConnection_totalCount(ctx, field)
+			case "todoCount":
+				return ec.fieldContext_TaskConnection_todoCount(ctx, field)
+			case "doneCount":
+				return ec.fieldContext_TaskConnection_doneCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_TaskConnection_edges(ctx, field)
 			case "pageInfo":
@@ -29847,6 +30223,14 @@ func (ec *executionContext) fieldContext_Risk_measures(ctx context.Context, fiel
 			switch field.Name {
 			case "totalCount":
 				return ec.fieldContext_MeasureConnection_totalCount(ctx, field)
+			case "notStartedCount":
+				return ec.fieldContext_MeasureConnection_notStartedCount(ctx, field)
+			case "inProgressCount":
+				return ec.fieldContext_MeasureConnection_inProgressCount(ctx, field)
+			case "notApplicableCount":
+				return ec.fieldContext_MeasureConnection_notApplicableCount(ctx, field)
+			case "completedCount":
+				return ec.fieldContext_MeasureConnection_completedCount(ctx, field)
 			case "edges":
 				return ec.fieldContext_MeasureConnection_edges(ctx, field)
 			case "pageInfo":
@@ -31152,6 +31536,94 @@ func (ec *executionContext) _TaskConnection_totalCount(ctx context.Context, fiel
 }
 
 func (ec *executionContext) fieldContext_TaskConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskConnection_todoCount(ctx context.Context, field graphql.CollectedField, obj *types.TaskConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskConnection_todoCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.TaskConnection().TodoCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskConnection_todoCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskConnection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskConnection_doneCount(ctx context.Context, field graphql.CollectedField, obj *types.TaskConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskConnection_doneCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.TaskConnection().DoneCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskConnection_doneCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TaskConnection",
 		Field:      field,
@@ -44146,6 +44618,11 @@ func (ec *executionContext) _DeleteMeasurePayload(ctx context.Context, sel ast.S
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "deletedTaskIds":
+			out.Values[i] = ec._DeleteMeasurePayload_deletedTaskIds(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -46199,6 +46676,11 @@ func (ec *executionContext) _ImportMeasurePayload(ctx context.Context, sel ast.S
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "taskEdges":
+			out.Values[i] = ec._ImportMeasurePayload_taskEdges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -46495,6 +46977,150 @@ func (ec *executionContext) _MeasureConnection(ctx context.Context, sel ast.Sele
 					}
 				}()
 				res = ec._MeasureConnection_totalCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "notStartedCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MeasureConnection_notStartedCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "inProgressCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MeasureConnection_inProgressCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "notApplicableCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MeasureConnection_notApplicableCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "completedCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MeasureConnection_completedCount(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -48945,6 +49571,78 @@ func (ec *executionContext) _TaskConnection(ctx context.Context, sel ast.Selecti
 					}
 				}()
 				res = ec._TaskConnection_totalCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "todoCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TaskConnection_todoCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "doneCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TaskConnection_doneCount(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -53248,6 +53946,36 @@ func (ec *executionContext) marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋg
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNID2ᚕgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGIDᚄ(ctx context.Context, v any) ([]gid.GID, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]gid.GID, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNID2ᚕgithubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGIDᚄ(ctx context.Context, sel ast.SelectionSet, v []gid.GID) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNImportFrameworkInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐImportFrameworkInput(ctx context.Context, v any) (types.ImportFrameworkInput, error) {

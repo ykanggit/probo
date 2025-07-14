@@ -25,6 +25,8 @@ type (
 
 	TaskConnection struct {
 		TotalCount int
+		TodoCount  int
+		DoneCount  int
 		Edges      []*TaskEdge
 		PageInfo   PageInfo
 
