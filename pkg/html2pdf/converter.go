@@ -21,6 +21,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
@@ -74,8 +75,13 @@ func WithTracerProvider(tp trace.TracerProvider) Option {
 }
 
 func NewConverter(addr string, opts ...Option) *Converter {
+	// Only add ws:// prefix if it's not already present
+	if !strings.HasPrefix(addr, "ws://") {
+		addr = "ws://" + addr
+	}
+
 	c := &Converter{
-		addr:           "ws://" + addr,
+		addr:           addr,
 		l:              log.NewLogger(log.WithOutput(io.Discard)),
 		tracerProvider: otel.GetTracerProvider(),
 	}
