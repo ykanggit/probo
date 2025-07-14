@@ -105,3 +105,20 @@ jobs:
             coverage.out
             coverage.html
           retention-days: 30
+
+  lint:
+    name: "lint"
+    runs-on: "ubuntu-22.04"
+    permissions:
+      contents: "read"
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: "actions/setup-go@v5"
+        with:
+          go-version: 24
+      - uses: "actions/setup-node@v4"
+        with:
+          node-version: 22
+      - run: "npm ci"
+      - run: "make lint"
+      # - run: "npm run lint"
