@@ -22,6 +22,7 @@ GO_BASE=	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go
 GO_BUILD=	$(GO_BASE) build $(LDFLAGS) $(GCFLAGS)
 GO_GENERATE=	$(GO_BASE) generate
 GO_TEST=	$(GO_BASE) test $(TEST_FLAGS)
+GO_VET=	$(GO_BASE) vet
 
 TEST_FLAGS?=	-race -cover -coverprofile=coverage.out
 
@@ -35,11 +36,15 @@ PROBOD_SRC=	cmd/probod/main.go
 all: build
 
 .PHONY: lint
-lint: fmt-check vet
+lint: vet npm-lint
 
 .PHONY: vet
 vet:
-	$(GO) vet ./...
+	$(GO_VET) ./...
+
+.PHONY: npm-lint
+npm-lint:
+	$(NPM) run lint
 
 .PHONY: test
 test: ## Run tests with race detection and coverage (usage: make test [MODULE=./pkg/some/module])
