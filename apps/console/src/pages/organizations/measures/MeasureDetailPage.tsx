@@ -81,6 +81,7 @@ export default function MeasureDetailPage(props: Props) {
             variables: {
               input: { measureId },
               connections: [connectionId],
+              taskConnections: [`client:${organizationId}:__TasksPageFragment_tasks_connection`],
             },
             onSuccess() {
               navigate(`/organizations/${organizationId}/measures`);

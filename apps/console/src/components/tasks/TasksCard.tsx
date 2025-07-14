@@ -14,6 +14,7 @@ import {
   TaskStateIcon,
   useConfirm,
   useDialogRef,
+  InfiniteScrollTrigger,
 } from "@probo/ui";
 import { Fragment } from "react";
 import { graphql, useMutation } from "react-relay";
@@ -44,9 +45,15 @@ type Props = {
     } | null;
   } & TaskFormDialogFragment$key)[];
   connectionId: string;
+  totalCount?: number;
+  todoCount?: number;
+  doneCount?: number;
+  hasNext?: boolean;
+  loadNext?: (...args: any[]) => void;
+  isLoadingNext?: boolean;
 };
 
-export default function TasksCard({ tasks, connectionId }: Props) {
+export default function TasksCard({ tasks, connectionId, totalCount, todoCount, doneCount, hasNext, loadNext, isLoadingNext }: Props) {
   const { __ } = useTranslate();
   const hash = useLocation().hash.replace("#", "");
 
@@ -77,7 +84,14 @@ export default function TasksCard({ tasks, connectionId }: Props) {
               <TabItem asChild active={hash === h.hash} key={h.hash}>
                 <Link to={`#${h.hash}`}>
                   {h.label}
-                  <TabBadge>{tasksPerHash.get(h.hash)?.length}</TabBadge>
+                  <TabBadge>
+                    {h.hash === "all" 
+                      ? totalCount ?? tasksPerHash.get(h.hash)?.length ?? 0
+                      : h.hash === "" 
+                        ? todoCount ?? tasksPerHash.get(h.hash)?.length ?? 0
+                        : doneCount ?? tasksPerHash.get(h.hash)?.length ?? 0
+                    }
+                  </TabBadge>
                 </Link>
               </TabItem>
             ))}
@@ -114,6 +128,12 @@ export default function TasksCard({ tasks, connectionId }: Props) {
                   />
                 ))}
           </div>
+          {hasNext && loadNext && (
+            <InfiniteScrollTrigger
+              onView={() => loadNext(50)}
+              loading={isLoadingNext}
+            />
+          )}
         </Card>
       )}
     </div>

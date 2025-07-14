@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6428f29f3af64fb014520d574c7486bc>>
+ * @generated SignedSource<<ed5a316f535ca95dde4b12e2cec72754>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,74 +10,147 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type MeasureGraphListQuery$variables = {
-  organizationId: string;
+export type MeasureOrderField = "CREATED_AT";
+export type OrderDirection = "ASC" | "DESC";
+export type MeasureOrder = {
+  direction: OrderDirection;
+  field: MeasureOrderField;
 };
-export type MeasureGraphListQuery$data = {
-  readonly organization: {
-    readonly id: string;
+export type MeasuresPageFragment_query$variables = {
+  after?: any | null | undefined;
+  before?: any | null | undefined;
+  first?: number | null | undefined;
+  id: string;
+  last?: number | null | undefined;
+  order?: MeasureOrder | null | undefined;
+};
+export type MeasuresPageFragment_query$data = {
+  readonly node: {
     readonly " $fragmentSpreads": FragmentRefs<"MeasuresPageFragment">;
   };
 };
-export type MeasureGraphListQuery = {
-  response: MeasureGraphListQuery$data;
-  variables: MeasureGraphListQuery$variables;
+export type MeasuresPageFragment_query = {
+  response: MeasuresPageFragment_query$data;
+  variables: MeasuresPageFragment_query$variables;
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "defaultValue": null,
-    "kind": "LocalArgument",
-    "name": "organizationId"
-  }
-],
-v1 = [
+var v0 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "after"
+},
+v1 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "before"
+},
+v2 = {
+  "defaultValue": 50,
+  "kind": "LocalArgument",
+  "name": "first"
+},
+v3 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "id"
+},
+v4 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "last"
+},
+v5 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "order"
+},
+v6 = [
   {
     "kind": "Variable",
     "name": "id",
-    "variableName": "organizationId"
+    "variableName": "id"
   }
 ],
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
+v7 = {
+  "kind": "Variable",
+  "name": "after",
+  "variableName": "after"
 },
-v3 = {
+v8 = {
+  "kind": "Variable",
+  "name": "before",
+  "variableName": "before"
+},
+v9 = {
+  "kind": "Variable",
+  "name": "first",
+  "variableName": "first"
+},
+v10 = {
+  "kind": "Variable",
+  "name": "last",
+  "variableName": "last"
+},
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v4 = [
+v12 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v13 = [
+  (v7/*: any*/),
+  (v8/*: any*/),
+  (v9/*: any*/),
+  (v10/*: any*/),
   {
-    "kind": "Literal",
-    "name": "first",
-    "value": 50
+    "kind": "Variable",
+    "name": "orderBy",
+    "variableName": "order"
   }
 ];
 return {
   "fragment": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/),
+      (v2/*: any*/),
+      (v3/*: any*/),
+      (v4/*: any*/),
+      (v5/*: any*/)
+    ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "MeasureGraphListQuery",
+    "name": "MeasuresPageFragment_query",
     "selections": [
       {
-        "alias": "organization",
-        "args": (v1/*: any*/),
+        "alias": null,
+        "args": (v6/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v2/*: any*/),
           {
-            "args": null,
+            "args": [
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/),
+              (v10/*: any*/),
+              {
+                "kind": "Variable",
+                "name": "order",
+                "variableName": "order"
+              }
+            ],
             "kind": "FragmentSpread",
             "name": "MeasuresPageFragment"
           }
@@ -90,26 +163,33 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [
+      (v0/*: any*/),
+      (v1/*: any*/),
+      (v2/*: any*/),
+      (v4/*: any*/),
+      (v5/*: any*/),
+      (v3/*: any*/)
+    ],
     "kind": "Operation",
-    "name": "MeasureGraphListQuery",
+    "name": "MeasuresPageFragment_query",
     "selections": [
       {
-        "alias": "organization",
-        "args": (v1/*: any*/),
+        "alias": null,
+        "args": (v6/*: any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v3/*: any*/),
-          (v2/*: any*/),
+          (v11/*: any*/),
+          (v12/*: any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v4/*: any*/),
+                "args": (v13/*: any*/),
                 "concreteType": "MeasureConnection",
                 "kind": "LinkedField",
                 "name": "measures",
@@ -166,7 +246,7 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v2/*: any*/),
+                          (v12/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -195,7 +275,7 @@ return {
                             "name": "description",
                             "storageKey": null
                           },
-                          (v3/*: any*/)
+                          (v11/*: any*/)
                         ],
                         "storageKey": null
                       },
@@ -261,11 +341,11 @@ return {
                     ]
                   }
                 ],
-                "storageKey": "measures(first:50)"
+                "storageKey": null
               },
               {
                 "alias": null,
-                "args": (v4/*: any*/),
+                "args": (v13/*: any*/),
                 "filters": [
                   "orderBy"
                 ],
@@ -284,16 +364,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "46db6f3a865d3825f56f1814ead8e45a",
+    "cacheID": "cc8775b3e41942b2901fd380691f5499",
     "id": null,
     "metadata": {},
-    "name": "MeasureGraphListQuery",
+    "name": "MeasuresPageFragment_query",
     "operationKind": "query",
-    "text": "query MeasureGraphListQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...MeasuresPageFragment\n  }\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasuresPageFragment on Organization {\n  measures(first: 50) {\n    totalCount\n    notStartedCount\n    inProgressCount\n    notApplicableCount\n    completedCount\n    edges {\n      node {\n        id\n        name\n        category\n        state\n        ...MeasureFormDialogMeasureFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query MeasuresPageFragment_query(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: MeasureOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...MeasuresPageFragment_16fISc\n    id\n  }\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasuresPageFragment_16fISc on Organization {\n  measures(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    totalCount\n    notStartedCount\n    inProgressCount\n    notApplicableCount\n    completedCount\n    edges {\n      node {\n        id\n        name\n        category\n        state\n        ...MeasureFormDialogMeasureFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3014f5724257c0819ba6ef15d2b72d07";
+(node as any).hash = "4d982147f48e75619d93150fb1ea01c0";
 
 export default node;

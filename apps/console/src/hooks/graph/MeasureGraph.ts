@@ -16,9 +16,11 @@ const deleteMeasureMutation = graphql`
   mutation MeasureGraphDeleteMutation(
     $input: DeleteMeasureInput!
     $connections: [ID!]!
+    $taskConnections: [ID!]!
   ) {
     deleteMeasure(input: $input) {
       deletedMeasureId @deleteEdge(connections: $connections)
+      deletedTaskIds @deleteEdge(connections: $taskConnections)
     }
   }
 `;

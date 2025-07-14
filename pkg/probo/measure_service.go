@@ -17,11 +17,13 @@ package probo
 import (
 	"context"
 	"fmt"
+	"maps"
 	"time"
 
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
+	"github.com/jackc/pgx/v5"
 	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
@@ -48,17 +50,20 @@ type (
 
 	ImportMeasureRequest struct {
 		Measures []struct {
-			Name        string `json:"name"`
-			Category    string `json:"category"`
-			ReferenceID string `json:"reference-id"`
+			Name        string  `json:"name"`
+			Description *string `json:"description,omitempty"`
+			Category    string  `json:"category"`
+			ReferenceID string  `json:"reference-id"`
+			State       *string `json:"state,omitempty"`
 			Standards   []struct {
 				Framework string `json:"framework"`
 				Control   string `json:"control"`
 			} `json:"standards"`
 			Tasks []struct {
-				Name               string `json:"name"`
-				Description        string `json:"description"`
-				ReferenceID        string `json:"reference-id"`
+				Name               string  `json:"name"`
+				Description        string  `json:"description"`
+				ReferenceID        string  `json:"reference-id"`
+				State              *string `json:"state,omitempty"`
 				RequestedEvidences []struct {
 					ReferenceID string                `json:"reference-id"`
 					Type        coredata.EvidenceType `json:"type"`
@@ -213,6 +218,34 @@ func (s MeasureService) CountForOrganizationID(
 	return count, nil
 }
 
+func (s MeasureService) CountForOrganizationIDByState(
+	ctx context.Context,
+	organizationID gid.GID,
+	state coredata.MeasureState,
+	filter *coredata.MeasureFilter,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			measures := &coredata.Measures{}
+			count, err = measures.CountByOrganizationIDAndState(ctx, conn, s.svc.scope, organizationID, state, filter)
+			if err != nil {
+				return fmt.Errorf("cannot count measures: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s MeasureService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
@@ -272,12 +305,18 @@ func (s MeasureService) Get(
 	return measure, nil
 }
 
+type ImportResult struct {
+	Measures *page.Page[*coredata.Measure, coredata.MeasureOrderField]
+	Tasks    []*coredata.Task
+}
+
 func (s MeasureService) Import(
 	ctx context.Context,
 	organizationID gid.GID,
 	req ImportMeasureRequest,
-) (*page.Page[*coredata.Measure, coredata.MeasureOrderField], error) {
+) (*ImportResult, error) {
 	importedMeasures := coredata.Measures{}
+	importedTasks := []*coredata.Task{}
 	organization := &coredata.Organization{}
 
 	err := s.svc.pg.WithTx(
@@ -292,13 +331,37 @@ func (s MeasureService) Import(
 
 				measureID := gid.New(organization.ID.TenantID(), coredata.MeasureEntityType)
 
+				description := ""
+				if req.Measures[i].Description != nil {
+					description = *req.Measures[i].Description
+				}
+
+				// Set default state to NOT_STARTED
+				state := coredata.MeasureStateNotStarted
+				if req.Measures[i].State != nil {
+					stateStr := *req.Measures[i].State
+					switch stateStr {
+					case "NOT_STARTED":
+						state = coredata.MeasureStateNotStarted
+					case "IN_PROGRESS":
+						state = coredata.MeasureStateInProgress
+					case "NOT_APPLICABLE":
+						state = coredata.MeasureStateNotApplicable
+					case "IMPLEMENTED":
+						state = coredata.MeasureStateImplemented
+					default:
+						// If invalid state provided, default to NOT_STARTED
+						state = coredata.MeasureStateNotStarted
+					}
+				}
+
 				measure := &coredata.Measure{
 					ID:             measureID,
 					OrganizationID: organization.ID,
 					Name:           req.Measures[i].Name,
-					Description:    "",
+					Description:    description,
 					Category:       req.Measures[i].Category,
-					State:          coredata.MeasureStateNotStarted,
+					State:          state,
 					ReferenceID:    req.Measures[i].ReferenceID,
 					CreatedAt:      now,
 					UpdatedAt:      now,
@@ -313,6 +376,21 @@ func (s MeasureService) Import(
 				for j := range req.Measures[i].Tasks {
 					taskID := gid.New(organization.ID.TenantID(), coredata.TaskEntityType)
 
+					// Set default state to TODO
+					state := coredata.TaskStateTodo
+					if req.Measures[i].Tasks[j].State != nil {
+						stateStr := *req.Measures[i].Tasks[j].State
+						switch stateStr {
+						case "TODO":
+							state = coredata.TaskStateTodo
+						case "DONE":
+							state = coredata.TaskStateDone
+						default:
+							// If invalid state provided, default to TODO
+							state = coredata.TaskStateTodo
+						}
+					}
+
 					task := &coredata.Task{
 						ID:             taskID,
 						OrganizationID: organizationID,
@@ -320,7 +398,7 @@ func (s MeasureService) Import(
 						Name:           req.Measures[i].Tasks[j].Name,
 						Description:    req.Measures[i].Tasks[j].Description,
 						ReferenceID:    req.Measures[i].Tasks[j].ReferenceID,
-						State:          coredata.TaskStateTodo,
+						State:          state,
 						CreatedAt:      now,
 						UpdatedAt:      now,
 					}
@@ -328,6 +406,8 @@ func (s MeasureService) Import(
 					if err := task.Upsert(ctx, tx, s.svc.scope); err != nil {
 						return fmt.Errorf("cannot upsert task: %w", err)
 					}
+
+					importedTasks = append(importedTasks, task)
 
 					for k := range req.Measures[i].Tasks[j].RequestedEvidences {
 						evidenceID := gid.New(organizationID.TenantID(), coredata.EvidenceEntityType)
@@ -390,7 +470,10 @@ func (s MeasureService) Import(
 		},
 	)
 
-	return page.NewPage(importedMeasures, cursor), nil
+	return &ImportResult{
+		Measures: page.NewPage(importedMeasures, cursor),
+		Tasks:    importedTasks,
+	}, nil
 }
 
 func (s MeasureService) Update(
@@ -488,14 +571,67 @@ func (s MeasureService) Create(
 func (s MeasureService) Delete(
 	ctx context.Context,
 	measureID gid.GID,
-) error {
-	return s.svc.pg.WithTx(ctx, func(conn pg.Conn) error {
-		measure := &coredata.Measure{}
+) ([]gid.GID, error) {
+	var deletedTaskIDs []gid.GID
 
+	err := s.svc.pg.WithTx(ctx, func(conn pg.Conn) error {
+		// First, delete all tasks associated with this measure
+		// Use a simple query to get all tasks for this measure
+		q := `
+		SELECT
+			id,
+			measure_id,
+			organization_id,
+			name,
+			description,
+			state,
+			reference_id,
+			time_estimate,
+			assigned_to,
+			deadline,
+			created_at,
+			updated_at
+		FROM
+			tasks
+		WHERE
+			%s
+			AND measure_id = @measure_id
+		`
+		q = fmt.Sprintf(q, s.svc.scope.SQLFragment())
+
+		args := pgx.StrictNamedArgs{"measure_id": measureID}
+		maps.Copy(args, s.svc.scope.SQLArguments())
+
+		rows, err := conn.Query(ctx, q, args)
+		if err != nil {
+			return fmt.Errorf("cannot query tasks for measure: %w", err)
+		}
+
+		tasks, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[coredata.Task])
+		if err != nil {
+			return fmt.Errorf("cannot collect tasks: %w", err)
+		}
+
+		// Collect task IDs before deleting them
+		for _, task := range tasks {
+			deletedTaskIDs = append(deletedTaskIDs, task.ID)
+		}
+
+		// Delete each task
+		for _, task := range tasks {
+			if err := task.Delete(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot delete task %s: %w", task.ID, err)
+			}
+		}
+
+		// Then delete the measure
+		measure := &coredata.Measure{}
 		if err := measure.Delete(ctx, conn, s.svc.scope, measureID); err != nil {
 			return fmt.Errorf("cannot delete measure: %w", err)
 		}
 
 		return nil
 	})
+
+	return deletedTaskIDs, err
 }

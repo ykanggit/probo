@@ -1156,6 +1156,10 @@ type MeasureConnection
     model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.MeasureConnection"
   ) {
   totalCount: Int! @goField(forceResolver: true)
+  notStartedCount: Int! @goField(forceResolver: true)
+  inProgressCount: Int! @goField(forceResolver: true)
+  notApplicableCount: Int! @goField(forceResolver: true)
+  completedCount: Int! @goField(forceResolver: true)
   edges: [MeasureEdge!]!
   pageInfo: PageInfo!
 }
@@ -1170,6 +1174,8 @@ type TaskConnection
     model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.TaskConnection"
   ) {
   totalCount: Int! @goField(forceResolver: true)
+  todoCount: Int! @goField(forceResolver: true)
+  doneCount: Int! @goField(forceResolver: true)
   edges: [TaskEdge!]!
   pageInfo: PageInfo!
 }
@@ -1850,6 +1856,7 @@ type UpdateMeasurePayload {
 
 type ImportMeasurePayload {
   measureEdges: [MeasureEdge!]!
+  taskEdges: [TaskEdge!]!
 }
 
 type CreateTaskPayload {
@@ -2032,6 +2039,7 @@ input DeleteMeasureInput {
 
 type DeleteMeasurePayload {
   deletedMeasureId: ID!
+  deletedTaskIds: [ID!]!
 }
 
 type DocumentVersion implements Node {

@@ -270,6 +270,32 @@ func (s TaskService) CountForOrganizationID(
 	return count, nil
 }
 
+func (s TaskService) CountForOrganizationIDByState(
+	ctx context.Context,
+	organizationID gid.GID,
+	state coredata.TaskState,
+) (int, error) {
+	var count int
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) (err error) {
+			tasks := coredata.Tasks{}
+			count, err = tasks.CountByOrganizationIDAndState(ctx, conn, s.svc.scope, organizationID, state)
+			if err != nil {
+				return fmt.Errorf("cannot count tasks: %w", err)
+			}
+
+			return nil
+		},
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s TaskService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,

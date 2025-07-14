@@ -1,7 +1,7 @@
 import { Button, IconPlusLarge, PageHeader } from "@probo/ui";
 import {
   usePreloadedQuery,
-  useRefetchableFragment,
+  usePaginationFragment,
   type PreloadedQuery,
 } from "react-relay";
 import { graphql } from "relay-runtime";
@@ -17,7 +17,7 @@ const tasksFragment = graphql`
   fragment TasksPageFragment on Organization
   @refetchable(queryName: "TasksPageFragment_query")
   @argumentDefinitions(
-    first: { type: "Int", defaultValue: 20 }
+    first: { type: "Int", defaultValue: 50 }
     order: { type: "TaskOrder", defaultValue: null }
     after: { type: "CursorKey", defaultValue: null }
     before: { type: "CursorKey", defaultValue: null }
@@ -31,6 +31,9 @@ const tasksFragment = graphql`
       orderBy: $order
     ) @connection(key: "TasksPageFragment_tasks") {
       __id
+      totalCount
+      todoCount
+      doneCount
       edges {
         node {
           id
@@ -59,12 +62,15 @@ interface Props {
 export default function TasksPage({ queryRef }: Props) {
   const { __ } = useTranslate();
   const query = usePreloadedQuery(tasksQuery, queryRef);
-  const [data] = useRefetchableFragment(
+  const pagination = usePaginationFragment(
     tasksFragment,
     query.organization as TasksPageFragment$key
   );
-  const tasks = data.tasks?.edges.map((edge) => edge.node);
-  const connectionId = data.tasks.__id;
+  const tasks = pagination.data.tasks?.edges.map((edge) => edge.node);
+  const connectionId = pagination.data.tasks.__id;
+  const totalCount = pagination.data.tasks?.totalCount ?? 0;
+  const todoCount = pagination.data.tasks?.todoCount ?? 0;
+  const doneCount = pagination.data.tasks?.doneCount ?? 0;
 
   usePageTitle(__("Tasks"));
 
@@ -80,7 +86,16 @@ export default function TasksPage({ queryRef }: Props) {
           <Button icon={IconPlusLarge}>{__("New task")}</Button>
         </TaskFormDialog>
       </PageHeader>
-      <TasksCard connectionId={connectionId} tasks={tasks ?? []} />
+      <TasksCard 
+        connectionId={connectionId} 
+        tasks={tasks ?? []} 
+        totalCount={totalCount}
+        todoCount={todoCount}
+        doneCount={doneCount}
+        hasNext={pagination.hasNext}
+        loadNext={pagination.loadNext}
+        isLoadingNext={pagination.isLoadingNext}
+      />
     </div>
   );
 }

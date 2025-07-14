@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<fcc24a794a473d9c17436612840d3228>>
+ * @generated SignedSource<<291373acf9d9e37a8d25e53fd6e84c14>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -46,7 +46,7 @@ v1 = {
   "name": "before"
 },
 v2 = {
-  "defaultValue": 20,
+  "defaultValue": 50,
   "kind": "LocalArgument",
   "name": "first"
 },
@@ -202,6 +202,27 @@ return {
                 "name": "tasks",
                 "plural": false,
                 "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "totalCount",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "todoCount",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "doneCount",
+                    "storageKey": null
+                  },
                   {
                     "alias": null,
                     "args": null,
@@ -369,16 +390,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9f6192e72e8d38b3150dfc8ece83ad97",
+    "cacheID": "857fd0bf36d2a4e08543b2f667a0cae3",
     "id": null,
     "metadata": {},
     "name": "TasksPageFragment_query",
     "operationKind": "query",
-    "text": "query TasksPageFragment_query(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 20\n  $last: Int = null\n  $order: TaskOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...TasksPageFragment_16fISc\n    id\n  }\n}\n\nfragment TaskFormDialogFragment on Task {\n  id\n  description\n  name\n  state\n  timeEstimate\n  deadline\n  assignedTo {\n    id\n  }\n  measure {\n    id\n  }\n}\n\nfragment TasksPageFragment_16fISc on Organization {\n  tasks(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    edges {\n      node {\n        id\n        name\n        state\n        description\n        ...TaskFormDialogFragment\n        measure {\n          id\n          name\n        }\n        assignedTo {\n          id\n          fullName\n        }\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query TasksPageFragment_query(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: TaskOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...TasksPageFragment_16fISc\n    id\n  }\n}\n\nfragment TaskFormDialogFragment on Task {\n  id\n  description\n  name\n  state\n  timeEstimate\n  deadline\n  assignedTo {\n    id\n  }\n  measure {\n    id\n  }\n}\n\nfragment TasksPageFragment_16fISc on Organization {\n  tasks(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    totalCount\n    todoCount\n    doneCount\n    edges {\n      node {\n        id\n        name\n        state\n        description\n        ...TaskFormDialogFragment\n        measure {\n          id\n          name\n        }\n        assignedTo {\n          id\n          fullName\n        }\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a555e698539fe819dd4713ac507ea440";
+(node as any).hash = "1eb22d6b3a051a4c0069a61b6709f665";
 
 export default node;

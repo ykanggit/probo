@@ -24,9 +24,13 @@ type (
 	MeasureOrderBy OrderBy[coredata.MeasureOrderField]
 
 	MeasureConnection struct {
-		TotalCount int
-		Edges      []*MeasureEdge
-		PageInfo   PageInfo
+		TotalCount         int
+		NotStartedCount    int
+		InProgressCount    int
+		NotApplicableCount int
+		CompletedCount     int
+		Edges              []*MeasureEdge
+		PageInfo           PageInfo
 
 		Resolver any
 		ParentID gid.GID

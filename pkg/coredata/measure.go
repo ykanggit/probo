@@ -302,6 +302,44 @@ WHERE
 	return count, nil
 }
 
+func (m *Measures) CountByOrganizationIDAndState(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+	state MeasureState,
+	filter *MeasureFilter,
+) (int, error) {
+	q := `
+SELECT
+    COUNT(id)
+FROM
+    measures
+WHERE
+    %s
+    AND organization_id = @organization_id
+    AND state = @state
+    AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{
+		"organization_id": organizationID,
+		"state":           state,
+	}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
+
 func (m *Measures) LoadByOrganizationID(
 	ctx context.Context,
 	conn pg.Conn,

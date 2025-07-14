@@ -1,8 +1,8 @@
 import type { MeasureGraphListQuery } from "/hooks/graph/__generated__/MeasureGraphListQuery.graphql";
 import {
-  useFragment,
   usePreloadedQuery,
   type PreloadedQuery,
+  usePaginationFragment,
 } from "react-relay";
 import { useTranslate } from "@probo/i18n";
 import {
@@ -17,6 +17,8 @@ import {
   IconPencil,
   IconPlusLarge,
   IconTrashCan,
+  IconListStack,
+  IconDotGrid1x3Horizontal,
   MeasureBadge,
   MeasureImplementation,
   PageHeader,
@@ -28,6 +30,7 @@ import {
   Tr,
   useConfirm,
   useDialogRef,
+  InfiniteScrollTrigger,
 } from "@probo/ui";
 import {
   measuresQuery,
@@ -52,10 +55,32 @@ type Props = {
   queryRef: PreloadedQuery<MeasureGraphListQuery>;
 };
 
+type SortField = 'name' | 'category' | 'state';
+type SortDirection = 'asc' | 'desc';
+
 const measuresFragment = graphql`
-  fragment MeasuresPageFragment on Organization {
-    measures(first: 100) @connection(key: "MeasuresGraphListQuery__measures") {
+  fragment MeasuresPageFragment on Organization
+  @refetchable(queryName: "MeasuresPageFragment_query")
+  @argumentDefinitions(
+    first: { type: "Int", defaultValue: 50 }
+    order: { type: "MeasureOrder", defaultValue: null }
+    after: { type: "CursorKey", defaultValue: null }
+    before: { type: "CursorKey", defaultValue: null }
+    last: { type: "Int", defaultValue: null }
+  ) {
+    measures(
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+      orderBy: $order
+    ) @connection(key: "MeasuresPageFragment_measures") {
       __id
+      totalCount
+      notStartedCount
+      inProgressCount
+      notApplicableCount
+      completedCount
       edges {
         node {
           id
@@ -73,6 +98,7 @@ const importMeasuresMutation = graphql`
   mutation MeasuresPageImportMutation(
     $input: ImportMeasureInput!
     $connections: [ID!]!
+    $taskConnections: [ID!]!
   ) {
     importMeasure(input: $input) {
       measureEdges @appendEdge(connections: $connections) {
@@ -81,6 +107,17 @@ const importMeasuresMutation = graphql`
           name
           category
           state
+        }
+      }
+      taskEdges @appendEdge(connections: $taskConnections) {
+        node {
+          id
+          name
+          description
+          state
+          measure {
+            id
+          }
         }
       }
     }
@@ -93,15 +130,31 @@ export default function MeasuresPage(props: Props) {
     measuresQuery,
     props.queryRef
   ).organization;
-  const data = useFragment<MeasuresPageFragment$key>(
+  const pagination = usePaginationFragment(
     measuresFragment,
-    organization
+    organization as MeasuresPageFragment$key
   );
-  const connectionId = data.measures.__id;
-  const measures = data.measures.edges.map((edge) => edge.node);
+  const connectionId = pagination.data.measures.__id;
+  const measures = pagination.data.measures.edges.map((edge) => edge.node);
+  const totalCount = pagination.data.measures?.totalCount ?? 0;
+  const notStartedCount = pagination.data.measures?.notStartedCount ?? 0;
+  const inProgressCount = pagination.data.measures?.inProgressCount ?? 0;
+  const notApplicableCount = pagination.data.measures?.notApplicableCount ?? 0;
+  const completedCount = pagination.data.measures?.completedCount ?? 0;
   const measuresPerCategory = useMemo(() => {
     return groupBy(measures, (measure) => measure.category);
   }, [measures]);
+  
+  // View state
+  const [viewMode, setViewMode] = useState<'categories' | 'table'>('table');
+  
+  // Sorting state for table view
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  
+  // Multi-select state for table view
+  const [selectedMeasures, setSelectedMeasures] = useState<Set<string>>(new Set());
+  
   const [importMeasures] = useMutationWithToasts<MeasuresPageImportMutation>(
     importMeasuresMutation,
     {
@@ -109,6 +162,8 @@ export default function MeasuresPage(props: Props) {
       errorMessage: __("Failed to import measures. Please try again."),
     }
   );
+  const [deleteMeasure] = useDeleteMeasureMutation();
+  const confirm = useConfirm();
   const importFileRef = useRef<HTMLInputElement>(null);
   usePageTitle(__("Measures"));
 
@@ -124,6 +179,7 @@ export default function MeasuresPage(props: Props) {
           file: null,
         },
         connections: [connectionId],
+        taskConnections: [`client:${organization.id}:__TasksPageFragment_tasks_connection`],
       },
       uploadables: {
         "input.file": file,
@@ -134,6 +190,109 @@ export default function MeasuresPage(props: Props) {
     });
   };
 
+  // Sort measures for table view
+  const sortedMeasures = useMemo(() => {
+    return [...measures].sort((a, b) => {
+      let aValue: string;
+      let bValue: string;
+      
+      switch (sortField) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'category':
+          aValue = a.category.toLowerCase();
+          bValue = b.category.toLowerCase();
+          break;
+        case 'state':
+          aValue = a.state.toLowerCase();
+          bValue = b.state.toLowerCase();
+          break;
+        default:
+          return 0;
+      }
+      
+      if (sortDirection === 'asc') {
+        return aValue.localeCompare(bValue);
+      } else {
+        return bValue.localeCompare(aValue);
+      }
+    });
+  }, [measures, sortField, sortDirection]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return null;
+    return sortDirection === 'asc' ? '↑' : '↓';
+  };
+
+  const handleSelectAll = () => {
+    if (selectedMeasures.size === sortedMeasures.length) {
+      setSelectedMeasures(new Set());
+    } else {
+      setSelectedMeasures(new Set(sortedMeasures.map(m => m.id)));
+    }
+  };
+
+  const handleSelectMeasure = (measureId: string) => {
+    const newSelected = new Set(selectedMeasures);
+    if (newSelected.has(measureId)) {
+      newSelected.delete(measureId);
+    } else {
+      newSelected.add(measureId);
+    }
+    setSelectedMeasures(newSelected);
+  };
+
+  const handleBulkDelete = () => {
+    confirm(
+      () => {
+        const promises = Array.from(selectedMeasures).map(measureId => 
+          deleteMeasure({
+            variables: { 
+              input: { measureId },
+              connections: [connectionId],
+              taskConnections: [`client:${organization.id}:__TasksPageFragment_tasks_connection`]
+            }
+          })
+        );
+        
+        return Promise.all(promises).then(() => {
+          setSelectedMeasures(new Set());
+        });
+      },
+      {
+        message: sprintf(__("This will permanently delete %s selected measures. This action cannot be undone."), selectedMeasures.size),
+      }
+    );
+  };
+
+  const handleDeleteMeasure = (measureId: string) => {
+    confirm(
+      () => {
+        return deleteMeasure({
+          variables: { 
+            input: { measureId },
+            connections: [connectionId],
+            taskConnections: [`client:${organization.id}:__TasksPageFragment_tasks_connection`]
+          }
+        });
+      },
+      {
+        message: __("This will permanently delete this measure. This action cannot be undone."),
+      }
+    );
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -142,6 +301,22 @@ export default function MeasuresPage(props: Props) {
           "Measures are actions taken to reduce the risk. Add them to track their implementation status."
         )}
       >
+        <div className="flex items-center gap-2">
+          <Button
+            variant={viewMode === 'categories' ? 'primary' : 'secondary'}
+            icon={IconDotGrid1x3Horizontal}
+            onClick={() => setViewMode('categories')}
+          >
+                          {__("Category view")}
+          </Button>
+          <Button
+            variant={viewMode === 'table' ? 'primary' : 'secondary'}
+            icon={IconListStack}
+            onClick={() => setViewMode('table')}
+          >
+                          {__("Table view")}
+          </Button>
+        </div>
         <FileButton
           ref={importFileRef}
           variant="secondary"
@@ -156,17 +331,139 @@ export default function MeasuresPage(props: Props) {
           </Button>
         </MeasureFormDialog>
       </PageHeader>
-      <MeasureImplementation measures={measures} className="my-10" />
-      {objectKeys(measuresPerCategory)
-        .sort((a, b) => a.localeCompare(b))
-        .map((category) => (
-          <Category
-            key={category}
-            category={category}
-            measures={measuresPerCategory[category]}
-            connectionId={connectionId}
-          />
-        ))}
+      
+      <MeasureImplementation measures={measures} totalCount={totalCount} className="my-10" />
+      
+      {viewMode === 'categories' ? (
+        // Category tiles view (existing implementation)
+        objectKeys(measuresPerCategory)
+          .sort((a, b) => a.localeCompare(b))
+          .map((category) => (
+            <Category
+              key={category}
+              category={category}
+              measures={measuresPerCategory[category]}
+              connectionId={connectionId}
+            />
+          ))
+      ) : (
+        // Table view
+        <Card className="p-0">
+          <div className="flex items-center justify-between p-4 border-b border-border-low">
+            <div className="flex items-center gap-4 text-sm text-txt-secondary">
+              <span>
+                {__("Total measures")}:{" "}
+                <span className="text-txt-primary font-medium">
+                  {totalCount}
+                </span>
+              </span>
+              <span>
+                {__("Not Started")}:{" "}
+                <span className="text-txt-primary font-medium">
+                  {notStartedCount}
+                </span>
+              </span>
+              <span>
+                {__("In Progress")}:{" "}
+                <span className="text-txt-primary font-medium">
+                  {inProgressCount}
+                </span>
+              </span>
+              <span>
+                {__("Not Applicable")}:{" "}
+                <span className="text-txt-primary font-medium">
+                  {notApplicableCount}
+                </span>
+              </span>
+              <span>
+                {__("Completed")}:{" "}
+                <span className="text-txt-primary font-medium">
+                  {completedCount}
+                </span>
+              </span>
+            </div>
+          </div>
+          {selectedMeasures.size > 0 && (
+            <div className="flex items-center justify-between p-4 bg-highlight border-b border-border-low">
+              <span className="text-sm text-txt-primary">
+                {sprintf(__("%s measures selected"), selectedMeasures.size)}
+              </span>
+              <Button
+                variant="danger"
+                icon={IconTrashCan}
+                onClick={handleBulkDelete}
+              >
+                {sprintf(__("Delete %s measures"), selectedMeasures.size)}
+              </Button>
+            </div>
+          )}
+          <Table>
+            <Thead>
+              <Tr>
+                <Th width={50}>
+                  <input
+                    type="checkbox"
+                    checked={selectedMeasures.size === sortedMeasures.length && sortedMeasures.length > 0}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleSelectAll();
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="rounded border-border-low"
+                  />
+                </Th>
+                <Th>
+                  <button
+                    className="flex items-center gap-1 hover:text-txt-primary transition-colors"
+                    onClick={() => handleSort('name')}
+                  >
+                    {__("Measure")}
+                    {getSortIcon('name')}
+                  </button>
+                </Th>
+                <Th>
+                  <button
+                    className="flex items-center gap-1 hover:text-txt-primary transition-colors"
+                    onClick={() => handleSort('category')}
+                  >
+                    {__("Category")}
+                    {getSortIcon('category')}
+                  </button>
+                </Th>
+                <Th>
+                  <button
+                    className="flex items-center gap-1 hover:text-txt-primary transition-colors"
+                    onClick={() => handleSort('state')}
+                  >
+                    {__("State")}
+                    {getSortIcon('state')}
+                  </button>
+                </Th>
+                <Th width={50}></Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {sortedMeasures.map((measure) => (
+                <MeasureRow
+                  key={measure.id}
+                  measure={measure}
+                  connectionId={connectionId}
+                  showCategory={true}
+                  isSelected={selectedMeasures.has(measure.id)}
+                  onSelect={() => handleSelectMeasure(measure.id)}
+                  onDelete={handleDeleteMeasure}
+                />
+              ))}
+            </Tbody>
+          </Table>
+          {pagination.hasNext && (
+            <InfiniteScrollTrigger
+              onView={() => pagination.loadNext(50)}
+              loading={pagination.isLoadingNext}
+            />
+          )}
+        </Card>
+      )}
     </div>
   );
 }
@@ -205,6 +502,13 @@ function Category(props: CategoryProps) {
             {__("Completion")}:{" "}
             <span className="text-txt-primary font-medium">
               {completedMeasures.length}/{props.measures.length}
+            </span>
+          </span>
+          <span className="text-border-low">|</span>
+          <span>
+            {__("Total")}:{" "}
+            <span className="text-txt-primary font-medium">
+              {props.measures.length}
             </span>
           </span>
           <span className="text-border-low">|</span>
@@ -250,25 +554,25 @@ function Category(props: CategoryProps) {
 type MeasureRowProps = {
   measure: NodeOf<MeasuresPageFragment$data["measures"]>;
   connectionId: string;
+  showCategory?: boolean;
+  isSelected?: boolean;
+  onSelect?: (measureId: string) => void;
+  onDelete?: (measureId: string) => void;
 };
 
 function MeasureRow(props: MeasureRowProps) {
   const { __ } = useTranslate();
-  const [deleteMeasure, isDeleting] = useDeleteMeasureMutation();
   const confirm = useConfirm();
   const organizationId = useOrganizationId();
 
   const onDelete = () => {
+    if (!props.onDelete) return;
+    
     confirm(
       () =>
         new Promise<void>((resolve) => {
-          deleteMeasure({
-            variables: {
-              input: { measureId: props.measure.id },
-              connections: [props.connectionId],
-            },
-            onCompleted: () => resolve(),
-          });
+          props.onDelete!(props.measure.id);
+          resolve();
         }),
       {
         message: sprintf(
@@ -287,7 +591,24 @@ function MeasureRow(props: MeasureRowProps) {
     <>
       <MeasureFormDialog measure={props.measure} ref={dialogRef} />
       <Tr to={`/organizations/${organizationId}/measures/${props.measure.id}`}>
+        {props.showCategory && (
+          <Td>
+            <input
+              type="checkbox"
+              checked={props.isSelected}
+              onChange={(e) => {
+                e.stopPropagation();
+                props.onSelect?.(props.measure.id);
+              }}
+              onClick={(e) => e.stopPropagation()}
+              className="rounded border-border-low"
+            />
+          </Td>
+        )}
         <Td>{props.measure.name}</Td>
+        {props.showCategory && (
+          <Td>{props.measure.category}</Td>
+        )}
         <Td width={120}>
           <MeasureBadge state={props.measure.state} />
         </Td>
@@ -301,7 +622,7 @@ function MeasureRow(props: MeasureRowProps) {
             </DropdownItem>
             <DropdownItem
               onClick={onDelete}
-              disabled={isDeleting}
+              disabled={false}
               variant="danger"
               icon={IconTrashCan}
             >
