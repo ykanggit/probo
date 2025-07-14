@@ -20,14 +20,16 @@ import (
 )
 
 var (
-	regHyphens = regexp.MustCompile("-+")
-	regSpaces  = regexp.MustCompile(" ")
-	regLower   = regexp.MustCompile("[^a-z0-9-]")
+	regHyphens     = regexp.MustCompile("-+")
+	regSpaces      = regexp.MustCompile(" ")
+	regUnderscores = regexp.MustCompile("_")
+	regLower       = regexp.MustCompile("[^a-z0-9-]")
 )
 
 func Make(s string) string {
 	s = strings.ToLower(s)
 	s = regSpaces.ReplaceAllString(s, "-")
+	s = regUnderscores.ReplaceAllString(s, "-")
 	s = regLower.ReplaceAllString(s, "")
 	s = regHyphens.ReplaceAllString(s, "-")
 	s = strings.Trim(s, "-")
