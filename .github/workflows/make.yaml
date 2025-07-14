@@ -73,8 +73,35 @@ jobs:
     steps:
       - uses: "actions/checkout@v4"
       - uses: "actions/setup-go@v5"
+        with:
+          go-version: 24
       - uses: "actions/setup-node@v4"
         with:
           node-version: 22
       - run: "npm ci"
       - run: "make build"
+
+  test:
+    name: "test"
+    runs-on: "ubuntu-22.04"
+    permissions:
+      contents: "read"
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: "actions/setup-go@v5"
+        with:
+          go-version: stable
+      - uses: "actions/setup-node@v4"
+        with:
+          node-version: 22
+      - run: "npm ci"
+      - run: "make test"
+      - run: "make coverage-report"
+      - name: "Upload coverage reports"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "coverage-reports"
+          path: |
+            coverage.out
+            coverage.html
+          retention-days: 30
