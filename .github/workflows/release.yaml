@@ -41,6 +41,10 @@ jobs:
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 
+      - name: Install Grype
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3
 
@@ -71,6 +75,12 @@ jobs:
       - name: Generate SBOM for attestation
         run: |
           syft dir:. --output cyclonedx-json --source-name probod --source-version ${{ github.ref_name }} > sbom.json
+
+      - name: Scan SBOM for vulnerabilities
+        run: |
+          echo "Scanning SBOM for vulnerabilities..."
+          grype sbom:sbom.json --fail-on critical --output table
+          echo "Vulnerability scan completed successfully - no critical vulnerabilities found"
 
       - name: Generate subject for attestation
         id: hash
