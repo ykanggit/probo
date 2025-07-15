@@ -13,10 +13,12 @@ const documentTabs = (prefix: string) => {
   return [
     {
       path: `${prefix}`,
-      queryLoader: ({ organizationId, documentId }) => {
-        throw redirect(
-          `/organizations/${organizationId}/documents/${documentId}/description`,
-        );
+      queryLoader: ({ organizationId, documentId, versionId }) => {
+        const basePath = `/organizations/${organizationId}/documents/${documentId}`;
+        const redirectPath = versionId
+          ? `${basePath}/versions/${versionId}/description`
+          : `${basePath}/description`;
+        throw redirect(redirectPath);
       },
       Component: Fragment,
     },
