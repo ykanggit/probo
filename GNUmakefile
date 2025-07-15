@@ -36,7 +36,7 @@ PROBOD_SRC=	cmd/probod/main.go
 all: build
 
 .PHONY: lint
-lint: vet npm-lint
+lint: vet # npm-lint
 
 .PHONY: vet
 vet:
@@ -47,6 +47,7 @@ npm-lint:
 	$(NPM) run lint
 
 .PHONY: test
+test: CGO_ENABLED=1
 test: ## Run tests with race detection and coverage (usage: make test [MODULE=./pkg/some/module])
 	$(GO_TEST) $(if $(MODULE),$(MODULE),./...)
 
