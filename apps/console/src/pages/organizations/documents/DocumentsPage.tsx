@@ -39,7 +39,6 @@ import { sprintf, getDocumentTypeLabel } from "@probo/helpers";
 import { CreateDocumentDialog } from "./dialogs/CreateDocumentDialog";
 import type { DocumentsPageRowFragment$key } from "./__generated__/DocumentsPageRowFragment.graphql";
 import { SortableTable, SortableTh } from "/components/SortableTable";
-import { usePeople } from "/hooks/graph/PeopleGraph.ts";
 import { PublishDocumentsDialog } from "./dialogs/PublishDocumentsDialog.tsx";
 import { SignatureDocumentsDialog } from "./dialogs/SignatureDocumentsDialog.tsx";
 
@@ -95,7 +94,6 @@ export default function DocumentsPage(props: Props) {
   const [sendSigningNotifications] = useSendSigningNotificationsMutation();
   const { list: selection, toggle, clear, reset } = useList<string>([]);
 
-  const people = usePeople(organization.id);
   usePageTitle(__("Documents"));
 
   const handleSendSigningNotifications = () => {
