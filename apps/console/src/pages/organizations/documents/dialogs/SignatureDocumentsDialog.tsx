@@ -14,12 +14,15 @@ import {
   Table,
   IconChevronDown,
 } from "@probo/ui";
-import { Suspense, type FormEventHandler, type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { useTranslate } from "@probo/i18n";
 import { graphql } from "relay-runtime";
 import { sprintf } from "@probo/helpers";
 import { useMutationWithToasts } from "/hooks/useMutationWithToasts.ts";
 import { useOrganizationId } from "/hooks/useOrganizationId.ts";
+import type { SignatureDocumentsDialogMutation } from "./__generated__/SignatureDocumentsDialogMutation.graphql.ts";
+import { useFormWithSchema } from "/hooks/useFormWithSchema.ts";
+import z from "zod";
 import {
   paginatedPeopleFragment,
   paginatedPeopleQuery,
@@ -58,16 +61,23 @@ export function SignatureDocumentsDialog({
   const { __ } = useTranslate();
   const dialogRef = useDialogRef();
   const { list: selectedPeople, toggle } = useList<string>([]);
-  const [publishMutation] = useMutationWithToasts(documentsSignatureMutation, {
-    successMessage: sprintf(
-      __("%s signature requests sent"),
-      documentIds.length
-    ),
+
+  const schema = z.object({});
+
+  const [publishMutation] = useMutationWithToasts<SignatureDocumentsDialogMutation>(documentsSignatureMutation, {
+    successMessage: (response) => {
+      const actualRequestsCount = response.bulkRequestSignatures.documentVersionSignatureEdges.length;
+      return sprintf(__("%s signature requests sent"), actualRequestsCount);
+    },
     errorMessage: __("Failed to send signature requests"),
   });
 
-  const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useFormWithSchema(schema, {});
+
+  const onSubmit = handleSubmit(async () => {
     await publishMutation({
       variables: {
         input: {
@@ -75,10 +85,12 @@ export function SignatureDocumentsDialog({
           signatoryIds: selectedPeople,
         },
       },
+      onSuccess: () => {
+        dialogRef.current?.close();
+        onSave();
+      },
     });
-    dialogRef.current?.close();
-    onSave();
-  };
+  });
 
   return (
     <Dialog
@@ -94,7 +106,7 @@ export function SignatureDocumentsDialog({
           </Suspense>
         </DialogContent>
         <DialogFooter>
-          <Button type="submit" disabled={selectedPeople.length === 0}>
+          <Button type="submit" disabled={selectedPeople.length === 0 || isSubmitting}>
             {__("Send signature requests")}
           </Button>
         </DialogFooter>

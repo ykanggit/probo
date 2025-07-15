@@ -10,7 +10,7 @@ import type { MutationParameters, GraphQLTaggedNode } from "relay-runtime";
 export function useMutationWithToasts<T extends MutationParameters>(
   query: GraphQLTaggedNode,
   baseOptions?: {
-    successMessage?: string;
+    successMessage?: string | ((response: T["response"]) => string);
     errorMessage?: string;
   }
 ) {
@@ -21,7 +21,7 @@ export function useMutationWithToasts<T extends MutationParameters>(
     (
       queryOptions: UseMutationConfig<T> & {
         onSuccess?: () => void;
-        successMessage?: string;
+        successMessage?: string | ((response: T["response"]) => string);
         errorMessage?: string;
       }
     ) => {
@@ -42,10 +42,14 @@ export function useMutationWithToasts<T extends MutationParameters>(
               reject(error);
               return;
             }
+            const successMessage = typeof options.successMessage === "function"
+              ? options.successMessage(response)
+              : options.successMessage;
+
             toast({
               title: __("Success"),
               description:
-                options.successMessage ??
+                successMessage ??
                 __("Operation completed successfully"),
               variant: "success",
             });
