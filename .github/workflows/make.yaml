@@ -121,4 +121,3 @@ jobs:
           node-version: 22
       - run: "npm ci"
       - run: "make lint"
-      # - run: "npm run lint"
