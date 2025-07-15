@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Revision of multiple UI elements
+
+### Added
+
+- Add document version selector on details page
+- Add document bulk publication
+- Add document bulk signature request
+- Add cancel signature request
+
 ## [0.40.0] - 2025-07-11
 
 ### Added
