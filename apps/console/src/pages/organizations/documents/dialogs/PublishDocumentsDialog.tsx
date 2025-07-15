@@ -14,6 +14,7 @@ import { useFormWithSchema } from "/hooks/useFormWithSchema.ts";
 import { graphql } from "relay-runtime";
 import { sprintf } from "@probo/helpers";
 import { useMutationWithToasts } from "/hooks/useMutationWithToasts.ts";
+import type { PublishDocumentsDialogMutation } from "./__generated__/PublishDocumentsDialogMutation.graphql.ts";
 
 type Props = {
   documentIds: string[];
@@ -36,10 +37,6 @@ const documentsPublishMutation = graphql`
   }
 `;
 
-const schema = z.object({
-  changelog: z.string().min(1, "Changelog is required"),
-});
-
 export function PublishDocumentsDialog({
   documentIds,
   children,
@@ -47,6 +44,22 @@ export function PublishDocumentsDialog({
 }: Props) {
   const { __ } = useTranslate();
   const dialogRef = useDialogRef();
+
+  const schema = z.object({
+    changelog: z.string().min(1, __("Changelog is required")),
+  });
+
+  const [publishMutation] = useMutationWithToasts<PublishDocumentsDialogMutation>(documentsPublishMutation, {
+    successMessage: (response) => {
+      const actualPublishedCount = response.bulkPublishDocumentVersions.documentEdges.length;
+      return sprintf(__("%s documents published"), actualPublishedCount);
+    },
+    errorMessage: sprintf(
+      __("Failed to publish %s documents"),
+      documentIds.length
+    ),
+  });
+
   const {
     handleSubmit,
     register,
@@ -56,6 +69,7 @@ export function PublishDocumentsDialog({
       changelog: "",
     },
   });
+
   const onSubmit = handleSubmit(async (data) => {
     await publishMutation({
       variables: {
@@ -64,17 +78,11 @@ export function PublishDocumentsDialog({
           changelog: data.changelog,
         },
       },
+      onSuccess: () => {
+        dialogRef.current?.close();
+        onSave();
+      },
     });
-    dialogRef.current?.close();
-    onSave();
-  });
-
-  const [publishMutation] = useMutationWithToasts(documentsPublishMutation, {
-    successMessage: sprintf(__("%s documents published"), documentIds.length),
-    errorMessage: sprintf(
-      __("Failed to publish %s documents"),
-      documentIds.length
-    ),
   });
 
   return (
