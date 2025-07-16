@@ -17,6 +17,7 @@ import type {
   DocumentDetailPageDocumentFragment$data,
   DocumentDetailPageDocumentFragment$key,
 } from "./__generated__/DocumentDetailPageDocumentFragment.graphql";
+import type { DocumentDetailPageExportPDFMutation } from "./__generated__/DocumentDetailPageExportPDFMutation.graphql";
 import { useTranslate } from "@probo/i18n";
 import {
   ActionDropdown,
@@ -27,6 +28,7 @@ import {
   Drawer,
   Dropdown,
   DropdownItem,
+  IconArrowDown,
   IconCheckmark1,
   IconChevronDown,
   IconClock,
@@ -116,12 +118,22 @@ const publishDocumentVersionMutation = graphql`
   }
 `;
 
+const exportDocumentVersionPDFMutation = graphql`
+  mutation DocumentDetailPageExportPDFMutation(
+    $input: ExportDocumentVersionPDFInput!
+  ) {
+    exportDocumentVersionPDF(input: $input) {
+      data
+    }
+  }
+`;
+
 export default function DocumentDetailPage(props: Props) {
   const { versionId } = useParams<{ versionId?: string }>();
   const node = usePreloadedQuery(documentNodeQuery, props.queryRef).node;
-  const document = useFragment(
+  const document = useFragment<DocumentDetailPageDocumentFragment$key>(
     documentFragment,
-    node as DocumentDetailPageDocumentFragment$key,
+    node
   );
   const { __, dateFormat } = useTranslate();
   const organizationId = useOrganizationId();
@@ -138,9 +150,17 @@ export default function DocumentDetailPage(props: Props) {
     {
       successMessage: __("Document published successfully."),
       errorMessage: __("Failed to publish document. Please try again."),
-    },
+    }
   );
   const [deleteDocument, isDeleting] = useDeleteDocumentMutation();
+  const [exportDocumentVersionPDF, isExporting] =
+    useMutationWithToasts<DocumentDetailPageExportPDFMutation>(
+      exportDocumentVersionPDFMutation,
+      {
+        successMessage: __("PDF download started."),
+        errorMessage: __("Failed to generate PDF. Please try again."),
+      }
+    );
   const versionConnectionId = document.versions.__id;
 
   usePageTitle(document.title);
@@ -156,7 +176,7 @@ export default function DocumentDetailPage(props: Props) {
           props.queryRef.environment,
           documentNodeQuery,
           props.queryRef.variables,
-          { fetchPolicy: "network-only" },
+          { fetchPolicy: "network-only" }
         );
       },
     });
@@ -170,7 +190,7 @@ export default function DocumentDetailPage(props: Props) {
         new Promise<void>((resolve) => {
           const connectionId = ConnectionHandler.getConnectionID(
             organizationId,
-            DocumentsConnectionKey,
+            DocumentsConnectionKey
           );
           deleteDocument({
             variables: {
@@ -186,12 +206,30 @@ export default function DocumentDetailPage(props: Props) {
       {
         message: sprintf(
           __(
-            'This will permanently delete the document "%s". This action cannot be undone.',
+            'This will permanently delete the document "%s". This action cannot be undone.'
           ),
-          document.title,
+          document.title
         ),
-      },
+      }
     );
+  };
+
+  const handleDownloadPdf = () => {
+    exportDocumentVersionPDF({
+      variables: {
+        input: { documentVersionId: currentVersion.id },
+      },
+      onCompleted: (data) => {
+        if (data.exportDocumentVersionPDF?.data) {
+          const link = window.document.createElement("a");
+          link.href = data.exportDocumentVersionPDF.data;
+          link.download = `${document.title}-v${currentVersion.version}.pdf`;
+          window.document.body.appendChild(link);
+          link.click();
+          window.document.body.removeChild(link);
+        }
+      },
+    });
   };
 
   const updateDialogRef = useRef<{ open: () => void }>(null);
@@ -256,6 +294,13 @@ export default function DocumentDetailPage(props: Props) {
                 icon={IconPencil}
               >
                 {isDraft ? __("Edit draft document") : __("Create new draft")}
+              </DropdownItem>
+              <DropdownItem
+                onClick={handleDownloadPdf}
+                icon={IconArrowDown}
+                disabled={isExporting}
+              >
+                {__("Download PDF")}
               </DropdownItem>
               <DropdownItem
                 variant="danger"
@@ -357,7 +402,12 @@ function VersionItem({
       {...props}
     >
       <div className="flex gap-3 w-full overflow-hidden">
-                 <div className={clsx("flex-shrink-0 flex items-center justify-center size-10", active && "bg-active rounded")}>
+        <div
+          className={clsx(
+            "flex-shrink-0 flex items-center justify-center size-10",
+            active && "bg-active rounded"
+          )}
+        >
           <div className="text-base text-txt-primary whitespace-nowrap font-bold text-center">
             {version.version}
           </div>
