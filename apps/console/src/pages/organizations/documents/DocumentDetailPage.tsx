@@ -248,136 +248,6 @@ export default function DocumentDetailPage(props: Props) {
                   />
                 </DropdownItem>
               ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
-              {versions.map((version) => (
-                <DropdownItem asChild key={version.id}>
-                  <VersionItem
-                    document={document}
-                    version={version}
-                    active={version.id === currentVersion.id}
-                    onSelect={() => {}}
-                  />
-                </DropdownItem>
-              ))}
             </Dropdown>
 
             <ActionDropdown variant="secondary">
@@ -476,29 +346,36 @@ function VersionItem({
   active?: boolean;
   onSelect: (v: Version) => void;
 }) {
-  const { dateTimeFormat } = useTranslate();
+  const { dateTimeFormat, __ } = useTranslate();
   const organizationId = useOrganizationId();
   const suffix = useLocation().pathname.split("/").at(-1);
   return (
     <Link
       to={`/organizations/${organizationId}/documents/${document.id}/versions/${version.id}/${suffix}`}
       onClick={() => onSelect(version)}
-      className={clsx(
-        "flex items-center gap-2 py-2 px-[10px] w-full hover:bg-tertiary-hover cursor-pointer rounded",
-        active && "bg-tertiary-pressed",
-      )}
+      className="flex items-center gap-2 py-2 px-[10px] w-full hover:bg-tertiary-hover cursor-pointer rounded"
       {...props}
     >
-      <Avatar
-        name={version.publishedBy?.fullName ?? document.owner.fullName}
-        size="l"
-      />
-      <div className="text-start space-y-[2px] w-full overflow-hidden">
-        <div className="text-sm text-txt-primary whitespace-nowrap overflow-hidden text-ellipsis">
-          {version.publishedBy?.fullName ?? document.owner.fullName}
+      <div className="flex gap-3 w-full overflow-hidden">
+                 <div className={clsx("flex-shrink-0 flex items-center justify-center size-10", active && "bg-active rounded")}>
+          <div className="text-base text-txt-primary whitespace-nowrap font-bold text-center">
+            {version.version}
+          </div>
         </div>
-        <div className="text-xs text-txt-secondary whitespace-nowrap overflow-hidden text-ellipsis">
-          {dateTimeFormat(version.publishedAt ?? version.updatedAt)}
+        <div className="flex-1 space-y-[2px] overflow-hidden">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <div className="text-sm text-txt-secondary whitespace-nowrap overflow-hidden text-ellipsis">
+              {version.publishedBy?.fullName ?? document.owner.fullName}
+            </div>
+            {version.status === "DRAFT" && (
+              <Badge variant="neutral" size="sm">
+                {__("Draft")}
+              </Badge>
+            )}
+          </div>
+          <div className="text-xs text-txt-secondary whitespace-nowrap overflow-hidden text-ellipsis">
+            {dateTimeFormat(version.publishedAt ?? version.updatedAt)}
+          </div>
         </div>
       </div>
     </Link>
