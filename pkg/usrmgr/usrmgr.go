@@ -802,23 +802,40 @@ func (s Service) ConfirmInvitation(ctx context.Context, tokenString string, pass
 				return fmt.Errorf("cannot insert user organization: %w", err)
 			}
 
-			peopleID := gid.New(token.Data.OrganizationID.TenantID(), coredata.PeopleEntityType)
-			people := coredata.People{
-				ID:                       peopleID,
-				OrganizationID:           token.Data.OrganizationID,
-				UserID:                   &user.ID,
-				FullName:                 token.Data.FullName,
-				PrimaryEmailAddress:      token.Data.Email,
-				Kind:                     coredata.PeopleKindEmployee,
-				AdditionalEmailAddresses: []string{},
-				CreatedAt:                now,
-				UpdatedAt:                now,
-			}
-
+			people := &coredata.People{}
 			scope := coredata.NewScope(token.Data.OrganizationID.TenantID())
 
-			if err := people.Insert(ctx, tx, scope); err != nil {
-				return fmt.Errorf("cannot insert people: %w", err)
+			if err := people.LoadByEmail(ctx, tx, scope, token.Data.Email); err != nil {
+				var errPeopleNotFound *coredata.ErrPeopleNotFound
+
+				if errors.As(err, &errPeopleNotFound) {
+					peopleID := gid.New(token.Data.OrganizationID.TenantID(), coredata.PeopleEntityType)
+					people = &coredata.People{
+						ID:                       peopleID,
+						OrganizationID:           token.Data.OrganizationID,
+						UserID:                   &user.ID,
+						FullName:                 token.Data.FullName,
+						PrimaryEmailAddress:      token.Data.Email,
+						Kind:                     coredata.PeopleKindEmployee,
+						AdditionalEmailAddresses: []string{},
+						CreatedAt:                now,
+						UpdatedAt:                now,
+					}
+
+					if err := people.Insert(ctx, tx, scope); err != nil {
+						return fmt.Errorf("cannot insert people: %w", err)
+					}
+				} else {
+					return fmt.Errorf("cannot load people by email: %w", err)
+				}
+			} else {
+				people.UserID = &user.ID
+				people.FullName = token.Data.FullName
+				people.UpdatedAt = now
+
+				if err := people.Update(ctx, tx, scope); err != nil {
+					return fmt.Errorf("cannot update people: %w", err)
+				}
 			}
 
 			return nil
