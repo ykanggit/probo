@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.42.0] - 2025-07-16
 
 ### Fixed
 - Fix document version selector
