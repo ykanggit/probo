@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- Fix document version selector
+- Fix duplicate people
+
 ## [0.41.0] - 2025-07-16
 
 ### Changed
