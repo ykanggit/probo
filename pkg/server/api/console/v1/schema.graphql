@@ -509,6 +509,18 @@ enum DataClassification
       value: "github.com/getprobo/probo/pkg/coredata.DataClassificationSecret"
     )
 }
+
+enum ControlStatus
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ControlStatus") {
+  INCLUDED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ControlStatusIncluded"
+    )
+  EXCLUDED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ControlStatusExcluded"
+    )
+}
 # Input Types
 input UserOrder
   @goModel(
@@ -865,6 +877,8 @@ type Control implements Node {
   sectionTitle: String!
   name: String!
   description: String!
+  status: ControlStatus!
+  exclusionJustification: String
 
   framework: Framework! @goField(forceResolver: true)
 
@@ -1775,6 +1789,8 @@ input CreateControlInput {
   sectionTitle: String!
   name: String!
   description: String!
+  status: ControlStatus
+  exclusionJustification: String
 }
 
 input UpdateControlInput {
@@ -1782,6 +1798,8 @@ input UpdateControlInput {
   sectionTitle: String
   name: String
   description: String
+  status: ControlStatus
+  exclusionJustification: String
 }
 
 input DeleteControlInput {

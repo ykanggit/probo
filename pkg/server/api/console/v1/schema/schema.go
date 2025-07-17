@@ -147,15 +147,17 @@ type ComplexityRoot struct {
 	}
 
 	Control struct {
-		CreatedAt    func(childComplexity int) int
-		Description  func(childComplexity int) int
-		Documents    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) int
-		Framework    func(childComplexity int) int
-		ID           func(childComplexity int) int
-		Measures     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) int
-		Name         func(childComplexity int) int
-		SectionTitle func(childComplexity int) int
-		UpdatedAt    func(childComplexity int) int
+		CreatedAt              func(childComplexity int) int
+		Description            func(childComplexity int) int
+		Documents              func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) int
+		ExclusionJustification func(childComplexity int) int
+		Framework              func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		Measures               func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) int
+		Name                   func(childComplexity int) int
+		SectionTitle           func(childComplexity int) int
+		Status                 func(childComplexity int) int
+		UpdatedAt              func(childComplexity int) int
 	}
 
 	ControlConnection struct {
@@ -1425,6 +1427,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Control.Documents(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.DocumentOrderBy), args["filter"].(*types.DocumentFilter)), true
 
+	case "Control.exclusionJustification":
+		if e.complexity.Control.ExclusionJustification == nil {
+			break
+		}
+
+		return e.complexity.Control.ExclusionJustification(childComplexity), true
+
 	case "Control.framework":
 		if e.complexity.Control.Framework == nil {
 			break
@@ -1464,6 +1473,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Control.SectionTitle(childComplexity), true
+
+	case "Control.status":
+		if e.complexity.Control.Status == nil {
+			break
+		}
+
+		return e.complexity.Control.Status(childComplexity), true
 
 	case "Control.updatedAt":
 		if e.complexity.Control.UpdatedAt == nil {
@@ -5637,6 +5653,18 @@ enum DataClassification
       value: "github.com/getprobo/probo/pkg/coredata.DataClassificationSecret"
     )
 }
+
+enum ControlStatus
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.ControlStatus") {
+  INCLUDED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ControlStatusIncluded"
+    )
+  EXCLUDED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.ControlStatusExcluded"
+    )
+}
 # Input Types
 input UserOrder
   @goModel(
@@ -5993,6 +6021,8 @@ type Control implements Node {
   sectionTitle: String!
   name: String!
   description: String!
+  status: ControlStatus!
+  exclusionJustification: String
 
   framework: Framework! @goField(forceResolver: true)
 
@@ -6903,6 +6933,8 @@ input CreateControlInput {
   sectionTitle: String!
   name: String!
   description: String!
+  status: ControlStatus
+  exclusionJustification: String
 }
 
 input UpdateControlInput {
@@ -6910,6 +6942,8 @@ input UpdateControlInput {
   sectionTitle: String
   name: String
   description: String
+  status: ControlStatus
+  exclusionJustification: String
 }
 
 input DeleteControlInput {
@@ -14316,6 +14350,91 @@ func (ec *executionContext) fieldContext_Control_description(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Control_status(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(coredata.ControlStatus)
+	fc.Result = res
+	return ec.marshalNControlStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ControlStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Control_exclusionJustification(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_exclusionJustification(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExclusionJustification, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_exclusionJustification(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Control_framework(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Control_framework(ctx, field)
 	if err != nil {
@@ -14837,6 +14956,10 @@ func (ec *executionContext) fieldContext_ControlEdge_node(_ context.Context, fie
 				return ec.fieldContext_Control_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Control_description(ctx, field)
+			case "status":
+				return ec.fieldContext_Control_status(ctx, field)
+			case "exclusionJustification":
+				return ec.fieldContext_Control_exclusionJustification(ctx, field)
 			case "framework":
 				return ec.fieldContext_Control_framework(ctx, field)
 			case "measures":
@@ -32571,6 +32694,10 @@ func (ec *executionContext) fieldContext_UpdateControlPayload_control(_ context.
 				return ec.fieldContext_Control_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Control_description(ctx, field)
+			case "status":
+				return ec.fieldContext_Control_status(ctx, field)
+			case "exclusionJustification":
+				return ec.fieldContext_Control_exclusionJustification(ctx, field)
 			case "framework":
 				return ec.fieldContext_Control_framework(ctx, field)
 			case "measures":
@@ -39333,7 +39460,7 @@ func (ec *executionContext) unmarshalInputCreateControlInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"frameworkId", "sectionTitle", "name", "description"}
+	fieldsInOrder := [...]string{"frameworkId", "sectionTitle", "name", "description", "status", "exclusionJustification"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -39368,6 +39495,20 @@ func (ec *executionContext) unmarshalInputCreateControlInput(ctx context.Context
 				return it, err
 			}
 			it.Description = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalOControlStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "exclusionJustification":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("exclusionJustification"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExclusionJustification = data
 		}
 	}
 
@@ -41783,7 +41924,7 @@ func (ec *executionContext) unmarshalInputUpdateControlInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "sectionTitle", "name", "description"}
+	fieldsInOrder := [...]string{"id", "sectionTitle", "name", "description", "status", "exclusionJustification"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -41818,6 +41959,20 @@ func (ec *executionContext) unmarshalInputUpdateControlInput(ctx context.Context
 				return it, err
 			}
 			it.Description = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalOControlStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "exclusionJustification":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("exclusionJustification"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExclusionJustification = data
 		}
 	}
 
@@ -43698,6 +43853,13 @@ func (ec *executionContext) _Control(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "status":
+			out.Values[i] = ec._Control_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "exclusionJustification":
+			out.Values[i] = ec._Control_exclusionJustification(ctx, field, obj)
 		case "framework":
 			field := field
 
@@ -53045,6 +53207,34 @@ var (
 	}
 )
 
+func (ec *executionContext) unmarshalNControlStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx context.Context, v any) (coredata.ControlStatus, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNControlStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNControlStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx context.Context, sel ast.SelectionSet, v coredata.ControlStatus) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalString(marshalNControlStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNControlStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus = map[string]coredata.ControlStatus{
+		"INCLUDED": coredata.ControlStatusIncluded,
+		"EXCLUDED": coredata.ControlStatusExcluded,
+	}
+	marshalNControlStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus = map[coredata.ControlStatus]string{
+		coredata.ControlStatusIncluded: "INCLUDED",
+		coredata.ControlStatusExcluded: "EXCLUDED",
+	}
+)
+
 func (ec *executionContext) unmarshalNCreateAssetInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateAssetInput(ctx context.Context, v any) (types.CreateAssetInput, error) {
 	res, err := ec.unmarshalInputCreateAssetInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -56868,6 +57058,36 @@ func (ec *executionContext) unmarshalOControlOrder2ᚖgithubᚗcomᚋgetproboᚋ
 	res, err := ec.unmarshalInputControlOrder(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
+
+func (ec *executionContext) unmarshalOControlStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx context.Context, v any) (*coredata.ControlStatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalOControlStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOControlStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx context.Context, sel ast.SelectionSet, v *coredata.ControlStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalString(marshalOControlStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus[*v])
+	return res
+}
+
+var (
+	unmarshalOControlStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus = map[string]coredata.ControlStatus{
+		"INCLUDED": coredata.ControlStatusIncluded,
+		"EXCLUDED": coredata.ControlStatusExcluded,
+	}
+	marshalOControlStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus = map[coredata.ControlStatus]string{
+		coredata.ControlStatusIncluded: "INCLUDED",
+		coredata.ControlStatusExcluded: "EXCLUDED",
+	}
+)
 
 func (ec *executionContext) unmarshalOCriticityLevel2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐCriticityLevel(ctx context.Context, v any) (*coredata.CriticityLevel, error) {
 	if v == nil {
