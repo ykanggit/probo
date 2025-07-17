@@ -253,6 +253,7 @@ func (s FrameworkService) Import(
 				SectionTitle: control.ID,
 				Name:         control.Name,
 				Description:  control.Description,
+				Status:       coredata.ControlStatusIncluded,
 				CreatedAt:    now,
 				UpdatedAt:    now,
 			}
@@ -306,16 +307,39 @@ func (s FrameworkService) StateOfApplicability(ctx context.Context, frameworkID 
 			}
 
 			for _, control := range controls {
+				exclusionJustification := ""
+				if control.Status == coredata.ControlStatusExcluded {
+					if control.ExclusionJustification == nil {
+						return fmt.Errorf("exclusion justification is required for excluded controls")
+					}
+					exclusionJustification = *control.ExclusionJustification
+				}
+
+				applicability := soagen.NewApplicability("Yes", true)
+				if control.Status == coredata.ControlStatusExcluded {
+					applicability = soagen.NewApplicability("No", false)
+				}
+
+				bestPractice := ref.Ref(true)
+				if control.Status == coredata.ControlStatusExcluded {
+					bestPractice = ref.Ref(false)
+				}
+
 				row := soagen.SOARowData{
 					SectionTitle:           control.SectionTitle,
 					ControlName:            control.Name,
-					Applicability:          soagen.NewApplicability("Yes", true),
-					JustificationExclusion: "",
+					Applicability:          applicability,
+					ExclusionJustification: exclusionJustification,
 					Regulatory:             ref.Ref(false),
 					Contractual:            ref.Ref(false),
-					BestPractice:           ref.Ref(true),
+					BestPractice:           bestPractice,
 					RiskAssessment:         ref.Ref(false),
 					SecurityMeasures:       []string{},
+				}
+
+				if control.Status == coredata.ControlStatusExcluded {
+					rows = append(rows, row)
+					continue
 				}
 
 				measures := coredata.Measures{}
