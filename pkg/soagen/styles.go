@@ -78,12 +78,18 @@ func applyDataValidation(f *excelize.File, sheetName, col string, row int, valid
 	dv.Sqref = fmt.Sprintf("%s%d:%s1000", col, row, col) // Apply to reasonable range
 	dv.SetDropList(validation)
 	dv.SetError(excelize.DataValidationErrorStyleStop, "Invalid Input", "Please select from the dropdown list.")
-	return f.AddDataValidation(sheetName, dv)
+	if err := f.AddDataValidation(sheetName, dv); err != nil {
+		return fmt.Errorf("cannot add data validation: %w", err)
+	}
+
+	return nil
 }
 
 func setColumnWidth(f *excelize.File, sheetName, col string, width float64) error {
 	if width > 0 {
-		f.SetColWidth(sheetName, col, col, width)
+		if err := f.SetColWidth(sheetName, col, col, width); err != nil {
+			return fmt.Errorf("cannot set column width: %w", err)
+		}
 	}
 	return nil
 }

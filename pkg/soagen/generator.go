@@ -26,8 +26,14 @@ func GenerateSOAExcel(data SOAData) ([]byte, error) {
 	defer f.Close()
 
 	sheetName := "State of Applicability"
-	f.NewSheet(sheetName)
-	f.DeleteSheet("Sheet1")
+	_, err := f.NewSheet(sheetName)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create sheet: %w", err)
+	}
+
+	if err := f.DeleteSheet("Sheet1"); err != nil {
+		return nil, fmt.Errorf("cannot delete sheet: %w", err)
+	}
 
 	if err := setupSOAHeader(f, sheetName); err != nil {
 		return nil, fmt.Errorf("cannot setup Excel header: %w", err)
@@ -183,20 +189,26 @@ func processField(f *excelize.File, sheetName string, row int, value interface{}
 		col := config.Columns[0]
 		cellRef := fmt.Sprintf("%s%d", col, row)
 
-		f.SetCellValue(sheetName, cellRef, v)
+		if err := f.SetCellValue(sheetName, cellRef, v); err != nil {
+			return nil, fmt.Errorf("cannot set cell value: %w", err)
+		}
 
 		textStyleID, err := createCellStyle(f, getTextStyle())
 		if err != nil {
 			return nil, fmt.Errorf("cannot create text style: %w", err)
 		}
-		f.SetCellStyle(sheetName, cellRef, cellRef, textStyleID)
+		if err := f.SetCellStyle(sheetName, cellRef, cellRef, textStyleID); err != nil {
+			return nil, fmt.Errorf("cannot set cell style: %w", err)
+		}
 
 		if isFirstRow {
 			width := config.DefaultWidth
 			if len(config.Width) > 0 {
 				width = config.Width[0]
 			}
-			f.SetColWidth(sheetName, col, col, width)
+			if err := f.SetColWidth(sheetName, col, col, width); err != nil {
+				return nil, fmt.Errorf("cannot set column width: %w", err)
+			}
 		}
 
 		if config.HasFilter {
@@ -226,20 +238,26 @@ func processField(f *excelize.File, sheetName string, row int, value interface{}
 		col := config.Columns[0]
 		cellRef := fmt.Sprintf("%s%d", col, row)
 
-		f.SetCellValue(sheetName, cellRef, joinedValue)
+		if err := f.SetCellValue(sheetName, cellRef, joinedValue); err != nil {
+			return nil, fmt.Errorf("cannot set cell value: %w", err)
+		}
 
 		textStyleID, err := createCellStyle(f, getTextStyle())
 		if err != nil {
 			return nil, fmt.Errorf("cannot create text style: %w", err)
 		}
-		f.SetCellStyle(sheetName, cellRef, cellRef, textStyleID)
+		if err := f.SetCellStyle(sheetName, cellRef, cellRef, textStyleID); err != nil {
+			return nil, fmt.Errorf("cannot set cell style: %w", err)
+		}
 
 		if isFirstRow {
 			width := config.DefaultWidth
 			if len(config.Width) > 0 {
 				width = config.Width[0]
 			}
-			f.SetColWidth(sheetName, col, col, width)
+			if err := f.SetColWidth(sheetName, col, col, width); err != nil {
+				return nil, fmt.Errorf("cannot set column width: %w", err)
+			}
 		}
 
 		if config.HasFilter {

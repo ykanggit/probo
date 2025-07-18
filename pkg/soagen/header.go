@@ -15,6 +15,7 @@
 package soagen
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/xuri/excelize/v2"
@@ -116,14 +117,18 @@ func applyHeaderLayout(f *excelize.File, sheetName string, layout HeaderLayout, 
 
 func applyCells(f *excelize.File, sheetName string, cells []HeaderCell, headerStyle, cellStyle int) error {
 	for _, cell := range cells {
-		f.SetCellValue(sheetName, cell.Cell, cell.Value)
+		if err := f.SetCellValue(sheetName, cell.Cell, cell.Value); err != nil {
+			return fmt.Errorf("cannot set cell value: %w", err)
+		}
 
 		style := cellStyle
 		if cell.Style == "header" {
 			style = headerStyle
 		}
 
-		f.SetCellStyle(sheetName, cell.Cell, cell.Cell, style)
+		if err := f.SetCellStyle(sheetName, cell.Cell, cell.Cell, style); err != nil {
+			return fmt.Errorf("cannot set cell style: %w", err)
+		}
 	}
 	return nil
 }
