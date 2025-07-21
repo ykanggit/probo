@@ -1201,10 +1201,12 @@ func (r *mutationResolver) CreateControl(ctx context.Context, input types.Create
 	prb := r.ProboService(ctx, input.FrameworkID.TenantID())
 
 	control, err := prb.Controls.Create(ctx, probo.CreateControlRequest{
-		FrameworkID:  input.FrameworkID,
-		Name:         input.Name,
-		Description:  input.Description,
-		SectionTitle: input.SectionTitle,
+		FrameworkID:            input.FrameworkID,
+		Name:                   input.Name,
+		Description:            input.Description,
+		SectionTitle:           input.SectionTitle,
+		Status:                 &input.Status,
+		ExclusionJustification: input.ExclusionJustification,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot create control: %w", err)

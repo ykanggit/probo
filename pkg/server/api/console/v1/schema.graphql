@@ -1761,7 +1761,7 @@ input CreateControlInput {
   sectionTitle: String!
   name: String!
   description: String!
-  status: ControlStatus
+  status: ControlStatus!
   exclusionJustification: String
 }
 

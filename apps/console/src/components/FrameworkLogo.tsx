@@ -8,7 +8,7 @@ const availableLogos = new Map(
 export function FrameworkLogo({ name }: { name: string }) {
   const logo = availableLogos.get(name);
   return logo ? (
-    <img src={logo} alt="" className="size-12" />
+    <img src={logo} alt="" className="h-12" />
   ) : (
     <Avatar name={name} size="l" className="size-12" />
   );
