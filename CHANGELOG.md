@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.43.0] - 2025-07-21
 
 ### Added
 - Add control exclusion
