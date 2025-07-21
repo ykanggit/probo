@@ -244,7 +244,7 @@ function DocumentRow({
   const lastVersion = document.versions.edges[0].node;
   const isDraft = lastVersion.status === "DRAFT";
   const { __, dateFormat } = useTranslate();
-  const signatures = lastVersion.signatures.edges.map((edge) => edge.node);
+  const signatures = lastVersion.signatures?.edges?.map((edge) => edge.node) ?? [];
   const signedCount = signatures.filter(
     (signature) => signature.state === "SIGNED"
   ).length;
