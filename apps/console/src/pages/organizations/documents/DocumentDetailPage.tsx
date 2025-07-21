@@ -142,7 +142,7 @@ export default function DocumentDetailPage(props: Props) {
   const currentVersion =
     document.versions.edges.find((v) => v.node.id === versionId)?.node ??
     document.versions.edges[0].node;
-  const signatures = currentVersion.signatures.edges.map((s) => s.node);
+  const signatures = currentVersion.signatures?.edges?.map((s) => s.node) ?? [];
   const signedSignatures = signatures.filter((s) => s.state === "SIGNED");
   const isDraft = currentVersion.status === "DRAFT";
   const [publishDocumentVersion, isPublishing] = useMutationWithToasts(

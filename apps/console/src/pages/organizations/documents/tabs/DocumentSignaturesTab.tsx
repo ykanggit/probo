@@ -34,12 +34,20 @@ export default function DocumentSignaturesTab() {
 }
 
 function SignatureList(props: { version: Version }) {
-  const signatures = props.version.signatures.edges.map((edge) => edge.node);
+  const signatures = props.version.signatures?.edges?.map((edge) => edge.node) ?? [];
   const { __ } = useTranslate();
   const signatureMap = new Map(signatures.map((s) => [s.signedBy.id, s]));
   const organizationId = useOrganizationId();
   const people = usePeople(organizationId);
   const signable = props.version.status === "PUBLISHED";
+
+  if (!props.version.signatures) {
+    return (
+      <div className="text-center text-sm text-txt-tertiary py-3">
+        {__("Loading signatures...")}
+      </div>
+    );
+  }
 
   if (people.length === 0) {
     return (
