@@ -2,10 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- Add control exclusion
+
+### Fixed
+- Fix small issues on SOA
+
 ## [0.42.1] - 2025-07-16
 
 ### Fixed
-
 - Fix missing document download button
 
 ## [0.42.0] - 2025-07-16
