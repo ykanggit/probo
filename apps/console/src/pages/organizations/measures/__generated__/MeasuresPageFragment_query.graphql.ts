@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<29c5c69f18349dce1decfa0cfc363ab6>>
+ * @generated SignedSource<<10d90e5e86c0319fe565ed9386adbc11>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -46,7 +46,7 @@ v1 = {
   "name": "before"
 },
 v2 = {
-  "defaultValue": 50,
+  "defaultValue": 100,
   "kind": "LocalArgument",
   "name": "first"
 },
@@ -333,6 +333,7 @@ return {
                                         "plural": false,
                                         "selections": [
                                           (v15/*: any*/),
+                                          (v14/*: any*/),
                                           (v12/*: any*/)
                                         ],
                                         "storageKey": null
@@ -474,16 +475,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "de921748c6000f97623083a0e6d8d29d",
+    "cacheID": "463fee700be8ddfb05ae27aea716a071",
     "id": null,
     "metadata": {},
     "name": "MeasuresPageFragment_query",
     "operationKind": "query",
-    "text": "query MeasuresPageFragment_query(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 50\n  $last: Int = null\n  $order: MeasureOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...MeasuresPageFragment_16fISc\n    id\n  }\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasuresPageFragment_16fISc on Organization {\n  measures(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    totalCount\n    notStartedCount\n    inProgressCount\n    notApplicableCount\n    completedCount\n    edges {\n      node {\n        id\n        referenceId\n        name\n        category\n        state\n        description\n        controls(first: 1) {\n          edges {\n            node {\n              sectionTitle\n              framework {\n                name\n                id\n              }\n              id\n            }\n          }\n        }\n        tasks(first: 1) {\n          edges {\n            node {\n              id\n              referenceId\n              name\n              description\n              state\n            }\n          }\n        }\n        ...MeasureFormDialogMeasureFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query MeasuresPageFragment_query(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 100\n  $last: Int = null\n  $order: MeasureOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...MeasuresPageFragment_16fISc\n    id\n  }\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasuresPageFragment_16fISc on Organization {\n  measures(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    totalCount\n    notStartedCount\n    inProgressCount\n    notApplicableCount\n    completedCount\n    edges {\n      node {\n        id\n        referenceId\n        name\n        category\n        state\n        description\n        controls(first: 1) {\n          edges {\n            node {\n              sectionTitle\n              framework {\n                name\n                referenceId\n                id\n              }\n              id\n            }\n          }\n        }\n        tasks(first: 1) {\n          edges {\n            node {\n              id\n              referenceId\n              name\n              description\n              state\n            }\n          }\n        }\n        ...MeasureFormDialogMeasureFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a581f449f589ca2835b944bea250bcf0";
+(node as any).hash = "66de49169032ed8f52146d698a5dffeb";
 
 export default node;

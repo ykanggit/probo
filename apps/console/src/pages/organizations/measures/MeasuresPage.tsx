@@ -64,7 +64,7 @@ const measuresFragment = graphql`
   fragment MeasuresPageFragment on Organization
   @refetchable(queryName: "MeasuresPageFragment_query")
   @argumentDefinitions(
-    first: { type: "Int", defaultValue: 50 }
+    first: { type: "Int", defaultValue: 100 }
     order: { type: "MeasureOrder", defaultValue: null }
     after: { type: "CursorKey", defaultValue: null }
     before: { type: "CursorKey", defaultValue: null }
@@ -97,6 +97,7 @@ const measuresFragment = graphql`
                 sectionTitle
                 framework {
                   name
+                  referenceId
                 }
               }
             }
@@ -251,25 +252,23 @@ export default function MeasuresPage(props: Props) {
       document.body.removeChild(link);
     } else if (options.scope === 'current' && options.format === 'json') {
       // Export current view as JSON
-      const exportData = {
-        measures: measures.map(measure => ({
-          name: measure.name,
-          description: measure.description,
-          category: measure.category,
-          'reference-id': measure.referenceId,
-          state: measure.state,
-          standards: measure.controls?.edges?.map(edge => ({
-            framework: edge.node.framework?.name || 'Unknown',
-            control: edge.node.sectionTitle
-          })) || [],
-          tasks: measure.tasks?.edges?.map(edge => ({
-            name: edge.node.name,
-            description: edge.node.description,
-            'reference-id': edge.node.referenceId,
-            state: edge.node.state
-          })) || []
-        }))
-      };
+      const exportData = measures.map(measure => ({
+        name: measure.name,
+        description: measure.description,
+        category: measure.category,
+        'reference-id': measure.referenceId,
+        state: measure.state,
+        standards: measure.controls?.edges?.map(edge => ({
+          framework: edge.node.framework?.referenceId || edge.node.framework?.name || 'Unknown',
+          control: edge.node.sectionTitle
+        })) || [],
+        tasks: measure.tasks?.edges?.map(edge => ({
+          name: edge.node.name,
+          description: edge.node.description,
+          'reference-id': edge.node.referenceId,
+          state: edge.node.state
+        })) || []
+      }));
       
       const jsonContent = JSON.stringify(exportData, null, 2);
       const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });

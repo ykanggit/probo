@@ -437,11 +437,32 @@ func (s MeasureService) Import(
 				for _, standard := range req.Measures[i].Standards {
 					framework := &coredata.Framework{}
 					if err := framework.LoadByReferenceID(ctx, tx, s.svc.scope, standard.Framework); err != nil {
-						continue
+						// Try alternative framework reference formats
+						alternativeRefs := []string{
+							"ISO/IEC 27001:2022", // Standard format
+							"ISO27001-2022",      // Alternative format
+							"ISO 27001 (2022)",   // Another common format
+						}
+
+						frameworkFound := false
+						for _, altRef := range alternativeRefs {
+							if err := framework.LoadByReferenceID(ctx, tx, s.svc.scope, altRef); err == nil {
+								frameworkFound = true
+								break
+							}
+						}
+
+						if !frameworkFound {
+							// Log the error but continue with other measures
+							fmt.Printf("Warning: Framework not found for reference '%s' in measure '%s'\n", standard.Framework, measure.Name)
+							continue
+						}
 					}
 
 					control := &coredata.Control{}
 					if err := control.LoadByFrameworkIDAndSectionTitle(ctx, tx, s.svc.scope, framework.ID, standard.Control); err != nil {
+						// Log the error but continue with other controls
+						fmt.Printf("Warning: Control not found for framework '%s' and section '%s' in measure '%s'\n", framework.Name, standard.Control, measure.Name)
 						continue
 					}
 
@@ -714,7 +735,13 @@ func (s MeasureService) Export(
 					Control   string `json:"control"`
 				}, len(controls))
 				for i, c := range controls {
-					standards[i].Framework = ""
+					// Load the framework to get the reference ID
+					var framework coredata.Framework
+					if err := framework.LoadByID(ctx, conn, s.svc.scope, c.FrameworkID); err != nil {
+						standards[i].Framework = ""
+					} else {
+						standards[i].Framework = framework.ReferenceID
+					}
 					standards[i].Control = c.SectionTitle
 				}
 				tasks := coredata.Tasks{}
@@ -870,9 +897,7 @@ func (s MeasureService) ExportAll(
 				State       string `json:"state"`
 			} `json:"tasks"`
 		}
-		exportData := struct {
-			Measures []ExportedMeasure `json:"measures"`
-		}{Measures: []ExportedMeasure{}}
+		exportData := []ExportedMeasure{}
 		for _, m := range measures {
 			var controls coredata.Controls
 			err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
@@ -920,7 +945,7 @@ func (s MeasureService) ExportAll(
 					Framework string `json:"framework"`
 					Control   string `json:"control"`
 				}{
-					Framework: framework.Name,
+					Framework: framework.ReferenceID,
 					Control:   c.SectionTitle,
 				})
 			}
@@ -937,7 +962,7 @@ func (s MeasureService) ExportAll(
 					State:       t.State.String(),
 				})
 			}
-			exportData.Measures = append(exportData.Measures, em)
+			exportData = append(exportData, em)
 		}
 		jsonBytes, err := json.MarshalIndent(exportData, "", "  ")
 		if err != nil {

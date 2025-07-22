@@ -673,6 +673,7 @@ type ExportMeasuresPayload struct {
 
 type Framework struct {
 	ID           gid.GID            `json:"id"`
+	ReferenceID  string             `json:"referenceId"`
 	Name         string             `json:"name"`
 	Description  string             `json:"description"`
 	Organization *Organization      `json:"organization"`
