@@ -83,7 +83,7 @@ export default function FrameworkDetailPage(props: Props) {
   const controls = framework.controls.edges.map((edge) => edge.node);
   const selectedControl = controlId
     ? controls.find((control) => control.id === controlId)
-    : controls[0];
+    : controls[0] || null;
   const connectionId = framework.controls.__id;
   const deleteFramework = useDeleteFrameworkMutation(
     framework,
@@ -109,7 +109,7 @@ export default function FrameworkDetailPage(props: Props) {
     });
   };
 
-  if (!controlId) {
+  if (!controlId && controls.length > 0) {
     return (
       <Navigate
         to={`/organizations/${organizationId}/frameworks/${framework.id}/controls/${controls[0].id}`}

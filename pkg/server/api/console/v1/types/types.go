@@ -173,12 +173,12 @@ type CreateControlDocumentMappingPayload struct {
 }
 
 type CreateControlInput struct {
-	FrameworkID            gid.GID                 `json:"frameworkId"`
-	SectionTitle           string                  `json:"sectionTitle"`
-	Name                   string                  `json:"name"`
-	Description            string                  `json:"description"`
-	Status                 *coredata.ControlStatus `json:"status,omitempty"`
-	ExclusionJustification *string                 `json:"exclusionJustification,omitempty"`
+	FrameworkID            gid.GID                `json:"frameworkId"`
+	SectionTitle           string                 `json:"sectionTitle"`
+	Name                   string                 `json:"name"`
+	Description            string                 `json:"description"`
+	Status                 coredata.ControlStatus `json:"status"`
+	ExclusionJustification *string                `json:"exclusionJustification,omitempty"`
 }
 
 type CreateControlMeasureMappingInput struct {
@@ -673,6 +673,7 @@ type ExportMeasuresPayload struct {
 
 type Framework struct {
 	ID           gid.GID            `json:"id"`
+	ReferenceID  string             `json:"referenceId"`
 	Name         string             `json:"name"`
 	Description  string             `json:"description"`
 	Organization *Organization      `json:"organization"`

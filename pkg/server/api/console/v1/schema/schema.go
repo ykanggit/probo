@@ -458,6 +458,7 @@ type ComplexityRoot struct {
 		ID           func(childComplexity int) int
 		Name         func(childComplexity int) int
 		Organization func(childComplexity int) int
+		ReferenceID  func(childComplexity int) int
 		UpdatedAt    func(childComplexity int) int
 	}
 
@@ -2457,6 +2458,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Framework.Organization(childComplexity), true
+
+	case "Framework.referenceId":
+		if e.complexity.Framework.ReferenceID == nil {
+			break
+		}
+
+		return e.complexity.Framework.ReferenceID(childComplexity), true
 
 	case "Framework.updatedAt":
 		if e.complexity.Framework.UpdatedAt == nil {
@@ -5998,6 +6006,7 @@ type VendorComplianceReport implements Node {
 
 type Framework implements Node {
   id: ID!
+  referenceId: String!
   name: String!
   description: String!
 
@@ -6933,7 +6942,7 @@ input CreateControlInput {
   sectionTitle: String!
   name: String!
   description: String!
-  status: ControlStatus
+  status: ControlStatus!
   exclusionJustification: String
 }
 
@@ -14476,6 +14485,8 @@ func (ec *executionContext) fieldContext_Control_framework(_ context.Context, fi
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Framework_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Framework_referenceId(ctx, field)
 			case "name":
 				return ec.fieldContext_Framework_name(ctx, field)
 			case "description":
@@ -21198,6 +21209,50 @@ func (ec *executionContext) fieldContext_Framework_id(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Framework_referenceId(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Framework_referenceId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReferenceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Framework_referenceId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Framework",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Framework_name(ctx context.Context, field graphql.CollectedField, obj *types.Framework) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Framework_name(ctx, field)
 	if err != nil {
@@ -21762,6 +21817,8 @@ func (ec *executionContext) fieldContext_FrameworkEdge_node(_ context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Framework_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Framework_referenceId(ctx, field)
 			case "name":
 				return ec.fieldContext_Framework_name(ctx, field)
 			case "description":
@@ -32958,6 +33015,8 @@ func (ec *executionContext) fieldContext_UpdateFrameworkPayload_framework(_ cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Framework_id(ctx, field)
+			case "referenceId":
+				return ec.fieldContext_Framework_referenceId(ctx, field)
 			case "name":
 				return ec.fieldContext_Framework_name(ctx, field)
 			case "description":
@@ -39497,7 +39556,7 @@ func (ec *executionContext) unmarshalInputCreateControlInput(ctx context.Context
 			it.Description = data
 		case "status":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOControlStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx, v)
+			data, err := ec.unmarshalNControlStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47125,6 +47184,11 @@ func (ec *executionContext) _Framework(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = graphql.MarshalString("Framework")
 		case "id":
 			out.Values[i] = ec._Framework_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "referenceId":
+			out.Values[i] = ec._Framework_referenceId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}

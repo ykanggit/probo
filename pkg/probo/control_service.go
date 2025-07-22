@@ -31,11 +31,13 @@ type (
 	}
 
 	CreateControlRequest struct {
-		ID           gid.GID
-		FrameworkID  gid.GID
-		Name         string
-		Description  string
-		SectionTitle string
+		ID                     gid.GID
+		FrameworkID            gid.GID
+		Name                   string
+		Description            string
+		SectionTitle           string
+		Status                 *coredata.ControlStatus
+		ExclusionJustification *string
 	}
 
 	UpdateControlRequest struct {
@@ -498,14 +500,16 @@ func (s ControlService) Create(
 	framework := &coredata.Framework{}
 
 	control := &coredata.Control{
-		ID:           gid.New(s.svc.scope.GetTenantID(), coredata.ControlEntityType),
-		FrameworkID:  req.FrameworkID,
-		TenantID:     s.svc.scope.GetTenantID(),
-		Name:         req.Name,
-		Description:  req.Description,
-		SectionTitle: req.SectionTitle,
-		CreatedAt:    now,
-		UpdatedAt:    now,
+		ID:                     gid.New(s.svc.scope.GetTenantID(), coredata.ControlEntityType),
+		FrameworkID:            req.FrameworkID,
+		TenantID:               s.svc.scope.GetTenantID(),
+		Name:                   req.Name,
+		Description:            req.Description,
+		SectionTitle:           req.SectionTitle,
+		Status:                 *req.Status,
+		ExclusionJustification: req.ExclusionJustification,
+		CreatedAt:              now,
+		UpdatedAt:              now,
 	}
 
 	err := s.svc.pg.WithTx(

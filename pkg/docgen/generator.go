@@ -25,6 +25,8 @@ import (
 
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
+	gmhtml "github.com/yuin/goldmark/renderer/html"
 )
 
 var (
@@ -38,7 +40,12 @@ var (
 		"lower":                func(s string) string { return strings.ToLower(s) },
 		"classificationString": func(c Classification) string { return string(c) },
 		"formatContent": func(content string) template.HTML {
-			md := goldmark.New()
+			md := goldmark.New(
+				goldmark.WithExtensions(extension.Table),
+				goldmark.WithRendererOptions(
+					gmhtml.WithUnsafe(),
+				),
+			)
 
 			var buf bytes.Buffer
 			if err := md.Convert([]byte(content), &buf); err != nil {

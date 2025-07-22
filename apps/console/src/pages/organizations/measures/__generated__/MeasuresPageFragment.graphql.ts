@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3ff52f114dc1be7d56e0aed14e1b1fbb>>
+ * @generated SignedSource<<ae62e3366fb4c09186f781b40cea5fb6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -25,6 +25,7 @@ export type MeasuresPageFragment$data = {
             readonly node: {
               readonly framework: {
                 readonly name: string;
+                readonly referenceId: string;
               };
               readonly sectionTitle: string;
             };
@@ -122,7 +123,7 @@ return {
       "name": "before"
     },
     {
-      "defaultValue": 50,
+      "defaultValue": 100,
       "kind": "LocalArgument",
       "name": "first"
     },
@@ -287,7 +288,8 @@ return {
                               "name": "framework",
                               "plural": false,
                               "selections": [
-                                (v3/*: any*/)
+                                (v3/*: any*/),
+                                (v2/*: any*/)
                               ],
                               "storageKey": null
                             }
@@ -424,6 +426,6 @@ return {
 };
 })();
 
-(node as any).hash = "a581f449f589ca2835b944bea250bcf0";
+(node as any).hash = "66de49169032ed8f52146d698a5dffeb";
 
 export default node;

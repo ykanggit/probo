@@ -854,6 +854,7 @@ type VendorComplianceReport implements Node {
 
 type Framework implements Node {
   id: ID!
+  referenceId: String!
   name: String!
   description: String!
 
@@ -1789,7 +1790,7 @@ input CreateControlInput {
   sectionTitle: String!
   name: String!
   description: String!
-  status: ControlStatus
+  status: ControlStatus!
   exclusionJustification: String
 }
 
