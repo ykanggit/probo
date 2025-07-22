@@ -14,27 +14,27 @@
 
 package coredata
 
-const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MeasureEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ConnectorEntityType
-	VendorRiskAssessmentEntityType
-	VendorEntityType
-	PeopleEntityType
-	VendorComplianceReportEntityType
-	DocumentEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
-	DocumentVersionEntityType
-	DocumentVersionSignatureEntityType
-	AssetEntityType
-	DatumEntityType
-	AuditEntityType
-	ReportEntityType
+type (
+	ReportOrderField string
 )
+
+const (
+	ReportOrderFieldID ReportOrderField = "ID"
+)
+
+func (p ReportOrderField) Column() string {
+	return string(p)
+}
+
+func (p ReportOrderField) String() string {
+	return string(p)
+}
+
+func (p ReportOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *ReportOrderField) UnmarshalText(text []byte) error {
+	*p = ReportOrderField(text)
+	return nil
+}
