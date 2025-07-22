@@ -12,15 +12,9 @@ export const availableFrameworks = [
         description: "System and Organization Controls 2",
     },
     {
-        id: "GDPR",
-        name: "GDPR",
-        logo: "/logos/gdpr.png",
-        description: "General Data Protection Regulation",
-    },
-    {
-        id: "SOX",
-        name: "SOX",
-        logo: "/logos/sox.png",
-        description: "Sarbanes-Oxley Act",
+        id: "HIPAA",
+        name: "HIPAA",
+        logo: "/logos/hipaa.png",
+        description: "Health Insurance Portability and Accountability Act",
     },
 ];

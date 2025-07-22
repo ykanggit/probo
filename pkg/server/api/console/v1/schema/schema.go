@@ -6942,7 +6942,7 @@ input CreateControlInput {
   sectionTitle: String!
   name: String!
   description: String!
-  status: ControlStatus
+  status: ControlStatus!
   exclusionJustification: String
 }
 
@@ -39556,7 +39556,7 @@ func (ec *executionContext) unmarshalInputCreateControlInput(ctx context.Context
 			it.Description = data
 		case "status":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOControlStatus2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx, v)
+			data, err := ec.unmarshalNControlStatus2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐControlStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
