@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- Fix PDF tables
+
 ## [0.43.1] - 2025-07-22
 
 ### Fixed
