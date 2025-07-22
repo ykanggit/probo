@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Fix PDF tables
+- Fix display issue on control and framework
+- Fix control creation
 
 ## [0.43.1] - 2025-07-22
 
