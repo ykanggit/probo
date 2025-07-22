@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.43.1] - 2025-07-22
+
+### Fixed
+- Fix document draft creation
+
 ## [0.43.0] - 2025-07-21
 
 ### Added
