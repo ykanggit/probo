@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5687ac9bfd8f9dcafbb2f3ac53a47b1a>>
+ * @generated SignedSource<<a992287066937d27360cd2eab35ca4bb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -247,6 +247,13 @@ return {
                                       {
                                         "alias": null,
                                         "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "exclusionJustification",
+                                        "storageKey": null
+                                      },
+                                      {
+                                        "alias": null,
+                                        "args": null,
                                         "concreteType": "Framework",
                                         "kind": "LinkedField",
                                         "name": "framework",
@@ -395,12 +402,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "88d1342a523d5a64b4c816250d15f54c",
+    "cacheID": "f608c103221da2324e1fff4c3b6ef8db",
     "id": null,
     "metadata": {},
     "name": "MeasureGraphListQuery",
     "operationKind": "query",
-    "text": "query MeasureGraphListQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...MeasuresPageFragment\n  }\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasuresPageFragment on Organization {\n  measures(first: 100) {\n    totalCount\n    notStartedCount\n    inProgressCount\n    notApplicableCount\n    completedCount\n    edges {\n      node {\n        id\n        referenceId\n        name\n        category\n        state\n        description\n        controls(first: 1) {\n          edges {\n            node {\n              sectionTitle\n              framework {\n                name\n                referenceId\n                id\n              }\n              id\n            }\n          }\n        }\n        tasks(first: 1) {\n          edges {\n            node {\n              id\n              referenceId\n              name\n              description\n              state\n            }\n          }\n        }\n        ...MeasureFormDialogMeasureFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query MeasureGraphListQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...MeasuresPageFragment\n  }\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasuresPageFragment on Organization {\n  measures(first: 100) {\n    totalCount\n    notStartedCount\n    inProgressCount\n    notApplicableCount\n    completedCount\n    edges {\n      node {\n        id\n        referenceId\n        name\n        category\n        state\n        description\n        controls(first: 1) {\n          edges {\n            node {\n              sectionTitle\n              exclusionJustification\n              framework {\n                name\n                referenceId\n                id\n              }\n              id\n            }\n          }\n        }\n        tasks(first: 1) {\n          edges {\n            node {\n              id\n              referenceId\n              name\n              description\n              state\n            }\n          }\n        }\n        ...MeasureFormDialogMeasureFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();

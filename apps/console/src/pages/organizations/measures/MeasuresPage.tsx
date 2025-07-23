@@ -95,6 +95,7 @@ const measuresFragment = graphql`
             edges {
               node {
                 sectionTitle
+                exclusionJustification
                 framework {
                   name
                   referenceId
@@ -220,16 +221,26 @@ export default function MeasuresPage(props: Props) {
   const handleExport = async (options: { scope: 'current' | 'all'; format: 'csv' | 'json' }) => {
     if (options.scope === 'current' && options.format === 'csv') {
       // Export current view as CSV
-      const csvHeaders = ['CONTROL', 'TITLE', 'DESCRIPTION', 'STATE', 'IMPLEMENTATION DETAILS'];
+      const csvHeaders = ['CONTROL', 'TITLE', 'APPLICABLE', 'JUSTIFICATION', 'DESCRIPTION', 'STATE', 'IMPLEMENTATION DETAILS'];
       const csvRows = measures.map(measure => {
         // Get the first linked control's section title as the control reference
         const controlReference = measure.controls?.edges?.[0]?.node?.sectionTitle || '';
         // Get the first linked task's description as implementation details
         const implementationDetails = measure.tasks?.edges?.[0]?.node?.description || '';
         
+        // Determine APPLICABLE value based on measure state
+        const isApplicable = measure.state === 'NOT_APPLICABLE' ? 'NO' : 'YES';
+        
+        // Determine JUSTIFICATION value
+        const justification = isApplicable === 'NO' 
+          ? (measure.controls?.edges?.[0]?.node?.exclusionJustification || 'n/a')
+          : 'n/a';
+        
         return [
           controlReference,
           measure.name,
+          isApplicable,
+          justification,
           measure.description,
           measure.state,
           implementationDetails
