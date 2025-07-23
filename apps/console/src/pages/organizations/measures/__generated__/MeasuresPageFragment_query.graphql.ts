@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<10d90e5e86c0319fe565ed9386adbc11>>
+ * @generated SignedSource<<f3b4666debb361a27207cc32410e630a>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -327,6 +327,13 @@ return {
                                       {
                                         "alias": null,
                                         "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "exclusionJustification",
+                                        "storageKey": null
+                                      },
+                                      {
+                                        "alias": null,
+                                        "args": null,
                                         "concreteType": "Framework",
                                         "kind": "LinkedField",
                                         "name": "framework",
@@ -475,16 +482,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "463fee700be8ddfb05ae27aea716a071",
+    "cacheID": "b18baf56a21898f81d8c1c49dae9353b",
     "id": null,
     "metadata": {},
     "name": "MeasuresPageFragment_query",
     "operationKind": "query",
-    "text": "query MeasuresPageFragment_query(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 100\n  $last: Int = null\n  $order: MeasureOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...MeasuresPageFragment_16fISc\n    id\n  }\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasuresPageFragment_16fISc on Organization {\n  measures(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    totalCount\n    notStartedCount\n    inProgressCount\n    notApplicableCount\n    completedCount\n    edges {\n      node {\n        id\n        referenceId\n        name\n        category\n        state\n        description\n        controls(first: 1) {\n          edges {\n            node {\n              sectionTitle\n              framework {\n                name\n                referenceId\n                id\n              }\n              id\n            }\n          }\n        }\n        tasks(first: 1) {\n          edges {\n            node {\n              id\n              referenceId\n              name\n              description\n              state\n            }\n          }\n        }\n        ...MeasureFormDialogMeasureFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query MeasuresPageFragment_query(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 100\n  $last: Int = null\n  $order: MeasureOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...MeasuresPageFragment_16fISc\n    id\n  }\n}\n\nfragment MeasureFormDialogMeasureFragment on Measure {\n  id\n  description\n  name\n  category\n  state\n}\n\nfragment MeasuresPageFragment_16fISc on Organization {\n  measures(first: $first, after: $after, last: $last, before: $before, orderBy: $order) {\n    totalCount\n    notStartedCount\n    inProgressCount\n    notApplicableCount\n    completedCount\n    edges {\n      node {\n        id\n        referenceId\n        name\n        category\n        state\n        description\n        controls(first: 1) {\n          edges {\n            node {\n              sectionTitle\n              exclusionJustification\n              framework {\n                name\n                referenceId\n                id\n              }\n              id\n            }\n          }\n        }\n        tasks(first: 1) {\n          edges {\n            node {\n              id\n              referenceId\n              name\n              description\n              state\n            }\n          }\n        }\n        ...MeasureFormDialogMeasureFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "66de49169032ed8f52146d698a5dffeb";
+(node as any).hash = "fb9c874696923e1844c9ca5c44f83eb1";
 
 export default node;

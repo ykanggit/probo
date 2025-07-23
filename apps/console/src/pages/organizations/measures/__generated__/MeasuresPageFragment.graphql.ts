@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ae62e3366fb4c09186f781b40cea5fb6>>
+ * @generated SignedSource<<783f49ea256cdc5ce07fac0c8f16010c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -23,6 +23,7 @@ export type MeasuresPageFragment$data = {
         readonly controls: {
           readonly edges: ReadonlyArray<{
             readonly node: {
+              readonly exclusionJustification: string | null | undefined;
               readonly framework: {
                 readonly name: string;
                 readonly referenceId: string;
@@ -283,6 +284,13 @@ return {
                             {
                               "alias": null,
                               "args": null,
+                              "kind": "ScalarField",
+                              "name": "exclusionJustification",
+                              "storageKey": null
+                            },
+                            {
+                              "alias": null,
+                              "args": null,
                               "concreteType": "Framework",
                               "kind": "LinkedField",
                               "name": "framework",
@@ -426,6 +434,6 @@ return {
 };
 })();
 
-(node as any).hash = "66de49169032ed8f52146d698a5dffeb";
+(node as any).hash = "fb9c874696923e1844c9ca5c44f83eb1";
 
 export default node;

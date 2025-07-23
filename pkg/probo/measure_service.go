@@ -683,15 +683,19 @@ func (s MeasureService) Export(
 
 		if strings.ToLower(format) == "csv" {
 			w := csv.NewWriter(&buf)
-			w.Write([]string{"CONTROL", "TITLE", "DESCRIPTION", "STATE", "IMPLEMENTATION DETAILS"})
+			w.Write([]string{"CONTROL", "TITLE", "APPLICABLE", "JUSTIFICATION", "DESCRIPTION", "STATE", "IMPLEMENTATION DETAILS"})
 			for _, m := range measures {
 				controls := coredata.Controls{}
 				if err := controls.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, page.NewCursor(10, nil, page.Head, page.OrderBy[coredata.ControlOrderField]{Field: coredata.ControlOrderFieldCreatedAt, Direction: page.OrderDirectionAsc}), coredata.NewControlFilter(nil)); err != nil {
 					return err
 				}
 				controlRef := ""
+				exclusionJustification := ""
 				if len(controls) > 0 {
 					controlRef = controls[0].SectionTitle
+					if controls[0].ExclusionJustification != nil {
+						exclusionJustification = *controls[0].ExclusionJustification
+					}
 				}
 				tasks := coredata.Tasks{}
 				if err := tasks.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, page.NewCursor(10, nil, page.Head, page.OrderBy[coredata.TaskOrderField]{Field: coredata.TaskOrderFieldCreatedAt, Direction: page.OrderDirectionAsc})); err != nil {
@@ -701,7 +705,22 @@ func (s MeasureService) Export(
 				if len(tasks) > 0 {
 					implDetails = tasks[0].Description
 				}
-				w.Write([]string{controlRef, m.Name, m.Description, m.State.String(), implDetails})
+
+				// Determine APPLICABLE value based on measure state
+				isApplicable := "YES"
+				if m.State == coredata.MeasureStateNotApplicable {
+					isApplicable = "NO"
+				}
+
+				// Determine JUSTIFICATION value
+				justification := "n/a"
+				if isApplicable == "NO" {
+					if exclusionJustification != "" {
+						justification = exclusionJustification
+					}
+				}
+
+				w.Write([]string{controlRef, m.Name, isApplicable, justification, m.Description, m.State.String(), implDetails})
 			}
 			w.Flush()
 			return w.Error()
@@ -833,7 +852,7 @@ func (s MeasureService) ExportAll(
 	case "csv":
 		var buf bytes.Buffer
 		w := csv.NewWriter(&buf)
-		w.Write([]string{"CONTROL", "TITLE", "DESCRIPTION", "STATE", "IMPLEMENTATION DETAILS"})
+		w.Write([]string{"CONTROL", "TITLE", "APPLICABLE", "JUSTIFICATION", "DESCRIPTION", "STATE", "IMPLEMENTATION DETAILS"})
 		for _, m := range measures {
 			var controls coredata.Controls
 			err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
@@ -849,8 +868,12 @@ func (s MeasureService) ExportAll(
 				return nil, "", err
 			}
 			controlRef := ""
+			exclusionJustification := ""
 			if len(controls) > 0 {
 				controlRef = controls[0].SectionTitle
+				if controls[0].ExclusionJustification != nil {
+					exclusionJustification = *controls[0].ExclusionJustification
+				}
 			}
 			var tasks coredata.Tasks
 			err = s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
@@ -868,9 +891,26 @@ func (s MeasureService) ExportAll(
 			if len(tasks) > 0 {
 				implDetails = tasks[0].Description
 			}
+
+			// Determine APPLICABLE value based on measure state
+			isApplicable := "YES"
+			if m.State == coredata.MeasureStateNotApplicable {
+				isApplicable = "NO"
+			}
+
+			// Determine JUSTIFICATION value
+			justification := "n/a"
+			if isApplicable == "NO" {
+				if exclusionJustification != "" {
+					justification = exclusionJustification
+				}
+			}
+
 			w.Write([]string{
 				controlRef,
 				m.Name,
+				isApplicable,
+				justification,
 				m.Description,
 				m.State.String(),
 				implDetails,
