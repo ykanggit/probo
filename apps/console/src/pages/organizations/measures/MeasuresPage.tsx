@@ -53,6 +53,41 @@ import MeasureFormDialog from "./dialog/MeasureFormDialog";
 import ExportMeasuresDialog from "./dialog/ExportMeasuresDialog";
 import { usePageTitle } from "@probo/hooks";
 
+// Function to compare dot notation strings (e.g., "A.5.1" vs "A.5.10")
+function compareDotNotation(a: string, b: string): number {
+  if (a === b) return 0;
+  if (a === '') return -1;
+  if (b === '') return 1;
+  
+  const partsA = a.split('.');
+  const partsB = b.split('.');
+  
+  const maxLength = Math.max(partsA.length, partsB.length);
+  
+  for (let i = 0; i < maxLength; i++) {
+    const partA = partsA[i] || '';
+    const partB = partsB[i] || '';
+    
+    // Try to compare as numbers first
+    const numA = parseInt(partA, 10);
+    const numB = parseInt(partB, 10);
+    
+    if (!isNaN(numA) && !isNaN(numB)) {
+      // Both are numbers, compare numerically
+      if (numA !== numB) {
+        return numA - numB;
+      }
+    } else {
+      // At least one is not a number, compare as strings
+      if (partA !== partB) {
+        return partA.localeCompare(partB);
+      }
+    }
+  }
+  
+  return 0;
+}
+
 type Props = {
   queryRef: PreloadedQuery<MeasureGraphListQuery>;
 };
@@ -221,34 +256,61 @@ export default function MeasuresPage(props: Props) {
   const handleExport = async (options: { scope: 'current' | 'all'; format: 'csv' | 'json' }) => {
     if (options.scope === 'current' && options.format === 'csv') {
       // Export current view as CSV
-      const csvHeaders = ['CONTROL', 'TITLE', 'APPLICABLE', 'JUSTIFICATION', 'DESCRIPTION', 'STATE', 'IMPLEMENTATION DETAILS'];
-      const csvRows = measures.map(measure => {
-        // Get the first linked control's section title as the control reference
-        const controlReference = measure.controls?.edges?.[0]?.node?.sectionTitle || '';
-        // Get the first linked task's description as implementation details
-        const implementationDetails = measure.tasks?.edges?.[0]?.node?.description || '';
+      const csvHeaders = ['CONTROL', 'TITLE', 'DESCRIPTION', 'APPLICABLE', 'JUSTIFICATION', 'STATE', 'IMPLEMENTATION DETAILS'];
+      
+      // Group measures by category and sort within each category
+      const measuresByCategory = groupBy(measures, (measure) => measure.category);
+      const sortedCategories = objectKeys(measuresByCategory).sort();
+      
+      const csvRows: (string | string[])[] = [];
+      
+      for (const category of sortedCategories) {
+        // Add category header row
+        csvRows.push([category, '', '', '', '', '', '']);
         
-        // Determine APPLICABLE value based on measure state
-        const isApplicable = measure.state === 'NOT_APPLICABLE' ? 'NO' : 'YES';
+        // Get measures for this category and sort them
+        const categoryMeasures = measuresByCategory[category];
+        const categoryRows = categoryMeasures.map(measure => {
+          // Get the first linked control's section title as the control reference
+          const controlReference = measure.controls?.edges?.[0]?.node?.sectionTitle || '';
+          // Get the first linked task's description as implementation details
+          const implementationDetails = measure.tasks?.edges?.[0]?.node?.description || '';
+          
+          // Determine APPLICABLE value based on measure state
+          const isApplicable = measure.state === 'NOT_APPLICABLE' ? 'NO' : 'YES';
+          
+          // Determine JUSTIFICATION value
+          const justification = isApplicable === 'NO' 
+            ? (measure.controls?.edges?.[0]?.node?.exclusionJustification || 'n/a')
+            : 'n/a';
+          
+          return [
+            controlReference,
+            measure.name,
+            measure.description,
+            isApplicable,
+            justification,
+            measure.state,
+            implementationDetails
+          ];
+        }).sort((a, b) => {
+          // Sort by CONTROL column (first column) in ascending order using dot notation
+          const controlA = a[0] || '';
+          const controlB = b[0] || '';
+          return compareDotNotation(controlA, controlB);
+        });
         
-        // Determine JUSTIFICATION value
-        const justification = isApplicable === 'NO' 
-          ? (measure.controls?.edges?.[0]?.node?.exclusionJustification || 'n/a')
-          : 'n/a';
-        
-        return [
-          controlReference,
-          measure.name,
-          isApplicable,
-          justification,
-          measure.description,
-          measure.state,
-          implementationDetails
-        ];
-      });
+        csvRows.push(...categoryRows);
+      }
       
       const csvContent = [csvHeaders, ...csvRows]
-        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+        .map(row => {
+          if (Array.isArray(row)) {
+            return row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',');
+          } else {
+            return `"${String(row).replace(/"/g, '""')}"`;
+          }
+        })
         .join('\n');
       
       // Create and download the file

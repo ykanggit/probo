@@ -18,12 +18,14 @@ import (
 	"context"
 	"fmt"
 	"maps"
+	"sort"
+	"strconv"
+	"strings"
 	"time"
 
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
-	"strings"
 
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
@@ -683,44 +685,76 @@ func (s MeasureService) Export(
 
 		if strings.ToLower(format) == "csv" {
 			w := csv.NewWriter(&buf)
-			w.Write([]string{"CONTROL", "TITLE", "APPLICABLE", "JUSTIFICATION", "DESCRIPTION", "STATE", "IMPLEMENTATION DETAILS"})
+			w.Write([]string{"CONTROL", "TITLE", "DESCRIPTION", "APPLICABLE", "JUSTIFICATION", "STATE", "IMPLEMENTATION DETAILS"})
+
+			// Group measures by category
+			categoryMap := make(map[string][]*coredata.Measure)
 			for _, m := range measures {
-				controls := coredata.Controls{}
-				if err := controls.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, page.NewCursor(10, nil, page.Head, page.OrderBy[coredata.ControlOrderField]{Field: coredata.ControlOrderFieldCreatedAt, Direction: page.OrderDirectionAsc}), coredata.NewControlFilter(nil)); err != nil {
-					return err
-				}
-				controlRef := ""
-				exclusionJustification := ""
-				if len(controls) > 0 {
-					controlRef = controls[0].SectionTitle
-					if controls[0].ExclusionJustification != nil {
-						exclusionJustification = *controls[0].ExclusionJustification
+				categoryMap[m.Category] = append(categoryMap[m.Category], m)
+			}
+
+			// Get sorted categories
+			var categories []string
+			for category := range categoryMap {
+				categories = append(categories, category)
+			}
+			sort.Strings(categories)
+
+			// Process each category
+			for _, category := range categories {
+				// Write category header row
+				w.Write([]string{category, "", "", "", "", "", ""})
+
+				// Collect rows for this category
+				var rows [][]string
+				for _, m := range categoryMap[category] {
+					controls := coredata.Controls{}
+					if err := controls.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, page.NewCursor(10, nil, page.Head, page.OrderBy[coredata.ControlOrderField]{Field: coredata.ControlOrderFieldCreatedAt, Direction: page.OrderDirectionAsc}), coredata.NewControlFilter(nil)); err != nil {
+						return err
 					}
-				}
-				tasks := coredata.Tasks{}
-				if err := tasks.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, page.NewCursor(10, nil, page.Head, page.OrderBy[coredata.TaskOrderField]{Field: coredata.TaskOrderFieldCreatedAt, Direction: page.OrderDirectionAsc})); err != nil {
-					return err
-				}
-				implDetails := ""
-				if len(tasks) > 0 {
-					implDetails = tasks[0].Description
-				}
-
-				// Determine APPLICABLE value based on measure state
-				isApplicable := "YES"
-				if m.State == coredata.MeasureStateNotApplicable {
-					isApplicable = "NO"
-				}
-
-				// Determine JUSTIFICATION value
-				justification := "n/a"
-				if isApplicable == "NO" {
-					if exclusionJustification != "" {
-						justification = exclusionJustification
+					controlRef := ""
+					exclusionJustification := ""
+					if len(controls) > 0 {
+						controlRef = controls[0].SectionTitle
+						if controls[0].ExclusionJustification != nil {
+							exclusionJustification = *controls[0].ExclusionJustification
+						}
 					}
+					tasks := coredata.Tasks{}
+					if err := tasks.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, page.NewCursor(10, nil, page.Head, page.OrderBy[coredata.TaskOrderField]{Field: coredata.TaskOrderFieldCreatedAt, Direction: page.OrderDirectionAsc})); err != nil {
+						return err
+					}
+					implDetails := ""
+					if len(tasks) > 0 {
+						implDetails = tasks[0].Description
+					}
+
+					// Determine APPLICABLE value based on measure state
+					isApplicable := "YES"
+					if m.State == coredata.MeasureStateNotApplicable {
+						isApplicable = "NO"
+					}
+
+					// Determine JUSTIFICATION value
+					justification := "n/a"
+					if isApplicable == "NO" {
+						if exclusionJustification != "" {
+							justification = exclusionJustification
+						}
+					}
+
+					rows = append(rows, []string{controlRef, m.Name, m.Description, isApplicable, justification, m.State.String(), implDetails})
 				}
 
-				w.Write([]string{controlRef, m.Name, isApplicable, justification, m.Description, m.State.String(), implDetails})
+				// Sort rows by CONTROL column (first column) in ascending order using dot notation
+				sort.Slice(rows, func(i, j int) bool {
+					return compareDotNotation(rows[i][0], rows[j][0]) < 0
+				})
+
+				// Write sorted rows for this category
+				for _, row := range rows {
+					w.Write(row)
+				}
 			}
 			w.Flush()
 			return w.Error()
@@ -828,6 +862,58 @@ func (s MeasureService) Export(
 	return "", fmt.Errorf("S3/MinIO export is not implemented")
 }
 
+// compareDotNotation compares two dot notation strings (e.g., "A.5.1" vs "A.5.10")
+func compareDotNotation(a, b string) int {
+	if a == b {
+		return 0
+	}
+	if a == "" {
+		return -1
+	}
+	if b == "" {
+		return 1
+	}
+
+	partsA := strings.Split(a, ".")
+	partsB := strings.Split(b, ".")
+
+	maxLength := len(partsA)
+	if len(partsB) > maxLength {
+		maxLength = len(partsB)
+	}
+
+	for i := 0; i < maxLength; i++ {
+		var partA, partB string
+		if i < len(partsA) {
+			partA = partsA[i]
+		}
+		if i < len(partsB) {
+			partB = partsB[i]
+		}
+
+		// Try to compare as numbers first
+		numA, errA := strconv.Atoi(partA)
+		numB, errB := strconv.Atoi(partB)
+
+		if errA == nil && errB == nil {
+			// Both are numbers, compare numerically
+			if numA != numB {
+				return numA - numB
+			}
+		} else {
+			// At least one is not a number, compare as strings
+			if partA != partB {
+				if partA < partB {
+					return -1
+				}
+				return 1
+			}
+		}
+	}
+
+	return 0
+}
+
 // ExportAll exports all measures for an organization as CSV or JSON for direct download
 func (s MeasureService) ExportAll(
 	ctx context.Context,
@@ -852,69 +938,101 @@ func (s MeasureService) ExportAll(
 	case "csv":
 		var buf bytes.Buffer
 		w := csv.NewWriter(&buf)
-		w.Write([]string{"CONTROL", "TITLE", "APPLICABLE", "JUSTIFICATION", "DESCRIPTION", "STATE", "IMPLEMENTATION DETAILS"})
+		w.Write([]string{"CONTROL", "TITLE", "DESCRIPTION", "APPLICABLE", "JUSTIFICATION", "STATE", "IMPLEMENTATION DETAILS"})
+
+		// Group measures by category
+		categoryMap := make(map[string][]*coredata.Measure)
 		for _, m := range measures {
-			var controls coredata.Controls
-			err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
-				// Create proper cursor and filter for controls
-				cursor := page.NewCursor(100, nil, page.Head, page.OrderBy[coredata.ControlOrderField]{
-					Field:     coredata.ControlOrderFieldCreatedAt,
-					Direction: page.OrderDirectionAsc,
+			categoryMap[m.Category] = append(categoryMap[m.Category], m)
+		}
+
+		// Get sorted categories
+		var categories []string
+		for category := range categoryMap {
+			categories = append(categories, category)
+		}
+		sort.Strings(categories)
+
+		// Process each category
+		for _, category := range categories {
+			// Write category header row
+			w.Write([]string{category, "", "", "", "", "", ""})
+
+			// Collect rows for this category
+			var rows [][]string
+			for _, m := range categoryMap[category] {
+				var controls coredata.Controls
+				err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
+					// Create proper cursor and filter for controls
+					cursor := page.NewCursor(100, nil, page.Head, page.OrderBy[coredata.ControlOrderField]{
+						Field:     coredata.ControlOrderFieldCreatedAt,
+						Direction: page.OrderDirectionAsc,
+					})
+					filter := &coredata.ControlFilter{}
+					return controls.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, cursor, filter)
 				})
-				filter := &coredata.ControlFilter{}
-				return controls.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, cursor, filter)
-			})
-			if err != nil {
-				return nil, "", err
-			}
-			controlRef := ""
-			exclusionJustification := ""
-			if len(controls) > 0 {
-				controlRef = controls[0].SectionTitle
-				if controls[0].ExclusionJustification != nil {
-					exclusionJustification = *controls[0].ExclusionJustification
+				if err != nil {
+					return nil, "", err
 				}
-			}
-			var tasks coredata.Tasks
-			err = s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
-				// Create proper cursor for tasks
-				cursor := page.NewCursor(100, nil, page.Head, page.OrderBy[coredata.TaskOrderField]{
-					Field:     coredata.TaskOrderFieldCreatedAt,
-					Direction: page.OrderDirectionAsc,
+				controlRef := ""
+				exclusionJustification := ""
+				if len(controls) > 0 {
+					controlRef = controls[0].SectionTitle
+					if controls[0].ExclusionJustification != nil {
+						exclusionJustification = *controls[0].ExclusionJustification
+					}
+				}
+				var tasks coredata.Tasks
+				err = s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
+					// Create proper cursor for tasks
+					cursor := page.NewCursor(100, nil, page.Head, page.OrderBy[coredata.TaskOrderField]{
+						Field:     coredata.TaskOrderFieldCreatedAt,
+						Direction: page.OrderDirectionAsc,
+					})
+					return tasks.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, cursor)
 				})
-				return tasks.LoadByMeasureID(ctx, conn, s.svc.scope, m.ID, cursor)
-			})
-			if err != nil {
-				return nil, "", err
-			}
-			implDetails := ""
-			if len(tasks) > 0 {
-				implDetails = tasks[0].Description
-			}
-
-			// Determine APPLICABLE value based on measure state
-			isApplicable := "YES"
-			if m.State == coredata.MeasureStateNotApplicable {
-				isApplicable = "NO"
-			}
-
-			// Determine JUSTIFICATION value
-			justification := "n/a"
-			if isApplicable == "NO" {
-				if exclusionJustification != "" {
-					justification = exclusionJustification
+				if err != nil {
+					return nil, "", err
 				}
+				implDetails := ""
+				if len(tasks) > 0 {
+					implDetails = tasks[0].Description
+				}
+
+				// Determine APPLICABLE value based on measure state
+				isApplicable := "YES"
+				if m.State == coredata.MeasureStateNotApplicable {
+					isApplicable = "NO"
+				}
+
+				// Determine JUSTIFICATION value
+				justification := "n/a"
+				if isApplicable == "NO" {
+					if exclusionJustification != "" {
+						justification = exclusionJustification
+					}
+				}
+
+				rows = append(rows, []string{
+					controlRef,
+					m.Name,
+					m.Description,
+					isApplicable,
+					justification,
+					m.State.String(),
+					implDetails,
+				})
 			}
 
-			w.Write([]string{
-				controlRef,
-				m.Name,
-				isApplicable,
-				justification,
-				m.Description,
-				m.State.String(),
-				implDetails,
+			// Sort rows by CONTROL column (first column) in ascending order using dot notation
+			sort.Slice(rows, func(i, j int) bool {
+				return compareDotNotation(rows[i][0], rows[j][0]) < 0
 			})
+
+			// Write sorted rows for this category
+			for _, row := range rows {
+				w.Write(row)
+			}
 		}
 		w.Flush()
 		filename := "measures-export-" + time.Now().Format("2006-01-02") + ".csv"

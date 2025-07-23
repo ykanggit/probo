@@ -93,7 +93,7 @@ export default function ExportMeasuresDialog(props: Props) {
               >
                 <div className="font-medium">{__("CSV File")}</div>
                 <div className="text-sm text-txt-secondary">
-                  {__("Spreadsheet format with columns: CONTROL, TITLE, DESCRIPTION, STATE, IMPLEMENTATION DETAILS")}
+                  {__("Spreadsheet format with columns: CONTROL, TITLE, DESCRIPTION, APPLICABLE, JUSTIFICATION, STATE, IMPLEMENTATION DETAILS")}
                 </div>
               </button>
               <button
