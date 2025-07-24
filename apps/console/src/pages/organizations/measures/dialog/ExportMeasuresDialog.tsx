@@ -28,7 +28,7 @@ export default function ExportMeasuresDialog(props: Props) {
   const { __ } = useTranslate();
   const dialogRef = props.ref ?? useDialogRef();
   const [options, setOptions] = useState<ExportOptions>({
-    scope: 'current',
+    scope: 'all',
     format: 'csv'
   });
 
