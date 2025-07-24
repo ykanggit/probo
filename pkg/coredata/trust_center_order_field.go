@@ -14,28 +14,25 @@
 
 package coredata
 
+type TrustCenterOrderField string
+
 const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MeasureEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ConnectorEntityType
-	VendorRiskAssessmentEntityType
-	VendorEntityType
-	PeopleEntityType
-	VendorComplianceReportEntityType
-	DocumentEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
-	DocumentVersionEntityType
-	DocumentVersionSignatureEntityType
-	AssetEntityType
-	DatumEntityType
-	AuditEntityType
-	ReportEntityType
-	TrustCenterEntityType
+	TrustCenterOrderFieldCreatedAt TrustCenterOrderField = "CREATED_AT"
 )
+
+func (p TrustCenterOrderField) Column() string {
+	return string(p)
+}
+
+func (p TrustCenterOrderField) String() string {
+	return string(p)
+}
+
+func (p TrustCenterOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *TrustCenterOrderField) UnmarshalText(text []byte) error {
+	*p = TrustCenterOrderField(text)
+	return nil
+}
