@@ -17,4 +17,10 @@ export const availableFrameworks = [
         logo: "/logos/hipaa.png",
         description: "Health Insurance Portability and Accountability Act",
     },
+    {
+        id: "14117",
+        name: "EO 14117",
+        logo: "/logos/doj.png",
+        description: "Executive Order 14117 on Preventing Access to Americans' Bulk Sensitive Personal Data and United States Government-Related Data by Countries of Concern",
+    },
 ];
