@@ -774,7 +774,6 @@ type MeasureRowProps = {
 
 function MeasureRow(props: MeasureRowProps) {
   const { __ } = useTranslate();
-  const confirm = useConfirm();
   const organizationId = useOrganizationId();
 
   const onDelete = () => {
