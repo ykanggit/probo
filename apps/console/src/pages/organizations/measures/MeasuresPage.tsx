@@ -553,6 +553,7 @@ export default function MeasuresPage(props: Props) {
               category={category}
               measures={measuresPerCategory[category]}
               connectionId={connectionId}
+              onDeleteMeasure={handleDeleteMeasure}
             />
           ))
       ) : (
@@ -681,6 +682,7 @@ type CategoryProps = {
   category: string;
   measures: NodeOf<MeasuresPageFragment$data["measures"]>[];
   connectionId: string;
+  onDeleteMeasure: (measureId: string) => void;
 };
 
 function Category(props: CategoryProps) {
@@ -740,6 +742,7 @@ function Category(props: CategoryProps) {
                   key={measure.id}
                   measure={measure}
                   connectionId={props.connectionId}
+                  onDelete={props.onDeleteMeasure}
                 />
               ))}
             </Tbody>
@@ -776,22 +779,7 @@ function MeasureRow(props: MeasureRowProps) {
 
   const onDelete = () => {
     if (!props.onDelete) return;
-    
-    confirm(
-      () =>
-        new Promise<void>((resolve) => {
-          props.onDelete!(props.measure.id);
-          resolve();
-        }),
-      {
-        message: sprintf(
-          __(
-            'This will permanently delete the measure "%s". This action cannot be undone.'
-          ),
-          props.measure.name
-        ),
-      }
-    );
+    props.onDelete(props.measure.id);
   };
 
   const dialogRef = useDialogRef();
