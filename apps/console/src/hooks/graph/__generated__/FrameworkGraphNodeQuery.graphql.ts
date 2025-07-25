@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8901b5c750861080551542d26c2681d6>>
+ * @generated SignedSource<<24675a4774ceabbd8f8192a036c081e4>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -53,7 +53,29 @@ v3 = {
   "kind": "ScalarField",
   "name": "name",
   "storageKey": null
-};
+},
+v4 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v5 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 250
+  },
+  {
+    "kind": "Literal",
+    "name": "orderBy",
+    "value": {
+      "direction": "ASC",
+      "field": "SECTION_TITLE"
+    }
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": (v0/*: any*/),
@@ -104,13 +126,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "__typename",
-            "storageKey": null
-          },
+          (v4/*: any*/),
           (v2/*: any*/),
           {
             "kind": "InlineFragment",
@@ -138,21 +154,7 @@ return {
               },
               {
                 "alias": null,
-                "args": [
-                  {
-                    "kind": "Literal",
-                    "name": "first",
-                    "value": 250
-                  },
-                  {
-                    "kind": "Literal",
-                    "name": "orderBy",
-                    "value": {
-                      "direction": "ASC",
-                      "field": "SECTION_TITLE"
-                    }
-                  }
-                ],
+                "args": (v5/*: any*/),
                 "concreteType": "ControlConnection",
                 "kind": "LinkedField",
                 "name": "controls",
@@ -196,8 +198,41 @@ return {
                             "kind": "ScalarField",
                             "name": "exclusionJustification",
                             "storageKey": null
-                          }
+                          },
+                          (v4/*: any*/)
                         ],
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "cursor",
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "PageInfo",
+                    "kind": "LinkedField",
+                    "name": "pageInfo",
+                    "plural": false,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "endCursor",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "hasNextPage",
                         "storageKey": null
                       }
                     ],
@@ -217,6 +252,17 @@ return {
                   }
                 ],
                 "storageKey": "controls(first:250,orderBy:{\"direction\":\"ASC\",\"field\":\"SECTION_TITLE\"})"
+              },
+              {
+                "alias": null,
+                "args": (v5/*: any*/),
+                "filters": [
+                  "orderBy"
+                ],
+                "handle": "connection",
+                "key": "FrameworkDetailPage_controls",
+                "kind": "LinkedHandle",
+                "name": "controls"
               }
             ],
             "type": "Framework",
@@ -228,12 +274,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "29d6f638feb1bb633169abcfe083f5d2",
+    "cacheID": "f09cfb3a65113e74dde7982dd67ebe7a",
     "id": null,
     "metadata": {},
     "name": "FrameworkGraphNodeQuery",
     "operationKind": "query",
-    "text": "query FrameworkGraphNodeQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    ... on Framework {\n      id\n      name\n      ...FrameworkDetailPageFragment\n    }\n    id\n  }\n}\n\nfragment FrameworkDetailPageFragment on Framework {\n  id\n  name\n  description\n  organization {\n    name\n    id\n  }\n  controls(first: 250, orderBy: {field: SECTION_TITLE, direction: ASC}) {\n    edges {\n      node {\n        id\n        sectionTitle\n        name\n        status\n        exclusionJustification\n      }\n    }\n  }\n}\n"
+    "text": "query FrameworkGraphNodeQuery(\n  $frameworkId: ID!\n) {\n  node(id: $frameworkId) {\n    __typename\n    ... on Framework {\n      id\n      name\n      ...FrameworkDetailPageFragment\n    }\n    id\n  }\n}\n\nfragment FrameworkDetailPageFragment on Framework {\n  id\n  name\n  description\n  organization {\n    name\n    id\n  }\n  controls(first: 250, orderBy: {field: SECTION_TITLE, direction: ASC}) {\n    edges {\n      node {\n        id\n        sectionTitle\n        name\n        status\n        exclusionJustification\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();

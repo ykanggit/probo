@@ -39,7 +39,8 @@ const frameworkDetailFragment = graphql`
     organization {
       name
     }
-    controls(first: 250, orderBy: { field: SECTION_TITLE, direction: ASC }) {
+    controls(first: 250, orderBy: { field: SECTION_TITLE, direction: ASC })
+      @connection(key: "FrameworkDetailPage_controls") {
       __id
       edges {
         node {

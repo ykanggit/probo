@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c6e55821a322dceae5408ac3898cfa48>>
+ * @generated SignedSource<<a8df126d510af8b4716568fb3ff1e2ed>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -55,7 +55,18 @@ v1 = {
 return {
   "argumentDefinitions": [],
   "kind": "Fragment",
-  "metadata": null,
+  "metadata": {
+    "connection": [
+      {
+        "count": null,
+        "cursor": null,
+        "direction": "forward",
+        "path": [
+          "controls"
+        ]
+      }
+    ]
+  },
   "name": "FrameworkDetailPageFragment",
   "selections": [
     (v0/*: any*/),
@@ -80,13 +91,8 @@ return {
       "storageKey": null
     },
     {
-      "alias": null,
+      "alias": "controls",
       "args": [
-        {
-          "kind": "Literal",
-          "name": "first",
-          "value": 250
-        },
         {
           "kind": "Literal",
           "name": "orderBy",
@@ -98,7 +104,7 @@ return {
       ],
       "concreteType": "ControlConnection",
       "kind": "LinkedField",
-      "name": "controls",
+      "name": "__FrameworkDetailPage_controls_connection",
       "plural": false,
       "selections": [
         {
@@ -139,8 +145,47 @@ return {
                   "kind": "ScalarField",
                   "name": "exclusionJustification",
                   "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "__typename",
+                  "storageKey": null
                 }
               ],
+              "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "cursor",
+              "storageKey": null
+            }
+          ],
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "concreteType": "PageInfo",
+          "kind": "LinkedField",
+          "name": "pageInfo",
+          "plural": false,
+          "selections": [
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "endCursor",
+              "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "hasNextPage",
               "storageKey": null
             }
           ],
@@ -159,7 +204,7 @@ return {
           ]
         }
       ],
-      "storageKey": "controls(first:250,orderBy:{\"direction\":\"ASC\",\"field\":\"SECTION_TITLE\"})"
+      "storageKey": "__FrameworkDetailPage_controls_connection(orderBy:{\"direction\":\"ASC\",\"field\":\"SECTION_TITLE\"})"
     }
   ],
   "type": "Framework",
@@ -167,6 +212,6 @@ return {
 };
 })();
 
-(node as any).hash = "c31fd5c0f675d2524f736d69c4ebebe3";
+(node as any).hash = "0a88a4276231a6a6e0a36f2d7ae6143e";
 
 export default node;
