@@ -68,37 +68,6 @@ ON CONFLICT (control_id, measure_id) DO NOTHING;
 	return err
 }
 
-func (cm ControlMeasure) Insert(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-) error {
-	q := `
-INSERT INTO
-    controls_measures (
-        control_id,
-        measure_id,
-        tenant_id,
-        created_at
-    )
-VALUES (
-    @control_id,
-    @measure_id,
-    @tenant_id,
-    @created_at
-);
-`
-
-	args := pgx.StrictNamedArgs{
-		"control_id": cm.ControlID,
-		"measure_id": cm.MeasureID,
-		"tenant_id":  scope.GetTenantID(),
-		"created_at": cm.CreatedAt,
-	}
-	_, err := conn.Exec(ctx, q, args)
-	return err
-}
-
 func (cm ControlMeasure) Delete(
 	ctx context.Context,
 	conn pg.Conn,
