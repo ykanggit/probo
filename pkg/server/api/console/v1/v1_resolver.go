@@ -998,6 +998,77 @@ func (r *mutationResolver) UpdateTrustCenter(ctx context.Context, input types.Up
 	}, nil
 }
 
+// RevokeTrustCenterAccess is the resolver for the revokeTrustCenterAccess field.
+func (r *mutationResolver) RevokeTrustCenterAccess(ctx context.Context, input types.RevokeTrustCenterAccessInput) (*types.RevokeTrustCenterAccessPayload, error) {
+	prb := r.ProboService(ctx, input.AccessID.TenantID())
+
+	access, err := prb.TrustCenterAccesses.RevokeAccess(ctx, &probo.RevokeTrustCenterAccessRequest{
+		AccessID: input.AccessID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot revoke trust center access: %w", err)
+	}
+
+	return &types.RevokeTrustCenterAccessPayload{
+		TrustCenterAccess: types.NewTrustCenterAccess(access),
+	}, nil
+}
+
+// CreateTrustCenterAccess is the resolver for the createTrustCenterAccess field.
+func (r *mutationResolver) CreateTrustCenterAccess(ctx context.Context, input types.CreateTrustCenterAccessInput) (*types.CreateTrustCenterAccessPayload, error) {
+	prb := r.ProboService(ctx, input.TrustCenterID.TenantID())
+
+	access, err := prb.TrustCenterAccesses.Create(ctx, &probo.CreateTrustCenterAccessRequest{
+		TrustCenterID: input.TrustCenterID,
+		Email:         input.Email,
+		Name:          input.Name,
+		SendEmail:     input.SendEmail,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create trust center access: %w", err)
+	}
+
+	return &types.CreateTrustCenterAccessPayload{
+		TrustCenterAccessEdge: types.NewTrustCenterAccessEdge(access, coredata.TrustCenterAccessOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateTrustCenterAccess is the resolver for the updateTrustCenterAccess field.
+func (r *mutationResolver) UpdateTrustCenterAccess(ctx context.Context, input types.UpdateTrustCenterAccessInput) (*types.UpdateTrustCenterAccessPayload, error) {
+	prb := r.ProboService(ctx, input.AccessID.TenantID())
+
+	access, err := prb.TrustCenterAccesses.Update(ctx, &probo.UpdateTrustCenterAccessRequest{
+		AccessID:  input.AccessID,
+		Email:     input.Email,
+		Name:      input.Name,
+		Active:    input.Active,
+		SendEmail: input.SendEmail,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot update trust center access: %w", err)
+	}
+
+	return &types.UpdateTrustCenterAccessPayload{
+		TrustCenterAccess: types.NewTrustCenterAccess(access),
+	}, nil
+}
+
+// DeleteTrustCenterAccess is the resolver for the deleteTrustCenterAccess field.
+func (r *mutationResolver) DeleteTrustCenterAccess(ctx context.Context, input types.DeleteTrustCenterAccessInput) (*types.DeleteTrustCenterAccessPayload, error) {
+	prb := r.ProboService(ctx, input.AccessID.TenantID())
+
+	err := prb.TrustCenterAccesses.Delete(ctx, &probo.DeleteTrustCenterAccessRequest{
+		AccessID: input.AccessID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete trust center access: %w", err)
+	}
+
+	return &types.DeleteTrustCenterAccessPayload{
+		DeletedTrustCenterAccessID: input.AccessID,
+	}, nil
+}
+
 // ConfirmEmail is the resolver for the confirmEmail field.
 func (r *mutationResolver) ConfirmEmail(ctx context.Context, input types.ConfirmEmailInput) (*types.ConfirmEmailPayload, error) {
 	err := r.usrmgrSvc.ConfirmEmail(ctx, input.Token)
@@ -2883,7 +2954,7 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 		}
 		return types.NewReport(report), nil
 	case coredata.TrustCenterEntityType:
-		trustCenter, err := prb.TrustCenters.GetByOrganizationID(ctx, id)
+		trustCenter, err := prb.TrustCenters.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get trust center: %w", err))
 		}
@@ -2903,6 +2974,11 @@ func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
 		ID:   session.ID,
 		User: types.NewUser(user),
 	}, nil
+}
+
+// TrustCenters is the resolver for the trustCenters field.
+func (r *queryResolver) TrustCenters(ctx context.Context, first *int, after *page.CursorKey, last *int, before *page.CursorKey, filter *types.TrustCenterFilter) (*types.TrustCenterConnection, error) {
+	panic(fmt.Errorf("not implemented: TrustCenters - trustCenters"))
 }
 
 // DownloadURL is the resolver for the downloadUrl field.
@@ -3167,6 +3243,43 @@ func (r *taskConnectionResolver) TotalCount(ctx context.Context, obj *types.Task
 	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 }
 
+// Organization is the resolver for the organization field.
+func (r *trustCenterResolver) Organization(ctx context.Context, obj *types.TrustCenter) (*types.Organization, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	organization, err := prb.Organizations.Get(ctx, obj.Organization.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get organization: %w", err)
+	}
+
+	return types.NewOrganization(organization), nil
+}
+
+// Accesses is the resolver for the accesses field.
+func (r *trustCenterResolver) Accesses(ctx context.Context, obj *types.TrustCenter, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrderBy[coredata.TrustCenterAccessOrderField]) (*types.TrustCenterAccessConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.TrustCenterAccessOrderField]{
+		Field:     coredata.TrustCenterAccessOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.TrustCenterAccessOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	result, err := prb.TrustCenterAccesses.ListForTrustCenterID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list trust center accesses: %w", err))
+	}
+
+	return types.NewTrustCenterAccessConnection(result), nil
+}
+
 // People is the resolver for the people field.
 func (r *userResolver) People(ctx context.Context, obj *types.User, organizationID gid.GID) (*types.People, error) {
 	prb := r.ProboService(ctx, organizationID.TenantID())
@@ -3369,7 +3482,7 @@ func (r *vendorRiskAssessmentResolver) AssessedBy(ctx context.Context, obj *type
 }
 
 // Organizations is the resolver for the organizations field.
-func (r *viewerResolver) Organizations(ctx context.Context, obj *types.Viewer, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder) (*types.OrganizationConnection, error) {
+func (r *viewerResolver) Organizations(ctx context.Context, obj *types.Viewer, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder, filter *types.OrganizationFilter) (*types.OrganizationConnection, error) {
 	user := UserFromContext(ctx)
 
 	// For now, we're not using cursor pagination since we're loading all organizations
@@ -3496,6 +3609,9 @@ func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
 // TaskConnection returns schema.TaskConnectionResolver implementation.
 func (r *Resolver) TaskConnection() schema.TaskConnectionResolver { return &taskConnectionResolver{r} }
 
+// TrustCenter returns schema.TrustCenterResolver implementation.
+func (r *Resolver) TrustCenter() schema.TrustCenterResolver { return &trustCenterResolver{r} }
+
 // User returns schema.UserResolver implementation.
 func (r *Resolver) User() schema.UserResolver { return &userResolver{r} }
 
@@ -3547,6 +3663,7 @@ type riskResolver struct{ *Resolver }
 type riskConnectionResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
 type taskConnectionResolver struct{ *Resolver }
+type trustCenterResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
 type vendorResolver struct{ *Resolver }
 type vendorComplianceReportResolver struct{ *Resolver }

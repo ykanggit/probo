@@ -367,6 +367,17 @@ type CreateTaskPayload struct {
 	TaskEdge *TaskEdge `json:"taskEdge"`
 }
 
+type CreateTrustCenterAccessInput struct {
+	TrustCenterID gid.GID `json:"trustCenterId"`
+	Email         string  `json:"email"`
+	Name          string  `json:"name"`
+	SendEmail     bool    `json:"sendEmail"`
+}
+
+type CreateTrustCenterAccessPayload struct {
+	TrustCenterAccessEdge *TrustCenterAccessEdge `json:"trustCenterAccessEdge"`
+}
+
 type CreateVendorInput struct {
 	OrganizationID                gid.GID                  `json:"organizationId"`
 	Name                          string                   `json:"name"`
@@ -559,6 +570,14 @@ type DeleteTaskInput struct {
 
 type DeleteTaskPayload struct {
 	DeletedTaskID gid.GID `json:"deletedTaskId"`
+}
+
+type DeleteTrustCenterAccessInput struct {
+	AccessID gid.GID `json:"accessId"`
+}
+
+type DeleteTrustCenterAccessPayload struct {
+	DeletedTrustCenterAccessID gid.GID `json:"deletedTrustCenterAccessId"`
 }
 
 type DeleteVendorComplianceReportInput struct {
@@ -836,6 +855,10 @@ type OrganizationEdge struct {
 	Node   *Organization  `json:"node"`
 }
 
+type OrganizationFilter struct {
+	TrustCenterSlug *string `json:"trustCenterSlug,omitempty"`
+}
+
 type OrganizationOrder struct {
 	Direction page.OrderDirection             `json:"direction"`
 	Field     coredata.OrganizationOrderField `json:"field"`
@@ -925,6 +948,14 @@ type RequestSignaturePayload struct {
 	DocumentVersionSignatureEdge *DocumentVersionSignatureEdge `json:"documentVersionSignatureEdge"`
 }
 
+type RevokeTrustCenterAccessInput struct {
+	AccessID gid.GID `json:"accessId"`
+}
+
+type RevokeTrustCenterAccessPayload struct {
+	TrustCenterAccess *TrustCenterAccess `json:"trustCenterAccess"`
+}
+
 type Risk struct {
 	ID                 gid.GID                `json:"id"`
 	Name               string                 `json:"name"`
@@ -996,15 +1027,53 @@ type TaskEdge struct {
 }
 
 type TrustCenter struct {
-	ID        gid.GID   `json:"id"`
-	Active    bool      `json:"active"`
-	Slug      string    `json:"slug"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID           gid.GID                      `json:"id"`
+	Active       bool                         `json:"active"`
+	Slug         string                       `json:"slug"`
+	CreatedAt    time.Time                    `json:"createdAt"`
+	UpdatedAt    time.Time                    `json:"updatedAt"`
+	Organization *Organization                `json:"organization"`
+	Accesses     *TrustCenterAccessConnection `json:"accesses"`
 }
 
 func (TrustCenter) IsNode()             {}
 func (this TrustCenter) GetID() gid.GID { return this.ID }
+
+type TrustCenterAccess struct {
+	ID        gid.GID   `json:"id"`
+	Email     string    `json:"email"`
+	Name      string    `json:"name"`
+	Active    bool      `json:"active"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+func (TrustCenterAccess) IsNode()             {}
+func (this TrustCenterAccess) GetID() gid.GID { return this.ID }
+
+type TrustCenterAccessConnection struct {
+	Edges    []*TrustCenterAccessEdge `json:"edges"`
+	PageInfo *PageInfo                `json:"pageInfo"`
+}
+
+type TrustCenterAccessEdge struct {
+	Cursor page.CursorKey     `json:"cursor"`
+	Node   *TrustCenterAccess `json:"node"`
+}
+
+type TrustCenterConnection struct {
+	Edges    []*TrustCenterEdge `json:"edges"`
+	PageInfo *PageInfo          `json:"pageInfo"`
+}
+
+type TrustCenterEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *TrustCenter   `json:"node"`
+}
+
+type TrustCenterFilter struct {
+	Slug *string `json:"slug,omitempty"`
+}
 
 type UnassignTaskInput struct {
 	TaskID gid.GID `json:"taskId"`
@@ -1165,6 +1234,18 @@ type UpdateTaskInput struct {
 
 type UpdateTaskPayload struct {
 	Task *Task `json:"task"`
+}
+
+type UpdateTrustCenterAccessInput struct {
+	AccessID  gid.GID `json:"accessId"`
+	Email     *string `json:"email,omitempty"`
+	Name      *string `json:"name,omitempty"`
+	Active    *bool   `json:"active,omitempty"`
+	SendEmail bool    `json:"sendEmail"`
+}
+
+type UpdateTrustCenterAccessPayload struct {
+	TrustCenterAccess *TrustCenterAccess `json:"trustCenterAccess"`
 }
 
 type UpdateTrustCenterInput struct {

@@ -20,7 +20,8 @@ import (
 
 type (
 	DocumentFilter struct {
-		query *string
+		query             *string
+		showOnTrustCenter *bool
 	}
 )
 
@@ -30,21 +31,52 @@ func NewDocumentFilter(query *string) *DocumentFilter {
 	}
 }
 
-func (f *DocumentFilter) SQLArguments() pgx.NamedArgs {
-	return pgx.NamedArgs{
-		"query": f.query,
+func NewDocumentTrustCenterFilter() *DocumentFilter {
+	showOnTrustCenter := true
+	return &DocumentFilter{
+		showOnTrustCenter: &showOnTrustCenter,
 	}
 }
 
-func (f *DocumentFilter) SQLFragment() string {
-	if f.query == nil || *f.query == "" {
-		return "TRUE"
+func (f *DocumentFilter) SQLArguments() pgx.NamedArgs {
+	args := pgx.NamedArgs{}
+
+	if f.query != nil {
+		args["query"] = *f.query
+	}
+	if f.showOnTrustCenter != nil {
+		args["show_on_trust_center"] = *f.showOnTrustCenter
 	}
 
-	return `
+	return args
+}
+
+func (f *DocumentFilter) SQLFragment() string {
+	conditions := []string{}
+
+	if f.query != nil && *f.query != "" {
+		conditions = append(conditions, `
 		search_vector @@ (
 			SELECT to_tsquery('simple', string_agg(lexeme || ':*', ' & '))
 			FROM unnest(regexp_split_to_array(trim(@query), '\s+')) AS lexeme
-		)
-	`
+		)`)
+	}
+
+	if f.showOnTrustCenter != nil {
+		conditions = append(conditions, "show_on_trust_center = @show_on_trust_center")
+	}
+
+	if len(conditions) == 0 {
+		return "TRUE"
+	}
+
+	result := ""
+	for i, condition := range conditions {
+		if i > 0 {
+			result += " AND "
+		}
+		result += condition
+	}
+
+	return result
 }

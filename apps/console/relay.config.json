@@ -3,5 +3,8 @@
   "schema": "../../pkg/server/api/console/v1/schema.graphql",
   "language": "typescript",
   "eagerEsModules": true,
-  "noFutureProofEnums": true
+  "noFutureProofEnums": true,
+  "excludes": [
+    "**/PublicTrustCenterGraph.ts"
+  ]
 }

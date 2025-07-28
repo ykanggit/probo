@@ -1,0 +1,29 @@
+schema: ["schema.graphql"]
+
+exec:
+  filename: "schema/schema.go"
+  package: "schema"
+
+model:
+  filename: "types/types.go"
+  package: "types"
+
+resolver:
+  layout: "follow-schema"
+  dir: "."
+  package: "trust_v1"
+  filename_template: "v1_resolver.go"
+
+autobind: []
+call_argument_directives_with_null: true
+
+models:
+  ID:
+    model:
+      - "github.com/getprobo/probo/pkg/server/api/trust/v1/types.GIDScalar"
+  Datetime:
+    model:
+      - "github.com/99designs/gqlgen/graphql.Time"
+  CursorKey:
+    model:
+      - "github.com/getprobo/probo/pkg/server/api/trust/v1/types.CursorKeyScalar"

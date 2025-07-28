@@ -18,10 +18,14 @@ import (
 	"errors"
 	"net/http"
 
+	"time"
+
 	"github.com/getprobo/probo/pkg/connector"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/saferedirect"
 	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
+	trust_v1 "github.com/getprobo/probo/pkg/server/api/trust/v1"
+	"github.com/getprobo/probo/pkg/trust"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -30,11 +34,19 @@ import (
 )
 
 type (
+	AuthConfig struct {
+		CookieName      string
+		CookieDomain    string
+		SessionDuration time.Duration
+		CookieSecret    string
+	}
+
 	Config struct {
 		AllowedOrigins    []string
 		Probo             *probo.Service
 		Usrmgr            *usrmgr.Service
-		Auth              console_v1.AuthConfig
+		Trust             *trust.Service
+		Auth              AuthConfig
 		ConnectorRegistry *connector.ConnectorRegistry
 		SafeRedirect      *saferedirect.SafeRedirect
 		Logger            *log.Logger
@@ -122,9 +134,30 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			s.cfg.Logger.Named("console.v1"),
 			s.cfg.Probo,
 			s.cfg.Usrmgr,
-			s.cfg.Auth,
+			console_v1.AuthConfig{
+				CookieName:      s.cfg.Auth.CookieName,
+				CookieDomain:    s.cfg.Auth.CookieDomain,
+				SessionDuration: s.cfg.Auth.SessionDuration,
+				CookieSecret:    s.cfg.Auth.CookieSecret,
+			},
 			s.cfg.ConnectorRegistry,
 			s.cfg.SafeRedirect,
+		),
+	)
+
+	// Mount the trust API with authentication
+	router.Mount(
+		"/trust/v1",
+		trust_v1.NewMux(
+			s.cfg.Logger.Named("trust.v1"),
+			s.cfg.Usrmgr,
+			s.cfg.Trust,
+			trust_v1.AuthConfig{
+				CookieName:      s.cfg.Auth.CookieName,
+				CookieDomain:    s.cfg.Auth.CookieDomain,
+				SessionDuration: s.cfg.Auth.SessionDuration,
+				CookieSecret:    s.cfg.Auth.CookieSecret,
+			},
 		),
 	)
 

@@ -25,6 +25,7 @@ import (
 	"github.com/getprobo/probo/pkg/filevalidation"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/html2pdf"
+	"github.com/getprobo/probo/pkg/usrmgr"
 	"go.gearno.de/kit/pg"
 )
 
@@ -38,6 +39,7 @@ type (
 		tokenSecret       string
 		agentConfig       agents.Config
 		html2pdfConverter *html2pdf.Converter
+		usrmgr            *usrmgr.Service
 	}
 
 	TenantService struct {
@@ -66,6 +68,7 @@ type (
 		Audits                  *AuditService
 		Reports                 *ReportService
 		TrustCenters            *TrustCenterService
+		TrustCenterAccesses     *TrustCenterAccessService
 	}
 )
 
@@ -79,6 +82,7 @@ func NewService(
 	tokenSecret string,
 	agentConfig agents.Config,
 	html2pdfConverter *html2pdf.Converter,
+	usrmgrService *usrmgr.Service,
 ) (*Service, error) {
 	if bucket == "" {
 		return nil, fmt.Errorf("bucket is required")
@@ -93,9 +97,14 @@ func NewService(
 		tokenSecret:       tokenSecret,
 		agentConfig:       agentConfig,
 		html2pdfConverter: html2pdfConverter,
+		usrmgr:            usrmgrService,
 	}
 
 	return svc, nil
+}
+
+func (s *Service) GetEncryptionKey() cipher.EncryptionKey {
+	return s.encryptionKey
 }
 
 func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
@@ -146,5 +155,9 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.Audits = &AuditService{svc: tenantService}
 	tenantService.Reports = &ReportService{svc: tenantService}
 	tenantService.TrustCenters = &TrustCenterService{svc: tenantService}
+	tenantService.TrustCenterAccesses = &TrustCenterAccessService{
+		svc:    tenantService,
+		usrmgr: s.usrmgr,
+	}
 	return tenantService
 }

@@ -35,7 +35,8 @@ import (
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/saferedirect"
 	"github.com/getprobo/probo/pkg/server"
-	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
+	"github.com/getprobo/probo/pkg/server/api"
+	"github.com/getprobo/probo/pkg/trust"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.gearno.de/kit/httpclient"
@@ -226,10 +227,21 @@ func (impl *Implm) Run(
 		impl.cfg.Auth.Cookie.Secret,
 		agentConfig,
 		html2pdfConverter,
+		usrmgrService,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot create probo service: %w", err)
 	}
+
+	trustService := trust.NewService(
+		pgClient,
+		s3Client,
+		impl.cfg.AWS.Bucket,
+		impl.cfg.EncryptionKey,
+		impl.cfg.Auth.Cookie.Secret,
+		usrmgrService,
+		html2pdfConverter,
+	)
 
 	serverHandler, err := server.NewServer(
 		server.Config{
@@ -237,11 +249,12 @@ func (impl *Implm) Run(
 			ExtraHeaderFields: impl.cfg.Api.ExtraHeaderFields,
 			Probo:             proboService,
 			Usrmgr:            usrmgrService,
+			Trust:             trustService,
 			ConnectorRegistry: defaultConnectorRegistry,
 			Agent:             agent,
 			SafeRedirect:      &saferedirect.SafeRedirect{AllowedHost: impl.cfg.Hostname},
 			Logger:            l.Named("http.server"),
-			Auth: console_v1.AuthConfig{
+			Auth: api.AuthConfig{
 				CookieName:      impl.cfg.Auth.Cookie.Name,
 				CookieDomain:    impl.cfg.Auth.Cookie.Domain,
 				SessionDuration: time.Duration(impl.cfg.Auth.Cookie.Duration) * time.Hour,

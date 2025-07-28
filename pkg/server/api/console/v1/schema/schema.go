@@ -69,6 +69,7 @@ type ResolverRoot interface {
 	RiskConnection() RiskConnectionResolver
 	Task() TaskResolver
 	TaskConnection() TaskConnectionResolver
+	TrustCenter() TrustCenterResolver
 	User() UserResolver
 	Vendor() VendorResolver
 	VendorComplianceReport() VendorComplianceReportResolver
@@ -272,6 +273,10 @@ type ComplexityRoot struct {
 		TaskEdge func(childComplexity int) int
 	}
 
+	CreateTrustCenterAccessPayload struct {
+		TrustCenterAccessEdge func(childComplexity int) int
+	}
+
 	CreateVendorPayload struct {
 		VendorEdge func(childComplexity int) int
 	}
@@ -368,6 +373,10 @@ type ComplexityRoot struct {
 
 	DeleteTaskPayload struct {
 		DeletedTaskID func(childComplexity int) int
+	}
+
+	DeleteTrustCenterAccessPayload struct {
+		DeletedTrustCenterAccessID func(childComplexity int) int
 	}
 
 	DeleteVendorComplianceReportPayload struct {
@@ -576,6 +585,7 @@ type ComplexityRoot struct {
 		CreateRiskDocumentMapping             func(childComplexity int, input types.CreateRiskDocumentMappingInput) int
 		CreateRiskMeasureMapping              func(childComplexity int, input types.CreateRiskMeasureMappingInput) int
 		CreateTask                            func(childComplexity int, input types.CreateTaskInput) int
+		CreateTrustCenterAccess               func(childComplexity int, input types.CreateTrustCenterAccessInput) int
 		CreateVendor                          func(childComplexity int, input types.CreateVendorInput) int
 		CreateVendorRiskAssessment            func(childComplexity int, input types.CreateVendorRiskAssessmentInput) int
 		DeleteAsset                           func(childComplexity int, input types.DeleteAssetInput) int
@@ -594,6 +604,7 @@ type ComplexityRoot struct {
 		DeleteRiskDocumentMapping             func(childComplexity int, input types.DeleteRiskDocumentMappingInput) int
 		DeleteRiskMeasureMapping              func(childComplexity int, input types.DeleteRiskMeasureMappingInput) int
 		DeleteTask                            func(childComplexity int, input types.DeleteTaskInput) int
+		DeleteTrustCenterAccess               func(childComplexity int, input types.DeleteTrustCenterAccessInput) int
 		DeleteVendor                          func(childComplexity int, input types.DeleteVendorInput) int
 		DeleteVendorComplianceReport          func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
 		ExportDocumentVersionPDF              func(childComplexity int, input types.ExportDocumentVersionPDFInput) int
@@ -607,6 +618,7 @@ type ComplexityRoot struct {
 		RemoveUser                            func(childComplexity int, input types.RemoveUserInput) int
 		RequestEvidence                       func(childComplexity int, input types.RequestEvidenceInput) int
 		RequestSignature                      func(childComplexity int, input types.RequestSignatureInput) int
+		RevokeTrustCenterAccess               func(childComplexity int, input types.RevokeTrustCenterAccessInput) int
 		SendSigningNotifications              func(childComplexity int, input types.SendSigningNotificationsInput) int
 		UnassignTask                          func(childComplexity int, input types.UnassignTaskInput) int
 		UpdateAsset                           func(childComplexity int, input types.UpdateAssetInput) int
@@ -622,6 +634,7 @@ type ComplexityRoot struct {
 		UpdateRisk                            func(childComplexity int, input types.UpdateRiskInput) int
 		UpdateTask                            func(childComplexity int, input types.UpdateTaskInput) int
 		UpdateTrustCenter                     func(childComplexity int, input types.UpdateTrustCenterInput) int
+		UpdateTrustCenterAccess               func(childComplexity int, input types.UpdateTrustCenterAccessInput) int
 		UpdateVendor                          func(childComplexity int, input types.UpdateVendorInput) int
 		UploadAuditReport                     func(childComplexity int, input types.UploadAuditReportInput) int
 		UploadMeasureEvidence                 func(childComplexity int, input types.UploadMeasureEvidenceInput) int
@@ -698,8 +711,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Node   func(childComplexity int, id gid.GID) int
-		Viewer func(childComplexity int) int
+		Node         func(childComplexity int, id gid.GID) int
+		TrustCenters func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, filter *types.TrustCenterFilter) int
+		Viewer       func(childComplexity int) int
 	}
 
 	RemoveUserPayload struct {
@@ -723,6 +737,10 @@ type ComplexityRoot struct {
 
 	RequestSignaturePayload struct {
 		DocumentVersionSignatureEdge func(childComplexity int) int
+	}
+
+	RevokeTrustCenterAccessPayload struct {
+		TrustCenterAccess func(childComplexity int) int
 	}
 
 	Risk struct {
@@ -794,11 +812,42 @@ type ComplexityRoot struct {
 	}
 
 	TrustCenter struct {
+		Accesses     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrderBy[coredata.TrustCenterAccessOrderField]) int
+		Active       func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Organization func(childComplexity int) int
+		Slug         func(childComplexity int) int
+		UpdatedAt    func(childComplexity int) int
+	}
+
+	TrustCenterAccess struct {
 		Active    func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
+		Email     func(childComplexity int) int
 		ID        func(childComplexity int) int
-		Slug      func(childComplexity int) int
+		Name      func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
+	}
+
+	TrustCenterAccessConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	TrustCenterAccessEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	TrustCenterConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	TrustCenterEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	UnassignTaskPayload struct {
@@ -851,6 +900,10 @@ type ComplexityRoot struct {
 
 	UpdateTaskPayload struct {
 		Task func(childComplexity int) int
+	}
+
+	UpdateTrustCenterAccessPayload struct {
+		TrustCenterAccess func(childComplexity int) int
 	}
 
 	UpdateTrustCenterPayload struct {
@@ -982,7 +1035,7 @@ type ComplexityRoot struct {
 
 	Viewer struct {
 		ID            func(childComplexity int) int
-		Organizations func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder) int
+		Organizations func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder, filter *types.OrganizationFilter) int
 		User          func(childComplexity int) int
 	}
 }
@@ -1076,6 +1129,10 @@ type MutationResolver interface {
 	CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error)
 	UpdateOrganization(ctx context.Context, input types.UpdateOrganizationInput) (*types.UpdateOrganizationPayload, error)
 	UpdateTrustCenter(ctx context.Context, input types.UpdateTrustCenterInput) (*types.UpdateTrustCenterPayload, error)
+	RevokeTrustCenterAccess(ctx context.Context, input types.RevokeTrustCenterAccessInput) (*types.RevokeTrustCenterAccessPayload, error)
+	CreateTrustCenterAccess(ctx context.Context, input types.CreateTrustCenterAccessInput) (*types.CreateTrustCenterAccessPayload, error)
+	UpdateTrustCenterAccess(ctx context.Context, input types.UpdateTrustCenterAccessInput) (*types.UpdateTrustCenterAccessPayload, error)
+	DeleteTrustCenterAccess(ctx context.Context, input types.DeleteTrustCenterAccessInput) (*types.DeleteTrustCenterAccessPayload, error)
 	ConfirmEmail(ctx context.Context, input types.ConfirmEmailInput) (*types.ConfirmEmailPayload, error)
 	InviteUser(ctx context.Context, input types.InviteUserInput) (*types.InviteUserPayload, error)
 	RemoveUser(ctx context.Context, input types.RemoveUserInput) (*types.RemoveUserPayload, error)
@@ -1170,6 +1227,7 @@ type PeopleConnectionResolver interface {
 type QueryResolver interface {
 	Node(ctx context.Context, id gid.GID) (types.Node, error)
 	Viewer(ctx context.Context) (*types.Viewer, error)
+	TrustCenters(ctx context.Context, first *int, after *page.CursorKey, last *int, before *page.CursorKey, filter *types.TrustCenterFilter) (*types.TrustCenterConnection, error)
 }
 type ReportResolver interface {
 	DownloadURL(ctx context.Context, obj *types.Report) (*string, error)
@@ -1192,6 +1250,10 @@ type TaskResolver interface {
 }
 type TaskConnectionResolver interface {
 	TotalCount(ctx context.Context, obj *types.TaskConnection) (int, error)
+}
+type TrustCenterResolver interface {
+	Organization(ctx context.Context, obj *types.TrustCenter) (*types.Organization, error)
+	Accesses(ctx context.Context, obj *types.TrustCenter, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrderBy[coredata.TrustCenterAccessOrderField]) (*types.TrustCenterAccessConnection, error)
 }
 type UserResolver interface {
 	People(ctx context.Context, obj *types.User, organizationID gid.GID) (*types.People, error)
@@ -1217,7 +1279,7 @@ type VendorRiskAssessmentResolver interface {
 	AssessedBy(ctx context.Context, obj *types.VendorRiskAssessment) (*types.People, error)
 }
 type ViewerResolver interface {
-	Organizations(ctx context.Context, obj *types.Viewer, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder) (*types.OrganizationConnection, error)
+	Organizations(ctx context.Context, obj *types.Viewer, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.OrganizationOrder, filter *types.OrganizationFilter) (*types.OrganizationConnection, error)
 }
 
 type executableSchema struct {
@@ -1856,6 +1918,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.CreateTaskPayload.TaskEdge(childComplexity), true
 
+	case "CreateTrustCenterAccessPayload.trustCenterAccessEdge":
+		if e.complexity.CreateTrustCenterAccessPayload.TrustCenterAccessEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateTrustCenterAccessPayload.TrustCenterAccessEdge(childComplexity), true
+
 	case "CreateVendorPayload.vendorEdge":
 		if e.complexity.CreateVendorPayload.VendorEdge == nil {
 			break
@@ -2105,6 +2174,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.DeleteTaskPayload.DeletedTaskID(childComplexity), true
+
+	case "DeleteTrustCenterAccessPayload.deletedTrustCenterAccessId":
+		if e.complexity.DeleteTrustCenterAccessPayload.DeletedTrustCenterAccessID == nil {
+			break
+		}
+
+		return e.complexity.DeleteTrustCenterAccessPayload.DeletedTrustCenterAccessID(childComplexity), true
 
 	case "DeleteVendorComplianceReportPayload.deletedVendorComplianceReportId":
 		if e.complexity.DeleteVendorComplianceReportPayload.DeletedVendorComplianceReportID == nil {
@@ -3124,6 +3200,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.CreateTask(childComplexity, args["input"].(types.CreateTaskInput)), true
 
+	case "Mutation.createTrustCenterAccess":
+		if e.complexity.Mutation.CreateTrustCenterAccess == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTrustCenterAccess_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateTrustCenterAccess(childComplexity, args["input"].(types.CreateTrustCenterAccessInput)), true
+
 	case "Mutation.createVendor":
 		if e.complexity.Mutation.CreateVendor == nil {
 			break
@@ -3340,6 +3428,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.DeleteTask(childComplexity, args["input"].(types.DeleteTaskInput)), true
 
+	case "Mutation.deleteTrustCenterAccess":
+		if e.complexity.Mutation.DeleteTrustCenterAccess == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteTrustCenterAccess_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteTrustCenterAccess(childComplexity, args["input"].(types.DeleteTrustCenterAccessInput)), true
+
 	case "Mutation.deleteVendor":
 		if e.complexity.Mutation.DeleteVendor == nil {
 			break
@@ -3495,6 +3595,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.RequestSignature(childComplexity, args["input"].(types.RequestSignatureInput)), true
+
+	case "Mutation.revokeTrustCenterAccess":
+		if e.complexity.Mutation.RevokeTrustCenterAccess == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_revokeTrustCenterAccess_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RevokeTrustCenterAccess(childComplexity, args["input"].(types.RevokeTrustCenterAccessInput)), true
 
 	case "Mutation.sendSigningNotifications":
 		if e.complexity.Mutation.SendSigningNotifications == nil {
@@ -3675,6 +3787,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateTrustCenter(childComplexity, args["input"].(types.UpdateTrustCenterInput)), true
+
+	case "Mutation.updateTrustCenterAccess":
+		if e.complexity.Mutation.UpdateTrustCenterAccess == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateTrustCenterAccess_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateTrustCenterAccess(childComplexity, args["input"].(types.UpdateTrustCenterAccessInput)), true
 
 	case "Mutation.updateVendor":
 		if e.complexity.Mutation.UpdateVendor == nil {
@@ -4121,6 +4245,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.Node(childComplexity, args["id"].(gid.GID)), true
 
+	case "Query.trustCenters":
+		if e.complexity.Query.TrustCenters == nil {
+			break
+		}
+
+		args, err := ec.field_Query_trustCenters_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TrustCenters(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["filter"].(*types.TrustCenterFilter)), true
+
 	case "Query.viewer":
 		if e.complexity.Query.Viewer == nil {
 			break
@@ -4204,6 +4340,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.RequestSignaturePayload.DocumentVersionSignatureEdge(childComplexity), true
+
+	case "RevokeTrustCenterAccessPayload.trustCenterAccess":
+		if e.complexity.RevokeTrustCenterAccessPayload.TrustCenterAccess == nil {
+			break
+		}
+
+		return e.complexity.RevokeTrustCenterAccessPayload.TrustCenterAccess(childComplexity), true
 
 	case "Risk.category":
 		if e.complexity.Risk.Category == nil {
@@ -4533,6 +4676,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.TaskEdge.Node(childComplexity), true
 
+	case "TrustCenter.accesses":
+		if e.complexity.TrustCenter.Accesses == nil {
+			break
+		}
+
+		args, err := ec.field_TrustCenter_accesses_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.TrustCenter.Accesses(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.OrderBy[coredata.TrustCenterAccessOrderField])), true
+
 	case "TrustCenter.active":
 		if e.complexity.TrustCenter.Active == nil {
 			break
@@ -4554,6 +4709,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.TrustCenter.ID(childComplexity), true
 
+	case "TrustCenter.organization":
+		if e.complexity.TrustCenter.Organization == nil {
+			break
+		}
+
+		return e.complexity.TrustCenter.Organization(childComplexity), true
+
 	case "TrustCenter.slug":
 		if e.complexity.TrustCenter.Slug == nil {
 			break
@@ -4567,6 +4729,104 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.TrustCenter.UpdatedAt(childComplexity), true
+
+	case "TrustCenterAccess.active":
+		if e.complexity.TrustCenterAccess.Active == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterAccess.Active(childComplexity), true
+
+	case "TrustCenterAccess.createdAt":
+		if e.complexity.TrustCenterAccess.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterAccess.CreatedAt(childComplexity), true
+
+	case "TrustCenterAccess.email":
+		if e.complexity.TrustCenterAccess.Email == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterAccess.Email(childComplexity), true
+
+	case "TrustCenterAccess.id":
+		if e.complexity.TrustCenterAccess.ID == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterAccess.ID(childComplexity), true
+
+	case "TrustCenterAccess.name":
+		if e.complexity.TrustCenterAccess.Name == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterAccess.Name(childComplexity), true
+
+	case "TrustCenterAccess.updatedAt":
+		if e.complexity.TrustCenterAccess.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterAccess.UpdatedAt(childComplexity), true
+
+	case "TrustCenterAccessConnection.edges":
+		if e.complexity.TrustCenterAccessConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterAccessConnection.Edges(childComplexity), true
+
+	case "TrustCenterAccessConnection.pageInfo":
+		if e.complexity.TrustCenterAccessConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterAccessConnection.PageInfo(childComplexity), true
+
+	case "TrustCenterAccessEdge.cursor":
+		if e.complexity.TrustCenterAccessEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterAccessEdge.Cursor(childComplexity), true
+
+	case "TrustCenterAccessEdge.node":
+		if e.complexity.TrustCenterAccessEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterAccessEdge.Node(childComplexity), true
+
+	case "TrustCenterConnection.edges":
+		if e.complexity.TrustCenterConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterConnection.Edges(childComplexity), true
+
+	case "TrustCenterConnection.pageInfo":
+		if e.complexity.TrustCenterConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterConnection.PageInfo(childComplexity), true
+
+	case "TrustCenterEdge.cursor":
+		if e.complexity.TrustCenterEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterEdge.Cursor(childComplexity), true
+
+	case "TrustCenterEdge.node":
+		if e.complexity.TrustCenterEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.TrustCenterEdge.Node(childComplexity), true
 
 	case "UnassignTaskPayload.task":
 		if e.complexity.UnassignTaskPayload.Task == nil {
@@ -4658,6 +4918,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.UpdateTaskPayload.Task(childComplexity), true
+
+	case "UpdateTrustCenterAccessPayload.trustCenterAccess":
+		if e.complexity.UpdateTrustCenterAccessPayload.TrustCenterAccess == nil {
+			break
+		}
+
+		return e.complexity.UpdateTrustCenterAccessPayload.TrustCenterAccess(childComplexity), true
 
 	case "UpdateTrustCenterPayload.trustCenter":
 		if e.complexity.UpdateTrustCenterPayload.TrustCenter == nil {
@@ -5202,7 +5469,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Viewer.Organizations(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.OrganizationOrder)), true
+		return e.complexity.Viewer.Organizations(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.OrganizationOrder), args["filter"].(*types.OrganizationFilter)), true
 
 	case "Viewer.user":
 		if e.complexity.Viewer.User == nil {
@@ -5247,6 +5514,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateRiskInput,
 		ec.unmarshalInputCreateRiskMeasureMappingInput,
 		ec.unmarshalInputCreateTaskInput,
+		ec.unmarshalInputCreateTrustCenterAccessInput,
 		ec.unmarshalInputCreateVendorInput,
 		ec.unmarshalInputCreateVendorRiskAssessmentInput,
 		ec.unmarshalInputDatumOrder,
@@ -5266,6 +5534,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeleteRiskInput,
 		ec.unmarshalInputDeleteRiskMeasureMappingInput,
 		ec.unmarshalInputDeleteTaskInput,
+		ec.unmarshalInputDeleteTrustCenterAccessInput,
 		ec.unmarshalInputDeleteVendorComplianceReportInput,
 		ec.unmarshalInputDeleteVendorInput,
 		ec.unmarshalInputDocumentFilter,
@@ -5284,16 +5553,20 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputInviteUserInput,
 		ec.unmarshalInputMeasureFilter,
 		ec.unmarshalInputMeasureOrder,
+		ec.unmarshalInputOrganizationFilter,
 		ec.unmarshalInputOrganizationOrder,
 		ec.unmarshalInputPeopleOrder,
 		ec.unmarshalInputPublishDocumentVersionInput,
 		ec.unmarshalInputRemoveUserInput,
 		ec.unmarshalInputRequestEvidenceInput,
 		ec.unmarshalInputRequestSignatureInput,
+		ec.unmarshalInputRevokeTrustCenterAccessInput,
 		ec.unmarshalInputRiskFilter,
 		ec.unmarshalInputRiskOrder,
 		ec.unmarshalInputSendSigningNotificationsInput,
 		ec.unmarshalInputTaskOrder,
+		ec.unmarshalInputTrustCenterAccessOrder,
+		ec.unmarshalInputTrustCenterFilter,
 		ec.unmarshalInputUnassignTaskInput,
 		ec.unmarshalInputUpdateAssetInput,
 		ec.unmarshalInputUpdateAuditInput,
@@ -5307,6 +5580,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdatePeopleInput,
 		ec.unmarshalInputUpdateRiskInput,
 		ec.unmarshalInputUpdateTaskInput,
+		ec.unmarshalInputUpdateTrustCenterAccessInput,
 		ec.unmarshalInputUpdateTrustCenterInput,
 		ec.unmarshalInputUpdateVendorInput,
 		ec.unmarshalInputUploadAuditReportInput,
@@ -5982,6 +6256,14 @@ enum AuditOrderField
     )
 }
 
+enum TrustCenterAccessOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.TrustCenterAccessOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.TrustCenterAccessOrderFieldCreatedAt"
+    )
+}
+
 # Input Types
 input UserOrder
   @goModel(
@@ -6063,6 +6345,14 @@ input AuditOrder
   field: AuditOrderField!
 }
 
+input TrustCenterAccessOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.TrustCenterAccessOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: TrustCenterAccessOrderField!
+}
+
 input EvidenceOrder
   @goModel(
     model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.EvidenceOrderBy"
@@ -6118,6 +6408,14 @@ input RiskFilter {
   query: String
 }
 
+input OrganizationFilter {
+  trustCenterSlug: String
+}
+
+input TrustCenterFilter {
+  slug: String
+}
+
 # Core Types
 type TrustCenter implements Node {
   id: ID!
@@ -6125,6 +6423,15 @@ type TrustCenter implements Node {
   slug: String!
   createdAt: Datetime!
   updatedAt: Datetime!
+  organization: Organization! @goField(forceResolver: true)
+
+  accesses(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: TrustCenterAccessOrder
+  ): TrustCenterAccessConnection! @goField(forceResolver: true)
 }
 
 type Organization implements Node {
@@ -6593,6 +6900,7 @@ type Viewer {
     last: Int
     before: CursorKey
     orderBy: OrganizationOrder
+    filter: OrganizationFilter
   ): OrganizationConnection! @goField(forceResolver: true)
 }
 
@@ -6605,6 +6913,35 @@ type OrganizationConnection {
 type OrganizationEdge {
   cursor: CursorKey!
   node: Organization!
+}
+
+type TrustCenterConnection {
+  edges: [TrustCenterEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TrustCenterEdge {
+  cursor: CursorKey!
+  node: TrustCenter!
+}
+
+type TrustCenterAccess implements Node {
+  id: ID!
+  email: String!
+  name: String!
+  active: Boolean!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type TrustCenterAccessConnection {
+  edges: [TrustCenterAccessEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TrustCenterAccessEdge {
+  cursor: CursorKey!
+  node: TrustCenterAccess!
 }
 
 type UserConnection {
@@ -6815,6 +7152,13 @@ type AuditEdge {
 type Query {
   node(id: ID!): Node!
   viewer: Viewer!
+  trustCenters(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    filter: TrustCenterFilter
+  ): TrustCenterConnection! @goField(forceResolver: true)
 }
 
 type Mutation {
@@ -6829,6 +7173,24 @@ type Mutation {
   updateTrustCenter(
     input: UpdateTrustCenterInput!
   ): UpdateTrustCenterPayload!
+
+
+  revokeTrustCenterAccess(
+    input: RevokeTrustCenterAccessInput!
+  ): RevokeTrustCenterAccessPayload!
+
+  # Trust Center Access CRUD mutations
+  createTrustCenterAccess(
+    input: CreateTrustCenterAccessInput!
+  ): CreateTrustCenterAccessPayload!
+
+  updateTrustCenterAccess(
+    input: UpdateTrustCenterAccessInput!
+  ): UpdateTrustCenterAccessPayload!
+
+  deleteTrustCenterAccess(
+    input: DeleteTrustCenterAccessInput!
+  ): DeleteTrustCenterAccessPayload!
 
   # User mutations
   confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
@@ -7000,6 +7362,31 @@ input UpdateTrustCenterInput {
   trustCenterId: ID!
   active: Boolean
   slug: String
+}
+
+
+
+input RevokeTrustCenterAccessInput {
+  accessId: ID!
+}
+
+input CreateTrustCenterAccessInput {
+  trustCenterId: ID!
+  email: String!
+  name: String!
+  sendEmail: Boolean! = true
+}
+
+input UpdateTrustCenterAccessInput {
+  accessId: ID!
+  email: String
+  name: String
+  active: Boolean
+  sendEmail: Boolean! = false
+}
+
+input DeleteTrustCenterAccessInput {
+  accessId: ID!
 }
 
 input CreateVendorInput {
@@ -7365,6 +7752,24 @@ type UpdateOrganizationPayload {
 
 type UpdateTrustCenterPayload {
   trustCenter: TrustCenter!
+}
+
+
+
+type RevokeTrustCenterAccessPayload {
+  trustCenterAccess: TrustCenterAccess!
+}
+
+type CreateTrustCenterAccessPayload {
+  trustCenterAccessEdge: TrustCenterAccessEdge!
+}
+
+type UpdateTrustCenterAccessPayload {
+  trustCenterAccess: TrustCenterAccess!
+}
+
+type DeleteTrustCenterAccessPayload {
+  deletedTrustCenterAccessId: ID!
 }
 
 type CreateControlPayload {
@@ -9734,6 +10139,29 @@ func (ec *executionContext) field_Mutation_createTask_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_createTrustCenterAccess_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createTrustCenterAccess_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createTrustCenterAccess_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateTrustCenterAccessInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateTrustCenterAccessInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTrustCenterAccessInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateTrustCenterAccessInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_createVendorRiskAssessment_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -10148,6 +10576,29 @@ func (ec *executionContext) field_Mutation_deleteTask_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteTrustCenterAccess_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteTrustCenterAccess_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteTrustCenterAccess_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteTrustCenterAccessInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteTrustCenterAccessInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteTrustCenterAccessInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteTrustCenterAccessInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteVendorComplianceReport_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -10444,6 +10895,29 @@ func (ec *executionContext) field_Mutation_requestSignature_argsInput(
 	}
 
 	var zeroVal types.RequestSignatureInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_revokeTrustCenterAccess_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_revokeTrustCenterAccess_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_revokeTrustCenterAccess_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.RevokeTrustCenterAccessInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNRevokeTrustCenterAccessInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRevokeTrustCenterAccessInput(ctx, tmp)
+	}
+
+	var zeroVal types.RevokeTrustCenterAccessInput
 	return zeroVal, nil
 }
 
@@ -10766,6 +11240,29 @@ func (ec *executionContext) field_Mutation_updateTask_argsInput(
 	}
 
 	var zeroVal types.UpdateTaskInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTrustCenterAccess_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateTrustCenterAccess_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateTrustCenterAccess_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UpdateTrustCenterAccessInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdateTrustCenterAccessInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateTrustCenterAccessInput(ctx, tmp)
+	}
+
+	var zeroVal types.UpdateTrustCenterAccessInput
 	return zeroVal, nil
 }
 
@@ -12260,6 +12757,101 @@ func (ec *executionContext) field_Query_node_argsID(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Query_trustCenters_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_trustCenters_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Query_trustCenters_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Query_trustCenters_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Query_trustCenters_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Query_trustCenters_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_Query_trustCenters_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_trustCenters_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_trustCenters_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_trustCenters_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_trustCenters_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.TrustCenterFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOTrustCenterFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.TrustCenterFilter
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Risk_controls_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -12694,6 +13286,101 @@ func (ec *executionContext) field_Task_evidences_argsOrderBy(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_TrustCenter_accesses_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_TrustCenter_accesses_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_TrustCenter_accesses_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_TrustCenter_accesses_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_TrustCenter_accesses_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_TrustCenter_accesses_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_TrustCenter_accesses_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_TrustCenter_accesses_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_TrustCenter_accesses_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_TrustCenter_accesses_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_TrustCenter_accesses_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.OrderBy[coredata.TrustCenterAccessOrderField], error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOTrustCenterAccessOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.OrderBy[coredata.TrustCenterAccessOrderField]
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_User_people_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -12935,6 +13622,11 @@ func (ec *executionContext) field_Viewer_organizations_args(ctx context.Context,
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Viewer_organizations_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Viewer_organizations_argsFirst(
@@ -12999,6 +13691,19 @@ func (ec *executionContext) field_Viewer_organizations_argsOrderBy(
 	}
 
 	var zeroVal *types.OrganizationOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Viewer_organizations_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.OrganizationFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOOrganizationFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.OrganizationFilter
 	return zeroVal, nil
 }
 
@@ -17456,6 +18161,56 @@ func (ec *executionContext) fieldContext_CreateTaskPayload_taskEdge(_ context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _CreateTrustCenterAccessPayload_trustCenterAccessEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateTrustCenterAccessPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateTrustCenterAccessPayload_trustCenterAccessEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TrustCenterAccessEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TrustCenterAccessEdge)
+	fc.Result = res
+	return ec.marshalNTrustCenterAccessEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccessEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateTrustCenterAccessPayload_trustCenterAccessEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateTrustCenterAccessPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_TrustCenterAccessEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_TrustCenterAccessEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrustCenterAccessEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CreateVendorPayload_vendorEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateVendorPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CreateVendorPayload_vendorEdge(ctx, field)
 	if err != nil {
@@ -19137,6 +19892,50 @@ func (ec *executionContext) _DeleteTaskPayload_deletedTaskId(ctx context.Context
 func (ec *executionContext) fieldContext_DeleteTaskPayload_deletedTaskId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteTaskPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteTrustCenterAccessPayload_deletedTrustCenterAccessId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteTrustCenterAccessPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteTrustCenterAccessPayload_deletedTrustCenterAccessId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedTrustCenterAccessID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteTrustCenterAccessPayload_deletedTrustCenterAccessId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteTrustCenterAccessPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -24489,6 +25288,242 @@ func (ec *executionContext) fieldContext_Mutation_updateTrustCenter(ctx context.
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_revokeTrustCenterAccess(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_revokeTrustCenterAccess(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RevokeTrustCenterAccess(rctx, fc.Args["input"].(types.RevokeTrustCenterAccessInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.RevokeTrustCenterAccessPayload)
+	fc.Result = res
+	return ec.marshalNRevokeTrustCenterAccessPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRevokeTrustCenterAccessPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_revokeTrustCenterAccess(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "trustCenterAccess":
+				return ec.fieldContext_RevokeTrustCenterAccessPayload_trustCenterAccess(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type RevokeTrustCenterAccessPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_revokeTrustCenterAccess_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createTrustCenterAccess(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createTrustCenterAccess(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTrustCenterAccess(rctx, fc.Args["input"].(types.CreateTrustCenterAccessInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateTrustCenterAccessPayload)
+	fc.Result = res
+	return ec.marshalNCreateTrustCenterAccessPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTrustCenterAccessPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createTrustCenterAccess(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "trustCenterAccessEdge":
+				return ec.fieldContext_CreateTrustCenterAccessPayload_trustCenterAccessEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateTrustCenterAccessPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createTrustCenterAccess_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateTrustCenterAccess(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateTrustCenterAccess(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateTrustCenterAccess(rctx, fc.Args["input"].(types.UpdateTrustCenterAccessInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UpdateTrustCenterAccessPayload)
+	fc.Result = res
+	return ec.marshalNUpdateTrustCenterAccessPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateTrustCenterAccessPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateTrustCenterAccess(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "trustCenterAccess":
+				return ec.fieldContext_UpdateTrustCenterAccessPayload_trustCenterAccess(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateTrustCenterAccessPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateTrustCenterAccess_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteTrustCenterAccess(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteTrustCenterAccess(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteTrustCenterAccess(rctx, fc.Args["input"].(types.DeleteTrustCenterAccessInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteTrustCenterAccessPayload)
+	fc.Result = res
+	return ec.marshalNDeleteTrustCenterAccessPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteTrustCenterAccessPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteTrustCenterAccess(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedTrustCenterAccessId":
+				return ec.fieldContext_DeleteTrustCenterAccessPayload_deletedTrustCenterAccessId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteTrustCenterAccessPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteTrustCenterAccess_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_confirmEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_confirmEmail(ctx, field)
 	if err != nil {
@@ -29631,6 +30666,10 @@ func (ec *executionContext) fieldContext_Organization_trustCenter(_ context.Cont
 				return ec.fieldContext_TrustCenter_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_TrustCenter_updatedAt(ctx, field)
+			case "organization":
+				return ec.fieldContext_TrustCenter_organization(ctx, field)
+			case "accesses":
+				return ec.fieldContext_TrustCenter_accesses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TrustCenter", field.Name)
 		},
@@ -31066,6 +32105,67 @@ func (ec *executionContext) fieldContext_Query_viewer(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_trustCenters(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_trustCenters(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TrustCenters(rctx, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["filter"].(*types.TrustCenterFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TrustCenterConnection)
+	fc.Result = res
+	return ec.marshalNTrustCenterConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_trustCenters(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_TrustCenterConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_TrustCenterConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrustCenterConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_trustCenters_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -31685,6 +32785,64 @@ func (ec *executionContext) fieldContext_RequestSignaturePayload_documentVersion
 				return ec.fieldContext_DocumentVersionSignatureEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type DocumentVersionSignatureEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RevokeTrustCenterAccessPayload_trustCenterAccess(ctx context.Context, field graphql.CollectedField, obj *types.RevokeTrustCenterAccessPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RevokeTrustCenterAccessPayload_trustCenterAccess(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TrustCenterAccess, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TrustCenterAccess)
+	fc.Result = res
+	return ec.marshalNTrustCenterAccess2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccess(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_RevokeTrustCenterAccessPayload_trustCenterAccess(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RevokeTrustCenterAccessPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TrustCenterAccess_id(ctx, field)
+			case "email":
+				return ec.fieldContext_TrustCenterAccess_email(ctx, field)
+			case "name":
+				return ec.fieldContext_TrustCenterAccess_name(ctx, field)
+			case "active":
+				return ec.fieldContext_TrustCenterAccess_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_TrustCenterAccess_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_TrustCenterAccess_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrustCenterAccess", field.Name)
 		},
 	}
 	return fc, nil
@@ -34153,6 +35311,829 @@ func (ec *executionContext) fieldContext_TrustCenter_updatedAt(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _TrustCenter_organization(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenter) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenter_organization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.TrustCenter().Organization(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Organization)
+	fc.Result = res
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganization(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenter_organization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenter",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Organization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Organization_name(ctx, field)
+			case "logoUrl":
+				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "connectors":
+				return ec.fieldContext_Organization_connectors(ctx, field)
+			case "frameworks":
+				return ec.fieldContext_Organization_frameworks(ctx, field)
+			case "controls":
+				return ec.fieldContext_Organization_controls(ctx, field)
+			case "vendors":
+				return ec.fieldContext_Organization_vendors(ctx, field)
+			case "peoples":
+				return ec.fieldContext_Organization_peoples(ctx, field)
+			case "documents":
+				return ec.fieldContext_Organization_documents(ctx, field)
+			case "measures":
+				return ec.fieldContext_Organization_measures(ctx, field)
+			case "risks":
+				return ec.fieldContext_Organization_risks(ctx, field)
+			case "tasks":
+				return ec.fieldContext_Organization_tasks(ctx, field)
+			case "assets":
+				return ec.fieldContext_Organization_assets(ctx, field)
+			case "data":
+				return ec.fieldContext_Organization_data(ctx, field)
+			case "audits":
+				return ec.fieldContext_Organization_audits(ctx, field)
+			case "trustCenter":
+				return ec.fieldContext_Organization_trustCenter(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Organization_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Organization_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenter_accesses(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenter) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenter_accesses(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.TrustCenter().Accesses(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.OrderBy[coredata.TrustCenterAccessOrderField]))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TrustCenterAccessConnection)
+	fc.Result = res
+	return ec.marshalNTrustCenterAccessConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccessConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenter_accesses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenter",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_TrustCenterAccessConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_TrustCenterAccessConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrustCenterAccessConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_TrustCenter_accesses_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterAccess_id(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterAccess) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterAccess_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterAccess_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterAccess",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterAccess_email(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterAccess) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterAccess_email(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterAccess_email(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterAccess",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterAccess_name(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterAccess) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterAccess_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterAccess_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterAccess",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterAccess_active(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterAccess) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterAccess_active(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Active, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterAccess_active(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterAccess",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterAccess_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterAccess) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterAccess_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterAccess_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterAccess",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterAccess_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterAccess) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterAccess_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterAccess_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterAccess",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterAccessConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterAccessConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterAccessConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.TrustCenterAccessEdge)
+	fc.Result = res
+	return ec.marshalNTrustCenterAccessEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccessEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterAccessConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterAccessConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_TrustCenterAccessEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_TrustCenterAccessEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrustCenterAccessEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterAccessConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterAccessConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterAccessConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterAccessConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterAccessConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterAccessEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterAccessEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterAccessEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterAccessEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterAccessEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterAccessEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterAccessEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterAccessEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TrustCenterAccess)
+	fc.Result = res
+	return ec.marshalNTrustCenterAccess2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccess(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterAccessEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterAccessEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TrustCenterAccess_id(ctx, field)
+			case "email":
+				return ec.fieldContext_TrustCenterAccess_email(ctx, field)
+			case "name":
+				return ec.fieldContext_TrustCenterAccess_name(ctx, field)
+			case "active":
+				return ec.fieldContext_TrustCenterAccess_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_TrustCenterAccess_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_TrustCenterAccess_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrustCenterAccess", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.TrustCenterEdge)
+	fc.Result = res
+	return ec.marshalNTrustCenterEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_TrustCenterEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_TrustCenterEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrustCenterEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.TrustCenterEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrustCenterEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TrustCenter)
+	fc.Result = res
+	return ec.marshalNTrustCenter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenter(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TrustCenter_id(ctx, field)
+			case "active":
+				return ec.fieldContext_TrustCenter_active(ctx, field)
+			case "slug":
+				return ec.fieldContext_TrustCenter_slug(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_TrustCenter_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_TrustCenter_updatedAt(ctx, field)
+			case "organization":
+				return ec.fieldContext_TrustCenter_organization(ctx, field)
+			case "accesses":
+				return ec.fieldContext_TrustCenter_accesses(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrustCenter", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UnassignTaskPayload_task(ctx context.Context, field graphql.CollectedField, obj *types.UnassignTaskPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UnassignTaskPayload_task(ctx, field)
 	if err != nil {
@@ -35063,6 +37044,64 @@ func (ec *executionContext) fieldContext_UpdateTaskPayload_task(_ context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _UpdateTrustCenterAccessPayload_trustCenterAccess(ctx context.Context, field graphql.CollectedField, obj *types.UpdateTrustCenterAccessPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateTrustCenterAccessPayload_trustCenterAccess(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TrustCenterAccess, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.TrustCenterAccess)
+	fc.Result = res
+	return ec.marshalNTrustCenterAccess2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccess(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateTrustCenterAccessPayload_trustCenterAccess(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateTrustCenterAccessPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TrustCenterAccess_id(ctx, field)
+			case "email":
+				return ec.fieldContext_TrustCenterAccess_email(ctx, field)
+			case "name":
+				return ec.fieldContext_TrustCenterAccess_name(ctx, field)
+			case "active":
+				return ec.fieldContext_TrustCenterAccess_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_TrustCenterAccess_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_TrustCenterAccess_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrustCenterAccess", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateTrustCenterPayload_trustCenter(ctx context.Context, field graphql.CollectedField, obj *types.UpdateTrustCenterPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateTrustCenterPayload_trustCenter(ctx, field)
 	if err != nil {
@@ -35112,6 +37151,10 @@ func (ec *executionContext) fieldContext_UpdateTrustCenterPayload_trustCenter(_ 
 				return ec.fieldContext_TrustCenter_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_TrustCenter_updatedAt(ctx, field)
+			case "organization":
+				return ec.fieldContext_TrustCenter_organization(ctx, field)
+			case "accesses":
+				return ec.fieldContext_TrustCenter_accesses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TrustCenter", field.Name)
 		},
@@ -38892,7 +40935,7 @@ func (ec *executionContext) _Viewer_organizations(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Viewer().Organizations(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.OrganizationOrder))
+		return ec.resolvers.Viewer().Organizations(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.OrganizationOrder), fc.Args["filter"].(*types.OrganizationFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -42133,6 +44176,58 @@ func (ec *executionContext) unmarshalInputCreateTaskInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateTrustCenterAccessInput(ctx context.Context, obj any) (types.CreateTrustCenterAccessInput, error) {
+	var it types.CreateTrustCenterAccessInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["sendEmail"]; !present {
+		asMap["sendEmail"] = true
+	}
+
+	fieldsInOrder := [...]string{"trustCenterId", "email", "name", "sendEmail"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "trustCenterId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("trustCenterId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TrustCenterID = data
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "sendEmail":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sendEmail"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SendEmail = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context, obj any) (types.CreateVendorInput, error) {
 	var it types.CreateVendorInput
 	asMap := map[string]any{}
@@ -42842,6 +44937,33 @@ func (ec *executionContext) unmarshalInputDeleteTaskInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteTrustCenterAccessInput(ctx context.Context, obj any) (types.DeleteTrustCenterAccessInput, error) {
+	var it types.DeleteTrustCenterAccessInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"accessId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "accessId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AccessID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDeleteVendorComplianceReportInput(ctx context.Context, obj any) (types.DeleteVendorComplianceReportInput, error) {
 	var it types.DeleteVendorComplianceReportInput
 	asMap := map[string]any{}
@@ -43419,6 +45541,33 @@ func (ec *executionContext) unmarshalInputMeasureOrder(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputOrganizationFilter(ctx context.Context, obj any) (types.OrganizationFilter, error) {
+	var it types.OrganizationFilter
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"trustCenterSlug"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "trustCenterSlug":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("trustCenterSlug"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TrustCenterSlug = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputOrganizationOrder(ctx context.Context, obj any) (types.OrganizationOrder, error) {
 	var it types.OrganizationOrder
 	asMap := map[string]any{}
@@ -43637,6 +45786,33 @@ func (ec *executionContext) unmarshalInputRequestSignatureInput(ctx context.Cont
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputRevokeTrustCenterAccessInput(ctx context.Context, obj any) (types.RevokeTrustCenterAccessInput, error) {
+	var it types.RevokeTrustCenterAccessInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"accessId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "accessId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AccessID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRiskFilter(ctx context.Context, obj any) (types.RiskFilter, error) {
 	var it types.RiskFilter
 	asMap := map[string]any{}
@@ -43753,6 +45929,67 @@ func (ec *executionContext) unmarshalInputTaskOrder(ctx context.Context, obj any
 				return it, err
 			}
 			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputTrustCenterAccessOrder(ctx context.Context, obj any) (types.OrderBy[coredata.TrustCenterAccessOrderField], error) {
+	var it types.OrderBy[coredata.TrustCenterAccessOrderField]
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNTrustCenterAccessOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTrustCenterAccessOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputTrustCenterFilter(ctx context.Context, obj any) (types.TrustCenterFilter, error) {
+	var it types.TrustCenterFilter
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"slug"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "slug":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("slug"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Slug = data
 		}
 	}
 
@@ -44509,6 +46746,65 @@ func (ec *executionContext) unmarshalInputUpdateTaskInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateTrustCenterAccessInput(ctx context.Context, obj any) (types.UpdateTrustCenterAccessInput, error) {
+	var it types.UpdateTrustCenterAccessInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["sendEmail"]; !present {
+		asMap["sendEmail"] = false
+	}
+
+	fieldsInOrder := [...]string{"accessId", "email", "name", "active", "sendEmail"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "accessId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AccessID = data
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "active":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Active = data
+		case "sendEmail":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sendEmail"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SendEmail = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateTrustCenterInput(ctx context.Context, obj any) (types.UpdateTrustCenterInput, error) {
 	var it types.UpdateTrustCenterInput
 	asMap := map[string]any{}
@@ -45039,6 +47335,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._User(ctx, sel, obj)
+	case types.TrustCenterAccess:
+		return ec._TrustCenterAccess(ctx, sel, &obj)
+	case *types.TrustCenterAccess:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._TrustCenterAccess(ctx, sel, obj)
 	case types.TrustCenter:
 		return ec._TrustCenter(ctx, sel, &obj)
 	case *types.TrustCenter:
@@ -47206,6 +49509,45 @@ func (ec *executionContext) _CreateTaskPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var createTrustCenterAccessPayloadImplementors = []string{"CreateTrustCenterAccessPayload"}
+
+func (ec *executionContext) _CreateTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateTrustCenterAccessPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createTrustCenterAccessPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateTrustCenterAccessPayload")
+		case "trustCenterAccessEdge":
+			out.Values[i] = ec._CreateTrustCenterAccessPayload_trustCenterAccessEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createVendorPayloadImplementors = []string{"CreateVendorPayload"}
 
 func (ec *executionContext) _CreateVendorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateVendorPayload) graphql.Marshaler {
@@ -48193,6 +50535,45 @@ func (ec *executionContext) _DeleteTaskPayload(ctx context.Context, sel ast.Sele
 			out.Values[i] = graphql.MarshalString("DeleteTaskPayload")
 		case "deletedTaskId":
 			out.Values[i] = ec._DeleteTaskPayload_deletedTaskId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteTrustCenterAccessPayloadImplementors = []string{"DeleteTrustCenterAccessPayload"}
+
+func (ec *executionContext) _DeleteTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteTrustCenterAccessPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteTrustCenterAccessPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteTrustCenterAccessPayload")
+		case "deletedTrustCenterAccessId":
+			out.Values[i] = ec._DeleteTrustCenterAccessPayload_deletedTrustCenterAccessId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -50410,6 +52791,34 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "revokeTrustCenterAccess":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_revokeTrustCenterAccess(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createTrustCenterAccess":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createTrustCenterAccess(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateTrustCenterAccess":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateTrustCenterAccess(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteTrustCenterAccess":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteTrustCenterAccess(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "confirmEmail":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_confirmEmail(ctx, field)
@@ -51953,6 +54362,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "trustCenters":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_trustCenters(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -52177,6 +54608,45 @@ func (ec *executionContext) _RequestSignaturePayload(ctx context.Context, sel as
 			out.Values[i] = graphql.MarshalString("RequestSignaturePayload")
 		case "documentVersionSignatureEdge":
 			out.Values[i] = ec._RequestSignaturePayload_documentVersionSignatureEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var revokeTrustCenterAccessPayloadImplementors = []string{"RevokeTrustCenterAccessPayload"}
+
+func (ec *executionContext) _RevokeTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, obj *types.RevokeTrustCenterAccessPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, revokeTrustCenterAccessPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RevokeTrustCenterAccessPayload")
+		case "trustCenterAccess":
+			out.Values[i] = ec._RevokeTrustCenterAccessPayload_trustCenterAccess(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -53035,25 +55505,337 @@ func (ec *executionContext) _TrustCenter(ctx context.Context, sel ast.SelectionS
 		case "id":
 			out.Values[i] = ec._TrustCenter_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "active":
 			out.Values[i] = ec._TrustCenter_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "slug":
 			out.Values[i] = ec._TrustCenter_slug(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "createdAt":
 			out.Values[i] = ec._TrustCenter_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._TrustCenter_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "organization":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TrustCenter_organization(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "accesses":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TrustCenter_accesses(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var trustCenterAccessImplementors = []string{"TrustCenterAccess", "Node"}
+
+func (ec *executionContext) _TrustCenterAccess(ctx context.Context, sel ast.SelectionSet, obj *types.TrustCenterAccess) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trustCenterAccessImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TrustCenterAccess")
+		case "id":
+			out.Values[i] = ec._TrustCenterAccess_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "email":
+			out.Values[i] = ec._TrustCenterAccess_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._TrustCenterAccess_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "active":
+			out.Values[i] = ec._TrustCenterAccess_active(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._TrustCenterAccess_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._TrustCenterAccess_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var trustCenterAccessConnectionImplementors = []string{"TrustCenterAccessConnection"}
+
+func (ec *executionContext) _TrustCenterAccessConnection(ctx context.Context, sel ast.SelectionSet, obj *types.TrustCenterAccessConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trustCenterAccessConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TrustCenterAccessConnection")
+		case "edges":
+			out.Values[i] = ec._TrustCenterAccessConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._TrustCenterAccessConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var trustCenterAccessEdgeImplementors = []string{"TrustCenterAccessEdge"}
+
+func (ec *executionContext) _TrustCenterAccessEdge(ctx context.Context, sel ast.SelectionSet, obj *types.TrustCenterAccessEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trustCenterAccessEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TrustCenterAccessEdge")
+		case "cursor":
+			out.Values[i] = ec._TrustCenterAccessEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._TrustCenterAccessEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var trustCenterConnectionImplementors = []string{"TrustCenterConnection"}
+
+func (ec *executionContext) _TrustCenterConnection(ctx context.Context, sel ast.SelectionSet, obj *types.TrustCenterConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trustCenterConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TrustCenterConnection")
+		case "edges":
+			out.Values[i] = ec._TrustCenterConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._TrustCenterConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var trustCenterEdgeImplementors = []string{"TrustCenterEdge"}
+
+func (ec *executionContext) _TrustCenterEdge(ctx context.Context, sel ast.SelectionSet, obj *types.TrustCenterEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trustCenterEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TrustCenterEdge")
+		case "cursor":
+			out.Values[i] = ec._TrustCenterEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._TrustCenterEdge_node(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -53561,6 +56343,45 @@ func (ec *executionContext) _UpdateTaskPayload(ctx context.Context, sel ast.Sele
 			out.Values[i] = graphql.MarshalString("UpdateTaskPayload")
 		case "task":
 			out.Values[i] = ec._UpdateTaskPayload_task(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateTrustCenterAccessPayloadImplementors = []string{"UpdateTrustCenterAccessPayload"}
+
+func (ec *executionContext) _UpdateTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdateTrustCenterAccessPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateTrustCenterAccessPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateTrustCenterAccessPayload")
+		case "trustCenterAccess":
+			out.Values[i] = ec._UpdateTrustCenterAccessPayload_trustCenterAccess(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -56252,6 +59073,25 @@ func (ec *executionContext) marshalNCreateTaskPayload2ᚖgithubᚗcomᚋgetprobo
 	return ec._CreateTaskPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateTrustCenterAccessInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTrustCenterAccessInput(ctx context.Context, v any) (types.CreateTrustCenterAccessInput, error) {
+	res, err := ec.unmarshalInputCreateTrustCenterAccessInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateTrustCenterAccessPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateTrustCenterAccessPayload) graphql.Marshaler {
+	return ec._CreateTrustCenterAccessPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateTrustCenterAccessPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateTrustCenterAccessPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateTrustCenterAccessPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorInput(ctx context.Context, v any) (types.CreateVendorInput, error) {
 	res, err := ec.unmarshalInputCreateVendorInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -56828,6 +59668,25 @@ func (ec *executionContext) marshalNDeleteTaskPayload2ᚖgithubᚗcomᚋgetprobo
 		return graphql.Null
 	}
 	return ec._DeleteTaskPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeleteTrustCenterAccessInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteTrustCenterAccessInput(ctx context.Context, v any) (types.DeleteTrustCenterAccessInput, error) {
+	res, err := ec.unmarshalInputDeleteTrustCenterAccessInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteTrustCenterAccessPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteTrustCenterAccessPayload) graphql.Marshaler {
+	return ec._DeleteTrustCenterAccessPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteTrustCenterAccessPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteTrustCenterAccessPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteTrustCenterAccessPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeleteVendorComplianceReportInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorComplianceReportInput(ctx context.Context, v any) (types.DeleteVendorComplianceReportInput, error) {
@@ -58258,6 +61117,25 @@ func (ec *executionContext) marshalNRequestSignaturePayload2ᚖgithubᚗcomᚋge
 	return ec._RequestSignaturePayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNRevokeTrustCenterAccessInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRevokeTrustCenterAccessInput(ctx context.Context, v any) (types.RevokeTrustCenterAccessInput, error) {
+	res, err := ec.unmarshalInputRevokeTrustCenterAccessInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRevokeTrustCenterAccessPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRevokeTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, v types.RevokeTrustCenterAccessPayload) graphql.Marshaler {
+	return ec._RevokeTrustCenterAccessPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNRevokeTrustCenterAccessPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRevokeTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, v *types.RevokeTrustCenterAccessPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._RevokeTrustCenterAccessPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNRisk2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐRisk(ctx context.Context, sel ast.SelectionSet, v *types.Risk) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -58604,6 +61482,178 @@ func (ec *executionContext) marshalNTrustCenter2ᚖgithubᚗcomᚋgetproboᚋpro
 	return ec._TrustCenter(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNTrustCenterAccess2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccess(ctx context.Context, sel ast.SelectionSet, v *types.TrustCenterAccess) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrustCenterAccess(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTrustCenterAccessConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccessConnection(ctx context.Context, sel ast.SelectionSet, v types.TrustCenterAccessConnection) graphql.Marshaler {
+	return ec._TrustCenterAccessConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTrustCenterAccessConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccessConnection(ctx context.Context, sel ast.SelectionSet, v *types.TrustCenterAccessConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrustCenterAccessConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTrustCenterAccessEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccessEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.TrustCenterAccessEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTrustCenterAccessEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccessEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTrustCenterAccessEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterAccessEdge(ctx context.Context, sel ast.SelectionSet, v *types.TrustCenterAccessEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrustCenterAccessEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNTrustCenterAccessOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTrustCenterAccessOrderField(ctx context.Context, v any) (coredata.TrustCenterAccessOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNTrustCenterAccessOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTrustCenterAccessOrderField[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTrustCenterAccessOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTrustCenterAccessOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.TrustCenterAccessOrderField) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalString(marshalNTrustCenterAccessOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTrustCenterAccessOrderField[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNTrustCenterAccessOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTrustCenterAccessOrderField = map[string]coredata.TrustCenterAccessOrderField{
+		"CREATED_AT": coredata.TrustCenterAccessOrderFieldCreatedAt,
+	}
+	marshalNTrustCenterAccessOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐTrustCenterAccessOrderField = map[coredata.TrustCenterAccessOrderField]string{
+		coredata.TrustCenterAccessOrderFieldCreatedAt: "CREATED_AT",
+	}
+)
+
+func (ec *executionContext) marshalNTrustCenterConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterConnection(ctx context.Context, sel ast.SelectionSet, v types.TrustCenterConnection) graphql.Marshaler {
+	return ec._TrustCenterConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTrustCenterConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterConnection(ctx context.Context, sel ast.SelectionSet, v *types.TrustCenterConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrustCenterConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTrustCenterEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.TrustCenterEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTrustCenterEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTrustCenterEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterEdge(ctx context.Context, sel ast.SelectionSet, v *types.TrustCenterEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrustCenterEdge(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNUnassignTaskInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUnassignTaskInput(ctx context.Context, v any) (types.UnassignTaskInput, error) {
 	res, err := ec.unmarshalInputUnassignTaskInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -58849,6 +61899,25 @@ func (ec *executionContext) marshalNUpdateTaskPayload2ᚖgithubᚗcomᚋgetprobo
 		return graphql.Null
 	}
 	return ec._UpdateTaskPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateTrustCenterAccessInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateTrustCenterAccessInput(ctx context.Context, v any) (types.UpdateTrustCenterAccessInput, error) {
+	res, err := ec.unmarshalInputUpdateTrustCenterAccessInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateTrustCenterAccessPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, v types.UpdateTrustCenterAccessPayload) graphql.Marshaler {
+	return ec._UpdateTrustCenterAccessPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateTrustCenterAccessPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateTrustCenterAccessPayload(ctx context.Context, sel ast.SelectionSet, v *types.UpdateTrustCenterAccessPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateTrustCenterAccessPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateTrustCenterInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateTrustCenterInput(ctx context.Context, v any) (types.UpdateTrustCenterInput, error) {
@@ -60287,6 +63356,14 @@ var (
 	}
 )
 
+func (ec *executionContext) unmarshalOOrganizationFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationFilter(ctx context.Context, v any) (*types.OrganizationFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputOrganizationFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOOrganizationOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrganizationOrder(ctx context.Context, v any) (*types.OrganizationOrder, error) {
 	if v == nil {
 		return nil, nil
@@ -60503,6 +63580,22 @@ func (ec *executionContext) marshalOTrustCenter2ᚖgithubᚗcomᚋgetproboᚋpro
 		return graphql.Null
 	}
 	return ec._TrustCenter(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOTrustCenterAccessOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐOrderBy(ctx context.Context, v any) (*types.OrderBy[coredata.TrustCenterAccessOrderField], error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputTrustCenterAccessOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOTrustCenterFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐTrustCenterFilter(ctx context.Context, v any) (*types.TrustCenterFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputTrustCenterFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v any) (*graphql.Upload, error) {
