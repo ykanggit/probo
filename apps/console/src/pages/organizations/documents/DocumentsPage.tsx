@@ -130,7 +130,7 @@ export default function DocumentsPage(props: Props) {
             <Tr>
               <Th>
                 <Checkbox
-                  checked={selection.length === documents.length}
+                  checked={selection.length === documents.length && documents.length > 0}
                   onChange={() => reset(documents.map((d) => d.id))}
                 />
               </Th>
