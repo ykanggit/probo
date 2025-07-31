@@ -196,7 +196,7 @@ func (r *Report) CursorKey(orderBy ReportOrderField) page.CursorKey {
 	switch orderBy {
 	case ReportOrderFieldID:
 		return page.NewCursorKey(r.ID, r.ID)
-	default:
-		return page.NewCursorKey(r.ID, r.ID)
 	}
+
+	panic(fmt.Sprintf("unsupported order by: %s", orderBy))
 }
