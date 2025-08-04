@@ -1,5 +1,9 @@
 import { graphql } from 'react-relay';
 import { useLazyLoadQuery } from 'react-relay';
+import type {
+  TrustCenterAccessGraphQuery,
+  TrustCenterAccessGraphQuery$data
+} from "./__generated__/TrustCenterAccessGraphQuery.graphql";
 
 export const trustCenterAccessesQuery = graphql`
   query TrustCenterAccessGraphQuery($trustCenterId: ID!) {
@@ -90,6 +94,6 @@ export const deleteTrustCenterAccessMutation = graphql`
   }
 `;
 
-export function useTrustCenterAccesses(trustCenterId: string) {
-  return useLazyLoadQuery(trustCenterAccessesQuery, { trustCenterId });
+export function useTrustCenterAccesses(trustCenterId: string): TrustCenterAccessGraphQuery$data {
+  return useLazyLoadQuery<TrustCenterAccessGraphQuery>(trustCenterAccessesQuery, { trustCenterId });
 }

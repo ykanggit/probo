@@ -7174,7 +7174,6 @@ type Mutation {
     input: UpdateTrustCenterInput!
   ): UpdateTrustCenterPayload!
 
-
   revokeTrustCenterAccess(
     input: RevokeTrustCenterAccessInput!
   ): RevokeTrustCenterAccessPayload!
@@ -7363,8 +7362,6 @@ input UpdateTrustCenterInput {
   active: Boolean
   slug: String
 }
-
-
 
 input RevokeTrustCenterAccessInput {
   accessId: ID!

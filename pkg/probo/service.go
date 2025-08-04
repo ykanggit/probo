@@ -103,10 +103,6 @@ func NewService(
 	return svc, nil
 }
 
-func (s *Service) GetEncryptionKey() cipher.EncryptionKey {
-	return s.encryptionKey
-}
-
 func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService := &TenantService{
 		pg:            s.pg,

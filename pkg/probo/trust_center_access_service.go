@@ -331,10 +331,12 @@ func (s TrustCenterAccessService) sendAccessEmail(ctx context.Context, access *c
 	}
 
 	accessURL := url.URL{
-		Scheme:   "https",
-		Host:     s.svc.hostname,
-		Path:     "/trust/" + trustCenter.Slug + "/access",
-		RawQuery: "token=" + url.QueryEscape(accessToken),
+		Scheme: "https",
+		Host:   s.svc.hostname,
+		Path:   "/trust/" + trustCenter.Slug + "/access",
+		RawQuery: url.Values{
+			"token": []string{accessToken},
+		}.Encode(),
 	}
 
 	return s.usrmgr.SendTrustCenterAccessEmail(ctx, access.Name, access.Email, organization.Name, accessURL.String())

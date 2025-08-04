@@ -9,7 +9,6 @@ import {
   deleteTrustCenterAccessMutation
 } from "/hooks/graph/TrustCenterAccessGraph";
 import { useMutation } from "react-relay";
-import type { TrustCenterAccessGraphQuery$data } from "/hooks/graph/__generated__/TrustCenterAccessGraphQuery.graphql";
 
 type ContextType = {
   organization: {
@@ -41,7 +40,7 @@ export default function TrustCenterAccessTab() {
     createdAt: Date;
   };
 
-  const data = useTrustCenterAccesses(organization.trustCenter?.id || "");
+  const trustCenterData = useTrustCenterAccesses(organization.trustCenter?.id || "");
 
   if (!organization.trustCenter?.id) {
     return (
@@ -63,7 +62,6 @@ export default function TrustCenterAccessTab() {
     );
   }
 
-  const trustCenterData = data as TrustCenterAccessGraphQuery$data | null;
   const accesses: AccessType[] = trustCenterData?.node?.accesses?.edges ?
     trustCenterData.node.accesses.edges.map(edge => ({
       id: edge.node.id,
@@ -343,13 +341,6 @@ export default function TrustCenterAccessTab() {
         </DialogContent>
 
         <DialogFooter>
-          <Button
-            variant="secondary"
-            onClick={() => dialogRef.current?.close()}
-            disabled={isCreating}
-          >
-            {__("Cancel")}
-          </Button>
           <Button onClick={handleInvite} disabled={isCreating}>
             {isCreating && <Spinner />}
             {__("Send Invitation")}

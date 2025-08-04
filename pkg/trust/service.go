@@ -78,10 +78,6 @@ func NewService(
 	}
 }
 
-func (s *Service) GetEncryptionKey() cipher.EncryptionKey {
-	return s.encryptionKey
-}
-
 func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService := &TenantService{
 		pg:                s.pg,
@@ -105,4 +101,8 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.Organizations = &OrganizationService{svc: tenantService}
 
 	return tenantService
+}
+
+func (s *Service) GetTokenSecret() string {
+	return s.tokenSecret
 }

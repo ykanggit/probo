@@ -16,15 +16,12 @@ package trust_v1
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/getprobo/probo/pkg/crypto/cipher"
 	"github.com/getprobo/probo/pkg/probo"
-	"github.com/getprobo/probo/pkg/securecookie"
 	"github.com/getprobo/probo/pkg/statelesstoken"
 	"github.com/getprobo/probo/pkg/trust"
 	"go.gearno.de/kit/httpserver"
@@ -42,7 +39,7 @@ type (
 	}
 )
 
-func authTokenHandler(trustSvc *trust.Service, authCfg AuthConfig, encryptionKey cipher.EncryptionKey) http.HandlerFunc {
+func authTokenHandler(trustSvc *trust.Service, authCfg AuthConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req AuthTokenRequest
 		// Limit request body size to 1KB to prevent DoS attacks
@@ -69,43 +66,28 @@ func authTokenHandler(trustSvc *trust.Service, authCfg AuthConfig, encryptionKey
 			return
 		}
 
-		tokenData := TrustCenterTokenData{
-			TrustCenterID: accessData.TrustCenterID,
-			Email:         accessData.Email,
-			TenantID:      accessData.TrustCenterID.TenantID(),
-			Scope:         TokenScopeTrustCenterReadOnly,
-			ExpiresAt:     time.Now().Add(24 * time.Hour),
-		}
-
-		tokenBytes, err := json.Marshal(tokenData)
+		tokenString, err := statelesstoken.NewToken(
+			authCfg.CookieSecret,
+			probo.TokenTypeTrustCenterAccess,
+			24*time.Hour,
+			*accessData,
+		)
 		if err != nil {
-			httpserver.RenderError(w, http.StatusInternalServerError, fmt.Errorf("failed to serialize token data: %w", err))
+			httpserver.RenderError(w, http.StatusInternalServerError, fmt.Errorf("failed to create token: %w", err))
 			return
 		}
 
-		encryptedTokenData, err := cipher.Encrypt(tokenBytes, encryptionKey)
-		if err != nil {
-			httpserver.RenderError(w, http.StatusInternalServerError, fmt.Errorf("failed to encrypt token data: %w", err))
-			return
-		}
-
-		encryptedTokenString := base64.StdEncoding.EncodeToString(encryptedTokenData)
-
-		cookieConfig := securecookie.Config{
+		cookie := &http.Cookie{
 			Name:     TokenCookieName,
-			Secret:   authCfg.CookieSecret,
+			Value:    tokenString,
 			Domain:   authCfg.CookieDomain,
 			Path:     "/",
 			MaxAge:   int(24 * time.Hour / time.Second), // 24 hours
 			Secure:   true,
-			HTTPOnly: true,
+			HttpOnly: true,
 			SameSite: http.SameSiteStrictMode,
 		}
-
-		if err := securecookie.Set(w, cookieConfig, encryptedTokenString); err != nil {
-			httpserver.RenderError(w, http.StatusInternalServerError, fmt.Errorf("failed to set cookie: %w", err))
-			return
-		}
+		http.SetCookie(w, cookie)
 
 		httpserver.RenderJSON(w, http.StatusOK, AuthTokenResponse{
 			Success:       true,
@@ -117,7 +99,7 @@ func authTokenHandler(trustSvc *trust.Service, authCfg AuthConfig, encryptionKey
 
 func validateTrustCenterAccessToken(ctx context.Context, trustSvc *trust.Service, authCfg AuthConfig, tokenString string) (*probo.TrustCenterAccessData, error) {
 	token, err := statelesstoken.ValidateToken[probo.TrustCenterAccessData](
-		authCfg.CookieSecret,
+		trustSvc.GetTokenSecret(),
 		probo.TokenTypeTrustCenterAccess,
 		tokenString,
 	)
@@ -133,18 +115,17 @@ func validateTrustCenterAccessToken(ctx context.Context, trustSvc *trust.Service
 
 func trustCenterLogoutHandler(authCfg AuthConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookieConfig := securecookie.Config{
+		// Clear cookie directly
+		http.SetCookie(w, &http.Cookie{
 			Name:     TokenCookieName,
-			Secret:   authCfg.CookieSecret,
+			Value:    "",
 			Domain:   authCfg.CookieDomain,
 			Path:     "/",
 			MaxAge:   -1,
 			Secure:   true,
-			HTTPOnly: true,
+			HttpOnly: true,
 			SameSite: http.SameSiteStrictMode,
-		}
-
-		securecookie.Clear(w, cookieConfig)
+		})
 
 		w.Header().Set("Clear-Site-Data", "*")
 
