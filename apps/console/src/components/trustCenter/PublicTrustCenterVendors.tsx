@@ -47,10 +47,10 @@ export function PublicTrustCenterVendors({ vendors, organizationName }: Props) {
     <Card padded className="space-y-4">
       <div>
         <h2 className="text-xl font-semibold text-txt-primary">
-          {__("Vendors")}
+          {__("Subcontractors")}
         </h2>
         <p className="text-sm text-txt-secondary mt-1">
-          {sprintf(__("Third-party vendors and service providers %s work with"), organizationName)}
+          {sprintf(__("Third-party subcontractors %s work with"), organizationName)}
         </p>
       </div>
 
