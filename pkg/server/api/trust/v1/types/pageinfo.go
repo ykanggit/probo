@@ -16,24 +16,15 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/page"
-	"go.gearno.de/x/ref"
+	sharedTypes "github.com/getprobo/probo/pkg/server/api/types"
 )
 
 func NewPageInfo[T page.Paginable[O], O page.OrderField](p *page.Page[T, O]) *PageInfo {
-	var (
-		startCursor *page.CursorKey
-		endCursor   *page.CursorKey
-	)
-
-	if len(p.Data) > 0 {
-		startCursor = ref.Ref(p.First().CursorKey(p.Cursor.OrderBy.Field))
-		endCursor = ref.Ref(p.Last().CursorKey(p.Cursor.OrderBy.Field))
-	}
-
+	data := sharedTypes.NewPageInfoData(p)
 	return &PageInfo{
-		HasNextPage:     p.Info.HasNext,
-		HasPreviousPage: p.Info.HasPrev,
-		StartCursor:     startCursor,
-		EndCursor:       endCursor,
+		HasNextPage:     data.HasNextPage,
+		HasPreviousPage: data.HasPreviousPage,
+		StartCursor:     data.StartCursor,
+		EndCursor:       data.EndCursor,
 	}
 }

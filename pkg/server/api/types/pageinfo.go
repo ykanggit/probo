@@ -16,34 +16,34 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/page"
-	sharedTypes "github.com/getprobo/probo/pkg/server/api/types"
+	"go.gearno.de/x/ref"
 )
 
-func NewCursor[O page.OrderField](
-	first *int,
-	after *page.CursorKey,
-	last *int,
-	before *page.CursorKey,
-	orderBy page.OrderBy[O],
-) *page.Cursor[O] {
-	var (
-		size      int
-		from      *page.CursorKey
-		direction = page.Head
-	)
-
-	if first != nil {
-		size = *first
-		direction = page.Head
-		from = after
-	} else if last != nil {
-		size = *last
-		direction = page.Tail
-		from = before
-	}
-
-	return page.NewCursor(size, from, direction, orderBy)
+// PageInfoData contains the raw data for constructing PageInfo structs
+type PageInfoData struct {
+	HasNextPage     bool
+	HasPreviousPage bool
+	StartCursor     *page.CursorKey
+	EndCursor       *page.CursorKey
 }
 
-var MarshalCursorKeyScalar = sharedTypes.MarshalCursorKeyScalar
-var UnmarshalCursorKeyScalar = sharedTypes.UnmarshalCursorKeyScalar
+// NewPageInfoData creates PageInfo data from a Page result.
+// This can be used by local packages to construct their PageInfo structs.
+func NewPageInfoData[T page.Paginable[O], O page.OrderField](p *page.Page[T, O]) PageInfoData {
+	var (
+		startCursor *page.CursorKey
+		endCursor   *page.CursorKey
+	)
+
+	if len(p.Data) > 0 {
+		startCursor = ref.Ref(p.First().CursorKey(p.Cursor.OrderBy.Field))
+		endCursor = ref.Ref(p.Last().CursorKey(p.Cursor.OrderBy.Field))
+	}
+
+	return PageInfoData{
+		HasNextPage:     p.Info.HasNext,
+		HasPreviousPage: p.Info.HasPrev,
+		StartCursor:     startCursor,
+		EndCursor:       endCursor,
+	}
+}

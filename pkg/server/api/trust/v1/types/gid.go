@@ -15,30 +15,8 @@
 package types
 
 import (
-	"errors"
-	"io"
-	"strconv"
-
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/getprobo/probo/pkg/gid"
+	sharedTypes "github.com/getprobo/probo/pkg/server/api/types"
 )
 
-func MarshalGIDScalar(id gid.GID) graphql.Marshaler {
-	return graphql.WriterFunc(func(w io.Writer) {
-		w.Write([]byte(strconv.Quote(id.String())))
-	})
-}
-
-func UnmarshalGIDScalar(v interface{}) (gid.GID, error) {
-	s, ok := v.(string)
-	if !ok {
-		return gid.Nil, errors.New("must be a string")
-	}
-
-	id, err := gid.ParseGID(s)
-	if err != nil {
-		return gid.Nil, err
-	}
-
-	return id, nil
-}
+var MarshalGIDScalar = sharedTypes.MarshalGIDScalar
+var UnmarshalGIDScalar = sharedTypes.UnmarshalGIDScalar

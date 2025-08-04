@@ -15,8 +15,30 @@
 package types
 
 import (
-	sharedTypes "github.com/getprobo/probo/pkg/server/api/types"
+	"errors"
+	"io"
+	"strconv"
+
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/getprobo/probo/pkg/page"
 )
 
-var MarshalGIDScalar = sharedTypes.MarshalGIDScalar
-var UnmarshalGIDScalar = sharedTypes.UnmarshalGIDScalar
+func MarshalCursorKeyScalar(ck page.CursorKey) graphql.Marshaler {
+	return graphql.WriterFunc(func(w io.Writer) {
+		_, _ = w.Write([]byte(strconv.Quote(ck.String())))
+	})
+}
+
+func UnmarshalCursorKeyScalar(v interface{}) (page.CursorKey, error) {
+	s, ok := v.(string)
+	if !ok {
+		return page.CursorKeyNil, errors.New("must be a string")
+	}
+
+	ck, err := page.ParseCursorKey(s)
+	if err != nil {
+		return page.CursorKeyNil, err
+	}
+
+	return ck, nil
+}

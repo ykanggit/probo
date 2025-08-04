@@ -15,12 +15,8 @@
 package types
 
 import (
-	"errors"
-	"io"
-	"strconv"
-
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/getprobo/probo/pkg/page"
+	sharedTypes "github.com/getprobo/probo/pkg/server/api/types"
 )
 
 func NewCursor[O page.OrderField](
@@ -49,22 +45,5 @@ func NewCursor[O page.OrderField](
 	return page.NewCursor(size, from, direction, orderBy)
 }
 
-func MarshalCursorKeyScalar(ck page.CursorKey) graphql.Marshaler {
-	return graphql.WriterFunc(func(w io.Writer) {
-		_, _ = w.Write([]byte(strconv.Quote(ck.String())))
-	})
-}
-
-func UnmarshalCursorKeyScalar(v interface{}) (page.CursorKey, error) {
-	s, ok := v.(string)
-	if !ok {
-		return page.CursorKeyNil, errors.New("must be a string")
-	}
-
-	ck, err := page.ParseCursorKey(s)
-	if err != nil {
-		return page.CursorKeyNil, err
-	}
-
-	return ck, nil
-}
+var MarshalCursorKeyScalar = sharedTypes.MarshalCursorKeyScalar
+var UnmarshalCursorKeyScalar = sharedTypes.UnmarshalCursorKeyScalar
