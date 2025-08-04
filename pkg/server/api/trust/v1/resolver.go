@@ -167,14 +167,14 @@ func WithSession(usrmgrSvc *usrmgr.Service, trustSvc *trust.Service, authCfg Aut
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		if authCtx := trySessionAuth(ctx, w, r, usrmgrSvc, authCfg); authCtx != nil {
+		if authCtx := tryTokenAuth(ctx, w, r, trustSvc, authCfg); authCtx != nil {
 			next(w, r.WithContext(authCtx))
-			updateSessionIfNeeded(authCtx, usrmgrSvc)
 			return
 		}
 
-		if authCtx := tryTokenAuth(ctx, w, r, trustSvc, authCfg); authCtx != nil {
+		if authCtx := trySessionAuth(ctx, w, r, usrmgrSvc, authCfg); authCtx != nil {
 			next(w, r.WithContext(authCtx))
+			updateSessionIfNeeded(authCtx, usrmgrSvc)
 			return
 		}
 
