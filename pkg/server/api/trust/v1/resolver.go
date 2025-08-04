@@ -27,7 +27,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo"
@@ -105,8 +104,6 @@ func NewMux(
 
 	r.Handle("/graphql", graphqlHandler(logger, usrmgrSvc, trustSvc, authCfg))
 
-	r.Handle("/playground", playground.Handler("GraphQL Playground", "/api/trust/v1/graphql"))
-
 	r.Post("/auth/authenticate", authTokenHandler(trustSvc, authCfg))
 	r.Delete("/auth/logout", trustCenterLogoutHandler(authCfg))
 
@@ -114,8 +111,6 @@ func NewMux(
 }
 
 func graphqlHandler(logger *log.Logger, usrmgrSvc *usrmgr.Service, trustSvc *trust.Service, authCfg AuthConfig) http.HandlerFunc {
-	var mb int64 = 1 << 20
-
 	resolver := &Resolver{
 		trustCenterSvc: trustSvc,
 		authCfg:        authCfg,
@@ -134,12 +129,6 @@ func graphqlHandler(logger *log.Logger, usrmgrSvc *usrmgr.Service, trustSvc *tru
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.Options{})
-	srv.AddTransport(
-		transport.MultipartForm{
-			MaxMemory:     32 * mb,
-			MaxUploadSize: 50 * mb,
-		},
-	)
 
 	srv.Use(extension.Introspection{})
 
