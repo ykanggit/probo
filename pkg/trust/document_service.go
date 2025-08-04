@@ -85,7 +85,7 @@ func (s *DocumentService) ListForOrganizationId(
 
 func (s *DocumentService) ExportPDF(
 	ctx context.Context,
-	documentVersionID gid.GID,
+	documentID gid.GID,
 ) ([]byte, error) {
 	document := &coredata.Document{}
 	version := &coredata.DocumentVersion{}
@@ -97,16 +97,16 @@ func (s *DocumentService) ExportPDF(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			if err := version.LoadByID(ctx, conn, s.svc.scope, documentVersionID); err != nil {
-				return fmt.Errorf("cannot load document version: %w", err)
-			}
-
-			if err := document.LoadByID(ctx, conn, s.svc.scope, version.DocumentID); err != nil {
+			if err := document.LoadByID(ctx, conn, s.svc.scope, documentID); err != nil {
 				return fmt.Errorf("cannot load document: %w", err)
 			}
 
 			if !document.ShowOnTrustCenter {
 				return fmt.Errorf("document not visible on trust center")
+			}
+
+			if err := version.LoadLatestPublishedVersion(ctx, conn, s.svc.scope, documentID); err != nil {
+				return fmt.Errorf("cannot load latest published document version: %w", err)
 			}
 
 			if version.PublishedBy != nil {
@@ -125,7 +125,7 @@ func (s *DocumentService) ExportPDF(
 				},
 			)
 
-			if err := signatures.LoadByDocumentVersionID(ctx, conn, s.svc.scope, documentVersionID, cursor); err != nil {
+			if err := signatures.LoadByDocumentVersionID(ctx, conn, s.svc.scope, version.ID, cursor); err != nil {
 				return fmt.Errorf("cannot load document version signatures: %w", err)
 			}
 

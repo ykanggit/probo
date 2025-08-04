@@ -20,13 +20,6 @@ export const publicTrustCenterQuery = {
                 id
                 title
                 documentType
-                versions(first: 1) {
-                  edges {
-                    node {
-                      id
-                    }
-                  }
-                }
               }
             }
           }

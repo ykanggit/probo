@@ -321,6 +321,59 @@ LIMIT 1;
 	return nil
 }
 
+func (p *DocumentVersion) LoadLatestPublishedVersion(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	documentID gid.GID,
+) error {
+	q := `
+SELECT
+	id,
+	document_id,
+	title,
+	owner_id,
+	version_number,
+	content,
+	changelog,
+	created_by,
+	status,
+	published_by,
+	published_at,
+	created_at,
+	updated_at
+FROM
+	document_versions
+WHERE
+	%s
+	AND document_id = @document_id
+	AND status = @status
+ORDER BY published_at DESC
+LIMIT 1;
+`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{
+		"document_id": documentID,
+		"status":      DocumentStatusPublished,
+	}
+	maps.Copy(args, scope.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query document versions: %w", err)
+	}
+
+	documentVersion, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[DocumentVersion])
+	if err != nil {
+		return fmt.Errorf("cannot collect document version: %w", err)
+	}
+
+	*p = documentVersion
+
+	return nil
+}
+
 func (p DocumentVersion) Update(
 	ctx context.Context,
 	conn pg.Conn,

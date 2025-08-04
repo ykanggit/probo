@@ -42,7 +42,6 @@ type Config struct {
 
 type ResolverRoot interface {
 	Audit() AuditResolver
-	Document() DocumentResolver
 	Mutation() MutationResolver
 	Organization() OrganizationResolver
 	Query() QueryResolver
@@ -76,7 +75,6 @@ type ComplexityRoot struct {
 		DocumentType func(childComplexity int) int
 		ID           func(childComplexity int) int
 		Title        func(childComplexity int) int
-		Versions     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey) int
 	}
 
 	DocumentConnection struct {
@@ -89,21 +87,7 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
-	DocumentVersion struct {
-		ID func(childComplexity int) int
-	}
-
-	DocumentVersionConnection struct {
-		Edges    func(childComplexity int) int
-		PageInfo func(childComplexity int) int
-	}
-
-	DocumentVersionEdge struct {
-		Cursor func(childComplexity int) int
-		Node   func(childComplexity int) int
-	}
-
-	ExportDocumentVersionPDFPayload struct {
+	ExportDocumentPDFPayload struct {
 		Data func(childComplexity int) int
 	}
 
@@ -113,7 +97,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		ExportDocumentVersionPDF func(childComplexity int, input types.ExportDocumentVersionPDFInput) int
+		ExportDocumentPDF func(childComplexity int, input types.ExportDocumentPDFInput) int
 	}
 
 	Organization struct {
@@ -173,11 +157,8 @@ type AuditResolver interface {
 	Report(ctx context.Context, obj *types.Audit) (*types.Report, error)
 	ReportURL(ctx context.Context, obj *types.Audit) (*string, error)
 }
-type DocumentResolver interface {
-	Versions(ctx context.Context, obj *types.Document, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.DocumentVersionConnection, error)
-}
 type MutationResolver interface {
-	ExportDocumentVersionPDF(ctx context.Context, input types.ExportDocumentVersionPDFInput) (*types.ExportDocumentVersionPDFPayload, error)
+	ExportDocumentPDF(ctx context.Context, input types.ExportDocumentPDFInput) (*types.ExportDocumentPDFPayload, error)
 }
 type OrganizationResolver interface {
 	LogoURL(ctx context.Context, obj *types.Organization) (*string, error)
@@ -291,18 +272,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Document.Title(childComplexity), true
 
-	case "Document.versions":
-		if e.complexity.Document.Versions == nil {
-			break
-		}
-
-		args, err := ec.field_Document_versions_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Document.Versions(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey)), true
-
 	case "DocumentConnection.edges":
 		if e.complexity.DocumentConnection.Edges == nil {
 			break
@@ -331,47 +300,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.DocumentEdge.Node(childComplexity), true
 
-	case "DocumentVersion.id":
-		if e.complexity.DocumentVersion.ID == nil {
+	case "ExportDocumentPDFPayload.data":
+		if e.complexity.ExportDocumentPDFPayload.Data == nil {
 			break
 		}
 
-		return e.complexity.DocumentVersion.ID(childComplexity), true
-
-	case "DocumentVersionConnection.edges":
-		if e.complexity.DocumentVersionConnection.Edges == nil {
-			break
-		}
-
-		return e.complexity.DocumentVersionConnection.Edges(childComplexity), true
-
-	case "DocumentVersionConnection.pageInfo":
-		if e.complexity.DocumentVersionConnection.PageInfo == nil {
-			break
-		}
-
-		return e.complexity.DocumentVersionConnection.PageInfo(childComplexity), true
-
-	case "DocumentVersionEdge.cursor":
-		if e.complexity.DocumentVersionEdge.Cursor == nil {
-			break
-		}
-
-		return e.complexity.DocumentVersionEdge.Cursor(childComplexity), true
-
-	case "DocumentVersionEdge.node":
-		if e.complexity.DocumentVersionEdge.Node == nil {
-			break
-		}
-
-		return e.complexity.DocumentVersionEdge.Node(childComplexity), true
-
-	case "ExportDocumentVersionPDFPayload.data":
-		if e.complexity.ExportDocumentVersionPDFPayload.Data == nil {
-			break
-		}
-
-		return e.complexity.ExportDocumentVersionPDFPayload.Data(childComplexity), true
+		return e.complexity.ExportDocumentPDFPayload.Data(childComplexity), true
 
 	case "Framework.id":
 		if e.complexity.Framework.ID == nil {
@@ -387,17 +321,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Framework.Name(childComplexity), true
 
-	case "Mutation.exportDocumentVersionPDF":
-		if e.complexity.Mutation.ExportDocumentVersionPDF == nil {
+	case "Mutation.exportDocumentPDF":
+		if e.complexity.Mutation.ExportDocumentPDF == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_exportDocumentVersionPDF_args(ctx, rawArgs)
+		args, err := ec.field_Mutation_exportDocumentPDF_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.ExportDocumentVersionPDF(childComplexity, args["input"].(types.ExportDocumentVersionPDFInput)), true
+		return e.complexity.Mutation.ExportDocumentPDF(childComplexity, args["input"].(types.ExportDocumentPDFInput)), true
 
 	case "Organization.id":
 		if e.complexity.Organization.ID == nil {
@@ -616,7 +550,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputExportDocumentVersionPDFInput,
+		ec.unmarshalInputExportDocumentPDFInput,
 	)
 	first := true
 
@@ -764,20 +698,10 @@ enum DocumentType
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypePolicy")
 }
 
-type DocumentVersion implements Node {
-  id: ID!
-}
-
 type Document implements Node {
   id: ID!
   title: String!
   documentType: DocumentType!
-  versions(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-  ): DocumentVersionConnection! @goField(forceResolver: true)
 }
 
 type DocumentConnection {
@@ -788,16 +712,6 @@ type DocumentConnection {
 type DocumentEdge {
   cursor: CursorKey!
   node: Document!
-}
-
-type DocumentVersionConnection {
-  edges: [DocumentVersionEdge!]!
-  pageInfo: PageInfo!
-}
-
-type DocumentVersionEdge {
-  cursor: CursorKey!
-  node: DocumentVersion!
 }
 
 
@@ -960,11 +874,11 @@ type TrustCenter implements Node {
   ): VendorConnection! @goField(forceResolver: true)
 }
 
-input ExportDocumentVersionPDFInput {
-  documentVersionId: ID!
+input ExportDocumentPDFInput {
+  documentId: ID!
 }
 
-type ExportDocumentVersionPDFPayload {
+type ExportDocumentPDFPayload {
   data: String!
 }
 
@@ -973,9 +887,9 @@ type Query {
 }
 
 type Mutation {
-  exportDocumentVersionPDF(
-    input: ExportDocumentVersionPDFInput!
-  ): ExportDocumentVersionPDFPayload! @mustBeAuthenticated(role: USER)
+  exportDocumentPDF(
+    input: ExportDocumentPDFInput!
+  ): ExportDocumentPDFPayload! @mustBeAuthenticated(role: USER)
 }
 `, BuiltIn: false},
 }
@@ -1013,103 +927,26 @@ func (ec *executionContext) dir_mustBeAuthenticated_argsRole(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Document_versions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Mutation_exportDocumentPDF_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Document_versions_argsFirst(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["first"] = arg0
-	arg1, err := ec.field_Document_versions_argsAfter(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["after"] = arg1
-	arg2, err := ec.field_Document_versions_argsLast(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["last"] = arg2
-	arg3, err := ec.field_Document_versions_argsBefore(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["before"] = arg3
-	return args, nil
-}
-func (ec *executionContext) field_Document_versions_argsFirst(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*int, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-	if tmp, ok := rawArgs["first"]; ok {
-		return ec.unmarshalOInt2ᚖint(ctx, tmp)
-	}
-
-	var zeroVal *int
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Document_versions_argsAfter(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*page.CursorKey, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-	if tmp, ok := rawArgs["after"]; ok {
-		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
-	}
-
-	var zeroVal *page.CursorKey
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Document_versions_argsLast(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*int, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-	if tmp, ok := rawArgs["last"]; ok {
-		return ec.unmarshalOInt2ᚖint(ctx, tmp)
-	}
-
-	var zeroVal *int
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Document_versions_argsBefore(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*page.CursorKey, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-	if tmp, ok := rawArgs["before"]; ok {
-		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
-	}
-
-	var zeroVal *page.CursorKey
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_exportDocumentVersionPDF_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_exportDocumentVersionPDF_argsInput(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_exportDocumentPDF_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["input"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_Mutation_exportDocumentVersionPDF_argsInput(
+func (ec *executionContext) field_Mutation_exportDocumentPDF_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (types.ExportDocumentVersionPDFInput, error) {
+) (types.ExportDocumentPDFInput, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNExportDocumentVersionPDFInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐExportDocumentVersionPDFInput(ctx, tmp)
+		return ec.unmarshalNExportDocumentPDFInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐExportDocumentPDFInput(ctx, tmp)
 	}
 
-	var zeroVal types.ExportDocumentVersionPDFInput
+	var zeroVal types.ExportDocumentPDFInput
 	return zeroVal, nil
 }
 
@@ -2035,67 +1872,6 @@ func (ec *executionContext) fieldContext_Document_documentType(_ context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Document_versions(ctx context.Context, field graphql.CollectedField, obj *types.Document) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Document_versions(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Document().Versions(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.DocumentVersionConnection)
-	fc.Result = res
-	return ec.marshalNDocumentVersionConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐDocumentVersionConnection(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Document_versions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Document",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "edges":
-				return ec.fieldContext_DocumentVersionConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_DocumentVersionConnection_pageInfo(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type DocumentVersionConnection", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Document_versions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _DocumentConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.DocumentConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DocumentConnection_edges(ctx, field)
 	if err != nil {
@@ -2289,8 +2065,6 @@ func (ec *executionContext) fieldContext_DocumentEdge_node(_ context.Context, fi
 				return ec.fieldContext_Document_title(ctx, field)
 			case "documentType":
 				return ec.fieldContext_Document_documentType(ctx, field)
-			case "versions":
-				return ec.fieldContext_Document_versions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Document", field.Name)
 		},
@@ -2298,248 +2072,8 @@ func (ec *executionContext) fieldContext_DocumentEdge_node(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _DocumentVersion_id(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersion) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DocumentVersion_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(gid.GID)
-	fc.Result = res
-	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DocumentVersion_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DocumentVersion",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DocumentVersionConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersionConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DocumentVersionConnection_edges(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Edges, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*types.DocumentVersionEdge)
-	fc.Result = res
-	return ec.marshalNDocumentVersionEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐDocumentVersionEdgeᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DocumentVersionConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DocumentVersionConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "cursor":
-				return ec.fieldContext_DocumentVersionEdge_cursor(ctx, field)
-			case "node":
-				return ec.fieldContext_DocumentVersionEdge_node(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type DocumentVersionEdge", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DocumentVersionConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersionConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DocumentVersionConnection_pageInfo(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PageInfo, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.PageInfo)
-	fc.Result = res
-	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DocumentVersionConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DocumentVersionConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "hasNextPage":
-				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
-			case "hasPreviousPage":
-				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
-			case "startCursor":
-				return ec.fieldContext_PageInfo_startCursor(ctx, field)
-			case "endCursor":
-				return ec.fieldContext_PageInfo_endCursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DocumentVersionEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersionEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DocumentVersionEdge_cursor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Cursor, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(page.CursorKey)
-	fc.Result = res
-	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DocumentVersionEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DocumentVersionEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type CursorKey does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DocumentVersionEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersionEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DocumentVersionEdge_node(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Node, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*types.DocumentVersion)
-	fc.Result = res
-	return ec.marshalNDocumentVersion2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐDocumentVersion(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DocumentVersionEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DocumentVersionEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_DocumentVersion_id(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type DocumentVersion", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ExportDocumentVersionPDFPayload_data(ctx context.Context, field graphql.CollectedField, obj *types.ExportDocumentVersionPDFPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ExportDocumentVersionPDFPayload_data(ctx, field)
+func (ec *executionContext) _ExportDocumentPDFPayload_data(ctx context.Context, field graphql.CollectedField, obj *types.ExportDocumentPDFPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExportDocumentPDFPayload_data(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2569,9 +2103,9 @@ func (ec *executionContext) _ExportDocumentVersionPDFPayload_data(ctx context.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ExportDocumentVersionPDFPayload_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ExportDocumentPDFPayload_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ExportDocumentVersionPDFPayload",
+		Object:     "ExportDocumentPDFPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2670,8 +2204,8 @@ func (ec *executionContext) fieldContext_Framework_name(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_exportDocumentVersionPDF(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_exportDocumentVersionPDF(ctx, field)
+func (ec *executionContext) _Mutation_exportDocumentPDF(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_exportDocumentPDF(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2685,17 +2219,17 @@ func (ec *executionContext) _Mutation_exportDocumentVersionPDF(ctx context.Conte
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		directive0 := func(rctx context.Context) (any, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().ExportDocumentVersionPDF(rctx, fc.Args["input"].(types.ExportDocumentVersionPDFInput))
+			return ec.resolvers.Mutation().ExportDocumentPDF(rctx, fc.Args["input"].(types.ExportDocumentPDFInput))
 		}
 
 		directive1 := func(ctx context.Context) (any, error) {
 			role, err := ec.unmarshalORole2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐRole(ctx, "USER")
 			if err != nil {
-				var zeroVal *types.ExportDocumentVersionPDFPayload
+				var zeroVal *types.ExportDocumentPDFPayload
 				return zeroVal, err
 			}
 			if ec.directives.MustBeAuthenticated == nil {
-				var zeroVal *types.ExportDocumentVersionPDFPayload
+				var zeroVal *types.ExportDocumentPDFPayload
 				return zeroVal, errors.New("directive mustBeAuthenticated is not implemented")
 			}
 			return ec.directives.MustBeAuthenticated(ctx, nil, directive0, role)
@@ -2708,10 +2242,10 @@ func (ec *executionContext) _Mutation_exportDocumentVersionPDF(ctx context.Conte
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*types.ExportDocumentVersionPDFPayload); ok {
+		if data, ok := tmp.(*types.ExportDocumentPDFPayload); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/getprobo/probo/pkg/server/api/trust/v1/types.ExportDocumentVersionPDFPayload`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/getprobo/probo/pkg/server/api/trust/v1/types.ExportDocumentPDFPayload`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2723,12 +2257,12 @@ func (ec *executionContext) _Mutation_exportDocumentVersionPDF(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.ExportDocumentVersionPDFPayload)
+	res := resTmp.(*types.ExportDocumentPDFPayload)
 	fc.Result = res
-	return ec.marshalNExportDocumentVersionPDFPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐExportDocumentVersionPDFPayload(ctx, field.Selections, res)
+	return ec.marshalNExportDocumentPDFPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐExportDocumentPDFPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_exportDocumentVersionPDF(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_exportDocumentPDF(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2737,9 +2271,9 @@ func (ec *executionContext) fieldContext_Mutation_exportDocumentVersionPDF(ctx c
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "data":
-				return ec.fieldContext_ExportDocumentVersionPDFPayload_data(ctx, field)
+				return ec.fieldContext_ExportDocumentPDFPayload_data(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ExportDocumentVersionPDFPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ExportDocumentPDFPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -2749,7 +2283,7 @@ func (ec *executionContext) fieldContext_Mutation_exportDocumentVersionPDF(ctx c
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_exportDocumentVersionPDF_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_exportDocumentPDF_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6173,27 +5707,27 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputExportDocumentVersionPDFInput(ctx context.Context, obj any) (types.ExportDocumentVersionPDFInput, error) {
-	var it types.ExportDocumentVersionPDFInput
+func (ec *executionContext) unmarshalInputExportDocumentPDFInput(ctx context.Context, obj any) (types.ExportDocumentPDFInput, error) {
+	var it types.ExportDocumentPDFInput
 	asMap := map[string]any{}
 	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"documentVersionId"}
+	fieldsInOrder := [...]string{"documentId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "documentVersionId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentVersionId"))
+		case "documentId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentId"))
 			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.DocumentVersionID = data
+			it.DocumentID = data
 		}
 	}
 
@@ -6243,13 +5777,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Framework(ctx, sel, obj)
-	case types.DocumentVersion:
-		return ec._DocumentVersion(ctx, sel, &obj)
-	case *types.DocumentVersion:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._DocumentVersion(ctx, sel, obj)
 	case types.Document:
 		return ec._Document(ctx, sel, &obj)
 	case *types.Document:
@@ -6516,54 +6043,18 @@ func (ec *executionContext) _Document(ctx context.Context, sel ast.SelectionSet,
 		case "id":
 			out.Values[i] = ec._Document_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "title":
 			out.Values[i] = ec._Document_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "documentType":
 			out.Values[i] = ec._Document_documentType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
-		case "versions":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Document_versions(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6675,146 +6166,19 @@ func (ec *executionContext) _DocumentEdge(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var documentVersionImplementors = []string{"DocumentVersion", "Node"}
+var exportDocumentPDFPayloadImplementors = []string{"ExportDocumentPDFPayload"}
 
-func (ec *executionContext) _DocumentVersion(ctx context.Context, sel ast.SelectionSet, obj *types.DocumentVersion) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, documentVersionImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("DocumentVersion")
-		case "id":
-			out.Values[i] = ec._DocumentVersion_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var documentVersionConnectionImplementors = []string{"DocumentVersionConnection"}
-
-func (ec *executionContext) _DocumentVersionConnection(ctx context.Context, sel ast.SelectionSet, obj *types.DocumentVersionConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, documentVersionConnectionImplementors)
+func (ec *executionContext) _ExportDocumentPDFPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ExportDocumentPDFPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, exportDocumentPDFPayloadImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("DocumentVersionConnection")
-		case "edges":
-			out.Values[i] = ec._DocumentVersionConnection_edges(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "pageInfo":
-			out.Values[i] = ec._DocumentVersionConnection_pageInfo(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var documentVersionEdgeImplementors = []string{"DocumentVersionEdge"}
-
-func (ec *executionContext) _DocumentVersionEdge(ctx context.Context, sel ast.SelectionSet, obj *types.DocumentVersionEdge) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, documentVersionEdgeImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("DocumentVersionEdge")
-		case "cursor":
-			out.Values[i] = ec._DocumentVersionEdge_cursor(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "node":
-			out.Values[i] = ec._DocumentVersionEdge_node(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var exportDocumentVersionPDFPayloadImplementors = []string{"ExportDocumentVersionPDFPayload"}
-
-func (ec *executionContext) _ExportDocumentVersionPDFPayload(ctx context.Context, sel ast.SelectionSet, obj *types.ExportDocumentVersionPDFPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, exportDocumentVersionPDFPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ExportDocumentVersionPDFPayload")
+			out.Values[i] = graphql.MarshalString("ExportDocumentPDFPayload")
 		case "data":
-			out.Values[i] = ec._ExportDocumentVersionPDFPayload_data(ctx, field, obj)
+			out.Values[i] = ec._ExportDocumentPDFPayload_data(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -6904,9 +6268,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "exportDocumentVersionPDF":
+		case "exportDocumentPDF":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_exportDocumentVersionPDF(ctx, field)
+				return ec._Mutation_exportDocumentPDF(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -8092,101 +7456,23 @@ var (
 	}
 )
 
-func (ec *executionContext) marshalNDocumentVersion2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐDocumentVersion(ctx context.Context, sel ast.SelectionSet, v *types.DocumentVersion) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DocumentVersion(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNDocumentVersionConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐDocumentVersionConnection(ctx context.Context, sel ast.SelectionSet, v types.DocumentVersionConnection) graphql.Marshaler {
-	return ec._DocumentVersionConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNDocumentVersionConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐDocumentVersionConnection(ctx context.Context, sel ast.SelectionSet, v *types.DocumentVersionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DocumentVersionConnection(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNDocumentVersionEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐDocumentVersionEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.DocumentVersionEdge) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNDocumentVersionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐDocumentVersionEdge(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNDocumentVersionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐDocumentVersionEdge(ctx context.Context, sel ast.SelectionSet, v *types.DocumentVersionEdge) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DocumentVersionEdge(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNExportDocumentVersionPDFInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐExportDocumentVersionPDFInput(ctx context.Context, v any) (types.ExportDocumentVersionPDFInput, error) {
-	res, err := ec.unmarshalInputExportDocumentVersionPDFInput(ctx, v)
+func (ec *executionContext) unmarshalNExportDocumentPDFInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐExportDocumentPDFInput(ctx context.Context, v any) (types.ExportDocumentPDFInput, error) {
+	res, err := ec.unmarshalInputExportDocumentPDFInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNExportDocumentVersionPDFPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐExportDocumentVersionPDFPayload(ctx context.Context, sel ast.SelectionSet, v types.ExportDocumentVersionPDFPayload) graphql.Marshaler {
-	return ec._ExportDocumentVersionPDFPayload(ctx, sel, &v)
+func (ec *executionContext) marshalNExportDocumentPDFPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐExportDocumentPDFPayload(ctx context.Context, sel ast.SelectionSet, v types.ExportDocumentPDFPayload) graphql.Marshaler {
+	return ec._ExportDocumentPDFPayload(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNExportDocumentVersionPDFPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐExportDocumentVersionPDFPayload(ctx context.Context, sel ast.SelectionSet, v *types.ExportDocumentVersionPDFPayload) graphql.Marshaler {
+func (ec *executionContext) marshalNExportDocumentPDFPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐExportDocumentPDFPayload(ctx context.Context, sel ast.SelectionSet, v *types.ExportDocumentPDFPayload) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._ExportDocumentVersionPDFPayload(ctx, sel, v)
+	return ec._ExportDocumentPDFPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNFramework2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋtrustᚋv1ᚋtypesᚐFramework(ctx context.Context, sel ast.SelectionSet, v types.Framework) graphql.Marshaler {

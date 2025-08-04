@@ -39,10 +39,9 @@ type AuditEdge struct {
 }
 
 type Document struct {
-	ID           gid.GID                    `json:"id"`
-	Title        string                     `json:"title"`
-	DocumentType coredata.DocumentType      `json:"documentType"`
-	Versions     *DocumentVersionConnection `json:"versions"`
+	ID           gid.GID               `json:"id"`
+	Title        string                `json:"title"`
+	DocumentType coredata.DocumentType `json:"documentType"`
 }
 
 func (Document) IsNode()             {}
@@ -58,28 +57,11 @@ type DocumentEdge struct {
 	Node   *Document      `json:"node"`
 }
 
-type DocumentVersion struct {
-	ID gid.GID `json:"id"`
+type ExportDocumentPDFInput struct {
+	DocumentID gid.GID `json:"documentId"`
 }
 
-func (DocumentVersion) IsNode()             {}
-func (this DocumentVersion) GetID() gid.GID { return this.ID }
-
-type DocumentVersionConnection struct {
-	Edges    []*DocumentVersionEdge `json:"edges"`
-	PageInfo *PageInfo              `json:"pageInfo"`
-}
-
-type DocumentVersionEdge struct {
-	Cursor page.CursorKey   `json:"cursor"`
-	Node   *DocumentVersion `json:"node"`
-}
-
-type ExportDocumentVersionPDFInput struct {
-	DocumentVersionID gid.GID `json:"documentVersionId"`
-}
-
-type ExportDocumentVersionPDFPayload struct {
+type ExportDocumentPDFPayload struct {
 	Data string `json:"data"`
 }
 

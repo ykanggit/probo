@@ -76,50 +76,16 @@ func (r *auditResolver) ReportURL(ctx context.Context, obj *types.Audit) (*strin
 	return url, nil
 }
 
-// Versions is the resolver for the versions field.
-func (r *documentResolver) Versions(ctx context.Context, obj *types.Document, first *int, after *page.CursorKey, last *int, before *page.CursorKey) (*types.DocumentVersionConnection, error) {
-	trust := r.TrustService(ctx, obj.ID.TenantID())
+// ExportDocumentPDF is the resolver for the exportDocumentPDF field.
+func (r *mutationResolver) ExportDocumentPDF(ctx context.Context, input types.ExportDocumentPDFInput) (*types.ExportDocumentPDFPayload, error) {
+	trust := r.trustCenterSvc.WithTenant(input.DocumentID.TenantID())
 
-	pageOrderBy := page.OrderBy[coredata.DocumentVersionOrderField]{
-		Field:     coredata.DocumentVersionOrderFieldCreatedAt,
-		Direction: page.OrderDirectionDesc,
-	}
-	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
-
-	// For the public trust API, only return published versions
-	page, err := trust.Documents.ListVersions(ctx, obj.ID, cursor)
+	pdf, err := trust.Documents.ExportPDF(ctx, input.DocumentID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list document versions: %w", err)
+		return nil, fmt.Errorf("cannot export document PDF: %w", err)
 	}
 
-	// Filter to only published versions and create edges directly
-	publishedEdges := make([]*types.DocumentVersionEdge, 0)
-	for _, version := range page.Data {
-		if version.Status == coredata.DocumentStatusPublished {
-			edge := &types.DocumentVersionEdge{
-				Cursor: version.CursorKey(pageOrderBy.Field),
-				Node:   types.NewDocumentVersion(version),
-			}
-			publishedEdges = append(publishedEdges, edge)
-		}
-	}
-
-	return &types.DocumentVersionConnection{
-		Edges:    publishedEdges,
-		PageInfo: types.NewPageInfo(page),
-	}, nil
-}
-
-// ExportDocumentVersionPDF is the resolver for the exportDocumentVersionPDF field.
-func (r *mutationResolver) ExportDocumentVersionPDF(ctx context.Context, input types.ExportDocumentVersionPDFInput) (*types.ExportDocumentVersionPDFPayload, error) {
-	trust := r.trustCenterSvc.WithTenant(input.DocumentVersionID.TenantID())
-
-	pdf, err := trust.Documents.ExportPDF(ctx, input.DocumentVersionID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot export document version PDF: %w", err)
-	}
-
-	return &types.ExportDocumentVersionPDFPayload{
+	return &types.ExportDocumentPDFPayload{
 		Data: fmt.Sprintf("data:application/pdf;base64,%s", base64.StdEncoding.EncodeToString(pdf)),
 	}, nil
 }
@@ -231,9 +197,6 @@ func (r *trustCenterResolver) Vendors(ctx context.Context, obj *types.TrustCente
 // Audit returns schema.AuditResolver implementation.
 func (r *Resolver) Audit() schema.AuditResolver { return &auditResolver{r} }
 
-// Document returns schema.DocumentResolver implementation.
-func (r *Resolver) Document() schema.DocumentResolver { return &documentResolver{r} }
-
 // Mutation returns schema.MutationResolver implementation.
 func (r *Resolver) Mutation() schema.MutationResolver { return &mutationResolver{r} }
 
@@ -250,7 +213,6 @@ func (r *Resolver) Report() schema.ReportResolver { return &reportResolver{r} }
 func (r *Resolver) TrustCenter() schema.TrustCenterResolver { return &trustCenterResolver{r} }
 
 type auditResolver struct{ *Resolver }
-type documentResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

@@ -48,20 +48,10 @@ enum DocumentType
     @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypePolicy")
 }
 
-type DocumentVersion implements Node {
-  id: ID!
-}
-
 type Document implements Node {
   id: ID!
   title: String!
   documentType: DocumentType!
-  versions(
-    first: Int
-    after: CursorKey
-    last: Int
-    before: CursorKey
-  ): DocumentVersionConnection! @goField(forceResolver: true)
 }
 
 type DocumentConnection {
@@ -72,16 +62,6 @@ type DocumentConnection {
 type DocumentEdge {
   cursor: CursorKey!
   node: Document!
-}
-
-type DocumentVersionConnection {
-  edges: [DocumentVersionEdge!]!
-  pageInfo: PageInfo!
-}
-
-type DocumentVersionEdge {
-  cursor: CursorKey!
-  node: DocumentVersion!
 }
 
 
@@ -244,11 +224,11 @@ type TrustCenter implements Node {
   ): VendorConnection! @goField(forceResolver: true)
 }
 
-input ExportDocumentVersionPDFInput {
-  documentVersionId: ID!
+input ExportDocumentPDFInput {
+  documentId: ID!
 }
 
-type ExportDocumentVersionPDFPayload {
+type ExportDocumentPDFPayload {
   data: String!
 }
 
@@ -257,7 +237,7 @@ type Query {
 }
 
 type Mutation {
-  exportDocumentVersionPDF(
-    input: ExportDocumentVersionPDFInput!
-  ): ExportDocumentVersionPDFPayload! @mustBeAuthenticated(role: USER)
+  exportDocumentPDF(
+    input: ExportDocumentPDFInput!
+  ): ExportDocumentPDFPayload! @mustBeAuthenticated(role: USER)
 }

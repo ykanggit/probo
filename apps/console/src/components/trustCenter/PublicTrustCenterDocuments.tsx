@@ -9,34 +9,31 @@ import {
   DocumentTypeBadge,
   Button,
   IconArrowDown,
+  useToast,
 } from "@probo/ui";
 import { useTranslate } from "@probo/i18n";
-import { graphql } from "relay-runtime";
-import { useMutation } from "react-relay";
-import type { PublicTrustCenterDocumentsExportPDFMutation } from "./__generated__/PublicTrustCenterDocumentsExportPDFMutation.graphql";
-
-const exportDocumentVersionPDFMutation = graphql`
-  mutation PublicTrustCenterDocumentsExportPDFMutation(
-    $input: ExportDocumentVersionPDFInput!
-  ) {
-    exportDocumentVersionPDF(input: $input) {
-      data
-    }
+import { buildEndpoint } from "/providers/RelayProviders";
+// Manual mutation for trust API (not processed by relay compiler)
+const exportDocumentPDFMutation = {
+  params: {
+    name: "PublicTrustCenterDocumentsExportPDFMutation",
+    operationKind: "mutation",
+    text: `
+      mutation PublicTrustCenterDocumentsExportPDFMutation(
+        $input: ExportDocumentPDFInput!
+      ) {
+        exportDocumentPDF(input: $input) {
+          data
+        }
+      }
+    `
   }
-`;
+};
 
 type Document = {
   id: string;
   title: string;
   documentType: string;
-  versions: {
-    edges: Array<{
-      node: {
-        id: string;
-        status: string;
-      };
-    }>;
-  };
 };
 
 type Props = {
@@ -44,29 +41,56 @@ type Props = {
   isAuthenticated: boolean;
 };
 
+type ExportDocumentPDFResponse = {
+  data?: {
+    exportDocumentPDF?: {
+      data: string;
+    };
+  };
+  errors?: Array<{ message: string }>;
+};
+
 export function PublicTrustCenterDocuments({ documents, isAuthenticated }: Props) {
   const { __ } = useTranslate();
-  const [exportDocumentVersionPDF] = useMutation<PublicTrustCenterDocumentsExportPDFMutation>(exportDocumentVersionPDFMutation);
+  const { toast } = useToast();
 
-  const handleDownload = (document: Document) => {
-    const latestVersion = document.versions.edges[0]?.node;
-    if (!latestVersion) return;
+  const handleDownload = async (document: Document) => {
+    try {
+      const response = await fetch(buildEndpoint("/api/trust/v1/graphql"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          operationName: exportDocumentPDFMutation.params.name,
+          query: exportDocumentPDFMutation.params.text,
+          variables: { input: { documentId: document.id } },
+        }),
+      });
 
-    exportDocumentVersionPDF({
-      variables: {
-        input: { documentVersionId: latestVersion.id },
-      },
-      onCompleted: (data) => {
-        if (data.exportDocumentVersionPDF?.data) {
-          const link = window.document.createElement("a");
-          link.href = data.exportDocumentVersionPDF.data;
-          link.download = `${document.title}.pdf`;
-          window.document.body.appendChild(link);
-          link.click();
-          window.document.body.removeChild(link);
-        }
-      },
-    });
+      const result: ExportDocumentPDFResponse = await response.json();
+
+      if (result.errors) {
+        throw new Error(result.errors[0].message);
+      }
+
+      if (result.data?.exportDocumentPDF?.data) {
+        const link = window.document.createElement("a");
+        link.href = result.data.exportDocumentPDF.data;
+        link.download = `${document.title}.pdf`;
+        window.document.body.appendChild(link);
+        link.click();
+        window.document.body.removeChild(link);
+      }
+    } catch (error) {
+      toast({
+        title: __("Download Failed"),
+        description: __("Unable to download the document. Please try again."),
+        variant: "error",
+      });
+    }
   };
 
   if (documents.length === 0) {
@@ -105,8 +129,6 @@ export function PublicTrustCenterDocuments({ documents, isAuthenticated }: Props
         </Thead>
         <Tbody>
           {documents.map((document) => {
-            const latestVersion = document.versions.edges[0]?.node;
-
             return (
               <Tr key={document.id}>
                 <Td>
@@ -118,11 +140,7 @@ export function PublicTrustCenterDocuments({ documents, isAuthenticated }: Props
                   <DocumentTypeBadge type={document.documentType} />
                 </Td>
                 <Td>
-                  {!latestVersion ? (
-                    <span className="text-txt-tertiary text-sm">
-                      {__("No version available")}
-                    </span>
-                  ) : !isAuthenticated ? (
+                  {!isAuthenticated ? (
                     <span className="text-txt-tertiary text-sm">
                       {__("Not available")}
                     </span>
