@@ -38,7 +38,12 @@ func (s AuditService) Get(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return audit.LoadByID(ctx, conn, s.svc.scope, auditID)
+			err := audit.LoadByID(ctx, conn, s.svc.scope, auditID)
+			if err != nil {
+				return fmt.Errorf("cannot load audit: %w", err)
+			}
+
+			return nil
 		},
 	)
 
