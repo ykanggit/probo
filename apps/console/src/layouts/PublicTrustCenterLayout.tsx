@@ -15,7 +15,7 @@ export function PublicTrustCenterLayout({ organizationName, organizationLogo, ch
 
     const handleLogout = async () => {
     try {
-      await fetch(buildEndpoint('/api/trust/v1/trust-center-access/logout'), {
+      await fetch(buildEndpoint('/api/trust/v1/auth/logout'), {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

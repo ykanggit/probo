@@ -107,8 +107,8 @@ func NewMux(
 
 	r.Handle("/playground", playground.Handler("GraphQL Playground", "/api/trust/v1/graphql"))
 
-	r.Post("/trust-center-access/authenticate", authTokenHandler(trustSvc, authCfg))
-	r.Delete("/trust-center-access/logout", trustCenterLogoutHandler(authCfg))
+	r.Post("/auth/authenticate", authTokenHandler(trustSvc, authCfg))
+	r.Delete("/auth/logout", trustCenterLogoutHandler(authCfg))
 
 	return r
 }

@@ -87,7 +87,7 @@ export default function TrustCenterAccessPage() {
       return;
     }
 
-    fetch(buildEndpoint('/api/trust/v1/trust-center-access/authenticate'), {
+    fetch(buildEndpoint('/api/trust/v1/auth/authenticate'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
