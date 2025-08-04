@@ -31,6 +31,7 @@ import (
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/securecookie"
+	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
 	"github.com/getprobo/probo/pkg/server/api/trust/v1/auth"
 	"github.com/getprobo/probo/pkg/server/api/trust/v1/schema"
 	"github.com/getprobo/probo/pkg/statelesstoken"
@@ -42,24 +43,23 @@ import (
 )
 
 type (
-	AuthConfig struct {
-		CookieName      string
-		CookieDomain    string
-		SessionDuration time.Duration
-		CookieSecret    string
+	TrustAuthConfig struct {
+		CookieName     string
+		CookieDomain   string
+		CookieDuration time.Duration
+		TokenDuration  time.Duration
+		TokenSecret    string
+		Scope          string
+		TokenType      string
 	}
 
 	Resolver struct {
 		trustCenterSvc *trust.Service
-		authCfg        AuthConfig
+		authCfg        console_v1.AuthConfig
+		trustAuthCfg   TrustAuthConfig
 	}
 
 	ctxKey struct{ name string }
-)
-
-const (
-	TokenScopeTrustCenterReadOnly = "trust_center_readonly"
-	TokenCookieName               = "trust_center_token"
 )
 
 var (
@@ -98,22 +98,24 @@ func NewMux(
 	logger *log.Logger,
 	usrmgrSvc *usrmgr.Service,
 	trustSvc *trust.Service,
-	authCfg AuthConfig,
+	authCfg console_v1.AuthConfig,
+	trustAuthCfg TrustAuthConfig,
 ) *chi.Mux {
 	r := chi.NewMux()
 
-	r.Handle("/graphql", graphqlHandler(logger, usrmgrSvc, trustSvc, authCfg))
+	r.Handle("/graphql", graphqlHandler(logger, usrmgrSvc, trustSvc, authCfg, trustAuthCfg))
 
-	r.Post("/auth/authenticate", authTokenHandler(trustSvc, authCfg))
-	r.Delete("/auth/logout", trustCenterLogoutHandler(authCfg))
+	r.Post("/auth/authenticate", authTokenHandler(trustSvc, trustAuthCfg))
+	r.Delete("/auth/logout", trustCenterLogoutHandler(trustAuthCfg))
 
 	return r
 }
 
-func graphqlHandler(logger *log.Logger, usrmgrSvc *usrmgr.Service, trustSvc *trust.Service, authCfg AuthConfig) http.HandlerFunc {
+func graphqlHandler(logger *log.Logger, usrmgrSvc *usrmgr.Service, trustSvc *trust.Service, authCfg console_v1.AuthConfig, trustAuthCfg TrustAuthConfig) http.HandlerFunc {
 	resolver := &Resolver{
 		trustCenterSvc: trustSvc,
 		authCfg:        authCfg,
+		trustAuthCfg:   trustAuthCfg,
 	}
 
 	c := schema.Config{
@@ -139,7 +141,7 @@ func graphqlHandler(logger *log.Logger, usrmgrSvc *usrmgr.Service, trustSvc *tru
 		return errors.New("internal server error")
 	})
 
-	return WithSession(usrmgrSvc, trustSvc, authCfg, srv.ServeHTTP)
+	return WithSession(usrmgrSvc, trustSvc, authCfg, trustAuthCfg, srv.ServeHTTP)
 }
 
 // TrustService returns a trust service scoped to the given tenant
@@ -152,11 +154,11 @@ func (r *Resolver) GetTenantService(ctx context.Context, tenantID gid.TenantID) 
 	return r.trustCenterSvc.WithTenant(tenantID)
 }
 
-func WithSession(usrmgrSvc *usrmgr.Service, trustSvc *trust.Service, authCfg AuthConfig, next http.HandlerFunc) http.HandlerFunc {
+func WithSession(usrmgrSvc *usrmgr.Service, trustSvc *trust.Service, authCfg console_v1.AuthConfig, trustAuthCfg TrustAuthConfig, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		if authCtx := tryTokenAuth(ctx, w, r, trustSvc, authCfg); authCtx != nil {
+		if authCtx := tryTokenAuth(ctx, w, r, trustSvc, trustAuthCfg); authCtx != nil {
 			next(w, r.WithContext(authCtx))
 			return
 		}
@@ -171,7 +173,7 @@ func WithSession(usrmgrSvc *usrmgr.Service, trustSvc *trust.Service, authCfg Aut
 	}
 }
 
-func trySessionAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, usrmgrSvc *usrmgr.Service, authCfg AuthConfig) context.Context {
+func trySessionAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, usrmgrSvc *usrmgr.Service, authCfg console_v1.AuthConfig) context.Context {
 	cookieValue, err := securecookie.Get(r, securecookie.DefaultConfig(
 		authCfg.CookieName,
 		authCfg.CookieSecret,
@@ -211,19 +213,19 @@ func trySessionAuth(ctx context.Context, w http.ResponseWriter, r *http.Request,
 	return ctx
 }
 
-func tryTokenAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, trustSvc *trust.Service, authCfg AuthConfig) context.Context {
-	cookie, err := r.Cookie(TokenCookieName)
+func tryTokenAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, trustSvc *trust.Service, trustAuthCfg TrustAuthConfig) context.Context {
+	cookie, err := r.Cookie(trustAuthCfg.CookieName)
 	if err != nil {
 		return nil
 	}
 
 	payload, err := statelesstoken.ValidateToken[probo.TrustCenterAccessData](
-		authCfg.CookieSecret,
-		probo.TokenTypeTrustCenterAccess,
+		trustAuthCfg.TokenSecret,
+		trustAuthCfg.TokenType,
 		cookie.Value,
 	)
 	if err != nil {
-		clearTokenCookie(w, authCfg)
+		clearTokenCookie(w, trustAuthCfg)
 		return nil
 	}
 
@@ -233,24 +235,24 @@ func tryTokenAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, t
 		TrustCenterID: payload.Data.TrustCenterID,
 		Email:         payload.Data.Email,
 		TenantID:      tenantID,
-		Scope:         TokenScopeTrustCenterReadOnly,
+		Scope:         trustAuthCfg.Scope,
 	}
 
 	return context.WithValue(ctx, tokenAccessContextKey, tokenAccess)
 }
 
-func clearSessionCookie(w http.ResponseWriter, authCfg AuthConfig) {
+func clearSessionCookie(w http.ResponseWriter, authCfg console_v1.AuthConfig) {
 	securecookie.Clear(w, securecookie.DefaultConfig(
 		authCfg.CookieName,
 		authCfg.CookieSecret,
 	))
 }
 
-func clearTokenCookie(w http.ResponseWriter, authCfg AuthConfig) {
+func clearTokenCookie(w http.ResponseWriter, trustAuthCfg TrustAuthConfig) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     TokenCookieName,
+		Name:     trustAuthCfg.CookieName,
 		Value:    "",
-		Domain:   authCfg.CookieDomain,
+		Domain:   trustAuthCfg.CookieDomain,
 		Path:     "/",
 		MaxAge:   -1,
 		Secure:   true,

@@ -78,8 +78,8 @@ func (s TrustCenterAccessService) ValidateToken(
 	tokenString string,
 ) (*TrustCenterAccessData, error) {
 	token, err := statelesstoken.ValidateToken[TrustCenterAccessData](
-		s.svc.tokenSecret,
-		TokenTypeTrustCenterAccess,
+		s.svc.trustConfig.TokenSecret,
+		s.svc.trustConfig.TokenType,
 		tokenString,
 	)
 	if err != nil {
@@ -176,9 +176,9 @@ func (s TrustCenterAccessService) Delete(
 
 func (s TrustCenterAccessService) sendAccessEmail(ctx context.Context, access *coredata.TrustCenterAccess) error {
 	accessToken, err := statelesstoken.NewToken(
-		s.svc.tokenSecret,
-		TokenTypeTrustCenterAccess,
-		7*24*time.Hour,
+		s.svc.trustConfig.TokenSecret,
+		s.svc.trustConfig.TokenType,
+		s.svc.trustConfig.TokenDuration,
 		TrustCenterAccessData{
 			TrustCenterID: access.TrustCenterID,
 			Email:         access.Email,

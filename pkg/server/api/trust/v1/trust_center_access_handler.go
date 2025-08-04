@@ -39,7 +39,7 @@ type (
 	}
 )
 
-func authTokenHandler(trustSvc *trust.Service, authCfg AuthConfig) http.HandlerFunc {
+func authTokenHandler(trustSvc *trust.Service, trustAuthCfg TrustAuthConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req AuthTokenRequest
 		// Limit request body size to 1KB to prevent DoS attacks
@@ -57,7 +57,7 @@ func authTokenHandler(trustSvc *trust.Service, authCfg AuthConfig) http.HandlerF
 			return
 		}
 
-		accessData, err := validateTrustCenterAccessToken(r.Context(), trustSvc, authCfg, req.Token)
+		accessData, err := validateTrustCenterAccessToken(r.Context(), trustSvc, trustAuthCfg, req.Token)
 		if err != nil {
 			httpserver.RenderJSON(w, http.StatusUnauthorized, AuthTokenResponse{
 				Success: false,
@@ -67,9 +67,9 @@ func authTokenHandler(trustSvc *trust.Service, authCfg AuthConfig) http.HandlerF
 		}
 
 		tokenString, err := statelesstoken.NewToken(
-			authCfg.CookieSecret,
-			probo.TokenTypeTrustCenterAccess,
-			24*time.Hour,
+			trustAuthCfg.TokenSecret,
+			trustAuthCfg.TokenType,
+			trustAuthCfg.TokenDuration,
 			*accessData,
 		)
 		if err != nil {
@@ -78,11 +78,11 @@ func authTokenHandler(trustSvc *trust.Service, authCfg AuthConfig) http.HandlerF
 		}
 
 		cookie := &http.Cookie{
-			Name:     TokenCookieName,
+			Name:     trustAuthCfg.CookieName,
 			Value:    tokenString,
-			Domain:   authCfg.CookieDomain,
+			Domain:   trustAuthCfg.CookieDomain,
 			Path:     "/",
-			MaxAge:   int(24 * time.Hour / time.Second), // 24 hours
+			MaxAge:   int(trustAuthCfg.CookieDuration / time.Second),
 			Secure:   true,
 			HttpOnly: true,
 			SameSite: http.SameSiteStrictMode,
@@ -97,10 +97,10 @@ func authTokenHandler(trustSvc *trust.Service, authCfg AuthConfig) http.HandlerF
 	}
 }
 
-func validateTrustCenterAccessToken(ctx context.Context, trustSvc *trust.Service, authCfg AuthConfig, tokenString string) (*probo.TrustCenterAccessData, error) {
+func validateTrustCenterAccessToken(ctx context.Context, trustSvc *trust.Service, trustAuthCfg TrustAuthConfig, tokenString string) (*probo.TrustCenterAccessData, error) {
 	token, err := statelesstoken.ValidateToken[probo.TrustCenterAccessData](
 		trustSvc.GetTokenSecret(),
-		probo.TokenTypeTrustCenterAccess,
+		trustAuthCfg.TokenType,
 		tokenString,
 	)
 	if err != nil {
@@ -113,13 +113,13 @@ func validateTrustCenterAccessToken(ctx context.Context, trustSvc *trust.Service
 	return tenantSvc.TrustCenterAccesses.ValidateToken(ctx, tokenString)
 }
 
-func trustCenterLogoutHandler(authCfg AuthConfig) http.HandlerFunc {
+func trustCenterLogoutHandler(trustAuthCfg TrustAuthConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Clear cookie directly
 		http.SetCookie(w, &http.Cookie{
-			Name:     TokenCookieName,
+			Name:     trustAuthCfg.CookieName,
 			Value:    "",
-			Domain:   authCfg.CookieDomain,
+			Domain:   trustAuthCfg.CookieDomain,
 			Path:     "/",
 			MaxAge:   -1,
 			Secure:   true,
@@ -127,8 +127,8 @@ func trustCenterLogoutHandler(authCfg AuthConfig) http.HandlerFunc {
 			SameSite: http.SameSiteStrictMode,
 		})
 
-		w.Header().Set("Clear-Site-Data", "*")
-
-		httpserver.RenderJSON(w, http.StatusOK, map[string]bool{"success": true})
+		httpserver.RenderJSON(w, http.StatusOK, map[string]string{
+			"message": "Logged out successfully",
+		})
 	}
 }

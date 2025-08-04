@@ -38,7 +38,8 @@ type Config struct {
 	Probo             *probo.Service
 	Usrmgr            *usrmgr.Service
 	Trust             *trust.Service
-	Auth              api.AuthConfig
+	Auth              api.ConsoleAuthConfig
+	TrustAuth         api.TrustAuthConfig
 	ConnectorRegistry *connector.ConnectorRegistry
 	Agent             *agents.Agent
 	SafeRedirect      *saferedirect.SafeRedirect
@@ -62,6 +63,7 @@ func NewServer(cfg Config) (*Server, error) {
 		Usrmgr:            cfg.Usrmgr,
 		Trust:             cfg.Trust,
 		Auth:              cfg.Auth,
+		TrustAuth:         cfg.TrustAuth,
 		ConnectorRegistry: cfg.ConnectorRegistry,
 		SafeRedirect:      cfg.SafeRedirect,
 		Logger:            cfg.Logger.Named("api"),

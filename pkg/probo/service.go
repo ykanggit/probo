@@ -17,6 +17,7 @@ package probo
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/agents"
@@ -30,6 +31,12 @@ import (
 )
 
 type (
+	TrustConfig struct {
+		TokenSecret   string
+		TokenDuration time.Duration
+		TokenType     string
+	}
+
 	Service struct {
 		pg                *pg.Client
 		s3                *s3.Client
@@ -37,6 +44,7 @@ type (
 		encryptionKey     cipher.EncryptionKey
 		hostname          string
 		tokenSecret       string
+		trustConfig       TrustConfig
 		agentConfig       agents.Config
 		html2pdfConverter *html2pdf.Converter
 		usrmgr            *usrmgr.Service
@@ -50,6 +58,7 @@ type (
 		scope                   coredata.Scoper
 		hostname                string
 		tokenSecret             string
+		trustConfig             TrustConfig
 		agent                   *agents.Agent
 		Frameworks              *FrameworkService
 		Measures                *MeasureService
@@ -80,6 +89,7 @@ func NewService(
 	bucket string,
 	hostname string,
 	tokenSecret string,
+	trustConfig TrustConfig,
 	agentConfig agents.Config,
 	html2pdfConverter *html2pdf.Converter,
 	usrmgrService *usrmgr.Service,
@@ -95,6 +105,7 @@ func NewService(
 		encryptionKey:     encryptionKey,
 		hostname:          hostname,
 		tokenSecret:       tokenSecret,
+		trustConfig:       trustConfig,
 		agentConfig:       agentConfig,
 		html2pdfConverter: html2pdfConverter,
 		usrmgr:            usrmgrService,
@@ -112,6 +123,7 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 		hostname:      s.hostname,
 		scope:         coredata.NewScope(tenantID),
 		tokenSecret:   s.tokenSecret,
+		trustConfig:   s.trustConfig,
 		agent:         agents.NewAgent(nil, s.agentConfig),
 	}
 

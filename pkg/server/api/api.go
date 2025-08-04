@@ -34,11 +34,21 @@ import (
 )
 
 type (
-	AuthConfig struct {
+	ConsoleAuthConfig struct {
 		CookieName      string
 		CookieDomain    string
 		SessionDuration time.Duration
 		CookieSecret    string
+	}
+
+	TrustAuthConfig struct {
+		CookieName     string
+		CookieDomain   string
+		CookieDuration time.Duration
+		TokenDuration  time.Duration
+		TokenSecret    string
+		Scope          string
+		TokenType      string
 	}
 
 	Config struct {
@@ -46,7 +56,8 @@ type (
 		Probo             *probo.Service
 		Usrmgr            *usrmgr.Service
 		Trust             *trust.Service
-		Auth              AuthConfig
+		Auth              ConsoleAuthConfig
+		TrustAuth         TrustAuthConfig
 		ConnectorRegistry *connector.ConnectorRegistry
 		SafeRedirect      *saferedirect.SafeRedirect
 		Logger            *log.Logger
@@ -152,11 +163,20 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			s.cfg.Logger.Named("trust.v1"),
 			s.cfg.Usrmgr,
 			s.cfg.Trust,
-			trust_v1.AuthConfig{
+			console_v1.AuthConfig{
 				CookieName:      s.cfg.Auth.CookieName,
 				CookieDomain:    s.cfg.Auth.CookieDomain,
 				SessionDuration: s.cfg.Auth.SessionDuration,
 				CookieSecret:    s.cfg.Auth.CookieSecret,
+			},
+			trust_v1.TrustAuthConfig{
+				CookieName:     s.cfg.TrustAuth.CookieName,
+				CookieDomain:   s.cfg.TrustAuth.CookieDomain,
+				CookieDuration: s.cfg.TrustAuth.CookieDuration,
+				TokenDuration:  s.cfg.TrustAuth.TokenDuration,
+				TokenSecret:    s.cfg.TrustAuth.TokenSecret,
+				Scope:          s.cfg.TrustAuth.Scope,
+				TokenType:      s.cfg.TrustAuth.TokenType,
 			},
 		),
 	)
