@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"github.com/getprobo/probo/pkg/coredata"
-	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/statelesstoken"
 	"github.com/getprobo/probo/pkg/usrmgr"
@@ -64,26 +63,5 @@ func (s TrustCenterAccessService) ValidateToken(
 		return nil, err
 	}
 
-	if !access.Active {
-		return nil, fmt.Errorf("access has been revoked")
-	}
-
 	return &token.Data, nil
-}
-
-func (s TrustCenterAccessService) IsAccessActive(
-	ctx context.Context,
-	trustCenterID gid.GID,
-	email string,
-) (bool, error) {
-	access := &coredata.TrustCenterAccess{}
-	err := s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
-		return access.LoadByTrustCenterIDAndEmail(ctx, conn, s.svc.scope, trustCenterID, email)
-	})
-
-	if err != nil {
-		return false, fmt.Errorf("cannot load trust center access: %w", err)
-	}
-
-	return access.Active, nil
 }

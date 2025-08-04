@@ -371,7 +371,6 @@ type CreateTrustCenterAccessInput struct {
 	TrustCenterID gid.GID `json:"trustCenterId"`
 	Email         string  `json:"email"`
 	Name          string  `json:"name"`
-	SendEmail     bool    `json:"sendEmail"`
 }
 
 type CreateTrustCenterAccessPayload struct {
@@ -948,14 +947,6 @@ type RequestSignaturePayload struct {
 	DocumentVersionSignatureEdge *DocumentVersionSignatureEdge `json:"documentVersionSignatureEdge"`
 }
 
-type RevokeTrustCenterAccessInput struct {
-	AccessID gid.GID `json:"accessId"`
-}
-
-type RevokeTrustCenterAccessPayload struct {
-	TrustCenterAccess *TrustCenterAccess `json:"trustCenterAccess"`
-}
-
 type Risk struct {
 	ID                 gid.GID                `json:"id"`
 	Name               string                 `json:"name"`
@@ -1043,7 +1034,6 @@ type TrustCenterAccess struct {
 	ID        gid.GID   `json:"id"`
 	Email     string    `json:"email"`
 	Name      string    `json:"name"`
-	Active    bool      `json:"active"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
@@ -1234,18 +1224,6 @@ type UpdateTaskInput struct {
 
 type UpdateTaskPayload struct {
 	Task *Task `json:"task"`
-}
-
-type UpdateTrustCenterAccessInput struct {
-	AccessID  gid.GID `json:"accessId"`
-	Email     *string `json:"email,omitempty"`
-	Name      *string `json:"name,omitempty"`
-	Active    *bool   `json:"active,omitempty"`
-	SendEmail bool    `json:"sendEmail"`
-}
-
-type UpdateTrustCenterAccessPayload struct {
-	TrustCenterAccess *TrustCenterAccess `json:"trustCenterAccess"`
 }
 
 type UpdateTrustCenterInput struct {

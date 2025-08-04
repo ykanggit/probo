@@ -33,7 +33,6 @@ type (
 		TrustCenterID gid.GID      `db:"trust_center_id"`
 		Email         string       `db:"email"`
 		Name          string       `db:"name"`
-		Active        bool         `db:"active"`
 		CreatedAt     time.Time    `db:"created_at"`
 		UpdatedAt     time.Time    `db:"updated_at"`
 	}
@@ -63,7 +62,6 @@ SELECT
 	trust_center_id,
 	email,
 	name,
-	active,
 	created_at,
 	updated_at
 FROM
@@ -108,7 +106,6 @@ SELECT
 	trust_center_id,
 	email,
 	name,
-	active,
 	created_at,
 	updated_at
 FROM
@@ -155,7 +152,6 @@ INSERT INTO trust_center_accesses (
 	trust_center_id,
 	email,
 	name,
-	active,
 	created_at,
 	updated_at
 ) VALUES (
@@ -164,7 +160,6 @@ INSERT INTO trust_center_accesses (
 	@trust_center_id,
 	@email,
 	@name,
-	@active,
 	@created_at,
 	@updated_at
 )
@@ -176,7 +171,6 @@ INSERT INTO trust_center_accesses (
 		"trust_center_id": tca.TrustCenterID,
 		"email":           tca.Email,
 		"name":            tca.Name,
-		"active":          tca.Active,
 		"created_at":      tca.CreatedAt,
 		"updated_at":      tca.UpdatedAt,
 	}
@@ -184,38 +178,6 @@ INSERT INTO trust_center_accesses (
 	_, err := conn.Exec(ctx, q, args)
 	if err != nil {
 		return fmt.Errorf("cannot insert trust center access: %w", err)
-	}
-
-	return nil
-}
-
-func (tca *TrustCenterAccess) Update(
-	ctx context.Context,
-	conn pg.Conn,
-	scope Scoper,
-) error {
-	q := `
-UPDATE trust_center_accesses
-SET
-	active = @active,
-	updated_at = @updated_at
-WHERE
-	%s
-	AND id = @id
-`
-
-	q = fmt.Sprintf(q, scope.SQLFragment())
-
-	args := pgx.StrictNamedArgs{
-		"id":         tca.ID,
-		"active":     tca.Active,
-		"updated_at": tca.UpdatedAt,
-	}
-	maps.Copy(args, scope.SQLArguments())
-
-	_, err := conn.Exec(ctx, q, args)
-	if err != nil {
-		return fmt.Errorf("cannot update trust center access: %w", err)
 	}
 
 	return nil
@@ -262,7 +224,6 @@ SELECT
 	trust_center_id,
 	email,
 	name,
-	active,
 	created_at,
 	updated_at
 FROM

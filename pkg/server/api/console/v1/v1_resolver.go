@@ -998,22 +998,6 @@ func (r *mutationResolver) UpdateTrustCenter(ctx context.Context, input types.Up
 	}, nil
 }
 
-// RevokeTrustCenterAccess is the resolver for the revokeTrustCenterAccess field.
-func (r *mutationResolver) RevokeTrustCenterAccess(ctx context.Context, input types.RevokeTrustCenterAccessInput) (*types.RevokeTrustCenterAccessPayload, error) {
-	prb := r.ProboService(ctx, input.AccessID.TenantID())
-
-	access, err := prb.TrustCenterAccesses.RevokeAccess(ctx, &probo.RevokeTrustCenterAccessRequest{
-		AccessID: input.AccessID,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cannot revoke trust center access: %w", err)
-	}
-
-	return &types.RevokeTrustCenterAccessPayload{
-		TrustCenterAccess: types.NewTrustCenterAccess(access),
-	}, nil
-}
-
 // CreateTrustCenterAccess is the resolver for the createTrustCenterAccess field.
 func (r *mutationResolver) CreateTrustCenterAccess(ctx context.Context, input types.CreateTrustCenterAccessInput) (*types.CreateTrustCenterAccessPayload, error) {
 	prb := r.ProboService(ctx, input.TrustCenterID.TenantID())
@@ -1022,7 +1006,6 @@ func (r *mutationResolver) CreateTrustCenterAccess(ctx context.Context, input ty
 		TrustCenterID: input.TrustCenterID,
 		Email:         input.Email,
 		Name:          input.Name,
-		SendEmail:     input.SendEmail,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot create trust center access: %w", err)
@@ -1030,26 +1013,6 @@ func (r *mutationResolver) CreateTrustCenterAccess(ctx context.Context, input ty
 
 	return &types.CreateTrustCenterAccessPayload{
 		TrustCenterAccessEdge: types.NewTrustCenterAccessEdge(access, coredata.TrustCenterAccessOrderFieldCreatedAt),
-	}, nil
-}
-
-// UpdateTrustCenterAccess is the resolver for the updateTrustCenterAccess field.
-func (r *mutationResolver) UpdateTrustCenterAccess(ctx context.Context, input types.UpdateTrustCenterAccessInput) (*types.UpdateTrustCenterAccessPayload, error) {
-	prb := r.ProboService(ctx, input.AccessID.TenantID())
-
-	access, err := prb.TrustCenterAccesses.Update(ctx, &probo.UpdateTrustCenterAccessRequest{
-		AccessID:  input.AccessID,
-		Email:     input.Email,
-		Name:      input.Name,
-		Active:    input.Active,
-		SendEmail: input.SendEmail,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cannot update trust center access: %w", err)
-	}
-
-	return &types.UpdateTrustCenterAccessPayload{
-		TrustCenterAccess: types.NewTrustCenterAccess(access),
 	}, nil
 }
 

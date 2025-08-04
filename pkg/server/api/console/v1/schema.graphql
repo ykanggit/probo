@@ -1239,7 +1239,6 @@ type TrustCenterAccess implements Node {
   id: ID!
   email: String!
   name: String!
-  active: Boolean!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -1484,18 +1483,10 @@ type Mutation {
     input: UpdateTrustCenterInput!
   ): UpdateTrustCenterPayload!
 
-  revokeTrustCenterAccess(
-    input: RevokeTrustCenterAccessInput!
-  ): RevokeTrustCenterAccessPayload!
-
   # Trust Center Access CRUD mutations
   createTrustCenterAccess(
     input: CreateTrustCenterAccessInput!
   ): CreateTrustCenterAccessPayload!
-
-  updateTrustCenterAccess(
-    input: UpdateTrustCenterAccessInput!
-  ): UpdateTrustCenterAccessPayload!
 
   deleteTrustCenterAccess(
     input: DeleteTrustCenterAccessInput!
@@ -1673,23 +1664,10 @@ input UpdateTrustCenterInput {
   slug: String
 }
 
-input RevokeTrustCenterAccessInput {
-  accessId: ID!
-}
-
 input CreateTrustCenterAccessInput {
   trustCenterId: ID!
   email: String!
   name: String!
-  sendEmail: Boolean! = true
-}
-
-input UpdateTrustCenterAccessInput {
-  accessId: ID!
-  email: String
-  name: String
-  active: Boolean
-  sendEmail: Boolean! = false
 }
 
 input DeleteTrustCenterAccessInput {
@@ -2063,16 +2041,8 @@ type UpdateTrustCenterPayload {
 
 
 
-type RevokeTrustCenterAccessPayload {
-  trustCenterAccess: TrustCenterAccess!
-}
-
 type CreateTrustCenterAccessPayload {
   trustCenterAccessEdge: TrustCenterAccessEdge!
-}
-
-type UpdateTrustCenterAccessPayload {
-  trustCenterAccess: TrustCenterAccess!
 }
 
 type DeleteTrustCenterAccessPayload {

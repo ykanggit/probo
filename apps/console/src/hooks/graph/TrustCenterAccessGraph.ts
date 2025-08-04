@@ -25,25 +25,10 @@ export const trustCenterAccessesQuery = graphql`
               id
               email
               name
-              active
               createdAt
             }
           }
         }
-      }
-    }
-  }
-`;
-
-export const revokeTrustCenterAccessMutation = graphql`
-  mutation TrustCenterAccessGraphRevokeMutation($input: RevokeTrustCenterAccessInput!) {
-    revokeTrustCenterAccess(input: $input) {
-      trustCenterAccess {
-        id
-        email
-        name
-        active
-        createdAt
       }
     }
   }
@@ -61,23 +46,8 @@ export const createTrustCenterAccessMutation = graphql`
           id
           email
           name
-          active
           createdAt
         }
-      }
-    }
-  }
-`;
-
-export const updateTrustCenterAccessMutation = graphql`
-  mutation TrustCenterAccessGraphUpdateMutation($input: UpdateTrustCenterAccessInput!) {
-    updateTrustCenterAccess(input: $input) {
-      trustCenterAccess {
-        id
-        email
-        name
-        active
-        createdAt
       }
     }
   }
@@ -94,6 +64,15 @@ export const deleteTrustCenterAccessMutation = graphql`
   }
 `;
 
-export function useTrustCenterAccesses(trustCenterId: string): TrustCenterAccessGraphQuery$data {
-  return useLazyLoadQuery<TrustCenterAccessGraphQuery>(trustCenterAccessesQuery, { trustCenterId });
+export function useTrustCenterAccesses(trustCenterId: string): TrustCenterAccessGraphQuery$data | null {
+  // Always call useLazyLoadQuery to maintain consistent hook order
+  // Use a placeholder value when trustCenterId is empty
+  const data = useLazyLoadQuery<TrustCenterAccessGraphQuery>(
+    trustCenterAccessesQuery,
+    { trustCenterId: trustCenterId || "" },
+    { fetchPolicy: 'store-and-network' }
+  );
+
+  // Return null if trustCenterId was empty, otherwise return the data
+  return trustCenterId ? data : null;
 }

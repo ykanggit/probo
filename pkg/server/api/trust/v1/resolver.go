@@ -239,13 +239,6 @@ func tryTokenAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, t
 	}
 
 	tenantID := payload.Data.TrustCenterID.TenantID()
-	tenantSvc := trustSvc.WithTenant(tenantID)
-	isActive, err := tenantSvc.TrustCenterAccesses.IsAccessActive(ctx, payload.Data.TrustCenterID, payload.Data.Email)
-
-	if err != nil || !isActive {
-		clearTokenCookie(w, authCfg)
-		return nil
-	}
 
 	tokenAccess := &auth.TokenAccessData{
 		TrustCenterID: payload.Data.TrustCenterID,
