@@ -42,13 +42,14 @@ import (
 
 type (
 	TrustAuthConfig struct {
-		CookieName     string
-		CookieDomain   string
-		CookieDuration time.Duration
-		TokenDuration  time.Duration
-		TokenSecret    string
-		Scope          string
-		TokenType      string
+		CookieName        string
+		CookieDomain      string
+		CookieDuration    time.Duration
+		TokenDuration     time.Duration
+		ReportURLDuration time.Duration
+		TokenSecret       string
+		Scope             string
+		TokenType         string
 	}
 
 	Resolver struct {

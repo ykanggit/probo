@@ -42,13 +42,14 @@ type (
 	}
 
 	TrustAuthConfig struct {
-		CookieName     string
-		CookieDomain   string
-		CookieDuration time.Duration
-		TokenDuration  time.Duration
-		TokenSecret    string
-		Scope          string
-		TokenType      string
+		CookieName        string
+		CookieDomain      string
+		CookieDuration    time.Duration
+		TokenDuration     time.Duration
+		ReportURLDuration time.Duration
+		TokenSecret       string
+		Scope             string
+		TokenType         string
 	}
 
 	Config struct {
@@ -170,13 +171,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				CookieSecret:    s.cfg.Auth.CookieSecret,
 			},
 			trust_v1.TrustAuthConfig{
-				CookieName:     s.cfg.TrustAuth.CookieName,
-				CookieDomain:   s.cfg.TrustAuth.CookieDomain,
-				CookieDuration: s.cfg.TrustAuth.CookieDuration,
-				TokenDuration:  s.cfg.TrustAuth.TokenDuration,
-				TokenSecret:    s.cfg.TrustAuth.TokenSecret,
-				Scope:          s.cfg.TrustAuth.Scope,
-				TokenType:      s.cfg.TrustAuth.TokenType,
+				CookieName:        s.cfg.TrustAuth.CookieName,
+				CookieDomain:      s.cfg.TrustAuth.CookieDomain,
+				CookieDuration:    s.cfg.TrustAuth.CookieDuration,
+				TokenDuration:     s.cfg.TrustAuth.TokenDuration,
+				ReportURLDuration: s.cfg.TrustAuth.ReportURLDuration,
+				TokenSecret:       s.cfg.TrustAuth.TokenSecret,
+				Scope:             s.cfg.TrustAuth.Scope,
+				TokenType:         s.cfg.TrustAuth.TokenType,
 			},
 		),
 	)

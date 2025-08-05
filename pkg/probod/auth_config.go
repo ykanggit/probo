@@ -27,13 +27,14 @@ type (
 	}
 
 	trustAuthConfig struct {
-		CookieName     string `json:"cookie-name"`
-		CookieDomain   string `json:"cookie-domain"`
-		CookieDuration int    `json:"cookie-duration"`
-		TokenDuration  int    `json:"token-duration"`
-		TokenSecret    string `json:"token-secret"`
-		Scope          string `json:"scope"`
-		TokenType      string `json:"token-type"`
+		CookieName        string `json:"cookie-name"`
+		CookieDomain      string `json:"cookie-domain"`
+		CookieDuration    int    `json:"cookie-duration"`
+		TokenDuration     int    `json:"token-duration"`
+		ReportURLDuration int    `json:"report-url-duration"`
+		TokenSecret       string `json:"token-secret"`
+		Scope             string `json:"scope"`
+		TokenType         string `json:"token-type"`
 	}
 
 	cookieConfig struct {

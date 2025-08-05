@@ -73,7 +73,7 @@ func (r *auditResolver) ReportURL(ctx context.Context, obj *types.Audit) (*strin
 		return nil, nil
 	}
 
-	url, err := trust.Audits.GenerateReportURL(ctx, obj.ID, 15*time.Minute)
+	url, err := trust.Audits.GenerateReportURL(ctx, obj.ID, r.trustAuthCfg.ReportURLDuration)
 	if err != nil {
 		return nil, fmt.Errorf("cannot generate report URL: %w", err)
 	}
