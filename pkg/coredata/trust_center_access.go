@@ -256,24 +256,3 @@ WHERE
 
 	return nil
 }
-
-type (
-	TrustCenterAccessOrderField string
-)
-
-const (
-	TrustCenterAccessOrderFieldCreatedAt TrustCenterAccessOrderField = "CREATED_AT"
-)
-
-func (tcaof TrustCenterAccessOrderField) String() string {
-	return string(tcaof)
-}
-
-func (tcaof TrustCenterAccessOrderField) Column() string {
-	switch tcaof {
-	case TrustCenterAccessOrderFieldCreatedAt:
-		return "created_at"
-	}
-
-	panic(fmt.Sprintf("unsupported order by: %s", tcaof))
-}
