@@ -205,7 +205,7 @@ func tryTokenAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, t
 		return nil
 	}
 
-	payload, err := statelesstoken.ValidateToken[probo.TrustCenterAccessData](
+	basicPayload, err := statelesstoken.ValidateToken[probo.TrustCenterAccessData](
 		trustAuthCfg.TokenSecret,
 		trustAuthCfg.TokenType,
 		cookie.Value,
@@ -215,11 +215,18 @@ func tryTokenAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, t
 		return nil
 	}
 
-	tenantID := payload.Data.TrustCenterID.TenantID()
+	tenantID := basicPayload.Data.TrustCenterID.TenantID()
+
+	tenantSvc := trustSvc.WithTenant(tenantID)
+	payload, err := tenantSvc.TrustCenterAccesses.ValidateToken(ctx, cookie.Value)
+	if err != nil {
+		clearTokenCookie(w, trustAuthCfg)
+		return nil
+	}
 
 	tokenAccess := &auth.TokenAccessData{
-		TrustCenterID: payload.Data.TrustCenterID,
-		Email:         payload.Data.Email,
+		TrustCenterID: payload.TrustCenterID,
+		Email:         payload.Email,
 		TenantID:      tenantID,
 		Scope:         trustAuthCfg.Scope,
 	}
