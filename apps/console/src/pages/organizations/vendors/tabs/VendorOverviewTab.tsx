@@ -18,7 +18,7 @@ export default function VendorOverviewTab() {
     control,
     register,
     handleSubmit,
-    formState: { errors, isDirty, isSubmitting },
+    formState: { errors, isSubmitting },
   } = useVendorForm(vendor);
 
   const urls = useMemo(
@@ -38,7 +38,7 @@ export default function VendorOverviewTab() {
         { name: "securityPageUrl", label: __("Security page URL") },
         { name: "trustPageUrl", label: __("Trust page URL") },
       ] as const,
-    []
+    [],
   );
 
   usePageTitle(vendor.name + " - " + __("Overview"));
@@ -84,7 +84,7 @@ export default function VendorOverviewTab() {
 
       {/* Ownership */}
       <div className="space-y-4">
-        <h2 className="text-base font-medium">{__("Ownership details`")}</h2>
+        <h2 className="text-base font-medium">{__("Ownership details")}</h2>
         <Card className="space-y-4" padded>
           <PeopleSelectField
             organizationId={organizationId}
@@ -134,11 +134,9 @@ export default function VendorOverviewTab() {
 
       {/* Submit */}
       <div className="flex justify-end">
-        {isDirty && (
-          <Button type="submit" disabled={isSubmitting}>
-            {__("Update vendor")}
-          </Button>
-        )}
+        <Button type="submit" disabled={isSubmitting}>
+          {__("Update vendor")}
+        </Button>
       </div>
     </form>
   );

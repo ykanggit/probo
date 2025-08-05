@@ -9,10 +9,12 @@ import {
   IconInboxEmpty,
   IconPageTextLine,
   IconSettingsGear2,
+  IconCheckmark1,
   IconStore,
   IconTodo,
   IconListStack,
   IconBox,
+  IconShield,
   Layout,
   SidebarItem,
   UserDropdown as UserDropdownRoot,
@@ -130,6 +132,16 @@ export function MainLayout() {
             label={__("Data")}
             icon={IconListStack}
             to={`${prefix}/data`}
+          />
+          <SidebarItem
+            label={__("Audits")}
+            icon={IconCheckmark1}
+            to={`${prefix}/audits`}
+          />
+          <SidebarItem
+            label={__("Trust Center")}
+            icon={IconShield}
+            to={`${prefix}/trust-center`}
           />
           <SidebarItem
             label={__("Settings")}

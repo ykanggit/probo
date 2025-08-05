@@ -63,6 +63,9 @@ type (
 		Connectors              *ConnectorService
 		Assets                  *AssetService
 		Data                    *DatumService
+		Audits                  *AuditService
+		Reports                 *ReportService
+		TrustCenters            *TrustCenterService
 	}
 )
 
@@ -140,5 +143,8 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.Connectors = &ConnectorService{svc: tenantService}
 	tenantService.Assets = &AssetService{svc: tenantService}
 	tenantService.Data = &DatumService{svc: tenantService}
+	tenantService.Audits = &AuditService{svc: tenantService}
+	tenantService.Reports = &ReportService{svc: tenantService}
+	tenantService.TrustCenters = &TrustCenterService{svc: tenantService}
 	return tenantService
 }

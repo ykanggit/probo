@@ -35,4 +35,7 @@ const (
 	DocumentVersionSignatureEntityType
 	AssetEntityType
 	DatumEntityType
+	AuditEntityType
+	ReportEntityType
+	TrustCenterEntityType
 )

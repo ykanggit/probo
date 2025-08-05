@@ -370,7 +370,7 @@ func (s ControlService) CreateMeasureMapping(
 				return fmt.Errorf("cannot load measure: %w", err)
 			}
 
-			return controlMeasure.Insert(ctx, conn, s.svc.scope)
+			return controlMeasure.Upsert(ctx, conn, s.svc.scope)
 		},
 	)
 
