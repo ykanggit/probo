@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"runtime/debug"
 	"strings"
 	"time"
 
@@ -38,11 +37,11 @@ import (
 	"github.com/getprobo/probo/pkg/saferedirect"
 	"github.com/getprobo/probo/pkg/securecookie"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/schema"
+	gqlutils "github.com/getprobo/probo/pkg/server/graphql"
 	"github.com/getprobo/probo/pkg/statelesstoken"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
 	"github.com/vektah/gqlparser/v2/gqlerror"
-	"go.gearno.de/kit/httpserver"
 	"go.gearno.de/kit/log"
 )
 
@@ -233,12 +232,7 @@ func graphqlHandler(logger *log.Logger, proboSvc *probo.Service, usrmgrSvc *usrm
 	)
 	srv.Use(extension.Introspection{})
 	srv.Use(tracingExtension{})
-	srv.SetRecoverFunc(func(ctx context.Context, err any) error {
-		logger := httpserver.LoggerFromContext(ctx)
-		logger.Error("resolver panic", log.Any("error", err), log.Any("stack", string(debug.Stack())))
-
-		return errors.New("internal server error")
-	})
+	srv.SetRecoverFunc(gqlutils.RecoverFunc)
 
 	srv.AroundOperations(
 		func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
