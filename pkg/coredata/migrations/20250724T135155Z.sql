@@ -11,6 +11,23 @@ CREATE TABLE trust_centers (
     UNIQUE(slug)
 );
 
+-- Create a function to generate unique slugs
+CREATE OR REPLACE FUNCTION generate_unique_slug(base_slug TEXT, organization_id TEXT) RETURNS TEXT AS $$
+DECLARE
+    counter INTEGER := 0;
+    unique_slug TEXT := base_slug;
+BEGIN
+    -- Try the base slug first
+    WHILE EXISTS (SELECT 1 FROM trust_centers WHERE slug = unique_slug) LOOP
+        counter := counter + 1;
+        unique_slug := base_slug || '-' || counter::TEXT;
+    END LOOP;
+    
+    RETURN unique_slug;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Insert trust centers with unique slugs
 INSERT INTO trust_centers (
     id,
     organization_id,
@@ -25,18 +42,24 @@ SELECT
     o.id,
     o.tenant_id,
     false,
-    LOWER(
-        REGEXP_REPLACE(
+    generate_unique_slug(
+        LOWER(
             REGEXP_REPLACE(
-                unaccent(o.name),
-                '[^a-zA-Z0-9\s]', '', 'g'
-            ),
-            '\s+', '-', 'g'
-        )
+                REGEXP_REPLACE(
+                    unaccent(o.name),
+                    '[^a-zA-Z0-9\s]', '', 'g'
+                ),
+                '\s+', '-', 'g'
+            )
+        ),
+        o.id
     ),
     NOW(),
     NOW()
 FROM organizations o;
+
+-- Drop the helper function
+DROP FUNCTION generate_unique_slug(TEXT, TEXT);
 
 ALTER TABLE documents ADD COLUMN show_on_trust_center BOOLEAN NOT NULL DEFAULT false;
 
