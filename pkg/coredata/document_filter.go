@@ -38,45 +38,41 @@ func NewDocumentTrustCenterFilter() *DocumentFilter {
 	}
 }
 
-func (f *DocumentFilter) SQLArguments() pgx.NamedArgs {
-	args := pgx.NamedArgs{}
+func (f *DocumentFilter) SQLArguments() pgx.StrictNamedArgs {
+	args := pgx.StrictNamedArgs{}
 
 	if f.query != nil {
 		args["query"] = *f.query
+	} else {
+		args["query"] = (*string)(nil)
 	}
+
 	if f.showOnTrustCenter != nil {
 		args["show_on_trust_center"] = *f.showOnTrustCenter
+	} else {
+		args["show_on_trust_center"] = (*bool)(nil)
 	}
 
 	return args
 }
 
 func (f *DocumentFilter) SQLFragment() string {
-	conditions := []string{}
+	sql := `(
+		CASE
+			WHEN @query::text IS NOT NULL AND @query::text != '' THEN
+				search_vector @@ (
+					SELECT to_tsquery('simple', string_agg(lexeme || ':*', ' & '))
+					FROM unnest(regexp_split_to_array(trim(@query::text), '\s+')) AS lexeme
+				)
+			ELSE TRUE
+		END
+		AND
+		CASE
+			WHEN @show_on_trust_center::boolean IS NOT NULL THEN
+				show_on_trust_center = @show_on_trust_center::boolean
+			ELSE TRUE
+		END
+	)`
 
-	if f.query != nil && *f.query != "" {
-		conditions = append(conditions, `
-		search_vector @@ (
-			SELECT to_tsquery('simple', string_agg(lexeme || ':*', ' & '))
-			FROM unnest(regexp_split_to_array(trim(@query), '\s+')) AS lexeme
-		)`)
-	}
-
-	if f.showOnTrustCenter != nil {
-		conditions = append(conditions, "show_on_trust_center = @show_on_trust_center")
-	}
-
-	if len(conditions) == 0 {
-		return "TRUE"
-	}
-
-	result := ""
-	for i, condition := range conditions {
-		if i > 0 {
-			result += " AND "
-		}
-		result += condition
-	}
-
-	return result
+	return sql
 }
