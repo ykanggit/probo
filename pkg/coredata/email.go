@@ -48,12 +48,15 @@ func NewEmail(
 	subject string,
 	body string,
 ) *Email {
+	now := time.Now()
 	return &Email{
 		ID:             gid.New(gid.NilTenant, EmailEntityType),
 		RecipientName:  recipientName,
 		RecipientEmail: recipientEmail,
 		Subject:        subject,
 		TextBody:       body,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
 }
 
