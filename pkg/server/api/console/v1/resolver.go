@@ -19,7 +19,6 @@ package console_v1
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -35,9 +34,9 @@ import (
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/saferedirect"
-	"github.com/getprobo/probo/pkg/securecookie"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/schema"
 	gqlutils "github.com/getprobo/probo/pkg/server/graphql"
+	"github.com/getprobo/probo/pkg/server/session"
 	"github.com/getprobo/probo/pkg/statelesstoken"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
@@ -264,65 +263,43 @@ func WithSession(usrmgrSvc *usrmgr.Service, authCfg AuthConfig, next http.Handle
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		cookieValue, err := securecookie.Get(r, securecookie.DefaultConfig(
-			authCfg.CookieName,
-			authCfg.CookieSecret,
-		))
-		if err != nil {
-			if !errors.Is(err, securecookie.ErrCookieNotFound) {
+		sessionAuthCfg := session.AuthConfig{
+			CookieName:   authCfg.CookieName,
+			CookieSecret: authCfg.CookieSecret,
+		}
+
+		errorHandler := session.ErrorHandler{
+			OnCookieError: func(err error) {
 				panic(fmt.Errorf("failed to get session: %w", err))
-			}
+			},
+			OnParseError: func(w http.ResponseWriter, authCfg session.AuthConfig) {
+				session.ClearCookie(w, authCfg)
+			},
+			OnSessionError: func(w http.ResponseWriter, authCfg session.AuthConfig) {
+				session.ClearCookie(w, authCfg)
+			},
+			OnUserError: func(w http.ResponseWriter, authCfg session.AuthConfig) {
+				session.ClearCookie(w, authCfg)
+			},
+			OnTenantError: func(err error) {
+				panic(fmt.Errorf("failed to list tenants for user: %w", err))
+			},
+		}
 
+		authResult := session.TryAuth(ctx, w, r, usrmgrSvc, sessionAuthCfg, errorHandler)
+		if authResult == nil {
 			next(w, r)
 			return
 		}
 
-		sessionID, err := gid.ParseGID(cookieValue)
-		if err != nil {
-			securecookie.Clear(w, securecookie.DefaultConfig(
-				authCfg.CookieName,
-				authCfg.CookieSecret,
-			))
-
-			next(w, r)
-			return
-		}
-
-		session, err := usrmgrSvc.GetSession(ctx, sessionID)
-		if err != nil {
-			securecookie.Clear(w, securecookie.DefaultConfig(
-				authCfg.CookieName,
-				authCfg.CookieSecret,
-			))
-
-			next(w, r)
-			return
-		}
-
-		user, err := usrmgrSvc.GetUserBySession(ctx, sessionID)
-		if err != nil {
-			securecookie.Clear(w, securecookie.DefaultConfig(
-				authCfg.CookieName,
-				authCfg.CookieSecret,
-			))
-
-			next(w, r)
-			return
-		}
-
-		tenantIDs, err := usrmgrSvc.ListTenantsForUserID(ctx, user.ID)
-		if err != nil {
-			panic(fmt.Errorf("failed to list tenants for user: %w", err))
-		}
-
-		ctx = context.WithValue(ctx, sessionContextKey, session)
-		ctx = context.WithValue(ctx, userContextKey, user)
-		ctx = context.WithValue(ctx, userTenantContextKey, &tenantIDs)
+		ctx = context.WithValue(ctx, sessionContextKey, authResult.Session)
+		ctx = context.WithValue(ctx, userContextKey, authResult.User)
+		ctx = context.WithValue(ctx, userTenantContextKey, &authResult.TenantIDs)
 
 		next(w, r.WithContext(ctx))
 
 		// Update session after the handler completes
-		if err := usrmgrSvc.UpdateSession(ctx, session); err != nil {
+		if err := usrmgrSvc.UpdateSession(ctx, authResult.Session); err != nil {
 			panic(fmt.Errorf("failed to update session: %w", err))
 		}
 	}

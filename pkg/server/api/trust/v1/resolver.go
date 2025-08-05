@@ -28,11 +28,11 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/probo"
-	"github.com/getprobo/probo/pkg/securecookie"
 	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
 	"github.com/getprobo/probo/pkg/server/api/trust/v1/auth"
 	"github.com/getprobo/probo/pkg/server/api/trust/v1/schema"
 	gqlutils "github.com/getprobo/probo/pkg/server/graphql"
+	"github.com/getprobo/probo/pkg/server/session"
 	"github.com/getprobo/probo/pkg/statelesstoken"
 	"github.com/getprobo/probo/pkg/trust"
 	"github.com/getprobo/probo/pkg/usrmgr"
@@ -167,41 +167,34 @@ func WithSession(usrmgrSvc *usrmgr.Service, trustSvc *trust.Service, authCfg con
 }
 
 func trySessionAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, usrmgrSvc *usrmgr.Service, authCfg console_v1.AuthConfig) context.Context {
-	cookieValue, err := securecookie.Get(r, securecookie.DefaultConfig(
-		authCfg.CookieName,
-		authCfg.CookieSecret,
-	))
-	if err != nil {
+	sessionAuthCfg := session.AuthConfig{
+		CookieName:   authCfg.CookieName,
+		CookieSecret: authCfg.CookieSecret,
+	}
+
+	errorHandler := session.ErrorHandler{
+		OnParseError: func(w http.ResponseWriter, authCfg session.AuthConfig) {
+			session.ClearCookie(w, authCfg)
+		},
+		OnSessionError: func(w http.ResponseWriter, authCfg session.AuthConfig) {
+			session.ClearCookie(w, authCfg)
+		},
+		OnUserError: func(w http.ResponseWriter, authCfg session.AuthConfig) {
+			session.ClearCookie(w, authCfg)
+		},
+		OnTenantError: func(err error) {
+			session.ClearCookie(w, sessionAuthCfg)
+		},
+	}
+
+	authResult := session.TryAuth(ctx, w, r, usrmgrSvc, sessionAuthCfg, errorHandler)
+	if authResult == nil {
 		return nil
 	}
 
-	sessionID, err := gid.ParseGID(cookieValue)
-	if err != nil {
-		clearSessionCookie(w, authCfg)
-		return nil
-	}
-
-	session, err := usrmgrSvc.GetSession(ctx, sessionID)
-	if err != nil {
-		clearSessionCookie(w, authCfg)
-		return nil
-	}
-
-	user, err := usrmgrSvc.GetUserBySession(ctx, sessionID)
-	if err != nil {
-		clearSessionCookie(w, authCfg)
-		return nil
-	}
-
-	tenantIDs, err := usrmgrSvc.ListTenantsForUserID(ctx, user.ID)
-	if err != nil {
-		clearSessionCookie(w, authCfg)
-		return nil
-	}
-
-	ctx = context.WithValue(ctx, sessionContextKey, session)
-	ctx = context.WithValue(ctx, userContextKey, user)
-	ctx = context.WithValue(ctx, userTenantContextKey, &tenantIDs)
+	ctx = context.WithValue(ctx, sessionContextKey, authResult.Session)
+	ctx = context.WithValue(ctx, userContextKey, authResult.User)
+	ctx = context.WithValue(ctx, userTenantContextKey, &authResult.TenantIDs)
 
 	return ctx
 }
@@ -232,13 +225,6 @@ func tryTokenAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, t
 	}
 
 	return context.WithValue(ctx, tokenAccessContextKey, tokenAccess)
-}
-
-func clearSessionCookie(w http.ResponseWriter, authCfg console_v1.AuthConfig) {
-	securecookie.Clear(w, securecookie.DefaultConfig(
-		authCfg.CookieName,
-		authCfg.CookieSecret,
-	))
 }
 
 func clearTokenCookie(w http.ResponseWriter, trustAuthCfg TrustAuthConfig) {
