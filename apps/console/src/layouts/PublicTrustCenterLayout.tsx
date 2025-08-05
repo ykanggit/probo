@@ -23,7 +23,7 @@ export function PublicTrustCenterLayout({ organizationName, organizationLogo, ch
         credentials: 'include',
       });
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('Logout failed');
     } finally {
       window.location.href = "/";
     }

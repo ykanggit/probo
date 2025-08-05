@@ -95,7 +95,17 @@ export default function TrustCenterAccessPage() {
       credentials: 'include',
       body: JSON.stringify({ token }),
     })
-    .then(response => response.json())
+    .then(async response => {
+      if (!response.ok) {
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+        } catch {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      }
+      return response.json();
+    })
     .then(data => {
       if (data.success) {
         navigate(`/trust/${slug}`);
@@ -104,8 +114,8 @@ export default function TrustCenterAccessPage() {
         setLoading(false);
       }
     })
-    .catch(() => {
-      setError(__("Authentication failed"));
+    .catch((error) => {
+      setError(error.message || __("Authentication failed"));
       setLoading(false);
     });
   }, [slug, token, __, navigate]);
