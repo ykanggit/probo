@@ -18,6 +18,7 @@ import type {
   DocumentDetailPageDocumentFragment$key,
 } from "./__generated__/DocumentDetailPageDocumentFragment.graphql";
 import type { DocumentDetailPageExportPDFMutation } from "./__generated__/DocumentDetailPageExportPDFMutation.graphql";
+import type { DocumentDetailPageUpdateMutation } from "./__generated__/DocumentDetailPageUpdateMutation.graphql";
 import { useTranslate } from "@probo/i18n";
 import {
   ActionDropdown,
@@ -34,6 +35,8 @@ import {
   IconClock,
   IconPencil,
   IconTrashCan,
+  IconCrossLargeX,
+  Input,
   PageHeader,
   PropertyRow,
   TabBadge,
@@ -43,7 +46,7 @@ import {
 } from "@probo/ui";
 import { useOrganizationId } from "/hooks/useOrganizationId";
 import { useMutationWithToasts } from "/hooks/useMutationWithToasts";
-import { getDocumentTypeLabel, sprintf } from "@probo/helpers";
+import { getDocumentTypeLabel, sprintf, documentTypes } from "@probo/helpers";
 import {
   Link,
   Outlet,
@@ -52,9 +55,14 @@ import {
   useParams,
 } from "react-router";
 import UpdateVersionDialog from "./dialogs/UpdateVersionDialog";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { NodeOf } from "/types.ts";
 import clsx from "clsx";
+import { PeopleSelectField } from "/components/form/PeopleSelectField";
+import { ControlledField } from "/components/form/ControlledField";
+import { DocumentTypeOptions } from "/components/form/DocumentTypeOptions";
+import { z } from "zod";
+import { useFormWithSchema } from "/hooks/useFormWithSchema";
 
 type Props = {
   queryRef: PreloadedQuery<DocumentGraphNodeQuery>;
@@ -128,6 +136,28 @@ const exportDocumentVersionPDFMutation = graphql`
   }
 `;
 
+const updateDocumentMutation = graphql`
+  mutation DocumentDetailPageUpdateMutation($input: UpdateDocumentInput!) {
+    updateDocument(input: $input) {
+      document {
+        id
+        title
+        documentType
+        owner {
+          id
+          fullName
+        }
+      }
+    }
+  }
+`;
+
+const documentUpdateSchema = z.object({
+  title: z.string().min(1, "Title is required").max(255),
+  ownerId: z.string().min(1, "Owner is required"),
+  documentType: z.enum(documentTypes),
+});
+
 export default function DocumentDetailPage(props: Props) {
   const { versionId } = useParams<{ versionId?: string }>();
   const node = usePreloadedQuery(documentNodeQuery, props.queryRef).node;
@@ -138,6 +168,10 @@ export default function DocumentDetailPage(props: Props) {
   const { __, dateFormat } = useTranslate();
   const organizationId = useOrganizationId();
   const navigate = useNavigate();
+
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [isEditingOwner, setIsEditingOwner] = useState(false);
+  const [isEditingType, setIsEditingType] = useState(false);
   const versions = document.versions.edges.map((edge) => edge.node);
   const currentVersion =
     document.versions.edges.find((v) => v.node.id === versionId)?.node ??
@@ -161,9 +195,72 @@ export default function DocumentDetailPage(props: Props) {
         errorMessage: __("Failed to generate PDF. Please try again."),
       }
     );
+  const [updateDocument, isUpdatingDocument] = useMutationWithToasts<DocumentDetailPageUpdateMutation>(
+    updateDocumentMutation,
+    {
+      successMessage: __("Document updated successfully."),
+      errorMessage: __("Failed to update document. Please try again."),
+    }
+  );
   const versionConnectionId = document.versions.__id;
 
+  const { register, control, handleSubmit, reset } = useFormWithSchema(documentUpdateSchema, {
+    defaultValues: {
+      title: document.title,
+      ownerId: document.owner?.id || "",
+      documentType: document.documentType,
+    },
+  });
+
   usePageTitle(document.title);
+
+  const handleUpdateTitle = (data: { title: string }) => {
+    updateDocument({
+      variables: {
+        input: {
+          id: document.id,
+          title: data.title,
+        },
+      },
+      onSuccess: () => {
+        setIsEditingTitle(false);
+      },
+    });
+  };
+
+  const handleUpdateOwner = (data: { ownerId: string }) => {
+    updateDocument({
+      variables: {
+        input: {
+          id: document.id,
+          ownerId: data.ownerId,
+        },
+      },
+      onSuccess: () => {
+        setIsEditingOwner(false);
+      },
+    });
+  };
+
+  const handleUpdateDocumentType = (data: { documentType: typeof documentTypes[number] }) => {
+    updateDocument({
+      variables: {
+        input: {
+          id: document.id,
+          documentType: data.documentType,
+        },
+      },
+      onSuccess: () => {
+        setIsEditingType(false);
+        loadQuery(
+          props.queryRef.environment,
+          documentNodeQuery,
+          props.queryRef.variables,
+          { fetchPolicy: "network-only" }
+        );
+      },
+    });
+  };
 
   const handlePublish = () => {
     publishDocumentVersion({
@@ -313,7 +410,52 @@ export default function DocumentDetailPage(props: Props) {
             </ActionDropdown>
           </div>
         </div>
-        <PageHeader title={document.title} />
+        <PageHeader
+          title={
+            isEditingTitle ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  {...register("title")}
+                  variant="title"
+                  className="flex-1"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      setIsEditingTitle(false);
+                      reset();
+                    }
+                    if (e.key === "Enter") {
+                      handleSubmit(handleUpdateTitle)();
+                    }
+                  }}
+                />
+                <Button
+                  variant="quaternary"
+                  icon={IconCheckmark1}
+                  onClick={handleSubmit(handleUpdateTitle)}
+                  disabled={isUpdatingDocument}
+                />
+                <Button
+                  variant="quaternary"
+                  icon={IconCrossLargeX}
+                  onClick={() => {
+                    setIsEditingTitle(false);
+                    reset();
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span>{document.title}</span>
+                <Button
+                  variant="quaternary"
+                  icon={IconPencil}
+                  onClick={() => setIsEditingTitle(true)}
+                />
+              </div>
+            )
+          }
+        />
 
         <Tabs>
           <TabLink to={`${urlPrefix}/description`}>{__("Description")}</TabLink>
@@ -336,15 +478,55 @@ export default function DocumentDetailPage(props: Props) {
           {__("Properties")}
         </div>
         <PropertyRow label={__("Owner")}>
-          <Badge variant="highlight" size="md" className="gap-2">
-            <Avatar name={document.owner?.fullName ?? ""} />
-            {document.owner?.fullName}
-          </Badge>
+          {isEditingOwner ? (
+            <EditablePropertyContent
+              onSave={handleSubmit(handleUpdateOwner)}
+              onCancel={() => {
+                setIsEditingOwner(false);
+                reset();
+              }}
+              disabled={isUpdatingDocument}
+            >
+              <PeopleSelectField
+                name="ownerId"
+                control={control}
+                organizationId={organizationId}
+              />
+            </EditablePropertyContent>
+          ) : (
+            <ReadOnlyPropertyContent onEdit={() => setIsEditingOwner(true)}>
+              <Badge variant="highlight" size="md" className="gap-2">
+                <Avatar name={document.owner?.fullName ?? ""} />
+                {document.owner?.fullName}
+              </Badge>
+            </ReadOnlyPropertyContent>
+          )}
         </PropertyRow>
         <PropertyRow label={__("Type")}>
-          <div className="text-sm text-txt-secondary">
-            {getDocumentTypeLabel(__, document.documentType)}
-          </div>
+          {isEditingType ? (
+            <EditablePropertyContent
+              onSave={handleSubmit(handleUpdateDocumentType)}
+              onCancel={() => {
+                setIsEditingType(false);
+                reset();
+              }}
+              disabled={isUpdatingDocument}
+            >
+              <ControlledField
+                name="documentType"
+                control={control}
+                type="select"
+              >
+                <DocumentTypeOptions />
+              </ControlledField>
+            </EditablePropertyContent>
+          ) : (
+            <ReadOnlyPropertyContent onEdit={() => setIsEditingType(true)}>
+              <div className="text-sm text-txt-secondary">
+                {getDocumentTypeLabel(__, document.documentType)}
+              </div>
+            </ReadOnlyPropertyContent>
+          )}
         </PropertyRow>
         <PropertyRow label={__("Status")}>
           <Badge
@@ -378,6 +560,54 @@ export default function DocumentDetailPage(props: Props) {
 }
 
 type Version = NodeOf<DocumentDetailPageDocumentFragment$data["versions"]>;
+
+function EditablePropertyContent({
+  children,
+  onSave,
+  onCancel,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onSave: () => void;
+  onCancel: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex-1">{children}</div>
+      <Button
+        variant="quaternary"
+        icon={IconCheckmark1}
+        onClick={onSave}
+        disabled={disabled}
+      />
+      <Button
+        variant="quaternary"
+        icon={IconCrossLargeX}
+        onClick={onCancel}
+      />
+    </div>
+  );
+}
+
+function ReadOnlyPropertyContent({
+  children,
+  onEdit,
+}: {
+  children: React.ReactNode;
+  onEdit: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      {children}
+      <Button
+        variant="quaternary"
+        icon={IconPencil}
+        onClick={onEdit}
+      />
+    </div>
+  );
+}
 
 function VersionItem({
   document,

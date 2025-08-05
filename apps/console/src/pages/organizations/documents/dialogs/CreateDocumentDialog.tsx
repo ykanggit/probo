@@ -11,7 +11,6 @@ import {
   PropertyRow,
   Textarea,
   useDialogRef,
-  Option,
 } from "@probo/ui";
 import { type ReactNode } from "react";
 import { graphql } from "relay-runtime";
@@ -21,6 +20,7 @@ import { useMutationWithToasts } from "/hooks/useMutationWithToasts";
 import { PeopleSelectField } from "/components/form/PeopleSelectField";
 import type { CreateDocumentDialogMutation } from "./__generated__/CreateDocumentDialogMutation.graphql";
 import { ControlledField } from "/components/form/ControlledField";
+import { DocumentTypeOptions } from "/components/form/DocumentTypeOptions";
 
 type Props = {
   trigger?: ReactNode;
@@ -121,15 +121,7 @@ export function CreateDocumentDialog({ trigger, connection }: Props) {
                 name="documentType"
                 type="select"
               >
-                <Option value="POLICY">
-                  {__("Policy")}
-                </Option>
-                <Option value="ISMS">
-                  {__("ISMS")}
-                </Option>
-                <Option value="OTHER">
-                  {__("Other")}
-                </Option>
+                <DocumentTypeOptions />
               </ControlledField>
             </PropertyRow>
 
