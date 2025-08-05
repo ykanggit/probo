@@ -13,6 +13,7 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
+	"github.com/getprobo/probo/pkg/server/api/trust/v1/auth"
 	"github.com/getprobo/probo/pkg/server/api/trust/v1/schema"
 	"github.com/getprobo/probo/pkg/server/api/trust/v1/types"
 )
@@ -57,6 +58,10 @@ func (r *auditResolver) Report(ctx context.Context, obj *types.Audit) (*types.Re
 
 // ReportURL is the resolver for the reportUrl field.
 func (r *auditResolver) ReportURL(ctx context.Context, obj *types.Audit) (*string, error) {
+	if err := auth.ValidateTenantAccess(ctx, r, userTenantContextKey, obj.ID.TenantID()); err != nil {
+		return nil, err
+	}
+
 	trust := r.TrustService(ctx, obj.ID.TenantID())
 
 	audit, err := trust.Audits.Get(ctx, obj.ID)
@@ -78,6 +83,10 @@ func (r *auditResolver) ReportURL(ctx context.Context, obj *types.Audit) (*strin
 
 // ExportDocumentPDF is the resolver for the exportDocumentPDF field.
 func (r *mutationResolver) ExportDocumentPDF(ctx context.Context, input types.ExportDocumentPDFInput) (*types.ExportDocumentPDFPayload, error) {
+	if err := auth.ValidateTenantAccess(ctx, r, userTenantContextKey, input.DocumentID.TenantID()); err != nil {
+		return nil, err
+	}
+
 	trust := r.trustCenterSvc.WithTenant(input.DocumentID.TenantID())
 
 	pdf, err := trust.Documents.ExportPDF(ctx, input.DocumentID)
@@ -99,9 +108,9 @@ func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organizat
 
 // TrustCenterBySlug is the resolver for the trustCenterBySlug field.
 func (r *queryResolver) TrustCenterBySlug(ctx context.Context, slug string) (*types.TrustCenter, error) {
-	trust := r.trustCenterSvc.WithTenant(gid.NewTenantID())
+	publicTrust := r.trustCenterSvc.WithTenant(gid.NewTenantID())
 
-	trustCenter, err := trust.TrustCenters.GetBySlug(ctx, slug)
+	trustCenter, err := publicTrust.TrustCenters.GetBySlug(ctx, slug)
 	if err != nil {
 		return nil, nil
 	}
@@ -125,6 +134,10 @@ func (r *queryResolver) TrustCenterBySlug(ctx context.Context, slug string) (*ty
 
 // DownloadURL is the resolver for the downloadUrl field.
 func (r *reportResolver) DownloadURL(ctx context.Context, obj *types.Report) (*string, error) {
+	if err := auth.ValidateTenantAccess(ctx, r, userTenantContextKey, obj.ID.TenantID()); err != nil {
+		return nil, err
+	}
+
 	trust := r.TrustService(ctx, obj.ID.TenantID())
 
 	url, err := trust.Reports.GenerateDownloadURL(ctx, obj.ID, 5*time.Minute)

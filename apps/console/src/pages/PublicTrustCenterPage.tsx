@@ -129,11 +129,14 @@ function PublicTrustCenterContent() {
     })
       .then(response => response.json())
       .then((result: GraphQLResponse<PublicTrustCenterData>) => {
-        if (result.errors && result.errors.some((error: GraphQLError) =>
-          !error.message.includes('access denied: authentication required')
-        )) {
-          throw new Error(result.errors[0].message);
+        const nonAuthErrors = result.errors?.filter((error: GraphQLError) =>
+          !error.message.includes('access denied')
+        ) || [];
+
+        if (nonAuthErrors.length > 0) {
+          throw new Error(nonAuthErrors[0].message);
         }
+
         setData(result.data || null);
       })
       .catch(setError)

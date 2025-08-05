@@ -36,6 +36,33 @@ type ContextAccessor interface {
 	TokenAccessFromContext(ctx context.Context) *TokenAccessData
 }
 
+func ValidateTenantAccess(ctx context.Context, accessor ContextAccessor, userTenantContextKey interface{}, resourceTenantID gid.TenantID) error {
+	tokenAccess := accessor.TokenAccessFromContext(ctx)
+	if tokenAccess != nil {
+		if tokenAccess.TenantID != resourceTenantID {
+			return fmt.Errorf("access denied: token not authorized for this organization")
+		}
+		return nil
+	}
+
+	user := accessor.UserFromContext(ctx)
+	if user != nil {
+		userTenants, ok := ctx.Value(userTenantContextKey).(*[]gid.TenantID)
+		if !ok || userTenants == nil {
+			return fmt.Errorf("access denied: no tenant information available")
+		}
+
+		for _, tenantID := range *userTenants {
+			if tenantID == resourceTenantID {
+				return nil
+			}
+		}
+		return fmt.Errorf("access denied: not authorized for this organization")
+	}
+
+	return fmt.Errorf("access denied: authentication required")
+}
+
 func GetCurrentUserRole(ctx context.Context, accessor ContextAccessor) types.Role {
 	user := accessor.UserFromContext(ctx)
 	tokenAccess := accessor.TokenAccessFromContext(ctx)
