@@ -52,7 +52,18 @@ type (
 )
 
 const (
-	TokenTypeTrustCenterAccess = "trust_center_access"
+	trustCenterAccessEmailSubject  = "Trust Center Access Invitation - %s"
+	trustCenterAccessEmailTemplate = `
+	You have been granted access to %s's Trust Center!
+
+	Click the link below to access it:
+
+	[1] %s
+
+	This link will expire in 7 days.
+
+	If the link above doesn't work, copy and paste the entire URL into your browser.
+	`
 )
 
 func (s TrustCenterAccessService) ListForTrustCenterID(
@@ -139,15 +150,15 @@ func (s TrustCenterAccessService) Create(
 			return fmt.Errorf("cannot insert trust center access: %w", err)
 		}
 
+		if err := s.sendAccessEmail(ctx, tx, access); err != nil {
+			return fmt.Errorf("failed to send access email: %w", err)
+		}
+
 		return nil
 	})
 
 	if err != nil {
 		return nil, err
-	}
-
-	if err := s.sendAccessEmail(ctx, access); err != nil {
-		fmt.Printf("Failed to send access email\n")
 	}
 
 	return access, nil
@@ -174,7 +185,7 @@ func (s TrustCenterAccessService) Delete(
 	return err
 }
 
-func (s TrustCenterAccessService) sendAccessEmail(ctx context.Context, access *coredata.TrustCenterAccess) error {
+func (s TrustCenterAccessService) sendAccessEmail(ctx context.Context, tx pg.Conn, access *coredata.TrustCenterAccess) error {
 	accessToken, err := statelesstoken.NewToken(
 		s.svc.trustConfig.TokenSecret,
 		s.svc.trustConfig.TokenType,
@@ -189,17 +200,13 @@ func (s TrustCenterAccessService) sendAccessEmail(ctx context.Context, access *c
 	}
 
 	trustCenter := &coredata.TrustCenter{}
-	err = s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
-		return trustCenter.LoadByID(ctx, conn, s.svc.scope, access.TrustCenterID)
-	})
+	err = trustCenter.LoadByID(ctx, tx, s.svc.scope, access.TrustCenterID)
 	if err != nil {
 		return fmt.Errorf("cannot load trust center: %w", err)
 	}
 
 	organization := &coredata.Organization{}
-	err = s.svc.pg.WithConn(ctx, func(conn pg.Conn) error {
-		return organization.LoadByID(ctx, conn, s.svc.scope, trustCenter.OrganizationID)
-	})
+	err = organization.LoadByID(ctx, tx, s.svc.scope, trustCenter.OrganizationID)
 	if err != nil {
 		return fmt.Errorf("cannot load organization: %w", err)
 	}
@@ -213,5 +220,26 @@ func (s TrustCenterAccessService) sendAccessEmail(ctx context.Context, access *c
 		}.Encode(),
 	}
 
-	return s.usrmgr.SendTrustCenterAccessEmail(ctx, access.Name, access.Email, organization.Name, accessURL.String())
+	return s.sendTrustCenterAccessEmail(ctx, tx, access.Name, access.Email, organization.Name, accessURL.String())
+}
+
+func (s TrustCenterAccessService) sendTrustCenterAccessEmail(
+	ctx context.Context,
+	tx pg.Conn,
+	name string,
+	email string,
+	companyName string,
+	accessURL string,
+) error {
+	accessEmail := coredata.NewEmail(
+		name,
+		email,
+		fmt.Sprintf(trustCenterAccessEmailSubject, companyName),
+		fmt.Sprintf(trustCenterAccessEmailTemplate, companyName, accessURL),
+	)
+
+	if err := accessEmail.Insert(ctx, tx); err != nil {
+		return fmt.Errorf("cannot insert access email: %w", err)
+	}
+	return nil
 }
