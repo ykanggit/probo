@@ -2941,7 +2941,7 @@ func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
 
 // TrustCenters is the resolver for the trustCenters field.
 func (r *queryResolver) TrustCenters(ctx context.Context, first *int, after *page.CursorKey, last *int, before *page.CursorKey, filter *types.TrustCenterFilter) (*types.TrustCenterConnection, error) {
-	panic(fmt.Errorf("not implemented: TrustCenters - trustCenters"))
+	return nil, fmt.Errorf("not implemented: TrustCenters - trustCenters")
 }
 
 // DownloadURL is the resolver for the downloadUrl field.

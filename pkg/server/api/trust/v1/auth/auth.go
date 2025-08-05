@@ -46,8 +46,8 @@ func GetCurrentUserRole(ctx context.Context, accessor ContextAccessor) types.Rol
 	return types.RoleNone
 }
 
-func MustBeAuthenticatedDirective(accessor ContextAccessor) func(ctx context.Context, obj interface{}, next graphql.Resolver, role *types.Role) (interface{}, error) {
-	return func(ctx context.Context, obj interface{}, next graphql.Resolver, role *types.Role) (interface{}, error) {
+func MustBeAuthenticatedDirective(accessor ContextAccessor) func(ctx context.Context, obj any, next graphql.Resolver, role *types.Role) (any, error) {
+	return func(ctx context.Context, obj any, next graphql.Resolver, role *types.Role) (any, error) {
 		currentRole := GetCurrentUserRole(ctx, accessor)
 
 		if role != nil && *role == types.RoleUser && currentRole == types.RoleNone {
