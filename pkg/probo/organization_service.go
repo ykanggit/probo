@@ -29,6 +29,7 @@ import (
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/filevalidation"
 	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/slug"
 	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
@@ -75,11 +76,25 @@ func (s OrganizationService) Create(
 		UpdatedAt: now,
 	}
 
-	err := s.svc.pg.WithConn(
+	err := s.svc.pg.WithTx(
 		ctx,
 		func(tx pg.Conn) error {
 			if err := organization.Insert(ctx, tx); err != nil {
 				return fmt.Errorf("cannot insert organization: %w", err)
+			}
+
+			trustCenter := &coredata.TrustCenter{
+				ID:             gid.New(s.svc.scope.GetTenantID(), coredata.TrustCenterEntityType),
+				OrganizationID: organization.ID,
+				TenantID:       organization.TenantID,
+				Active:         false,
+				Slug:           slug.Make(organization.Name),
+				CreatedAt:      now,
+				UpdatedAt:      now,
+			}
+
+			if err := trustCenter.Insert(ctx, tx, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert trust center: %w", err)
 			}
 
 			return nil

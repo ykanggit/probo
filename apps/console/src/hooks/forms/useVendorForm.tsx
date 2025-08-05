@@ -5,6 +5,7 @@ import { useFragment } from "react-relay";
 import type { useVendorFormFragment$key } from "./__generated__/useVendorFormFragment.graphql";
 import { useMutationWithToasts } from "../useMutationWithToasts";
 import { useTranslate } from "@probo/i18n";
+import { useEffect, useMemo } from "react";
 
 const schema = z.object({
   name: z.string(),
@@ -68,8 +69,8 @@ export function useVendorForm(vendorKey: useVendorFormFragment$key) {
     errorMessage: __("Failed to update vendor. Please try again."),
   });
 
-  const form = useFormWithSchema(schema, {
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       name: vendor.name,
       description: vendor.description ?? "",
       statusPageUrl: vendor.statusPageUrl ?? "",
@@ -85,7 +86,12 @@ export function useVendorForm(vendorKey: useVendorFormFragment$key) {
       trustPageUrl: vendor.trustPageUrl ?? "",
       businessOwnerId: vendor.businessOwner?.id,
       securityOwnerId: vendor.securityOwner?.id,
-    },
+    }),
+    [vendor],
+  );
+
+  const form = useFormWithSchema(schema, {
+    defaultValues,
   });
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -100,6 +106,10 @@ export function useVendorForm(vendorKey: useVendorFormFragment$key) {
       form.reset(data);
     });
   });
+
+  useEffect(() => {
+    form.reset(defaultValues, { keepDirty: true });
+  }, [defaultValues, form]);
 
   return {
     ...form,

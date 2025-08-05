@@ -127,6 +127,30 @@ enum RiskTreatment
     )
 }
 
+enum AuditState
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.AuditState") {
+  NOT_STARTED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AuditStateNotStarted"
+    )
+  IN_PROGRESS
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AuditStateInProgress"
+    )
+  COMPLETED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AuditStateCompleted"
+    )
+  REJECTED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AuditStateRejected"
+    )
+  OUTDATED
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AuditStateOutdated"
+    )
+}
+
 # Order Field Enums
 enum UserOrderField
   @goModel(model: "github.com/getprobo/probo/pkg/coredata.UserOrderField") {
@@ -521,6 +545,27 @@ enum ControlStatus
       value: "github.com/getprobo/probo/pkg/coredata.ControlStatusExcluded"
     )
 }
+
+enum AuditOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.AuditOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AuditOrderFieldCreatedAt"
+    )
+  VALID_FROM
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AuditOrderFieldValidFrom"
+    )
+  VALID_UNTIL
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AuditOrderFieldValidUntil"
+    )
+  STATE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.AuditOrderFieldState"
+    )
+}
+
 # Input Types
 input UserOrder
   @goModel(
@@ -594,6 +639,14 @@ input RiskOrder
   field: RiskOrderField!
 }
 
+input AuditOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.AuditOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: AuditOrderField!
+}
+
 input EvidenceOrder
   @goModel(
     model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.EvidenceOrderBy"
@@ -650,6 +703,14 @@ input RiskFilter {
 }
 
 # Core Types
+type TrustCenter implements Node {
+  id: ID!
+  active: Boolean!
+  slug: String!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
 type Organization implements Node {
   id: ID!
   name: String!
@@ -761,6 +822,16 @@ type Organization implements Node {
     orderBy: DatumOrder
   ): DatumConnection! @goField(forceResolver: true)
 
+  audits(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: AuditOrder
+  ): AuditConnection! @goField(forceResolver: true)
+
+  trustCenter: TrustCenter @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -836,6 +907,7 @@ type Vendor implements Node {
   headquarterAddress: String
   legalName: String
   websiteUrl: String
+  showOnTrustCenter: Boolean!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -1000,6 +1072,7 @@ type Document implements Node {
   description: String!
   documentType: DocumentType!
   currentPublishedVersion: Int
+  showOnTrustCenter: Boolean!
   owner: People! @goField(forceResolver: true)
   organization: Organization! @goField(forceResolver: true)
 
@@ -1069,6 +1142,31 @@ type Risk implements Node {
     filter: ControlFilter
   ): ControlConnection! @goField(forceResolver: true)
 
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type Audit implements Node {
+  id: ID!
+  organization: Organization! @goField(forceResolver: true)
+  framework: Framework! @goField(forceResolver: true)
+  validFrom: Datetime
+  validUntil: Datetime
+  report: Report @goField(forceResolver: true)
+  reportUrl: String @goField(forceResolver: true)
+  state: AuditState!
+  showOnTrustCenter: Boolean!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type Report implements Node {
+  id: ID!
+  objectKey: String!
+  mimeType: String!
+  filename: String!
+  size: Int!
+  downloadUrl: String @goField(forceResolver: true)
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -1298,6 +1396,20 @@ type DatumEdge {
   node: Datum!
 }
 
+type AuditConnection
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.AuditConnection"
+  ) {
+  totalCount: Int! @goField(forceResolver: true)
+  edges: [AuditEdge!]!
+  pageInfo: PageInfo!
+}
+
+type AuditEdge {
+  cursor: CursorKey!
+  node: Audit!
+}
+
 # Root Types
 type Query {
   node(id: ID!): Node!
@@ -1315,6 +1427,10 @@ type Mutation {
   deleteOrganization(
     input: DeleteOrganizationInput!
   ): DeleteOrganizationPayload!
+
+  updateTrustCenter(
+    input: UpdateTrustCenterInput!
+  ): UpdateTrustCenterPayload!
 
   # User mutations
   confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
@@ -1456,6 +1572,12 @@ type Mutation {
   createDatum(input: CreateDatumInput!): CreateDatumPayload!
   updateDatum(input: UpdateDatumInput!): UpdateDatumPayload!
   deleteDatum(input: DeleteDatumInput!): DeleteDatumPayload!
+
+  createAudit(input: CreateAuditInput!): CreateAuditPayload!
+  updateAudit(input: UpdateAuditInput!): UpdateAuditPayload!
+  deleteAudit(input: DeleteAuditInput!): DeleteAuditPayload!
+  uploadAuditReport(input: UploadAuditReportInput!): UploadAuditReportPayload!
+  deleteAuditReport(input: DeleteAuditReportInput!): DeleteAuditReportPayload!
 }
 
 # Input Types
@@ -1485,6 +1607,12 @@ input UpdateOrganizationInput {
 
 input DeleteOrganizationInput {
   organizationId: ID!
+}
+
+input UpdateTrustCenterInput {
+  trustCenterId: ID!
+  active: Boolean
+  slug: String
 }
 
 input CreateVendorInput {
@@ -1529,6 +1657,7 @@ input UpdateVendorInput {
   trustPageUrl: String
   businessOwnerId: ID
   securityOwnerId: ID
+  showOnTrustCenter: Boolean
 }
 
 input DeleteVendorInput {
@@ -1760,6 +1889,7 @@ input UpdateDocumentInput {
   ownerId: ID
   createdBy: ID
   documentType: DocumentType
+  showOnTrustCenter: Boolean
 }
 
 input ExportDocumentVersionPDFInput {
@@ -1807,6 +1937,36 @@ input DeleteControlInput {
   controlId: ID!
 }
 
+# Audit input types
+input CreateAuditInput {
+  organizationId: ID!
+  frameworkId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+  state: AuditState
+}
+
+input UpdateAuditInput {
+  id: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+  state: AuditState
+  showOnTrustCenter: Boolean
+}
+
+input DeleteAuditInput {
+  auditId: ID!
+}
+
+input UploadAuditReportInput {
+  auditId: ID!
+  file: Upload!
+}
+
+input DeleteAuditReportInput {
+  auditId: ID!
+}
+
 # Payload Types
 type CreateOrganizationPayload {
   organizationEdge: OrganizationEdge!
@@ -1818,6 +1978,10 @@ type UpdateOrganizationPayload {
 
 type DeleteOrganizationPayload {
   success: Boolean!
+}
+
+type UpdateTrustCenterPayload {
+  trustCenter: TrustCenter!
 }
 
 type CreateControlPayload {
@@ -2408,4 +2572,24 @@ type UpdateDatumPayload {
 
 type DeleteDatumPayload {
   deletedDatumId: ID!
+}
+
+type CreateAuditPayload {
+  auditEdge: AuditEdge!
+}
+
+type UpdateAuditPayload {
+  audit: Audit!
+}
+
+type DeleteAuditPayload {
+  deletedAuditId: ID!
+}
+
+type UploadAuditReportPayload {
+  audit: Audit!
+}
+
+type DeleteAuditReportPayload {
+  audit: Audit!
 }
