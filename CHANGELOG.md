@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-##  [0.45.0] - 2025-08-06
+## [0.45.1] - 2025-08-06
+
+- Fix data page display
+
+## [0.45.0] - 2025-08-06
 
 ### Added
 - Add trust center
