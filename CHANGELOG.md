@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- Add trust center
+- Add edition of document fields
+
 ## [0.44.0] - 2025-07-23
 
 ### Fixed
