@@ -503,6 +503,7 @@ WITH vend AS (
 		v.terms_of_service_url,
 		v.security_page_url,
 		v.trust_page_url,
+		v.show_on_trust_center,
 		v.created_at,
 		v.updated_at
 	FROM
@@ -534,6 +535,7 @@ SELECT
 	terms_of_service_url,
 	security_page_url,
 	trust_page_url,
+	show_on_trust_center,
 	created_at,
 	updated_at
 FROM
@@ -632,6 +634,7 @@ WITH vend AS (
 		v.terms_of_service_url,
 		v.security_page_url,
 		v.trust_page_url,
+		v.show_on_trust_center,
 		v.created_at,
 		v.updated_at
 	FROM
@@ -663,6 +666,7 @@ SELECT
 	terms_of_service_url,
 	security_page_url,
 	trust_page_url,
+	show_on_trust_center,
 	created_at,
 	updated_at
 FROM
