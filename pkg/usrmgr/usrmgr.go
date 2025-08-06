@@ -32,11 +32,12 @@ import (
 
 type (
 	Service struct {
-		pg            *pg.Client
-		hp            *passwdhash.Profile
-		hostname      string
-		tokenSecret   string
-		disableSignup bool
+		pg                      *pg.Client
+		hp                      *passwdhash.Profile
+		hostname                string
+		tokenSecret             string
+		disableSignup           bool
+		invitationTokenValidity time.Duration
 	}
 
 	ErrInvalidCredentials struct {
@@ -168,13 +169,15 @@ func NewService(
 	tokenSecret string,
 	hostname string,
 	disableSignup bool,
+	invitationTokenValidity time.Duration,
 ) (*Service, error) {
 	return &Service{
-		pg:            pgClient,
-		hp:            hp,
-		hostname:      hostname,
-		tokenSecret:   tokenSecret,
-		disableSignup: disableSignup,
+		pg:                      pgClient,
+		hp:                      hp,
+		hostname:                hostname,
+		tokenSecret:             tokenSecret,
+		disableSignup:           disableSignup,
+		invitationTokenValidity: invitationTokenValidity,
 	}, nil
 }
 
@@ -710,7 +713,7 @@ func (s Service) InviteUser(
 	confirmationToken, err := statelesstoken.NewToken(
 		s.tokenSecret,
 		TokenTypeOrganizationInvitation,
-		12*time.Hour,
+		s.invitationTokenValidity,
 		InvitationData{OrganizationID: organizationID, Email: emailAddress, FullName: fullName},
 	)
 	if err != nil {

@@ -99,7 +99,8 @@ func New() *Implm {
 					Duration: 24,
 					Domain:   "localhost",
 				},
-				DisableSignup: false,
+				DisableSignup:                       false,
+				InvitationConfirmationTokenValidity: 3600,
 			},
 			TrustAuth: trustAuthConfig{
 				CookieName:        "TCT",
@@ -235,6 +236,7 @@ func (impl *Implm) Run(
 		impl.cfg.Auth.Cookie.Secret,
 		impl.cfg.Hostname,
 		impl.cfg.Auth.DisableSignup,
+		time.Duration(impl.cfg.Auth.InvitationConfirmationTokenValidity)*time.Second,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot create usrmgr service: %w", err)

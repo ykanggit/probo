@@ -21,9 +21,10 @@ import (
 
 type (
 	authConfig struct {
-		Cookie        cookieConfig   `json:"cookie"`
-		Password      passwordConfig `json:"password"`
-		DisableSignup bool           `json:"disable-signup"`
+		Cookie                              cookieConfig   `json:"cookie"`
+		Password                            passwordConfig `json:"password"`
+		DisableSignup                       bool           `json:"disable-signup"`
+		InvitationConfirmationTokenValidity int            `json:"invitation-confirmation-token-validity"`
 	}
 
 	trustAuthConfig struct {
