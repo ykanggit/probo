@@ -21,9 +21,21 @@ import (
 
 type (
 	authConfig struct {
-		Cookie        cookieConfig   `json:"cookie"`
-		Password      passwordConfig `json:"password"`
-		DisableSignup bool           `json:"disable-signup"`
+		Cookie                              cookieConfig   `json:"cookie"`
+		Password                            passwordConfig `json:"password"`
+		DisableSignup                       bool           `json:"disable-signup"`
+		InvitationConfirmationTokenValidity int            `json:"invitation-confirmation-token-validity"`
+	}
+
+	trustAuthConfig struct {
+		CookieName        string `json:"cookie-name"`
+		CookieDomain      string `json:"cookie-domain"`
+		CookieDuration    int    `json:"cookie-duration"`
+		TokenDuration     int    `json:"token-duration"`
+		ReportURLDuration int    `json:"report-url-duration"`
+		TokenSecret       string `json:"token-secret"`
+		Scope             string `json:"scope"`
+		TokenType         string `json:"token-type"`
 	}
 
 	cookieConfig struct {
@@ -75,4 +87,23 @@ func (c authConfig) GetCookieSecretBytes() ([]byte, error) {
 	}
 
 	return []byte(c.Cookie.Secret), nil
+}
+
+func (c trustAuthConfig) GetTokenSecretBytes() ([]byte, error) {
+	if c.TokenSecret == "" {
+		return nil, fmt.Errorf("token secret cannot be empty")
+	}
+
+	if decoded, err := base64.StdEncoding.DecodeString(c.TokenSecret); err == nil {
+		if len(decoded) < 32 {
+			return nil, fmt.Errorf("decoded token secret must be at least 32 bytes long")
+		}
+		return decoded, nil
+	}
+
+	if len(c.TokenSecret) < 32 {
+		return nil, fmt.Errorf("token secret must be at least 32 bytes long")
+	}
+
+	return []byte(c.TokenSecret), nil
 }

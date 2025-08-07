@@ -86,7 +86,7 @@ func (s TrustCenterService) GetByOrganizationID(
 	return trustCenter, nil
 }
 
-func (s *TrustCenterService) Update(
+func (s TrustCenterService) Update(
 	ctx context.Context,
 	req *UpdateTrustCenterRequest,
 ) (*coredata.TrustCenter, error) {

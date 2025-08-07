@@ -35,7 +35,8 @@ import (
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/saferedirect"
 	"github.com/getprobo/probo/pkg/server"
-	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
+	"github.com/getprobo/probo/pkg/server/api"
+	"github.com/getprobo/probo/pkg/trust"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.gearno.de/kit/httpclient"
@@ -58,6 +59,7 @@ type (
 		Pg            pgConfig             `json:"pg"`
 		Api           apiConfig            `json:"api"`
 		Auth          authConfig           `json:"auth"`
+		TrustAuth     trustAuthConfig      `json:"trust-auth"`
 		AWS           awsConfig            `json:"aws"`
 		Mailer        mailerConfig         `json:"mailer"`
 		Connectors    []connectorConfig    `json:"connectors"`
@@ -97,7 +99,18 @@ func New() *Implm {
 					Duration: 24,
 					Domain:   "localhost",
 				},
-				DisableSignup: false,
+				DisableSignup:                       false,
+				InvitationConfirmationTokenValidity: 3600,
+			},
+			TrustAuth: trustAuthConfig{
+				CookieName:        "TCT",
+				CookieDomain:      "localhost",
+				CookieDuration:    24,
+				TokenDuration:     168,
+				ReportURLDuration: 15,
+				TokenSecret:       "this-is-a-secure-secret-for-trust-token-signing-at-least-32-bytes",
+				Scope:             "trust_center_readonly",
+				TokenType:         "trust_center_access",
 			},
 			AWS: awsConfig{
 				Region: "us-east-1",
@@ -156,6 +169,12 @@ func (impl *Implm) Run(
 		return fmt.Errorf("cannot get cookie secret bytes: %w", err)
 	}
 
+	_, err = impl.cfg.TrustAuth.GetTokenSecretBytes()
+	if err != nil {
+		rootSpan.RecordError(err)
+		return fmt.Errorf("cannot get trust auth token secret bytes: %w", err)
+	}
+
 	awsConfig := awsconfig.NewConfig(
 		l,
 		httpclient.DefaultPooledClient(
@@ -202,6 +221,12 @@ func (impl *Implm) Run(
 		ModelName:    impl.cfg.OpenAI.ModelName,
 	}
 
+	trustConfig := probo.TrustConfig{
+		TokenSecret:   impl.cfg.TrustAuth.TokenSecret,
+		TokenDuration: time.Duration(impl.cfg.TrustAuth.TokenDuration) * time.Hour,
+		TokenType:     impl.cfg.TrustAuth.TokenType,
+	}
+
 	agent := agents.NewAgent(l.Named("agent"), agentConfig)
 
 	usrmgrService, err := usrmgr.NewService(
@@ -211,6 +236,7 @@ func (impl *Implm) Run(
 		impl.cfg.Auth.Cookie.Secret,
 		impl.cfg.Hostname,
 		impl.cfg.Auth.DisableSignup,
+		time.Duration(impl.cfg.Auth.InvitationConfirmationTokenValidity)*time.Second,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot create usrmgr service: %w", err)
@@ -224,12 +250,24 @@ func (impl *Implm) Run(
 		impl.cfg.AWS.Bucket,
 		impl.cfg.Hostname,
 		impl.cfg.Auth.Cookie.Secret,
+		trustConfig,
 		agentConfig,
 		html2pdfConverter,
+		usrmgrService,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot create probo service: %w", err)
 	}
+
+	trustService := trust.NewService(
+		pgClient,
+		s3Client,
+		impl.cfg.AWS.Bucket,
+		impl.cfg.EncryptionKey,
+		impl.cfg.TrustAuth.TokenSecret,
+		usrmgrService,
+		html2pdfConverter,
+	)
 
 	serverHandler, err := server.NewServer(
 		server.Config{
@@ -237,15 +275,26 @@ func (impl *Implm) Run(
 			ExtraHeaderFields: impl.cfg.Api.ExtraHeaderFields,
 			Probo:             proboService,
 			Usrmgr:            usrmgrService,
+			Trust:             trustService,
 			ConnectorRegistry: defaultConnectorRegistry,
 			Agent:             agent,
 			SafeRedirect:      &saferedirect.SafeRedirect{AllowedHost: impl.cfg.Hostname},
 			Logger:            l.Named("http.server"),
-			Auth: console_v1.AuthConfig{
+			Auth: api.ConsoleAuthConfig{
 				CookieName:      impl.cfg.Auth.Cookie.Name,
 				CookieDomain:    impl.cfg.Auth.Cookie.Domain,
 				SessionDuration: time.Duration(impl.cfg.Auth.Cookie.Duration) * time.Hour,
 				CookieSecret:    impl.cfg.Auth.Cookie.Secret,
+			},
+			TrustAuth: api.TrustAuthConfig{
+				CookieName:        impl.cfg.TrustAuth.CookieName,
+				CookieDomain:      impl.cfg.TrustAuth.CookieDomain,
+				CookieDuration:    time.Duration(impl.cfg.TrustAuth.CookieDuration) * time.Hour,
+				TokenDuration:     time.Duration(impl.cfg.TrustAuth.TokenDuration) * time.Hour,
+				ReportURLDuration: time.Duration(impl.cfg.TrustAuth.ReportURLDuration) * time.Minute,
+				TokenSecret:       impl.cfg.TrustAuth.TokenSecret,
+				Scope:             impl.cfg.TrustAuth.Scope,
+				TokenType:         impl.cfg.TrustAuth.TokenType,
 			},
 		},
 	)

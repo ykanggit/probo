@@ -24,8 +24,8 @@ import (
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/saferedirect"
 	"github.com/getprobo/probo/pkg/server/api"
-	console_v1 "github.com/getprobo/probo/pkg/server/api/console/v1"
 	"github.com/getprobo/probo/pkg/server/web"
+	"github.com/getprobo/probo/pkg/trust"
 	"github.com/getprobo/probo/pkg/usrmgr"
 	"github.com/go-chi/chi/v5"
 	"go.gearno.de/kit/log"
@@ -37,7 +37,9 @@ type Config struct {
 	ExtraHeaderFields map[string]string
 	Probo             *probo.Service
 	Usrmgr            *usrmgr.Service
-	Auth              console_v1.AuthConfig
+	Trust             *trust.Service
+	Auth              api.ConsoleAuthConfig
+	TrustAuth         api.TrustAuthConfig
 	ConnectorRegistry *connector.ConnectorRegistry
 	Agent             *agents.Agent
 	SafeRedirect      *saferedirect.SafeRedirect
@@ -59,7 +61,9 @@ func NewServer(cfg Config) (*Server, error) {
 		AllowedOrigins:    cfg.AllowedOrigins,
 		Probo:             cfg.Probo,
 		Usrmgr:            cfg.Usrmgr,
+		Trust:             cfg.Trust,
 		Auth:              cfg.Auth,
+		TrustAuth:         cfg.TrustAuth,
 		ConnectorRegistry: cfg.ConnectorRegistry,
 		SafeRedirect:      cfg.SafeRedirect,
 		Logger:            cfg.Logger.Named("api"),

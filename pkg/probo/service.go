@@ -17,6 +17,7 @@ package probo
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getprobo/probo/pkg/agents"
@@ -25,10 +26,17 @@ import (
 	"github.com/getprobo/probo/pkg/filevalidation"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/html2pdf"
+	"github.com/getprobo/probo/pkg/usrmgr"
 	"go.gearno.de/kit/pg"
 )
 
 type (
+	TrustConfig struct {
+		TokenSecret   string
+		TokenDuration time.Duration
+		TokenType     string
+	}
+
 	Service struct {
 		pg                *pg.Client
 		s3                *s3.Client
@@ -36,8 +44,10 @@ type (
 		encryptionKey     cipher.EncryptionKey
 		hostname          string
 		tokenSecret       string
+		trustConfig       TrustConfig
 		agentConfig       agents.Config
 		html2pdfConverter *html2pdf.Converter
+		usrmgr            *usrmgr.Service
 	}
 
 	TenantService struct {
@@ -48,6 +58,7 @@ type (
 		scope                   coredata.Scoper
 		hostname                string
 		tokenSecret             string
+		trustConfig             TrustConfig
 		agent                   *agents.Agent
 		Frameworks              *FrameworkService
 		Measures                *MeasureService
@@ -66,6 +77,7 @@ type (
 		Audits                  *AuditService
 		Reports                 *ReportService
 		TrustCenters            *TrustCenterService
+		TrustCenterAccesses     *TrustCenterAccessService
 	}
 )
 
@@ -77,8 +89,10 @@ func NewService(
 	bucket string,
 	hostname string,
 	tokenSecret string,
+	trustConfig TrustConfig,
 	agentConfig agents.Config,
 	html2pdfConverter *html2pdf.Converter,
+	usrmgrService *usrmgr.Service,
 ) (*Service, error) {
 	if bucket == "" {
 		return nil, fmt.Errorf("bucket is required")
@@ -91,8 +105,10 @@ func NewService(
 		encryptionKey:     encryptionKey,
 		hostname:          hostname,
 		tokenSecret:       tokenSecret,
+		trustConfig:       trustConfig,
 		agentConfig:       agentConfig,
 		html2pdfConverter: html2pdfConverter,
+		usrmgr:            usrmgrService,
 	}
 
 	return svc, nil
@@ -107,6 +123,7 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 		hostname:      s.hostname,
 		scope:         coredata.NewScope(tenantID),
 		tokenSecret:   s.tokenSecret,
+		trustConfig:   s.trustConfig,
 		agent:         agents.NewAgent(nil, s.agentConfig),
 	}
 
@@ -146,5 +163,9 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.Audits = &AuditService{svc: tenantService}
 	tenantService.Reports = &ReportService{svc: tenantService}
 	tenantService.TrustCenters = &TrustCenterService{svc: tenantService}
+	tenantService.TrustCenterAccesses = &TrustCenterAccessService{
+		svc:    tenantService,
+		usrmgr: s.usrmgr,
+	}
 	return tenantService
 }

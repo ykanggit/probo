@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.45.1] - 2025-08-06
+
+- Fix data page display
+
+## [0.45.0] - 2025-08-06
+
+### Added
+- Add trust center
+- Add edition of document fields
+
 ## [0.44.0] - 2025-07-23
 
 ### Fixed

@@ -201,7 +201,8 @@ func (s AuditService) ListForOrganizationID(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			err := audits.LoadByOrganizationID(ctx, conn, s.svc.scope, organizationID, cursor)
+			filter := coredata.NewAuditFilter()
+			err := audits.LoadByOrganizationID(ctx, conn, s.svc.scope, organizationID, cursor, filter)
 			if err != nil {
 				return fmt.Errorf("cannot load audits: %w", err)
 			}
