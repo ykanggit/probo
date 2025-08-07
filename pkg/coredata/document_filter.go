@@ -20,7 +20,8 @@ import (
 
 type (
 	DocumentFilter struct {
-		query *string
+		query             *string
+		showOnTrustCenter *bool
 	}
 )
 
@@ -30,21 +31,36 @@ func NewDocumentFilter(query *string) *DocumentFilter {
 	}
 }
 
-func (f *DocumentFilter) SQLArguments() pgx.NamedArgs {
-	return pgx.NamedArgs{
-		"query": f.query,
+func NewDocumentTrustCenterFilter() *DocumentFilter {
+	showOnTrustCenter := true
+	return &DocumentFilter{
+		showOnTrustCenter: &showOnTrustCenter,
+	}
+}
+
+func (f *DocumentFilter) SQLArguments() pgx.StrictNamedArgs {
+	return pgx.StrictNamedArgs{
+		"query":                f.query,
+		"show_on_trust_center": f.showOnTrustCenter,
 	}
 }
 
 func (f *DocumentFilter) SQLFragment() string {
-	if f.query == nil || *f.query == "" {
-		return "TRUE"
-	}
-
 	return `
-		search_vector @@ (
-			SELECT to_tsquery('simple', string_agg(lexeme || ':*', ' & '))
-			FROM unnest(regexp_split_to_array(trim(@query), '\s+')) AS lexeme
-		)
-	`
+(
+	CASE
+		WHEN @query::text IS NOT NULL AND @query::text != '' THEN
+			search_vector @@ (
+				SELECT to_tsquery('simple', string_agg(lexeme || ':*', ' & '))
+				FROM unnest(regexp_split_to_array(trim(@query::text), '\s+')) AS lexeme
+			)
+		ELSE TRUE
+	END
+	AND
+	CASE
+		WHEN @show_on_trust_center::boolean IS NOT NULL THEN
+			show_on_trust_center = @show_on_trust_center::boolean
+		ELSE TRUE
+	END
+)`
 }

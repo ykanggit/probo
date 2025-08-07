@@ -566,6 +566,14 @@ enum AuditOrderField
     )
 }
 
+enum TrustCenterAccessOrderField
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.TrustCenterAccessOrderField") {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.TrustCenterAccessOrderFieldCreatedAt"
+    )
+}
+
 # Input Types
 input UserOrder
   @goModel(
@@ -647,6 +655,14 @@ input AuditOrder
   field: AuditOrderField!
 }
 
+input TrustCenterAccessOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.TrustCenterAccessOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: TrustCenterAccessOrderField!
+}
+
 input EvidenceOrder
   @goModel(
     model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.EvidenceOrderBy"
@@ -702,6 +718,14 @@ input RiskFilter {
   query: String
 }
 
+input OrganizationFilter {
+  trustCenterSlug: String
+}
+
+input TrustCenterFilter {
+  slug: String
+}
+
 # Core Types
 type TrustCenter implements Node {
   id: ID!
@@ -709,6 +733,15 @@ type TrustCenter implements Node {
   slug: String!
   createdAt: Datetime!
   updatedAt: Datetime!
+  organization: Organization! @goField(forceResolver: true)
+
+  accesses(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: TrustCenterAccessOrder
+  ): TrustCenterAccessConnection! @goField(forceResolver: true)
 }
 
 type Organization implements Node {
@@ -1186,6 +1219,7 @@ type Viewer {
     last: Int
     before: CursorKey
     orderBy: OrganizationOrder
+    filter: OrganizationFilter
   ): OrganizationConnection! @goField(forceResolver: true)
 }
 
@@ -1198,6 +1232,34 @@ type OrganizationConnection {
 type OrganizationEdge {
   cursor: CursorKey!
   node: Organization!
+}
+
+type TrustCenterConnection {
+  edges: [TrustCenterEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TrustCenterEdge {
+  cursor: CursorKey!
+  node: TrustCenter!
+}
+
+type TrustCenterAccess implements Node {
+  id: ID!
+  email: String!
+  name: String!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type TrustCenterAccessConnection {
+  edges: [TrustCenterAccessEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TrustCenterAccessEdge {
+  cursor: CursorKey!
+  node: TrustCenterAccess!
 }
 
 type UserConnection {
@@ -1414,6 +1476,13 @@ type AuditEdge {
 type Query {
   node(id: ID!): Node!
   viewer: Viewer!
+  trustCenters(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    filter: TrustCenterFilter
+  ): TrustCenterConnection! @goField(forceResolver: true)
 }
 
 type Mutation {
@@ -1431,6 +1500,15 @@ type Mutation {
   updateTrustCenter(
     input: UpdateTrustCenterInput!
   ): UpdateTrustCenterPayload!
+
+  # Trust Center Access CRUD mutations
+  createTrustCenterAccess(
+    input: CreateTrustCenterAccessInput!
+  ): CreateTrustCenterAccessPayload!
+
+  deleteTrustCenterAccess(
+    input: DeleteTrustCenterAccessInput!
+  ): DeleteTrustCenterAccessPayload!
 
   # User mutations
   confirmEmail(input: ConfirmEmailInput!): ConfirmEmailPayload!
@@ -1613,6 +1691,16 @@ input UpdateTrustCenterInput {
   trustCenterId: ID!
   active: Boolean
   slug: String
+}
+
+input CreateTrustCenterAccessInput {
+  trustCenterId: ID!
+  email: String!
+  name: String!
+}
+
+input DeleteTrustCenterAccessInput {
+  accessId: ID!
 }
 
 input CreateVendorInput {
@@ -1982,6 +2070,16 @@ type DeleteOrganizationPayload {
 
 type UpdateTrustCenterPayload {
   trustCenter: TrustCenter!
+}
+
+
+
+type CreateTrustCenterAccessPayload {
+  trustCenterAccessEdge: TrustCenterAccessEdge!
+}
+
+type DeleteTrustCenterAccessPayload {
+  deletedTrustCenterAccessId: ID!
 }
 
 type CreateControlPayload {

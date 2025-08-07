@@ -1,4 +1,6 @@
 probod:
+  auth:
+    invitation-confirmation-token-validity: 3600
   api:
     cors:
       allowed-origins: ["http://localhost:8080", "http://localhost:5173"]

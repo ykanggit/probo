@@ -8,7 +8,7 @@ import {
 } from "react-router";
 import { MainLayout } from "./layouts/MainLayout";
 import { AuthLayout, CenteredLayout, CenteredLayoutSkeleton } from "@probo/ui";
-import { Fragment, Suspense, type FC, type LazyExoticComponent } from "react";
+import { Fragment, Suspense } from "react";
 import {
   relayEnvironment,
   UnAuthenticatedError,
@@ -31,6 +31,13 @@ import { auditRoutes } from "./routes/auditRoutes.ts";
 import { trustCenterRoutes } from "./routes/trustCenterRoutes.ts";
 import { lazy } from "@probo/react-lazy";
 
+export type AppRoute = Omit<RouteObject, "Component" | "children"> & {
+  Component?: React.ComponentType<any>;
+  children?: AppRoute[];
+  fallback?: React.ComponentType;
+  queryLoader?: (params: any) => PreloadedQuery<any>;
+};
+
 /**
  * Top level error boundary
  */
@@ -43,13 +50,6 @@ function ErrorBoundary({ error: propsError }: { error?: string }) {
 
   return <PageError error={error?.toString()} />;
 }
-
-export type AppRoute = {
-  Component: FC<any> | LazyExoticComponent<FC<any>>;
-  children?: AppRoute[];
-  fallback?: FC;
-  queryLoader?: (params: Record<string, string>) => PreloadedQuery<any>;
-} & Omit<RouteObject, "Component" | "children">;
 
 const routes = [
   {
@@ -107,6 +107,18 @@ const routes = [
     ],
   },
   {
+    path: "/trust/:slug",
+    ErrorBoundary: ErrorBoundary,
+    fallback: PageSkeleton,
+    Component: lazy(() => import("./pages/PublicTrustCenterPage")),
+  },
+  {
+    path: "/trust/:slug/access",
+    ErrorBoundary: ErrorBoundary,
+    fallback: PageSkeleton,
+    Component: lazy(() => import("./pages/TrustCenterAccessPage")),
+  },
+  {
     path: "/organizations/:organizationId",
     Component: MainLayout,
     ErrorBoundary: ErrorBoundary,
@@ -160,17 +172,19 @@ function routeTransformer({
   ...route
 }: AppRoute): RouteObject {
   let result = { ...route };
-  if (FallbackComponent) {
+  if (FallbackComponent && route.Component) {
+    const OriginalComponent = route.Component;
     result = {
       ...result,
       Component: (props) => (
         <Suspense fallback={<FallbackComponent />}>
-          <route.Component {...props} />
+          <OriginalComponent {...props} />
         </Suspense>
       ),
     };
   }
-  if (queryLoader) {
+  if (queryLoader && route.Component) {
+    const OriginalComponent = route.Component;
     result = {
       ...result,
       loader: ({ params }) => {
@@ -187,7 +201,7 @@ function routeTransformer({
 
         return (
           <Suspense fallback={FallbackComponent ? <FallbackComponent /> : null}>
-            <route.Component queryRef={queryRef} />
+            <OriginalComponent queryRef={queryRef} />
           </Suspense>
         );
       },

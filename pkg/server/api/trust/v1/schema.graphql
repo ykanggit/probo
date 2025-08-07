@@ -1,0 +1,243 @@
+# Directives
+directive @goField(
+  forceResolver: Boolean
+  name: String
+  omittable: Boolean
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+directive @goModel(
+  model: String
+  models: [String!]
+) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
+
+directive @goEnum(value: String) on ENUM_VALUE
+
+directive @mustBeAuthenticated(role: Role = NONE) on FIELD_DEFINITION | OBJECT
+
+enum Role {
+  NONE
+  USER
+}
+
+scalar Datetime
+scalar CursorKey
+
+interface Node {
+  id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: CursorKey
+  endCursor: CursorKey
+}
+
+type Organization implements Node {
+  id: ID!
+  name: String!
+  logoUrl: String @goField(forceResolver: true)
+}
+
+enum DocumentType
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.DocumentType") {
+  OTHER
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypeOther")
+  ISMS @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypeISMS")
+  POLICY
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.DocumentTypePolicy")
+}
+
+type Document implements Node {
+  id: ID!
+  title: String!
+  documentType: DocumentType!
+}
+
+type DocumentConnection {
+  edges: [DocumentEdge!]!
+  pageInfo: PageInfo!
+}
+
+type DocumentEdge {
+  cursor: CursorKey!
+  node: Document!
+}
+
+
+type Framework implements Node {
+  id: ID!
+  name: String!
+}
+
+type Report implements Node {
+  id: ID!
+  filename: String!
+  downloadUrl: String @goField(forceResolver: true) @mustBeAuthenticated(role: USER)
+}
+
+type Audit implements Node {
+  id: ID!
+  framework: Framework! @goField(forceResolver: true)
+  report: Report @goField(forceResolver: true)
+  reportUrl: String @goField(forceResolver: true) @mustBeAuthenticated(role: USER)
+}
+
+type AuditConnection {
+  edges: [AuditEdge!]!
+  pageInfo: PageInfo!
+}
+
+type AuditEdge {
+  cursor: CursorKey!
+  node: Audit!
+}
+
+enum VendorCategory
+  @goModel(model: "github.com/getprobo/probo/pkg/coredata.VendorCategory") {
+  ANALYTICS
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryAnalytics"
+    )
+  CLOUD_MONITORING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudMonitoring"
+    )
+  CLOUD_PROVIDER
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCloudProvider"
+    )
+  COLLABORATION
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCollaboration"
+    )
+  CUSTOMER_SUPPORT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryCustomerSupport"
+    )
+  DATA_STORAGE_AND_PROCESSING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDataStorageAndProcessing"
+    )
+  DOCUMENT_MANAGEMENT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryDocumentManagement"
+    )
+  EMPLOYEE_MANAGEMENT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEmployeeManagement"
+    )
+  ENGINEERING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryEngineering"
+    )
+  FINANCE
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryFinance"
+    )
+  IDENTITY_PROVIDER
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryIdentityProvider"
+    )
+  IT @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryIT")
+  MARKETING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryMarketing"
+    )
+  OFFICE_OPERATIONS
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOfficeOperations"
+    )
+  OTHER
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryOther")
+  PASSWORD_MANAGEMENT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryPasswordManagement"
+    )
+  PRODUCT_AND_DESIGN
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProductAndDesign"
+    )
+  PROFESSIONAL_SERVICES
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryProfessionalServices"
+    )
+  RECRUITING
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryRecruiting"
+    )
+  SALES
+    @goEnum(value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySales")
+  SECURITY
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategorySecurity"
+    )
+  VERSION_CONTROL
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorCategoryVersionControl"
+    )
+}
+
+type Vendor implements Node {
+  id: ID!
+  name: String!
+  category: VendorCategory!
+  websiteUrl: String
+  privacyPolicyUrl: String
+}
+
+type VendorConnection {
+  edges: [VendorEdge!]!
+  pageInfo: PageInfo!
+}
+
+type VendorEdge {
+  cursor: CursorKey!
+  node: Vendor!
+}
+
+type TrustCenter implements Node {
+  id: ID!
+  active: Boolean!
+  slug: String!
+  organization: Organization! @goField(forceResolver: true)
+
+  documents(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): DocumentConnection! @goField(forceResolver: true)
+
+  audits(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): AuditConnection! @goField(forceResolver: true)
+
+  vendors(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+  ): VendorConnection! @goField(forceResolver: true)
+}
+
+input ExportDocumentPDFInput {
+  documentId: ID!
+}
+
+type ExportDocumentPDFPayload {
+  data: String!
+}
+
+type Query {
+  trustCenterBySlug(slug: String!): TrustCenter @mustBeAuthenticated(role: NONE)
+}
+
+type Mutation {
+  exportDocumentPDF(
+    input: ExportDocumentPDFInput!
+  ): ExportDocumentPDFPayload! @mustBeAuthenticated(role: USER)
+}
