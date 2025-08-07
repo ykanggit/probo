@@ -12,24 +12,21 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package types
+package pageinfo
 
 import (
 	"github.com/getprobo/probo/pkg/page"
 	"go.gearno.de/x/ref"
 )
 
-// PageInfoData contains the raw data for constructing PageInfo structs
-type PageInfoData struct {
+type PageInfo struct {
 	HasNextPage     bool
 	HasPreviousPage bool
 	StartCursor     *page.CursorKey
 	EndCursor       *page.CursorKey
 }
 
-// NewPageInfoData creates PageInfo data from a Page result.
-// This can be used by local packages to construct their PageInfo structs.
-func NewPageInfoData[T page.Paginable[O], O page.OrderField](p *page.Page[T, O]) PageInfoData {
+func NewPageInfo[T page.Paginable[O], O page.OrderField](p *page.Page[T, O]) *PageInfo {
 	var (
 		startCursor *page.CursorKey
 		endCursor   *page.CursorKey
@@ -40,7 +37,7 @@ func NewPageInfoData[T page.Paginable[O], O page.OrderField](p *page.Page[T, O])
 		endCursor = ref.Ref(p.Last().CursorKey(p.Cursor.OrderBy.Field))
 	}
 
-	return PageInfoData{
+	return &PageInfo{
 		HasNextPage:     p.Info.HasNext,
 		HasPreviousPage: p.Info.HasPrev,
 		StartCursor:     startCursor,

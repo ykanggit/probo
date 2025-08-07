@@ -20,13 +20,13 @@ call_argument_directives_with_null: true
 models:
   ID:
     model:
-      - "github.com/getprobo/probo/pkg/server/api/console/v1/types.GIDScalar"
+      - "github.com/getprobo/probo/pkg/server/graphql/types/gid.GIDScalar"
   Datetime:
     model:
       - "github.com/99designs/gqlgen/graphql.Time"
   CursorKey:
     model:
-      - "github.com/getprobo/probo/pkg/server/api/console/v1/types.CursorKeyScalar"
+      - "github.com/getprobo/probo/pkg/server/graphql/types/cursor.CursorKeyScalar"
   Duration:
     model:
       - "github.com/99designs/gqlgen/graphql.Duration"

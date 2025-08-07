@@ -12,7 +12,7 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package types
+package cursor
 
 import (
 	"errors"
@@ -20,25 +20,53 @@ import (
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/getprobo/probo/pkg/gid"
+	"github.com/getprobo/probo/pkg/page"
 )
 
-func MarshalGIDScalar(id gid.GID) graphql.Marshaler {
+type CursorKeyScalar = page.CursorKey
+
+func NewCursor[O page.OrderField](
+	first *int,
+	after *page.CursorKey,
+	last *int,
+	before *page.CursorKey,
+	orderBy page.OrderBy[O],
+) *page.Cursor[O] {
+	var (
+		size      int
+		from      *page.CursorKey
+		direction = page.Head
+	)
+
+	if first != nil {
+		size = *first
+		direction = page.Head
+		from = after
+	} else if last != nil {
+		size = *last
+		direction = page.Tail
+		from = before
+	}
+
+	return page.NewCursor(size, from, direction, orderBy)
+}
+
+func MarshalCursorKeyScalar(ck page.CursorKey) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
-		w.Write([]byte(strconv.Quote(id.String())))
+		_, _ = w.Write([]byte(strconv.Quote(ck.String())))
 	})
 }
 
-func UnmarshalGIDScalar(v interface{}) (gid.GID, error) {
+func UnmarshalCursorKeyScalar(v interface{}) (page.CursorKey, error) {
 	s, ok := v.(string)
 	if !ok {
-		return gid.Nil, errors.New("must be a string")
+		return page.CursorKeyNil, errors.New("must be a string")
 	}
 
-	id, err := gid.ParseGID(s)
+	ck, err := page.ParseCursorKey(s)
 	if err != nil {
-		return gid.Nil, err
+		return page.CursorKeyNil, err
 	}
 
-	return id, nil
+	return ck, nil
 }

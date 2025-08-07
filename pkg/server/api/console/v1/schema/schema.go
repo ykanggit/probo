@@ -18,6 +18,8 @@ import (
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/types"
+	"github.com/getprobo/probo/pkg/server/graphql/types/cursor"
+	gid1 "github.com/getprobo/probo/pkg/server/graphql/types/gid"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -58548,13 +58550,13 @@ var (
 )
 
 func (ec *executionContext) unmarshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx context.Context, v any) (page.CursorKey, error) {
-	res, err := types.UnmarshalCursorKeyScalar(v)
+	res, err := cursor.UnmarshalCursorKeyScalar(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx context.Context, sel ast.SelectionSet, v page.CursorKey) graphql.Marshaler {
 	_ = sel
-	res := types.MarshalCursorKeyScalar(v)
+	res := cursor.MarshalCursorKeyScalar(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -59864,13 +59866,13 @@ func (ec *executionContext) marshalNGenerateFrameworkStateOfApplicabilityPayload
 }
 
 func (ec *executionContext) unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, v any) (gid.GID, error) {
-	res, err := types.UnmarshalGIDScalar(v)
+	res, err := gid1.UnmarshalGIDScalar(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, sel ast.SelectionSet, v gid.GID) graphql.Marshaler {
 	_ = sel
-	res := types.MarshalGIDScalar(v)
+	res := gid1.MarshalGIDScalar(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -62366,7 +62368,7 @@ func (ec *executionContext) unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋpro
 	if v == nil {
 		return nil, nil
 	}
-	res, err := types.UnmarshalCursorKeyScalar(v)
+	res, err := cursor.UnmarshalCursorKeyScalar(v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -62376,7 +62378,7 @@ func (ec *executionContext) marshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋprobo
 	}
 	_ = sel
 	_ = ctx
-	res := types.MarshalCursorKeyScalar(*v)
+	res := cursor.MarshalCursorKeyScalar(*v)
 	return res
 }
 
@@ -62616,7 +62618,7 @@ func (ec *executionContext) unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpk
 	if v == nil {
 		return nil, nil
 	}
-	res, err := types.UnmarshalGIDScalar(v)
+	res, err := gid1.UnmarshalGIDScalar(v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -62626,7 +62628,7 @@ func (ec *executionContext) marshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkg�
 	}
 	_ = sel
 	_ = ctx
-	res := types.MarshalGIDScalar(*v)
+	res := gid1.MarshalGIDScalar(*v)
 	return res
 }
 

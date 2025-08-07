@@ -12,7 +12,7 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package types
+package gid
 
 import (
 	"errors"
@@ -20,25 +20,27 @@ import (
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/getprobo/probo/pkg/page"
+	"github.com/getprobo/probo/pkg/gid"
 )
 
-func MarshalCursorKeyScalar(ck page.CursorKey) graphql.Marshaler {
+type GIDScalar = gid.GID
+
+func MarshalGIDScalar(id gid.GID) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
-		_, _ = w.Write([]byte(strconv.Quote(ck.String())))
+		w.Write([]byte(strconv.Quote(id.String())))
 	})
 }
 
-func UnmarshalCursorKeyScalar(v interface{}) (page.CursorKey, error) {
+func UnmarshalGIDScalar(v interface{}) (gid.GID, error) {
 	s, ok := v.(string)
 	if !ok {
-		return page.CursorKeyNil, errors.New("must be a string")
+		return gid.Nil, errors.New("must be a string")
 	}
 
-	ck, err := page.ParseCursorKey(s)
+	id, err := gid.ParseGID(s)
 	if err != nil {
-		return page.CursorKeyNil, err
+		return gid.Nil, err
 	}
 
-	return ck, nil
+	return id, nil
 }
