@@ -32,6 +32,9 @@ import clsx from "clsx";
 import { useMutationWithToasts } from "/hooks/useMutationWithToasts";
 import { useOrganizationId } from "/hooks/useOrganizationId";
 import { InviteUserDialog } from "/components/organizations/InviteUserDialog";
+import { useDeleteOrganizationMutation } from "/hooks/graph/OrganizationGraph";
+import { useNavigate } from "react-router";
+import { DeleteOrganizationDialog } from "/components/organizations/DeleteOrganizationDialog";
 
 type Props = {
   queryRef: PreloadedQuery<OrganizationGraph_ViewQuery>;
@@ -79,6 +82,7 @@ const updateOrganizationMutation = graphql`
 
 export default function SettingsPage({ queryRef }: Props) {
   const { __ } = useTranslate();
+  const navigate = useNavigate();
   const organizationKey = usePreloadedQuery(
     organizationViewQuery,
     queryRef
@@ -91,6 +95,7 @@ export default function SettingsPage({ queryRef }: Props) {
   const [updateOrganization, isUpdating] = useMutation(
     updateOrganizationMutation
   );
+  const [deleteOrganization, isDeleting] = useDeleteOrganizationMutation();
   const users = organization.users.edges.map((edge) => edge.node);
 
   const updateOrganizationName = useDebounceCallback((name: string) => {
@@ -128,6 +133,20 @@ export default function SettingsPage({ queryRef }: Props) {
           description: error.message || __("Please try again."),
           variant: "error",
         });
+      },
+    });
+  };
+
+  const handleDeleteOrganization = () => {
+    return deleteOrganization({
+      variables: {
+        input: {
+          organizationId: organization.id,
+        },
+        connections: [],
+      },
+      onSuccess: () => {
+        navigate("/", { replace: true });
       },
     });
   };
@@ -198,6 +217,36 @@ export default function SettingsPage({ queryRef }: Props) {
             organizationId={organization.id}
             connectors={organization.connectors.edges.map((edge) => edge.node)}
           />
+        </Card>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-base font-medium text-red-600">{__("Danger Zone")}</h2>
+        <Card padded className="border-red-200 flex items-center gap-3">
+          <div className="mr-auto">
+            <h3 className="text-base font-semibold text-red-700">
+              {__("Delete Organization")}
+            </h3>
+            <p className="text-sm text-txt-tertiary">
+              {__("Permanently delete this organization and all its data.")}{" "}
+              <span className="text-red-600 font-medium">
+                {__("This action cannot be undone.")}
+              </span>
+            </p>
+          </div>
+          <DeleteOrganizationDialog
+            organizationName={organization.name}
+            onConfirm={handleDeleteOrganization}
+            isDeleting={isDeleting}
+          >
+            <Button
+              variant="danger"
+              icon={IconTrashCan}
+              disabled={isDeleting}
+            >
+              {isDeleting ? __("Deleting...") : __("Delete Organization")}
+            </Button>
+          </DeleteOrganizationDialog>
         </Card>
       </div>
     </div>

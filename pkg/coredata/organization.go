@@ -156,3 +156,28 @@ WHERE
 
 	return nil
 }
+
+func (o *Organization) Delete(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+) error {
+	q := `
+DELETE FROM organizations
+WHERE
+    %s
+    AND id = @id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"id": o.ID}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot delete organization: %w", err)
+	}
+
+	return nil
+}

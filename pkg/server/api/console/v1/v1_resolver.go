@@ -980,6 +980,20 @@ func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.U
 	}, nil
 }
 
+// DeleteOrganization is the resolver for the deleteOrganization field.
+func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error) {
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
+
+	err := prb.Organizations.Delete(ctx, input.OrganizationID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete organization: %w", err)
+	}
+
+	return &types.DeleteOrganizationPayload{
+		DeletedOrganizationID: input.OrganizationID,
+	}, nil
+}
+
 // UpdateTrustCenter is the resolver for the updateTrustCenter field.
 func (r *mutationResolver) UpdateTrustCenter(ctx context.Context, input types.UpdateTrustCenterInput) (*types.UpdateTrustCenterPayload, error) {
 	prb := r.ProboService(ctx, input.TrustCenterID.TenantID())

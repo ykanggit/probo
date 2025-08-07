@@ -527,6 +527,14 @@ type DeleteMeasurePayload struct {
 	DeletedMeasureID gid.GID `json:"deletedMeasureId"`
 }
 
+type DeleteOrganizationInput struct {
+	OrganizationID gid.GID `json:"organizationId"`
+}
+
+type DeleteOrganizationPayload struct {
+	DeletedOrganizationID gid.GID `json:"deletedOrganizationId"`
+}
+
 type DeletePeopleInput struct {
 	PeopleID gid.GID `json:"peopleId"`
 }

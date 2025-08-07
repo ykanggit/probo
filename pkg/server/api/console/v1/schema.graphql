@@ -1478,6 +1478,9 @@ type Mutation {
   updateOrganization(
     input: UpdateOrganizationInput!
   ): UpdateOrganizationPayload!
+  deleteOrganization(
+    input: DeleteOrganizationInput!
+  ): DeleteOrganizationPayload!
 
   updateTrustCenter(
     input: UpdateTrustCenterInput!
@@ -1656,6 +1659,10 @@ input UpdateOrganizationInput {
   organizationId: ID!
   name: String
   logo: Upload
+}
+
+input DeleteOrganizationInput {
+  organizationId: ID!
 }
 
 input UpdateTrustCenterInput {
@@ -2033,6 +2040,10 @@ type CreateOrganizationPayload {
 
 type UpdateOrganizationPayload {
   organization: Organization!
+}
+
+type DeleteOrganizationPayload {
+  deletedOrganizationId: ID!
 }
 
 type UpdateTrustCenterPayload {

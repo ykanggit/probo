@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<78eb861601ac1babc8f02dc877d9e1cf>>
+ * @generated SignedSource<<e02cdda6c1c24ac700a79ed236c6dfdc>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -25,6 +25,7 @@ export type DocumentDetailPageUpdateMutation$variables = {
 export type DocumentDetailPageUpdateMutation$data = {
   readonly updateDocument: {
     readonly document: {
+      readonly documentType: DocumentType;
       readonly id: string;
       readonly owner: {
         readonly fullName: string;
@@ -88,6 +89,13 @@ v2 = [
           {
             "alias": null,
             "args": null,
+            "kind": "ScalarField",
+            "name": "documentType",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
             "concreteType": "People",
             "kind": "LinkedField",
             "name": "owner",
@@ -129,16 +137,16 @@ return {
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "bb375479bf3446cccb49753a27fb6bcb",
+    "cacheID": "23268b13b11a1a56164dcc4cb96e24b3",
     "id": null,
     "metadata": {},
     "name": "DocumentDetailPageUpdateMutation",
     "operationKind": "mutation",
-    "text": "mutation DocumentDetailPageUpdateMutation(\n  $input: UpdateDocumentInput!\n) {\n  updateDocument(input: $input) {\n    document {\n      id\n      title\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
+    "text": "mutation DocumentDetailPageUpdateMutation(\n  $input: UpdateDocumentInput!\n) {\n  updateDocument(input: $input) {\n    document {\n      id\n      title\n      documentType\n      owner {\n        id\n        fullName\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "9d204fe6a01448bd05d68699c06d18f9";
+(node as any).hash = "507a2bd40b923d2064fdd864f16f29aa";
 
 export default node;

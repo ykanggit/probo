@@ -355,6 +355,10 @@ type ComplexityRoot struct {
 		DeletedMeasureID func(childComplexity int) int
 	}
 
+	DeleteOrganizationPayload struct {
+		DeletedOrganizationID func(childComplexity int) int
+	}
+
 	DeletePeoplePayload struct {
 		DeletedPeopleID func(childComplexity int) int
 	}
@@ -601,6 +605,7 @@ type ComplexityRoot struct {
 		DeleteEvidence                        func(childComplexity int, input types.DeleteEvidenceInput) int
 		DeleteFramework                       func(childComplexity int, input types.DeleteFrameworkInput) int
 		DeleteMeasure                         func(childComplexity int, input types.DeleteMeasureInput) int
+		DeleteOrganization                    func(childComplexity int, input types.DeleteOrganizationInput) int
 		DeletePeople                          func(childComplexity int, input types.DeletePeopleInput) int
 		DeleteRisk                            func(childComplexity int, input types.DeleteRiskInput) int
 		DeleteRiskDocumentMapping             func(childComplexity int, input types.DeleteRiskDocumentMappingInput) int
@@ -1119,6 +1124,7 @@ type MeasureConnectionResolver interface {
 type MutationResolver interface {
 	CreateOrganization(ctx context.Context, input types.CreateOrganizationInput) (*types.CreateOrganizationPayload, error)
 	UpdateOrganization(ctx context.Context, input types.UpdateOrganizationInput) (*types.UpdateOrganizationPayload, error)
+	DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error)
 	UpdateTrustCenter(ctx context.Context, input types.UpdateTrustCenterInput) (*types.UpdateTrustCenterPayload, error)
 	CreateTrustCenterAccess(ctx context.Context, input types.CreateTrustCenterAccessInput) (*types.CreateTrustCenterAccessPayload, error)
 	DeleteTrustCenterAccess(ctx context.Context, input types.DeleteTrustCenterAccessInput) (*types.DeleteTrustCenterAccessPayload, error)
@@ -2114,6 +2120,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.DeleteMeasurePayload.DeletedMeasureID(childComplexity), true
+
+	case "DeleteOrganizationPayload.deletedOrganizationId":
+		if e.complexity.DeleteOrganizationPayload.DeletedOrganizationID == nil {
+			break
+		}
+
+		return e.complexity.DeleteOrganizationPayload.DeletedOrganizationID(childComplexity), true
 
 	case "DeletePeoplePayload.deletedPeopleId":
 		if e.complexity.DeletePeoplePayload.DeletedPeopleID == nil {
@@ -3356,6 +3369,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteMeasure(childComplexity, args["input"].(types.DeleteMeasureInput)), true
+
+	case "Mutation.deleteOrganization":
+		if e.complexity.Mutation.DeleteOrganization == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteOrganization_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteOrganization(childComplexity, args["input"].(types.DeleteOrganizationInput)), true
 
 	case "Mutation.deletePeople":
 		if e.complexity.Mutation.DeletePeople == nil {
@@ -5473,6 +5498,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeleteEvidenceInput,
 		ec.unmarshalInputDeleteFrameworkInput,
 		ec.unmarshalInputDeleteMeasureInput,
+		ec.unmarshalInputDeleteOrganizationInput,
 		ec.unmarshalInputDeletePeopleInput,
 		ec.unmarshalInputDeleteRiskDocumentMappingInput,
 		ec.unmarshalInputDeleteRiskInput,
@@ -7110,6 +7136,9 @@ type Mutation {
   updateOrganization(
     input: UpdateOrganizationInput!
   ): UpdateOrganizationPayload!
+  deleteOrganization(
+    input: DeleteOrganizationInput!
+  ): DeleteOrganizationPayload!
 
   updateTrustCenter(
     input: UpdateTrustCenterInput!
@@ -7288,6 +7317,10 @@ input UpdateOrganizationInput {
   organizationId: ID!
   name: String
   logo: Upload
+}
+
+input DeleteOrganizationInput {
+  organizationId: ID!
 }
 
 input UpdateTrustCenterInput {
@@ -7665,6 +7698,10 @@ type CreateOrganizationPayload {
 
 type UpdateOrganizationPayload {
   organization: Organization!
+}
+
+type DeleteOrganizationPayload {
+  deletedOrganizationId: ID!
 }
 
 type UpdateTrustCenterPayload {
@@ -10367,6 +10404,29 @@ func (ec *executionContext) field_Mutation_deleteMeasure_argsInput(
 	}
 
 	var zeroVal types.DeleteMeasureInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteOrganization_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteOrganization_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteOrganization_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteOrganizationInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteOrganizationInput
 	return zeroVal, nil
 }
 
@@ -19457,6 +19517,50 @@ func (ec *executionContext) fieldContext_DeleteMeasurePayload_deletedMeasureId(_
 	return fc, nil
 }
 
+func (ec *executionContext) _DeleteOrganizationPayload_deletedOrganizationId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteOrganizationPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedOrganizationID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteOrganizationPayload_deletedOrganizationId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteOrganizationPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DeletePeoplePayload_deletedPeopleId(ctx context.Context, field graphql.CollectedField, obj *types.DeletePeoplePayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DeletePeoplePayload_deletedPeopleId(ctx, field)
 	if err != nil {
@@ -25086,6 +25190,65 @@ func (ec *executionContext) fieldContext_Mutation_updateOrganization(ctx context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteOrganization(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteOrganization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteOrganization(rctx, fc.Args["input"].(types.DeleteOrganizationInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteOrganizationPayload)
+	fc.Result = res
+	return ec.marshalNDeleteOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteOrganization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedOrganizationId":
+				return ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteOrganizationPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteOrganization_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -44360,6 +44523,33 @@ func (ec *executionContext) unmarshalInputDeleteMeasureInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteOrganizationInput(ctx context.Context, obj any) (types.DeleteOrganizationInput, error) {
+	var it types.DeleteOrganizationInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"organizationId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDeletePeopleInput(ctx context.Context, obj any) (types.DeletePeopleInput, error) {
 	var it types.DeletePeopleInput
 	asMap := map[string]any{}
@@ -49842,6 +50032,45 @@ func (ec *executionContext) _DeleteMeasurePayload(ctx context.Context, sel ast.S
 	return out
 }
 
+var deleteOrganizationPayloadImplementors = []string{"DeleteOrganizationPayload"}
+
+func (ec *executionContext) _DeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteOrganizationPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteOrganizationPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteOrganizationPayload")
+		case "deletedOrganizationId":
+			out.Values[i] = ec._DeleteOrganizationPayload_deletedOrganizationId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deletePeoplePayloadImplementors = []string{"DeletePeoplePayload"}
 
 func (ec *executionContext) _DeletePeoplePayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeletePeoplePayload) graphql.Marshaler {
@@ -52266,6 +52495,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "updateOrganization":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateOrganization(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteOrganization":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteOrganization(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -58962,6 +59198,25 @@ func (ec *executionContext) marshalNDeleteMeasurePayload2ᚖgithubᚗcomᚋgetpr
 		return graphql.Null
 	}
 	return ec._DeleteMeasurePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeleteOrganizationInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationInput(ctx context.Context, v any) (types.DeleteOrganizationInput, error) {
+	res, err := ec.unmarshalInputDeleteOrganizationInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteOrganizationPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteOrganizationPayload) graphql.Marshaler {
+	return ec._DeleteOrganizationPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteOrganizationPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteOrganizationPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteOrganizationPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteOrganizationPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeletePeopleInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeletePeopleInput(ctx context.Context, v any) (types.DeletePeopleInput, error) {

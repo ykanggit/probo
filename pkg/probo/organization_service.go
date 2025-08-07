@@ -281,6 +281,51 @@ func (s OrganizationService) GenerateLogoURL(
 	return &presignedReq.URL, nil
 }
 
+func (s OrganizationService) Delete(
+	ctx context.Context,
+	organizationID gid.GID,
+) error {
+	organization := &coredata.Organization{}
+
+	err := s.svc.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			if err := organization.LoadByID(ctx, tx, s.svc.scope, organizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			// Delete documents first because versions and signatures have a delete restriction on people
+			// that must be resolved before deleting the organization
+			document := &coredata.Document{}
+			if err := document.DeleteByOrganizationID(ctx, tx, s.svc.scope, organizationID); err != nil {
+				return fmt.Errorf("cannot delete documents: %w", err)
+			}
+
+			if err := organization.Delete(ctx, tx, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot delete organization: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if organization.LogoObjectKey != "" {
+		_, err := s.svc.s3.DeleteObject(ctx, &s3.DeleteObjectInput{
+			Bucket: aws.String(s.svc.bucket),
+			Key:    aws.String(organization.LogoObjectKey),
+		})
+		if err != nil {
+			return fmt.Errorf("organization deleted but failed to delete logo from S3: %w", err)
+		}
+	}
+
+	return nil
+}
+
 func (s OrganizationService) createProboVendor(ctx context.Context, tx pg.Conn, organization *coredata.Organization, now time.Time) error {
 	proboData := &coredata.Vendor{
 		ID:                   gid.New(s.svc.scope.GetTenantID(), coredata.VendorEntityType),
