@@ -2,7 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.46.0] - 2025-08-08
+
+### Added
+
+- Add organization deletion
+- Add Probo by default
+
 ## [0.45.1] - 2025-08-06
+
+### Fixed
 
 - Fix data page display
 
