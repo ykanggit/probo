@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.46.1] - 2025-08-08
+## [0.46.2] - 2025-08-10
+
+### Fixed
+
+- Fix various SQL queries failures due to trust center
+- Fix internal information leaking to API
+
+
+## [0.46.1] - 2025-08-10
 
 ### Fixed
 
