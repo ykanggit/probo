@@ -474,19 +474,19 @@ func (r *documentConnectionResolver) TotalCount(ctx context.Context, obj *types.
 	case *controlResolver:
 		count, err := prb.Documents.CountForControlID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count controls: %w", err)
+			panic(fmt.Errorf("cannot count controls: %w", err))
 		}
 		return count, nil
 	case *organizationResolver:
 		count, err := prb.Documents.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count documents: %w", err)
+			panic(fmt.Errorf("cannot count documents: %w", err))
 		}
 		return count, nil
 	case *riskResolver:
 		count, err := prb.Documents.CountForRiskID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count risks: %w", err)
+			panic(fmt.Errorf("cannot count risks: %w", err))
 		}
 		return count, nil
 	}
@@ -3105,13 +3105,13 @@ func (r *riskConnectionResolver) TotalCount(ctx context.Context, obj *types.Risk
 	case *measureResolver:
 		count, err := prb.Risks.CountForMeasureID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count risks: %w", err)
+			panic(fmt.Errorf("cannot count risks: %w", err))
 		}
 		return count, nil
 	case *organizationResolver:
 		count, err := prb.Risks.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count risks: %w", err)
+			panic(fmt.Errorf("cannot count risks: %w", err))
 		}
 		return count, nil
 	}
