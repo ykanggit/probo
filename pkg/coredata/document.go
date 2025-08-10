@@ -319,7 +319,9 @@ func (p *Documents) CountByControlID(
 WITH plcs AS (
 	SELECT
 		p.id,
-		p.tenant_id
+		p.tenant_id,
+		p.search_vector,
+		p.show_on_trust_center
 	FROM
 		documents p
 	INNER JOIN
@@ -428,7 +430,9 @@ func (p *Documents) CountByRiskID(
 WITH plcs AS (
 	SELECT
 		p.id,
-		p.tenant_id
+		p.tenant_id,
+		p.search_vector,
+		p.show_on_trust_center
 	FROM
 		documents p
 	INNER JOIN
@@ -479,7 +483,8 @@ WITH plcs AS (
 		p.current_published_version,
 		p.show_on_trust_center,
 		p.created_at,
-		p.updated_at
+		p.updated_at,
+		p.search_vector
 	FROM
 		documents p
 	INNER JOIN

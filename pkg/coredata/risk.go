@@ -136,6 +136,7 @@ WITH rsks AS (
 		r.residual_likelihood,
 		r.residual_impact,
 		r.residual_risk_score,
+		r.search_vector,
 		r.created_at,
 		r.updated_at
 	FROM
