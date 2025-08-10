@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.46.1] - 2025-08-08
+
+### Fixed
+
+- 5xx on risk show page
+
 ## [0.46.0] - 2025-08-08
 
 ### Added
