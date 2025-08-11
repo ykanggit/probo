@@ -558,46 +558,6 @@ OAuth2 token exchange endpoint URL.
 
 List of OAuth2 scopes to request during authorization.
 
-## Security Considerations
-
-### Secrets Management
-
-- **Encryption Keys**: The `encryption-key` should be generated using a cryptographically secure random number generator and stored securely.
-- **Database Credentials**: Use strong passwords and consider database connection encryption for production deployments.
-- **Cookie Secrets**: Authentication and trust auth secrets should be unique, random, and at least 32 bytes long.
-- **API Keys**: Store external service API keys securely and rotate them regularly.
-
-### Network Security
-
-- Configure appropriate firewall rules to restrict access to the Probod service.
-- Use TLS/SSL termination at the load balancer or reverse proxy level.
-- Implement proper CORS configuration to prevent unauthorized cross-origin requests.
-
-### Database Security
-
-- Use TLS encryption for database connections in production.
-- Implement database user permissions following the principle of least privilege.
-- Regular database backups and security updates are recommended.
-
-## Environment-Specific Configuration
-
-### Development
-
-For development environments, you can use the provided example configurations in the `cfg/` directory:
-
-- `cfg/dev.yaml` - Basic development configuration
-- `cfg/gearnode.yaml` - Advanced development configuration with connectors
-
-### Production
-
-Production deployments should:
-
-1. Use strong, unique secrets for all authentication components
-2. Enable TLS for all external communications
-3. Use managed database services with encryption at rest
-4. Implement proper monitoring and logging
-5. Regular security updates and vulnerability assessments
-
 ## Troubleshooting
 
 ### Common Configuration Issues
