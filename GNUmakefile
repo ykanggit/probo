@@ -110,9 +110,17 @@ bin/probod: pkg/server/api/console/v1/schema/schema.go pkg/server/api/console/v1
 
 .PHONY: @probo/console
 @probo/console: NODE_ENV=production
-@probo/console:
+@probo/console: node_modules
 	$(NPM) --workspace $@ run check
 	$(NPM) --workspace $@ run build
+
+# Check if node_modules exists and is up to date, install if needed
+node_modules: package.json package-lock.json
+	@if [ ! -d node_modules ] || [ package.json -nt node_modules ] || [ package-lock.json -nt node_modules ]; then \
+		echo "Installing npm dependencies..."; \
+		$(NPM) install; \
+	fi
+	@touch node_modules
 
 pkg/server/api/console/v1/schema/schema.go \
 pkg/server/api/console/v1/types/types.go \
@@ -141,6 +149,10 @@ clean: ## Clean the project (node_modules and build artifacts)
 	$(RM) -rf apps/console/{dist,node_modules}
 	$(RM) -rf sbom-docker.json sbom.json
 	$(RM) -rf coverage.out coverage.html
+
+.PHONY: clean-all
+clean-all: clean ## Clean everything including Go module cache (slower but more thorough)
+	$(GO) clean -modcache
 
 .PHONY: stack-up
 stack-up: ## Start the docker stack as a deamon
