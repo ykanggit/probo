@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- Add document draft deletion
+
+### Fixed
+- Fix closing of document deletion pop up
+- Fix creation of empty draft without save
+
 ## [0.46.2] - 2025-08-10
 
 ### Fixed
