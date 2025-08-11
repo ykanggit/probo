@@ -150,6 +150,10 @@ clean: ## Clean the project (node_modules and build artifacts)
 	$(RM) -rf sbom-docker.json sbom.json
 	$(RM) -rf coverage.out coverage.html
 
+.PHONY: clean-all
+clean-all: clean ## Clean everything including Go module cache (slower but more thorough)
+	$(GO) clean -modcache
+
 .PHONY: stack-up
 stack-up: ## Start the docker stack as a deamon
 	$(DOCKER_COMPOSE) up -d
