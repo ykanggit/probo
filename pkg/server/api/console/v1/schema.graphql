@@ -915,6 +915,8 @@ type Vendor implements Node {
     orderBy: VendorComplianceReportOrder
   ): VendorComplianceReportConnection! @goField(forceResolver: true)
 
+  businessAssociateAgreement: VendorBusinessAssociateAgreement @goField(forceResolver: true)
+
   riskAssessments(
     first: Int
     after: CursorKey
@@ -950,6 +952,18 @@ type VendorComplianceReport implements Node {
   reportDate: Datetime!
   validUntil: Datetime
   reportName: String!
+  fileUrl: String! @goField(forceResolver: true)
+  fileSize: Int!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type VendorBusinessAssociateAgreement implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
   fileUrl: String! @goField(forceResolver: true)
   fileSize: Int!
   createdAt: Datetime!
@@ -1593,6 +1607,17 @@ type Mutation {
     input: DeleteVendorComplianceReportInput!
   ): DeleteVendorComplianceReportPayload!
 
+  # Vendor Business Associate Agreement mutations
+  uploadVendorBusinessAssociateAgreement(
+    input: UploadVendorBusinessAssociateAgreementInput!
+  ): UploadVendorBusinessAssociateAgreementPayload!
+  updateVendorBusinessAssociateAgreement(
+    input: UpdateVendorBusinessAssociateAgreementInput!
+  ): UpdateVendorBusinessAssociateAgreementPayload!
+  deleteVendorBusinessAssociateAgreement(
+    input: DeleteVendorBusinessAssociateAgreementInput!
+  ): DeleteVendorBusinessAssociateAgreementPayload!
+
   # Document mutations
   createDocument(input: CreateDocumentInput!): CreateDocumentPayload!
   updateDocument(input: UpdateDocumentInput!): UpdateDocumentPayload!
@@ -1948,6 +1973,24 @@ input DeleteVendorComplianceReportInput {
   reportId: ID!
 }
 
+input UploadVendorBusinessAssociateAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
+  file: Upload!
+}
+
+input UpdateVendorBusinessAssociateAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+}
+
+input DeleteVendorBusinessAssociateAgreementInput {
+  vendorId: ID!
+}
+
 input CreateDocumentInput {
   organizationId: ID!
   title: String!
@@ -2226,6 +2269,18 @@ type UploadVendorComplianceReportPayload {
 
 type DeleteVendorComplianceReportPayload {
   deletedVendorComplianceReportId: ID!
+}
+
+type UploadVendorBusinessAssociateAgreementPayload {
+  vendorBusinessAssociateAgreement: VendorBusinessAssociateAgreement!
+}
+
+type UpdateVendorBusinessAssociateAgreementPayload {
+  vendorBusinessAssociateAgreement: VendorBusinessAssociateAgreement!
+}
+
+type DeleteVendorBusinessAssociateAgreementPayload {
+  deletedVendorId: ID!
 }
 
 type CreateDocumentPayload {

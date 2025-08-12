@@ -18,6 +18,7 @@ import (
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/schema"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/types"
+	pgx "github.com/jackc/pgx/v5"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -1905,6 +1906,64 @@ func (r *mutationResolver) DeleteVendorComplianceReport(ctx context.Context, inp
 	}, nil
 }
 
+// UploadVendorBusinessAssociateAgreement is the resolver for the uploadVendorBusinessAssociateAgreement field.
+func (r *mutationResolver) UploadVendorBusinessAssociateAgreement(ctx context.Context, input types.UploadVendorBusinessAssociateAgreementInput) (*types.UploadVendorBusinessAssociateAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	vendorBusinessAssociateAgreement, file, err := prb.VendorBusinessAssociateAgreements.Upload(
+		ctx,
+		input.VendorID,
+		&probo.VendorBusinessAssociateAgreementCreateRequest{
+			File:       input.File.File,
+			ValidFrom:  input.ValidFrom,
+			ValidUntil: input.ValidUntil,
+			FileName:   input.FileName,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload vendor business associate agreement: %w", err)
+	}
+
+	return &types.UploadVendorBusinessAssociateAgreementPayload{
+		VendorBusinessAssociateAgreement: types.NewVendorBusinessAssociateAgreement(vendorBusinessAssociateAgreement, file),
+	}, nil
+}
+
+// UpdateVendorBusinessAssociateAgreement is the resolver for the updateVendorBusinessAssociateAgreement field.
+func (r *mutationResolver) UpdateVendorBusinessAssociateAgreement(ctx context.Context, input types.UpdateVendorBusinessAssociateAgreementInput) (*types.UpdateVendorBusinessAssociateAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	vendorBusinessAssociateAgreement, file, err := prb.VendorBusinessAssociateAgreements.Update(
+		ctx,
+		input.VendorID,
+		&probo.VendorBusinessAssociateAgreementUpdateRequest{
+			ValidFrom:  &input.ValidFrom,
+			ValidUntil: &input.ValidUntil,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update vendor business associate agreement: %w", err)
+	}
+
+	return &types.UpdateVendorBusinessAssociateAgreementPayload{
+		VendorBusinessAssociateAgreement: types.NewVendorBusinessAssociateAgreement(vendorBusinessAssociateAgreement, file),
+	}, nil
+}
+
+// DeleteVendorBusinessAssociateAgreement is the resolver for the deleteVendorBusinessAssociateAgreement field.
+func (r *mutationResolver) DeleteVendorBusinessAssociateAgreement(ctx context.Context, input types.DeleteVendorBusinessAssociateAgreementInput) (*types.DeleteVendorBusinessAssociateAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	err := prb.VendorBusinessAssociateAgreements.DeleteByVendorID(ctx, input.VendorID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete vendor business associate agreement: %w", err)
+	}
+
+	return &types.DeleteVendorBusinessAssociateAgreementPayload{
+		DeletedVendorID: input.VendorID,
+	}, nil
+}
+
 // CreateDocument is the resolver for the createDocument field.
 func (r *mutationResolver) CreateDocument(ctx context.Context, input types.CreateDocumentInput) (*types.CreateDocumentPayload, error) {
 	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
@@ -3330,6 +3389,22 @@ func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendo
 	return types.NewVendorComplianceReportConnection(page), nil
 }
 
+// BusinessAssociateAgreement is the resolver for the businessAssociateAgreement field.
+func (r *vendorResolver) BusinessAssociateAgreement(ctx context.Context, obj *types.Vendor) (*types.VendorBusinessAssociateAgreement, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	vendorBusinessAssociateAgreement, file, err := prb.VendorBusinessAssociateAgreements.GetByVendorID(ctx, obj.ID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, fmt.Errorf("failed to get vendor business associate agreement: %w", err)
+	}
+
+	return types.NewVendorBusinessAssociateAgreement(vendorBusinessAssociateAgreement, file), nil
+}
+
 // RiskAssessments is the resolver for the riskAssessments field.
 func (r *vendorResolver) RiskAssessments(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorRiskAssessmentOrder) (*types.VendorRiskAssessmentConnection, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
@@ -3394,6 +3469,30 @@ func (r *vendorResolver) SecurityOwner(ctx context.Context, obj *types.Vendor) (
 	}
 
 	return types.NewPeople(people), nil
+}
+
+// Vendor is the resolver for the vendor field.
+func (r *vendorBusinessAssociateAgreementResolver) Vendor(ctx context.Context, obj *types.VendorBusinessAssociateAgreement) (*types.Vendor, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	vendor, err := prb.Vendors.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get vendor: %w", err)
+	}
+
+	return types.NewVendor(vendor), nil
+}
+
+// FileURL is the resolver for the fileUrl field.
+func (r *vendorBusinessAssociateAgreementResolver) FileURL(ctx context.Context, obj *types.VendorBusinessAssociateAgreement) (string, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	fileURL, err := prb.VendorBusinessAssociateAgreements.GenerateFileURL(ctx, obj.ID, 1*time.Hour)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate file URL: %w", err)
+	}
+
+	return fileURL, nil
 }
 
 // Vendor is the resolver for the vendor field.
@@ -3614,6 +3713,11 @@ func (r *Resolver) User() schema.UserResolver { return &userResolver{r} }
 // Vendor returns schema.VendorResolver implementation.
 func (r *Resolver) Vendor() schema.VendorResolver { return &vendorResolver{r} }
 
+// VendorBusinessAssociateAgreement returns schema.VendorBusinessAssociateAgreementResolver implementation.
+func (r *Resolver) VendorBusinessAssociateAgreement() schema.VendorBusinessAssociateAgreementResolver {
+	return &vendorBusinessAssociateAgreementResolver{r}
+}
+
 // VendorComplianceReport returns schema.VendorComplianceReportResolver implementation.
 func (r *Resolver) VendorComplianceReport() schema.VendorComplianceReportResolver {
 	return &vendorComplianceReportResolver{r}
@@ -3662,6 +3766,7 @@ type taskConnectionResolver struct{ *Resolver }
 type trustCenterResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
 type vendorResolver struct{ *Resolver }
+type vendorBusinessAssociateAgreementResolver struct{ *Resolver }
 type vendorComplianceReportResolver struct{ *Resolver }
 type vendorConnectionResolver struct{ *Resolver }
 type vendorRiskAssessmentResolver struct{ *Resolver }

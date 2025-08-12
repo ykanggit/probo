@@ -51,33 +51,34 @@ type (
 	}
 
 	TenantService struct {
-		pg                      *pg.Client
-		s3                      *s3.Client
-		bucket                  string
-		encryptionKey           cipher.EncryptionKey
-		scope                   coredata.Scoper
-		hostname                string
-		tokenSecret             string
-		trustConfig             TrustConfig
-		agent                   *agents.Agent
-		Frameworks              *FrameworkService
-		Measures                *MeasureService
-		Tasks                   *TaskService
-		Evidences               *EvidenceService
-		Organizations           *OrganizationService
-		Vendors                 *VendorService
-		Peoples                 *PeopleService
-		Documents               *DocumentService
-		Controls                *ControlService
-		Risks                   *RiskService
-		VendorComplianceReports *VendorComplianceReportService
-		Connectors              *ConnectorService
-		Assets                  *AssetService
-		Data                    *DatumService
-		Audits                  *AuditService
-		Reports                 *ReportService
-		TrustCenters            *TrustCenterService
-		TrustCenterAccesses     *TrustCenterAccessService
+		pg                                *pg.Client
+		s3                                *s3.Client
+		bucket                            string
+		encryptionKey                     cipher.EncryptionKey
+		scope                             coredata.Scoper
+		hostname                          string
+		tokenSecret                       string
+		trustConfig                       TrustConfig
+		agent                             *agents.Agent
+		Frameworks                        *FrameworkService
+		Measures                          *MeasureService
+		Tasks                             *TaskService
+		Evidences                         *EvidenceService
+		Organizations                     *OrganizationService
+		Vendors                           *VendorService
+		Peoples                           *PeopleService
+		Documents                         *DocumentService
+		Controls                          *ControlService
+		Risks                             *RiskService
+		VendorComplianceReports           *VendorComplianceReportService
+		VendorBusinessAssociateAgreements *VendorBusinessAssociateAgreementService
+		Connectors                        *ConnectorService
+		Assets                            *AssetService
+		Data                              *DatumService
+		Audits                            *AuditService
+		Reports                           *ReportService
+		TrustCenters                      *TrustCenterService
+		TrustCenterAccesses               *TrustCenterAccessService
 	}
 )
 
@@ -157,6 +158,7 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.Controls = &ControlService{svc: tenantService}
 	tenantService.Risks = &RiskService{svc: tenantService}
 	tenantService.VendorComplianceReports = &VendorComplianceReportService{svc: tenantService}
+	tenantService.VendorBusinessAssociateAgreements = &VendorBusinessAssociateAgreementService{svc: tenantService}
 	tenantService.Connectors = &ConnectorService{svc: tenantService}
 	tenantService.Assets = &AssetService{svc: tenantService}
 	tenantService.Data = &DatumService{svc: tenantService}

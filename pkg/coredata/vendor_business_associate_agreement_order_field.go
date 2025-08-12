@@ -14,31 +14,28 @@
 
 package coredata
 
-const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MeasureEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ConnectorEntityType
-	VendorRiskAssessmentEntityType
-	VendorEntityType
-	PeopleEntityType
-	VendorComplianceReportEntityType
-	DocumentEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
-	DocumentVersionEntityType
-	DocumentVersionSignatureEntityType
-	AssetEntityType
-	DatumEntityType
-	AuditEntityType
-	ReportEntityType
-	TrustCenterEntityType
-	TrustCenterAccessEntityType
-	VendorBusinessAssociateAgreementEntityType
-	FileEntityType
+type (
+	VendorBusinessAssociateAgreementOrderField string
 )
+
+const (
+	VendorBusinessAssociateAgreementOrderFieldValidFrom VendorBusinessAssociateAgreementOrderField = "VALID_FROM"
+	VendorBusinessAssociateAgreementOrderFieldCreatedAt VendorBusinessAssociateAgreementOrderField = "CREATED_AT"
+)
+
+func (p VendorBusinessAssociateAgreementOrderField) Column() string {
+	return string(p)
+}
+
+func (p VendorBusinessAssociateAgreementOrderField) String() string {
+	return string(p)
+}
+
+func (p VendorBusinessAssociateAgreementOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *VendorBusinessAssociateAgreementOrderField) UnmarshalText(text []byte) error {
+	*p = VendorBusinessAssociateAgreementOrderField(text)
+	return nil
+}

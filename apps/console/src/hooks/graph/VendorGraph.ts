@@ -153,6 +153,7 @@ export const vendorNodeQuery = graphql`
         ...useVendorFormFragment
         ...VendorComplianceTabFragment
         ...VendorRiskAssessmentTabFragment
+        ...VendorOverviewTabBusinessAssociateAgreementFragment
       }
     }
     viewer {
