@@ -2587,7 +2587,7 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 }
 
 // Peoples is the resolver for the peoples field.
-func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) (*types.PeopleConnection, error) {
+func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy, filter *types.PeopleFilter) (*types.PeopleConnection, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.PeopleOrderField]{
@@ -2603,12 +2603,17 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := prb.Peoples.ListForOrganizationID(ctx, obj.ID, cursor)
+	var peopleFilter = coredata.NewPeopleFilter(nil)
+	if filter != nil {
+		peopleFilter = coredata.NewPeopleFilter(filter.ExcludeContractEnded)
+	}
+
+	page, err := prb.Peoples.ListForOrganizationID(ctx, obj.ID, cursor, peopleFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization peoples: %w", err))
 	}
 
-	return types.NewPeopleConnection(page, r, obj.ID), nil
+	return types.NewPeopleConnection(page, r, obj.ID, peopleFilter), nil
 }
 
 // Documents is the resolver for the documents field.
@@ -2819,7 +2824,7 @@ func (r *peopleConnectionResolver) TotalCount(ctx context.Context, obj *types.Pe
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := prb.Peoples.CountForOrganizationID(ctx, obj.ParentID)
+		count, err := prb.Peoples.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count peoples: %w", err)
 		}

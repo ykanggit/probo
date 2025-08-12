@@ -718,6 +718,10 @@ input RiskFilter {
   query: String
 }
 
+input PeopleFilter {
+  excludeContractEnded: Boolean
+}
+
 input OrganizationFilter {
   trustCenterSlug: String
 }
@@ -796,6 +800,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: PeopleOrder
+    filter: PeopleFilter
   ): PeopleConnection! @goField(forceResolver: true)
 
   documents(

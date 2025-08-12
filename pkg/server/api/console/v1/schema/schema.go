@@ -665,7 +665,7 @@ type ComplexityRoot struct {
 		LogoURL     func(childComplexity int) int
 		Measures    func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) int
 		Name        func(childComplexity int) int
-		Peoples     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) int
+		Peoples     func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy, filter *types.PeopleFilter) int
 		Risks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) int
 		Tasks       func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) int
 		TrustCenter func(childComplexity int) int
@@ -1212,7 +1212,7 @@ type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) (*types.FrameworkConnection, error)
 	Controls(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error)
 	Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error)
-	Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) (*types.PeopleConnection, error)
+	Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy, filter *types.PeopleFilter) (*types.PeopleConnection, error)
 	Documents(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error)
 	Measures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error)
 	Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) (*types.RiskConnection, error)
@@ -4009,7 +4009,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Organization.Peoples(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.PeopleOrderBy)), true
+		return e.complexity.Organization.Peoples(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.PeopleOrderBy), args["filter"].(*types.PeopleFilter)), true
 
 	case "Organization.risks":
 		if e.complexity.Organization.Risks == nil {
@@ -5551,6 +5551,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputMeasureOrder,
 		ec.unmarshalInputOrganizationFilter,
 		ec.unmarshalInputOrganizationOrder,
+		ec.unmarshalInputPeopleFilter,
 		ec.unmarshalInputPeopleOrder,
 		ec.unmarshalInputPublishDocumentVersionInput,
 		ec.unmarshalInputRemoveUserInput,
@@ -6402,6 +6403,10 @@ input RiskFilter {
   query: String
 }
 
+input PeopleFilter {
+  excludeContractEnded: Boolean
+}
+
 input OrganizationFilter {
   trustCenterSlug: String
 }
@@ -6480,6 +6485,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: PeopleOrder
+    filter: PeopleFilter
   ): PeopleConnection! @goField(forceResolver: true)
 
   documents(
@@ -12229,6 +12235,11 @@ func (ec *executionContext) field_Organization_peoples_args(ctx context.Context,
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Organization_peoples_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Organization_peoples_argsFirst(
@@ -12293,6 +12304,19 @@ func (ec *executionContext) field_Organization_peoples_argsOrderBy(
 	}
 
 	var zeroVal *types.PeopleOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_peoples_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.PeopleFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPeopleFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.PeopleFilter
 	return zeroVal, nil
 }
 
@@ -30201,7 +30225,7 @@ func (ec *executionContext) _Organization_peoples(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Peoples(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.PeopleOrderBy))
+		return ec.resolvers.Organization().Peoples(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.PeopleOrderBy), fc.Args["filter"].(*types.PeopleFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -45548,6 +45572,33 @@ func (ec *executionContext) unmarshalInputOrganizationOrder(ctx context.Context,
 				return it, err
 			}
 			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPeopleFilter(ctx context.Context, obj any) (types.PeopleFilter, error) {
+	var it types.PeopleFilter
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"excludeContractEnded"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "excludeContractEnded":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("excludeContractEnded"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExcludeContractEnded = data
 		}
 	}
 
@@ -63238,6 +63289,14 @@ func (ec *executionContext) marshalOPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋ
 		return graphql.Null
 	}
 	return ec._People(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOPeopleFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleFilter(ctx context.Context, v any) (*types.PeopleFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPeopleFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind(ctx context.Context, v any) (*coredata.PeopleKind, error) {

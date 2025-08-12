@@ -300,6 +300,7 @@ func (p *Peoples) CountByOrganizationID(
 	conn pg.Conn,
 	scope Scoper,
 	organizationID gid.GID,
+	filter *PeopleFilter,
 ) (int, error) {
 	q := `
 SELECT
@@ -309,12 +310,14 @@ FROM
 WHERE
     %s
     AND organization_id = @organization_id
+    AND %s
 `
 
-	q = fmt.Sprintf(q, scope.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
 
 	args := pgx.StrictNamedArgs{"organization_id": organizationID}
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
 
 	row := conn.QueryRow(ctx, q, args)
 
@@ -333,6 +336,7 @@ func (p *Peoples) LoadByOrganizationID(
 	scope Scoper,
 	organizationID gid.GID,
 	cursor *page.Cursor[PeopleOrderField],
+	filter *PeopleFilter,
 ) error {
 	q := `
 SELECT
@@ -354,13 +358,15 @@ WHERE
     %s
     AND organization_id = @organization_id
     AND %s
+    AND %s
 `
 
-	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
 
 	args := pgx.StrictNamedArgs{"organization_id": organizationID}
 	maps.Copy(args, cursor.SQLArguments())
 	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
 
 	rows, err := conn.Query(ctx, q, args)
 	if err != nil {

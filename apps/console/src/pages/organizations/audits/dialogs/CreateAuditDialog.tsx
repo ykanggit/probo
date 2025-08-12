@@ -16,7 +16,7 @@ import z from "zod";
 import { useFormWithSchema } from "/hooks/useFormWithSchema";
 import { ControlledField } from "/components/form/ControlledField";
 import { useCreateAudit } from "/hooks/graph/AuditGraph";
-import { auditStates, getAuditStateLabel } from "@probo/helpers";
+import { auditStates, getAuditStateLabel, formatDatetime } from "@probo/helpers";
 import { useLazyLoadQuery } from "react-relay";
 import { graphql } from "relay-runtime";
 import { Suspense } from "react";
@@ -74,12 +74,6 @@ export function CreateAuditDialog({
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      // Convert date strings to datetime format
-      const formatDatetime = (dateString?: string) => {
-        if (!dateString) return undefined;
-        return `${dateString}T00:00:00Z`;
-      };
-
       await createAudit({
         organizationId,
         frameworkId: data.frameworkId,

@@ -31,7 +31,7 @@ import { useOrganizationId } from "/hooks/useOrganizationId";
 import { ControlledField } from "/components/form/ControlledField";
 import { useFormWithSchema } from "/hooks/useFormWithSchema";
 import z from "zod";
-import { getAuditStateLabel, getAuditStateVariant, auditStates, fileSize, sprintf } from "@probo/helpers";
+import { getAuditStateLabel, getAuditStateVariant, auditStates, fileSize, sprintf, formatDatetime } from "@probo/helpers";
 import type { AuditGraphNodeQuery } from "/hooks/graph/__generated__/AuditGraphNodeQuery.graphql";
 
 const updateAuditSchema = z.object({
@@ -77,11 +77,6 @@ export default function AuditDetailsPage(props: Props) {
     if (!auditEntry.id) return;
 
     try {
-      const formatDatetime = (dateString?: string) => {
-        if (!dateString) return undefined;
-        return `${dateString}T00:00:00Z`;
-      };
-
       await updateAudit({
         id: auditEntry.id,
         validFrom: formatDatetime(formData.validFrom),

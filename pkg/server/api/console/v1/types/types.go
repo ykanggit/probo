@@ -907,6 +907,10 @@ type PeopleEdge struct {
 	Node   *People        `json:"node"`
 }
 
+type PeopleFilter struct {
+	ExcludeContractEnded *bool `json:"excludeContractEnded,omitempty"`
+}
+
 type PublishDocumentVersionInput struct {
 	DocumentID gid.GID `json:"documentId"`
 	Changelog  *string `json:"changelog,omitempty"`
