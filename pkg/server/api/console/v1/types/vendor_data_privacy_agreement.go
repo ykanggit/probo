@@ -12,35 +12,20 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package coredata
+package types
 
-const (
-	OrganizationEntityType uint16 = iota
-	FrameworkEntityType
-	MeasureEntityType
-	TaskEntityType
-	EvidenceEntityType
-	ConnectorEntityType
-	VendorRiskAssessmentEntityType
-	VendorEntityType
-	PeopleEntityType
-	VendorComplianceReportEntityType
-	DocumentEntityType
-	UserEntityType
-	SessionEntityType
-	EmailEntityType
-	ControlEntityType
-	RiskEntityType
-	DocumentVersionEntityType
-	DocumentVersionSignatureEntityType
-	AssetEntityType
-	DatumEntityType
-	AuditEntityType
-	ReportEntityType
-	TrustCenterEntityType
-	TrustCenterAccessEntityType
-	VendorBusinessAssociateAgreementEntityType
-	FileEntityType
-	VendorContactEntityType
-	VendorDataPrivacyAgreementEntityType
+import (
+	"github.com/getprobo/probo/pkg/coredata"
 )
+
+func NewVendorDataPrivacyAgreement(v *coredata.VendorDataPrivacyAgreement, file *coredata.File) *VendorDataPrivacyAgreement {
+	return &VendorDataPrivacyAgreement{
+		ID:         v.ID,
+		ValidFrom:  v.ValidFrom,
+		ValidUntil: v.ValidUntil,
+		FileName:   file.FileName,
+		FileSize:   file.FileSize,
+		CreatedAt:  v.CreatedAt,
+		UpdatedAt:  v.UpdatedAt,
+	}
+}

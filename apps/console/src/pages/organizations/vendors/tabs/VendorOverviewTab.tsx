@@ -11,12 +11,29 @@ import { useFragment, graphql } from "react-relay";
 import { UploadBusinessAssociateAgreementDialog } from "../dialogs/UploadBusinessAssociateAgreementDialog";
 import { DeleteBusinessAssociateAgreementDialog } from "../dialogs/DeleteBusinessAssociateAgreementDialog";
 import { EditBusinessAssociateAgreementDialog } from "../dialogs/EditBusinessAssociateAgreementDialog";
+import { UploadDataPrivacyAgreementDialog } from "../dialogs/UploadDataPrivacyAgreementDialog";
+import { DeleteDataPrivacyAgreementDialog } from "../dialogs/DeleteDataPrivacyAgreementDialog";
+import { EditDataPrivacyAgreementDialog } from "../dialogs/EditDataPrivacyAgreementDialog";
 import type { useVendorFormFragment$key } from "/hooks/forms/__generated__/useVendorFormFragment.graphql";
 import type { VendorOverviewTabBusinessAssociateAgreementFragment$key } from "./__generated__/VendorOverviewTabBusinessAssociateAgreementFragment.graphql";
+import type { VendorOverviewTabDataPrivacyAgreementFragment$key } from "./__generated__/VendorOverviewTabDataPrivacyAgreementFragment.graphql";
 
 const vendorBusinessAssociateAgreementFragment = graphql`
   fragment VendorOverviewTabBusinessAssociateAgreementFragment on Vendor {
     businessAssociateAgreement {
+      id
+      fileName
+      fileUrl
+      validFrom
+      validUntil
+      createdAt
+    }
+  }
+`;
+
+const vendorDataPrivacyAgreementFragment = graphql`
+  fragment VendorOverviewTabDataPrivacyAgreementFragment on Vendor {
+    dataPrivacyAgreement {
       id
       fileName
       fileUrl
@@ -33,7 +50,7 @@ export default function VendorOverviewTab() {
   }>();
 
   const { vendor: vendorForBAA } = useOutletContext<{
-    vendor: VendorOverviewTabBusinessAssociateAgreementFragment$key;
+    vendor: VendorOverviewTabBusinessAssociateAgreementFragment$key & VendorOverviewTabDataPrivacyAgreementFragment$key;
   }>();
 
   const { __ } = useTranslate();
@@ -51,6 +68,12 @@ export default function VendorOverviewTab() {
     vendorForBAA
   );
   const businessAssociateAgreement = vendorWithBAA.businessAssociateAgreement;
+
+  const vendorWithDPA = useFragment<VendorOverviewTabDataPrivacyAgreementFragment$key>(
+    vendorDataPrivacyAgreementFragment,
+    vendorForBAA
+  );
+  const dataPrivacyAgreement = vendorWithDPA.dataPrivacyAgreement;
 
   const urls = useMemo(
     () =>
@@ -224,6 +247,69 @@ export default function VendorOverviewTab() {
                     {__("Upload")}
                   </Button>
                 </UploadBusinessAssociateAgreementDialog>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 border border-border-low rounded-lg">
+            <div className="flex-1">
+              <h3 className="font-medium text-txt-primary">
+                {__("Data Privacy Agreement")}
+              </h3>
+              <p className="text-sm text-txt-secondary mt-1">
+                {dataPrivacyAgreement ? dataPrivacyAgreement.fileName : __("No data privacy agreement available")}
+              </p>
+              {(dataPrivacyAgreement?.validFrom || dataPrivacyAgreement?.validUntil) && (
+                <p className="text-xs text-txt-secondary mt-1">
+                  {__("Valid")}
+                  {dataPrivacyAgreement.validFrom &&
+                    ` ${__("from")} ${new Date(dataPrivacyAgreement.validFrom).toLocaleDateString()}`
+                  }
+                  {dataPrivacyAgreement.validUntil &&
+                    ` ${__("until")} ${new Date(dataPrivacyAgreement.validUntil).toLocaleDateString()}`
+                  }
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {dataPrivacyAgreement ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => downloadFile(dataPrivacyAgreement.fileUrl, dataPrivacyAgreement.fileName)}
+                  >
+                    {__("Download PDF")}
+                  </Button>
+                  <EditDataPrivacyAgreementDialog
+                    vendorId={vendor.id}
+                    agreement={{
+                      validFrom: dataPrivacyAgreement.validFrom,
+                      validUntil: dataPrivacyAgreement.validUntil,
+                    }}
+                    onSuccess={() => window.location.reload()}
+                  >
+                    <Button variant="quaternary" icon={IconPencil} />
+                  </EditDataPrivacyAgreementDialog>
+                  <DeleteDataPrivacyAgreementDialog
+                    vendorId={vendor.id}
+                    fileName={dataPrivacyAgreement.fileName}
+                    onSuccess={() => window.location.reload()}
+                  >
+                    <Button variant="quaternary" icon={IconTrashCan} />
+                  </DeleteDataPrivacyAgreementDialog>
+                </>
+              ) : (
+                <>
+                  <UploadDataPrivacyAgreementDialog
+                    vendorId={vendor.id}
+                    onSuccess={() => window.location.reload()}
+                  >
+                    <Button variant="secondary" icon={IconPlusLarge}>
+                      {__("Upload")}
+                    </Button>
+                  </UploadDataPrivacyAgreementDialog>
+                </>
               )}
             </div>
           </div>

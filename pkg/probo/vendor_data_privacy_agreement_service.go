@@ -32,40 +32,40 @@ import (
 )
 
 type (
-	VendorBusinessAssociateAgreementService struct {
+	VendorDataPrivacyAgreementService struct {
 		svc *TenantService
 	}
 
-	VendorBusinessAssociateAgreementCreateRequest struct {
+	VendorDataPrivacyAgreementCreateRequest struct {
 		File       io.Reader
 		ValidFrom  *time.Time
 		ValidUntil *time.Time
 		FileName   string
 	}
 
-	VendorBusinessAssociateAgreementUpdateRequest struct {
+	VendorDataPrivacyAgreementUpdateRequest struct {
 		ValidFrom  **time.Time
 		ValidUntil **time.Time
 	}
 )
 
-func (s VendorBusinessAssociateAgreementService) GetByVendorID(
+func (s VendorDataPrivacyAgreementService) GetByVendorID(
 	ctx context.Context,
 	vendorID gid.GID,
-) (*coredata.VendorBusinessAssociateAgreement, *coredata.File, error) {
-	var vendorBusinessAssociateAgreement *coredata.VendorBusinessAssociateAgreement
+) (*coredata.VendorDataPrivacyAgreement, *coredata.File, error) {
+	var vendorDataPrivacyAgreement *coredata.VendorDataPrivacyAgreement
 	var file *coredata.File
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			vendorBusinessAssociateAgreement = &coredata.VendorBusinessAssociateAgreement{}
-			if err := vendorBusinessAssociateAgreement.LoadByVendorID(ctx, conn, s.svc.scope, vendorID); err != nil {
-				return fmt.Errorf("cannot load vendor business associate agreement: %w", err)
+			vendorDataPrivacyAgreement = &coredata.VendorDataPrivacyAgreement{}
+			if err := vendorDataPrivacyAgreement.LoadByVendorID(ctx, conn, s.svc.scope, vendorID); err != nil {
+				return fmt.Errorf("cannot load vendor data privacy agreement: %w", err)
 			}
 
 			file = &coredata.File{}
-			if err := file.LoadByID(ctx, conn, s.svc.scope, vendorBusinessAssociateAgreement.FileID); err != nil {
+			if err := file.LoadByID(ctx, conn, s.svc.scope, vendorDataPrivacyAgreement.FileID); err != nil {
 				return fmt.Errorf("cannot load file: %w", err)
 			}
 
@@ -77,14 +77,14 @@ func (s VendorBusinessAssociateAgreementService) GetByVendorID(
 		return nil, nil, err
 	}
 
-	return vendorBusinessAssociateAgreement, file, nil
+	return vendorDataPrivacyAgreement, file, nil
 }
 
-func (s VendorBusinessAssociateAgreementService) Upload(
+func (s VendorDataPrivacyAgreementService) Upload(
 	ctx context.Context,
 	vendorID gid.GID,
-	req *VendorBusinessAssociateAgreementCreateRequest,
-) (*coredata.VendorBusinessAssociateAgreement, *coredata.File, error) {
+	req *VendorDataPrivacyAgreementCreateRequest,
+) (*coredata.VendorDataPrivacyAgreement, *coredata.File, error) {
 	objectKey, err := uuid.NewV7()
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot generate object key: %w", err)
@@ -113,9 +113,9 @@ func (s VendorBusinessAssociateAgreementService) Upload(
 	now := time.Now()
 
 	fileID := gid.New(s.svc.scope.GetTenantID(), coredata.FileEntityType)
-	vendorBusinessAssociateAgreementID := gid.New(s.svc.scope.GetTenantID(), coredata.VendorBusinessAssociateAgreementEntityType)
+	vendorDataPrivacyAgreementID := gid.New(s.svc.scope.GetTenantID(), coredata.VendorDataPrivacyAgreementEntityType)
 
-	var vendorBusinessAssociateAgreement *coredata.VendorBusinessAssociateAgreement
+	var vendorDataPrivacyAgreement *coredata.VendorDataPrivacyAgreement
 	var file *coredata.File
 
 	err = s.svc.pg.WithTx(
@@ -137,8 +137,9 @@ func (s VendorBusinessAssociateAgreementService) Upload(
 				UpdatedAt:  now,
 			}
 
-			vendorBusinessAssociateAgreement = &coredata.VendorBusinessAssociateAgreement{
-				ID:             vendorBusinessAssociateAgreementID,
+			vendorDataPrivacyAgreement = &coredata.VendorDataPrivacyAgreement{
+				ID:             vendorDataPrivacyAgreementID,
+				TenantID:       s.svc.scope.GetTenantID(),
 				OrganizationID: vendor.OrganizationID,
 				VendorID:       vendorID,
 				ValidFrom:      req.ValidFrom,
@@ -152,8 +153,8 @@ func (s VendorBusinessAssociateAgreementService) Upload(
 				return fmt.Errorf("cannot insert file: %w", err)
 			}
 
-			if err := vendorBusinessAssociateAgreement.Upsert(ctx, conn, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot insert vendor business associate agreement: %w", err)
+			if err := vendorDataPrivacyAgreement.Upsert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert vendor data privacy agreement: %w", err)
 			}
 
 			return nil
@@ -164,26 +165,26 @@ func (s VendorBusinessAssociateAgreementService) Upload(
 		return nil, nil, err
 	}
 
-	return vendorBusinessAssociateAgreement, file, nil
+	return vendorDataPrivacyAgreement, file, nil
 }
 
-func (s VendorBusinessAssociateAgreementService) Get(
+func (s VendorDataPrivacyAgreementService) Get(
 	ctx context.Context,
-	vendorBusinessAssociateAgreementID gid.GID,
-) (*coredata.VendorBusinessAssociateAgreement, *coredata.File, error) {
-	var vendorBusinessAssociateAgreement *coredata.VendorBusinessAssociateAgreement
+	vendorDataPrivacyAgreementID gid.GID,
+) (*coredata.VendorDataPrivacyAgreement, *coredata.File, error) {
+	var vendorDataPrivacyAgreement *coredata.VendorDataPrivacyAgreement
 	var file *coredata.File
 
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			vendorBusinessAssociateAgreement = &coredata.VendorBusinessAssociateAgreement{}
-			if err := vendorBusinessAssociateAgreement.LoadByID(ctx, conn, s.svc.scope, vendorBusinessAssociateAgreementID); err != nil {
-				return fmt.Errorf("cannot load vendor business associate agreement: %w", err)
+			vendorDataPrivacyAgreement = &coredata.VendorDataPrivacyAgreement{}
+			if err := vendorDataPrivacyAgreement.LoadByID(ctx, conn, s.svc.scope, vendorDataPrivacyAgreementID); err != nil {
+				return fmt.Errorf("cannot load vendor data privacy agreement: %w", err)
 			}
 
 			file = &coredata.File{}
-			if err := file.LoadByID(ctx, conn, s.svc.scope, vendorBusinessAssociateAgreement.FileID); err != nil {
+			if err := file.LoadByID(ctx, conn, s.svc.scope, vendorDataPrivacyAgreement.FileID); err != nil {
 				return fmt.Errorf("cannot load file: %w", err)
 			}
 
@@ -192,15 +193,15 @@ func (s VendorBusinessAssociateAgreementService) Get(
 	)
 
 	if err != nil {
-		return nil, nil, fmt.Errorf("cannot load vendor business associate agreement: %w", err)
+		return nil, nil, fmt.Errorf("cannot load vendor data privacy agreement: %w", err)
 	}
 
-	return vendorBusinessAssociateAgreement, file, nil
+	return vendorDataPrivacyAgreement, file, nil
 }
 
-func (s VendorBusinessAssociateAgreementService) GenerateFileURL(
+func (s VendorDataPrivacyAgreementService) GenerateFileURL(
 	ctx context.Context,
-	vendorBusinessAssociateAgreementID gid.GID,
+	vendorDataPrivacyAgreementID gid.GID,
 	expiresIn time.Duration,
 ) (string, error) {
 	var file *coredata.File
@@ -208,13 +209,13 @@ func (s VendorBusinessAssociateAgreementService) GenerateFileURL(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			vendorBusinessAssociateAgreement := &coredata.VendorBusinessAssociateAgreement{}
-			if err := vendorBusinessAssociateAgreement.LoadByID(ctx, conn, s.svc.scope, vendorBusinessAssociateAgreementID); err != nil {
-				return fmt.Errorf("cannot load vendor business associate agreement: %w", err)
+			vendorDataPrivacyAgreement := &coredata.VendorDataPrivacyAgreement{}
+			if err := vendorDataPrivacyAgreement.LoadByID(ctx, conn, s.svc.scope, vendorDataPrivacyAgreementID); err != nil {
+				return fmt.Errorf("cannot load vendor data privacy agreement: %w", err)
 			}
 
 			file = &coredata.File{}
-			if err := file.LoadByID(ctx, conn, s.svc.scope, vendorBusinessAssociateAgreement.FileID); err != nil {
+			if err := file.LoadByID(ctx, conn, s.svc.scope, vendorDataPrivacyAgreement.FileID); err != nil {
 				return fmt.Errorf("cannot load file: %w", err)
 			}
 
@@ -246,19 +247,19 @@ func (s VendorBusinessAssociateAgreementService) GenerateFileURL(
 	return presignedReq.URL, nil
 }
 
-func (s VendorBusinessAssociateAgreementService) Update(
+func (s VendorDataPrivacyAgreementService) Update(
 	ctx context.Context,
 	vendorID gid.GID,
-	req *VendorBusinessAssociateAgreementUpdateRequest,
-) (*coredata.VendorBusinessAssociateAgreement, *coredata.File, error) {
-	existingAgreement := &coredata.VendorBusinessAssociateAgreement{}
+	req *VendorDataPrivacyAgreementUpdateRequest,
+) (*coredata.VendorDataPrivacyAgreement, *coredata.File, error) {
+	existingAgreement := &coredata.VendorDataPrivacyAgreement{}
 	file := &coredata.File{}
 
 	err := s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
 			if err := existingAgreement.LoadByVendorID(ctx, conn, s.svc.scope, vendorID); err != nil {
-				return fmt.Errorf("cannot load existing vendor business associate agreement: %w", err)
+				return fmt.Errorf("cannot load existing vendor data privacy agreement: %w", err)
 			}
 
 			now := time.Now()
@@ -272,7 +273,7 @@ func (s VendorBusinessAssociateAgreementService) Update(
 			existingAgreement.UpdatedAt = now
 
 			if err := existingAgreement.Update(ctx, conn, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot update vendor business associate agreement: %w", err)
+				return fmt.Errorf("cannot update vendor data privacy agreement: %w", err)
 			}
 
 			if err := file.LoadByID(ctx, conn, s.svc.scope, existingAgreement.FileID); err != nil {
@@ -290,22 +291,22 @@ func (s VendorBusinessAssociateAgreementService) Update(
 	return existingAgreement, file, nil
 }
 
-func (s VendorBusinessAssociateAgreementService) Delete(
+func (s VendorDataPrivacyAgreementService) Delete(
 	ctx context.Context,
-	vendorBusinessAssociateAgreementID gid.GID,
+	vendorDataPrivacyAgreementID gid.GID,
 ) error {
 	return s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			vendorBusinessAssociateAgreement := &coredata.VendorBusinessAssociateAgreement{}
-			if err := vendorBusinessAssociateAgreement.LoadByID(ctx, conn, s.svc.scope, vendorBusinessAssociateAgreementID); err != nil {
-				return fmt.Errorf("cannot load vendor business associate agreement: %w", err)
+			vendorDataPrivacyAgreement := &coredata.VendorDataPrivacyAgreement{}
+			if err := vendorDataPrivacyAgreement.LoadByID(ctx, conn, s.svc.scope, vendorDataPrivacyAgreementID); err != nil {
+				return fmt.Errorf("cannot load vendor data privacy agreement: %w", err)
 			}
 
-			file := &coredata.File{ID: vendorBusinessAssociateAgreement.FileID}
+			file := &coredata.File{ID: vendorDataPrivacyAgreement.FileID}
 
-			if err := vendorBusinessAssociateAgreement.Delete(ctx, conn, s.svc.scope); err != nil {
-				return fmt.Errorf("cannot delete vendor business associate agreement: %w", err)
+			if err := vendorDataPrivacyAgreement.Delete(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot delete vendor data privacy agreement: %w", err)
 			}
 
 			if err := file.SoftDelete(ctx, conn, s.svc.scope); err != nil {
@@ -317,22 +318,22 @@ func (s VendorBusinessAssociateAgreementService) Delete(
 	)
 }
 
-func (s VendorBusinessAssociateAgreementService) DeleteByVendorID(
+func (s VendorDataPrivacyAgreementService) DeleteByVendorID(
 	ctx context.Context,
 	vendorID gid.GID,
 ) error {
 	return s.svc.pg.WithTx(
 		ctx,
 		func(conn pg.Conn) error {
-			vendorBusinessAssociateAgreement := &coredata.VendorBusinessAssociateAgreement{}
-			if err := vendorBusinessAssociateAgreement.LoadByVendorID(ctx, conn, s.svc.scope, vendorID); err != nil {
-				return fmt.Errorf("cannot load vendor business associate agreement: %w", err)
+			vendorDataPrivacyAgreement := &coredata.VendorDataPrivacyAgreement{}
+			if err := vendorDataPrivacyAgreement.LoadByVendorID(ctx, conn, s.svc.scope, vendorID); err != nil {
+				return fmt.Errorf("cannot load vendor data privacy agreement: %w", err)
 			}
 
-			file := &coredata.File{ID: vendorBusinessAssociateAgreement.FileID}
+			file := &coredata.File{ID: vendorDataPrivacyAgreement.FileID}
 
-			if err := vendorBusinessAssociateAgreement.DeleteByVendorID(ctx, conn, s.svc.scope, vendorID); err != nil {
-				return fmt.Errorf("cannot delete vendor business associate agreement: %w", err)
+			if err := vendorDataPrivacyAgreement.DeleteByVendorID(ctx, conn, s.svc.scope, vendorID); err != nil {
+				return fmt.Errorf("cannot delete vendor data privacy agreement: %w", err)
 			}
 
 			if err := file.SoftDelete(ctx, conn, s.svc.scope); err != nil {

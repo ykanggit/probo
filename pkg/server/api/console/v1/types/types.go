@@ -631,6 +631,14 @@ type DeleteVendorContactPayload struct {
 	DeletedVendorContactID gid.GID `json:"deletedVendorContactId"`
 }
 
+type DeleteVendorDataPrivacyAgreementInput struct {
+	VendorID gid.GID `json:"vendorId"`
+}
+
+type DeleteVendorDataPrivacyAgreementPayload struct {
+	DeletedVendorID gid.GID `json:"deletedVendorId"`
+}
+
 type DeleteVendorInput struct {
 	VendorID gid.GID `json:"vendorId"`
 }
@@ -1306,6 +1314,16 @@ type UpdateVendorContactPayload struct {
 	VendorContact *VendorContact `json:"vendorContact"`
 }
 
+type UpdateVendorDataPrivacyAgreementInput struct {
+	VendorID   gid.GID    `json:"vendorId"`
+	ValidFrom  *time.Time `json:"validFrom,omitempty"`
+	ValidUntil *time.Time `json:"validUntil,omitempty"`
+}
+
+type UpdateVendorDataPrivacyAgreementPayload struct {
+	VendorDataPrivacyAgreement *VendorDataPrivacyAgreement `json:"vendorDataPrivacyAgreement"`
+}
+
 type UpdateVendorInput struct {
 	ID                            gid.GID                  `json:"id"`
 	Name                          *string                  `json:"name,omitempty"`
@@ -1384,6 +1402,18 @@ type UploadVendorComplianceReportPayload struct {
 	VendorComplianceReportEdge *VendorComplianceReportEdge `json:"vendorComplianceReportEdge"`
 }
 
+type UploadVendorDataPrivacyAgreementInput struct {
+	VendorID   gid.GID        `json:"vendorId"`
+	ValidFrom  *time.Time     `json:"validFrom,omitempty"`
+	ValidUntil *time.Time     `json:"validUntil,omitempty"`
+	FileName   string         `json:"fileName"`
+	File       graphql.Upload `json:"file"`
+}
+
+type UploadVendorDataPrivacyAgreementPayload struct {
+	VendorDataPrivacyAgreement *VendorDataPrivacyAgreement `json:"vendorDataPrivacyAgreement"`
+}
+
 type User struct {
 	ID        gid.GID   `json:"id"`
 	FullName  string    `json:"fullName"`
@@ -1414,6 +1444,7 @@ type Vendor struct {
 	Organization                  *Organization                     `json:"organization"`
 	ComplianceReports             *VendorComplianceReportConnection `json:"complianceReports"`
 	BusinessAssociateAgreement    *VendorBusinessAssociateAgreement `json:"businessAssociateAgreement,omitempty"`
+	DataPrivacyAgreement          *VendorDataPrivacyAgreement       `json:"dataPrivacyAgreement,omitempty"`
 	Contacts                      *VendorContactConnection          `json:"contacts"`
 	RiskAssessments               *VendorRiskAssessmentConnection   `json:"riskAssessments"`
 	BusinessOwner                 *People                           `json:"businessOwner,omitempty"`
@@ -1502,6 +1533,21 @@ type VendorContactEdge struct {
 	Cursor page.CursorKey `json:"cursor"`
 	Node   *VendorContact `json:"node"`
 }
+
+type VendorDataPrivacyAgreement struct {
+	ID         gid.GID    `json:"id"`
+	Vendor     *Vendor    `json:"vendor"`
+	ValidFrom  *time.Time `json:"validFrom,omitempty"`
+	ValidUntil *time.Time `json:"validUntil,omitempty"`
+	FileName   string     `json:"fileName"`
+	FileURL    string     `json:"fileUrl"`
+	FileSize   int        `json:"fileSize"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	UpdatedAt  time.Time  `json:"updatedAt"`
+}
+
+func (VendorDataPrivacyAgreement) IsNode()             {}
+func (this VendorDataPrivacyAgreement) GetID() gid.GID { return this.ID }
 
 type VendorEdge struct {
 	Cursor page.CursorKey `json:"cursor"`

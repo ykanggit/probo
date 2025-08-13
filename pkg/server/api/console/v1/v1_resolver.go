@@ -2022,6 +2022,64 @@ func (r *mutationResolver) DeleteVendorBusinessAssociateAgreement(ctx context.Co
 	}, nil
 }
 
+// UploadVendorDataPrivacyAgreement is the resolver for the uploadVendorDataPrivacyAgreement field.
+func (r *mutationResolver) UploadVendorDataPrivacyAgreement(ctx context.Context, input types.UploadVendorDataPrivacyAgreementInput) (*types.UploadVendorDataPrivacyAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	vendorDataPrivacyAgreement, file, err := prb.VendorDataPrivacyAgreements.Upload(
+		ctx,
+		input.VendorID,
+		&probo.VendorDataPrivacyAgreementCreateRequest{
+			File:       input.File.File,
+			ValidFrom:  input.ValidFrom,
+			ValidUntil: input.ValidUntil,
+			FileName:   input.FileName,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload vendor data privacy agreement: %w", err)
+	}
+
+	return &types.UploadVendorDataPrivacyAgreementPayload{
+		VendorDataPrivacyAgreement: types.NewVendorDataPrivacyAgreement(vendorDataPrivacyAgreement, file),
+	}, nil
+}
+
+// UpdateVendorDataPrivacyAgreement is the resolver for the updateVendorDataPrivacyAgreement field.
+func (r *mutationResolver) UpdateVendorDataPrivacyAgreement(ctx context.Context, input types.UpdateVendorDataPrivacyAgreementInput) (*types.UpdateVendorDataPrivacyAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	vendorDataPrivacyAgreement, file, err := prb.VendorDataPrivacyAgreements.Update(
+		ctx,
+		input.VendorID,
+		&probo.VendorDataPrivacyAgreementUpdateRequest{
+			ValidFrom:  &input.ValidFrom,
+			ValidUntil: &input.ValidUntil,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update vendor data privacy agreement: %w", err)
+	}
+
+	return &types.UpdateVendorDataPrivacyAgreementPayload{
+		VendorDataPrivacyAgreement: types.NewVendorDataPrivacyAgreement(vendorDataPrivacyAgreement, file),
+	}, nil
+}
+
+// DeleteVendorDataPrivacyAgreement is the resolver for the deleteVendorDataPrivacyAgreement field.
+func (r *mutationResolver) DeleteVendorDataPrivacyAgreement(ctx context.Context, input types.DeleteVendorDataPrivacyAgreementInput) (*types.DeleteVendorDataPrivacyAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	err := prb.VendorDataPrivacyAgreements.DeleteByVendorID(ctx, input.VendorID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete vendor data privacy agreement: %w", err)
+	}
+
+	return &types.DeleteVendorDataPrivacyAgreementPayload{
+		DeletedVendorID: input.VendorID,
+	}, nil
+}
+
 // CreateDocument is the resolver for the createDocument field.
 func (r *mutationResolver) CreateDocument(ctx context.Context, input types.CreateDocumentInput) (*types.CreateDocumentPayload, error) {
 	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
@@ -3469,6 +3527,22 @@ func (r *vendorResolver) BusinessAssociateAgreement(ctx context.Context, obj *ty
 	return types.NewVendorBusinessAssociateAgreement(vendorBusinessAssociateAgreement, file), nil
 }
 
+// DataPrivacyAgreement is the resolver for the dataPrivacyAgreement field.
+func (r *vendorResolver) DataPrivacyAgreement(ctx context.Context, obj *types.Vendor) (*types.VendorDataPrivacyAgreement, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	vendorDataPrivacyAgreement, file, err := prb.VendorDataPrivacyAgreements.GetByVendorID(ctx, obj.ID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, fmt.Errorf("failed to get vendor data privacy agreement: %w", err)
+	}
+
+	return types.NewVendorDataPrivacyAgreement(vendorDataPrivacyAgreement, file), nil
+}
+
 // Contacts is the resolver for the contacts field.
 func (r *vendorResolver) Contacts(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorContactOrderBy) (*types.VendorContactConnection, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
@@ -3655,6 +3729,30 @@ func (r *vendorContactResolver) Vendor(ctx context.Context, obj *types.VendorCon
 }
 
 // Vendor is the resolver for the vendor field.
+func (r *vendorDataPrivacyAgreementResolver) Vendor(ctx context.Context, obj *types.VendorDataPrivacyAgreement) (*types.Vendor, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	vendor, err := prb.Vendors.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get vendor: %w", err)
+	}
+
+	return types.NewVendor(vendor), nil
+}
+
+// FileURL is the resolver for the fileUrl field.
+func (r *vendorDataPrivacyAgreementResolver) FileURL(ctx context.Context, obj *types.VendorDataPrivacyAgreement) (string, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	fileURL, err := prb.VendorDataPrivacyAgreements.GenerateFileURL(ctx, obj.ID, 1*time.Hour)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate file URL: %w", err)
+	}
+
+	return fileURL, nil
+}
+
+// Vendor is the resolver for the vendor field.
 func (r *vendorRiskAssessmentResolver) Vendor(ctx context.Context, obj *types.VendorRiskAssessment) (*types.Vendor, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
 
@@ -3838,6 +3936,11 @@ func (r *Resolver) VendorConnection() schema.VendorConnectionResolver {
 // VendorContact returns schema.VendorContactResolver implementation.
 func (r *Resolver) VendorContact() schema.VendorContactResolver { return &vendorContactResolver{r} }
 
+// VendorDataPrivacyAgreement returns schema.VendorDataPrivacyAgreementResolver implementation.
+func (r *Resolver) VendorDataPrivacyAgreement() schema.VendorDataPrivacyAgreementResolver {
+	return &vendorDataPrivacyAgreementResolver{r}
+}
+
 // VendorRiskAssessment returns schema.VendorRiskAssessmentResolver implementation.
 func (r *Resolver) VendorRiskAssessment() schema.VendorRiskAssessmentResolver {
 	return &vendorRiskAssessmentResolver{r}
@@ -3880,5 +3983,6 @@ type vendorBusinessAssociateAgreementResolver struct{ *Resolver }
 type vendorComplianceReportResolver struct{ *Resolver }
 type vendorConnectionResolver struct{ *Resolver }
 type vendorContactResolver struct{ *Resolver }
+type vendorDataPrivacyAgreementResolver struct{ *Resolver }
 type vendorRiskAssessmentResolver struct{ *Resolver }
 type viewerResolver struct{ *Resolver }

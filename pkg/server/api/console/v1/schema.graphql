@@ -942,6 +942,7 @@ type Vendor implements Node {
   ): VendorComplianceReportConnection! @goField(forceResolver: true)
 
   businessAssociateAgreement: VendorBusinessAssociateAgreement @goField(forceResolver: true)
+  dataPrivacyAgreement: VendorDataPrivacyAgreement @goField(forceResolver: true)
 
   contacts(
     first: Int
@@ -1011,6 +1012,18 @@ type VendorContact implements Node {
   email: String
   phone: String
   role: String
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type VendorDataPrivacyAgreement implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
+  fileUrl: String! @goField(forceResolver: true)
+  fileSize: Int!
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -1678,6 +1691,17 @@ type Mutation {
     input: DeleteVendorBusinessAssociateAgreementInput!
   ): DeleteVendorBusinessAssociateAgreementPayload!
 
+  # Vendor Data Privacy Agreement mutations
+  uploadVendorDataPrivacyAgreement(
+    input: UploadVendorDataPrivacyAgreementInput!
+  ): UploadVendorDataPrivacyAgreementPayload!
+  updateVendorDataPrivacyAgreement(
+    input: UpdateVendorDataPrivacyAgreementInput!
+  ): UpdateVendorDataPrivacyAgreementPayload!
+  deleteVendorDataPrivacyAgreement(
+    input: DeleteVendorDataPrivacyAgreementInput!
+  ): DeleteVendorDataPrivacyAgreementPayload!
+
   # Document mutations
   createDocument(input: CreateDocumentInput!): CreateDocumentPayload!
   updateDocument(input: UpdateDocumentInput!): UpdateDocumentPayload!
@@ -2071,6 +2095,24 @@ input DeleteVendorBusinessAssociateAgreementInput {
   vendorId: ID!
 }
 
+input UploadVendorDataPrivacyAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
+  file: Upload!
+}
+
+input UpdateVendorDataPrivacyAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+}
+
+input DeleteVendorDataPrivacyAgreementInput {
+  vendorId: ID!
+}
+
 input CreateDocumentInput {
   organizationId: ID!
   title: String!
@@ -2372,6 +2414,18 @@ type UpdateVendorBusinessAssociateAgreementPayload {
 }
 
 type DeleteVendorBusinessAssociateAgreementPayload {
+  deletedVendorId: ID!
+}
+
+type UploadVendorDataPrivacyAgreementPayload {
+  vendorDataPrivacyAgreement: VendorDataPrivacyAgreement!
+}
+
+type UpdateVendorDataPrivacyAgreementPayload {
+  vendorDataPrivacyAgreement: VendorDataPrivacyAgreement!
+}
+
+type DeleteVendorDataPrivacyAgreementPayload {
   deletedVendorId: ID!
 }
 
