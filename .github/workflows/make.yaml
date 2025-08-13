@@ -39,7 +39,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: "aquasecurity/trivy-action@0.28.0"
         with:
-          image-ref: "ghcr.io/getprobo/probo:v0.46.2-amd64"
+          image-ref: "ghcr.io/getprobo/probo:latest-amd64"
           format: "table"
           exit-code: 1
           ignore-unfixed: true
