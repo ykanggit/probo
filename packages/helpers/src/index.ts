@@ -1,4 +1,4 @@
-export { objectKeys, objectEntries } from "./object";
+export { objectKeys, objectEntries, cleanFormData } from "./object";
 export { sprintf, faviconUrl, slugify } from "./string";
 export {
     getTreatment,
