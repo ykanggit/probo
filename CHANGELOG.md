@@ -2,10 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.47.0]
 
 ### Added
 - Add document draft deletion
+- People now have contract start and end dates in the UI and API.
+- Lists can filter out people whose contracts have ended.
 
 ### Fixed
 - Fix closing of document deletion pop up
