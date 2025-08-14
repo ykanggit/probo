@@ -29,6 +29,7 @@ import (
 type (
 	Audit struct {
 		ID                gid.GID    `db:"id"`
+		Name              *string    `db:"name"`
 		OrganizationID    gid.GID    `db:"organization_id"`
 		FrameworkID       gid.GID    `db:"framework_id"`
 		ReportID          *gid.GID   `db:"report_id"`
@@ -67,6 +68,7 @@ func (a *Audit) LoadByID(
 	q := `
 SELECT
 	id,
+	name,
 	organization_id,
 	framework_id,
 	report_id,
@@ -147,6 +149,7 @@ func (a *Audits) LoadByOrganizationID(
 	q := `
 SELECT
 	id,
+	name,
 	organization_id,
 	framework_id,
 	report_id,
@@ -195,6 +198,7 @@ func (a *Audit) Insert(
 	q := `
 INSERT INTO audits (
 	id,
+	name,
 	tenant_id,
 	organization_id,
 	framework_id,
@@ -207,6 +211,7 @@ INSERT INTO audits (
 	updated_at
 ) VALUES (
 	@id,
+	@name,
 	@tenant_id,
 	@organization_id,
 	@framework_id,
@@ -222,6 +227,7 @@ INSERT INTO audits (
 
 	args := pgx.StrictNamedArgs{
 		"id":                   a.ID,
+		"name":                 a.Name,
 		"tenant_id":            scope.GetTenantID(),
 		"organization_id":      a.OrganizationID,
 		"framework_id":         a.FrameworkID,
@@ -250,6 +256,7 @@ func (a *Audit) Update(
 	q := `
 UPDATE audits
 SET
+	name = @name,
 	report_id = @report_id,
 	valid_from = @valid_from,
 	valid_until = @valid_until,
@@ -265,6 +272,7 @@ WHERE
 
 	args := pgx.StrictNamedArgs{
 		"id":                   a.ID,
+		"name":                 a.Name,
 		"report_id":            a.ReportID,
 		"valid_from":           a.ValidFrom,
 		"valid_until":          a.ValidUntil,

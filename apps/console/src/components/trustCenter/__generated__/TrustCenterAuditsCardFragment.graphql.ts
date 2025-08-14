@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<794277d17daabd92807ccfaa5a1c2dbb>>
+ * @generated SignedSource<<b29f60aeb151f0b4ded9ebb02829b67f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,6 +17,7 @@ export type TrustCenterAuditsCardFragment$data = {
     readonly name: string;
   };
   readonly id: string;
+  readonly name: string | null | undefined;
   readonly showOnTrustCenter: boolean;
   readonly state: AuditState;
   readonly validFrom: any | null | undefined;
@@ -28,7 +29,15 @@ export type TrustCenterAuditsCardFragment$key = {
   readonly " $fragmentSpreads": FragmentRefs<"TrustCenterAuditsCardFragment">;
 };
 
-const node: ReaderFragment = {
+const node: ReaderFragment = (function(){
+var v0 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+};
+return {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
@@ -41,6 +50,7 @@ const node: ReaderFragment = {
       "name": "id",
       "storageKey": null
     },
+    (v0/*: any*/),
     {
       "alias": null,
       "args": null,
@@ -49,13 +59,7 @@ const node: ReaderFragment = {
       "name": "framework",
       "plural": false,
       "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "name",
-          "storageKey": null
-        }
+        (v0/*: any*/)
       ],
       "storageKey": null
     },
@@ -98,7 +102,8 @@ const node: ReaderFragment = {
   "type": "Audit",
   "abstractKey": null
 };
+})();
 
-(node as any).hash = "9c9291dffd5c057c0e70e2567a897362";
+(node as any).hash = "1c5db1ae603a40619342702f790adfeb";
 
 export default node;

@@ -58,6 +58,7 @@ type AssignTaskPayload struct {
 
 type Audit struct {
 	ID                gid.GID             `json:"id"`
+	Name              *string             `json:"name,omitempty"`
 	Organization      *Organization       `json:"organization"`
 	Framework         *Framework          `json:"framework"`
 	ValidFrom         *time.Time          `json:"validFrom,omitempty"`
@@ -183,6 +184,7 @@ type CreateAssetPayload struct {
 type CreateAuditInput struct {
 	OrganizationID gid.GID              `json:"organizationId"`
 	FrameworkID    gid.GID              `json:"frameworkId"`
+	Name           *string              `json:"name,omitempty"`
 	ValidFrom      *time.Time           `json:"validFrom,omitempty"`
 	ValidUntil     *time.Time           `json:"validUntil,omitempty"`
 	State          *coredata.AuditState `json:"state,omitempty"`
@@ -1146,6 +1148,7 @@ type UpdateAssetPayload struct {
 
 type UpdateAuditInput struct {
 	ID                gid.GID              `json:"id"`
+	Name              *string              `json:"name,omitempty"`
 	ValidFrom         *time.Time           `json:"validFrom,omitempty"`
 	ValidUntil        *time.Time           `json:"validUntil,omitempty"`
 	State             *coredata.AuditState `json:"state,omitempty"`

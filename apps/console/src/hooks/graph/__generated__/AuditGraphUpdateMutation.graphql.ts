@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d2c542541d5bfda5464af2b34ccae603>>
+ * @generated SignedSource<<4255866a0c7fe3c9c3416fe2603b5f63>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,6 +12,7 @@ import { ConcreteRequest } from 'relay-runtime';
 export type AuditState = "COMPLETED" | "IN_PROGRESS" | "NOT_STARTED" | "OUTDATED" | "REJECTED";
 export type UpdateAuditInput = {
   id: string;
+  name?: string | null | undefined;
   showOnTrustCenter?: boolean | null | undefined;
   state?: AuditState | null | undefined;
   validFrom?: any | null | undefined;
@@ -28,6 +29,7 @@ export type AuditGraphUpdateMutation$data = {
         readonly name: string;
       };
       readonly id: string;
+      readonly name: string | null | undefined;
       readonly report: {
         readonly filename: string;
         readonly id: string;
@@ -59,7 +61,14 @@ v1 = {
   "name": "id",
   "storageKey": null
 },
-v2 = [
+v2 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+},
+v3 = [
   {
     "alias": null,
     "args": [
@@ -83,6 +92,7 @@ v2 = [
         "plural": false,
         "selections": [
           (v1/*: any*/),
+          (v2/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -132,13 +142,7 @@ v2 = [
             "plural": false,
             "selections": [
               (v1/*: any*/),
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
-                "name": "name",
-                "storageKey": null
-              }
+              (v2/*: any*/)
             ],
             "storageKey": null
           },
@@ -162,7 +166,7 @@ return {
     "kind": "Fragment",
     "metadata": null,
     "name": "AuditGraphUpdateMutation",
-    "selections": (v2/*: any*/),
+    "selections": (v3/*: any*/),
     "type": "Mutation",
     "abstractKey": null
   },
@@ -171,19 +175,19 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
     "name": "AuditGraphUpdateMutation",
-    "selections": (v2/*: any*/)
+    "selections": (v3/*: any*/)
   },
   "params": {
-    "cacheID": "afd98ba771c6c437c46c275655333eb6",
+    "cacheID": "7257cd170b7441f3ce85966556e00ac3",
     "id": null,
     "metadata": {},
     "name": "AuditGraphUpdateMutation",
     "operationKind": "mutation",
-    "text": "mutation AuditGraphUpdateMutation(\n  $input: UpdateAuditInput!\n) {\n  updateAudit(input: $input) {\n    audit {\n      id\n      validFrom\n      validUntil\n      report {\n        id\n        filename\n      }\n      state\n      framework {\n        id\n        name\n      }\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation AuditGraphUpdateMutation(\n  $input: UpdateAuditInput!\n) {\n  updateAudit(input: $input) {\n    audit {\n      id\n      name\n      validFrom\n      validUntil\n      report {\n        id\n        filename\n      }\n      state\n      framework {\n        id\n        name\n      }\n      updatedAt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3ddd17832768611675505d76da1839a1";
+(node as any).hash = "7fb5d28c8c5fdffddb1c8926e66965ec";
 
 export default node;

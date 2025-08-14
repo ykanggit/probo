@@ -35,6 +35,7 @@ import { getAuditStateLabel, getAuditStateVariant, auditStates, fileSize, sprint
 import type { AuditGraphNodeQuery } from "/hooks/graph/__generated__/AuditGraphNodeQuery.graphql";
 
 const updateAuditSchema = z.object({
+  name: z.string().optional(),
   validFrom: z.string().optional(),
   validUntil: z.string().optional(),
   state: z.enum(["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "REJECTED", "OUTDATED"]),
@@ -61,6 +62,7 @@ export default function AuditDetailsPage(props: Props) {
 
   const { control, formState, handleSubmit, register, reset } = useFormWithSchema(updateAuditSchema, {
     defaultValues: {
+      name: auditEntry.name || "",
       validFrom: auditEntry.validFrom?.split('T')[0] || "",
       validUntil: auditEntry.validUntil?.split('T')[0] || "",
       state: auditEntry.state || "NOT_STARTED",
@@ -79,6 +81,7 @@ export default function AuditDetailsPage(props: Props) {
     try {
       await updateAudit({
         id: auditEntry.id,
+        name: formData.name,
         validFrom: formatDatetime(formData.validFrom),
         validUntil: formatDatetime(formData.validUntil),
         state: formData.state,
@@ -125,7 +128,7 @@ export default function AuditDetailsPage(props: Props) {
             to: `/organizations/${organizationId}/audits`,
           },
           {
-            label: auditEntry.framework?.name ?? __("Unknown Audit"),
+            label: (auditEntry.name || auditEntry.framework?.name) ?? __("Unknown Audit"),
           },
         ]}
       />
@@ -150,6 +153,10 @@ export default function AuditDetailsPage(props: Props) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <form onSubmit={onSubmit} className="space-y-6">
+          <Field label={__("Name")}>
+            <Input {...register("name")} placeholder={__("Audit name")} />
+          </Field>
+
           <ControlledField
             control={control}
             name="state"

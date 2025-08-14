@@ -42,6 +42,7 @@ const frameworksQuery = graphql`
 
 const schema = z.object({
   frameworkId: z.string().min(1, "Framework is required"),
+  name: z.string().optional(),
   validFrom: z.string().optional(),
   validUntil: z.string().optional(),
   state: z.enum(["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "REJECTED", "OUTDATED"]),
@@ -64,6 +65,7 @@ export function CreateAuditDialog({
     useFormWithSchema(schema, {
       defaultValues: {
         frameworkId: "",
+        name: "",
         validFrom: "",
         validUntil: "",
         state: "NOT_STARTED",
@@ -77,6 +79,7 @@ export function CreateAuditDialog({
       await createAudit({
         organizationId,
         frameworkId: data.frameworkId,
+        name: data.name,
         validFrom: formatDatetime(data.validFrom),
         validUntil: formatDatetime(data.validUntil),
         state: data.state,
@@ -113,6 +116,10 @@ export function CreateAuditDialog({
                 name="frameworkId"
               />
             </Suspense>
+          </Field>
+
+          <Field label={__("Name")}>
+            <Input {...register("name")} placeholder={__("Audit name")} />
           </Field>
 
           <ControlledField

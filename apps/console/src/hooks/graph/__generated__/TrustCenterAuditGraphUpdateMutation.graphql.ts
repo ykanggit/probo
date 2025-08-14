@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2a5e6cd48ca8a8fd7fe448c3a6190ccc>>
+ * @generated SignedSource<<5773d0630d11596682d41b4df95716c3>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,6 +13,7 @@ import { FragmentRefs } from "relay-runtime";
 export type AuditState = "COMPLETED" | "IN_PROGRESS" | "NOT_STARTED" | "OUTDATED" | "REJECTED";
 export type UpdateAuditInput = {
   id: string;
+  name?: string | null | undefined;
   showOnTrustCenter?: boolean | null | undefined;
   state?: AuditState | null | undefined;
   validFrom?: any | null | undefined;
@@ -62,6 +63,13 @@ v3 = {
   "args": null,
   "kind": "ScalarField",
   "name": "showOnTrustCenter",
+  "storageKey": null
+},
+v4 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
   "storageKey": null
 };
 return {
@@ -128,6 +136,7 @@ return {
             "selections": [
               (v2/*: any*/),
               (v3/*: any*/),
+              (v4/*: any*/),
               {
                 "alias": null,
                 "args": null,
@@ -136,13 +145,7 @@ return {
                 "name": "framework",
                 "plural": false,
                 "selections": [
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
-                    "name": "name",
-                    "storageKey": null
-                  },
+                  (v4/*: any*/),
                   (v2/*: any*/)
                 ],
                 "storageKey": null
@@ -184,12 +187,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9cb78f25506e1a67b5f29d4f742f8773",
+    "cacheID": "d27b79a065314a22dbcbd8216de1268b",
     "id": null,
     "metadata": {},
     "name": "TrustCenterAuditGraphUpdateMutation",
     "operationKind": "mutation",
-    "text": "mutation TrustCenterAuditGraphUpdateMutation(\n  $input: UpdateAuditInput!\n) {\n  updateAudit(input: $input) {\n    audit {\n      id\n      showOnTrustCenter\n      ...TrustCenterAuditsCardFragment\n    }\n  }\n}\n\nfragment TrustCenterAuditsCardFragment on Audit {\n  id\n  framework {\n    name\n    id\n  }\n  validFrom\n  validUntil\n  state\n  showOnTrustCenter\n  createdAt\n}\n"
+    "text": "mutation TrustCenterAuditGraphUpdateMutation(\n  $input: UpdateAuditInput!\n) {\n  updateAudit(input: $input) {\n    audit {\n      id\n      showOnTrustCenter\n      ...TrustCenterAuditsCardFragment\n    }\n  }\n}\n\nfragment TrustCenterAuditsCardFragment on Audit {\n  id\n  name\n  framework {\n    name\n    id\n  }\n  validFrom\n  validUntil\n  state\n  showOnTrustCenter\n  createdAt\n}\n"
   }
 };
 })();

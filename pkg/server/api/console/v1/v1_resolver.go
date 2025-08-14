@@ -2537,6 +2537,7 @@ func (r *mutationResolver) CreateAudit(ctx context.Context, input types.CreateAu
 	req := probo.CreateAuditRequest{
 		OrganizationID: input.OrganizationID,
 		FrameworkID:    input.FrameworkID,
+		Name:           input.Name,
 		ValidFrom:      input.ValidFrom,
 		ValidUntil:     input.ValidUntil,
 		State:          input.State,
@@ -2558,6 +2559,7 @@ func (r *mutationResolver) UpdateAudit(ctx context.Context, input types.UpdateAu
 
 	req := probo.UpdateAuditRequest{
 		ID:                input.ID,
+		Name:              &input.Name,
 		ValidFrom:         input.ValidFrom,
 		ValidUntil:        input.ValidUntil,
 		State:             input.State,

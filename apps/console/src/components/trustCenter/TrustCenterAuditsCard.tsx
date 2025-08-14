@@ -24,6 +24,7 @@ import type { TrustCenterAuditsCardFragment$key } from "./__generated__/TrustCen
 const trustCenterAuditFragment = graphql`
   fragment TrustCenterAuditsCardFragment on Audit {
     id
+    name
     framework {
       name
     }
@@ -81,6 +82,7 @@ export function TrustCenterAuditsCard<Params>(props: Props<Params>) {
         <Thead>
           <Tr>
             <Th>{__("Framework")}</Th>
+            <Th>{__("Name")}</Th>
             <Th>{__("Valid Until")}</Th>
             <Th>{__("State")}</Th>
             <Th>{__("Visibility")}</Th>
@@ -90,7 +92,7 @@ export function TrustCenterAuditsCard<Params>(props: Props<Params>) {
         <Tbody>
           {audits.length === 0 && (
             <Tr>
-              <Td colSpan={5} className="text-center text-txt-secondary">
+              <Td colSpan={6} className="text-center text-txt-secondary">
                 {__("No audits available")}
               </Td>
             </Tr>
@@ -139,6 +141,7 @@ function AuditRow(props: {
           {audit.framework.name}
         </div>
       </Td>
+      <Td>{audit.name || __("Untitled")}</Td>
       <Td>{validUntilFormatted}</Td>
       <Td>
         <Badge variant={getAuditStateVariant(audit.state)}>

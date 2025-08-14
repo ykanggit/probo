@@ -33,6 +33,7 @@ type (
 	CreateAuditRequest struct {
 		OrganizationID gid.GID
 		FrameworkID    gid.GID
+		Name           *string
 		ValidFrom      *time.Time
 		ValidUntil     *time.Time
 		State          *coredata.AuditState
@@ -40,6 +41,7 @@ type (
 
 	UpdateAuditRequest struct {
 		ID                gid.GID
+		Name              **string
 		ValidFrom         *time.Time
 		ValidUntil        *time.Time
 		State             *coredata.AuditState
@@ -89,6 +91,7 @@ func (s *AuditService) Create(
 
 	audit := &coredata.Audit{
 		ID:                gid.New(s.svc.scope.GetTenantID(), coredata.AuditEntityType),
+		Name:              req.Name,
 		OrganizationID:    req.OrganizationID,
 		FrameworkID:       req.FrameworkID,
 		ValidFrom:         req.ValidFrom,
@@ -144,6 +147,9 @@ func (s *AuditService) Update(
 				return fmt.Errorf("cannot load audit: %w", err)
 			}
 
+			if req.Name != nil {
+				audit.Name = *req.Name
+			}
 			if req.ValidFrom != nil {
 				audit.ValidFrom = req.ValidFrom
 			}
