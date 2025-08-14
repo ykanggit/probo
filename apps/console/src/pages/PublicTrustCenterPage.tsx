@@ -102,6 +102,7 @@ function PublicTrustCenterContent() {
   const [data, setData] = useState<PublicTrustCenterData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const organizationName = data?.trustCenterBySlug?.organization?.name;
   usePageTitle(organizationName ? `${organizationName} - Trust Center` : "Trust Center");
@@ -113,6 +114,7 @@ function PublicTrustCenterContent() {
     }
 
     setLoading(true);
+    setIsAuthenticated(false);
 
     fetch(buildEndpoint("/api/trust/v1/graphql"), {
       method: "POST",
@@ -129,6 +131,10 @@ function PublicTrustCenterContent() {
     })
       .then(response => response.json())
       .then((result: GraphQLResponse<PublicTrustCenterData>) => {
+        const accessDeniedErrors = result.errors?.filter((error: GraphQLError) =>
+          error.message.includes('access denied')
+        ) || [];
+
         const nonAuthErrors = result.errors?.filter((error: GraphQLError) =>
           !error.message.includes('access denied')
         ) || [];
@@ -137,6 +143,7 @@ function PublicTrustCenterContent() {
           throw new Error(nonAuthErrors[0].message);
         }
 
+        setIsAuthenticated(accessDeniedErrors.length === 0);
         setData(result.data || null);
       })
       .catch(setError)
@@ -175,10 +182,6 @@ function PublicTrustCenterContent() {
 
   const vendors = trustCenterBySlug.vendors.edges
     .map(edge => edge.node);
-
-  const isAuthenticated = audits.some((audit: Audit) =>
-    audit.report?.downloadUrl || audit.reportUrl
-  );
 
   return (
     <PublicTrustCenterLayout
