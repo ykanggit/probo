@@ -56,7 +56,12 @@ func (s VendorContactService) Get(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return vendorContact.LoadByID(ctx, conn, s.svc.scope, vendorContactID)
+			err := vendorContact.LoadByID(ctx, conn, s.svc.scope, vendorContactID)
+			if err != nil {
+				return fmt.Errorf("cannot load vendor contact: %w", err)
+			}
+
+			return nil
 		},
 	)
 
@@ -77,7 +82,12 @@ func (s VendorContactService) List(
 	err := s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return vendorContacts.LoadByVendorID(ctx, conn, s.svc.scope, vendorID, cursor)
+			err := vendorContacts.LoadByVendorID(ctx, conn, s.svc.scope, vendorID, cursor)
+			if err != nil {
+				return fmt.Errorf("cannot load vendor contacts: %w", err)
+			}
+
+			return nil
 		},
 	)
 
