@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.48.1]
+
+### Fixed
+
+- Fix display of download buttons in the public trust center
+
 ## [0.48.0]
 
 ### Added
