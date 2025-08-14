@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.48.0]
+
+### Added
+- Add baa to vendors
+- Add dpa to vendors
+- Add contacts to vendors
+- Add name to audits
+- Add audits to controls
+
 ## [0.47.0]
 
 ### Added
