@@ -1076,6 +1076,14 @@ type Control implements Node {
     filter: DocumentFilter
   ): DocumentConnection! @goField(forceResolver: true)
 
+  audits(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: AuditOrder
+  ): AuditConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -1257,6 +1265,16 @@ type Audit implements Node {
   report: Report @goField(forceResolver: true)
   reportUrl: String @goField(forceResolver: true)
   state: AuditState!
+
+  controls(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: ControlOrder
+    filter: ControlFilter
+  ): ControlConnection! @goField(forceResolver: true)
+
   showOnTrustCenter: Boolean!
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -1636,6 +1654,12 @@ type Mutation {
   deleteControlDocumentMapping(
     input: DeleteControlDocumentMappingInput!
   ): DeleteControlDocumentMappingPayload!
+  createControlAuditMapping(
+    input: CreateControlAuditMappingInput!
+  ): CreateControlAuditMappingPayload!
+  deleteControlAuditMapping(
+    input: DeleteControlAuditMappingInput!
+  ): DeleteControlAuditMappingPayload!
 
   # Task mutations
   createTask(input: CreateTaskInput!): CreateTaskPayload!
@@ -1985,6 +2009,16 @@ input DeleteControlMeasureMappingInput {
 input DeleteControlDocumentMappingInput {
   controlId: ID!
   documentId: ID!
+}
+
+input CreateControlAuditMappingInput {
+  controlId: ID!
+  auditId: ID!
+}
+
+input DeleteControlAuditMappingInput {
+  controlId: ID!
+  auditId: ID!
 }
 
 input CreateRiskInput {
@@ -2350,6 +2384,16 @@ type DeleteControlMeasureMappingPayload {
 type DeleteControlDocumentMappingPayload {
   deletedControlId: ID!
   deletedDocumentId: ID!
+}
+
+type CreateControlAuditMappingPayload {
+  controlEdge: ControlEdge!
+  auditEdge: AuditEdge!
+}
+
+type DeleteControlAuditMappingPayload {
+  deletedControlId: ID!
+  deletedAuditId: ID!
 }
 
 type CreateRiskPayload {

@@ -179,6 +179,36 @@ func (r *auditResolver) ReportURL(ctx context.Context, obj *types.Audit) (*strin
 	return url, nil
 }
 
+// Controls is the resolver for the controls field.
+func (r *auditResolver) Controls(ctx context.Context, obj *types.Audit, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
+		Field:     coredata.ControlOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ControlOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	var controlFilter = coredata.NewControlFilter(nil)
+	if filter != nil {
+		controlFilter = coredata.NewControlFilter(filter.Query)
+	}
+
+	page, err := prb.Controls.ListForAuditID(ctx, obj.ID, cursor, controlFilter)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list audit controls: %w", err)
+	}
+
+	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
+}
+
 // TotalCount is the resolver for the totalCount field.
 func (r *auditConnectionResolver) TotalCount(ctx context.Context, obj *types.AuditConnection) (int, error) {
 	prb := r.ProboService(ctx, obj.ParentID.TenantID())
@@ -265,6 +295,31 @@ func (r *controlResolver) Documents(ctx context.Context, obj *types.Control, fir
 	}
 
 	return types.NewDocumentConnection(page, r, obj.ID, documentFilter), nil
+}
+
+// Audits is the resolver for the audits field.
+func (r *controlResolver) Audits(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AuditOrderBy) (*types.AuditConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.AuditOrderField]{
+		Field:     coredata.AuditOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.AuditOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := prb.Audits.ListForControlID(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list control audits: %w", err)
+	}
+
+	return types.NewAuditConnection(page, r, obj.ID), nil
 }
 
 // TotalCount is the resolver for the totalCount field.
@@ -1595,6 +1650,36 @@ func (r *mutationResolver) DeleteControlDocumentMapping(ctx context.Context, inp
 	return &types.DeleteControlDocumentMappingPayload{
 		DeletedControlID:  control.ID,
 		DeletedDocumentID: document.ID,
+	}, nil
+}
+
+// CreateControlAuditMapping is the resolver for the createControlAuditMapping field.
+func (r *mutationResolver) CreateControlAuditMapping(ctx context.Context, input types.CreateControlAuditMappingInput) (*types.CreateControlAuditMappingPayload, error) {
+	prb := r.ProboService(ctx, input.AuditID.TenantID())
+
+	control, audit, err := prb.Controls.CreateAuditMapping(ctx, input.ControlID, input.AuditID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create control audit mapping: %w", err)
+	}
+
+	return &types.CreateControlAuditMappingPayload{
+		ControlEdge: types.NewControlEdge(control, coredata.ControlOrderFieldCreatedAt),
+		AuditEdge:   types.NewAuditEdge(audit, coredata.AuditOrderFieldCreatedAt),
+	}, nil
+}
+
+// DeleteControlAuditMapping is the resolver for the deleteControlAuditMapping field.
+func (r *mutationResolver) DeleteControlAuditMapping(ctx context.Context, input types.DeleteControlAuditMappingInput) (*types.DeleteControlAuditMappingPayload, error) {
+	prb := r.ProboService(ctx, input.AuditID.TenantID())
+
+	control, audit, err := prb.Controls.DeleteAuditMapping(ctx, input.ControlID, input.AuditID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete control audit mapping: %w", err)
+	}
+
+	return &types.DeleteControlAuditMappingPayload{
+		DeletedControlID: control.ID,
+		DeletedAuditID:   audit.ID,
 	}, nil
 }
 

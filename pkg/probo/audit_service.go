@@ -346,3 +346,34 @@ func (s AuditService) DeleteReport(
 
 	return audit, nil
 }
+
+func (s AuditService) ListForControlID(
+	ctx context.Context,
+	controlID gid.GID,
+	cursor *page.Cursor[coredata.AuditOrderField],
+) (*page.Page[*coredata.Audit, coredata.AuditOrderField], error) {
+	var audits coredata.Audits
+	control := &coredata.Control{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
+				return fmt.Errorf("cannot load control: %w", err)
+			}
+
+			err := audits.LoadByControlID(ctx, conn, s.svc.scope, control.ID, cursor)
+			if err != nil {
+				return fmt.Errorf("cannot load audits: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage(audits, cursor), nil
+}

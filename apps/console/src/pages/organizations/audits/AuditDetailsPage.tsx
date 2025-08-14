@@ -28,6 +28,7 @@ import {
 } from "@probo/ui";
 import { useTranslate } from "@probo/i18n";
 import { useOrganizationId } from "/hooks/useOrganizationId";
+import { FrameworkLogo } from "/components/FrameworkLogo";
 import { ControlledField } from "/components/form/ControlledField";
 import { useFormWithSchema } from "/hooks/useFormWithSchema";
 import z from "zod";
@@ -135,7 +136,10 @@ export default function AuditDetailsPage(props: Props) {
 
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-4">
-          <div className="text-2xl">{auditEntry.framework?.name}</div>
+          <div className="flex items-center gap-3">
+            <FrameworkLogo name={auditEntry.framework?.name || ""} />
+            <div className="text-2xl">{auditEntry.framework?.name}</div>
+          </div>
           <Badge variant={getAuditStateVariant(auditEntry.state || "NOT_STARTED")}>
             {getAuditStateLabel(__, auditEntry.state || "NOT_STARTED")}
           </Badge>

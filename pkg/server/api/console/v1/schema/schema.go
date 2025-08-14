@@ -121,6 +121,7 @@ type ComplexityRoot struct {
 	}
 
 	Audit struct {
+		Controls          func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) int
 		CreatedAt         func(childComplexity int) int
 		Framework         func(childComplexity int) int
 		ID                func(childComplexity int) int
@@ -182,6 +183,7 @@ type ComplexityRoot struct {
 	}
 
 	Control struct {
+		Audits                 func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AuditOrderBy) int
 		CreatedAt              func(childComplexity int) int
 		Description            func(childComplexity int) int
 		Documents              func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) int
@@ -212,6 +214,11 @@ type ComplexityRoot struct {
 
 	CreateAuditPayload struct {
 		AuditEdge func(childComplexity int) int
+	}
+
+	CreateControlAuditMappingPayload struct {
+		AuditEdge   func(childComplexity int) int
+		ControlEdge func(childComplexity int) int
 	}
 
 	CreateControlDocumentMappingPayload struct {
@@ -327,6 +334,11 @@ type ComplexityRoot struct {
 
 	DeleteAuditReportPayload struct {
 		Audit func(childComplexity int) int
+	}
+
+	DeleteControlAuditMappingPayload struct {
+		DeletedAuditID   func(childComplexity int) int
+		DeletedControlID func(childComplexity int) int
 	}
 
 	DeleteControlDocumentMappingPayload struct {
@@ -602,6 +614,7 @@ type ComplexityRoot struct {
 		CreateAsset                            func(childComplexity int, input types.CreateAssetInput) int
 		CreateAudit                            func(childComplexity int, input types.CreateAuditInput) int
 		CreateControl                          func(childComplexity int, input types.CreateControlInput) int
+		CreateControlAuditMapping              func(childComplexity int, input types.CreateControlAuditMappingInput) int
 		CreateControlDocumentMapping           func(childComplexity int, input types.CreateControlDocumentMappingInput) int
 		CreateControlMeasureMapping            func(childComplexity int, input types.CreateControlMeasureMappingInput) int
 		CreateDatum                            func(childComplexity int, input types.CreateDatumInput) int
@@ -623,6 +636,7 @@ type ComplexityRoot struct {
 		DeleteAudit                            func(childComplexity int, input types.DeleteAuditInput) int
 		DeleteAuditReport                      func(childComplexity int, input types.DeleteAuditReportInput) int
 		DeleteControl                          func(childComplexity int, input types.DeleteControlInput) int
+		DeleteControlAuditMapping              func(childComplexity int, input types.DeleteControlAuditMappingInput) int
 		DeleteControlDocumentMapping           func(childComplexity int, input types.DeleteControlDocumentMappingInput) int
 		DeleteControlMeasureMapping            func(childComplexity int, input types.DeleteControlMeasureMappingInput) int
 		DeleteDatum                            func(childComplexity int, input types.DeleteDatumInput) int
@@ -1155,6 +1169,8 @@ type AuditResolver interface {
 
 	Report(ctx context.Context, obj *types.Audit) (*types.Report, error)
 	ReportURL(ctx context.Context, obj *types.Audit) (*string, error)
+
+	Controls(ctx context.Context, obj *types.Audit, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error)
 }
 type AuditConnectionResolver interface {
 	TotalCount(ctx context.Context, obj *types.AuditConnection) (int, error)
@@ -1163,6 +1179,7 @@ type ControlResolver interface {
 	Framework(ctx context.Context, obj *types.Control) (*types.Framework, error)
 	Measures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error)
 	Documents(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error)
+	Audits(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AuditOrderBy) (*types.AuditConnection, error)
 }
 type ControlConnectionResolver interface {
 	TotalCount(ctx context.Context, obj *types.ControlConnection) (int, error)
@@ -1258,6 +1275,8 @@ type MutationResolver interface {
 	CreateControlDocumentMapping(ctx context.Context, input types.CreateControlDocumentMappingInput) (*types.CreateControlDocumentMappingPayload, error)
 	DeleteControlMeasureMapping(ctx context.Context, input types.DeleteControlMeasureMappingInput) (*types.DeleteControlMeasureMappingPayload, error)
 	DeleteControlDocumentMapping(ctx context.Context, input types.DeleteControlDocumentMappingInput) (*types.DeleteControlDocumentMappingPayload, error)
+	CreateControlAuditMapping(ctx context.Context, input types.CreateControlAuditMappingInput) (*types.CreateControlAuditMappingPayload, error)
+	DeleteControlAuditMapping(ctx context.Context, input types.DeleteControlAuditMappingInput) (*types.DeleteControlAuditMappingPayload, error)
 	CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error)
 	UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error)
 	DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error)
@@ -1555,6 +1574,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.AssignTaskPayload.Task(childComplexity), true
 
+	case "Audit.controls":
+		if e.complexity.Audit.Controls == nil {
+			break
+		}
+
+		args, err := ec.field_Audit_controls_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Audit.Controls(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.ControlOrderBy), args["filter"].(*types.ControlFilter)), true
+
 	case "Audit.createdAt":
 		if e.complexity.Audit.CreatedAt == nil {
 			break
@@ -1772,6 +1803,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.ConnectorEdge.Node(childComplexity), true
 
+	case "Control.audits":
+		if e.complexity.Control.Audits == nil {
+			break
+		}
+
+		args, err := ec.field_Control_audits_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Control.Audits(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.AuditOrderBy)), true
+
 	case "Control.createdAt":
 		if e.complexity.Control.CreatedAt == nil {
 			break
@@ -1907,6 +1950,20 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.CreateAuditPayload.AuditEdge(childComplexity), true
+
+	case "CreateControlAuditMappingPayload.auditEdge":
+		if e.complexity.CreateControlAuditMappingPayload.AuditEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateControlAuditMappingPayload.AuditEdge(childComplexity), true
+
+	case "CreateControlAuditMappingPayload.controlEdge":
+		if e.complexity.CreateControlAuditMappingPayload.ControlEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateControlAuditMappingPayload.ControlEdge(childComplexity), true
 
 	case "CreateControlDocumentMappingPayload.controlEdge":
 		if e.complexity.CreateControlDocumentMappingPayload.ControlEdge == nil {
@@ -2192,6 +2249,20 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.DeleteAuditReportPayload.Audit(childComplexity), true
+
+	case "DeleteControlAuditMappingPayload.deletedAuditId":
+		if e.complexity.DeleteControlAuditMappingPayload.DeletedAuditID == nil {
+			break
+		}
+
+		return e.complexity.DeleteControlAuditMappingPayload.DeletedAuditID(childComplexity), true
+
+	case "DeleteControlAuditMappingPayload.deletedControlId":
+		if e.complexity.DeleteControlAuditMappingPayload.DeletedControlID == nil {
+			break
+		}
+
+		return e.complexity.DeleteControlAuditMappingPayload.DeletedControlID(childComplexity), true
 
 	case "DeleteControlDocumentMappingPayload.deletedControlId":
 		if e.complexity.DeleteControlDocumentMappingPayload.DeletedControlID == nil {
@@ -3216,6 +3287,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.CreateControl(childComplexity, args["input"].(types.CreateControlInput)), true
 
+	case "Mutation.createControlAuditMapping":
+		if e.complexity.Mutation.CreateControlAuditMapping == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createControlAuditMapping_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateControlAuditMapping(childComplexity, args["input"].(types.CreateControlAuditMappingInput)), true
+
 	case "Mutation.createControlDocumentMapping":
 		if e.complexity.Mutation.CreateControlDocumentMapping == nil {
 			break
@@ -3467,6 +3550,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteControl(childComplexity, args["input"].(types.DeleteControlInput)), true
+
+	case "Mutation.deleteControlAuditMapping":
+		if e.complexity.Mutation.DeleteControlAuditMapping == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteControlAuditMapping_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteControlAuditMapping(childComplexity, args["input"].(types.DeleteControlAuditMappingInput)), true
 
 	case "Mutation.deleteControlDocumentMapping":
 		if e.complexity.Mutation.DeleteControlDocumentMapping == nil {
@@ -6029,6 +6124,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputControlOrder,
 		ec.unmarshalInputCreateAssetInput,
 		ec.unmarshalInputCreateAuditInput,
+		ec.unmarshalInputCreateControlAuditMappingInput,
 		ec.unmarshalInputCreateControlDocumentMappingInput,
 		ec.unmarshalInputCreateControlInput,
 		ec.unmarshalInputCreateControlMeasureMappingInput,
@@ -6052,6 +6148,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeleteAssetInput,
 		ec.unmarshalInputDeleteAuditInput,
 		ec.unmarshalInputDeleteAuditReportInput,
+		ec.unmarshalInputDeleteControlAuditMappingInput,
 		ec.unmarshalInputDeleteControlDocumentMappingInput,
 		ec.unmarshalInputDeleteControlInput,
 		ec.unmarshalInputDeleteControlMeasureMappingInput,
@@ -7307,6 +7404,14 @@ type Control implements Node {
     filter: DocumentFilter
   ): DocumentConnection! @goField(forceResolver: true)
 
+  audits(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: AuditOrder
+  ): AuditConnection! @goField(forceResolver: true)
+
   createdAt: Datetime!
   updatedAt: Datetime!
 }
@@ -7488,6 +7593,16 @@ type Audit implements Node {
   report: Report @goField(forceResolver: true)
   reportUrl: String @goField(forceResolver: true)
   state: AuditState!
+
+  controls(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: ControlOrder
+    filter: ControlFilter
+  ): ControlConnection! @goField(forceResolver: true)
+
   showOnTrustCenter: Boolean!
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -7867,6 +7982,12 @@ type Mutation {
   deleteControlDocumentMapping(
     input: DeleteControlDocumentMappingInput!
   ): DeleteControlDocumentMappingPayload!
+  createControlAuditMapping(
+    input: CreateControlAuditMappingInput!
+  ): CreateControlAuditMappingPayload!
+  deleteControlAuditMapping(
+    input: DeleteControlAuditMappingInput!
+  ): DeleteControlAuditMappingPayload!
 
   # Task mutations
   createTask(input: CreateTaskInput!): CreateTaskPayload!
@@ -8216,6 +8337,16 @@ input DeleteControlMeasureMappingInput {
 input DeleteControlDocumentMappingInput {
   controlId: ID!
   documentId: ID!
+}
+
+input CreateControlAuditMappingInput {
+  controlId: ID!
+  auditId: ID!
+}
+
+input DeleteControlAuditMappingInput {
+  controlId: ID!
+  auditId: ID!
 }
 
 input CreateRiskInput {
@@ -8581,6 +8712,16 @@ type DeleteControlMeasureMappingPayload {
 type DeleteControlDocumentMappingPayload {
   deletedControlId: ID!
   deletedDocumentId: ID!
+}
+
+type CreateControlAuditMappingPayload {
+  controlEdge: ControlEdge!
+  auditEdge: AuditEdge!
+}
+
+type DeleteControlAuditMappingPayload {
+  deletedControlId: ID!
+  deletedAuditId: ID!
 }
 
 type CreateRiskPayload {
@@ -9198,6 +9339,214 @@ func (ec *executionContext) field_Asset_vendors_argsOrderBy(
 	}
 
 	var zeroVal *types.VendorOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Audit_controls_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Audit_controls_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Audit_controls_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Audit_controls_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Audit_controls_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	arg5, err := ec.field_Audit_controls_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
+	return args, nil
+}
+func (ec *executionContext) field_Audit_controls_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.ControlOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOControlOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.ControlOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.ControlFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOControlFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.ControlFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_audits_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Control_audits_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Control_audits_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Control_audits_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Control_audits_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Control_audits_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_Control_audits_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_audits_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_audits_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_audits_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_audits_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.AuditOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOAuditOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAuditOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.AuditOrderBy
 	return zeroVal, nil
 }
 
@@ -10556,6 +10905,29 @@ func (ec *executionContext) field_Mutation_createAudit_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_createControlAuditMapping_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createControlAuditMapping_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createControlAuditMapping_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateControlAuditMappingInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateControlAuditMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlAuditMappingInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateControlAuditMappingInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_createControlDocumentMapping_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -11036,6 +11408,29 @@ func (ec *executionContext) field_Mutation_deleteAudit_argsInput(
 	}
 
 	var zeroVal types.DeleteAuditInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteControlAuditMapping_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteControlAuditMapping_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteControlAuditMapping_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteControlAuditMappingInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteControlAuditMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlAuditMappingInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteControlAuditMappingInput
 	return zeroVal, nil
 }
 
@@ -16318,6 +16713,69 @@ func (ec *executionContext) fieldContext_Audit_state(_ context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _Audit_controls(ctx context.Context, field graphql.CollectedField, obj *types.Audit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Audit_controls(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Audit().Controls(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.ControlOrderBy), fc.Args["filter"].(*types.ControlFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ControlConnection)
+	fc.Result = res
+	return ec.marshalNControlConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Audit_controls(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Audit",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ControlConnection_totalCount(ctx, field)
+			case "edges":
+				return ec.fieldContext_ControlConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_ControlConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Audit_controls_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Audit_showOnTrustCenter(ctx context.Context, field graphql.CollectedField, obj *types.Audit) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Audit_showOnTrustCenter(ctx, field)
 	if err != nil {
@@ -16699,6 +17157,8 @@ func (ec *executionContext) fieldContext_AuditEdge_node(_ context.Context, field
 				return ec.fieldContext_Audit_reportUrl(ctx, field)
 			case "state":
 				return ec.fieldContext_Audit_state(ctx, field)
+			case "controls":
+				return ec.fieldContext_Audit_controls(ctx, field)
 			case "showOnTrustCenter":
 				return ec.fieldContext_Audit_showOnTrustCenter(ctx, field)
 			case "createdAt":
@@ -17821,6 +18281,69 @@ func (ec *executionContext) fieldContext_Control_documents(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Control_audits(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_audits(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Control().Audits(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.AuditOrderBy))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.AuditConnection)
+	fc.Result = res
+	return ec.marshalNAuditConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAuditConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_audits(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_AuditConnection_totalCount(ctx, field)
+			case "edges":
+				return ec.fieldContext_AuditConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_AuditConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AuditConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Control_audits_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Control_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Control_createdAt(ctx, field)
 	if err != nil {
@@ -18158,6 +18681,8 @@ func (ec *executionContext) fieldContext_ControlEdge_node(_ context.Context, fie
 				return ec.fieldContext_Control_measures(ctx, field)
 			case "documents":
 				return ec.fieldContext_Control_documents(ctx, field)
+			case "audits":
+				return ec.fieldContext_Control_audits(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Control_createdAt(ctx, field)
 			case "updatedAt":
@@ -18253,6 +18778,106 @@ func (ec *executionContext) _CreateAuditPayload_auditEdge(ctx context.Context, f
 func (ec *executionContext) fieldContext_CreateAuditPayload_auditEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CreateAuditPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_AuditEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_AuditEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AuditEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateControlAuditMappingPayload_controlEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlAuditMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateControlAuditMappingPayload_controlEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ControlEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ControlEdge)
+	fc.Result = res
+	return ec.marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateControlAuditMappingPayload_controlEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateControlAuditMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_ControlEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_ControlEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateControlAuditMappingPayload_auditEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlAuditMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateControlAuditMappingPayload_auditEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AuditEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.AuditEdge)
+	fc.Result = res
+	return ec.marshalNAuditEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAuditEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateControlAuditMappingPayload_auditEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateControlAuditMappingPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -20301,6 +20926,8 @@ func (ec *executionContext) fieldContext_DeleteAuditReportPayload_audit(_ contex
 				return ec.fieldContext_Audit_reportUrl(ctx, field)
 			case "state":
 				return ec.fieldContext_Audit_state(ctx, field)
+			case "controls":
+				return ec.fieldContext_Audit_controls(ctx, field)
 			case "showOnTrustCenter":
 				return ec.fieldContext_Audit_showOnTrustCenter(ctx, field)
 			case "createdAt":
@@ -20309,6 +20936,94 @@ func (ec *executionContext) fieldContext_DeleteAuditReportPayload_audit(_ contex
 				return ec.fieldContext_Audit_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Audit", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteControlAuditMappingPayload_deletedControlId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteControlAuditMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteControlAuditMappingPayload_deletedControlId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedControlID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteControlAuditMappingPayload_deletedControlId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteControlAuditMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteControlAuditMappingPayload_deletedAuditId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteControlAuditMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteControlAuditMappingPayload_deletedAuditId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedAuditID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteControlAuditMappingPayload_deletedAuditId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteControlAuditMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -28499,6 +29214,128 @@ func (ec *executionContext) fieldContext_Mutation_deleteControlDocumentMapping(c
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteControlDocumentMapping_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createControlAuditMapping(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createControlAuditMapping(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateControlAuditMapping(rctx, fc.Args["input"].(types.CreateControlAuditMappingInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateControlAuditMappingPayload)
+	fc.Result = res
+	return ec.marshalNCreateControlAuditMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlAuditMappingPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createControlAuditMapping(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "controlEdge":
+				return ec.fieldContext_CreateControlAuditMappingPayload_controlEdge(ctx, field)
+			case "auditEdge":
+				return ec.fieldContext_CreateControlAuditMappingPayload_auditEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateControlAuditMappingPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createControlAuditMapping_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteControlAuditMapping(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteControlAuditMapping(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteControlAuditMapping(rctx, fc.Args["input"].(types.DeleteControlAuditMappingInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteControlAuditMappingPayload)
+	fc.Result = res
+	return ec.marshalNDeleteControlAuditMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlAuditMappingPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteControlAuditMapping(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedControlId":
+				return ec.fieldContext_DeleteControlAuditMappingPayload_deletedControlId(ctx, field)
+			case "deletedAuditId":
+				return ec.fieldContext_DeleteControlAuditMappingPayload_deletedAuditId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteControlAuditMappingPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteControlAuditMapping_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -38136,6 +38973,8 @@ func (ec *executionContext) fieldContext_UpdateAuditPayload_audit(_ context.Cont
 				return ec.fieldContext_Audit_reportUrl(ctx, field)
 			case "state":
 				return ec.fieldContext_Audit_state(ctx, field)
+			case "controls":
+				return ec.fieldContext_Audit_controls(ctx, field)
 			case "showOnTrustCenter":
 				return ec.fieldContext_Audit_showOnTrustCenter(ctx, field)
 			case "createdAt":
@@ -38206,6 +39045,8 @@ func (ec *executionContext) fieldContext_UpdateControlPayload_control(_ context.
 				return ec.fieldContext_Control_measures(ctx, field)
 			case "documents":
 				return ec.fieldContext_Control_documents(ctx, field)
+			case "audits":
+				return ec.fieldContext_Control_audits(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Control_createdAt(ctx, field)
 			case "updatedAt":
@@ -39262,6 +40103,8 @@ func (ec *executionContext) fieldContext_UploadAuditReportPayload_audit(_ contex
 				return ec.fieldContext_Audit_reportUrl(ctx, field)
 			case "state":
 				return ec.fieldContext_Audit_state(ctx, field)
+			case "controls":
+				return ec.fieldContext_Audit_controls(ctx, field)
 			case "showOnTrustCenter":
 				return ec.fieldContext_Audit_showOnTrustCenter(ctx, field)
 			case "createdAt":
@@ -47210,6 +48053,40 @@ func (ec *executionContext) unmarshalInputCreateAuditInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateControlAuditMappingInput(ctx context.Context, obj any) (types.CreateControlAuditMappingInput, error) {
+	var it types.CreateControlAuditMappingInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"controlId", "auditId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "controlId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("controlId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ControlID = data
+		case "auditId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("auditId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AuditID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateControlDocumentMappingInput(ctx context.Context, obj any) (types.CreateControlDocumentMappingInput, error) {
 	var it types.CreateControlDocumentMappingInput
 	asMap := map[string]any{}
@@ -48378,6 +49255,40 @@ func (ec *executionContext) unmarshalInputDeleteAuditReportInput(ctx context.Con
 			continue
 		}
 		switch k {
+		case "auditId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("auditId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AuditID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDeleteControlAuditMappingInput(ctx context.Context, obj any) (types.DeleteControlAuditMappingInput, error) {
+	var it types.DeleteControlAuditMappingInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"controlId", "auditId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "controlId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("controlId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ControlID = data
 		case "auditId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("auditId"))
 			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
@@ -52268,6 +53179,42 @@ func (ec *executionContext) _Audit(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "controls":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Audit_controls(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "showOnTrustCenter":
 			out.Values[i] = ec._Audit_showOnTrustCenter(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -52884,6 +53831,42 @@ func (ec *executionContext) _Control(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "audits":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Control_audits(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Control_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -53093,6 +54076,50 @@ func (ec *executionContext) _CreateAuditPayload(ctx context.Context, sel ast.Sel
 			out.Values[i] = graphql.MarshalString("CreateAuditPayload")
 		case "auditEdge":
 			out.Values[i] = ec._CreateAuditPayload_auditEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var createControlAuditMappingPayloadImplementors = []string{"CreateControlAuditMappingPayload"}
+
+func (ec *executionContext) _CreateControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateControlAuditMappingPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createControlAuditMappingPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateControlAuditMappingPayload")
+		case "controlEdge":
+			out.Values[i] = ec._CreateControlAuditMappingPayload_controlEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "auditEdge":
+			out.Values[i] = ec._CreateControlAuditMappingPayload_auditEdge(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -54267,6 +55294,50 @@ func (ec *executionContext) _DeleteAuditReportPayload(ctx context.Context, sel a
 			out.Values[i] = graphql.MarshalString("DeleteAuditReportPayload")
 		case "audit":
 			out.Values[i] = ec._DeleteAuditReportPayload_audit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteControlAuditMappingPayloadImplementors = []string{"DeleteControlAuditMappingPayload"}
+
+func (ec *executionContext) _DeleteControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteControlAuditMappingPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteControlAuditMappingPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteControlAuditMappingPayload")
+		case "deletedControlId":
+			out.Values[i] = ec._DeleteControlAuditMappingPayload_deletedControlId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletedAuditId":
+			out.Values[i] = ec._DeleteControlAuditMappingPayload_deletedAuditId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -57458,6 +58529,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteControlDocumentMapping":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteControlDocumentMapping(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createControlAuditMapping":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createControlAuditMapping(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteControlAuditMapping":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteControlAuditMapping(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -63989,6 +65074,25 @@ func (ec *executionContext) marshalNCreateAuditPayload2ᚖgithubᚗcomᚋgetprob
 	return ec._CreateAuditPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateControlAuditMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlAuditMappingInput(ctx context.Context, v any) (types.CreateControlAuditMappingInput, error) {
+	res, err := ec.unmarshalInputCreateControlAuditMappingInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateControlAuditMappingPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateControlAuditMappingPayload) graphql.Marshaler {
+	return ec._CreateControlAuditMappingPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateControlAuditMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateControlAuditMappingPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateControlAuditMappingPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateControlDocumentMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlDocumentMappingInput(ctx context.Context, v any) (types.CreateControlDocumentMappingInput, error) {
 	res, err := ec.unmarshalInputCreateControlDocumentMappingInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -64622,6 +65726,25 @@ func (ec *executionContext) marshalNDeleteAuditReportPayload2ᚖgithubᚗcomᚋg
 		return graphql.Null
 	}
 	return ec._DeleteAuditReportPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeleteControlAuditMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlAuditMappingInput(ctx context.Context, v any) (types.DeleteControlAuditMappingInput, error) {
+	res, err := ec.unmarshalInputDeleteControlAuditMappingInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteControlAuditMappingPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteControlAuditMappingPayload) graphql.Marshaler {
+	return ec._DeleteControlAuditMappingPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteControlAuditMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteControlAuditMappingPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteControlAuditMappingPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeleteControlDocumentMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlDocumentMappingInput(ctx context.Context, v any) (types.DeleteControlDocumentMappingInput, error) {

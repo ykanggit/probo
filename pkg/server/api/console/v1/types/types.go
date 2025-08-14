@@ -66,6 +66,7 @@ type Audit struct {
 	Report            *Report             `json:"report,omitempty"`
 	ReportURL         *string             `json:"reportUrl,omitempty"`
 	State             coredata.AuditState `json:"state"`
+	Controls          *ControlConnection  `json:"controls"`
 	ShowOnTrustCenter bool                `json:"showOnTrustCenter"`
 	CreatedAt         time.Time           `json:"createdAt"`
 	UpdatedAt         time.Time           `json:"updatedAt"`
@@ -150,6 +151,7 @@ type Control struct {
 	Framework              *Framework             `json:"framework"`
 	Measures               *MeasureConnection     `json:"measures"`
 	Documents              *DocumentConnection    `json:"documents"`
+	Audits                 *AuditConnection       `json:"audits"`
 	CreatedAt              time.Time              `json:"createdAt"`
 	UpdatedAt              time.Time              `json:"updatedAt"`
 }
@@ -192,6 +194,16 @@ type CreateAuditInput struct {
 
 type CreateAuditPayload struct {
 	AuditEdge *AuditEdge `json:"auditEdge"`
+}
+
+type CreateControlAuditMappingInput struct {
+	ControlID gid.GID `json:"controlId"`
+	AuditID   gid.GID `json:"auditId"`
+}
+
+type CreateControlAuditMappingPayload struct {
+	ControlEdge *ControlEdge `json:"controlEdge"`
+	AuditEdge   *AuditEdge   `json:"auditEdge"`
 }
 
 type CreateControlDocumentMappingInput struct {
@@ -471,6 +483,16 @@ type DeleteAuditReportInput struct {
 
 type DeleteAuditReportPayload struct {
 	Audit *Audit `json:"audit"`
+}
+
+type DeleteControlAuditMappingInput struct {
+	ControlID gid.GID `json:"controlId"`
+	AuditID   gid.GID `json:"auditId"`
+}
+
+type DeleteControlAuditMappingPayload struct {
+	DeletedControlID gid.GID `json:"deletedControlId"`
+	DeletedAuditID   gid.GID `json:"deletedAuditId"`
 }
 
 type DeleteControlDocumentMappingInput struct {
