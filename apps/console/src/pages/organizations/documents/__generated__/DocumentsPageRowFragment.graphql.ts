@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<428295a295761694c38d77aa3476d01f>>
+ * @generated SignedSource<<0e9889a7c30efd94243ec845dd12d693>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,6 +14,14 @@ export type DocumentType = "ISMS" | "OTHER" | "POLICY";
 export type DocumentVersionSignatureState = "REQUESTED" | "SIGNED";
 import { FragmentRefs } from "relay-runtime";
 export type DocumentsPageRowFragment$data = {
+  readonly controls: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly name: string;
+      };
+    }>;
+  };
   readonly description: string;
   readonly documentType: DocumentType;
   readonly id: string;
@@ -53,7 +61,14 @@ var v0 = {
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
-};
+},
+v1 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 1
+  }
+];
 return {
   "argumentDefinitions": [],
   "kind": "Fragment",
@@ -110,13 +125,48 @@ return {
     },
     {
       "alias": null,
-      "args": [
+      "args": (v1/*: any*/),
+      "concreteType": "ControlConnection",
+      "kind": "LinkedField",
+      "name": "controls",
+      "plural": false,
+      "selections": [
         {
-          "kind": "Literal",
-          "name": "first",
-          "value": 1
+          "alias": null,
+          "args": null,
+          "concreteType": "ControlEdge",
+          "kind": "LinkedField",
+          "name": "edges",
+          "plural": true,
+          "selections": [
+            {
+              "alias": null,
+              "args": null,
+              "concreteType": "Control",
+              "kind": "LinkedField",
+              "name": "node",
+              "plural": false,
+              "selections": [
+                (v0/*: any*/),
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "name",
+                  "storageKey": null
+                }
+              ],
+              "storageKey": null
+            }
+          ],
+          "storageKey": null
         }
       ],
+      "storageKey": "controls(first:1)"
+    },
+    {
+      "alias": null,
+      "args": (v1/*: any*/),
       "concreteType": "DocumentVersionConnection",
       "kind": "LinkedField",
       "name": "versions",
@@ -208,6 +258,6 @@ return {
 };
 })();
 
-(node as any).hash = "c8543275dc108732ad2377806efacfc1";
+(node as any).hash = "9663dbeb1b5c584b6b7c1462a6fbb9b3";
 
 export default node;

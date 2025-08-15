@@ -282,29 +282,37 @@ export default function DocumentDetailPage(props: Props) {
   const confirm = useConfirm();
 
   const handleDelete = () => {
-    confirm(
-      () =>
-        new Promise<void>((resolve) => {
-          deleteDocument({
-            variables: {
-              input: { documentId: document.id },
-            },
-            onSuccess() {
-              navigate(`/organizations/${organizationId}/documents`);
-              resolve();
-            },
-            onError: () => resolve(),
-          });
-        }),
-      {
-        message: sprintf(
-          __(
-            'This will permanently delete the document "%s". This action cannot be undone.'
+    const hasLinkedControls = document.controlsInfo.totalCount > 0;
+    
+    if (hasLinkedControls) {
+      // Document has linked controls - show informational message with OK button only
+      alert(__('You have linked controls. Unlink before delete.'));
+    } else {
+      // No linked controls - proceed with normal deletion
+      confirm(
+        () =>
+          new Promise<void>((resolve) => {
+            deleteDocument({
+              variables: {
+                input: { documentId: document.id },
+              },
+              onSuccess() {
+                navigate(`/organizations/${organizationId}/documents`);
+                resolve();
+              },
+              onError: () => resolve(),
+            });
+          }),
+        {
+          message: sprintf(
+            __(
+              'This will permanently delete the document "%s". This action cannot be undone.'
+            ),
+            document.title
           ),
-          document.title
-        ),
-      }
-    );
+        }
+      );
+    }
   };
 
   const handleDeleteDraft = () => {
