@@ -29,6 +29,7 @@ import (
 type (
 	Audit struct {
 		ID                gid.GID    `db:"id"`
+		Name              *string    `db:"name"`
 		OrganizationID    gid.GID    `db:"organization_id"`
 		FrameworkID       gid.GID    `db:"framework_id"`
 		ReportID          *gid.GID   `db:"report_id"`
@@ -67,6 +68,7 @@ func (a *Audit) LoadByID(
 	q := `
 SELECT
 	id,
+	name,
 	organization_id,
 	framework_id,
 	report_id,
@@ -147,6 +149,7 @@ func (a *Audits) LoadByOrganizationID(
 	q := `
 SELECT
 	id,
+	name,
 	organization_id,
 	framework_id,
 	report_id,
@@ -195,6 +198,7 @@ func (a *Audit) Insert(
 	q := `
 INSERT INTO audits (
 	id,
+	name,
 	tenant_id,
 	organization_id,
 	framework_id,
@@ -207,6 +211,7 @@ INSERT INTO audits (
 	updated_at
 ) VALUES (
 	@id,
+	@name,
 	@tenant_id,
 	@organization_id,
 	@framework_id,
@@ -222,6 +227,7 @@ INSERT INTO audits (
 
 	args := pgx.StrictNamedArgs{
 		"id":                   a.ID,
+		"name":                 a.Name,
 		"tenant_id":            scope.GetTenantID(),
 		"organization_id":      a.OrganizationID,
 		"framework_id":         a.FrameworkID,
@@ -250,6 +256,7 @@ func (a *Audit) Update(
 	q := `
 UPDATE audits
 SET
+	name = @name,
 	report_id = @report_id,
 	valid_from = @valid_from,
 	valid_until = @valid_until,
@@ -265,6 +272,7 @@ WHERE
 
 	args := pgx.StrictNamedArgs{
 		"id":                   a.ID,
+		"name":                 a.Name,
 		"report_id":            a.ReportID,
 		"valid_from":           a.ValidFrom,
 		"valid_until":          a.ValidUntil,
@@ -303,6 +311,112 @@ WHERE
 	if err != nil {
 		return fmt.Errorf("cannot delete audit: %w", err)
 	}
+
+	return nil
+}
+
+func (a *Audits) CountByControlID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	controlID gid.GID,
+) (int, error) {
+	q := `
+WITH audits_by_control AS (
+		SELECT
+			a.id,
+			a.tenant_id
+		FROM
+			audits a
+		INNER JOIN
+			controls_audits ca ON a.id = ca.audit_id
+		WHERE
+			ca.control_id = @control_id
+	)
+	SELECT
+		COUNT(id)
+	FROM
+		audits_by_control
+	WHERE %s
+	`
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"control_id": controlID}
+	maps.Copy(args, scope.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
+
+func (a *Audits) LoadByControlID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	controlID gid.GID,
+	cursor *page.Cursor[AuditOrderField],
+) error {
+	q := `
+WITH audits_by_control AS (
+	SELECT
+		a.id,
+		a.tenant_id,
+		a.name,
+		a.organization_id,
+		a.framework_id,
+		a.report_id,
+		a.valid_from,
+		a.valid_until,
+		a.state,
+		a.show_on_trust_center,
+		a.created_at,
+		a.updated_at
+	FROM
+		audits a
+	INNER JOIN
+		controls_audits ca ON a.id = ca.audit_id
+	WHERE
+		ca.control_id = @control_id
+)
+SELECT
+	id,
+	name,
+	organization_id,
+	framework_id,
+	report_id,
+	valid_from,
+	valid_until,
+	state,
+	show_on_trust_center,
+	created_at,
+	updated_at
+FROM
+	audits_by_control
+WHERE %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.NamedArgs{"control_id": controlID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query audits: %w", err)
+	}
+
+	audits, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Audit])
+	if err != nil {
+		return fmt.Errorf("cannot collect audits: %w", err)
+	}
+
+	*a = audits
 
 	return nil
 }

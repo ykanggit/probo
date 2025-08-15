@@ -17,6 +17,7 @@ import { LinkedMeasuresCard } from "/components/measures/LinkedMeasuresCard";
 import { useNavigate, useOutletContext } from "react-router";
 import { useOrganizationId } from "/hooks/useOrganizationId";
 import { LinkedDocumentsCard } from "/components/documents/LinkedDocumentsCard";
+import { LinkedAuditsCard } from "/components/audits/LinkedAuditsCard";
 import { FrameworkControlDialog } from "./dialogs/FrameworkControlDialog";
 import { promisifyMutation } from "@probo/helpers";
 import type { FrameworkGraphControlNodeQuery } from "/hooks/graph/__generated__/FrameworkGraphControlNodeQuery.graphql";
@@ -77,6 +78,33 @@ const detachDocumentMutation = graphql`
   }
 `;
 
+const attachAuditMutation = graphql`
+  mutation FrameworkControlPageAttachAuditMutation(
+    $input: CreateControlAuditMappingInput!
+    $connections: [ID!]!
+  ) {
+    createControlAuditMapping(input: $input) {
+      auditEdge @prependEdge(connections: $connections) {
+        node {
+          id
+          ...LinkedAuditsCardFragment
+        }
+      }
+    }
+  }
+`;
+
+const detachAuditMutation = graphql`
+  mutation FrameworkControlPageDetachAuditMutation(
+    $input: DeleteControlAuditMappingInput!
+    $connections: [ID!]!
+  ) {
+    deleteControlAuditMapping(input: $input) {
+      deletedAuditId @deleteEdge(connections: $connections)
+    }
+  }
+`;
+
 const deleteControlMutation = graphql`
   mutation FrameworkControlPageDeleteControlMutation(
     $input: DeleteControlInput!
@@ -118,6 +146,8 @@ export default function FrameworkControlPage({ queryRef }: Props) {
   const [attachDocument, isAttachingDocument] = useMutation(
     attachDocumentMutation
   );
+  const [detachAudit, isDetachingAudit] = useMutation(detachAuditMutation);
+  const [attachAudit, isAttachingAudit] = useMutation(attachAuditMutation);
   const [deleteControl] = useMutation(deleteControlMutation);
 
   const onDelete = () => {
@@ -204,7 +234,16 @@ export default function FrameworkControlPage({ queryRef }: Props) {
           onAttach={attachDocument}
           onDetach={detachDocument}
           disabled={isAttachingDocument || isDetachingDocument}
-      />
+        />
+        <LinkedAuditsCard
+          variant="card"
+          audits={control.audits?.edges.map((edge) => edge.node) ?? []}
+          params={{ controlId: control.id }}
+          connectionId={control.audits?.__id!}
+          onAttach={attachAudit}
+          onDetach={detachAudit}
+          disabled={isAttachingAudit || isDetachingAudit}
+        />
       </div>
     </div>
   );

@@ -292,6 +292,24 @@ enum VendorComplianceReportOrderField
     )
 }
 
+enum VendorContactOrderField
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.VendorContactOrderField"
+  ) {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorContactOrderFieldCreatedAt"
+    )
+  FULL_NAME
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorContactOrderFieldFullName"
+    )
+  EMAIL
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorContactOrderFieldEmail"
+    )
+}
+
 enum OrganizationOrderField
   @goModel(
     model: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderField"
@@ -679,6 +697,14 @@ input VendorComplianceReportOrder
   field: VendorComplianceReportOrderField!
 }
 
+input VendorContactOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.VendorContactOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: VendorContactOrderField!
+}
+
 input OrganizationOrder {
   direction: OrderDirection!
   field: OrganizationOrderField!
@@ -716,6 +742,10 @@ input MeasureFilter {
 
 input RiskFilter {
   query: String
+}
+
+input PeopleFilter {
+  excludeContractEnded: Boolean
 }
 
 input OrganizationFilter {
@@ -802,6 +832,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: PeopleOrder
+    filter: PeopleFilter
   ): PeopleConnection! @goField(forceResolver: true)
 
   documents(
@@ -916,6 +947,17 @@ type Vendor implements Node {
     orderBy: VendorComplianceReportOrder
   ): VendorComplianceReportConnection! @goField(forceResolver: true)
 
+  businessAssociateAgreement: VendorBusinessAssociateAgreement @goField(forceResolver: true)
+  dataPrivacyAgreement: VendorDataPrivacyAgreement @goField(forceResolver: true)
+
+  contacts(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: VendorContactOrder
+  ): VendorContactConnection! @goField(forceResolver: true)
+
   riskAssessments(
     first: Int
     after: CursorKey
@@ -951,6 +993,41 @@ type VendorComplianceReport implements Node {
   reportDate: Datetime!
   validUntil: Datetime
   reportName: String!
+  fileUrl: String! @goField(forceResolver: true)
+  fileSize: Int!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type VendorBusinessAssociateAgreement implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
+  fileUrl: String! @goField(forceResolver: true)
+  fileSize: Int!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type VendorContact implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  fullName: String
+  email: String
+  phone: String
+  role: String
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type VendorDataPrivacyAgreement implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
   fileUrl: String! @goField(forceResolver: true)
   fileSize: Int!
   createdAt: Datetime!
@@ -1005,6 +1082,14 @@ type Control implements Node {
     orderBy: DocumentOrder
     filter: DocumentFilter
   ): DocumentConnection! @goField(forceResolver: true)
+
+  audits(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: AuditOrder
+  ): AuditConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -1181,6 +1266,7 @@ type Risk implements Node {
 
 type Audit implements Node {
   id: ID!
+  name: String
   organization: Organization! @goField(forceResolver: true)
   framework: Framework! @goField(forceResolver: true)
   validFrom: Datetime
@@ -1188,6 +1274,16 @@ type Audit implements Node {
   report: Report @goField(forceResolver: true)
   reportUrl: String @goField(forceResolver: true)
   state: AuditState!
+
+  controls(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: ControlOrder
+    filter: ControlFilter
+  ): ControlConnection! @goField(forceResolver: true)
+
   showOnTrustCenter: Boolean!
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -1414,6 +1510,16 @@ type VendorComplianceReportEdge {
   node: VendorComplianceReport!
 }
 
+type VendorContactConnection {
+  edges: [VendorContactEdge!]!
+  pageInfo: PageInfo!
+}
+
+type VendorContactEdge {
+  cursor: CursorKey!
+  node: VendorContact!
+}
+
 type ConnectorConnection {
   edges: [ConnectorEdge!]!
   pageInfo: PageInfo!
@@ -1525,6 +1631,11 @@ type Mutation {
   updateVendor(input: UpdateVendorInput!): UpdateVendorPayload!
   deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
 
+  # Vendor Contact mutations
+  createVendorContact(input: CreateVendorContactInput!): CreateVendorContactPayload!
+  updateVendorContact(input: UpdateVendorContactInput!): UpdateVendorContactPayload!
+  deleteVendorContact(input: DeleteVendorContactInput!): DeleteVendorContactPayload!
+
   # Framework mutations
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
@@ -1559,6 +1670,12 @@ type Mutation {
   deleteControlDocumentMapping(
     input: DeleteControlDocumentMappingInput!
   ): DeleteControlDocumentMappingPayload!
+  createControlAuditMapping(
+    input: CreateControlAuditMappingInput!
+  ): CreateControlAuditMappingPayload!
+  deleteControlAuditMapping(
+    input: DeleteControlAuditMappingInput!
+  ): DeleteControlAuditMappingPayload!
 
   # Task mutations
   createTask(input: CreateTaskInput!): CreateTaskPayload!
@@ -1604,6 +1721,28 @@ type Mutation {
     input: DeleteVendorComplianceReportInput!
   ): DeleteVendorComplianceReportPayload!
 
+  # Vendor Business Associate Agreement mutations
+  uploadVendorBusinessAssociateAgreement(
+    input: UploadVendorBusinessAssociateAgreementInput!
+  ): UploadVendorBusinessAssociateAgreementPayload!
+  updateVendorBusinessAssociateAgreement(
+    input: UpdateVendorBusinessAssociateAgreementInput!
+  ): UpdateVendorBusinessAssociateAgreementPayload!
+  deleteVendorBusinessAssociateAgreement(
+    input: DeleteVendorBusinessAssociateAgreementInput!
+  ): DeleteVendorBusinessAssociateAgreementPayload!
+
+  # Vendor Data Privacy Agreement mutations
+  uploadVendorDataPrivacyAgreement(
+    input: UploadVendorDataPrivacyAgreementInput!
+  ): UploadVendorDataPrivacyAgreementPayload!
+  updateVendorDataPrivacyAgreement(
+    input: UpdateVendorDataPrivacyAgreementInput!
+  ): UpdateVendorDataPrivacyAgreementPayload!
+  deleteVendorDataPrivacyAgreement(
+    input: DeleteVendorDataPrivacyAgreementInput!
+  ): DeleteVendorDataPrivacyAgreementPayload!
+
   # Document mutations
   createDocument(input: CreateDocumentInput!): CreateDocumentPayload!
   updateDocument(input: UpdateDocumentInput!): UpdateDocumentPayload!
@@ -1620,6 +1759,9 @@ type Mutation {
   createDraftDocumentVersion(
     input: CreateDraftDocumentVersionInput!
   ): CreateDraftDocumentVersionPayload!
+  deleteDraftDocumentVersion(
+    input: DeleteDraftDocumentVersionInput!
+  ): DeleteDraftDocumentVersionPayload!
   updateDocumentVersion(
     input: UpdateDocumentVersionInput!
   ): UpdateDocumentVersionPayload!
@@ -1752,6 +1894,26 @@ input DeleteVendorInput {
   vendorId: ID!
 }
 
+input CreateVendorContactInput {
+  vendorId: ID!
+  fullName: String
+  email: String
+  phone: String
+  role: String
+}
+
+input UpdateVendorContactInput {
+  id: ID!
+  fullName: String
+  email: String
+  phone: String
+  role: String
+}
+
+input DeleteVendorContactInput {
+  vendorContactId: ID!
+}
+
 input CreatePeopleInput {
   organizationId: ID!
   fullName: String!
@@ -1871,6 +2033,16 @@ input DeleteControlDocumentMappingInput {
   documentId: ID!
 }
 
+input CreateControlAuditMappingInput {
+  controlId: ID!
+  auditId: ID!
+}
+
+input DeleteControlAuditMappingInput {
+  controlId: ID!
+  auditId: ID!
+}
+
 input CreateRiskInput {
   organizationId: ID!
   name: String!
@@ -1962,6 +2134,42 @@ input DeleteVendorComplianceReportInput {
   reportId: ID!
 }
 
+input UploadVendorBusinessAssociateAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
+  file: Upload!
+}
+
+input UpdateVendorBusinessAssociateAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+}
+
+input DeleteVendorBusinessAssociateAgreementInput {
+  vendorId: ID!
+}
+
+input UploadVendorDataPrivacyAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
+  file: Upload!
+}
+
+input UpdateVendorDataPrivacyAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+}
+
+input DeleteVendorDataPrivacyAgreementInput {
+  vendorId: ID!
+}
+
 input CreateDocumentInput {
   organizationId: ID!
   title: String!
@@ -2029,6 +2237,7 @@ input DeleteControlInput {
 input CreateAuditInput {
   organizationId: ID!
   frameworkId: ID!
+  name: String
   validFrom: Datetime
   validUntil: Datetime
   state: AuditState
@@ -2036,6 +2245,7 @@ input CreateAuditInput {
 
 input UpdateAuditInput {
   id: ID!
+  name: String
   validFrom: Datetime
   validUntil: Datetime
   state: AuditState
@@ -2065,7 +2275,7 @@ type UpdateOrganizationPayload {
 }
 
 type DeleteOrganizationPayload {
-  success: Boolean!
+  deletedOrganizationId: ID!
 }
 
 type UpdateTrustCenterPayload {
@@ -2104,6 +2314,18 @@ type UpdateVendorPayload {
 
 type DeleteVendorPayload {
   deletedVendorId: ID!
+}
+
+type CreateVendorContactPayload {
+  vendorContactEdge: VendorContactEdge!
+}
+
+type UpdateVendorContactPayload {
+  vendorContact: VendorContact!
+}
+
+type DeleteVendorContactPayload {
+  deletedVendorContactId: ID!
 }
 
 type CreatePeoplePayload {
@@ -2187,6 +2409,16 @@ type DeleteControlDocumentMappingPayload {
   deletedDocumentId: ID!
 }
 
+type CreateControlAuditMappingPayload {
+  controlEdge: ControlEdge!
+  auditEdge: AuditEdge!
+}
+
+type DeleteControlAuditMappingPayload {
+  deletedControlId: ID!
+  deletedAuditId: ID!
+}
+
 type CreateRiskPayload {
   riskEdge: RiskEdge!
 }
@@ -2241,6 +2473,30 @@ type UploadVendorComplianceReportPayload {
 
 type DeleteVendorComplianceReportPayload {
   deletedVendorComplianceReportId: ID!
+}
+
+type UploadVendorBusinessAssociateAgreementPayload {
+  vendorBusinessAssociateAgreement: VendorBusinessAssociateAgreement!
+}
+
+type UpdateVendorBusinessAssociateAgreementPayload {
+  vendorBusinessAssociateAgreement: VendorBusinessAssociateAgreement!
+}
+
+type DeleteVendorBusinessAssociateAgreementPayload {
+  deletedVendorId: ID!
+}
+
+type UploadVendorDataPrivacyAgreementPayload {
+  vendorDataPrivacyAgreement: VendorDataPrivacyAgreement!
+}
+
+type UpdateVendorDataPrivacyAgreementPayload {
+  vendorDataPrivacyAgreement: VendorDataPrivacyAgreement!
+}
+
+type DeleteVendorDataPrivacyAgreementPayload {
+  deletedVendorId: ID!
 }
 
 type CreateDocumentPayload {
@@ -2471,8 +2727,16 @@ type CreateDraftDocumentVersionPayload {
   documentVersionEdge: DocumentVersionEdge!
 }
 
+type DeleteDraftDocumentVersionPayload {
+  deletedDocumentVersionId: ID!
+}
+
 input CreateDraftDocumentVersionInput {
   documentID: ID!
+}
+
+input DeleteDraftDocumentVersionInput {
+  documentVersionId: ID!
 }
 
 input UpdateDocumentVersionInput {

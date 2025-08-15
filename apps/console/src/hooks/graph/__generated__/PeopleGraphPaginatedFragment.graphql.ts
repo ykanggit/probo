@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5eba326084bfab4966727af60e2aa85c>>
+ * @generated SignedSource<<940911e0b7ae1ffe53a31f98216dcfe6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -18,6 +18,8 @@ export type PeopleGraphPaginatedFragment$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly additionalEmailAddresses: ReadonlyArray<string>;
+        readonly contractEndDate: any | null | undefined;
+        readonly contractStartDate: any | null | undefined;
         readonly fullName: string;
         readonly id: string;
         readonly kind: PeopleKind;
@@ -59,6 +61,11 @@ return {
       "name": "before"
     },
     {
+      "defaultValue": null,
+      "kind": "LocalArgument",
+      "name": "filter"
+    },
+    {
       "defaultValue": 50,
       "kind": "LocalArgument",
       "name": "first"
@@ -69,7 +76,10 @@ return {
       "name": "last"
     },
     {
-      "defaultValue": null,
+      "defaultValue": {
+        "direction": "ASC",
+        "field": "FULL_NAME"
+      },
       "kind": "LocalArgument",
       "name": "order"
     }
@@ -111,6 +121,11 @@ return {
     {
       "alias": "peoples",
       "args": [
+        {
+          "kind": "Variable",
+          "name": "filter",
+          "variableName": "filter"
+        },
         {
           "kind": "Variable",
           "name": "orderBy",
@@ -172,6 +187,20 @@ return {
                   "args": null,
                   "kind": "ScalarField",
                   "name": "additionalEmailAddresses",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "contractStartDate",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "contractEndDate",
                   "storageKey": null
                 },
                 {
@@ -255,6 +284,6 @@ return {
 };
 })();
 
-(node as any).hash = "5e095baf6a65e7cdbaa804d4658cbb6b";
+(node as any).hash = "c658d1fc05ce8d1c12e6ba4fd3cf8c52";
 
 export default node;

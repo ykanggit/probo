@@ -18,6 +18,7 @@ import (
 	"github.com/getprobo/probo/pkg/probo"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/schema"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/types"
+	pgx "github.com/jackc/pgx/v5"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -178,6 +179,36 @@ func (r *auditResolver) ReportURL(ctx context.Context, obj *types.Audit) (*strin
 	return url, nil
 }
 
+// Controls is the resolver for the controls field.
+func (r *auditResolver) Controls(ctx context.Context, obj *types.Audit, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
+		Field:     coredata.ControlOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ControlOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	var controlFilter = coredata.NewControlFilter(nil)
+	if filter != nil {
+		controlFilter = coredata.NewControlFilter(filter.Query)
+	}
+
+	page, err := prb.Controls.ListForAuditID(ctx, obj.ID, cursor, controlFilter)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list audit controls: %w", err)
+	}
+
+	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
+}
+
 // TotalCount is the resolver for the totalCount field.
 func (r *auditConnectionResolver) TotalCount(ctx context.Context, obj *types.AuditConnection) (int, error) {
 	prb := r.ProboService(ctx, obj.ParentID.TenantID())
@@ -264,6 +295,31 @@ func (r *controlResolver) Documents(ctx context.Context, obj *types.Control, fir
 	}
 
 	return types.NewDocumentConnection(page, r, obj.ID, documentFilter), nil
+}
+
+// Audits is the resolver for the audits field.
+func (r *controlResolver) Audits(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AuditOrderBy) (*types.AuditConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.AuditOrderField]{
+		Field:     coredata.AuditOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.AuditOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := prb.Audits.ListForControlID(ctx, obj.ID, cursor)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list control audits: %w", err)
+	}
+
+	return types.NewAuditConnection(page, r, obj.ID), nil
 }
 
 // TotalCount is the resolver for the totalCount field.
@@ -474,19 +530,19 @@ func (r *documentConnectionResolver) TotalCount(ctx context.Context, obj *types.
 	case *controlResolver:
 		count, err := prb.Documents.CountForControlID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count controls: %w", err)
+			panic(fmt.Errorf("cannot count controls: %w", err))
 		}
 		return count, nil
 	case *organizationResolver:
 		count, err := prb.Documents.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count documents: %w", err)
+			panic(fmt.Errorf("cannot count documents: %w", err))
 		}
 		return count, nil
 	case *riskResolver:
 		count, err := prb.Documents.CountForRiskID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count risks: %w", err)
+			panic(fmt.Errorf("cannot count risks: %w", err))
 		}
 		return count, nil
 	}
@@ -1052,29 +1108,9 @@ func (r *mutationResolver) UpdateOrganization(ctx context.Context, input types.U
 
 // DeleteOrganization is the resolver for the deleteOrganization field.
 func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.DeleteOrganizationInput) (*types.DeleteOrganizationPayload, error) {
-	user := UserFromContext(ctx)
-
-	organizations, err := r.usrmgrSvc.ListOrganizationsForUserID(ctx, user.ID)
-	if err != nil {
-		panic(fmt.Errorf("failed to list organizations for user: %w", err))
-	}
-
-	// Check if user has access to the organization
-	hasAccess := false
-	for _, organization := range organizations {
-		if organization.ID == input.OrganizationID {
-			hasAccess = true
-			break
-		}
-	}
-
-	if !hasAccess {
-		return nil, fmt.Errorf("organization not found or access denied")
-	}
-
 	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
 
-	err = prb.Organizations.Delete(ctx, probo.DeleteOrganizationRequest{
+	err := prb.Organizations.Delete(ctx, probo.DeleteOrganizationRequest{
 		ID: input.OrganizationID,
 	})
 	if err != nil {
@@ -1082,7 +1118,7 @@ func (r *mutationResolver) DeleteOrganization(ctx context.Context, input types.D
 	}
 
 	return &types.DeleteOrganizationPayload{
-		Success: true,
+		DeletedOrganizationID: input.OrganizationID,
 	}, nil
 }
 
@@ -1338,6 +1374,64 @@ func (r *mutationResolver) DeleteVendor(ctx context.Context, input types.DeleteV
 
 	return &types.DeleteVendorPayload{
 		DeletedVendorID: input.VendorID,
+	}, nil
+}
+
+// CreateVendorContact is the resolver for the createVendorContact field.
+func (r *mutationResolver) CreateVendorContact(ctx context.Context, input types.CreateVendorContactInput) (*types.CreateVendorContactPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	req := probo.CreateVendorContactRequest{
+		VendorID: input.VendorID,
+		FullName: input.FullName,
+		Email:    input.Email,
+		Phone:    input.Phone,
+		Role:     input.Role,
+	}
+
+	vendorContact, err := prb.VendorContacts.Create(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create vendor contact: %w", err)
+	}
+
+	return &types.CreateVendorContactPayload{
+		VendorContactEdge: types.NewVendorContactEdge(vendorContact, coredata.VendorContactOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateVendorContact is the resolver for the updateVendorContact field.
+func (r *mutationResolver) UpdateVendorContact(ctx context.Context, input types.UpdateVendorContactInput) (*types.UpdateVendorContactPayload, error) {
+	prb := r.ProboService(ctx, input.ID.TenantID())
+
+	req := probo.UpdateVendorContactRequest{
+		ID:       input.ID,
+		FullName: &input.FullName,
+		Email:    &input.Email,
+		Phone:    &input.Phone,
+		Role:     &input.Role,
+	}
+
+	vendorContact, err := prb.VendorContacts.Update(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update vendor contact: %w", err)
+	}
+
+	return &types.UpdateVendorContactPayload{
+		VendorContact: types.NewVendorContact(vendorContact),
+	}, nil
+}
+
+// DeleteVendorContact is the resolver for the deleteVendorContact field.
+func (r *mutationResolver) DeleteVendorContact(ctx context.Context, input types.DeleteVendorContactInput) (*types.DeleteVendorContactPayload, error) {
+	prb := r.ProboService(ctx, input.VendorContactID.TenantID())
+
+	err := prb.VendorContacts.Delete(ctx, input.VendorContactID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete vendor contact: %w", err)
+	}
+
+	return &types.DeleteVendorContactPayload{
+		DeletedVendorContactID: input.VendorContactID,
 	}, nil
 }
 
@@ -1648,6 +1742,36 @@ func (r *mutationResolver) DeleteControlDocumentMapping(ctx context.Context, inp
 	return &types.DeleteControlDocumentMappingPayload{
 		DeletedControlID:  control.ID,
 		DeletedDocumentID: document.ID,
+	}, nil
+}
+
+// CreateControlAuditMapping is the resolver for the createControlAuditMapping field.
+func (r *mutationResolver) CreateControlAuditMapping(ctx context.Context, input types.CreateControlAuditMappingInput) (*types.CreateControlAuditMappingPayload, error) {
+	prb := r.ProboService(ctx, input.AuditID.TenantID())
+
+	control, audit, err := prb.Controls.CreateAuditMapping(ctx, input.ControlID, input.AuditID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create control audit mapping: %w", err)
+	}
+
+	return &types.CreateControlAuditMappingPayload{
+		ControlEdge: types.NewControlEdge(control, coredata.ControlOrderFieldCreatedAt),
+		AuditEdge:   types.NewAuditEdge(audit, coredata.AuditOrderFieldCreatedAt),
+	}, nil
+}
+
+// DeleteControlAuditMapping is the resolver for the deleteControlAuditMapping field.
+func (r *mutationResolver) DeleteControlAuditMapping(ctx context.Context, input types.DeleteControlAuditMappingInput) (*types.DeleteControlAuditMappingPayload, error) {
+	prb := r.ProboService(ctx, input.AuditID.TenantID())
+
+	control, audit, err := prb.Controls.DeleteAuditMapping(ctx, input.ControlID, input.AuditID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete control audit mapping: %w", err)
+	}
+
+	return &types.DeleteControlAuditMappingPayload{
+		DeletedControlID: control.ID,
+		DeletedAuditID:   audit.ID,
 	}, nil
 }
 
@@ -2017,6 +2141,122 @@ func (r *mutationResolver) DeleteVendorComplianceReport(ctx context.Context, inp
 	}, nil
 }
 
+// UploadVendorBusinessAssociateAgreement is the resolver for the uploadVendorBusinessAssociateAgreement field.
+func (r *mutationResolver) UploadVendorBusinessAssociateAgreement(ctx context.Context, input types.UploadVendorBusinessAssociateAgreementInput) (*types.UploadVendorBusinessAssociateAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	vendorBusinessAssociateAgreement, file, err := prb.VendorBusinessAssociateAgreements.Upload(
+		ctx,
+		input.VendorID,
+		&probo.VendorBusinessAssociateAgreementCreateRequest{
+			File:       input.File.File,
+			ValidFrom:  input.ValidFrom,
+			ValidUntil: input.ValidUntil,
+			FileName:   input.FileName,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload vendor business associate agreement: %w", err)
+	}
+
+	return &types.UploadVendorBusinessAssociateAgreementPayload{
+		VendorBusinessAssociateAgreement: types.NewVendorBusinessAssociateAgreement(vendorBusinessAssociateAgreement, file),
+	}, nil
+}
+
+// UpdateVendorBusinessAssociateAgreement is the resolver for the updateVendorBusinessAssociateAgreement field.
+func (r *mutationResolver) UpdateVendorBusinessAssociateAgreement(ctx context.Context, input types.UpdateVendorBusinessAssociateAgreementInput) (*types.UpdateVendorBusinessAssociateAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	vendorBusinessAssociateAgreement, file, err := prb.VendorBusinessAssociateAgreements.Update(
+		ctx,
+		input.VendorID,
+		&probo.VendorBusinessAssociateAgreementUpdateRequest{
+			ValidFrom:  &input.ValidFrom,
+			ValidUntil: &input.ValidUntil,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update vendor business associate agreement: %w", err)
+	}
+
+	return &types.UpdateVendorBusinessAssociateAgreementPayload{
+		VendorBusinessAssociateAgreement: types.NewVendorBusinessAssociateAgreement(vendorBusinessAssociateAgreement, file),
+	}, nil
+}
+
+// DeleteVendorBusinessAssociateAgreement is the resolver for the deleteVendorBusinessAssociateAgreement field.
+func (r *mutationResolver) DeleteVendorBusinessAssociateAgreement(ctx context.Context, input types.DeleteVendorBusinessAssociateAgreementInput) (*types.DeleteVendorBusinessAssociateAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	err := prb.VendorBusinessAssociateAgreements.DeleteByVendorID(ctx, input.VendorID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete vendor business associate agreement: %w", err)
+	}
+
+	return &types.DeleteVendorBusinessAssociateAgreementPayload{
+		DeletedVendorID: input.VendorID,
+	}, nil
+}
+
+// UploadVendorDataPrivacyAgreement is the resolver for the uploadVendorDataPrivacyAgreement field.
+func (r *mutationResolver) UploadVendorDataPrivacyAgreement(ctx context.Context, input types.UploadVendorDataPrivacyAgreementInput) (*types.UploadVendorDataPrivacyAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	vendorDataPrivacyAgreement, file, err := prb.VendorDataPrivacyAgreements.Upload(
+		ctx,
+		input.VendorID,
+		&probo.VendorDataPrivacyAgreementCreateRequest{
+			File:       input.File.File,
+			ValidFrom:  input.ValidFrom,
+			ValidUntil: input.ValidUntil,
+			FileName:   input.FileName,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload vendor data privacy agreement: %w", err)
+	}
+
+	return &types.UploadVendorDataPrivacyAgreementPayload{
+		VendorDataPrivacyAgreement: types.NewVendorDataPrivacyAgreement(vendorDataPrivacyAgreement, file),
+	}, nil
+}
+
+// UpdateVendorDataPrivacyAgreement is the resolver for the updateVendorDataPrivacyAgreement field.
+func (r *mutationResolver) UpdateVendorDataPrivacyAgreement(ctx context.Context, input types.UpdateVendorDataPrivacyAgreementInput) (*types.UpdateVendorDataPrivacyAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	vendorDataPrivacyAgreement, file, err := prb.VendorDataPrivacyAgreements.Update(
+		ctx,
+		input.VendorID,
+		&probo.VendorDataPrivacyAgreementUpdateRequest{
+			ValidFrom:  &input.ValidFrom,
+			ValidUntil: &input.ValidUntil,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update vendor data privacy agreement: %w", err)
+	}
+
+	return &types.UpdateVendorDataPrivacyAgreementPayload{
+		VendorDataPrivacyAgreement: types.NewVendorDataPrivacyAgreement(vendorDataPrivacyAgreement, file),
+	}, nil
+}
+
+// DeleteVendorDataPrivacyAgreement is the resolver for the deleteVendorDataPrivacyAgreement field.
+func (r *mutationResolver) DeleteVendorDataPrivacyAgreement(ctx context.Context, input types.DeleteVendorDataPrivacyAgreementInput) (*types.DeleteVendorDataPrivacyAgreementPayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	err := prb.VendorDataPrivacyAgreements.DeleteByVendorID(ctx, input.VendorID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete vendor data privacy agreement: %w", err)
+	}
+
+	return &types.DeleteVendorDataPrivacyAgreementPayload{
+		DeletedVendorID: input.VendorID,
+	}, nil
+}
+
 // CreateDocument is the resolver for the createDocument field.
 func (r *mutationResolver) CreateDocument(ctx context.Context, input types.CreateDocumentInput) (*types.CreateDocumentPayload, error) {
 	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
@@ -2172,6 +2412,20 @@ func (r *mutationResolver) CreateDraftDocumentVersion(ctx context.Context, input
 
 	return &types.CreateDraftDocumentVersionPayload{
 		DocumentVersionEdge: types.NewDocumentVersionEdge(documentVersion, coredata.DocumentVersionOrderFieldCreatedAt),
+	}, nil
+}
+
+// DeleteDraftDocumentVersion is the resolver for the deleteDraftDocumentVersion field.
+func (r *mutationResolver) DeleteDraftDocumentVersion(ctx context.Context, input types.DeleteDraftDocumentVersionInput) (*types.DeleteDraftDocumentVersionPayload, error) {
+	prb := r.ProboService(ctx, input.DocumentVersionID.TenantID())
+
+	err := prb.Documents.DeleteDraft(ctx, input.DocumentVersionID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete draft document version: %w", err))
+	}
+
+	return &types.DeleteDraftDocumentVersionPayload{
+		DeletedDocumentVersionID: input.DocumentVersionID,
 	}, nil
 }
 
@@ -2460,6 +2714,7 @@ func (r *mutationResolver) CreateAudit(ctx context.Context, input types.CreateAu
 	req := probo.CreateAuditRequest{
 		OrganizationID: input.OrganizationID,
 		FrameworkID:    input.FrameworkID,
+		Name:           input.Name,
 		ValidFrom:      input.ValidFrom,
 		ValidUntil:     input.ValidUntil,
 		State:          input.State,
@@ -2481,6 +2736,7 @@ func (r *mutationResolver) UpdateAudit(ctx context.Context, input types.UpdateAu
 
 	req := probo.UpdateAuditRequest{
 		ID:                input.ID,
+		Name:              &input.Name,
 		ValidFrom:         input.ValidFrom,
 		ValidUntil:        input.ValidUntil,
 		State:             input.State,
@@ -2685,7 +2941,7 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 }
 
 // Peoples is the resolver for the peoples field.
-func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) (*types.PeopleConnection, error) {
+func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy, filter *types.PeopleFilter) (*types.PeopleConnection, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.PeopleOrderField]{
@@ -2701,12 +2957,17 @@ func (r *organizationResolver) Peoples(ctx context.Context, obj *types.Organizat
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := prb.Peoples.ListForOrganizationID(ctx, obj.ID, cursor)
+	var peopleFilter = coredata.NewPeopleFilter(nil)
+	if filter != nil {
+		peopleFilter = coredata.NewPeopleFilter(filter.ExcludeContractEnded)
+	}
+
+	page, err := prb.Peoples.ListForOrganizationID(ctx, obj.ID, cursor, peopleFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization peoples: %w", err))
 	}
 
-	return types.NewPeopleConnection(page, r, obj.ID), nil
+	return types.NewPeopleConnection(page, r, obj.ID, peopleFilter), nil
 }
 
 // Documents is the resolver for the documents field.
@@ -2917,7 +3178,7 @@ func (r *peopleConnectionResolver) TotalCount(ctx context.Context, obj *types.Pe
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := prb.Peoples.CountForOrganizationID(ctx, obj.ParentID)
+		count, err := prb.Peoples.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count peoples: %w", err)
 		}
@@ -3006,6 +3267,12 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 			panic(fmt.Errorf("cannot get vendor compliance report: %w", err))
 		}
 		return types.NewVendorComplianceReport(vendorComplianceReport), nil
+	case coredata.VendorContactEntityType:
+		vendorContact, err := prb.VendorContacts.Get(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get vendor contact: %w", err))
+		}
+		return types.NewVendorContact(vendorContact), nil
 	case coredata.DocumentVersionEntityType:
 		documentVersion, err := prb.Documents.GetVersion(ctx, id)
 		if err != nil {
@@ -3217,13 +3484,13 @@ func (r *riskConnectionResolver) TotalCount(ctx context.Context, obj *types.Risk
 	case *measureResolver:
 		count, err := prb.Risks.CountForMeasureID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count risks: %w", err)
+			panic(fmt.Errorf("cannot count risks: %w", err))
 		}
 		return count, nil
 	case *organizationResolver:
 		count, err := prb.Risks.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count risks: %w", err)
+			panic(fmt.Errorf("cannot count risks: %w", err))
 		}
 		return count, nil
 	}
@@ -3455,6 +3722,63 @@ func (r *vendorResolver) ComplianceReports(ctx context.Context, obj *types.Vendo
 	return types.NewVendorComplianceReportConnection(page), nil
 }
 
+// BusinessAssociateAgreement is the resolver for the businessAssociateAgreement field.
+func (r *vendorResolver) BusinessAssociateAgreement(ctx context.Context, obj *types.Vendor) (*types.VendorBusinessAssociateAgreement, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	vendorBusinessAssociateAgreement, file, err := prb.VendorBusinessAssociateAgreements.GetByVendorID(ctx, obj.ID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, fmt.Errorf("failed to get vendor business associate agreement: %w", err)
+	}
+
+	return types.NewVendorBusinessAssociateAgreement(vendorBusinessAssociateAgreement, file), nil
+}
+
+// DataPrivacyAgreement is the resolver for the dataPrivacyAgreement field.
+func (r *vendorResolver) DataPrivacyAgreement(ctx context.Context, obj *types.Vendor) (*types.VendorDataPrivacyAgreement, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	vendorDataPrivacyAgreement, file, err := prb.VendorDataPrivacyAgreements.GetByVendorID(ctx, obj.ID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, fmt.Errorf("failed to get vendor data privacy agreement: %w", err)
+	}
+
+	return types.NewVendorDataPrivacyAgreement(vendorDataPrivacyAgreement, file), nil
+}
+
+// Contacts is the resolver for the contacts field.
+func (r *vendorResolver) Contacts(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorContactOrderBy) (*types.VendorContactConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.VendorContactOrderField]{
+		Field:     coredata.VendorContactOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.VendorContactOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := prb.VendorContacts.List(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("failed to list vendor contacts: %w", err))
+	}
+
+	return types.NewVendorContactConnection(page), nil
+}
+
 // RiskAssessments is the resolver for the riskAssessments field.
 func (r *vendorResolver) RiskAssessments(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorRiskAssessmentOrder) (*types.VendorRiskAssessmentConnection, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
@@ -3522,6 +3846,30 @@ func (r *vendorResolver) SecurityOwner(ctx context.Context, obj *types.Vendor) (
 }
 
 // Vendor is the resolver for the vendor field.
+func (r *vendorBusinessAssociateAgreementResolver) Vendor(ctx context.Context, obj *types.VendorBusinessAssociateAgreement) (*types.Vendor, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	vendor, err := prb.Vendors.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get vendor: %w", err)
+	}
+
+	return types.NewVendor(vendor), nil
+}
+
+// FileURL is the resolver for the fileUrl field.
+func (r *vendorBusinessAssociateAgreementResolver) FileURL(ctx context.Context, obj *types.VendorBusinessAssociateAgreement) (string, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	fileURL, err := prb.VendorBusinessAssociateAgreements.GenerateFileURL(ctx, obj.ID, 1*time.Hour)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate file URL: %w", err)
+	}
+
+	return fileURL, nil
+}
+
+// Vendor is the resolver for the vendor field.
 func (r *vendorComplianceReportResolver) Vendor(ctx context.Context, obj *types.VendorComplianceReport) (*types.Vendor, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
 
@@ -3571,6 +3919,48 @@ func (r *vendorConnectionResolver) TotalCount(ctx context.Context, obj *types.Ve
 	}
 
 	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
+// Vendor is the resolver for the vendor field.
+func (r *vendorContactResolver) Vendor(ctx context.Context, obj *types.VendorContact) (*types.Vendor, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	// Get the vendor contact to access the VendorID
+	vendorContact, err := prb.VendorContacts.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get vendor contact: %w", err))
+	}
+
+	vendor, err := prb.Vendors.Get(ctx, vendorContact.VendorID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get vendor: %w", err))
+	}
+
+	return types.NewVendor(vendor), nil
+}
+
+// Vendor is the resolver for the vendor field.
+func (r *vendorDataPrivacyAgreementResolver) Vendor(ctx context.Context, obj *types.VendorDataPrivacyAgreement) (*types.Vendor, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	vendor, err := prb.Vendors.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get vendor: %w", err)
+	}
+
+	return types.NewVendor(vendor), nil
+}
+
+// FileURL is the resolver for the fileUrl field.
+func (r *vendorDataPrivacyAgreementResolver) FileURL(ctx context.Context, obj *types.VendorDataPrivacyAgreement) (string, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	fileURL, err := prb.VendorDataPrivacyAgreements.GenerateFileURL(ctx, obj.ID, 1*time.Hour)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate file URL: %w", err)
+	}
+
+	return fileURL, nil
 }
 
 // Vendor is the resolver for the vendor field.
@@ -3739,6 +4129,11 @@ func (r *Resolver) User() schema.UserResolver { return &userResolver{r} }
 // Vendor returns schema.VendorResolver implementation.
 func (r *Resolver) Vendor() schema.VendorResolver { return &vendorResolver{r} }
 
+// VendorBusinessAssociateAgreement returns schema.VendorBusinessAssociateAgreementResolver implementation.
+func (r *Resolver) VendorBusinessAssociateAgreement() schema.VendorBusinessAssociateAgreementResolver {
+	return &vendorBusinessAssociateAgreementResolver{r}
+}
+
 // VendorComplianceReport returns schema.VendorComplianceReportResolver implementation.
 func (r *Resolver) VendorComplianceReport() schema.VendorComplianceReportResolver {
 	return &vendorComplianceReportResolver{r}
@@ -3747,6 +4142,14 @@ func (r *Resolver) VendorComplianceReport() schema.VendorComplianceReportResolve
 // VendorConnection returns schema.VendorConnectionResolver implementation.
 func (r *Resolver) VendorConnection() schema.VendorConnectionResolver {
 	return &vendorConnectionResolver{r}
+}
+
+// VendorContact returns schema.VendorContactResolver implementation.
+func (r *Resolver) VendorContact() schema.VendorContactResolver { return &vendorContactResolver{r} }
+
+// VendorDataPrivacyAgreement returns schema.VendorDataPrivacyAgreementResolver implementation.
+func (r *Resolver) VendorDataPrivacyAgreement() schema.VendorDataPrivacyAgreementResolver {
+	return &vendorDataPrivacyAgreementResolver{r}
 }
 
 // VendorRiskAssessment returns schema.VendorRiskAssessmentResolver implementation.
@@ -3787,7 +4190,10 @@ type taskConnectionResolver struct{ *Resolver }
 type trustCenterResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
 type vendorResolver struct{ *Resolver }
+type vendorBusinessAssociateAgreementResolver struct{ *Resolver }
 type vendorComplianceReportResolver struct{ *Resolver }
 type vendorConnectionResolver struct{ *Resolver }
+type vendorContactResolver struct{ *Resolver }
+type vendorDataPrivacyAgreementResolver struct{ *Resolver }
 type vendorRiskAssessmentResolver struct{ *Resolver }
 type viewerResolver struct{ *Resolver }

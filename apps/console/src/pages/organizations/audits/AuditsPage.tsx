@@ -53,6 +53,7 @@ const paginatedAuditsFragment = graphql`
       edges {
         node {
           id
+          name
           validFrom
           validUntil
           report {
@@ -103,12 +104,13 @@ export default function AuditsPage(props: Props) {
           connection={connectionId}
           organizationId={organizationId}
         >
-          <Button icon={IconPlusLarge}>{__("Add audit")}</Button>
+        <Button icon={IconPlusLarge}>{__("Add audit")}</Button>
         </CreateAuditDialog>
       </PageHeader>
       <SortableTable {...pagination}>
         <Thead>
           <Tr>
+            <Th>{__("Name")}</Th>
             <Th>{__("Framework")}</Th>
             <Th>{__("State")}</Th>
             <Th>{__("Valid From")}</Th>
@@ -144,6 +146,7 @@ function AuditRow({
 
   return (
     <Tr to={`/organizations/${organizationId}/audits/${entry.id}`}>
+      <Td>{entry.name || __("Untitled")}</Td>
       <Td>{entry.framework?.name ?? __("Unknown Framework")}</Td>
       <Td>
         <Badge variant={getAuditStateVariant(entry.state)}>

@@ -1,6 +1,6 @@
 module github.com/getprobo/probo
 
-go 1.24
+go 1.25
 
 // https://github.com/jaytaylor/html2text/issues/67
 replace github.com/olekukonko/tablewriter => github.com/olekukonko/tablewriter v0.0.5

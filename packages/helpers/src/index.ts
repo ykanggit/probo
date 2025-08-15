@@ -1,4 +1,4 @@
-export { objectKeys, objectEntries } from "./object";
+export { objectKeys, objectEntries, cleanFormData } from "./object";
 export { sprintf, faviconUrl, slugify } from "./string";
 export {
     getTreatment,
@@ -18,3 +18,4 @@ export { getAssetTypeVariant, getCriticityVariant } from "./assets";
 export { getAuditStateLabel, getAuditStateVariant, auditStates } from "./audits";
 export { promisifyMutation } from "./relay";
 export { fileType, fileSize } from "./file";
+export { formatDatetime } from "./date";

@@ -492,6 +492,111 @@ func (s ControlService) DeleteDocumentMapping(
 	return control, document, nil
 }
 
+func (s ControlService) CreateAuditMapping(
+	ctx context.Context,
+	controlID gid.GID,
+	auditID gid.GID,
+) (*coredata.Control, *coredata.Audit, error) {
+	controlAudit := &coredata.ControlAudit{
+		ControlID: controlID,
+		AuditID:   auditID,
+		CreatedAt: time.Now(),
+	}
+
+	control := &coredata.Control{}
+	audit := &coredata.Audit{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
+				return fmt.Errorf("cannot load control: %w", err)
+			}
+
+			if err := audit.LoadByID(ctx, conn, s.svc.scope, auditID); err != nil {
+				return fmt.Errorf("cannot load audit: %w", err)
+			}
+
+			if err := controlAudit.Upsert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot create control audit mapping: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return control, audit, nil
+}
+
+func (s ControlService) DeleteAuditMapping(
+	ctx context.Context,
+	controlID gid.GID,
+	auditID gid.GID,
+) (*coredata.Control, *coredata.Audit, error) {
+	control := &coredata.Control{}
+	audit := &coredata.Audit{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := control.LoadByID(ctx, conn, s.svc.scope, controlID); err != nil {
+				return fmt.Errorf("cannot load control: %w", err)
+			}
+
+			if err := audit.LoadByID(ctx, conn, s.svc.scope, auditID); err != nil {
+				return fmt.Errorf("cannot load audit: %w", err)
+			}
+
+			controlAudit := &coredata.ControlAudit{}
+			if err := controlAudit.Delete(ctx, conn, s.svc.scope, control.ID, audit.ID); err != nil {
+				return fmt.Errorf("cannot delete control audit mapping: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot delete control audit mapping: %w", err)
+	}
+
+	return control, audit, nil
+}
+
+func (s ControlService) ListForAuditID(
+	ctx context.Context,
+	auditID gid.GID,
+	cursor *page.Cursor[coredata.ControlOrderField],
+	filter *coredata.ControlFilter,
+) (*page.Page[*coredata.Control, coredata.ControlOrderField], error) {
+	var controls coredata.Controls
+	audit := &coredata.Audit{}
+
+	err := s.svc.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := audit.LoadByID(ctx, conn, s.svc.scope, auditID); err != nil {
+				return fmt.Errorf("cannot load audit: %w", err)
+			}
+			if err := controls.LoadByAuditID(ctx, conn, s.svc.scope, auditID, cursor, filter); err != nil {
+				return fmt.Errorf("cannot load controls: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return page.NewPage([]*coredata.Control(controls), cursor), nil
+}
+
 func (s ControlService) Create(
 	ctx context.Context,
 	req CreateControlRequest,

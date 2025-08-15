@@ -2,7 +2,56 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.48.1]
+
+### Fixed
+
+- Fix display of download buttons in the public trust center
+
+## [0.48.0]
+
+### Added
+- Add baa to vendors
+- Add dpa to vendors
+- Add contacts to vendors
+- Add name to audits
+- Add audits to controls
+
+## [0.47.0]
+
+### Added
+- Add document draft deletion
+- People now have contract start and end dates in the UI and API.
+- Lists can filter out people whose contracts have ended.
+
+### Fixed
+- Fix closing of document deletion pop up
+- Fix creation of empty draft without save
+
+## [0.46.2] - 2025-08-10
+
+### Fixed
+
+- Fix various SQL queries failures due to trust center
+- Fix internal information leaking to API
+
+
+## [0.46.1] - 2025-08-10
+
+### Fixed
+
+- 5xx on risk show page
+
+## [0.46.0] - 2025-08-08
+
+### Added
+
+- Add organization deletion
+- Add Probo by default
+
 ## [0.45.1] - 2025-08-06
+
+### Fixed
 
 - Fix data page display
 

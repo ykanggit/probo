@@ -16,10 +16,10 @@ import { promisifyMutation, sprintf } from "@probo/helpers";
 import { useTranslate } from "@probo/i18n";
 
 const peopleQuery = graphql`
-  query PeopleGraphQuery($organizationId: ID!) {
+  query PeopleGraphQuery($organizationId: ID!, $filter: PeopleFilter) {
     organization: node(id: $organizationId) {
       ... on Organization {
-        peoples(first: 100, orderBy: { direction: ASC, field: CREATED_AT }) {
+        peoples(first: 100, orderBy: { direction: ASC, field: FULL_NAME }, filter: $filter) {
           edges {
             node {
               id
@@ -36,10 +36,15 @@ const peopleQuery = graphql`
 /**
  * Return a list of people (used for people selectors)
  */
-export function usePeople(organizationId: string) {
-  const data = useLazyLoadQuery<PeopleGraphQuery>(peopleQuery, {
-    organizationId: organizationId,
-  });
+export function usePeople(organizationId: string, { excludeContractEnded }: { excludeContractEnded?: boolean } = {}) {
+  const data = useLazyLoadQuery<PeopleGraphQuery>(
+    peopleQuery,
+    {
+      organizationId: organizationId,
+      filter: excludeContractEnded ? { excludeContractEnded: true } : null,
+    },
+    { fetchPolicy: "network-only" }
+  );
   return useMemo(() => {
     return data.organization?.peoples?.edges.map((edge) => edge.node) ?? [];
   }, [data]);
@@ -61,7 +66,8 @@ export const paginatedPeopleFragment = graphql`
   @refetchable(queryName: "PeopleListQuery")
   @argumentDefinitions(
     first: { type: "Int", defaultValue: 50 }
-    order: { type: "PeopleOrder", defaultValue: null }
+    order: { type: "PeopleOrder", defaultValue: { direction: ASC, field: FULL_NAME } }
+    filter: { type: "PeopleFilter", defaultValue: null }
     after: { type: "CursorKey", defaultValue: null }
     before: { type: "CursorKey", defaultValue: null }
     last: { type: "Int", defaultValue: null }
@@ -72,6 +78,7 @@ export const paginatedPeopleFragment = graphql`
       last: $last
       before: $before
       orderBy: $order
+      filter: $filter
     ) @connection(key: "PeopleGraphPaginatedQuery_peoples") {
       __id
       edges {
@@ -82,6 +89,8 @@ export const paginatedPeopleFragment = graphql`
           kind
           position
           additionalEmailAddresses
+          contractStartDate
+          contractEndDate
         }
       }
     }
@@ -161,6 +170,8 @@ export const peopleNodeQuery = graphql`
         position
         kind
         additionalEmailAddresses
+        contractStartDate
+        contractEndDate
       }
     }
   }
@@ -176,6 +187,8 @@ export const updatePeopleMutation = graphql`
         position
         kind
         additionalEmailAddresses
+        contractStartDate
+        contractEndDate
       }
     }
   }

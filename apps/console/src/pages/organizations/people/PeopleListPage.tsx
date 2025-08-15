@@ -26,6 +26,14 @@ import { useOrganizationId } from "/hooks/useOrganizationId";
 
 type People = NodeOf<PeopleGraphPaginatedFragment$data["peoples"]>;
 
+const isContractEnded = (person: People): boolean => {
+  if (!person.contractEndDate) return false;
+  const endDate = new Date(person.contractEndDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return endDate < today;
+};
+
 export default function PeopleListPage({
   queryRef,
 }: {
@@ -87,9 +95,13 @@ function PeopleRow({
   const organizationId = useOrganizationId();
   const { __ } = useTranslate();
   const deletePeople = useDeletePeople(people, connectionId);
+  const contractEnded = isContractEnded(people);
 
   return (
-    <Tr to={`/organizations/${organizationId}/people/${people.id}/tasks`}>
+    <Tr
+      to={`/organizations/${organizationId}/people/${people.id}/tasks`}
+      className={contractEnded ? "opacity-50" : ""}
+    >
       <Td>
         <div className="flex gap-3 items-center">
           <Avatar name={people.fullName} />

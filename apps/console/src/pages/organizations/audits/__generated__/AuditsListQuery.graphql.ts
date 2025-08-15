@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<273ddcd519e40c3d2af76944a1f93191>>
+ * @generated SignedSource<<0010416e8a5bda346d415bd80fd70dc8>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -112,6 +112,13 @@ v9 = {
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
+},
+v10 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
 };
 return {
   "fragment": {
@@ -198,6 +205,7 @@ return {
                         "plural": false,
                         "selections": [
                           (v9/*: any*/),
+                          (v10/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -247,13 +255,7 @@ return {
                             "plural": false,
                             "selections": [
                               (v9/*: any*/),
-                              {
-                                "alias": null,
-                                "args": null,
-                                "kind": "ScalarField",
-                                "name": "name",
-                                "storageKey": null
-                              }
+                              (v10/*: any*/)
                             ],
                             "storageKey": null
                           },
@@ -353,16 +355,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "120524c1493bac68d36318259531f84e",
+    "cacheID": "9d185e504f8c34d5c3fd7211d4e8a2a2",
     "id": null,
     "metadata": {},
     "name": "AuditsListQuery",
     "operationKind": "query",
-    "text": "query AuditsListQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 10\n  $last: Int = null\n  $orderBy: AuditOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...AuditsPageFragment_sdb03\n    id\n  }\n}\n\nfragment AuditsPageFragment_sdb03 on Organization {\n  audits(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        validFrom\n        validUntil\n        report {\n          id\n          filename\n        }\n        state\n        framework {\n          id\n          name\n        }\n        createdAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query AuditsListQuery(\n  $after: CursorKey = null\n  $before: CursorKey = null\n  $first: Int = 10\n  $last: Int = null\n  $orderBy: AuditOrder = null\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...AuditsPageFragment_sdb03\n    id\n  }\n}\n\nfragment AuditsPageFragment_sdb03 on Organization {\n  audits(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        name\n        validFrom\n        validUntil\n        report {\n          id\n          filename\n        }\n        state\n        framework {\n          id\n          name\n        }\n        createdAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ef15955eb51e30372c935dcc7dcd5099";
+(node as any).hash = "be8d1f1d8015c16539886bc79c8026f7";
 
 export default node;

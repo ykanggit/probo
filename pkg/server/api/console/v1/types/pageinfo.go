@@ -16,11 +16,11 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/page"
-	sharedTypes "github.com/getprobo/probo/pkg/server/api/types"
+	"github.com/getprobo/probo/pkg/server/graphql/types/pageinfo"
 )
 
 func NewPageInfo[T page.Paginable[O], O page.OrderField](p *page.Page[T, O]) *PageInfo {
-	data := sharedTypes.NewPageInfoData(p)
+	data := pageinfo.NewPageInfo(p)
 	return &PageInfo{
 		HasNextPage:     data.HasNextPage,
 		HasPreviousPage: data.HasPreviousPage,

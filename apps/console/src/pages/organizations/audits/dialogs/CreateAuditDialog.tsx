@@ -16,7 +16,7 @@ import z from "zod";
 import { useFormWithSchema } from "/hooks/useFormWithSchema";
 import { ControlledField } from "/components/form/ControlledField";
 import { useCreateAudit } from "/hooks/graph/AuditGraph";
-import { auditStates, getAuditStateLabel } from "@probo/helpers";
+import { auditStates, getAuditStateLabel, formatDatetime } from "@probo/helpers";
 import { useLazyLoadQuery } from "react-relay";
 import { graphql } from "relay-runtime";
 import { Suspense } from "react";
@@ -42,6 +42,7 @@ const frameworksQuery = graphql`
 
 const schema = z.object({
   frameworkId: z.string().min(1, "Framework is required"),
+  name: z.string().optional(),
   validFrom: z.string().optional(),
   validUntil: z.string().optional(),
   state: z.enum(["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "REJECTED", "OUTDATED"]),
@@ -64,6 +65,7 @@ export function CreateAuditDialog({
     useFormWithSchema(schema, {
       defaultValues: {
         frameworkId: "",
+        name: "",
         validFrom: "",
         validUntil: "",
         state: "NOT_STARTED",
@@ -74,15 +76,10 @@ export function CreateAuditDialog({
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      // Convert date strings to datetime format
-      const formatDatetime = (dateString?: string) => {
-        if (!dateString) return undefined;
-        return `${dateString}T00:00:00Z`;
-      };
-
       await createAudit({
         organizationId,
         frameworkId: data.frameworkId,
+        name: data.name,
         validFrom: formatDatetime(data.validFrom),
         validUntil: formatDatetime(data.validUntil),
         state: data.state,
@@ -119,6 +116,10 @@ export function CreateAuditDialog({
                 name="frameworkId"
               />
             </Suspense>
+          </Field>
+
+          <Field label={__("Name")}>
+            <Input {...register("name")} placeholder={__("Audit name")} />
           </Field>
 
           <ControlledField
