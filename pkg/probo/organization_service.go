@@ -30,6 +30,7 @@ import (
 	"github.com/getprobo/probo/pkg/filevalidation"
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/slug"
+	"github.com/jackc/pgx/v5"
 	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
 )
@@ -105,12 +106,18 @@ func (s OrganizationService) Create(
 				return fmt.Errorf("cannot insert organization: %w", err)
 			}
 
+			baseSlug := slug.Make(organization.Name)
+			uniqueSlug, err := s.generateUniqueSlug(ctx, tx, baseSlug)
+			if err != nil {
+				return fmt.Errorf("cannot generate unique slug: %w", err)
+			}
+
 			trustCenter := &coredata.TrustCenter{
 				ID:             gid.New(s.svc.scope.GetTenantID(), coredata.TrustCenterEntityType),
 				OrganizationID: organization.ID,
 				TenantID:       organization.TenantID,
 				Active:         false,
-				Slug:           slug.Make(organization.Name),
+				Slug:           uniqueSlug,
 				CreatedAt:      now,
 				UpdatedAt:      now,
 			}
@@ -379,4 +386,49 @@ func (s OrganizationService) createProboVendor(ctx context.Context, tx pg.Conn, 
 	}
 
 	return nil
+}
+
+func (s OrganizationService) generateUniqueSlug(ctx context.Context, tx pg.Conn, baseSlug string) (string, error) {
+	slug := baseSlug
+	counter := 1
+
+	for {
+		// Check if this slug already exists
+		exists, err := s.slugExists(ctx, tx, slug)
+		if err != nil {
+			return "", fmt.Errorf("cannot check slug existence: %w", err)
+		}
+
+		if !exists {
+			return slug, nil
+		}
+
+		// Generate alternative slug with counter
+		slug = fmt.Sprintf("%s-%d", baseSlug, counter)
+		counter++
+
+		// Prevent infinite loop
+		if counter > 100 {
+			return "", fmt.Errorf("cannot generate unique slug after 100 attempts")
+		}
+	}
+}
+
+func (s OrganizationService) slugExists(ctx context.Context, tx pg.Conn, slug string) (bool, error) {
+	q := `
+		SELECT EXISTS(
+			SELECT 1 FROM trust_centers 
+			WHERE slug = @slug
+		)
+	`
+
+	args := pgx.StrictNamedArgs{"slug": slug}
+
+	var exists bool
+	err := tx.QueryRow(ctx, q, args).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("cannot check slug existence: %w", err)
+	}
+
+	return exists, nil
 }
